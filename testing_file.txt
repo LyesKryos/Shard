@@ -1,2 +1,0 @@
-This is the testing file
-This is the second line of the testing file. Edited in GitHub.
