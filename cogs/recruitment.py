@@ -473,7 +473,6 @@ class Recruitment(commands.Cog):
     async def monthly_recruiter_scheduler(self):
         # fetches channel object
         crashchannel = bot.get_channel(835579413625569322)
-        print(crashchannel)
         try:
             # sets up asyncio scheduler
             monthlyscheduler = AsyncIOScheduler()
@@ -563,4 +562,20 @@ class Recruitment(commands.Cog):
 
 
 def setup(bot):
+    async def monthly_recruiter_scheduler(bot):
+        # fetches channel object
+        crashchannel = bot.get_channel(835579413625569322)
+        try:
+            # sets up asyncio scheduler
+            monthlyscheduler = AsyncIOScheduler()
+            # adds the job with cron designator
+            monthlyscheduler.add_job(Recruitment.monthly_recruiter, CronTrigger.from_crontab('0 12 1 * *'),
+                                     id="monthly recruiter")
+            # starts the schedule, fetches the job information, and sends the confirmation that it has begun
+            monthlyscheduler.start()
+            monthlyjob = monthlyscheduler.get_job("monthly recruiter")
+            await crashchannel.send(f"Monthly recruiter next run: {monthlyjob.next_run_time}")
+        except Exception as error:
+            await crashchannel.send(error)
+    asyncio.run(monthly_recruiter_scheduler(bot=bot))
     bot.add_cog(Recruitment(bot))
