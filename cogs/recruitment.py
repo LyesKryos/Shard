@@ -123,7 +123,7 @@ class Recruitment(commands.Cog):
         except Exception as error:
             self.running = False
             await ctx.send("The recruitment bot has run into an issue. Recruitment has stopped.")
-            logging.warning(error)
+            await ctx.send(error)
 
     async def still_recruiting_check(self, ctx):
         while self.running:
