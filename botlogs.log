@@ -1,0 +1,11 @@
+2022-02-27 18:48:59 WARNING: <module 'time' (built-in)> Lies Kryos#1734 947566000801468517 728444080908140575 caused the error "password authentication failed for user "LyesKryos"" using the command recruit
+2022-02-28 15:00:15 WARNING: <module 'time' (built-in)> Lies Kryos#1734 947870823719534622 728444080908140575 caused the error "password authentication failed for user "postgres"" using the command recruit
+2022-02-28 15:02:15 WARNING: <module 'time' (built-in)> Lies Kryos#1734 947871330173333564 728444080908140575 caused the error "relation "recruitment" does not exist" using the command recruit
+2022-02-28 15:25:28 WARNING: <module 'time' (built-in)> Obv_Atlas#6021 947877170179633152 caused the error "Command "template" is not found" using the command template
+2022-02-28 15:25:28 WARNING: <module 'time' (built-in)> Obv_Atlas#6021 947877170179633152 674259612580446230 caused the error "Command "template" is not found" using the command template
+2022-02-28 15:27:37 WARNING: <module 'time' (built-in)> Obv_Atlas#6021 947877711244836874 caused the error "Command "register_template" is not found" using the command register_template
+2022-02-28 15:27:37 WARNING: <module 'time' (built-in)> Obv_Atlas#6021 947877711244836874 674259612580446230 caused the error "Command "register_template" is not found" using the command register_template
+2022-02-28 15:47:48 WARNING: <module 'time' (built-in)> Lies Kryos#1734 947882790198861907 728444080908140575 caused the error "Extension 'cogs.recruitment' raised an error: RuntimeError: asyncio.run() cannot be called from a running event loop" using the command reload
+2022-02-28 15:52:39 WARNING: <module 'time' (built-in)> Lies Kryos#1734 947884012473577482 728444080908140575 caused the error "Extension 'cogs.recruitment' raised an error: RuntimeError: This event loop is already running" using the command load
+2022-02-28 15:58:36 WARNING: <module 'time' (built-in)> Lies Kryos#1734 947885510616051743 728444080908140575 caused the error "Extension 'cogs.recruitment' raised an error: AttributeError: '_UnixSelectorEventLoop' object has no attribute 'run'" using the command load
+2022-02-28 16:03:56 WARNING: <module 'time' (built-in)> Lies Kryos#1734 947886852185145365 728444080908140575 caused the error "Extension 'cogs.recruitment' is already loaded." using the command load
