@@ -58,9 +58,9 @@ class Recruitment(commands.Cog):
     running = False
     recruitment_gather_object = None
 
-    connectionstr = 'postgresql://LyesKryos@127.0.0.1:5432'
+    connectionstr = 'postgresql://postgres@127.0.0.1:5432'
     database = "botdb"
-    password = "Kingsfoil-4"
+    password = "postgres"
 
     directory = r"C:\Users\jaedo\PycharmProjects\Discord Bot\\"
 
@@ -221,8 +221,8 @@ class Recruitment(commands.Cog):
             return
         # gathers the template, beings the code
         template = recruiter['template']
-        await conn.close()
         self.running = True
+        await conn.close()
         await ctx.send("Gathering...")
         # gathers two asyncio functions together to run simultaneously
         self.recruitment_gather_object = asyncio.gather(self.recruitment(ctx, template),
