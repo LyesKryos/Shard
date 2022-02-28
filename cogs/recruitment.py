@@ -439,52 +439,7 @@ class Recruitment(commands.Cog):
             await conn.close()
             return
 
-    async def monthly_recruiter(self):
-        # connects to database
-        conn = await asyncpg.connect(self.connectionstr, database=self.database,
-                                     password=self.password)
-        try:
-            # fetches all user data
-            top_recruiter = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month;''')
-            # finds the first entry and gathers user id, sent number, and sends the announcement message
-            top_recruiter_user = top_recruiter[0]['user_id']
-            top_recruiter_numbers = top_recruiter[0]['sent_this_month']
-            announcements = bot.get_channel(835579413625569322)
-            thegye = bot.get_guild(674259612580446230)
-            recruiter_of_the_month_role = thegye.get_role(813953181234626582)
-            user = bot.get_user(top_recruiter_user)
-            announce = await announcements.send(
-                f"**Congratulations to {user.mention}!**\n{user.display_name} has earned the "
-                f"destinction of being this month's top recruiter! This month, they have sent "
-                f"{top_recruiter_numbers} telegrams to new players. Wow! {user.display_name} has "
-                f"been awarded the {recruiter_of_the_month_role.mention} role, customizable by "
-                f"request. Everyone give them a round of applause!")
-            await announce.add_reaction("\U0001f44f")
-            # clears all sent_this_month
-            await conn.execute('''UPDATE recruitment SET sent_this_month = 0;''')
-            await conn.close()
-            return
-        except Exception as error:
-            crashchannel = bot.get_channel(835579413625569322)
-            await crashchannel.send(error)
-            await conn.close()
-            return
 
-    async def monthly_recruiter_scheduler(self):
-        # fetches channel object
-        crashchannel = bot.get_channel(835579413625569322)
-        try:
-            # sets up asyncio scheduler
-            monthlyscheduler = AsyncIOScheduler()
-            # adds the job with cron designator
-            monthlyscheduler.add_job(Recruitment.monthly_recruiter, CronTrigger.from_crontab('0 12 1 * *'),
-                                     id="monthly recruiter")
-            # starts the schedule, fetches the job information, and sends the confirmation that it has begun
-            monthlyscheduler.start()
-            monthlyjob = monthlyscheduler.get_job("monthly recruiter")
-            await crashchannel.send(f"Monthly recruiter next run: {monthlyjob.next_run_time}")
-        except Exception as error:
-            await crashchannel.send(error)
 
     @commands.command()
     @commands.guild_only()
@@ -569,7 +524,7 @@ def setup(bot):
             # sets up asyncio scheduler
             monthlyscheduler = AsyncIOScheduler()
             # adds the job with cron designator
-            monthlyscheduler.add_job(Recruitment.monthly_recruiter, CronTrigger.from_crontab('0 12 1 * *'),
+            monthlyscheduler.add_job(monthly_recruiter, CronTrigger.from_crontab('0 12 1 * *'), args=bot,
                                      id="monthly recruiter")
             # starts the schedule, fetches the job information, and sends the confirmation that it has begun
             monthlyscheduler.start()
@@ -577,6 +532,38 @@ def setup(bot):
             await crashchannel.send(f"Monthly recruiter next run: {monthlyjob.next_run_time}")
         except Exception as error:
             await crashchannel.send(error)
+
+    async def monthly_recruiter(bot):
+        # connects to database
+        conn = await asyncpg.connect(self.connectionstr, database=self.database,
+                                     password=self.password)
+        try:
+            # fetches all user data
+            top_recruiter = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month;''')
+            # finds the first entry and gathers user id, sent number, and sends the announcement message
+            top_recruiter_user = top_recruiter[0]['user_id']
+            top_recruiter_numbers = top_recruiter[0]['sent_this_month']
+            announcements = bot.get_channel(835579413625569322)
+            thegye = bot.get_guild(674259612580446230)
+            recruiter_of_the_month_role = thegye.get_role(813953181234626582)
+            user = bot.get_user(top_recruiter_user)
+            announce = await announcements.send(
+                f"**Congratulations to {user.mention}!**\n{user.display_name} has earned the "
+                f"destinction of being this month's top recruiter! This month, they have sent "
+                f"{top_recruiter_numbers} telegrams to new players. Wow! {user.display_name} has "
+                f"been awarded the {recruiter_of_the_month_role.mention} role, customizable by "
+                f"request. Everyone give them a round of applause!")
+            await announce.add_reaction("\U0001f44f")
+            # clears all sent_this_month
+            await conn.execute('''UPDATE recruitment SET sent_this_month = 0;''')
+            await conn.close()
+            return
+        except Exception as error:
+            crashchannel = bot.get_channel(835579413625569322)
+            await crashchannel.send(error)
+            await conn.close()
+            return
+
     loop = asyncio.get_running_loop()
     loop.create_task(monthly_recruiter_scheduler(bot=bot))
     bot.add_cog(Recruitment(bot))
