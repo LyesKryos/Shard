@@ -578,5 +578,5 @@ def setup(bot):
         except Exception as error:
             await crashchannel.send(error)
     loop = asyncio.get_running_loop()
-    loop.run_until_complete(monthly_recruiter_scheduler(bot=bot))
+    loop.run(monthly_recruiter_scheduler(bot=bot))
     bot.add_cog(Recruitment(bot))
