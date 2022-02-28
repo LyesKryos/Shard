@@ -123,7 +123,7 @@ class Recruitment(commands.Cog):
         except Exception as error:
             self.running = False
             await ctx.send("The recruitment bot has run into an issue. Recruitment has stopped.")
-            print(error)
+            logging.warning(error)
 
     async def still_recruiting_check(self, ctx):
         while self.running:
@@ -161,7 +161,7 @@ class Recruitment(commands.Cog):
                     await conn.close()
                     break
             except Exception as error:
-                print(error)
+                logging.warning(error)
                 await conn.close()
         return
 
