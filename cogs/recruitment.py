@@ -524,7 +524,7 @@ def setup(bot):
             # sets up asyncio scheduler
             monthlyscheduler = AsyncIOScheduler()
             # adds the job with cron designator
-            monthlyscheduler.add_job(monthly_recruiter, CronTrigger.from_crontab('0 12 1 * *'), args=bot,
+            monthlyscheduler.add_job(monthly_recruiter, CronTrigger.from_crontab('0 12 1 * *'), args=(bot,),
                                      id="monthly recruiter")
             # starts the schedule, fetches the job information, and sends the confirmation that it has begun
             monthlyscheduler.start()
@@ -535,8 +535,8 @@ def setup(bot):
 
     async def monthly_recruiter(bot):
         # connects to database
-        conn = await asyncpg.connect(self.connectionstr, database=self.database,
-                                     password=self.password)
+        conn = await asyncpg.connect(Recruitment.connectionstr, database=Recruitment.database,
+                                     password=Recruitment.password)
         try:
             # fetches all user data
             top_recruiter = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month;''')
@@ -563,7 +563,6 @@ def setup(bot):
             await crashchannel.send(error)
             await conn.close()
             return
-
     loop = asyncio.get_running_loop()
     loop.create_task(monthly_recruiter_scheduler(bot=bot))
     bot.add_cog(Recruitment(bot))
