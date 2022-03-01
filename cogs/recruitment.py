@@ -539,11 +539,11 @@ def setup(bot):
                                      password=Recruitment.password)
         try:
             # fetches all user data
-            top_recruiter = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month;''')
+            top_recruiter = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month DESC;''')
             # finds the first entry and gathers user id, sent number, and sends the announcement message
             top_recruiter_user = top_recruiter[0]['user_id']
             top_recruiter_numbers = top_recruiter[0]['sent_this_month']
-            announcements = bot.get_channel(835579413625569322)
+            announcements = bot.get_channel(674602527333023747)
             thegye = bot.get_guild(674259612580446230)
             recruiter_of_the_month_role = thegye.get_role(813953181234626582)
             user = bot.get_user(top_recruiter_user)
