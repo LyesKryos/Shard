@@ -168,7 +168,7 @@ class Recruitment(commands.Cog):
     @commands.guild_only()
     @commands.has_role(674260547897917460)
     async def recruiter(self, ctx):
-        recruiterrole = ctx.guild.get_role(848695379058360411)
+        recruiterrole = ctx.guild.get_role(674339578102153216)
         channel = bot.get_channel(674342850296807454)
         author = ctx.author
         # gets all author roles
