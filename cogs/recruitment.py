@@ -91,9 +91,8 @@ class Recruitment(commands.Cog):
                         number_puppet = re.search("\d+", nation)
                         # if there is a number, remove that nation and add it to the do not send list
                         if number_puppet is not None:
-                            if nation in self.sending_to:
-                                newnations.remove(nation)
-                                self.do_not_recruit.append(nation)
+                            newnations.remove(nation)
+                            self.do_not_recruit.append(nation)
                         self.sending_to = [n for n in newnations]
                     # if there are no nations in the list, pause for 30 seconds and then restart the loop
                     if len(self.sending_to) == 0:
@@ -177,7 +176,7 @@ class Recruitment(commands.Cog):
         for ar in ctx.message.author.roles:
             authorroles.append(ar.id)
         # if the Recruiter role is not in the author roles, will add
-        if recruiterrole not in authorroles:
+        if recruiterrole.id not in authorroles:
             await author.add_roles(recruiterrole)
             await ctx.send("Role added.")
             # sends message to new recruiter with mention
@@ -196,7 +195,7 @@ class Recruitment(commands.Cog):
                                f"simply type `$help Recruitment`. If you would like to re-read these instructions, "
                                f"use the `$instructions` command to review them. Happy recruiting, {author.mention}!")
         # if the Recruiter role is in the author roles, will remove
-        if recruiterrole in authorroles:
+        if recruiterrole.id in authorroles:
             await author.remove_roles(recruiterrole)
             await ctx.send("Role removed.")
 
