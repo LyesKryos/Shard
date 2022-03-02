@@ -149,7 +149,6 @@ class Recruitment(commands.Cog):
                 except asyncio.TimeoutError:
                     # if the reaction times out, stop the code
                     self.running = False
-                    self.recruitment_gather_object.cancel()
                     # updates information
                     userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', ctx.author.id)
                     await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
@@ -157,6 +156,7 @@ class Recruitment(commands.Cog):
                                        (self.user_sent + userinfo['sent_this_month']),
                                        ctx.author.id)
                     self.user_sent = 0
+                    self.recruitment_gather_object.cancel()
                     await conn.close()
                     break
             except Exception as error:
