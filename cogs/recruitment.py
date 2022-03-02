@@ -289,24 +289,25 @@ class Recruitment(commands.Cog):
                 await ctx.send(error)
                 await conn.close()
                 return
-        elif ' '.join(*args) == "global":
-            try:
-                # fetches relevant user data
-                allsent = await conn.fetch('''SELECT sent FROM recruitment;''', author.id)
-                totalsent = 0
-                monthlytotal = 0
-                for s in allsent:
-                    totalsent += s['sent']
-                    monthlytotal += s['sent_this_month']
-                # sends amount
-                await ctx.send(f"A total of {totalsent} telegrams have been sent.\nA total of {monthlytotal}"
-                               f"have been sent this month.")
-                await conn.close()
-                return
-            except Exception as error:
-                await ctx.send(error)
-                await conn.close()
-                return
+        elif ' '.join(args).lower() == "global":
+                try:
+                    # fetches relevant user data
+                    allsent = await conn.fetch('''SELECT sent, sent_this_month FROM recruitment;''')
+                    totalsent = 0
+                    monthlytotal = 0
+                    for s in allsent:
+                        totalsent += s['sent']
+                        monthlytotal += s['sent_this_month']
+                    # sends amount
+                    await ctx.send(
+                        f"A total of {totalsent} telegrams have been sent.\nA total of {monthlytotal} telegrams "
+                        f"have been sent this month.")
+                    await conn.close()
+                    return
+                except Exception as error:
+                    await ctx.send(error)
+                    await conn.close()
+                    return
         elif args != ():
             try:
                 # fetches the user object via the converter
