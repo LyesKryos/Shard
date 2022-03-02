@@ -300,7 +300,7 @@ class Recruitment(commands.Cog):
                         monthlytotal += s['sent_this_month']
                     # sends amount
                     await ctx.send(
-                        f"A total of {totalsent} telegrams have been sent.\nA total of {monthlytotal} telegrams "
+                        f"A total of {totalsent:,} telegrams have been sent.\nA total of {monthlytotal:,} telegrams "
                         f"have been sent this month.")
                     await conn.close()
                     return
