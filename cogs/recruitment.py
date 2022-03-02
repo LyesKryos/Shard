@@ -237,7 +237,6 @@ class Recruitment(commands.Cog):
         author = ctx.author
         # sets the running to false, quitting the loops
         self.running = False
-        self.recruitment_gather_object.cancel()
         # connects to database
         conn = await asyncpg.connect(self.connectionstr, database=self.database,
                                      password=self.password)
@@ -250,6 +249,7 @@ class Recruitment(commands.Cog):
                                ctx.author.id)
             self.user_sent = 0
             await conn.close()
+            self.recruitment_gather_object.cancel()
             return
         except Exception as error:
             await ctx.send(error)
