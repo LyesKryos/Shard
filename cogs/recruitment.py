@@ -12,6 +12,7 @@ from main import bot
 import aiohttp
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from time import perf_counter, strftime
+from PIL import ImageColor
 
 
 class RecruitmentChecks(commands.CheckFailure):
