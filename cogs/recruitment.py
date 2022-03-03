@@ -531,7 +531,7 @@ class Recruitment(commands.Cog):
                 await ctx.send(file=discord.File(campaign, f"{regions['region'].lower()}_endo_campaign.html"))
         await conn.close()
 
-    @commands.command(usage="[color] [name]")
+    @commands.command(usage="[hex color code] [name]")
     async def customize_recruiter_role(self, ctx, color: str, *args):
         recruiter_of_the_month_role = discord.utils.get(ctx.guild.roles, id=813953181234626582)
         name = ' '.join(args)
@@ -539,8 +539,8 @@ class Recruitment(commands.Cog):
             raise commands.MissingRole(recruiter_of_the_month_role)
         else:
             try:
-                color = color.strip('#')
-                rolecolor = discord.Color(int(color))
+                color = (x, y, z) = ImageColor.getrgb(color)
+                rolecolor = discord.Color.from_rgb(*color)
                 await recruiter_of_the_month_role.edit(color=rolecolor, name=f"{name} (Recruiter of the Month)")
                 await ctx.send(f"Color changed to `{rolecolor}` and name changed to `{name}` successfully!")
             except Exception as error:
