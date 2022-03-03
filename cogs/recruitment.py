@@ -531,6 +531,26 @@ class Recruitment(commands.Cog):
                 await ctx.send(file=discord.File(campaign, f"{regions['region'].lower()}_endo_campaign.html"))
         await conn.close()
 
+    @commands.command(usage="[color] [name]")
+    async def customize_recruiter_role(self, ctx, color: str, *args):
+        recruiter_of_the_month_role = discord.utils.get(ctx.guild.roles, id=813953181234626582)
+        name = ' '.join(args)
+        if recruiter_of_the_month_role not in ctx.author.roles:
+            raise commands.MissingRole(recruiter_of_the_month_role)
+        else:
+            try:
+                color = color.strip('#')
+                rolecolor = discord.Color(int(color))
+                await recruiter_of_the_month_role.edit(color=rolecolor, name=f"{name} (Recruiter of the Month)")
+                await ctx.send(f"Color changed to `{rolecolor}` and name changed to `{name}` successfully!")
+            except Exception as error:
+                if isinstance(error, ValueError):
+                    await ctx.send("That doesn't appear to be a valid hex color code.")
+                    return
+                else:
+                    await ctx.send(error)
+                    return
+
 
 def setup(bot):
     async def monthly_recruiter_scheduler(bot):
@@ -562,13 +582,19 @@ def setup(bot):
             announcements = bot.get_channel(674602527333023747)
             thegye = bot.get_guild(674259612580446230)
             recruiter_of_the_month_role = thegye.get_role(813953181234626582)
+            for members in thegye.members:
+                await members.remove_roles(recruiter_of_the_month_role)
             user = bot.get_user(top_recruiter_user)
+            monthly_total = 0
+            for s in top_recruiter:
+                monthly_total += s['sent_this_month']
             announce = await announcements.send(
                 f"**Congratulations to {user.mention}!**\n{user.display_name} has earned the "
-                f"destinction of being this month's top recruiter! This month, they have sent "
+                f"distinction of being this month's top recruiter! This month, they have sent "
                 f"{top_recruiter_numbers} telegrams to new players. Wow! {user.display_name} has "
                 f"been awarded the {recruiter_of_the_month_role.mention} role, customizable by "
-                f"request. Everyone give them a round of applause!")
+                f"request. Everyone give them a round of applause!\n In total, {monthly_total:,} telegrams have been "
+                f"sent by our wonderful recruiters this month!")
             await announce.add_reaction("\U0001f44f")
             # clears all sent_this_month
             await conn.execute('''UPDATE recruitment SET sent_this_month = 0;''')
