@@ -86,15 +86,16 @@ class Recruitment(commands.Cog):
                     newnations_post_filter = list(newnations_prefilter.difference(set(self.do_not_recruit)))
                     # grabs only the first eight
                     newnations = newnations_post_filter[0:8]
+                    non_puppets = list()
                     # puppet filter
                     for nation in newnations:
                         # searches for numbers in names
                         number_puppet = re.search("\d+", nation)
                         # if there is a number, remove that nation and add it to the do not send list
-                        if number_puppet:
-                            newnations.remove(nation)
+                        if not number_puppet:
+                            non_puppets.append(nation)
                             self.do_not_recruit.append(nation)
-                    self.sending_to = [n for n in newnations]
+                    self.sending_to = [n for n in non_puppets]
                     # if there are no nations in the list, pause for 30 seconds and then restart the loop
                     if len(self.sending_to) == 0:
                         await asyncio.sleep(30)
