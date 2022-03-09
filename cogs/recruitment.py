@@ -131,12 +131,12 @@ class Recruitment(commands.Cog):
                                        ctx.author.id)
                     self.user_sent = 0
                     self.recruitment_gather_object.cancel()
-                    await conn.close()
+                    
                     break
             except Exception as error:
                 crashchannel = self.bot.get_channel(835579413625569322)
                 await crashchannel.send(error)
-                await conn.close()
+                
         return
 
     @commands.command()
@@ -188,12 +188,12 @@ class Recruitment(commands.Cog):
         # if the user is not registered
         if recruiter is None:
             await ctx.send("User not registered.")
-            await conn.close()
+            
             return
         # gathers the template, beings the code
         template = recruiter['template']
         self.running = True
-        await conn.close()
+        
         await ctx.send("Gathering...")
         # gathers two asyncio functions together to run simultaneously
         self.recruitment_gather_object = asyncio.gather(self.recruitment(ctx, template),
@@ -221,12 +221,12 @@ class Recruitment(commands.Cog):
                                (self.user_sent + userinfo['sent']), (self.user_sent + userinfo['sent_this_month']),
                                ctx.author.id)
             self.user_sent = 0
-            await conn.close()
+            
             self.recruitment_gather_object.cancel()
             return
         except Exception as error:
             await ctx.send(error)
-            await conn.close()
+            
             return
 
     @commands.command()
@@ -255,11 +255,11 @@ class Recruitment(commands.Cog):
                 sent = userinfo['sent']
                 # sends amount
                 await ctx.send(f"{author} has sent {sent} telegrams.")
-                await conn.close()
+                
                 return
             except Exception as error:
                 await ctx.send(error)
-                await conn.close()
+                
                 return
         elif ' '.join(args).lower() == "global":
                 try:
@@ -274,11 +274,11 @@ class Recruitment(commands.Cog):
                     await ctx.send(
                         f"A total of {totalsent:,} telegrams have been sent.\nA total of {monthlytotal:,} telegrams "
                         f"have been sent this month.")
-                    await conn.close()
+                    
                     return
                 except Exception as error:
                     await ctx.send(error)
-                    await conn.close()
+                    
                     return
         elif args != ():
             try:
@@ -290,11 +290,11 @@ class Recruitment(commands.Cog):
                 userinfo = await conn.fetchrow('''SELECT sent FROM recruitment WHERE user_id = $1;''', user.id)
                 sent = userinfo['sent']
                 await ctx.send(f"{user} has sent {sent} telegrams.")
-                await conn.close()
+                
                 return
             except Exception as error:
                 await ctx.send(error)
-                await conn.close()
+                
                 return
 
     @commands.command(usage="<monthly? (m)>")
@@ -318,7 +318,7 @@ class Recruitment(commands.Cog):
                     ranksstr += userstring
                     rank += 1
                 await ctx.send(f"{ranksstr}")
-                await conn.close()
+                
                 return
             # if the user wants the sent monthly list
             elif monthly in ['m']:
@@ -332,14 +332,14 @@ class Recruitment(commands.Cog):
                     ranksstr += userstring
                     rank += 1
                 await ctx.send(f"{ranksstr}")
-                await conn.close()
+                
                 return
             else:
-                await conn.close()
+                
                 raise commands.UserInputError()
         except Exception as error:
             await ctx.send(error)
-            await conn.close()
+            
             return
 
     @commands.command(usage='[template id]')
@@ -355,16 +355,16 @@ class Recruitment(commands.Cog):
             # if the user already exists
             if exist is not None:
                 await ctx.send("You are already registered!")
-                await conn.close()
+                
                 return
             # inserts data into database
             await conn.execute('''INSERT INTO recruitment(user_id, template) VALUES($1, $2);''', author.id, templateid)
             await ctx.send(f"Registered successfully with template ID: `{templateid}`.")
-            await conn.close()
+            
             return
         except Exception as error:
             await ctx.send(error)
-            await conn.close()
+            
             return
 
     @commands.command(usage='[template id]')
@@ -380,16 +380,16 @@ class Recruitment(commands.Cog):
             # if the user does not exist
             if exist is None:
                 await ctx.send("You are not registered!")
-                await conn.close()
+                
                 return
             # updates the template
             await conn.execute('''UPDATE recruitment SET template = $2 WHERE user_id = $1;''', author.id, templateid)
             await ctx.send(f"Template ID for {author} set to `{templateid}` successfully.")
-            await conn.close()
+            
             return
         except Exception as error:
             await ctx.send(error)
-            await conn.close()
+            
             return
 
     @commands.command()
@@ -405,7 +405,7 @@ class Recruitment(commands.Cog):
             # if the user does not exist
             if template is None:
                 await ctx.send("You are not registered!")
-                await conn.close()
+                
                 return
             # sends relevant data, along with access link
             template = template['template']
@@ -414,11 +414,11 @@ class Recruitment(commands.Cog):
             await ctx.send(f"{author.name}'s template is {template}.\n"
                            f"The telegram template can be found here: "
                            f"https://www.nationstates.net/page=tg/tgid={templateid[0]}")
-            await conn.close()
+            
             return
         except Exception as error:
             await ctx.send(error)
-            await conn.close()
+            
             return
 
 
@@ -493,7 +493,7 @@ class Recruitment(commands.Cog):
         with open(fr"{self.directory}{regions['region'].lower()}_endo_campaign.html", "r") as campaign:
             async with ctx.channel.typing():
                 await ctx.send(file=discord.File(campaign, f"{regions['region'].lower()}_endo_campaign.html"))
-        await conn.close()
+        
 
     @commands.command(usage="[hex color code] [name]")
     async def customize_recruiter_role(self, ctx, color: str, *args):
@@ -561,12 +561,12 @@ def setup(bot):
             await announce.add_reaction("\U0001f44f")
             # clears all sent_this_month
             await conn.execute('''UPDATE recruitment SET sent_this_month = 0;''')
-            await conn.close()
+            
             return
         except Exception as error:
             crashchannel = bot.get_channel(835579413625569322)
             await crashchannel.send(error)
-            await conn.close()
+            
             return
     loop = asyncio.get_event_loop()
     loop.create_task(monthly_recruiter_scheduler(bot=bot))
