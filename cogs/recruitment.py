@@ -1,5 +1,6 @@
 # recruitment 1.02
 
+from ShardBot import Shard
 from urllib.parse import quote
 from apscheduler.triggers.cron import CronTrigger
 from discord.ext import commands
@@ -7,40 +8,16 @@ import discord
 import asyncio
 from bs4 import BeautifulSoup
 import re
-import asyncpg
-from main import bot
 import aiohttp
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from time import perf_counter, strftime
 from PIL import ImageColor
-
-
-class RecruitmentChecks(commands.CheckFailure):
-    pass
-
-
-def RecruitmentCheck():
-    # custom check
-    async def recruitmentcheck(ctx):
-        if ctx.author.id == 293518673417732098:
-            return True
-        else:
-            userroles = [role.id for role in ctx.author.roles]
-            if 674339578102153216 not in userroles:
-                raise RecruitmentChecks(
-                    f"You are not authorized to use this command. Use `{bot.command_prefix}recruiter"
-                    f"to get the required role.")
-            elif ctx.channel.id != 674342850296807454:
-                raise RecruitmentChecks(f"This is the wrong channel for that. Please make sure you are using only the"
-                                        f"#recruitment channel")
-            return True
-
-    return commands.check(recruitmentcheck)
+from customchecks import RecruitmentCheck
 
 
 class Recruitment(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: Shard):
         self.bot = bot
 
     def sanitize_links_percent(self, url: str) -> str:
@@ -58,11 +35,6 @@ class Recruitment(commands.Cog):
     user_sent = 0
     running = False
     recruitment_gather_object = None
-
-    connectionstr = 'postgresql://postgres@127.0.0.1:5432'
-    database = "botdb"
-    password = "postgres"
-
     directory = r"C:\Users\jaedo\PycharmProjects\Discord Bot\\"
 
     async def recruitment(self, ctx, template):
@@ -124,13 +96,13 @@ class Recruitment(commands.Cog):
         except Exception as error:
             self.running = False
             await ctx.send("The recruitment bot has run into an issue. Recruitment has stopped.")
-            main.logging.warning(error)
+            crashchannel = self.bot.get_channel(835579413625569322)
+            await crashchannel.send(error)
 
     async def still_recruiting_check(self, ctx):
         while self.running:
             # connects to database
-            conn = await asyncpg.connect(self.connectionstr, database=self.database,
-                                         password=self.password)
+            conn = self.bot.pool
             try:
                 # sleep for 10 minutes
                 await asyncio.sleep(600)
@@ -146,7 +118,7 @@ class Recruitment(commands.Cog):
 
                 try:
                     # if reaction is hit, do nothing
-                    await bot.wait_for('reaction_add', timeout=180, check=check)
+                    await self.bot.wait_for('reaction_add', timeout=180, check=check)
 
                 except asyncio.TimeoutError:
                     # if the reaction times out, stop the code
@@ -162,7 +134,8 @@ class Recruitment(commands.Cog):
                     await conn.close()
                     break
             except Exception as error:
-                logging.warning(error)
+                crashchannel = self.bot.get_channel(835579413625569322)
+                await crashchannel.send(error)
                 await conn.close()
         return
 
@@ -171,7 +144,7 @@ class Recruitment(commands.Cog):
     @commands.has_role(674260547897917460)
     async def recruiter(self, ctx):
         recruiterrole = ctx.guild.get_role(674339578102153216)
-        channel = bot.get_channel(674342850296807454)
+        channel = self.bot.get_channel(674342850296807454)
         author = ctx.author
         # gets all author roles
         authorroles = list()
@@ -208,8 +181,7 @@ class Recruitment(commands.Cog):
             await ctx.send("Someone is already recruiting! Wait for them to finish first.")
             return
         # connects to database
-        conn = await asyncpg.connect(self.connectionstr, database=self.database,
-                                     password=self.password)
+        conn = self.bot.pool
         author = ctx.author
         # fetches template
         recruiter = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', author.id)
@@ -240,8 +212,7 @@ class Recruitment(commands.Cog):
         # sets the running to false, quitting the loops
         self.running = False
         # connects to database
-        conn = await asyncpg.connect(self.connectionstr, database=self.database,
-                                     password=self.password)
+        conn = self.bot.pool
         try:
             # fetches relevant user info
             userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', author.id)
@@ -275,8 +246,7 @@ class Recruitment(commands.Cog):
         # fetches the sent amount of the specified user
         author = ctx.author
         # connects to database
-        conn = await asyncpg.connect(self.connectionstr, database=self.database,
-                                     password=self.password)
+        conn = self.bot.pool
         # if the call is for the author
         if args == ():
             try:
@@ -316,9 +286,7 @@ class Recruitment(commands.Cog):
                 user = ' '.join(args[:])
                 user = await commands.converter.MemberConverter().convert(ctx, user)
                 # connects to the database
-                conn = await asyncpg.connect(self.connectionstr, database=self.database,
-                                             password=self.password)
-                # fetches relevant user data and sends it
+                conn = self.bot.pool                # fetches relevant user data and sends it
                 userinfo = await conn.fetchrow('''SELECT sent FROM recruitment WHERE user_id = $1;''', user.id)
                 sent = userinfo['sent']
                 await ctx.send(f"{user} has sent {sent} telegrams.")
@@ -334,8 +302,7 @@ class Recruitment(commands.Cog):
     @RecruitmentCheck()
     async def rank(self, ctx, monthly: str = None):
         # connects to the database
-        conn = await asyncpg.connect(self.connectionstr, database=self.database,
-                                     password=self.password)
+        conn = self.bot.pool
         try:
             # if the user wants the regular ranks
             if monthly is None:
@@ -347,7 +314,7 @@ class Recruitment(commands.Cog):
                 # adds each user, by rank, to the list
                 rank = 1
                 for ranks in userinfo:
-                    userstring = f"**{rank}.** {bot.get_user(ranks['user_id'])}: {ranks['sent']}\n"
+                    userstring = f"**{rank}.** {self.bot.get_user(ranks['user_id'])}: {ranks['sent']}\n"
                     ranksstr += userstring
                     rank += 1
                 await ctx.send(f"{ranksstr}")
@@ -361,7 +328,7 @@ class Recruitment(commands.Cog):
                 # adds each user, by rank, to the list
                 rank = 1
                 for ranks in userinfo:
-                    userstring = f"**{rank}.** {bot.get_user(ranks['user_id'])}: {ranks['sent_this_month']}\n"
+                    userstring = f"**{rank}.** {self.bot.get_user(ranks['user_id'])}: {ranks['sent_this_month']}\n"
                     ranksstr += userstring
                     rank += 1
                 await ctx.send(f"{ranksstr}")
@@ -381,8 +348,7 @@ class Recruitment(commands.Cog):
     async def register(self, ctx, templateid):
         author = ctx.author
         # connects to the database
-        conn = await asyncpg.connect(self.connectionstr, database=self.database,
-                                     password=self.password)
+        conn = self.bot.pool
         try:
             # fetches data to ensure that the user doesn't exist
             exist = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', author.id)
@@ -407,8 +373,7 @@ class Recruitment(commands.Cog):
     async def edit_template(self, ctx, templateid):
         author = ctx.author
         # connects to database
-        conn = await asyncpg.connect(self.connectionstr, database=self.database,
-                                     password=self.password)
+        conn = self.bot.pool
         try:
             # checks for user existance
             exist = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', author.id)
@@ -433,8 +398,7 @@ class Recruitment(commands.Cog):
     async def view_template(self, ctx):
         author = ctx.author
         # connects to database
-        conn = await asyncpg.connect(self.connectionstr, database=self.database,
-                                     password=self.password)
+        conn = self.bot.pool
         try:
             # fetches user data
             template = await conn.fetchrow('''SELECT template FROM recruitment WHERE user_id = $1;''', author.id)
@@ -464,9 +428,7 @@ class Recruitment(commands.Cog):
     async def campaign(self, ctx):
         version = 'WACU v.2.1'
         start = perf_counter()
-        conn = await asyncpg.connect(self.connectionstr,
-                                     database=self.database,
-                                     password=self.password)
+        conn = self.bot.pool
         regions = await conn.fetchrow('''SELECT * FROM wacu WHERE server_id = $1;''', ctx.guild.id)
         if regions is None:
             await ctx.send("This server has no authorized campaign.")
@@ -571,10 +533,9 @@ def setup(bot):
         except Exception as error:
             await crashchannel.send(error)
 
-    async def monthly_recruiter(bot):
+    async def monthly_recruiter(bot: Shard):
         # connects to database
-        conn = await asyncpg.connect(Recruitment.connectionstr, database=Recruitment.database,
-                                     password=Recruitment.password)
+        conn = bot.pool
         try:
             # fetches all user data
             top_recruiter = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month DESC;''')
