@@ -1,5 +1,6 @@
 from discord.ext import commands
 import datetime
+from discord.utils import get
 
 
 class CNCFail(commands.CheckFailure):
@@ -86,10 +87,10 @@ def RecruitmentCheck():
         if ctx.author.id == 293518673417732098:
             return True
         else:
-            userroles = [role.id for role in ctx.author.roles]
-            if 674339578102153216 not in userroles:
+            recruiter_role = get(ctx.guild.roles, id=674339578102153216)
+            if recruiter_role not in ctx.author.roles:
                 raise RecruitmentCheckFail(
-                    f"You are not authorized to use this command. Use `{ctx.bot.command_prefix}recruiter "
+                    f"You are not authorized to use this command. Use `{ctx.bot.command_prefix}recruiter` "
                     f"to get the required role.")
             elif ctx.channel.id != 674342850296807454:
                 raise RecruitmentCheckFail(

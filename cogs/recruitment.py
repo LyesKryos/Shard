@@ -1,4 +1,4 @@
-# recruitment 1.02
+# recruitment 1.03
 
 from ShardBot import Shard
 from urllib.parse import quote
