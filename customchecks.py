@@ -85,15 +85,13 @@ def RecruitmentCheck():
     async def recruitmentcheck(ctx):
         if ctx.author.id == 293518673417732098:
             return True
-        elif ctx.author.id == 275497677481836545:
-            return True
         else:
             userroles = [role.id for role in ctx.author.roles]
-            if (674339578102153216 not in userroles) or (603002913639628810 not in userroles):
+            if 674339578102153216 not in userroles:
                 raise RecruitmentCheckFail(
                     f"You are not authorized to use this command. Use `{ctx.bot.command_prefix}recruiter "
                     f"to get the required role.")
-            elif (ctx.channel.id != 674342850296807454) or (ctx.channel.id != 603003000667111454):
+            elif ctx.channel.id != 674342850296807454:
                 raise RecruitmentCheckFail(
                     f"This is the wrong channel for that. Please make sure you are using only the"
                     f"#recruitment channel")
