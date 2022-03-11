@@ -102,8 +102,9 @@ class Dispatch(commands.Cog):
             # prepare dispatch command
             dresponse = requests.post("https://www.nationstates.net/cgi-bin/api.cgi", headers=headers, data=params)
             await asyncio.sleep(.6)
+            await crashchannel.send(f"{dresponse} for Thegye prepatory")
             if dresponse.status_code == 409:
-                return
+                raise Exception("409 response code")
             dresponse_headers = dresponse.headers
             soup = BeautifulSoup(dresponse.text, "lxml")
             token = soup.success.string
@@ -112,11 +113,12 @@ class Dispatch(commands.Cog):
             params["mode"] = "execute"
             headers["X-Pin"] = dresponse_headers["X-Pin"]
             Dispatch.xpin = dresponse_headers["X-Pin"]
+            execute_update = requests.post("https://www.nationstates.net/cgi-bin/api.cgi", headers=headers, data=params)
             await asyncio.sleep(.6)
+            await crashchannel.send(f"{execute_update} for Thegye execute")
             channel = bot.get_channel(674285035905613825)
             await channel.send(
                 "WA Registry successfully updated!\nhttps://www.nationstates.net/page=dispatch/id=1577144")
-            await crashchannel.send(f"{dresponse} for Thegye update")
         except Exception as error:
             await crashchannel.send(f"{error} in Thegye update")
 
@@ -188,7 +190,9 @@ class Dispatch(commands.Cog):
             # grab the token and execute dispatch command
             params["token"] = token
             params["mode"] = "execute"
+            execute_update = requests.post("https://www.nationstates.net/cgi-bin/api.cgi", headers=headers, data=params)
             await asyncio.sleep(.6)
+            await crashchannel.send(f"{execute_update} for Karma execute")
             channel = bot.get_channel(319961144091738112)
             await channel.send(
                 "World Assembly Registry updated successfully!\nhttps://www.nationstates.net/page=dispatch/id"
@@ -281,16 +285,18 @@ class Dispatch(commands.Cog):
             # prepare dispatch command
             dresponse = requests.post("https://www.nationstates.net/cgi-bin/api.cgi", headers=headers, data=params)
             await asyncio.sleep(.6)
-            dresponse_headers = dresponse.headers
             soup = BeautifulSoup(dresponse.text, "lxml")
             token = soup.success.string
             # grab the token and execute dispatch command
             params["token"] = token
             params["mode"] = "execute"
+            execute_update = requests.post("https://www.nationstates.net/cgi-bin/api.cgi", headers=headers, data=params)
+            await asyncio.sleep(.6)
+            await crashchannel.send(f"{execute_update} for Gaia execute")
             channel = bot.get_channel(606505493657288735)
             await channel.send(
                 "WA Registry successfully updated!\nhttps://www.nationstates.net/page=dispatch/id=1582896")
-            await crashchannel.send(f"{dresponse} for Thegye update")
+            await crashchannel.send(f"{dresponse} for Gaia update")
         except Exception as error:
             await crashchannel.send(f"{error} in GoG update")
 
@@ -298,8 +304,8 @@ class Dispatch(commands.Cog):
     @commands.is_owner()
     async def update_dispatches(self, ctx):
         await self.waupdate(self.bot)
-        await self.kaupdate(self.bot)
-        await self.gogupdate(self.bot)
+        # await self.kaupdate(self.bot)
+        # await self.gogupdate(self.bot)
         await ctx.send("All done!")
 
 
@@ -387,9 +393,11 @@ def setup(bot):
             headers["X-Pin"] = dresponse_headers["X-Pin"]
             Dispatch.xpin = dresponse_headers["X-Pin"]
             await asyncio.sleep(.6)
+            execute_update = requests.post("https://www.nationstates.net/cgi-bin/api.cgi", headers=headers, data=params)
+            await asyncio.sleep(.6)
+            await crashchannel.send(f"{execute_update} for Thegye execute")
             channel = bot.get_channel(674285035905613825)
             await channel.send("WA Registry successfully updated!\nhttps://www.nationstates.net/page=dispatch/id=1577144")
-            await crashchannel.send(f"{dresponse} for Thegye update")
         except Exception as error:
             await crashchannel.send(f"{error} in Thegye update")
 
@@ -461,11 +469,13 @@ def setup(bot):
             params["token"] = token
             params["mode"] = "execute"
             await asyncio.sleep(.6)
+            execute_update = requests.post("https://www.nationstates.net/cgi-bin/api.cgi", headers=headers, data=params)
+            await asyncio.sleep(.6)
+            await crashchannel.send(f"{execute_update} for Karma execute")
             channel = bot.get_channel(319961144091738112)
             await channel.send(
                 "World Assembly Registry updated successfully!\nhttps://www.nationstates.net/page=dispatch/id"
                 "=1577735")
-            await crashchannel.send(f"{dresponse} for Karma update")
         except Exception as error:
             await crashchannel.send(f"{error} in Karma update")
 
@@ -559,10 +569,12 @@ def setup(bot):
             # grab the token and execute dispatch command
             params["token"] = token
             params["mode"] = "execute"
+            execute_update = requests.post("https://www.nationstates.net/cgi-bin/api.cgi", headers=headers, data=params)
+            await asyncio.sleep(.6)
+            await crashchannel.send(f"{execute_update} for Gaia execute")
             channel = bot.get_channel(606505493657288735)
             await channel.send(
                 "WA Registry successfully updated!\nhttps://www.nationstates.net/page=dispatch/id=1582896")
-            await crashchannel.send(f"{dresponse} for Thegye update")
         except Exception as error:
             await crashchannel.send(f"{error} in GoG update")
 
