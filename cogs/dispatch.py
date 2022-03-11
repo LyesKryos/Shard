@@ -585,13 +585,13 @@ def setup(bot):
             # define cron scheduler and timezone to run every day
             eastern = timezone('US/Eastern')
             daily_dispatch_update = AsyncIOScheduler()
-            daily_dispatch_update.configure(timezone=eastern)
             daily_dispatch_update.add_job(waupdate, CronTrigger.from_crontab('10 2 * * *'), args=(bot,),
                                           id="thegye_update")
             daily_dispatch_update.add_job(kaupdate, CronTrigger.from_crontab('15 2 * * *'), args=(bot,),
                                           id="karma_update")
             daily_dispatch_update.add_job(gogupdate, CronTrigger.from_crontab('20 2 * * *'), args=(bot,),
                                           id="gaia_update")
+            daily_dispatch_update.configure(timezone=eastern)
             # start the updating
             daily_dispatch_update.start()
             thegyeupdate = daily_dispatch_update.get_job("thegye_update")
