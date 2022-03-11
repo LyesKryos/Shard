@@ -304,8 +304,8 @@ class Dispatch(commands.Cog):
     @commands.is_owner()
     async def update_dispatches(self, ctx):
         await self.waupdate(self.bot)
-        # await self.kaupdate(self.bot)
-        # await self.gogupdate(self.bot)
+        await self.kaupdate(self.bot)
+        await self.gogupdate(self.bot)
         await ctx.send("All done!")
 
 
