@@ -583,14 +583,15 @@ def setup(bot):
         crashchannel = bot.get_channel(835579413625569322)
         try:
             # define cron scheduler and timezone to run every day
+            eastern = timezone('US/Eastern')
             daily_dispatch_update = AsyncIOScheduler()
-            eastern = timezone("US/Eastern")
+            daily_dispatch_update.configure(timezone=eastern)
             daily_dispatch_update.add_job(waupdate, CronTrigger.from_crontab('10 2 * * *'), args=(bot,),
-                                          id="thegye_update", timezone=eastern)
+                                          id="thegye_update")
             daily_dispatch_update.add_job(kaupdate, CronTrigger.from_crontab('15 2 * * *'), args=(bot,),
-                                          id="karma_update", timezone=eastern)
+                                          id="karma_update")
             daily_dispatch_update.add_job(gogupdate, CronTrigger.from_crontab('20 2 * * *'), args=(bot,),
-                                          id="gaia_update", timezone=eastern)
+                                          id="gaia_update")
             # start the updating
             daily_dispatch_update.start()
             thegyeupdate = daily_dispatch_update.get_job("thegye_update")
