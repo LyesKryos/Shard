@@ -1,4 +1,5 @@
 # recruitment 1.03
+from pytz import timezone
 
 from ShardBot import Shard
 from urllib.parse import quote
@@ -131,12 +132,12 @@ class Recruitment(commands.Cog):
                                        ctx.author.id)
                     self.user_sent = 0
                     self.recruitment_gather_object.cancel()
-                    
+
                     break
             except Exception as error:
                 crashchannel = self.bot.get_channel(835579413625569322)
                 await crashchannel.send(error)
-                
+
         return
 
     @commands.command()
@@ -188,17 +189,17 @@ class Recruitment(commands.Cog):
         # if the user is not registered
         if recruiter is None:
             await ctx.send("User not registered.")
-            
+
             return
         # gathers the template, beings the code
         template = recruiter['template']
         self.running = True
-        
+
         await ctx.send("Gathering...")
         # gathers two asyncio functions together to run simultaneously
         self.recruitment_gather_object = asyncio.gather(self.recruitment(ctx, template),
                                                         self.still_recruiting_check(ctx))
-        
+
 
     @commands.command()
     @commands.guild_only()
@@ -221,12 +222,12 @@ class Recruitment(commands.Cog):
                                (self.user_sent + userinfo['sent']), (self.user_sent + userinfo['sent_this_month']),
                                ctx.author.id)
             self.user_sent = 0
-            
+
             self.recruitment_gather_object.cancel()
             return
         except Exception as error:
             await ctx.send(error)
-            
+
             return
 
     @commands.command()
@@ -255,11 +256,11 @@ class Recruitment(commands.Cog):
                 sent = userinfo['sent']
                 # sends amount
                 await ctx.send(f"{author} has sent {sent} telegrams.")
-                
+
                 return
             except Exception as error:
                 await ctx.send(error)
-                
+
                 return
         elif ' '.join(args).lower() == "global":
                 try:
@@ -274,11 +275,11 @@ class Recruitment(commands.Cog):
                     await ctx.send(
                         f"A total of {totalsent:,} telegrams have been sent.\nA total of {monthlytotal:,} telegrams "
                         f"have been sent this month.")
-                    
+
                     return
                 except Exception as error:
                     await ctx.send(error)
-                    
+
                     return
         elif args != ():
             try:
@@ -290,11 +291,11 @@ class Recruitment(commands.Cog):
                 userinfo = await conn.fetchrow('''SELECT sent FROM recruitment WHERE user_id = $1;''', user.id)
                 sent = userinfo['sent']
                 await ctx.send(f"{user} has sent {sent} telegrams.")
-                
+
                 return
             except Exception as error:
                 await ctx.send(error)
-                
+
                 return
 
     @commands.command(usage="<monthly? (m)>")
@@ -318,7 +319,7 @@ class Recruitment(commands.Cog):
                     ranksstr += userstring
                     rank += 1
                 await ctx.send(f"{ranksstr}")
-                
+
                 return
             # if the user wants the sent monthly list
             elif monthly in ['m']:
@@ -332,14 +333,14 @@ class Recruitment(commands.Cog):
                     ranksstr += userstring
                     rank += 1
                 await ctx.send(f"{ranksstr}")
-                
+
                 return
             else:
-                
+
                 raise commands.UserInputError()
         except Exception as error:
             await ctx.send(error)
-            
+
             return
 
     @commands.command(usage='[template id]')
@@ -355,16 +356,16 @@ class Recruitment(commands.Cog):
             # if the user already exists
             if exist is not None:
                 await ctx.send("You are already registered!")
-                
+
                 return
             # inserts data into database
             await conn.execute('''INSERT INTO recruitment(user_id, template) VALUES($1, $2);''', author.id, templateid)
             await ctx.send(f"Registered successfully with template ID: `{templateid}`.")
-            
+
             return
         except Exception as error:
             await ctx.send(error)
-            
+
             return
 
     @commands.command(usage='[template id]')
@@ -380,16 +381,16 @@ class Recruitment(commands.Cog):
             # if the user does not exist
             if exist is None:
                 await ctx.send("You are not registered!")
-                
+
                 return
             # updates the template
             await conn.execute('''UPDATE recruitment SET template = $2 WHERE user_id = $1;''', author.id, templateid)
             await ctx.send(f"Template ID for {author} set to `{templateid}` successfully.")
-            
+
             return
         except Exception as error:
             await ctx.send(error)
-            
+
             return
 
     @commands.command()
@@ -405,7 +406,7 @@ class Recruitment(commands.Cog):
             # if the user does not exist
             if template is None:
                 await ctx.send("You are not registered!")
-                
+
                 return
             # sends relevant data, along with access link
             template = template['template']
@@ -414,11 +415,11 @@ class Recruitment(commands.Cog):
             await ctx.send(f"{author.name}'s template is {template}.\n"
                            f"The telegram template can be found here: "
                            f"https://www.nationstates.net/page=tg/tgid={templateid[0]}")
-            
+
             return
         except Exception as error:
             await ctx.send(error)
-            
+
             return
 
 
@@ -493,7 +494,7 @@ class Recruitment(commands.Cog):
         with open(fr"{self.directory}{regions['region'].lower()}_endo_campaign.html", "r") as campaign:
             async with ctx.channel.typing():
                 await ctx.send(file=discord.File(campaign, f"{regions['region'].lower()}_endo_campaign.html"))
-        
+
 
     @commands.command(usage="[hex color code] [name]")
     async def customize_recruiter_role(self, ctx, color: str, *args):
@@ -523,8 +524,9 @@ def setup(bot):
         try:
             # sets up asyncio scheduler
             monthlyscheduler = AsyncIOScheduler()
+            eastern = timezone('US/Eastern')
             # adds the job with cron designator
-            monthlyscheduler.add_job(monthly_recruiter, CronTrigger.from_crontab('0 12 1 * *'), args=(bot,),
+            monthlyscheduler.add_job(monthly_recruiter, CronTrigger(hour=0, minute=0, timezone=eastern), args=(bot,),
                                      id="monthly recruiter")
             # starts the schedule, fetches the job information, and sends the confirmation that it has begun
             monthlyscheduler.start()
@@ -561,12 +563,11 @@ def setup(bot):
             await announce.add_reaction("\U0001f44f")
             # clears all sent_this_month
             await conn.execute('''UPDATE recruitment SET sent_this_month = 0;''')
-            
+
             return
         except Exception as error:
             crashchannel = bot.get_channel(835579413625569322)
             await crashchannel.send(error)
-            
             return
     loop = asyncio.get_event_loop()
     loop.create_task(monthly_recruiter_scheduler(bot=bot))
