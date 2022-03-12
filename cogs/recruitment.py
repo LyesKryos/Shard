@@ -527,7 +527,7 @@ def setup(bot):
             eastern = timezone('US/Eastern')
             # adds the job with cron designator
             monthlyscheduler.add_job(monthly_recruiter,
-                                     CronTrigger(hour=0, minute=0, day=1, timezone=eastern),
+                                     CronTrigger(hour=0, minute=0, second=1, day=1, timezone=eastern),
                                      args=(bot,),
                                      id="monthly recruiter")
             # starts the schedule, fetches the job information, and sends the confirmation that it has begun
