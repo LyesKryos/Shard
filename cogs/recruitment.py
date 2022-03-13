@@ -1,4 +1,4 @@
-# recruitment 1.03
+# recruitment 1.1
 from pytz import timezone
 
 from ShardBot import Shard
