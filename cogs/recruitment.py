@@ -31,12 +31,18 @@ class Recruitment(commands.Cog):
         to_regex = userinput.replace(" ", "_")
         return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
 
+    def cog_unload(self):
+        self.retention_loop.cancel()
+        self.monthly_loop.cancel()
+
     do_not_recruit = list()
     sending_to = list()
     user_sent = 0
     running = False
     recruitment_gather_object = None
     directory = r"C:\Users\jaedo\PycharmProjects\Discord Bot\\"
+    retention_loop = None
+    monthly_loop = None
 
     async def recruitment(self, ctx, template):
         try:
@@ -179,7 +185,9 @@ class Recruitment(commands.Cog):
     async def recruit(self, ctx):
         # checks status
         if self.running:
-            await ctx.send("Someone is already recruiting! Wait for them to finish first.")
+            waiting = discord.utils.get(ctx.guild.emojis, name="itsaguywaiting")
+            already = await ctx.send("Someone is already recruiting! Wait for them to finish first.")
+            await already.add_reaction(waiting)
             return
         # connects to database
         conn = self.bot.pool
@@ -189,12 +197,10 @@ class Recruitment(commands.Cog):
         # if the user is not registered
         if recruiter is None:
             await ctx.send("User not registered.")
-
             return
         # gathers the template, beings the code
         template = recruiter['template']
         self.running = True
-
         await ctx.send("Gathering...")
         # gathers two asyncio functions together to run simultaneously
         self.recruitment_gather_object = asyncio.gather(self.recruitment(ctx, template),
@@ -589,7 +595,7 @@ def setup(bot):
         crashchannel = bot.get_channel(835579413625569322)
         recruitment_channel = bot.get_channel(674342850296807454)
         thegye_server = bot.get_guild(674259612580446230)
-        recruiter_role = discord.utils.get(thegye_server.roles, id=950950836006187018)
+        notifrole = discord.utils.get(thegye_server.roles, id=950950836006187018)
         try:
             async with aiohttp.ClientSession() as session:
                 headers = {"User-Agent": "Bassiliya"}
@@ -613,12 +619,12 @@ def setup(bot):
                     if Recruitment.new_nations:
                         for n in Recruitment.new_nations:
                             notif = await recruitment_channel.send(
-                                f"A new nation has arrived, {recruiter_role.mention}!"
+                                f"A new nation has arrived, {notifrole.mention}!"
                                 f"\nhttps://www.nationstates.net/nation={n}")
                             await notif.add_reaction("\U0001f4ec")
                     if departed_nations:
                         for n in departed_nations:
-                            notif = await recruitment_channel.send(f"A nation has departed, {recruiter_role.mention}!"
+                            notif = await recruitment_channel.send(f"A nation has departed, {notifrole.mention}!"
                                                                    f"\nhttps://www.nationstates.net/nation={n}")
                             await notif.add_reaction("\U0001f4ec")
                     Recruitment.all_nations = set(recruitssoup.nations.text.split(':'))
@@ -626,8 +632,7 @@ def setup(bot):
                     continue
         except Exception as error:
             await crashchannel.send(f"`{error}` in retention module.")
-
     loop = asyncio.get_event_loop()
-    loop.create_task(monthly_recruiter_scheduler(bot))
-    loop.create_task(retention(bot))
+    Recruitment.monthly_loop=loop.create_task(monthly_recruiter_scheduler(bot))
+    Recruitment.retention_loop=loop.create_task(retention(bot))
     bot.add_cog(Recruitment(bot))
