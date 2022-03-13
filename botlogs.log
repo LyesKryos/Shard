@@ -177,3 +177,558 @@ asyncio.exceptions.CancelledError
 2022-03-02 20:14:46 ERROR: _GatheringFuture exception was never retrieved
 future: <_GatheringFuture finished exception=CancelledError()>
 asyncio.exceptions.CancelledError
+2022-03-02 20:53:08 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-02 21:35:59 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-02 23:27:55 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-02 23:27:55 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-02 23:27:55 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-02 23:27:55 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-03 00:16:18 WARNING: <module 'time' (built-in)> Lies Kryos#1734 948735537089511444 caused the error "Command "customize_recruiter_role" is not found" using the command customize_recruiter_role
+2022-03-03 00:16:18 WARNING: <module 'time' (built-in)> Lies Kryos#1734 948735537089511444 674259612580446230 caused the error "Command "customize_recruiter_role" is not found" using the command customize_recruiter_role
+2022-03-03 01:38:28 WARNING: <module 'time' (built-in)> Dr_Halred_Van_Richards#6410 948756214609743952 caused the error "Command "recriut" is not found" using the command recriut
+2022-03-03 01:38:28 WARNING: <module 'time' (built-in)> Dr_Halred_Van_Richards#6410 948756214609743952 674259612580446230 caused the error "Command "recriut" is not found" using the command recriut
+2022-03-03 01:38:53 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-03 06:43:41 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-03 07:18:44 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-03 07:22:40 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-03 08:00:33 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-03 08:19:55 WARNING: <module 'time' (built-in)> Secret#1982 948857243217051658 caused the error "Command "customize_recruiter_role[380474]" is not found" using the command customize_recruiter_role[380474]
+2022-03-03 08:19:55 WARNING: <module 'time' (built-in)> Secret#1982 948857243217051658 674259612580446230 caused the error "Command "customize_recruiter_role[380474]" is not found" using the command customize_recruiter_role[380474]
+2022-03-03 08:27:03 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-03 15:11:01 WARNING: <module 'time' (built-in)> Kosciuszko#1945 948960699663667220 caused the error "Command "template" is not found" using the command template
+2022-03-03 15:11:01 WARNING: <module 'time' (built-in)> Kosciuszko#1945 948960699663667220 674259612580446230 caused the error "Command "template" is not found" using the command template
+2022-03-03 15:12:11 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-03 16:34:12 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-03 18:05:26 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-03 18:05:43 WARNING: <module 'time' (built-in)> DolphinDiverBCT#7954 949004661766119494 caused the error "Command "sto" is not found" using the command sto
+2022-03-03 18:05:43 WARNING: <module 'time' (built-in)> DolphinDiverBCT#7954 949004661766119494 674259612580446230 caused the error "Command "sto" is not found" using the command sto
+2022-03-03 18:57:32 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 02:19:46 WARNING: <module 'time' (built-in)> EinZwei#6969 949128995864199199 caused the error "Command "recuiter" is not found" using the command recuiter
+2022-03-04 02:19:46 WARNING: <module 'time' (built-in)> EinZwei#6969 949128995864199199 674259612580446230 caused the error "Command "recuiter" is not found" using the command recuiter
+2022-03-04 03:47:49 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 04:15:22 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 06:28:03 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 07:52:34 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 08:25:56 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 13:16:01 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 14:40:36 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 14:40:36 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 14:58:44 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 16:27:43 WARNING: <module 'time' (built-in)> Kosciuszko#1945 949342386989985862 674259612580446230 caused the error "400 Bad Request (error code: 50006): Cannot send an empty message" using the command rank
+2022-03-04 16:29:17 WARNING: <module 'time' (built-in)> Lies Kryos#1734 949342781690761357 674259612580446230 caused the error "400 Bad Request (error code: 50006): Cannot send an empty message" using the command rank
+2022-03-04 16:29:37 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 18:31:57 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 19:56:35 WARNING: <module 'time' (built-in)> Secret#1982 949394952893394954 674259612580446230 caused the error "400 Bad Request (error code: 50006): Cannot send an empty message" using the command rank
+2022-03-04 19:59:23 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 21:21:39 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 21:23:11 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 21:40:44 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 22:09:27 WARNING: <module 'time' (built-in)> DolphinDiverBCT#7954 949428387418607657 caused the error "Command "reccruit" is not found" using the command reccruit
+2022-03-04 22:09:27 WARNING: <module 'time' (built-in)> DolphinDiverBCT#7954 949428387418607657 674259612580446230 caused the error "Command "reccruit" is not found" using the command reccruit
+2022-03-04 22:09:30 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-04 22:09:55 WARNING: <module 'time' (built-in)> DolphinDiverBCT#7954 949428506956271657 caused the error "Command "stopo" is not found" using the command stopo
+2022-03-04 22:09:55 WARNING: <module 'time' (built-in)> DolphinDiverBCT#7954 949428506956271657 674259612580446230 caused the error "Command "stopo" is not found" using the command stopo
+2022-03-05 03:05:54 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 03:55:14 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 04:35:45 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 06:45:27 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 08:30:11 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 09:00:52 WARNING: <module 'time' (built-in)> DolphinDiverBCT#7954 949592322826444820 caused the error "Command "ank" is not found" using the command ank
+2022-03-05 09:00:52 WARNING: <module 'time' (built-in)> DolphinDiverBCT#7954 949592322826444820 674259612580446230 caused the error "Command "ank" is not found" using the command ank
+2022-03-05 14:12:14 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 14:36:19 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 15:20:18 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 17:23:43 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 18:02:21 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 18:21:06 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 18:24:07 WARNING: <module 'time' (built-in)> Lies Kryos#1734 949734067644010526 674259612580446230 caused the error "400 Bad Request (error code: 50006): Cannot send an empty message" using the command rank
+2022-03-05 18:24:36 WARNING: <module 'time' (built-in)> Lies Kryos#1734 949734192512638976 674259612580446230 caused the error "400 Bad Request (error code: 50006): Cannot send an empty message" using the command rank
+2022-03-05 18:45:46 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 20:29:15 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 20:32:11 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 22:13:52 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-05 22:37:48 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 01:25:22 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 06:30:55 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 06:50:35 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 07:15:47 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 07:29:51 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 09:07:35 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 09:42:50 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 11:39:32 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 12:03:05 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 12:25:19 WARNING: <module 'time' (built-in)> Kosciuszko#1945 950006161300684830 caused the error "Command "recuit" is not found" using the command recuit
+2022-03-06 12:25:19 WARNING: <module 'time' (built-in)> Kosciuszko#1945 950006161300684830 674259612580446230 caused the error "Command "recuit" is not found" using the command recuit
+2022-03-06 14:03:39 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 14:18:16 WARNING: <module 'time' (built-in)> Kosciuszko#1945 950034588464480316 caused the error "Command "sto" is not found" using the command sto
+2022-03-06 14:18:16 WARNING: <module 'time' (built-in)> Kosciuszko#1945 950034588464480316 674259612580446230 caused the error "Command "sto" is not found" using the command sto
+2022-03-06 14:18:29 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 14:18:46 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 14:52:13 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 17:53:51 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 18:05:02 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 20:48:28 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-06 22:10:08 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-07 00:34:17 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-07 06:41:05 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-07 08:57:43 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-07 11:23:02 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-07 16:12:09 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-07 17:43:29 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-07 18:33:00 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-07 19:12:41 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-08 03:22:52 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-08 03:54:23 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-08 04:23:11 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-08 06:36:28 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-08 16:13:30 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-08 17:00:24 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-08 17:31:22 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-09 08:00:30 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-09 08:08:33 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-09 16:17:07 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-09 18:12:45 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-09 19:01:55 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-09 19:45:27 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-09 20:29:56 WARNING: <module 'time' (built-in)> Lies Kryos#1734 951215281496264745 caused the error "Command "nap" is not found" using the command nap
+2022-03-09 20:29:56 WARNING: <module 'time' (built-in)> Lies Kryos#1734 951215281496264745 728444080908140575 caused the error "Command "nap" is not found" using the command nap
+2022-03-09 20:30:08 ERROR: _ClientEventTask exception was never retrieved
+future: <ClientEventTask state=finished event=on_message coro=<bound method BotBase.on_message of <discord.ext.commands.bot.Bot object at 0x7f1f803667c0>> exception=SystemExit(100)>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/bot.py", line 606, in _load_from_module_spec
+    spec.loader.exec_module(lib)
+  File "<frozen importlib._bootstrap_external>", line 848, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/root/Documents/Shard/cogs/recruitment.py", line 11, in <module>
+    import aiohttp
+  File "/root/Documents/Shard/main.py", line 193, in <module>
+  File "/usr/local/lib/python3.8/dist-packages/discord/client.py", line 713, in run
+    loop.run_forever()
+  File "/usr/lib/python3.8/asyncio/base_events.py", line 570, in run_forever
+    self._run_once()
+  File "/usr/lib/python3.8/asyncio/base_events.py", line 1859, in _run_once
+    handle._run()
+  File "/usr/lib/python3.8/asyncio/events.py", line 81, in _run
+    self._context.run(self._callback, *self._args)
+  File "/usr/local/lib/python3.8/dist-packages/discord/client.py", line 343, in _run_event
+    await coro(*args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/bot.py", line 979, in on_message
+    await self.process_commands(message)
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/bot.py", line 976, in process_commands
+    await self.invoke(ctx)
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/bot.py", line 939, in invoke
+    await ctx.command.invoke(ctx)
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 863, in invoke
+    await injected(*ctx.args, **ctx.kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 85, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/main.py", line 108, in shut_down
+  File "/usr/lib/python3.8/_sitebuiltins.py", line 26, in __call__
+    raise SystemExit(code)
+SystemExit: 100
+2022-03-09 20:30:08 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-09 20:32:52 ERROR: Task exception was never retrieved
+future: <Task finished name='Task-1' coro=<setup.<locals>.monthly_recruiter_scheduler() done, defined at /root/Documents/Shard/cogs/recruitment.py:520> exception=AttributeError("'NoneType' object has no attribute 'send'")>
+Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/recruitment.py", line 532, in monthly_recruiter_scheduler
+    await crashchannel.send(f"Monthly recruiter next run: {monthlyjob.next_run_time}")
+AttributeError: 'NoneType' object has no attribute 'send'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/recruitment.py", line 534, in monthly_recruiter_scheduler
+    await crashchannel.send(error)
+AttributeError: 'NoneType' object has no attribute 'send'
+2022-03-09 20:33:29 WARNING: 2022-03-09 20:32:52 Lies Kryos#1734 951216178620153886 caused the error "Command "view_templte" is not found" using the command view_templte
+2022-03-09 20:33:29 WARNING: 2022-03-09 20:32:52 Lies Kryos#1734 951216178620153886 caused the error "Command "view_templte" is not found" using the command view_templte
+2022-03-09 21:00:19 ERROR: Task exception was never retrieved
+future: <Task finished name='Task-1' coro=<setup.<locals>.monthly_recruiter_scheduler() done, defined at /root/Documents/Shard/cogs/recruitment.py:520> exception=AttributeError("'NoneType' object has no attribute 'send'")>
+Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/recruitment.py", line 532, in monthly_recruiter_scheduler
+    await crashchannel.send(f"Monthly recruiter next run: {monthlyjob.next_run_time}")
+AttributeError: 'NoneType' object has no attribute 'send'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/recruitment.py", line 534, in monthly_recruiter_scheduler
+    await crashchannel.send(error)
+AttributeError: 'NoneType' object has no attribute 'send'
+2022-03-09 21:02:24 WARNING: 2022-03-09 21:00:19 Rock boi#1982 951223455292981258 caused the error "pool is closed" using the command recruit
+2022-03-09 21:03:32 WARNING: 2022-03-09 21:00:19 Lies Kryos#1734 951223738093944914 caused the error "Command "recurit" is not found" using the command recurit
+2022-03-09 21:03:32 WARNING: 2022-03-09 21:00:19 Lies Kryos#1734 951223738093944914 caused the error "Command "recurit" is not found" using the command recurit
+2022-03-09 21:03:35 WARNING: 2022-03-09 21:00:19 Lies Kryos#1734 951223751247278130 caused the error "pool is closed" using the command recruit
+2022-03-09 21:04:52 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-09 21:05:00 ERROR: Task exception was never retrieved
+future: <Task finished name='Task-1' coro=<setup.<locals>.monthly_recruiter_scheduler() done, defined at /root/Documents/Shard/cogs/recruitment.py:520> exception=AttributeError("'NoneType' object has no attribute 'send'")>
+Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/recruitment.py", line 532, in monthly_recruiter_scheduler
+    await crashchannel.send(f"Monthly recruiter next run: {monthlyjob.next_run_time}")
+AttributeError: 'NoneType' object has no attribute 'send'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/recruitment.py", line 534, in monthly_recruiter_scheduler
+    await crashchannel.send(error)
+AttributeError: 'NoneType' object has no attribute 'send'
+2022-03-10 00:15:25 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-10 00:25:18 WARNING: 2022-03-09 21:05:00 Frogge#5370 951274517274165329 caused the error "Command "m" is not found" using the command m
+2022-03-10 00:25:18 WARNING: 2022-03-09 21:05:00 Frogge#5370 951274517274165329 caused the error "Command "m" is not found" using the command m
+2022-03-10 00:25:27 WARNING: 2022-03-09 21:05:00 Frogge#5370 951274554922262539 caused the error "Command "recruitm" is not found" using the command recruitm
+2022-03-10 00:25:27 WARNING: 2022-03-09 21:05:00 Frogge#5370 951274554922262539 caused the error "Command "recruitm" is not found" using the command recruitm
+2022-03-10 00:25:39 WARNING: 2022-03-09 21:05:00 Frogge#5370 951274603605536838 caused the error "Command "recruit_m" is not found" using the command recruit_m
+2022-03-10 00:25:39 WARNING: 2022-03-09 21:05:00 Frogge#5370 951274603605536838 caused the error "Command "recruit_m" is not found" using the command recruit_m
+2022-03-10 06:42:20 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-10 07:09:23 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-10 16:12:13 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-10 20:40:33 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-10 23:06:50 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-11 01:45:48 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-11 03:22:11 WARNING: 2022-03-09 21:05:00 Lies Kryos#1734 951681419330068560 caused the error "Extension 'cogs.dispatches' has not been loaded." using the command reload
+2022-03-11 03:35:04 WARNING: 2022-03-09 21:05:00 Lies Kryos#1734 951684661296386118 caused the error "Extension 'cogs.dispatch' has not been loaded." using the command reload
+2022-03-11 15:20:38 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-11 17:38:33 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-11 17:58:09 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-11 19:49:13 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-11 20:21:52 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-11 20:24:00 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 02:10:01 WARNING: Run time of job "setup.<locals>.waupdate (trigger: cron[month='*', day='*', day_of_week='*', hour='2', minute='10'], next run at: 2022-03-13 02:10:00 UTC)" was missed by 0:00:01.026437
+2022-03-12 02:10:01 WARNING: Run time of job "setup.<locals>.waupdate (trigger: cron[month='*', day='*', day_of_week='*', hour='2', minute='10'], next run at: 2022-03-13 02:10:00 UTC)" was missed by 0:00:01.026986
+2022-03-12 02:10:01 WARNING: Run time of job "setup.<locals>.waupdate (trigger: cron[month='*', day='*', day_of_week='*', hour='2', minute='10'], next run at: 2022-03-13 02:10:00 UTC)" was missed by 0:00:01.027115
+2022-03-12 02:10:01 WARNING: Run time of job "setup.<locals>.waupdate (trigger: cron[month='*', day='*', day_of_week='*', hour='2', minute='10'], next run at: 2022-03-13 02:10:00 UTC)" was missed by 0:00:01.027227
+2022-03-12 02:10:01 WARNING: Run time of job "setup.<locals>.waupdate (trigger: cron[month='*', day='*', day_of_week='*', hour='2', minute='10'], next run at: 2022-03-13 02:10:00 UTC)" was missed by 0:00:01.027341
+2022-03-12 02:10:01 WARNING: Run time of job "setup.<locals>.waupdate (trigger: cron[month='*', day='*', day_of_week='*', hour='2', minute='10'], next run at: 2022-03-13 02:10:00 UTC)" was missed by 0:00:01.027447
+2022-03-12 02:10:01 WARNING: Run time of job "setup.<locals>.waupdate (trigger: cron[month='*', day='*', day_of_week='*', hour='2', minute='10'], next run at: 2022-03-13 02:10:00 UTC)" was missed by 0:00:01.027548
+2022-03-12 02:10:01 WARNING: Run time of job "setup.<locals>.waupdate (trigger: cron[month='*', day='*', day_of_week='*', hour='2', minute='10'], next run at: 2022-03-13 02:10:00 UTC)" was missed by 0:00:01.027649
+2022-03-12 02:10:01 WARNING: Run time of job "setup.<locals>.waupdate (trigger: cron[month='*', day='*', day_of_week='*', hour='2', minute='10'], next run at: 2022-03-13 02:10:00 UTC)" was missed by 0:00:01.027749
+2022-03-12 02:10:01 WARNING: Run time of job "setup.<locals>.waupdate (trigger: cron[month='*', day='*', day_of_week='*', hour='2', minute='10'], next run at: 2022-03-13 02:10:00 UTC)" was missed by 0:00:01.027849
+2022-03-12 02:15:01 WARNING: Run time of job "setup.<locals>.kaupdate (trigger: cron[month='*', day='*', day_of_week='*', hour='2', minute='15'], next run at: 2022-03-13 02:15:00 UTC)" was missed by 0:00:01.037532
+2022-03-12 02:15:01 WARNING: Run time of job "setup.<locals>.kaupdate (trigger: cron[month='*', day='*', day_of_week='*', hour='2', minute='15'], next run at: 2022-03-13 02:15:00 UTC)" was missed by 0:00:01.038098
+2022-03-12 02:15:05 ERROR: Job "setup.<locals>.kaupdate (trigger: cron[month='*', day='*', day_of_week='*', hour='2', minute='15'], next run at: 2022-03-13 02:15:00 UTC)" raised an exception
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/apscheduler/executors/base_py3.py", line 30, in run_coroutine_job
+    retval = await job.func(*job.args, **job.kwargs)
+  File "/root/Documents/Shard/cogs/dispatch.py", line 180, in kaupdate
+    "0200 EST.[/i][/size] "
+AttributeError: 'NoneType' object has no attribute 'string'
+2022-03-12 02:20:01 WARNING: Run time of job "setup.<locals>.gogupdate (trigger: cron[month='*', day='*', day_of_week='*', hour='2', minute='20'], next run at: 2022-03-13 02:20:00 UTC)" was missed by 0:00:01.208441
+2022-03-12 10:24:44 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 11:56:29 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 13:30:11 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 13:30:11 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 13:30:11 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 13:30:11 ERROR: Fatal error on SSL transport
+protocol: <asyncio.sslproto.SSLProtocol object at 0x7f047e6be520>
+transport: <_SelectorSocketTransport closing fd=7>
+Traceback (most recent call last):
+  File "/usr/lib/python3.8/asyncio/selector_events.py", line 910, in write
+    n = self._sock.send(data)
+OSError: [Errno 9] Bad file descriptor
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.8/asyncio/sslproto.py", line 685, in _process_write_backlog
+    self._transport.write(chunk)
+  File "/usr/lib/python3.8/asyncio/selector_events.py", line 916, in write
+    self._fatal_error(exc, 'Fatal write error on socket transport')
+  File "/usr/lib/python3.8/asyncio/selector_events.py", line 711, in _fatal_error
+    self._force_close(exc)
+  File "/usr/lib/python3.8/asyncio/selector_events.py", line 723, in _force_close
+    self._loop.call_soon(self._call_connection_lost, exc)
+  File "/usr/lib/python3.8/asyncio/base_events.py", line 719, in call_soon
+    self._check_closed()
+  File "/usr/lib/python3.8/asyncio/base_events.py", line 508, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+2022-03-12 08:41:24 ERROR: Task exception was never retrieved
+future: <Task finished name='Task-2' coro=<setup.<locals>.monthly_recruiter_scheduler() done, defined at /root/Documents/Shard/cogs/recruitment.py:521> exception=AttributeError("'NoneType' object has no attribute 'send'")>
+Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/recruitment.py", line 536, in monthly_recruiter_scheduler
+    await crashchannel.send(f"Monthly recruiter next run: {monthlyjob.next_run_time}")
+AttributeError: 'NoneType' object has no attribute 'send'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/recruitment.py", line 538, in monthly_recruiter_scheduler
+    await crashchannel.send(error)
+AttributeError: 'NoneType' object has no attribute 'send'
+2022-03-12 10:14:03 WARNING: 2022-03-12 08:41:24 Misty#3094 952222951325978679 caused the error "Command "recrui" is not found" using the command recrui
+2022-03-12 10:14:03 WARNING: 2022-03-12 08:41:24 Misty#3094 952222951325978679 caused the error "Command "recrui" is not found" using the command recrui
+2022-03-12 10:15:15 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 10:17:08 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 10:46:13 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 12:13:52 WARNING: 2022-03-12 08:41:24 DM#6277 952253105628672090 caused the error "Command "1?" is not found" using the command 1?
+2022-03-12 12:13:52 WARNING: 2022-03-12 08:41:24 DM#6277 952253105628672090 caused the error "Command "1?" is not found" using the command 1?
+2022-03-12 12:43:43 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 14:33:03 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 16:10:32 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 16:13:43 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 16:14:28 WARNING: 2022-03-12 08:41:24 Misty#3094 952313654651527180 caused the error "Command "rtrank" is not found" using the command rtrank
+2022-03-12 16:14:28 WARNING: 2022-03-12 08:41:24 Misty#3094 952313654651527180 caused the error "Command "rtrank" is not found" using the command rtrank
+2022-03-12 16:14:33 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 16:21:41 WARNING: 2022-03-12 08:41:24 DolphinDiverBCT#7954 952315470076330095 caused the error "Command "vie_template" is not found" using the command vie_template
+2022-03-12 16:21:41 WARNING: 2022-03-12 08:41:24 DolphinDiverBCT#7954 952315470076330095 caused the error "Command "vie_template" is not found" using the command vie_template
+2022-03-12 17:00:58 WARNING: 2022-03-12 08:41:24 Rock boi#1982 952325355761463386 caused the error "Command "sto" is not found" using the command sto
+2022-03-12 17:00:58 WARNING: 2022-03-12 08:41:24 Rock boi#1982 952325355761463386 caused the error "Command "sto" is not found" using the command sto
+2022-03-12 17:01:23 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 17:02:37 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 17:24:23 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-12 20:19:56 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-13 04:10:00 WARNING: Run time of job "setup.<locals>.waupdate (trigger: cron[hour='2', minute='10'], next run at: 2022-03-14 02:10:00 EDT)" was missed by 1:00:00.004667
+2022-03-13 04:10:00 WARNING: Run time of job "setup.<locals>.kaupdate (trigger: cron[hour='2', minute='15'], next run at: 2022-03-14 02:15:00 EDT)" was missed by 0:55:00.004983
+2022-03-13 04:10:00 WARNING: Run time of job "setup.<locals>.gogupdate (trigger: cron[hour='2', minute='20'], next run at: 2022-03-14 02:20:00 EDT)" was missed by 0:50:00.005099
+2022-03-13 07:33:40 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-13 09:17:56 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-13 11:06:48 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-13 11:19:05 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
+2022-03-13 11:25:58 ERROR: _GatheringFuture exception was never retrieved
+future: <_GatheringFuture finished exception=CancelledError()>
+asyncio.exceptions.CancelledError
