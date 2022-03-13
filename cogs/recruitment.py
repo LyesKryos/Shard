@@ -21,6 +21,107 @@ class Recruitment(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
 
+        async def monthly_recruiter_scheduler(bot):
+            # fetches channel object
+            crashchannel = bot.get_channel(835579413625569322)
+            try:
+                # sets up asyncio scheduler
+                monthlyscheduler = AsyncIOScheduler()
+                eastern = timezone('US/Eastern')
+                # adds the job with cron designator
+                monthlyscheduler.add_job(monthly_recruiter,
+                                         CronTrigger(hour=0, minute=0, day=1, timezone=eastern),
+                                         args=(bot,),
+                                         id="monthly recruiter")
+                # starts the schedule, fetches the job information, and sends the confirmation that it has begun
+                monthlyscheduler.start()
+                monthlyjob = monthlyscheduler.get_job("monthly recruiter")
+                await crashchannel.send(f"Monthly recruiter next run: {monthlyjob.next_run_time}")
+            except Exception as error:
+                await crashchannel.send(error)
+
+        async def monthly_recruiter(bot: Shard):
+            await bot.wait_until_ready()
+            # connects to database
+            conn = bot.pool
+            try:
+                # fetches all user data
+                top_recruiter = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month DESC;''')
+                # finds the first entry and gathers user id, sent number, and sends the announcement message
+                top_recruiter_user = top_recruiter[0]['user_id']
+                top_recruiter_numbers = top_recruiter[0]['sent_this_month']
+                announcements = bot.get_channel(674602527333023747)
+                thegye = bot.get_guild(674259612580446230)
+                recruiter_of_the_month_role = thegye.get_role(813953181234626582)
+                for members in thegye.members:
+                    await members.remove_roles(recruiter_of_the_month_role)
+                user = bot.get_user(top_recruiter_user)
+                monthly_total = 0
+                for s in top_recruiter:
+                    monthly_total += s['sent_this_month']
+                await recruiter_of_the_month_role.edit(color=discord.Color.light_grey(), name="Recruiter of the Month")
+                announce = await announcements.send(
+                    f"**Congratulations to {user.mention}!**\n{user.display_name} has earned the "
+                    f"distinction of being this month's top recruiter! This month, they have sent "
+                    f"{top_recruiter_numbers} telegrams to new players. Wow! {user.display_name} has "
+                    f"been awarded the {recruiter_of_the_month_role.mention} role, customizable by "
+                    f"request. Everyone give them a round of applause!\n In total, {monthly_total:,} telegrams have been "
+                    f"sent by our wonderful recruiters this month!")
+                await announce.add_reaction("\U0001f44f")
+                # clears all sent_this_month
+                await conn.execute('''UPDATE recruitment SET sent_this_month = 0;''')
+                return
+            except Exception as error:
+                crashchannel = bot.get_channel(835579413625569322)
+                await crashchannel.send(error)
+                return
+
+        async def retention(bot):
+            await bot.wait_until_ready()
+            crashchannel = bot.get_channel(835579413625569322)
+            recruitment_channel = bot.get_channel(674342850296807454)
+            thegye_server = bot.get_guild(674259612580446230)
+            notifrole = discord.utils.get(thegye_server.roles, id=950950836006187018)
+            try:
+                async with aiohttp.ClientSession() as session:
+                    headers = {"User-Agent": "Bassiliya"}
+                    params = {'q': 'nations',
+                              'region': 'thegye'}
+                    async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                           headers=headers, params=params) as recruitsresp:
+                        recruits = await recruitsresp.text()
+                        await asyncio.sleep(.6)
+                    recruitssoup = BeautifulSoup(recruits, 'lxml')
+                    Recruitment.all_nations = set(recruitssoup.nations.text.split(':'))
+                    while True:
+                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                               headers=headers, params=params) as recruitsresp:
+                            recruits = await recruitsresp.text()
+                            await asyncio.sleep(.6)
+                        recruitssoup = BeautifulSoup(recruits, 'lxml')
+                        Recruitment.new_nations = set(recruitssoup.nations.text.split(':')).difference(
+                            Recruitment.all_nations)
+                        departed_nations = Recruitment.all_nations.difference(set(recruitssoup.nations.text.split(':')))
+                        if Recruitment.new_nations:
+                            for n in Recruitment.new_nations:
+                                notif = await recruitment_channel.send(
+                                    f"A new nation has arrived, {notifrole.mention}!"
+                                    f"\nhttps://www.nationstates.net/nation={n}")
+                                await notif.add_reaction("\U0001f4ec")
+                        if departed_nations:
+                            for n in departed_nations:
+                                notif = await recruitment_channel.send(f"A nation has departed, {notifrole.mention}!"
+                                                                       f"\nhttps://www.nationstates.net/nation={n}")
+                                await notif.add_reaction("\U0001f4ec")
+                        Recruitment.all_nations = set(recruitssoup.nations.text.split(':'))
+                        await asyncio.sleep(300)
+                        continue
+            except Exception as error:
+                await crashchannel.send(f"`{error}` in retention module.")
+        loop = bot.loop
+        self.monthly_loop = loop.create_task(monthly_recruiter_scheduler(bot))
+        self.retention_loop = loop.create_task(retention(bot))
+
     def sanitize_links_percent(self, url: str) -> str:
         # sanitizes links with %s
         to_regex = url.replace("%", "%25")
@@ -40,9 +141,6 @@ class Recruitment(commands.Cog):
     user_sent = 0
     running = False
     recruitment_gather_object = None
-    directory = r"C:\Users\jaedo\PycharmProjects\Discord Bot\\"
-    retention_loop = None
-    monthly_loop = None
 
     async def recruitment(self, ctx, template):
         try:
@@ -536,104 +634,4 @@ class Recruitment(commands.Cog):
 
 
 def setup(bot):
-    async def monthly_recruiter_scheduler(bot):
-        # fetches channel object
-        crashchannel = bot.get_channel(835579413625569322)
-        try:
-            # sets up asyncio scheduler
-            monthlyscheduler = AsyncIOScheduler()
-            eastern = timezone('US/Eastern')
-            # adds the job with cron designator
-            monthlyscheduler.add_job(monthly_recruiter,
-                                     CronTrigger(hour=0, minute=0, day=1, timezone=eastern),
-                                     args=(bot,),
-                                     id="monthly recruiter")
-            # starts the schedule, fetches the job information, and sends the confirmation that it has begun
-            monthlyscheduler.start()
-            monthlyjob = monthlyscheduler.get_job("monthly recruiter")
-            await crashchannel.send(f"Monthly recruiter next run: {monthlyjob.next_run_time}")
-        except Exception as error:
-            await crashchannel.send(error)
-
-    async def monthly_recruiter(bot: Shard):
-        await bot.wait_until_ready()
-        # connects to database
-        conn = bot.pool
-        try:
-            # fetches all user data
-            top_recruiter = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month DESC;''')
-            # finds the first entry and gathers user id, sent number, and sends the announcement message
-            top_recruiter_user = top_recruiter[0]['user_id']
-            top_recruiter_numbers = top_recruiter[0]['sent_this_month']
-            announcements = bot.get_channel(674602527333023747)
-            thegye = bot.get_guild(674259612580446230)
-            recruiter_of_the_month_role = thegye.get_role(813953181234626582)
-            for members in thegye.members:
-                await members.remove_roles(recruiter_of_the_month_role)
-            user = bot.get_user(top_recruiter_user)
-            monthly_total = 0
-            for s in top_recruiter:
-                monthly_total += s['sent_this_month']
-            await recruiter_of_the_month_role.edit(color=discord.Color.light_grey(), name="Recruiter of the Month")
-            announce = await announcements.send(
-                f"**Congratulations to {user.mention}!**\n{user.display_name} has earned the "
-                f"distinction of being this month's top recruiter! This month, they have sent "
-                f"{top_recruiter_numbers} telegrams to new players. Wow! {user.display_name} has "
-                f"been awarded the {recruiter_of_the_month_role.mention} role, customizable by "
-                f"request. Everyone give them a round of applause!\n In total, {monthly_total:,} telegrams have been "
-                f"sent by our wonderful recruiters this month!")
-            await announce.add_reaction("\U0001f44f")
-            # clears all sent_this_month
-            await conn.execute('''UPDATE recruitment SET sent_this_month = 0;''')
-            return
-        except Exception as error:
-            crashchannel = bot.get_channel(835579413625569322)
-            await crashchannel.send(error)
-            return
-
-    async def retention(bot):
-        await bot.wait_until_ready()
-        crashchannel = bot.get_channel(835579413625569322)
-        recruitment_channel = bot.get_channel(674342850296807454)
-        thegye_server = bot.get_guild(674259612580446230)
-        notifrole = discord.utils.get(thegye_server.roles, id=950950836006187018)
-        try:
-            async with aiohttp.ClientSession() as session:
-                headers = {"User-Agent": "Bassiliya"}
-                params = {'q': 'nations',
-                          'region': 'thegye'}
-                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                       headers=headers, params=params) as recruitsresp:
-                    recruits = await recruitsresp.text()
-                    await asyncio.sleep(.6)
-                recruitssoup = BeautifulSoup(recruits, 'lxml')
-                Recruitment.all_nations = set(recruitssoup.nations.text.split(':'))
-                while True:
-                    async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                           headers=headers, params=params) as recruitsresp:
-                        recruits = await recruitsresp.text()
-                        await asyncio.sleep(.6)
-                    recruitssoup = BeautifulSoup(recruits, 'lxml')
-                    Recruitment.new_nations = set(recruitssoup.nations.text.split(':')).difference(
-                        Recruitment.all_nations)
-                    departed_nations = Recruitment.all_nations.difference(set(recruitssoup.nations.text.split(':')))
-                    if Recruitment.new_nations:
-                        for n in Recruitment.new_nations:
-                            notif = await recruitment_channel.send(
-                                f"A new nation has arrived, {notifrole.mention}!"
-                                f"\nhttps://www.nationstates.net/nation={n}")
-                            await notif.add_reaction("\U0001f4ec")
-                    if departed_nations:
-                        for n in departed_nations:
-                            notif = await recruitment_channel.send(f"A nation has departed, {notifrole.mention}!"
-                                                                   f"\nhttps://www.nationstates.net/nation={n}")
-                            await notif.add_reaction("\U0001f4ec")
-                    Recruitment.all_nations = set(recruitssoup.nations.text.split(':'))
-                    await asyncio.sleep(300)
-                    continue
-        except Exception as error:
-            await crashchannel.send(f"`{error}` in retention module.")
-    loop = asyncio.get_event_loop()
-    Recruitment.monthly_loop=loop.create_task(monthly_recruiter_scheduler(bot))
-    Recruitment.retention_loop=loop.create_task(retention(bot))
     bot.add_cog(Recruitment(bot))
