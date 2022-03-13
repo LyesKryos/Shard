@@ -556,6 +556,7 @@ def setup(bot):
             await crashchannel.send(error)
 
     async def monthly_recruiter(bot: Shard):
+        await bot.wait_until_ready()
         # connects to database
         conn = bot.pool
         try:
