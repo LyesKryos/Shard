@@ -600,7 +600,7 @@ def setup(bot):
                         for n in Recruitment.new_nations:
                             notif = await recruitment_channel.send(f"A new nation has arrived, {recruiter_role.mention}!"
                                                                    f"\nhttps://www.nationstates.net/nation={n}")
-                            await notif.reaction_add("\U0001f4ec")
+                            await notif.add_reaction("\U0001f4ec")
                     if departed_nations:
                         for n in departed_nations:
                             await recruitment_channel.send(f"A nation has departed, {recruiter_role.mention}!"
