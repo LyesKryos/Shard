@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing retention function">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Altering roles for retention and notifications.">
       <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -52,7 +51,7 @@
       <option name="presentableId" value="Default" />
       <updated>1646855861623</updated>
       <workItem from="1646855864250" duration="13268000" />
-      <workItem from="1647180785119" duration="4274000" />
+      <workItem from="1647180785119" duration="4942000" />
     </task>
     <task id="LOCAL-00001" summary="Removing any close calling from pool.">
       <created>1646859698687</created>
@@ -201,7 +200,21 @@
       <option name="project" value="LOCAL" />
       <updated>1647186199107</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Altering roles for retention and notifications.">
+      <created>1647198454809</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1647198454810</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Altering roles for retention and notifications.">
+      <created>1647198491625</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1647198491625</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -227,6 +240,7 @@
     <MESSAGE value="Correcting monthly recruiter runtime" />
     <MESSAGE value="Adding retention function" />
     <MESSAGE value="Fixing retention function" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing retention function" />
+    <MESSAGE value="Altering roles for retention and notifications." />
+    <option name="LAST_COMMIT_MESSAGE" value="Altering roles for retention and notifications." />
   </component>
 </project>

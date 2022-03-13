@@ -522,7 +522,7 @@ class Recruitment(commands.Cog):
             await recruitment_channel.send(f"**Welcome to the Order of Saint Julian, {ctx.author.mention}!**"
                                            f"\nYou can see our welcome telegram and exit telegram in the pins. "
                                            f"When a nation leaves or enters Thegye, you'll be notified via ping. If you"
-                                           f" send a telegram to the nation, hit the \U0001f44f emoji to let everyone"
+                                           f" send a telegram to the nation, hit the \U0001f4ec emoji to let everyone"
                                            f" else know you've done so. Good luck!")
         elif retention_role in ctx.author.roles:
             await ctx.author.remove_roles(retention_role)
