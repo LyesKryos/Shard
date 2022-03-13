@@ -342,6 +342,14 @@ class Recruitment(commands.Cog):
             await ctx.send("Recruitment is running.")
         elif self.running is False:
             await ctx.send("Recruitment is not running.")
+        if self.monthly_loop:
+            await ctx.send("Recruiter of the Month running.")
+        elif not self.monthly_loop:
+            await ctx.send("Recruiter of the Month not running.")
+        if self.retention_loop:
+            await ctx.send("Retention running.")
+        elif not self.retention_loop:
+            await ctx.send("Retention not running.")
 
     @commands.command()
     @commands.guild_only()
