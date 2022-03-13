@@ -571,6 +571,42 @@ def setup(bot):
             crashchannel = bot.get_channel(835579413625569322)
             await crashchannel.send(error)
             return
+    async def retention(bot):
+        await bot.wait_until_ready()
+        recruitment_channel = bot.get_channel(674342850296807454)
+        thegye_server = bot.get_guild(674259612580446230)
+        recruiter_role = discord.utils.get(thegye_server.roles, id=674339578102153216)
+        async with aiohttp.ClientSession() as session:
+            headers = {"User-Agent": "Bassiliya"}
+            params = {'q': 'nations',
+                      'region': 'project chaos'}
+            async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                   headers=headers, params=params) as recruitsresp:
+                recruits = await recruitsresp.text()
+                await asyncio.sleep(.6)
+            recruitssoup = BeautifulSoup(recruits, 'lxml')
+            Recruitment.all_nations = set(recruitssoup.nations.text.split(':'))
+            while True:
+                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                       headers=headers, params=params) as recruitsresp:
+                    recruits = await recruitsresp.text()
+                    await asyncio.sleep(.6)
+                recruitssoup = BeautifulSoup(recruits, 'lxml')
+                Recruitment.new_nations = set(recruitssoup.nations.text.split(':')).difference(Recruitment.all_nations)
+                departed_nations = Recruitment.all_nations.difference(set(recruitssoup.nations.text.split(':')))
+                if Recruitment.new_nations:
+                    for n in Recruitment.new_nations:
+                        notif = await recruitment_channel.send(f"A new nation has arrived, {recruiter_role.mention}!"
+                                                               f"\nhttps://www.nationstates.net/nation={n}")
+                        await notif.reaction_add("\U0001f4ec")
+                if departed_nations:
+                    for n in departed_nations:
+                        await recruitment_channel.send(f"A nation has departed, {recruiter_role.mention}!"
+                                                       f"\nhttps://www.nationstates.net/nation={n}")
+                Recruitment.all_nations = set(recruitssoup.nations.text.split(':'))
+                await asyncio.sleep(300)
+                continue
     loop = asyncio.get_event_loop()
-    loop.create_task(monthly_recruiter_scheduler(bot=bot))
+    loop.create_task(monthly_recruiter_scheduler(bot))
+    loop.create_task(retention(bot))
     bot.add_cog(Recruitment(bot))
