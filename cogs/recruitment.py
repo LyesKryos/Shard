@@ -200,7 +200,6 @@ class Recruitment(commands.Cog):
         self.recruitment_gather_object = asyncio.gather(self.recruitment(ctx, template),
                                                         self.still_recruiting_check(ctx))
 
-
     @commands.command()
     @commands.guild_only()
     @RecruitmentCheck()
@@ -263,31 +262,31 @@ class Recruitment(commands.Cog):
 
                 return
         elif ' '.join(args).lower() == "global":
-                try:
-                    # fetches relevant user data
-                    allsent = await conn.fetch('''SELECT sent, sent_this_month FROM recruitment;''')
-                    totalsent = 0
-                    monthlytotal = 0
-                    for s in allsent:
-                        totalsent += s['sent']
-                        monthlytotal += s['sent_this_month']
-                    # sends amount
-                    await ctx.send(
-                        f"A total of {totalsent:,} telegrams have been sent.\nA total of {monthlytotal:,} telegrams "
-                        f"have been sent this month.")
+            try:
+                # fetches relevant user data
+                allsent = await conn.fetch('''SELECT sent, sent_this_month FROM recruitment;''')
+                totalsent = 0
+                monthlytotal = 0
+                for s in allsent:
+                    totalsent += s['sent']
+                    monthlytotal += s['sent_this_month']
+                # sends amount
+                await ctx.send(
+                    f"A total of {totalsent:,} telegrams have been sent.\nA total of {monthlytotal:,} telegrams "
+                    f"have been sent this month.")
 
-                    return
-                except Exception as error:
-                    await ctx.send(error)
+                return
+            except Exception as error:
+                await ctx.send(error)
 
-                    return
+                return
         elif args != ():
             try:
                 # fetches the user object via the converter
                 user = ' '.join(args[:])
                 user = await commands.converter.MemberConverter().convert(ctx, user)
                 # connects to the database
-                conn = self.bot.pool                # fetches relevant user data and sends it
+                conn = self.bot.pool  # fetches relevant user data and sends it
                 userinfo = await conn.fetchrow('''SELECT sent FROM recruitment WHERE user_id = $1;''', user.id)
                 sent = userinfo['sent']
                 await ctx.send(f"{user} has sent {sent} telegrams.")
@@ -422,8 +421,6 @@ class Recruitment(commands.Cog):
 
             return
 
-
-
     @commands.command()
     @commands.guild_only()
     async def campaign(self, ctx):
@@ -495,7 +492,6 @@ class Recruitment(commands.Cog):
             async with ctx.channel.typing():
                 await ctx.send(file=discord.File(campaign, f"{regions['region'].lower()}_endo_campaign.html"))
 
-
     @commands.command(usage="[hex color code] [name]")
     async def customize_recruiter_role(self, ctx, color: str, *args):
         recruiter_of_the_month_role = discord.utils.get(ctx.guild.roles, id=813953181234626582)
@@ -531,6 +527,7 @@ class Recruitment(commands.Cog):
         elif retention_role in ctx.author.roles:
             await ctx.author.remove_roles(retention_role)
             await ctx.send("Role removed.")
+
 
 def setup(bot):
     async def monthly_recruiter_scheduler(bot):
@@ -586,6 +583,7 @@ def setup(bot):
             crashchannel = bot.get_channel(835579413625569322)
             await crashchannel.send(error)
             return
+
     async def retention(bot):
         await bot.wait_until_ready()
         crashchannel = bot.get_channel(835579413625569322)
@@ -609,23 +607,26 @@ def setup(bot):
                         recruits = await recruitsresp.text()
                         await asyncio.sleep(.6)
                     recruitssoup = BeautifulSoup(recruits, 'lxml')
-                    Recruitment.new_nations = set(recruitssoup.nations.text.split(':')).difference(Recruitment.all_nations)
+                    Recruitment.new_nations = set(recruitssoup.nations.text.split(':')).difference(
+                        Recruitment.all_nations)
                     departed_nations = Recruitment.all_nations.difference(set(recruitssoup.nations.text.split(':')))
                     if Recruitment.new_nations:
                         for n in Recruitment.new_nations:
-                            notif = await recruitment_channel.send(f"A new nation has arrived, {recruiter_role.mention}!"
-                                                                   f"\nhttps://www.nationstates.net/nation={n}")
+                            notif = await recruitment_channel.send(
+                                f"A new nation has arrived, {recruiter_role.mention}!"
+                                f"\nhttps://www.nationstates.net/nation={n}")
                             await notif.add_reaction("\U0001f4ec")
                     if departed_nations:
                         for n in departed_nations:
                             notif = await recruitment_channel.send(f"A nation has departed, {recruiter_role.mention}!"
-                                                           f"\nhttps://www.nationstates.net/nation={n}")
+                                                                   f"\nhttps://www.nationstates.net/nation={n}")
                             await notif.add_reaction("\U0001f4ec")
                     Recruitment.all_nations = set(recruitssoup.nations.text.split(':'))
                     await asyncio.sleep(300)
                     continue
         except Exception as error:
             await crashchannel.send(f"`{error}` in retention module.")
+
     loop = asyncio.get_event_loop()
     loop.create_task(monthly_recruiter_scheduler(bot))
     loop.create_task(retention(bot))
