@@ -16,9 +16,9 @@ class Dispatch(commands.Cog):
 
     def __init__(self, bot: Shard):
         self.bot = bot
-        crashchannel = bot.get_channel(835579413625569322)
 
         async def waupdate(bot):
+            crashchannel = bot.get_channel(835579413625569322)
             try:
                 headers = {"User-Agent": "Bassiliya @Lies Kryos#1734 on Discord",
                            "X-Password": "Kingsfoil4",
@@ -108,6 +108,7 @@ class Dispatch(commands.Cog):
                 await crashchannel.send(f"{error} in Thegye update")
 
         async def kaupdate(bot):
+            crashchannel = bot.get_channel(835579413625569322)
             try:
                 headers = {"User-Agent": "Bassiliya @Lies Kryos#1734 on Discord",
                            "X-pin": Dispatch.xpin}
