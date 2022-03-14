@@ -16,8 +16,11 @@ class Shard(commands.Bot):
             if filename.endswith(".py"):
                 self.load_extension(f"cogs.{filename[:-3]}")
         # sets up logging, time, and allowed mentions
-        logging.basicConfig(filename="botlogs.log", level=logging.WARNING,
-                            format='%(asctime)s %(levelname)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.WARNING)
+        handler = logging.FileHandler("mendedshardlogs.log", encoding="utf-8", mode='a')
+        handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
+        self.logger.addHandler(handler)
         self.time = dt.now().strftime("%Y-%m-%d %H:%M:%S")
         self.version = "Shard Version 1.4"
         self.last_update = "Shard Update: Repairman"
