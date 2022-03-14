@@ -111,6 +111,12 @@ class Recruitment(commands.Cog):
                                 await notif.add_reaction("\U0001f4ec")
                         if departed_nations:
                             for n in departed_nations:
+                                async with session.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={n}",
+                                                       headers=headers) as exist:
+                                    try:
+                                        exist.raise_for_status()
+                                    except Exception:
+                                        continue
                                 notif = await recruitment_channel.send(f"A nation has departed, {notifrole.mention}!"
                                                                        f"\nhttps://www.nationstates.net/nation={n}")
                                 await notif.add_reaction("\U0001f4ec")
