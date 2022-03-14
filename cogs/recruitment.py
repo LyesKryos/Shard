@@ -22,6 +22,7 @@ class Recruitment(commands.Cog):
         self.bot = bot
 
         async def monthly_recruiter_scheduler(bot):
+            await bot.wait_until_ready()
             # fetches channel object
             crashchannel = bot.get_channel(835579413625569322)
             try:
