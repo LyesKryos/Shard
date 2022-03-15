@@ -21,21 +21,18 @@ from customchecks import CNCcheck, modcheck
 class CommandAndConquest(commands.Cog):
 
     def __init__(self, bot: Shard):
-        self.map_directory = r"C:\Users\jaedo\OneDrive\Documents\NationStates BBCode\Thegye Stuff\Meta RP"
+        self.map_directory = r"/Documents/Shard/CNC/Map Files"
+        self.interaction_directory = r"/Documents/Shard/CNC/Interaction Files/"
         self.bot = bot
 
-    connectionstr = 'postgresql://postgres@127.0.0.1:5432'
-    database = "postgres"
     resourcesleeping = False
-    directory = r"C:\Users\jaedo\OneDrive\Documents\NationStates BBCode\Thegye Stuff\Meta RP"
-    interaction_directory = r"/media/pi/USB DISK/Discord Bot/bot files/Interaction Files/"
     banned_colors = ["#000000", "#ffffff", "#808080"]
 
     def map_color(self, province, province_cord, hexcode, release: bool = False):
         province_cord = ((int(province_cord[0])), (int(province_cord[1])))
         color = ImageColor.getrgb(hexcode)
-        map = Image.open(fr"{self.directory}\Maps\wargame_provinces.png").convert("RGBA")
-        prov = Image.open(fr"{self.directory}\Province Layers\{province}.png").convert("RGBA")
+        map = Image.open(fr"{self.map_directory}/Maps/wargame_provinces.png").convert("RGBA")
+        prov = Image.open(fr"{self.map_directory}/Province Layers/{province}.png").convert("RGBA")
         width = prov.size[0]
         height = prov.size[1]
         cord = (province_cord[0], province_cord[1])
@@ -55,13 +52,13 @@ class CommandAndConquest(commands.Cog):
                             prov.putpixel((x, y), color)
         prov = prov.convert("RGBA")
         map.paste(prov, box=cord, mask=prov)
-        map.save(fr"{self.directory}\Maps\wargame_provinces.png")
+        map.save(fr"{self.map_directory}/Maps/wargame_provinces.png")
 
     def add_ids(self):
-        bmap = Image.open(fr"{self.directory}\Maps\wargame_provinces.png").convert("RGBA")
-        ids = Image.open(fr"{self.directory}\Maps\wargame numbers.png").convert("RGBA")
+        bmap = Image.open(fr"{self.map_directory}/Maps/wargame_provinces.png").convert("RGBA")
+        ids = Image.open(fr"{self.map_directory}/Maps/wargame numbers.png").convert("RGBA")
         bmap.paste(ids, box=(0, 0), mask=ids)
-        bmap.save(fr"{self.directory}\Maps\wargame_nations_map.png")
+        bmap.save(fr"{self.map_directory}/Maps/wargame_nations_map.png")
 
     # ---------------------User Commands------------------------------
 
@@ -1021,7 +1018,7 @@ class CommandAndConquest(commands.Cog):
                 return
             # ensures authority
             if (interact['recipient_id'] != author.id) and (interact['sender_id'] != author.id) and (
-                    not self.self.bot.is_owner()):
+                    not self.bot.is_owner(author)):
                 await ctx.send("You are not authorized to cancel that interaction.")
                 
                 return
@@ -2088,9 +2085,9 @@ class CommandAndConquest(commands.Cog):
                                         description=f"Attack from Province #{stationed} by {userinfo['username']} on Province #{target} with {force} troops.",
                                         color=discord.Color.red())
             battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
-            battleembed.add_field(name="Defending Force", value=defending_troops)
-            battleembed.add_field(name="Terrain", value=terrain)
-            battleembed.add_field(name="Outcome", value=victor, inline=False)
+            battleembed.add_field(name="Defending Force", value=str(defending_troops))
+            battleembed.add_field(name="Terrain", value=str(terrain))
+            battleembed.add_field(name="Outcome", value=str(victor), inline=False)
             battleembed.add_field(name="Attacking Casualties", value=str(battle.AttackingCasualties))
             battleembed.add_field(name="Defending Casualties", value=str(battle.DefendingCasualties))
             battleembed.add_field(name="Crossing Fee", value=str(crossingfee), inline=False)
@@ -2639,8 +2636,8 @@ class CommandAndConquest(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def cnc_reset_map(self, ctx):
-        map = Image.open(fr"{self.directory}\Maps\wargame_blank_save.png").convert("RGBA")
-        map.save(fr"{self.directory}\Maps\wargame_provinces.png")
+        map = Image.open(fr"{self.map_directory}/Maps/wargame_blank_save.png").convert("RGBA")
+        map.save(fr"{self.map_directory}/Maps/wargame_provinces.png")
         await ctx.send("Map reset.")
 
     # ---------------------Moderation------------------------------
