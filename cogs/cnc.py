@@ -131,7 +131,7 @@ class CommandAndConquest(commands.Cog):
                     continue
                 await conn.execute('''INSERT INTO relations(name, nation) VALUES($1, $2);''', nationame, n)
                 await conn.execute('''INSERT INTO relations(name, nation) VALUES($1, $2);''', n, nationame)
-            file = open(f"{self.interaction_directory}{userid}", "w")
+            file = open(f"{self.interaction_directory}{userid}.txt", "w")
             file.close()
             await ctx.send(f"{ctx.author.name} has registered {nationame} in the Command and Conquer System!")
         # sends out any error
