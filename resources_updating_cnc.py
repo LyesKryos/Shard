@@ -3,7 +3,7 @@ import asyncpg
 from random import randrange
 
 async def resources():
-    conn = await asyncpg.connect('postgresql://posgres@127.0.0.1:5432', database="botdb", password="postgres4")
+    conn = await asyncpg.connect('postgresql://posgres@127.0.0.1:5432', database="botdb", password="postgres")
     provinceinfo = await conn.fetch('''SELECT * FROM provinces;''')
     province_ids = [p['id'] for p in provinceinfo]
     for p in province_ids:

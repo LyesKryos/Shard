@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding many CNC files">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="One of many CNC bug fixes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources_updating_cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources_updating_cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +60,7 @@
       <option name="presentableId" value="Default" />
       <updated>1646855861623</updated>
       <workItem from="1646855864250" duration="13268000" />
-      <workItem from="1647180785119" duration="21546000" />
+      <workItem from="1647180785119" duration="22766000" />
     </task>
     <task id="LOCAL-00001" summary="Removing any close calling from pool.">
       <created>1646859698687</created>
@@ -300,7 +300,14 @@
       <option name="project" value="LOCAL" />
       <updated>1647304759290</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="One of many CNC bug fixes">
+      <created>1647305571534</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1647305571534</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -332,6 +339,7 @@
     <MESSAGE value="Fixing retention to exclude CTEd nations" />
     <MESSAGE value="Adding the CNC cogs to the bot" />
     <MESSAGE value="Adding many CNC files" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding many CNC files" />
+    <MESSAGE value="One of many CNC bug fixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="One of many CNC bug fixes" />
   </component>
 </project>
