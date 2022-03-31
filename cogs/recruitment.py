@@ -1,6 +1,5 @@
 # recruitment 1.1
 from pytz import timezone
-
 from ShardBot import Shard
 from urllib.parse import quote
 from apscheduler.triggers.cron import CronTrigger

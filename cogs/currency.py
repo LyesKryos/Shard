@@ -2,7 +2,7 @@
 from ShardBot import Shard
 from discord.ext import commands
 import discord
-from customchecks import CurrencyCheck
+# from customchecks import CurrencyCheck
 
 
 class CurrencyCalculator(commands.Cog):
@@ -12,7 +12,7 @@ class CurrencyCalculator(commands.Cog):
 
     @commands.command(usage='[currency name] [worth] <symbol> <backed by>')
     @commands.guild_only()
-    @CurrencyCheck()
+    #@CurrencyCheck()
     async def add_currency(self, ctx, currencyname: str, worth: float, symbol: str = '', backed: str = ''):
         # connects to the database
         conn = self.bot.pool
@@ -37,7 +37,7 @@ class CurrencyCalculator(commands.Cog):
 
     @commands.command(usage="[currency name] [worth] <symbol> <backed by>")
     @commands.guild_only()
-    @CurrencyCheck()
+    #@CurrencyCheck()
     async def edit_currency(self, ctx, currencyname: str, worth: float, symbol: str = "", backed: str = ''):
         # connects to the database
         conn = self.bot.pool
@@ -69,7 +69,7 @@ class CurrencyCalculator(commands.Cog):
 
     @commands.command(usage="[currency name]")
     @commands.guild_only()
-    @CurrencyCheck()
+    #@CurrencyCheck()
     async def remove_currency(self, ctx, currencyname: str):
         # connects to the database
         conn = self.bot.pool
@@ -97,7 +97,7 @@ class CurrencyCalculator(commands.Cog):
 
     @commands.command(usage="[currency name]")
     @commands.guild_only()
-    @CurrencyCheck()
+    #@CurrencyCheck()
     async def currency(self, ctx, currency_string: str):
         currency = currency_string.lower()
         # connects to the database
@@ -125,7 +125,7 @@ class CurrencyCalculator(commands.Cog):
 
     @commands.command(usage="[currency] [currency] [amount]")
     @commands.guild_only()
-    @CurrencyCheck()
+    #@CurrencyCheck()
     async def exchange(self, ctx, firstcurrencyraw: str, secondcurrencyraw: str, amount: float):
         # connects to the database
         conn = self.bot.pool
@@ -175,7 +175,7 @@ class CurrencyCalculator(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @CurrencyCheck()
+    #@CurrencyCheck()
     async def ledger(self, ctx):
         # connects to the database
         conn = self.bot.pool
