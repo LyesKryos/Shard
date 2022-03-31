@@ -100,3 +100,16 @@ def RecruitmentCheck():
 
     return commands.check(recruitmentcheck)
 
+class CurrencyFail(commands.CheckFailure):
+    pass
+
+
+def CurrencyCheck():
+    # custom check
+    async def currency(ctx):
+        if ctx.guild.id in [674259612580446230, 549506142678548490, 728444080908140575]:
+            return True
+        else:
+            raise CurrencyFail("This server is not registered for that command.")
+
+    return commands.check(currency)
