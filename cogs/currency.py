@@ -10,9 +10,6 @@ class CurrencyCalculator(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
 
-    connectionstr = 'postgresql://postgres@127.0.0.1:5432'
-    database = "postgres"
-
     @commands.command(usage='[currency name] [worth] <symbol> <backed by>')
     @commands.guild_only()
     @CurrencyCheck()
