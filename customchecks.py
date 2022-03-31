@@ -100,6 +100,7 @@ def RecruitmentCheck():
 
     return commands.check(recruitmentcheck)
 
+
 class CurrencyFail(commands.CheckFailure):
     pass
 
