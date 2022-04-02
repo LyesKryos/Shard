@@ -34,6 +34,7 @@ class CurrencyCalculator(commands.Cog):
             await ctx.send(f"Added currency {currencyname.title()} to the ledger!")
         except Exception as error:
             await ctx.send(error)
+            self.bot.logger.warning(error)
 
     @commands.command(usage="[currency name] [worth] <symbol> <backed by>")
     @commands.guild_only()
@@ -66,6 +67,7 @@ class CurrencyCalculator(commands.Cog):
             await ctx.send(f"{currencyname} successfully updated!")
         except Exception as error:
             await ctx.send(error)
+            self.bot.logger.warning(error)
 
     @commands.command(usage="[currency name]")
     @commands.guild_only()
@@ -94,6 +96,7 @@ class CurrencyCalculator(commands.Cog):
             await ctx.send(f"{currencyname} succesfully removed from the ledger.")
         except Exception as error:
             await ctx.send(error)
+            self.bot.logger.warning(error)
 
     @commands.command(usage="[currency name]")
     @commands.guild_only()
@@ -122,6 +125,7 @@ class CurrencyCalculator(commands.Cog):
                 f"The {currencydata['name']}{symbol} is worth {currencydata['worth']} grams of gold per unit (AUG).{backed}")
         except Exception as error:
             await ctx.send(error)
+            self.bot.logger.warning(error)
 
     @commands.command(usage="[currency] [currency] [amount]")
     @commands.guild_only()
@@ -172,6 +176,7 @@ class CurrencyCalculator(commands.Cog):
                         value="{}{:,.2f}".format(currencyinfo1['symbol'], amount), inline=True)
         embed.add_field(name="Exchange Amount Out", value=output, inline=True)
         await ctx.send(embed=embed)
+        self.bot.logger.warning(error)
 
     @commands.command()
     @commands.guild_only()
@@ -198,6 +203,7 @@ class CurrencyCalculator(commands.Cog):
             worth = currency['worth']
             ledger_embed.add_field(name=f"{currency_name}{symbol}", value=f"{worth} AUG", inline=True)
         await ctx.send(embed=ledger_embed)
+        self.bot.logger.warning(error)
 
 
 def setup(bot):

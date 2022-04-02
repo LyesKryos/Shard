@@ -55,7 +55,8 @@ class Recruitment(commands.Cog):
                 recruiter_of_the_month_role = thegye.get_role(813953181234626582)
                 for members in thegye.members:
                     await members.remove_roles(recruiter_of_the_month_role)
-                user = bot.get_user(top_recruiter_user)
+                user = thegye.get_member(top_recruiter_user)
+                await user.add_roles(recruiter_of_the_month_role)
                 monthly_total = 0
                 for s in top_recruiter:
                     monthly_total += s['sent_this_month']
@@ -65,7 +66,7 @@ class Recruitment(commands.Cog):
                     f"distinction of being this month's top recruiter! This month, they have sent "
                     f"{top_recruiter_numbers} telegrams to new players. Wow! {user.display_name} has "
                     f"been awarded the {recruiter_of_the_month_role.mention} role, customizable by "
-                    f"request. Everyone give them a round of applause!\n In total, {monthly_total:,} telegrams have been "
+                    f"request. Everyone give them a round of applause!\nIn total, {monthly_total:,} telegrams have been "
                     f"sent by our wonderful recruiters this month!")
                 await announce.add_reaction("\U0001f44f")
                 # clears all sent_this_month
