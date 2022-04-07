@@ -75,6 +75,7 @@ class Recruitment(commands.Cog):
             except Exception as error:
                 crashchannel = bot.get_channel(835579413625569322)
                 await crashchannel.send(error)
+                self.bot.logger.warning(error)
                 return
 
         async def retention(bot):

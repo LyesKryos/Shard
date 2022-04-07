@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing currency.py">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing recruiter of the month feature">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/currency.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/currency.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
@@ -105,7 +105,7 @@
       <workItem from="1647360214609" duration="592000" />
       <workItem from="1647361075302" duration="595000" />
       <workItem from="1647399195623" duration="16536000" />
-      <workItem from="1648745229600" duration="5994000" />
+      <workItem from="1648745229600" duration="6643000" />
     </task>
     <task id="LOCAL-00001" summary="Removing any close calling from pool.">
       <created>1646859698687</created>
@@ -387,7 +387,14 @@
       <option name="project" value="LOCAL" />
       <updated>1648747457149</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="Fixing recruiter of the month feature">
+      <created>1648873301843</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1648873301843</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -421,7 +428,8 @@
     <MESSAGE value="One of many CNC bug fixes" />
     <MESSAGE value="Adding currency.py" />
     <MESSAGE value="Fixing currency.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing currency.py" />
+    <MESSAGE value="Fixing recruiter of the month feature" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing recruiter of the month feature" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

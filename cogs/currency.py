@@ -5,7 +5,7 @@ import discord
 # from customchecks import CurrencyCheck
 
 
-class CurrencyCalculator(commands.Cog):
+class Currency(commands.Cog):
 
     def __init__(self, bot: Shard):
         self.bot = bot
@@ -203,8 +203,7 @@ class CurrencyCalculator(commands.Cog):
             worth = currency['worth']
             ledger_embed.add_field(name=f"{currency_name}{symbol}", value=f"{worth} AUG", inline=True)
         await ctx.send(embed=ledger_embed)
-        self.bot.logger.warning(error)
 
 
 def setup(bot):
-    bot.add_cog(CurrencyCalculator(bot))
+    bot.add_cog(Currency(bot))
