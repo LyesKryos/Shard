@@ -19,6 +19,7 @@ class Recruitment(commands.Cog):
 
     def __init__(self, bot: Shard):
         self.bot = bot
+        self.monthly_recruiter_notification = False
 
         async def monthly_recruiter_scheduler(bot):
             await bot.wait_until_ready()
@@ -44,39 +45,41 @@ class Recruitment(commands.Cog):
             await bot.wait_until_ready()
             # connects to database
             conn = bot.pool
-            try:
-                # fetches all user data
-                top_recruiter = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month DESC;''')
-                # finds the first entry and gathers user id, sent number, and sends the announcement message
-                top_recruiter_user = top_recruiter[0]['user_id']
-                top_recruiter_numbers = top_recruiter[0]['sent_this_month']
-                announcements = bot.get_channel(674602527333023747)
-                thegye = bot.get_guild(674259612580446230)
-                recruiter_of_the_month_role = thegye.get_role(813953181234626582)
-                for members in thegye.members:
-                    await members.remove_roles(recruiter_of_the_month_role)
-                user = thegye.get_member(top_recruiter_user)
-                await user.add_roles(recruiter_of_the_month_role)
-                monthly_total = 0
-                for s in top_recruiter:
-                    monthly_total += s['sent_this_month']
-                await recruiter_of_the_month_role.edit(color=discord.Color.light_grey(), name="Recruiter of the Month")
-                announce = await announcements.send(
-                    f"**Congratulations to {user.mention}!**\n{user.display_name} has earned the "
-                    f"distinction of being this month's top recruiter! This month, they have sent "
-                    f"{top_recruiter_numbers} telegrams to new players. Wow! {user.display_name} has "
-                    f"been awarded the {recruiter_of_the_month_role.mention} role, customizable by "
-                    f"request. Everyone give them a round of applause!\nIn total, {monthly_total:,} telegrams have been "
-                    f"sent by our wonderful recruiters this month!")
-                await announce.add_reaction("\U0001f44f")
-                # clears all sent_this_month
-                await conn.execute('''UPDATE recruitment SET sent_this_month = 0;''')
-                return
-            except Exception as error:
-                crashchannel = bot.get_channel(835579413625569322)
-                await crashchannel.send(error)
-                self.bot.logger.warning(error)
-                return
+            if self.monthly_recruiter_notification is False:
+                try:
+                    # fetches all user data
+                    top_recruiter = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month DESC;''')
+                    # finds the first entry and gathers user id, sent number, and sends the announcement message
+                    top_recruiter_user = top_recruiter[0]['user_id']
+                    top_recruiter_numbers = top_recruiter[0]['sent_this_month']
+                    announcements = bot.get_channel(674602527333023747)
+                    thegye = bot.get_guild(674259612580446230)
+                    recruiter_of_the_month_role = thegye.get_role(813953181234626582)
+                    for members in thegye.members:
+                        await members.remove_roles(recruiter_of_the_month_role)
+                    user = thegye.get_member(top_recruiter_user)
+                    await user.add_roles(recruiter_of_the_month_role)
+                    monthly_total = 0
+                    for s in top_recruiter:
+                        monthly_total += s['sent_this_month']
+                    await recruiter_of_the_month_role.edit(color=discord.Color.light_grey(), name="Recruiter of the Month")
+                    announce = await announcements.send(
+                        f"**Congratulations to {user.mention}!**\n{user.display_name} has earned the "
+                        f"distinction of being this month's top recruiter! This month, they have sent "
+                        f"{top_recruiter_numbers} telegrams to new players. Wow! {user.display_name} has "
+                        f"been awarded the {recruiter_of_the_month_role.mention} role, customizable by "
+                        f"request. Everyone give them a round of applause!\nIn total, {monthly_total:,} telegrams have been "
+                        f"sent by our wonderful recruiters this month!")
+                    await announce.add_reaction("\U0001f44f")
+                    # clears all sent_this_month
+                    await conn.execute('''UPDATE recruitment SET sent_this_month = 0;''')
+                    self.monthly_recruiter_notification = True
+                    return
+                except Exception as error:
+                    crashchannel = bot.get_channel(835579413625569322)
+                    await crashchannel.send(error)
+                    self.bot.logger.warning(error)
+                    return
 
         async def retention(bot):
             await bot.wait_until_ready()
@@ -101,6 +104,9 @@ class Recruitment(commands.Cog):
                             recruits = await recruitsresp.text()
                             await asyncio.sleep(.6)
                         recruitssoup = BeautifulSoup(recruits, 'lxml')
+                        crashcheck = recruitssoup.nations.text.split(':')
+                        if crashcheck is False:
+                            raise Exception
                         Recruitment.new_nations = set(recruitssoup.nations.text.split(':')).difference(
                             Recruitment.all_nations)
                         departed_nations = Recruitment.all_nations.difference(set(recruitssoup.nations.text.split(':')))
@@ -207,8 +213,15 @@ class Recruitment(commands.Cog):
         except asyncio.CancelledError:
             await ctx.send("Recuitment stopped. Another link may post.")
         except Exception as error:
+            conn = self.bot.pool
             self.running = False
             await ctx.send("The recruitment bot has run into an issue. Recruitment has stopped.")
+            userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', ctx.author.id)
+            await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
+                               (self.user_sent + userinfo['sent']),
+                               (self.user_sent + userinfo['sent_this_month']),
+                               ctx.author.id)
+            self.user_sent = 0
             crashchannel = self.bot.get_channel(835579413625569322)
             await crashchannel.send(error)
 
@@ -410,7 +423,6 @@ class Recruitment(commands.Cog):
                 userinfo = await conn.fetchrow('''SELECT sent FROM recruitment WHERE user_id = $1;''', user.id)
                 sent = userinfo['sent']
                 await ctx.send(f"{user} has sent {sent} telegrams.")
-
                 return
             except Exception as error:
                 await ctx.send(error)

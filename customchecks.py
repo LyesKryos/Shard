@@ -108,9 +108,15 @@ class CurrencyFail(commands.CheckFailure):
 def CurrencyCheck():
     # custom check
     async def currency(ctx):
+        conn = ctx.bot.pool
+        blacklist = await conn.fetchrow('''SELECT * FROM blacklist WHERE user_id = $1 AND system = $2;''',
+                                        ctx.user.id, 'currency')
+        if blacklist:
+            raise CurrencyFail()
         if ctx.guild.id in [674259612580446230, 549506142678548490, 728444080908140575]:
             return True
         else:
             raise CurrencyFail("This server is not registered for that command.")
 
     return commands.check(currency)
+

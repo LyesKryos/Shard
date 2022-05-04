@@ -2,7 +2,7 @@
 from ShardBot import Shard
 from discord.ext import commands
 import discord
-# from customchecks import CurrencyCheck
+from customchecks import CurrencyCheck
 
 
 class Currency(commands.Cog):
@@ -176,7 +176,6 @@ class Currency(commands.Cog):
                         value="{}{:,.2f}".format(currencyinfo1['symbol'], amount), inline=True)
         embed.add_field(name="Exchange Amount Out", value=output, inline=True)
         await ctx.send(embed=embed)
-        self.bot.logger.warning(error)
 
     @commands.command()
     @commands.guild_only()
@@ -203,6 +202,20 @@ class Currency(commands.Cog):
             worth = currency['worth']
             ledger_embed.add_field(name=f"{currency_name}{symbol}", value=f"{worth} AUG", inline=True)
         await ctx.send(embed=ledger_embed)
+
+    @commands.command()
+    @commands.guild_only()
+    @commands.is_owner()
+    async def currency_blacklist(self, ctx, *, args):
+        user = args
+        user = await commands.converter.MemberConverter().convert(ctx, user)
+        conn = self.bot.pool
+        try:
+            await conn.execute('''INSERT INTO blacklist(user_id, system) VALUES($1, $2);''', user.id, "currency")
+            await ctx.send(f"{user.display_name}{user.discriminator} blacklisted from the Currency Exchange.")
+        except Exception as error:
+            await ctx.send(f"Error: {error}")
+            self.bot.logger.warning(msg=error)
 
 
 def setup(bot):
