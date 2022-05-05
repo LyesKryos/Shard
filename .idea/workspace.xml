@@ -6,9 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Update currency module">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/currency.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/currency.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/customchecks.py" beforeDir="false" afterPath="$PROJECT_DIR$/customchecks.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,7 +105,8 @@
       <workItem from="1647399195623" duration="16536000" />
       <workItem from="1648745229600" duration="10964000" />
       <workItem from="1651500112401" duration="39000" />
-      <workItem from="1651670712730" duration="1179000" />
+      <workItem from="1651670712730" duration="2595000" />
+      <workItem from="1651766364192" duration="313000" />
     </task>
     <task id="LOCAL-00001" summary="Removing any close calling from pool.">
       <created>1646859698687</created>
@@ -404,7 +402,14 @@
       <option name="project" value="LOCAL" />
       <updated>1649359584597</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="Update currency module">
+      <created>1651672642011</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1651672642011</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
