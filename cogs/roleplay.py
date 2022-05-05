@@ -1,10 +1,9 @@
-from ShardBot import Shard
-import discord
-from discord.ext import commands
-from discord import app_commands
-import requests
 import re
+import requests
 from bs4 import BeautifulSoup
+from discord.ext import commands
+
+from ShardBot import Shard
 
 
 class Roleplay(commands.Cog):
