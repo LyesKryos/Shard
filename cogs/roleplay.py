@@ -2,7 +2,6 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from discord.ext import commands
-
 from ShardBot import Shard
 
 
@@ -33,5 +32,5 @@ class Roleplay(commands.Cog):
         return
 
 
-async def setup(bot: Shard):
-    await bot.add_cog(Roleplay(bot))
+def setup(bot: Shard):
+    bot.add_cog(Roleplay(bot))
