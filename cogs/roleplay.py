@@ -26,10 +26,10 @@ class Roleplay(commands.Cog):
         for n in numbers:
             value = re.sub('/100', '', n)
             total += int(value)
-        percents = re.findall(r'\d+?%', dtext)
+        percents = re.findall(r'\d+?&#37', dtext)
         percents_total = 0
         for p in percents:
-            value = re.sub('%', '', p)
+            value = re.sub('&#37', '', p)
             percents_total += int(value)
         await ctx.send(f"Total: {total} points\nTotal Percentages: {percents_total} percentage points")
         return
