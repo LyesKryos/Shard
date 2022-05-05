@@ -22,12 +22,15 @@ class Roleplay(commands.Cog):
         textsoup = BeautifulSoup(response.text, 'html.parser')
         dtext = textsoup.find('text').string
         numbers = re.findall(r'\d+?/100', dtext)
-        numbers_list = list()
         total = 0
         for n in numbers:
             value = re.sub('/100', '', n)
-            numbers_list.append(int(value))
             total += int(value)
+        percents = re.findall(r'\d+?%', dtext)
+        percents_total = 0
+        for p in percents:
+            value = re.sub('%', '', p)
+            percents_total += int(value)
         await ctx.send(f"Total: {total} points")
         return
 
