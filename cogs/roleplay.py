@@ -31,7 +31,7 @@ class Roleplay(commands.Cog):
         for p in percents:
             value = re.sub('%', '', p)
             percents_total += int(value)
-        await ctx.send(f"Total: {total} points")
+        await ctx.send(f"Total: {total} points\nTotal Percentages: {percents_total} percentage points")
         return
 
 
