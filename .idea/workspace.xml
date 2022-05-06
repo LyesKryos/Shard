@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing rsc_check command">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,7 +107,7 @@
       <workItem from="1648745229600" duration="10964000" />
       <workItem from="1651500112401" duration="39000" />
       <workItem from="1651670712730" duration="2595000" />
-      <workItem from="1651766364192" duration="3636000" />
+      <workItem from="1651766364192" duration="5198000" />
     </task>
     <task id="LOCAL-00001" summary="Removing any close calling from pool.">
       <created>1646859698687</created>
@@ -444,7 +445,14 @@
       <option name="project" value="LOCAL" />
       <updated>1651769887343</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="Fixing rsc_check command">
+      <created>1651770841323</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1651770841324</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

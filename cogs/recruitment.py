@@ -104,9 +104,9 @@ class Recruitment(commands.Cog):
                             recruits = await recruitsresp.text()
                             await asyncio.sleep(.6)
                         recruitssoup = BeautifulSoup(recruits, 'lxml')
-                        crashcheck = recruitssoup.nations.text.split(':')
-                        if crashcheck is False:
-                            raise Exception
+                        crashcheck = recruitssoup.nations.text
+                        if re.search("Database Connection Error", crashcheck):
+                            raise Exception("NationStates Database Connection Error")
                         Recruitment.new_nations = set(recruitssoup.nations.text.split(':')).difference(
                             Recruitment.all_nations)
                         departed_nations = Recruitment.all_nations.difference(set(recruitssoup.nations.text.split(':')))
