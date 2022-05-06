@@ -31,9 +31,9 @@ class Shard(commands.Bot):
             replied_user=True,  # Whether to ping on replies to messages
         )
         # creates connection pool
-        self.pool: asyncpg.Pool = self.loop.run_until_complete(asyncpg.create_pool('postgresql://postgres@127.0.0.1:5432',
+        self.pool: asyncpg.Pool = self.loop.run_until_complete(asyncpg.create_pool('lyeskryos://lyeskryos@127.0.0.1:5432',
                                                       database="botdb",
-                                                      password="postgres"))
+                                                      password="Kingsfoil-4"))
 
 
 
