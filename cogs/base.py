@@ -16,7 +16,16 @@ class BaseCommands(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def info(self, ctx):
-        await ctx.send(f"{self.bot.version}\n {self.bot.last_update}")
+        infoembed = discord.Embed(color=discord.Color.blue(), title="Shard", description="A purpose-built machine for "
+                                                                                         "quality of life,"
+                                                                                         " ease of access, "
+                                                                                         "and entertainment.")
+        infoembed.add_field(name="Created", value="By Lies Kryos#1734\nApril 24, 2021")
+        infoembed.add_field(name="Current version", value=f"{self.bot.version} {self.bot.version_name}")
+        infoembed.add_field(name="Version Notes", value="None", inline=False)
+        await ctx.send(embed=infoembed)
+
+
 
     @commands.command()
     @commands.is_owner()
