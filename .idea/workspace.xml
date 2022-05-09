@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing database operations">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Amending info command">
       <change beforePath="$PROJECT_DIR$/cogs/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/base.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -106,14 +106,7 @@
       <workItem from="1648745229600" duration="10964000" />
       <workItem from="1651500112401" duration="39000" />
       <workItem from="1651670712730" duration="2595000" />
-      <workItem from="1651766364192" duration="12449000" />
-    </task>
-    <task id="LOCAL-00008" summary="Fixing dispatch.py functionality">
-      <created>1647020358081</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1647020358081</updated>
+      <workItem from="1651766364192" duration="12819000" />
     </task>
     <task id="LOCAL-00009" summary="Fixing dispatch.py functionality">
       <created>1647026445989</created>
@@ -451,7 +444,14 @@
       <option name="project" value="LOCAL" />
       <updated>1652066266421</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="Amending info command">
+      <created>1652066683992</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1652066683992</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -470,7 +470,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Removing any close calling from pool." />
     <MESSAGE value="Adding dispatch.py functionality" />
     <MESSAGE value="Fixing dispatch.py functionality" />
     <MESSAGE value="Correcting monthly recruiter runtime" />
@@ -495,7 +494,8 @@
     <MESSAGE value="Adding information command." />
     <MESSAGE value="Editing information command." />
     <MESSAGE value="Fixing database operations" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing database operations" />
+    <MESSAGE value="Amending info command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Amending info command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
