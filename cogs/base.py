@@ -23,6 +23,7 @@ class BaseCommands(commands.Cog):
         infoembed.add_field(name="Created", value="By Lies Kryos#1734\nApril 24, 2021")
         infoembed.add_field(name="Current version", value=f"{self.bot.version} {self.bot.version_name}")
         infoembed.add_field(name="Version Notes", value="None", inline=False)
+        infoembed.add_field(name="Hosting Software", value="Amazon AWS EC2 Virtual Machine")
         await ctx.send(embed=infoembed)
 
 
