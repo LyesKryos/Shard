@@ -20,6 +20,7 @@ class BaseCommands(commands.Cog):
                                                                                          "quality of life,"
                                                                                          " ease of access, "
                                                                                          "and entertainment.")
+        infoembed.set_thumbnail(url="https://i.ibb.co/Sc45nVZ/Shard.webp")
         infoembed.add_field(name="Created", value="By Lies Kryos#1734\nApril 24, 2021")
         infoembed.add_field(name="Current version", value=f"{self.bot.version} {self.bot.version_name}")
         infoembed.add_field(name="Version Notes", value="None", inline=False)
