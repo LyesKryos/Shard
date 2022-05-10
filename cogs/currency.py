@@ -13,7 +13,7 @@ class Currency(commands.Cog):
     @commands.command(usage='[currency name] [worth] <symbol> <backed by> <nation of origin> '
                             '\n Remember that multiple word names must be enclosed by quotation marks.')
     @commands.guild_only()
-    #@CurrencyCheck()
+    # @CurrencyCheck()
     async def add_currency(self, ctx, currencyname: str, worth: float, symbol: str = '', backed: str = '',
                            nation_of_origin: str = ''):
         # connects to the database
@@ -40,7 +40,7 @@ class Currency(commands.Cog):
 
     @commands.command(usage="[currency name] [worth] <symbol> <backed by>")
     @commands.guild_only()
-    #@CurrencyCheck()
+    # @CurrencyCheck()
     async def edit_currency(self, ctx, currencyname: str, worth: float, symbol: str = "", backed: str = '',
                             nation_of_origin: str = ''):
         # connects to the database
@@ -65,8 +65,9 @@ class Currency(commands.Cog):
             await ctx.send(f"You have input a worth of {worth}. The ledger does not accept negative numbers.")
             return
         try:
-            await conn.execute('''UPDATE currency SET worth = $1, symbol = $2, backed = $4, nation=$5 WHERE lower(name) = $3;''',
-                               worth, symbol, currencyname.lower(), backed, nation_of_origin)
+            await conn.execute(
+                '''UPDATE currency SET worth = $1, symbol = $2, backed = $4, nation=$5 WHERE lower(name) = $3;''',
+                worth, symbol, currencyname.lower(), backed, nation_of_origin)
             await ctx.send(f"{currencyname} successfully updated!")
         except Exception as error:
             await ctx.send(error)
@@ -74,7 +75,7 @@ class Currency(commands.Cog):
 
     @commands.command(usage="[currency name]")
     @commands.guild_only()
-    #@CurrencyCheck()
+    # @CurrencyCheck()
     async def remove_currency(self, ctx, currencyname: str):
         # connects to the database
         conn = self.bot.pool
@@ -103,7 +104,7 @@ class Currency(commands.Cog):
 
     @commands.command(usage="[currency name]")
     @commands.guild_only()
-    #@CurrencyCheck()
+    # @CurrencyCheck()
     async def currency(self, ctx, currency_string: str):
         currency = currency_string.lower()
         # connects to the database
@@ -137,7 +138,7 @@ class Currency(commands.Cog):
 
     @commands.command(usage="[currency] [currency] [amount]")
     @commands.guild_only()
-    #@CurrencyCheck()
+    # @CurrencyCheck()
     async def exchange(self, ctx, firstcurrencyraw: str, secondcurrencyraw: str, amount: float):
         # connects to the database
         conn = self.bot.pool
@@ -187,7 +188,7 @@ class Currency(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    #@CurrencyCheck()
+    # @CurrencyCheck()
     async def ledger(self, ctx):
         # connects to the database
         conn = self.bot.pool
