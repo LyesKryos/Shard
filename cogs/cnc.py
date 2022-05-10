@@ -65,6 +65,8 @@ class CNC(commands.Cog):
     @commands.command(brief="Sends informational embed.")
     @commands.guild_only()
     async def cnc_info(self, ctx):
+        conn = self.bot.pool
+        data = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
         infoembed = discord.Embed(title="Command And Conquest System", color=discord.Color.dark_red(),
                                   description="This is the condensed information about the CNC system. For more information, "
                                               "including commands, see the CNC Dispatch here: https://www.nationstates.net/page=dispatch/id=1641083")
@@ -73,11 +75,12 @@ class CNC(commands.Cog):
                                                 "an entertaining strategy game. The system makes used of combat "
                                                 "between armies, international relationships and intrigue, "
                                                 "resources, and more to bring players a fun and immersive experience. "
-                                                "The system is hosted on Shard, a purpose-built self.bot. For more "
+                                                "The system is hosted on Shard, a purpose-built bot. For more "
                                                 "information about the Command and Conquer system, make sure to check "
                                                 "out the dispatch and use the command "
                                                 f" `{self.bot.command_prefix}help CommandAndConquest`.", inline=False)
-        infoembed.add_field(name="Questions?", value="Contact the creator: Lies Kryos#1734\nContact a moderator: ")
+        infoembed.add_field(name="Turns", value=f"It has currently turn {int(data['data_value'])}.")
+        infoembed.add_field(name="Questions?", value="Contact the creator: Lies Kryos#1734\nContact a moderator: [Insert_Person_Here]#6003")
         infoembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
         await ctx.send(embed=infoembed)
 
@@ -2605,6 +2608,8 @@ class CNC(commands.Cog):
                 await map.clear_reactions()
                 return
             except Exception as error:
+                if debug is True:
+                    await ctx.send(f"Error encountered: `{error}`")
                 self.bot.logger.warning(msg=error)
                 return
 
