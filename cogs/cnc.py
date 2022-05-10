@@ -2583,7 +2583,7 @@ class CNC(commands.Cog):
                     async with ctx.typing():
                         initiate = perf_counter()
                         await loop.run_in_executor(None, self.add_ids)
-                        with open(fr"{self.map_directory}\Maps\wargame_nations_map.png", "rb") as preimg:
+                        with open(fr"{self.map_directory}/Maps/wargame_nations_map.png", "rb") as preimg:
                             img = b64encode(preimg.read())
                         image = perf_counter()
                         params = {"key": "a64d9505a13854ff660980db67ee3596",
