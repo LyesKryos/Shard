@@ -21,8 +21,8 @@ from customchecks import CNCcheck, modcheck
 class CNC(commands.Cog):
 
     def __init__(self, bot: Shard):
-        self.map_directory = r"/Documents/Shard/CNC/Map Files"
-        self.interaction_directory = r"/Documents/Shard/CNC/Interaction Files/"
+        self.map_directory = r"~/Documents/Shard/CNC/Map Files"
+        self.interaction_directory = r"~/Documents/Shard/CNC/Interaction Files/"
         self.bot = bot
 
     resourcesleeping = False
