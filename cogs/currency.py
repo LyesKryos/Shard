@@ -66,7 +66,7 @@ class Currency(commands.Cog):
             return
         try:
             await conn.execute(
-                '''UPDATE currency SET worth = $1, symbol = $2, backed = $4, nation=$5 WHERE lower(name) = $3;''',
+                '''UPDATE currency SET worth = $1, symbol = $2, backed = $4, nation = $5 WHERE lower(name) = $3;''',
                 worth, symbol, currencyname.lower(), backed, nation_of_origin)
             await ctx.send(f"{currencyname} successfully updated!")
         except Exception as error:
