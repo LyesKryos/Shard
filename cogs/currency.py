@@ -10,10 +10,12 @@ class Currency(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
 
-    @commands.command(usage='[currency name] [worth] <symbol> <backed by>')
+    @commands.command(usage='[currency name] [worth] <symbol> <backed by> <nation of origin> '
+                            '\n Remember that multiple word names must be enclosed by quotation marks.')
     @commands.guild_only()
     #@CurrencyCheck()
-    async def add_currency(self, ctx, currencyname: str, worth: float, symbol: str = '', backed: str = ''):
+    async def add_currency(self, ctx, currencyname: str, worth: float, symbol: str = '', backed: str = '',
+                           nation_of_origin: str = ''):
         # connects to the database
         conn = self.bot.pool
         # establishes the author
@@ -29,8 +31,8 @@ class Currency(commands.Cog):
             await ctx.send(f"You have input a worth of {worth}. The ledger does not accept negative numbers.")
             return
         try:
-            await conn.execute('''INSERT INTO currency VALUES($1,$2,$3,$4,$5, $6);''',
-                               currencyname, worth, author.id, symbol, backed, ctx.guild.id)
+            await conn.execute('''INSERT INTO currency VALUES($1,$2,$3,$4,$5,$6,$7);''',
+                               currencyname, worth, author.id, symbol, backed, ctx.guild.id, nation_of_origin)
             await ctx.send(f"Added currency {currencyname.title()} to the ledger!")
         except Exception as error:
             await ctx.send(error)
@@ -39,7 +41,8 @@ class Currency(commands.Cog):
     @commands.command(usage="[currency name] [worth] <symbol> <backed by>")
     @commands.guild_only()
     #@CurrencyCheck()
-    async def edit_currency(self, ctx, currencyname: str, worth: float, symbol: str = "", backed: str = ''):
+    async def edit_currency(self, ctx, currencyname: str, worth: float, symbol: str = "", backed: str = '',
+                            nation_of_origin: str = ''):
         # connects to the database
         conn = self.bot.pool
         # establishes the author
@@ -62,8 +65,8 @@ class Currency(commands.Cog):
             await ctx.send(f"You have input a worth of {worth}. The ledger does not accept negative numbers.")
             return
         try:
-            await conn.execute('''UPDATE currency SET worth = $1, symbol = $2, backed = $4 WHERE lower(name) = $3;''',
-                               worth, symbol, currencyname.lower(), backed)
+            await conn.execute('''UPDATE currency SET worth = $1, symbol = $2, backed = $4, nation=$5 WHERE lower(name) = $3;''',
+                               worth, symbol, currencyname.lower(), backed, nation_of_origin)
             await ctx.send(f"{currencyname} successfully updated!")
         except Exception as error:
             await ctx.send(error)
@@ -93,7 +96,7 @@ class Currency(commands.Cog):
         # removes currency
         try:
             await conn.execute('''DELETE FROM currency WHERE lower(name) = $1;''', currencyname.lower())
-            await ctx.send(f"{currencyname} succesfully removed from the ledger.")
+            await ctx.send(f"{currencyname} successfully removed from the ledger.")
         except Exception as error:
             await ctx.send(error)
             self.bot.logger.warning(error)
@@ -118,11 +121,16 @@ class Currency(commands.Cog):
             else:
                 symbol = ''
             if currencydata['backed'] != '':
-                backed = f" This currency is backed by {currencydata['backed']}."
+                backed = f"This currency is backed by {currencydata['backed']}."
             else:
                 backed = ''
+            if currencydata['nation'] != '':
+                nation = f"This currency belongs to {currencydata['nation']}."
+            else:
+                nation = ''
             await ctx.send(
-                f"The {currencydata['name']}{symbol} is worth {currencydata['worth']} grams of gold per unit (AUG).{backed}")
+                f"The {currencydata['name']}{symbol} is worth {currencydata['worth']} grams of gold per unit (AUG). "
+                f"{backed} {nation}")
         except Exception as error:
             await ctx.send(error)
             self.bot.logger.warning(error)
