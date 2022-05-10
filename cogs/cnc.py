@@ -18,7 +18,7 @@ from customchecks import CNCcheck, modcheck
 
 
 
-class CommandAndConquest(commands.Cog):
+class CNC(commands.Cog):
 
     def __init__(self, bot: Shard):
         self.map_directory = r"/Documents/Shard/CNC/Map Files"
@@ -3463,10 +3463,10 @@ def setup(bot: Shard):
     async def cncstartloop(bot):
         await bot.wait_until_ready()
         shardchannel = bot.get_channel(835579413625569322)
-        if CommandAndConquest.cnc_resource_loop.is_running():
+        if CNC.cnc_resource_loop.is_running():
             await shardchannel.send("Already running on_ready.")
             return
-        CommandAndConquest.resourcesleeping = True
+        CNC.resourcesleeping = True
         eastern = timezone('US/Eastern')
         now = datetime.datetime.now(eastern)
         if now.time() < datetime.time(hour=0):
@@ -3490,7 +3490,7 @@ def setup(bot: Shard):
             update += datetime.timedelta(days=1)
             await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
-        CommandAndConquest.cnc_resource_loop.start()
+        CNC.cnc_resource_loop.start()
     loop = bot.loop
     loop.create_task(cncstartloop(bot))
-    bot.add_cog(CommandAndConquest(bot))
+    bot.add_cog(CNC(bot))
