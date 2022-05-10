@@ -11,7 +11,7 @@ class Currency(commands.Cog):
         self.bot = bot
 
     @commands.command(usage='[currency name] [worth] <symbol> <backed by> <nation of origin> '
-                            '\n Remember that multiple word names must be enclosed by quotation marks.')
+                            '\nRemember that multiple word names must be enclosed by quotation marks.')
     @commands.guild_only()
     # @CurrencyCheck()
     async def add_currency(self, ctx, currencyname: str, worth: float, symbol: str = '', backed: str = '',
@@ -38,7 +38,8 @@ class Currency(commands.Cog):
             await ctx.send(error)
             self.bot.logger.warning(error)
 
-    @commands.command(usage="[currency name] [worth] <symbol> <backed by>")
+    @commands.command(usage="[currency name] [worth] <symbol> <backed by> <nation>"
+                            "\nRemember that multiple word names must be enclosed by quotation marks.")
     @commands.guild_only()
     # @CurrencyCheck()
     async def edit_currency(self, ctx, currencyname: str, worth: float, symbol: str = "", backed: str = '',
