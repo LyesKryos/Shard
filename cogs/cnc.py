@@ -3405,8 +3405,8 @@ class CNC(commands.Cog):
             await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         elif now.time() > datetime.time(hour=20, minute=0):
-            update = now.replace(hour=19, minute=17, second=30)
-            update += datetime.timedelta(days=1)
+            update = now.replace(hour=19, minute=18, second=30)
+            # update += datetime.timedelta(days=1)
             await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         CNC.cnc_resource_loop.start(self)
