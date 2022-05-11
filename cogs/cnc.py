@@ -3399,8 +3399,8 @@ def setup(bot: Shard):
             update = now.replace(hour=12, minute=0, second=0)
             await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
-        elif now.time() < datetime.time(hour=13, minute=42):
-            update = now.replace(hour=13, minute=42, second=0)
+        elif now.time() < datetime.time(hour=13, minute=44):
+            update = now.replace(hour=13, minute=44, second=0)
             await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         elif now.time() > datetime.time(hour=18, minute=0):
