@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="CNC loop testing">
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="CNC loop testing" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -107,21 +105,7 @@
       <workItem from="1651500112401" duration="39000" />
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
-      <workItem from="1652197800527" duration="25743000" />
-    </task>
-    <task id="LOCAL-00052" summary="Adding database connection error checking for recruitment.py">
-      <created>1651843945937</created>
-      <option name="number" value="00052" />
-      <option name="presentableId" value="LOCAL-00052" />
-      <option name="project" value="LOCAL" />
-      <updated>1651843945937</updated>
-    </task>
-    <task id="LOCAL-00053" summary="Working on databases">
-      <created>1651850559222</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1651850559223</updated>
+      <workItem from="1652197800527" duration="26053000" />
     </task>
     <task id="LOCAL-00054" summary="Adding information command.">
       <created>1652028203286</created>
@@ -452,7 +436,21 @@
       <option name="project" value="LOCAL" />
       <updated>1652311579351</updated>
     </task>
-    <option name="localTasksCounter" value="101" />
+    <task id="LOCAL-00101" summary="CNC loop testing">
+      <created>1652311879638</created>
+      <option name="number" value="00101" />
+      <option name="presentableId" value="LOCAL-00101" />
+      <option name="project" value="LOCAL" />
+      <updated>1652311879638</updated>
+    </task>
+    <task id="LOCAL-00102" summary="CNC loop testing">
+      <created>1652311894010</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1652311894010</updated>
+    </task>
+    <option name="localTasksCounter" value="103" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

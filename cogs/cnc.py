@@ -2554,6 +2554,7 @@ class CNC(commands.Cog):
                 await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(1000, 1300), p)
             if terrain['terrain'] == 7:
                 await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(100, 180), p)
+        await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = $2;''', "0", "turns")
         await ctx.send("https://tenor.com/view/finished-elijah-wood-lord-of-the-rings-lava-fire-gif-5894611")
         return
 
@@ -3404,9 +3405,9 @@ class CNC(commands.Cog):
             update = now.replace(hour=18, minute=0, second=0)
             await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
-        elif now.time() > datetime.time(hour=19, minute=0):
-            update = now.replace(hour=19, minute=31, second=45)
-            # update += datetime.timedelta(days=1)
+        elif now.time() > datetime.time(hour=18, minute=0):
+            update = now.replace(hour=0, minute=0, second=0)
+            update += datetime.timedelta(days=1)
             await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         CNC.cnc_resource_loop.start(self)
