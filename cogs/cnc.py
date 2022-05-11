@@ -3380,39 +3380,36 @@ class CNC(commands.Cog):
             await ctx.send("CNC loop not running.")
 
     async def cncstartloop(self):
-        try:
-            await self.bot.wait_until_ready()
-            shardchannel = self.bot.get_channel(835579413625569322)
-            if self.cnc_resource_loop.is_running():
-                await shardchannel.send("Already running on_ready.")
-                return
-            self.resourcesleeping = True
-            eastern = timezone('US/Eastern')
-            now = datetime.datetime.now(eastern)
-            if now.time() < datetime.time(hour=0):
-                update = now.replace(hour=0, minute=0, second=0, microsecond=1)
-                await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-                await discord.utils.sleep_until(update)
-            elif now.time() < datetime.time(hour=6):
-                update = now.replace(hour=6, minute=0, second=0)
-                await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-                await discord.utils.sleep_until(update)
-            elif now.time() < datetime.time(hour=12):
-                update = now.replace(hour=12, minute=0, second=0)
-                await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-                await discord.utils.sleep_until(update)
-            elif now.time() < datetime.time(hour=18, minute=0):
-                update = now.replace(hour=18, minute=0, second=0)
-                await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-                await discord.utils.sleep_until(update)
-            elif now.time() > datetime.time(hour=19, minute=0):
-                update = now.replace(hour=19, minute=27, second=30)
-                # update += datetime.timedelta(days=1)
-                await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-                await discord.utils.sleep_until(update)
-            self.cnc_resource_loop.start(self)
-        except Exception as error:
-            self.bot.logger.warning(msg=error)
+        await self.bot.wait_until_ready()
+        shardchannel = self.bot.get_channel(835579413625569322)
+        if CNC.cnc_resource_loop.is_running():
+            await shardchannel.send("Already running on_ready.")
+            return
+        CNC.resourcesleeping = True
+        eastern = timezone('US/Eastern')
+        now = datetime.datetime.now(eastern)
+        if now.time() < datetime.time(hour=0):
+            update = now.replace(hour=0, minute=0, second=0, microsecond=1)
+            await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await discord.utils.sleep_until(update)
+        elif now.time() < datetime.time(hour=6):
+            update = now.replace(hour=6, minute=0, second=0)
+            await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await discord.utils.sleep_until(update)
+        elif now.time() < datetime.time(hour=12):
+            update = now.replace(hour=12, minute=0, second=0)
+            await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await discord.utils.sleep_until(update)
+        elif now.time() < datetime.time(hour=18, minute=0):
+            update = now.replace(hour=18, minute=0, second=0)
+            await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await discord.utils.sleep_until(update)
+        elif now.time() > datetime.time(hour=19, minute=0):
+            update = now.replace(hour=19, minute=30, second=45)
+            # update += datetime.timedelta(days=1)
+            await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await discord.utils.sleep_until(update)
+        CNC.cnc_resource_loop.start(self)
 
 
 def setup(bot: Shard):

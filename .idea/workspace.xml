@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="CNC loop testing" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="CNC loop testing">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -105,42 +107,7 @@
       <workItem from="1651500112401" duration="39000" />
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
-      <workItem from="1652197800527" duration="25442000" />
-    </task>
-    <task id="LOCAL-00047" summary="Fixing roleplay.py">
-      <created>1651769762416</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1651769762416</updated>
-    </task>
-    <task id="LOCAL-00048" summary="Fixing rsc_check command">
-      <created>1651769887343</created>
-      <option name="number" value="00048" />
-      <option name="presentableId" value="LOCAL-00048" />
-      <option name="project" value="LOCAL" />
-      <updated>1651769887343</updated>
-    </task>
-    <task id="LOCAL-00049" summary="Fixing rsc_check command">
-      <created>1651770841323</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1651770841324</updated>
-    </task>
-    <task id="LOCAL-00050" summary="Adding database connection error checking for recruitment.py">
-      <created>1651843659993</created>
-      <option name="number" value="00050" />
-      <option name="presentableId" value="LOCAL-00050" />
-      <option name="project" value="LOCAL" />
-      <updated>1651843659993</updated>
-    </task>
-    <task id="LOCAL-00051" summary="Adding database connection error checking for recruitment.py">
-      <created>1651843857960</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
-      <option name="project" value="LOCAL" />
-      <updated>1651843857960</updated>
+      <workItem from="1652197800527" duration="25743000" />
     </task>
     <task id="LOCAL-00052" summary="Adding database connection error checking for recruitment.py">
       <created>1651843945937</created>
@@ -450,7 +417,42 @@
       <option name="project" value="LOCAL" />
       <updated>1652311242317</updated>
     </task>
-    <option name="localTasksCounter" value="96" />
+    <task id="LOCAL-00096" summary="CNC loop testing">
+      <created>1652311317083</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1652311317083</updated>
+    </task>
+    <task id="LOCAL-00097" summary="CNC loop testing">
+      <created>1652311328364</created>
+      <option name="number" value="00097" />
+      <option name="presentableId" value="LOCAL-00097" />
+      <option name="project" value="LOCAL" />
+      <updated>1652311328364</updated>
+    </task>
+    <task id="LOCAL-00098" summary="CNC loop testing">
+      <created>1652311504951</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1652311504952</updated>
+    </task>
+    <task id="LOCAL-00099" summary="CNC loop testing">
+      <created>1652311551055</created>
+      <option name="number" value="00099" />
+      <option name="presentableId" value="LOCAL-00099" />
+      <option name="project" value="LOCAL" />
+      <updated>1652311551055</updated>
+    </task>
+    <task id="LOCAL-00100" summary="CNC loop testing">
+      <created>1652311579351</created>
+      <option name="number" value="00100" />
+      <option name="presentableId" value="LOCAL-00100" />
+      <option name="project" value="LOCAL" />
+      <updated>1652311579351</updated>
+    </task>
+    <option name="localTasksCounter" value="101" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
