@@ -2740,8 +2740,9 @@ class CNC(commands.Cog):
             # execute temporary mute
             if unmute_time is not None:
                 await conn.execute(
-                    '''INSERT INTO blacklist(user_id, action_id, status, end_time, mod_id, reason) VALUES($1,$2,$3,$4,$5,$6)''',
-                    user.id, ctx.message.id, "mute", datetimeunmute, author.id, reason)
+                    '''INSERT INTO blacklist(user_id, action_id, status, end_time, mod_id, reason, action_date) 
+                    VALUES($1,$2,$3,$4,$5,$6,$7)''',
+                    user.id, ctx.message.id, "mute", datetimeunmute, author.id, reason, datetime.datetime.now())
                 await conn.execute('''INSERT INTO mod_logs(id, mod_id, action, reason) VALUES($1,$2,$3,$4);''',
                                    ctx.message.id, author.id, f"muted {user.id} for {mutetime}", reason)
                 muteduser = self.bot.get_user(user.id)
@@ -2753,8 +2754,8 @@ class CNC(commands.Cog):
             # execute indefinite mute
             if unmute_time is None:
                 await conn.execute(
-                    '''INSERT INTO blacklist(user_id, status, mod_id, reason) VALUES($1,$2,$3,$4)''',
-                    user.id, "mute", author.id, reason)
+                    '''INSERT INTO blacklist(user_id, status, mod_id, reason, action_date) VALUES($1,$2,$3,$4,$5)''',
+                    user.id, "mute", author.id, reason, datetime.datetime.now())
                 await conn.execute('''INSERT INTO mod_logs(id, mod_id, action, reason) VALUES($1,$2,$3,$4);''',
                                    ctx.message.id, author.id, f"muted {user.id} for {mutetime}", reason)
                 await ctx.send(f"User muted indefinitely.")
@@ -2843,8 +2844,9 @@ class CNC(commands.Cog):
         try:
             # executes ban
             await conn.execute(
-                '''INSERT INTO blacklist(user_id, action_id, status, mod_id, reason) VALUES($1,$2,$3,$4,$5)''',
-                user.id, ctx.message.id, "ban", author.id, reason)
+                '''INSERT INTO blacklist(user_id, action_id, status, mod_id, reason, action_date)
+                 VALUES($1,$2,$3,$4,$5,$6)''',
+                user.id, ctx.message.id, "ban", author.id, reason, datetime.datetime.now())
             await conn.execute('''INSERT INTO mod_logs(id, mod_id, action, reason) VALUES($1,$2,$3,$4);''',
                                ctx.message.id, author.id, f"banned {user.id}", reason)
             banneduser = self.bot.get_user(user.id)
