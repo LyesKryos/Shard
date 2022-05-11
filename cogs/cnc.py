@@ -3321,6 +3321,9 @@ class CNC(commands.Cog):
                                    (userinfo['resources'] + math.ceil(added_resources)), u)
                 await conn.execute('''UPDATE cncusers SET maxmanpower = $1, manpower = $2 WHERE user_id = $3;''',
                                    int(max_manpower), added_manpower, userinfo['user_id'])
+            turns = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
+            await conn.execute('''UPDATE cnc_data SET data_value = $2 WHERE data_name = $1;''', "turns",
+                               str(int(turns['data_value']) + 1))
             await cncchannel.send("Resource update complete.")
             return
         except Exception as error:
@@ -3402,7 +3405,7 @@ class CNC(commands.Cog):
             await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         elif now.time() > datetime.time(hour=20, minute=0):
-            update = now.replace(hour=19, minute=16, second=30)
+            update = now.replace(hour=19, minute=17, second=30)
             update += datetime.timedelta(days=1)
             await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
