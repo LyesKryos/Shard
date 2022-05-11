@@ -3408,7 +3408,7 @@ def setup(bot: Shard):
             update += datetime.timedelta(days=1)
             await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
-        CNC.cnc_resource_loop.start()
+        CNC.cnc_resource_loop.start(CNC)
 
     loop = bot.loop
     loop.create_task(cncstartloop(bot))
