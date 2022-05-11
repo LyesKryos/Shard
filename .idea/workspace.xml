@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="CNC loop testing">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -107,49 +108,7 @@
       <workItem from="1651500112401" duration="39000" />
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
-      <workItem from="1652197800527" duration="21123000" />
-    </task>
-    <task id="LOCAL-00032" summary="Fixing retention to exclude CTEd nations">
-      <created>1647239637457</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1647239637457</updated>
-    </task>
-    <task id="LOCAL-00033" summary="Adding the CNC cogs to the bot">
-      <created>1647296694448</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1647296694448</updated>
-    </task>
-    <task id="LOCAL-00034" summary="Adding many CNC files">
-      <created>1647304759290</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1647304759290</updated>
-    </task>
-    <task id="LOCAL-00035" summary="One of many CNC bug fixes">
-      <created>1647305571534</created>
-      <option name="number" value="00035" />
-      <option name="presentableId" value="LOCAL-00035" />
-      <option name="project" value="LOCAL" />
-      <updated>1647305571534</updated>
-    </task>
-    <task id="LOCAL-00036" summary="One of many CNC bug fixes">
-      <created>1647306845815</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1647306845815</updated>
-    </task>
-    <task id="LOCAL-00037" summary="Adding currency.py">
-      <created>1648746399248</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
-      <option name="project" value="LOCAL" />
-      <updated>1648746399248</updated>
+      <workItem from="1652197800527" duration="23608000" />
     </task>
     <task id="LOCAL-00038" summary="Fixing currency.py">
       <created>1648746759478</created>
@@ -452,7 +411,49 @@
       <option name="project" value="LOCAL" />
       <updated>1652290534008</updated>
     </task>
-    <option name="localTasksCounter" value="81" />
+    <task id="LOCAL-00081" summary="CNC loop testing">
+      <created>1652290742301</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1652290742301</updated>
+    </task>
+    <task id="LOCAL-00082" summary="CNC loop testing">
+      <created>1652290844238</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1652290844238</updated>
+    </task>
+    <task id="LOCAL-00083" summary="CNC loop testing">
+      <created>1652290873588</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1652290873588</updated>
+    </task>
+    <task id="LOCAL-00084" summary="CNC loop testing">
+      <created>1652290994632</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1652290994632</updated>
+    </task>
+    <task id="LOCAL-00085" summary="CNC loop testing">
+      <created>1652291009012</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1652291009012</updated>
+    </task>
+    <task id="LOCAL-00086" summary="CNC loop testing">
+      <created>1652291077724</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1652291077725</updated>
+    </task>
+    <option name="localTasksCounter" value="87" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
