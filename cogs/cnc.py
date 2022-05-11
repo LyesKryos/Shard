@@ -122,7 +122,6 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[nation name] [hexadecimal color id] <focus (m,e,s)>")
     @commands.guild_only()
-
     async def cnc_register(self, ctx, nationame: str, color: str, focus: str = None):
         try:
             userid = ctx.author.id
@@ -3252,9 +3251,9 @@ class CNC(commands.Cog):
     @tasks.loop(hours=6)
     # @commands.command()
     # @commands.is_owner()
-    async def cnc_resource_loop(self):
+    async def cnc_resource_loop(self, ctx):
         # channel to send to
-        cncchannel = self.bot.get_channel(896887449089867806)
+        cncchannel = self.bot.get_channel(728444080908140575)
         # connects to the database
         conn = self.bot.pool
         # fetches all the users and makes a list
@@ -3349,7 +3348,7 @@ class CNC(commands.Cog):
             await ctx.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         elif now.time() < datetime.time(hour=18, minute=0):
-            update = now.replace(hour=18, minute=0, second=0)
+            update = now.replace(hour=13, minute=36, second=0)
             await ctx.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         elif now.time() > datetime.time(hour=18, minute=0):
