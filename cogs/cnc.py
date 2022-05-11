@@ -302,7 +302,6 @@ class CNC(commands.Cog):
         # checks the author id against the list of registered users
         if author.id not in registeredlist:
             await ctx.send(f"{ctx.author} does not appear to be registered.")
-
             return
         # grabs the nation information
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
@@ -414,7 +413,6 @@ class CNC(commands.Cog):
         # checks the author id against the list of registered users
         if author.id not in registeredlist:
             await ctx.send(f"{ctx.author} does not appear to be registered.")
-
             return
         # pulls the specified nation data
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
@@ -481,7 +479,6 @@ class CNC(commands.Cog):
         # checks to see if the nation is registered
         if nationname.lower() not in userlist:
             await ctx.send(f"The user `{nationname}` does not appear to be registered.")
-
             return
         # grabs all nation information
         nationamesave = await conn.fetchrow('''SELECT username FROM cncusers WHERE lower(username) = $1;''',
@@ -538,12 +535,10 @@ class CNC(commands.Cog):
             registered = await conn.fetch('''SELECT * FROM cncusers;''')
             if colorreply.content.lower() in self.banned_colors:
                 await ctx.send("That color is a reserved color. Please pick another color.")
-
                 return
             colors = [u['usercolor'].lower() for u in registered]
             if colorreply.content.lower() in colors:
                 await ctx.send("That color is already taken by another user. Please pick another color.")
-
                 return
             # updates map with colors
             user = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
@@ -555,7 +550,6 @@ class CNC(commands.Cog):
             await conn.execute('''UPDATE cncusers SET usercolor = $1 WHERE user_id = $2''', colorreply.content,
                                author.id)
             await ctx.send(f"Success! Your new color is {colorreply.content}.")
-
             return
         # if the focus is being edited
         if editing.lower() == "focus":
@@ -583,12 +577,10 @@ class CNC(commands.Cog):
             if focusreply.content.lower() == "s":
                 focus = "`strategy`"
             await ctx.send(f"Success! Your new focus is {focus}.")
-
             return
         else:
             # if the editing argument is not the proper argument
             await ctx.send(f"`{editing}` is not a viable option for this command!")
-
             return
 
     # ---------------------Province Commands------------------------------
@@ -672,7 +664,6 @@ class CNC(commands.Cog):
         # ensures author registration
         if author.id not in alluserids:
             await ctx.send(f"{author} not registered.")
-
             return
         # fetches all province ids
         allprovinces = await conn.fetch('''SELECT id FROM provinces''')
@@ -682,14 +673,12 @@ class CNC(commands.Cog):
         # ensures province validity
         if provinceid not in allids:
             await ctx.send(f"Location id `{provinceid}` is not a valid ID.")
-
             return
         # fetches user info
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
         # ensures province ownership
         if provinceid not in userinfo['provinces_owned']:
             await ctx.send(f"{userinfo['username']} does not own province #{provinceid}.")
-
             return
         # fetches province information
         provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
@@ -739,7 +728,6 @@ class CNC(commands.Cog):
         # checks if author is registered
         if author.id not in alluserids:
             await ctx.send(f"{author} not registered.")
-
             return
         # fetches all province ids
         allprovinces = await conn.fetch('''SELECT id FROM provinces''')
@@ -749,7 +737,6 @@ class CNC(commands.Cog):
         # ensures valid id
         if location not in allids:
             await ctx.send(f"Location id `{location}` is not a valid ID.")
-
             return
         # fetches user info
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
@@ -758,12 +745,10 @@ class CNC(commands.Cog):
         # ensures location ownership
         if location not in userprovinces:
             await ctx.send(f"{userinfo['username']} does not own Province #{location} and cannot deploy troops there.")
-
             return
         # ensures troop sufficiency
         elif amount > userundeployed:
             await ctx.send(f"{userinfo['username']} does not have {amount} undeployed troops.")
-
             return
         else:
             # updates all user and province information
@@ -800,12 +785,10 @@ class CNC(commands.Cog):
         # ensures author registration
         if author.id not in alluserids:
             await ctx.send(f"{author} not registered.")
-
             return
         # ensures recipient existance
         if recipient.lower() not in allusernames:
             await ctx.send(f"`{recipient}` not registered.")
-
             return
         # fetches all province ids
         allprovinces = await conn.fetch('''SELECT id FROM provinces''')
@@ -815,14 +798,12 @@ class CNC(commands.Cog):
         # ensures province validity
         if provinceid not in allids:
             await ctx.send(f"Location id `{provinceid}` is not a valid ID.")
-
             return
         # fetches user info
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
         # ensures province ownership
         if provinceid not in userinfo['provinces_owned']:
             await ctx.send(f"{userinfo['username']} does not own province #{provinceid}.")
-
             return
         # fetches province information
         provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
@@ -856,23 +837,20 @@ class CNC(commands.Cog):
 
     @commands.command(usage="<offer id>", aliases=['cncvi'])
     @CNCcheck()
-    async def cnc_view_interaction(self, ctx, interactionid: int = None):
+    async def cnc_view_interactions(self, ctx, interactionid: int = None):
         author = ctx.author
         # connects to the database
         conn = self.bot.pool
         if interactionid is None:
             with open(f"{self.interaction_directory}{author.id}.txt", "rb") as file:
                 await author.send(file=discord.File(file, f"Interactions Log for {author.id}.txt"))
-
                 return
         interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE id = $1;''', interactionid)
         if interaction is None:
             await ctx.send("No such interaction.")
-
             return
         if interaction['sender_id'] != author.id and interaction['recipient_id'] != author.id:
             await ctx.send("You are not authorized to view that offer.")
-
             return
         upload = False
         if len(interaction['terms']) > 1024:
@@ -891,7 +869,6 @@ class CNC(commands.Cog):
         if upload is True:
             with open(f"{self.interaction_directory}{interaction['id']}.txt", "r") as file:
                 await ctx.send(file=discord.File(file, f"{interaction['id']}.txt"))
-
     @commands.command(usage="[offer id]")
     @CNCcheck()
     async def cnc_offer(self, ctx, offerid: int):
@@ -901,11 +878,9 @@ class CNC(commands.Cog):
         offer = await conn.fetchrow('''SELECT * FROM pending_interactions WHERE id = $1;''', offerid)
         if offer is None:
             await ctx.send("No such pending offer.")
-
             return
         if offer['sender_id'] != author.id and offer['recipient_id'] != author.id:
             await ctx.send("You are not authorized to view that offer.")
-
             return
         upload = False
         if len(offer['terms']) > 1024:
@@ -935,12 +910,10 @@ class CNC(commands.Cog):
             # checks for existence
             if pending_int is None:
                 await ctx.send("No such pending interaction.")
-
                 return
             # checks for authority
             if pending_int['recipient_id'] != author.id:
                 await ctx.send("You are not authorized to accept or reject that interaction.")
-
                 return
             if interaction.lower() == "accept":
                 try:
@@ -979,7 +952,6 @@ class CNC(commands.Cog):
                 except Exception as error:
                     self.bot.logger.warning(msg=error)
                     await ctx.send(error)
-
             if interaction.lower() == "reject":
                 try:
                     # removes terms file
@@ -993,7 +965,6 @@ class CNC(commands.Cog):
                 except Exception as error:
                     self.bot.logger.warning(msg=error)
                     await ctx.send(error)
-
         elif interaction.lower() == "cancel":
             # fetches interaction data
             interact = await conn.fetchrow('''SELECT * FROM interactions WHERE id = $1;''', interactionid)
@@ -1005,13 +976,11 @@ class CNC(commands.Cog):
             if interact['type'] != 'alliance':
                 await ctx.send(
                     "Only alliances can be cancelled. Wars must be resolved through using the peace command.")
-
                 return
             # ensures authority
             if (interact['recipient_id'] != author.id) and (interact['sender_id'] != author.id) and (
                     not self.bot.is_owner(author)):
                 await ctx.send("You are not authorized to cancel that interaction.")
-
                 return
             sender = interact['sender']
             recipient = interact['recipient']
@@ -1083,12 +1052,10 @@ class CNC(commands.Cog):
         # ensures author registration
         if author.id not in alluserids:
             await ctx.send(f"{author} not registered.")
-
             return
         # ensures recipient existance
         if rrecipient.lower() not in allusernames:
             await ctx.send(f"`{rrecipient}` not registered.")
-
             return
         # checks for existing active alliance
         interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'alliance' AND active = True;''')
@@ -1096,7 +1063,6 @@ class CNC(commands.Cog):
             if inter['recipient'].lower() == rrecipient.lower():
                 await ctx.send(
                     f"An alliance with `{rrecipient}` already exists. To view, use $cnc_interaction {inter['id']}")
-
                 return
         # fetches user information
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
@@ -1110,7 +1076,6 @@ class CNC(commands.Cog):
         terms = text
         if sender == recipient:
             await ctx.send("You cannot ally with yourself.")
-
             return
         try:
             # creates interaction text file
@@ -1157,19 +1122,16 @@ class CNC(commands.Cog):
         # ensures author registration
         if author.id not in alluserids:
             await ctx.send(f"{author} not registered.")
-
             return
         # ensures recipient existance
         if rrecipient.lower() not in allusernames:
             await ctx.send(f"`{rrecipient}` not registered.")
-
             return
         # ensures prior peace
         interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'war' AND active = True;''')
         for inter in interactions:
             if inter['recipient'].lower() == rrecipient.lower():
                 await ctx.send(f"A war with `{rrecipient}` already exists. To view, use $cnc_interaction {inter['id']}")
-
                 return
         # fetches user information
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
@@ -1184,14 +1146,12 @@ class CNC(commands.Cog):
         # ensures no self declarations
         if sender == recipient:
             await ctx.send("You cannot declare war on yourself.")
-
             return
         # ensures no alliance
         alliance = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 AND nation = $2;''', sender,
                                        recipient)
         if alliance['relation'] != 'peace':
             await ctx.send(f"It is not possible to declare war on {recipient} when you have an alliance with them!")
-
             return
         try:
             # creates text file for terms
@@ -1245,12 +1205,10 @@ class CNC(commands.Cog):
         # ensures author registration
         if author.id not in alluserids:
             await ctx.send(f"{author} not registered.")
-
             return
         # ensures recipient existance
         if rrecipient.lower() not in allusernames:
             await ctx.send(f"`{rrecipient}` not registered.")
-
             return
         # fetches user information
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
@@ -1264,14 +1222,12 @@ class CNC(commands.Cog):
         terms = text
         if sender == recipient:
             await ctx.send("You cannot negotiatee peace with yourself.")
-
             return
         # ensures war status
         war = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 AND nation = $2;''', sender,
                                   recipient)
         if war['relation'] != 'war':
             await ctx.send(f"You cannot negotiate peace with {sender} if you are not at war!")
-
             return
         try:
             # creates text file of terms
@@ -1309,7 +1265,6 @@ class CNC(commands.Cog):
             # checks the author id against the list of registered users
             if authorid not in registeredlist:
                 await ctx.send(f"{ctx.author} is not registered.")
-
                 return
             # grabs the nation information
             userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', authorid)
@@ -1345,7 +1300,6 @@ class CNC(commands.Cog):
             bankembed.add_field(name="Cities", value=cities)
             bankembed.add_field(name="Ports", value=ports)
             await ctx.send(embed=bankembed)
-
         else:
             registeredusers = await conn.fetch('''SELECT username FROM cncusers;''')
             # makes a list of the registered users
@@ -1410,13 +1364,11 @@ class CNC(commands.Cog):
         if monies < cost:
             await ctx.send(
                 f"{nationname} does not have enough resources to purchase {ramount * 1000} troops at \u03FE{cost}.")
-
             return
         # if the nation does not have enough manpower
         elif manpower > userinfo['manpower']:
             await ctx.send(f"{nationname} does not have enough manpower to recruit {ramount * 1000} troops, "
                            f"lacking {-(userinfo['manpower'] - manpower)} manpower. ")
-
             return
         # if the location is not set
         if location is None:
@@ -1443,13 +1395,11 @@ class CNC(commands.Cog):
             # if the location is invalid
             if location not in allids:
                 await ctx.send(f"Location id `{location}` is not a valid ID.")
-
                 return
             # if the location is not owned by the user
             if location not in userinfo['provinces_owned']:
                 await ctx.send(
                     f"{nationname} does not own province #{location}. Please select a location that {nationname} owns.")
-
                 return
         # updates all province and user information
         try:
@@ -1479,7 +1429,6 @@ class CNC(commands.Cog):
         # checks if author is registered
         if author.id not in alluserids:
             await ctx.send(f"{author} not registered.")
-
             return
         try:
             userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
@@ -1496,13 +1445,11 @@ class CNC(commands.Cog):
                 await ctx.send(
                     f"{userinfo['username']} does not have enough resources to purchase {amount * 1000} for every "
                     f"province at \u03FE{cost}.")
-
                 return
             # checks for enough manpower
             elif manpower > userinfo['manpower']:
                 await ctx.send(f"{userinfo['username']} does not have enough manpower to recruit {amount * 1000} troops"
                                f" for every province, lacking {-(userinfo['manpower'] - manpower)} manpower. ")
-
                 return
             await conn.execute('''UPDATE cncusers SET totaltroops = $1, manpower= $2 WHERE user_id = $3;''',
                                userinfo['totaltroops'] + (amount * 1000), userinfo['manpower'] - manpower, author.id)
@@ -1536,12 +1483,10 @@ class CNC(commands.Cog):
         # ensures author registration
         if author.id not in alluserids:
             await ctx.send(f"{author} not registered.")
-
             return
         # ensures recipient existance
         if recipient.lower() not in allusernames:
             await ctx.send(f"`{recipient}` not registered.")
-
             return
         # fetches user info
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
@@ -1556,7 +1501,6 @@ class CNC(commands.Cog):
         await conn.execute('''UPDATE cncusers SET resources = $1 WHERE username = $2;''',
                            (recipientinfo['resources'] + amount), recipientinfo['username'])
         await ctx.send(f"{userinfo['username']} has sent \u03FE{amount} to {recipientinfo['username']}.")
-
         return
 
     @commands.command(usage="[province id]")
@@ -1575,7 +1519,6 @@ class CNC(commands.Cog):
         # ensures author registration
         if author.id not in alluserids:
             await ctx.send(f"{author} not registered.")
-
             return
         # fetches all province ids
         allprovinces = await conn.fetch('''SELECT id FROM provinces''')
@@ -1585,7 +1528,6 @@ class CNC(commands.Cog):
         # ensures province validity
         if provinceid not in allids:
             await ctx.send(f"Location id `{provinceid}` is not a valid ID.")
-
             return
         # fetches province and user information
         provinceowner = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
@@ -1597,30 +1539,25 @@ class CNC(commands.Cog):
         # ensures user disownership
         if provinceid in userinfo['provinces_owned']:
             await ctx.send(f"{userinfo['username']} already owns Province #{provinceid}")
-
             return
         # ensures province availability
         elif provinceowner['owner_id'] != 0:
             await ctx.send(f"Province #{provinceid} is already owned!")
-
             return
         # ensures province's coastal proximity
         elif provinceowner['coast'] is False:
             await ctx.send(f"Province #{provinceid} is not a coastal province and cannot be purchased!")
-
             return
         # ensures resource sufficiency
         elif userinfo['resources'] < cost:
             difference = cost - userinfo['resources']
             await ctx.send(
                 f"{userinfo['username']} possesses {difference} fewer credit resources than needed to by a province.")
-
             return
         # ensures that the user has less than 3 provinces
         elif len(userinfo['provinces_owned']) >= 4:
             await ctx.send(f"{userinfo['username']} already controls enough provinces  and is not eligible to "
                            f"purchase another.")
-
             return
         else:
             # fetches necessary ownership information
@@ -1643,8 +1580,8 @@ class CNC(commands.Cog):
                                            userinfo['usercolor'])
                 return
             except Exception as error:
-                self.bot.logger.warning(msg=error)
                 await ctx.send(error)
+                self.bot.logger.warning(msg=error)
                 return
 
     @commands.command(usage="[province id] [structure (fort, port, city)]")
@@ -1662,7 +1599,6 @@ class CNC(commands.Cog):
         # ensures author registration
         if author.id not in alluserids:
             await ctx.send(f"{author} not registered.")
-
             return
         # fetches all province ids
         allprovinces = await conn.fetch('''SELECT id FROM provinces''')
@@ -1672,7 +1608,6 @@ class CNC(commands.Cog):
         # ensures province validity
         if provinceid not in allids:
             await ctx.send(f"Location id `{provinceid}` is not a valid ID.")
-
             return
         # fetches province and user information
         provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
@@ -1680,7 +1615,6 @@ class CNC(commands.Cog):
         # ensures user disownership
         if provinceid not in userinfo['provinces_owned']:
             await ctx.send(f"{userinfo['username']} does not own Province #{provinceid}!")
-
             return
         if structure.lower() not in ['fort', 'port', 'city']:
             raise commands.UserInputError
@@ -1688,11 +1622,9 @@ class CNC(commands.Cog):
             pcost = 10000
             if provinceinfo['coast'] is False:
                 await ctx.send(f"Province #{provinceid} is not a coastal province.")
-
                 return
             elif userinfo['portlimit'][0] == userinfo['portlimit'][1]:
                 await ctx.send(f"{userinfo['username']} has reached its port building limit.")
-
                 return
             if userinfo['focus'] == "e":
                 pcost = 10000 * uniform(.89, .99)
@@ -1700,15 +1632,12 @@ class CNC(commands.Cog):
                 difference = pcost - userinfo['resources']
                 await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a port."
                                f"\n**Resource Deficit:** \u03FE{difference}")
-
                 return
             elif provinceinfo['port'] is True:
                 await ctx.send(f"Province #{provinceid} already has a port constructed!")
-
                 return
             elif provinceinfo['terrain'] == 5:
                 await ctx.send("It is impossible to build a port on a mountain!")
-
                 return
             else:
                 try:
@@ -1727,15 +1656,12 @@ class CNC(commands.Cog):
                 difference = ccost - userinfo['resources']
                 await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a city."
                                f"\n**Resource Deficit:** \u03FE{difference}")
-
                 return
             elif userinfo['citylimit'][0] == userinfo['citylimit'][1]:
                 await ctx.send(f"{userinfo['username']} has reached its city building limit.")
-
                 return
             elif provinceinfo['city'] is True:
                 await ctx.send(f"Province #{provinceid} already has a city constructed!")
-
                 return
             elif provinceinfo['terrain'] == 5:
                 await ctx.send("It is impossible to build a port on a mountain!")
@@ -1760,19 +1686,15 @@ class CNC(commands.Cog):
                 difference = fcost - userinfo['resources']
                 await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a fort."
                                f"\n**Resource Deficit:** \u03FE{difference}")
-
                 return
             elif userinfo['fortlimit'][0] == userinfo['fortlimit'][1]:
                 await ctx.send(f"{userinfo['username']} has reached its fort building limit.")
-
                 return
             elif provinceinfo['fort'] is True:
                 await ctx.send(f"Province #{provinceid} already has a fort constructed!")
-
                 return
             elif provinceinfo['terrain'] == 5:
                 await ctx.send("Mountainous terrains are impossible to build forts on!")
-
                 return
             else:
                 try:
@@ -1805,7 +1727,6 @@ class CNC(commands.Cog):
         # ensures author registration
         if author.id not in alluserids:
             await ctx.send(f"{author} not registered.")
-
             return
         # fetches all province ids
         allprovinces = await conn.fetch('''SELECT id FROM provinces''')
@@ -1815,20 +1736,17 @@ class CNC(commands.Cog):
         # ensures province existence
         if province not in allids:
             await ctx.send(f"Location id `{province}` is not a valid ID.")
-
             return
         # ensures province ownership
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
         ownedprovinces = userinfo['provinces_owned']
         if province not in ownedprovinces:
             await ctx.send(f"{userinfo['username']} does not own province #{province}.")
-
             return
         provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', province)
         # ensures the amount is in the province
         if amount > provinceinfo['troops']:
             await ctx.send(f"There are not {amount} troops in province #{province}.")
-
             return
         try:
             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
@@ -1859,7 +1777,6 @@ class CNC(commands.Cog):
         # ensures author registration
         if author.id not in alluserids:
             await ctx.send(f"{author} not registered.")
-
             return
         # fetches all province ids
         allprovinces = await conn.fetch('''SELECT id FROM provinces''')
@@ -1869,11 +1786,9 @@ class CNC(commands.Cog):
         # ensures province existence
         if target not in allids:
             await ctx.send(f"Location id `{target}` is not a valid ID.")
-
             return
         elif stationed not in allids:
             await ctx.send(f"Location id `{stationed}` is not a valid ID.")
-
             return
         # fetches target and stationed information
         targetowner = await conn.fetchrow('''SELECT owner_id FROM provinces  WHERE id = $1;''', target)
@@ -1882,11 +1797,9 @@ class CNC(commands.Cog):
         # ensures province ownership
         if targetowner['owner_id'] != author.id:
             await ctx.send(f"{userinfo['username']} does not own Province #{target}!")
-
             return
         elif stationedowner['owner_id'] != author.id:
             await ctx.send(f"{userinfo['username']} does not own Province #{stationed}!")
-
             return
         # gathers specific province information
         targetinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', target)
@@ -1896,12 +1809,10 @@ class CNC(commands.Cog):
         if (targetinfo['coast'] is False) or (stationedinfo['coast'] is False):
             if stationed not in targetinfo['bordering']:
                 await ctx.send(f"Province #{stationed} does not border province #{target}!")
-
                 return
         # ensures sufficient troops reside in province
         if stationedinfo['troops'] < amount:
             await ctx.send(f"Province #{stationed} does not contain {amount} troops!")
-
             return
         try:
             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''', (targetinfo['troops'] + amount),
@@ -1932,7 +1843,6 @@ class CNC(commands.Cog):
         # ensures author registration
         if author.id not in alluserids:
             await ctx.send(f"{author} not registered.")
-
             return
         # fetches all province ids
         allprovinces = await conn.fetch('''SELECT id FROM provinces''')
@@ -1942,11 +1852,9 @@ class CNC(commands.Cog):
         # ensures province existence
         if target not in allids:
             await ctx.send(f"Location id `{target}` is not a valid ID.")
-
             return
         elif stationed not in allids:
             await ctx.send(f"Location id `{stationed}` is not a valid ID.")
-
             return
         # fetches target and stationed information
         targetownerid = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', target)
@@ -1955,16 +1863,13 @@ class CNC(commands.Cog):
         # checks to make sure the user has enough moves
         if userinfo['moves'] <= 0:
             await ctx.send(f"{userinfo['username']} does not have any movement points left!")
-
             return
         # checks ownership conflicts
         if stationedownerid['owner_id'] != author.id:
             await ctx.send(f"{userinfo['username']} does not own Province #{stationed}!")
-
             return
         if targetownerid['owner_id'] == author.id:
             await ctx.send(f"You cannot attack a province you already own!")
-
             return
         targetinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', target)
         stationedinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''',
@@ -1977,18 +1882,15 @@ class CNC(commands.Cog):
                                       userinfo['username'], defenderinfo['username'])
             if war['relation'] != 'war':
                 await ctx.send("You cannot attack a province owned by someone you are not at war with.")
-
                 return
         # ensures bordering
         if (targetinfo['coast'] is False) and (stationedinfo['coast'] is False):
             if stationed not in targetinfo['bordering']:
                 await ctx.send(f"Province #{stationed} does not border province #{target}!")
-
                 return
         # ensures sufficient troops reside in province
         if stationedinfo['troops'] < force:
             await ctx.send(f"Province #{stationed} does not contain {force} troops!")
-
             return
         # calculates crossing fee if the provinces do not border
         if (targetinfo['coast'] is True) and (stationedinfo['coast'] is True) and (
@@ -2000,7 +1902,6 @@ class CNC(commands.Cog):
             if crossingfee > userinfo['resources']:
                 await ctx.send(f"{userinfo['username']} does not have enough resources to cross with {force} troops!\n"
                                f"**Resources Required:** \u03FE{math.ceil(force * .05)}")
-
                 return
             if stationedinfo['port'] is True:
                 crossingfee *= .5
@@ -2847,7 +2748,6 @@ class CNC(commands.Cog):
                     f"You have been muted and will be unable to use the CnC system until {unmute_time_struct} for the following reason:"
                     f"```{reason}```")
                 await ctx.send(f"User muted until {unmute_time_struct} EST.")
-
                 return
             # execute indefinite mute
             if unmute_time is None:
@@ -2881,14 +2781,12 @@ class CNC(commands.Cog):
         allusers = [u['user_id'] for u in allusers]
         if user.id not in allusers:
             await ctx.send("You cannot unmute a user who is not part of the CnC system.")
-
             return
         # checks to make sure that the user is muted
         muted = await conn.fetchrow('''SELECT * FROM blacklist WHERE user_id = $1 AND status = $2 AND active = True;''',
                                     user.id, "mute")
         if muted is None:
             await ctx.send("You cannot unmute a user who is not already muted!")
-
             return
         try:
             # executes unmute
@@ -2921,7 +2819,6 @@ class CNC(commands.Cog):
         allusers = [u['user_id'] for u in allusers]
         if user.id not in allusers:
             await ctx.send("You cannot ban a user who is not part of the CnC system.")
-
             return
         # checks that the user is not banned
         banned = await conn.fetchrow(
@@ -2929,7 +2826,6 @@ class CNC(commands.Cog):
             user.id, "ban")
         if banned is not None:
             await ctx.send("You cannot ban a user who is already banned!")
-
             return
         await ctx.send("For what reason are you banning this user? The prompt will time out in 5 minutes")
 
@@ -2976,7 +2872,6 @@ class CNC(commands.Cog):
         allusers = [u['user_id'] for u in allusers]
         if user.id not in allusers:
             await ctx.send("You cannot unban a user who is not part of the CnC system.")
-
             return
         # checks that user is banned
         banned = await conn.fetchrow(
@@ -2984,7 +2879,6 @@ class CNC(commands.Cog):
             user.id, "ban")
         if banned is None:
             await ctx.send("You cannot unban a user who is not already banned!")
-
             return
         try:
             # executes unban
@@ -3036,7 +2930,6 @@ class CNC(commands.Cog):
                                    value=f"{(self.bot.get_user(entry['mod_id'])).name}#{(self.bot.get_user(entry['mod_id'])).discriminator}")
             userlogembed.add_field(name="Active", value=str(entry['active']))
             await ctx.send(embed=userlogembed)
-
             return
         if len(logs) > 1:
             reactions = ['\U000025c0', '\U0000274c', '\U000025b6']
@@ -3152,7 +3045,6 @@ class CNC(commands.Cog):
         uroles = [r.id for r in mod.roles]
         if 928889638888812586 not in uroles:
             await ctx.send("That user does not appear to be a CnC moderator.")
-
             return
         # fetch the logs
         logs = await conn.fetch('''SELECT * FROM blacklist WHERE mod_id = $1 ORDER BY action_date DESC;''',
@@ -3162,7 +3054,6 @@ class CNC(commands.Cog):
         # if the moderator hasn't taken any actions
         if len(logs) == 0:
             await ctx.send("That mod has no action record.")
-
             return
         # if there is only one entry, display the log
         if len(logs) == 1:
@@ -3181,7 +3072,6 @@ class CNC(commands.Cog):
                                       value=f"{strftime('%a, %d %b %Y %H:%M:%S %Z', entry['end_time'])}")
             modlogembed.add_field(name="Active", value=str(entry['active']))
             await ctx.send(embed=modlogembed)
-
             return
         # if there is more than one entry, prepare the log pages
         if len(logs) > 1:
@@ -3295,7 +3185,6 @@ class CNC(commands.Cog):
         log = await conn.fetchrow('''SELECT * FROM blacklist WHERE action_id = $1;''')
         if log is None:
             await ctx.send("That action does not appear to exist.")
-
             return
         entry = log
         user = self.bot.get_user(entry['user_id'])
@@ -3313,7 +3202,6 @@ class CNC(commands.Cog):
                                value=f"{(self.bot.get_user(entry['mod_id'])).name}#{(self.bot.get_user(entry['mod_id'])).discriminator}")
         userlogembed.add_field(name="Active", value=str(entry['active']))
         await ctx.send(embed=userlogembed)
-
         return
 
     # ---------------------Updating------------------------------
@@ -3391,7 +3279,6 @@ class CNC(commands.Cog):
             await conn.execute('''UPDATE cncusers SET maxmanpower = $1, manpower = $2 WHERE user_id = $3;''',
                                int(max_manpower), added_manpower, userinfo['user_id'])
         await cncchannel.send("Resource update complete.")
-
         return
 
     @commands.command()
