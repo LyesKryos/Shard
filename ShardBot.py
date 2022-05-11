@@ -18,7 +18,7 @@ class Shard(commands.Bot):
         # sets up logging, time, and allowed mentions
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.WARNING)
-        handler = logging.FileHandler("mendedshardlogs.log", encoding="utf-8", mode='a')
+        handler = logging.FileHandler("botlogs.log", encoding="utf-8", mode='a')
         handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
         self.logger.addHandler(handler)
         self.time = dt.now().strftime("%Y-%m-%d %H:%M:%S")
