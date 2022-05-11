@@ -3085,7 +3085,7 @@ class CNC(commands.Cog):
             # back, stop, forward reactions
             reactions = ['\U000025c0', '\U0000274c', '\U000025b6']
             entrynumber = 0
-            pages = len(logs) + 1
+            pages = len(logs)
             entry = logs[entrynumber]
             user = self.bot.get_user(entry['user_id'])
             modlogembed = discord.Embed(title=f"Moderation logs for {userobj.name}#{userobj.discriminator}",
