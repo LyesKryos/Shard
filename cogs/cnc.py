@@ -3254,7 +3254,7 @@ class CNC(commands.Cog):
     async def cnc_resource_loop(self):
         try:
             # channel to send to
-            cncchannel = self.bot.get_channel(927288304301387816)
+            cncchannel = self.bot.get_channel(835579413625569322)
             # connects to the database
             conn = self.bot.pool
             # fetches all the users and makes a list
@@ -3323,7 +3323,7 @@ class CNC(commands.Cog):
                                    int(max_manpower), added_manpower, userinfo['user_id'])
             turns = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
             await conn.execute('''UPDATE cnc_data SET data_value = $2 WHERE data_name = $1;''', "turns",
-                               str(int(turns['data_value']) + 1))
+                               str(int(turns['data_value'])+1))
             await cncchannel.send("Resource update complete.")
             return
         except Exception as error:
@@ -3380,36 +3380,39 @@ class CNC(commands.Cog):
             await ctx.send("CNC loop not running.")
 
     async def cncstartloop(self):
-        await self.bot.wait_until_ready()
-        shardchannel = self.bot.get_channel(835579413625569322)
-        if self.cnc_resource_loop.is_running():
-            await shardchannel.send("Already running on_ready.")
-            return
-        self.resourcesleeping = True
-        eastern = timezone('US/Eastern')
-        now = datetime.datetime.now(eastern)
-        if now.time() < datetime.time(hour=0):
-            update = now.replace(hour=0, minute=0, second=0, microsecond=1)
-            await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-            await discord.utils.sleep_until(update)
-        elif now.time() < datetime.time(hour=6):
-            update = now.replace(hour=6, minute=0, second=0)
-            await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-            await discord.utils.sleep_until(update)
-        elif now.time() < datetime.time(hour=12):
-            update = now.replace(hour=12, minute=0, second=0)
-            await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-            await discord.utils.sleep_until(update)
-        elif now.time() < datetime.time(hour=18, minute=0):
-            update = now.replace(hour=18, minute=0, second=0)
-            await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-            await discord.utils.sleep_until(update)
-        elif now.time() > datetime.time(hour=19, minute=0):
-            update = now.replace(hour=19, minute=22, second=30)
-            # update += datetime.timedelta(days=1)
-            await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-            await discord.utils.sleep_until(update)
-        self.cnc_resource_loop.start(self)
+        try:
+            await self.bot.wait_until_ready()
+            shardchannel = self.bot.get_channel(835579413625569322)
+            if self.cnc_resource_loop.is_running():
+                await shardchannel.send("Already running on_ready.")
+                return
+            self.resourcesleeping = True
+            eastern = timezone('US/Eastern')
+            now = datetime.datetime.now(eastern)
+            if now.time() < datetime.time(hour=0):
+                update = now.replace(hour=0, minute=0, second=0, microsecond=1)
+                await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await discord.utils.sleep_until(update)
+            elif now.time() < datetime.time(hour=6):
+                update = now.replace(hour=6, minute=0, second=0)
+                await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await discord.utils.sleep_until(update)
+            elif now.time() < datetime.time(hour=12):
+                update = now.replace(hour=12, minute=0, second=0)
+                await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await discord.utils.sleep_until(update)
+            elif now.time() < datetime.time(hour=18, minute=0):
+                update = now.replace(hour=18, minute=0, second=0)
+                await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await discord.utils.sleep_until(update)
+            elif now.time() > datetime.time(hour=19, minute=0):
+                update = now.replace(hour=19, minute=25, second=30)
+                # update += datetime.timedelta(days=1)
+                await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await discord.utils.sleep_until(update)
+            self.cnc_resource_loop.start(self)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
 
 
 async def setup(bot: Shard):
