@@ -3411,6 +3411,9 @@ class CNC(commands.Cog):
 
 async def setup(bot: Shard):
     cog = CNC(bot)
-    loop = bot.loop
-    loop.create_task(cog.cncstartloop())
-    await bot.add_cog(cog)
+    try:
+        loop = bot.loop
+        loop.create_task(cog.cncstartloop())
+        await bot.add_cog(cog)
+    except Exception as error:
+        cog.bot.logger.warning(msg=error)
