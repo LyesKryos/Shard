@@ -2938,7 +2938,7 @@ class CNC(commands.Cog):
             if len(logs) > 1:
                 reactions = ['\U000025c0', '\U0000274c', '\U000025b6']
                 entrynumber = 0
-                pages = len(logs) + 1
+                pages = len(logs)
                 entry = logs[entrynumber]
                 userlogembed = discord.Embed(title=f"Logs for {userobj.name}#{userobj.discriminator}",
                                              color=discord.Color.red())
