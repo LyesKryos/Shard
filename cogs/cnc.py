@@ -3252,76 +3252,79 @@ class CNC(commands.Cog):
     # @commands.command()
     # @commands.is_owner()
     async def cnc_resource_loop(self, ctx):
-        # channel to send to
-        cncchannel = self.bot.get_channel(728444080908140575)
-        # connects to the database
-        conn = self.bot.pool
-        # fetches all the users and makes a list
-        users = await conn.fetch('''SELECT user_id FROM cncusers;''')
-        userids = [ids['user_id'] for ids in users]
-        # for every user in the list
-        for u in userids:
-            # fetch all provinces  owned by the user
-            userinfo = await conn.fetchrow(
-                '''SELECT * FROM cncusers WHERE user_id = $1;''', u)
-            provinceslist = userinfo['provinces_owned']
-            provinceslist.remove(0)
-            added_resources = 0
-            manpower_mod = .1
-            if userinfo['focus'] == 'm':
-                manpower_mod = .2
-            max_manpower = 3000
-            manpower = userinfo['manpower']
-            # for every province, check the worth/manpower and add it to the overall amount
-            for p in userinfo['provinces_owned']:
-                provinceworth = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', p)
-                added_resources += provinceworth['worth']
-                # if there is a port, add 1/2 the province worth
-                if provinceworth['port'] is True:
-                    added_resources += .5 * provinceworth['worth']
-                # if there is a city, add 1000 to the resources
-                if provinceworth['city'] is True:
-                    added_resources += 1000
-                max_manpower += provinceworth['manpower']
-            added_manpower = math.ceil(manpower + (max_manpower * manpower_mod))
-            # ensure manpower limit
-            if added_manpower > max_manpower:
-                added_manpower = max_manpower
-            # calculate and add all movement points, resources, manpower, and other limits
-            # moves
-            if len(provinceslist) <= 5:
-                await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', 5, userinfo['user_id'])
-            elif len(provinceslist) > 5:
-                movementpoints = math.floor((len(provinceslist) - 5) / 5) + 5
-                if userinfo['focus'] == "s":
-                    movementpoints += math.ceil(movementpoints * .5)
-                await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', movementpoints,
-                                   userinfo['user_id'])
-            # fort/city/port limit update
-            if len(provinceslist) <= 5:
-                await conn.execute(
-                    '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;'''
-                    , [userinfo['citylimit'][0], 1], [userinfo['portlimit'][0], 1], [userinfo['fortlimit'][0], 1],
-                    userinfo['user_id'])
-            elif len(provinceslist) > 5:
-                fortlimit = math.floor((len(provinceslist) - 5) / 5) + 1
-                portlimit = math.floor((len(provinceslist) - 5) / 3) + 1
-                citylimit = math.floor((len(provinceslist) - 5) / 7) + 1
-                if userinfo['focus'] == 's':
-                    fortlimit += fortlimit + 1
-                if userinfo['focus'] == 'e':
-                    portlimit += portlimit + 1
-                await conn.execute(
-                    '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;'''
-                    , [userinfo['citylimit'][0], citylimit], [userinfo['portlimit'][0], portlimit],
-                    [userinfo['fortlimit'][0], fortlimit],
-                    userinfo['user_id'])
-            await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
-                               (userinfo['resources'] + math.ceil(added_resources)), u)
-            await conn.execute('''UPDATE cncusers SET maxmanpower = $1, manpower = $2 WHERE user_id = $3;''',
-                               int(max_manpower), added_manpower, userinfo['user_id'])
-        await cncchannel.send("Resource update complete.")
-        return
+        try:
+            # channel to send to
+            cncchannel = self.bot.get_channel(728444080908140575)
+            # connects to the database
+            conn = self.bot.pool
+            # fetches all the users and makes a list
+            users = await conn.fetch('''SELECT user_id FROM cncusers;''')
+            userids = [ids['user_id'] for ids in users]
+            # for every user in the list
+            for u in userids:
+                # fetch all provinces  owned by the user
+                userinfo = await conn.fetchrow(
+                    '''SELECT * FROM cncusers WHERE user_id = $1;''', u)
+                provinceslist = userinfo['provinces_owned']
+                provinceslist.remove(0)
+                added_resources = 0
+                manpower_mod = .1
+                if userinfo['focus'] == 'm':
+                    manpower_mod = .2
+                max_manpower = 3000
+                manpower = userinfo['manpower']
+                # for every province, check the worth/manpower and add it to the overall amount
+                for p in userinfo['provinces_owned']:
+                    provinceworth = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', p)
+                    added_resources += provinceworth['worth']
+                    # if there is a port, add 1/2 the province worth
+                    if provinceworth['port'] is True:
+                        added_resources += .5 * provinceworth['worth']
+                    # if there is a city, add 1000 to the resources
+                    if provinceworth['city'] is True:
+                        added_resources += 1000
+                    max_manpower += provinceworth['manpower']
+                added_manpower = math.ceil(manpower + (max_manpower * manpower_mod))
+                # ensure manpower limit
+                if added_manpower > max_manpower:
+                    added_manpower = max_manpower
+                # calculate and add all movement points, resources, manpower, and other limits
+                # moves
+                if len(provinceslist) <= 5:
+                    await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', 5, userinfo['user_id'])
+                elif len(provinceslist) > 5:
+                    movementpoints = math.floor((len(provinceslist) - 5) / 5) + 5
+                    if userinfo['focus'] == "s":
+                        movementpoints += math.ceil(movementpoints * .5)
+                    await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', movementpoints,
+                                       userinfo['user_id'])
+                # fort/city/port limit update
+                if len(provinceslist) <= 5:
+                    await conn.execute(
+                        '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;'''
+                        , [userinfo['citylimit'][0], 1], [userinfo['portlimit'][0], 1], [userinfo['fortlimit'][0], 1],
+                        userinfo['user_id'])
+                elif len(provinceslist) > 5:
+                    fortlimit = math.floor((len(provinceslist) - 5) / 5) + 1
+                    portlimit = math.floor((len(provinceslist) - 5) / 3) + 1
+                    citylimit = math.floor((len(provinceslist) - 5) / 7) + 1
+                    if userinfo['focus'] == 's':
+                        fortlimit += fortlimit + 1
+                    if userinfo['focus'] == 'e':
+                        portlimit += portlimit + 1
+                    await conn.execute(
+                        '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;'''
+                        , [userinfo['citylimit'][0], citylimit], [userinfo['portlimit'][0], portlimit],
+                        [userinfo['fortlimit'][0], fortlimit],
+                        userinfo['user_id'])
+                await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
+                                   (userinfo['resources'] + math.ceil(added_resources)), u)
+                await conn.execute('''UPDATE cncusers SET maxmanpower = $1, manpower = $2 WHERE user_id = $3;''',
+                                   int(max_manpower), added_manpower, userinfo['user_id'])
+            await cncchannel.send("Resource update complete.")
+            return
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
 
     @commands.command()
     @commands.is_owner()
@@ -3347,8 +3350,8 @@ class CNC(commands.Cog):
             update = now.replace(hour=12, minute=0, second=0)
             await ctx.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
-        elif now.time() < datetime.time(hour=18, minute=0):
-            update = now.replace(hour=13, minute=36, second=0)
+        elif now.time() < datetime.time(hour=13, minute=40):
+            update = now.replace(hour=13, minute=40, second=0)
             await ctx.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         elif now.time() > datetime.time(hour=18, minute=0):
