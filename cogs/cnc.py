@@ -3118,7 +3118,7 @@ class CNC(commands.Cog):
                     break
                 # if the reaction is back
                 if str(reaction) == '\U000025c0':
-                    # if the reaction is back and we are at entry 0
+                    # if the reaction is back and we are at entry 1
                     if entrynumber == 0:
                         await logmessage.clear_reactions()
                         for r in reactions:
