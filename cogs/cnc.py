@@ -40,7 +40,7 @@ class CNC(commands.Cog):
             for y in range(0, height):
                 data = prov.getpixel((x, y))
                 if data != color:
-                    if data != (0, 0, 0):
+                    if data != (255, 255,255):
                         prov.putpixel((x, y), color)
         if release is True:
             color = ImageColor.getrgb("#808080")
@@ -48,7 +48,7 @@ class CNC(commands.Cog):
                 for y in range(0, prov.size[1]):
                     data = prov.getpixel((x, y))
                     if data != color:
-                        if data != (0, 0, 0):
+                        if data != (255, 255, 255):
                             prov.putpixel((x, y), color)
         prov = prov.convert("RGBA")
         map.paste(prov, box=cord, mask=prov)
@@ -2625,17 +2625,16 @@ class CNC(commands.Cog):
         for p in province_ids:
             terrain = await conn.fetchrow('''SELECT terrain FROM provinces  WHERE id = $1;''', p)
             if terrain['terrain'] == 0:
-                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''', randrange(250, 400), p)
+                await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(250, 400), p)
             if terrain['terrain'] == 1:
-                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''', randrange(100, 180), p)
+                await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(100, 180), p)
             if terrain['terrain'] == 2:
-                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''', randrange(300, 400), p)
+                await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(300, 400), p)
             if terrain['terrain'] == 5:
-                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''', randrange(1000, 1300), p)
+                await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(1000, 1300), p)
             if terrain['terrain'] == 7:
-                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''', randrange(100, 180), p)
+                await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(100, 180), p)
         await ctx.send("https://tenor.com/view/finished-elijah-wood-lord-of-the-rings-lava-fire-gif-5894611")
-        
         return
 
     @commands.command()
