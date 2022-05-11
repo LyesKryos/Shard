@@ -105,9 +105,10 @@ class CNC(commands.Cog):
                         f"{nationame} is an already registered nation name! Please choose a different username.")
                     return
             # checks the focus and ensures proper reading
-            if focus is not None:
-                if focus.lower() != ("m" or "e" or "d"):
-                    raise commands.UserInputError
+            focuses = ['m', 'e', 'd']
+            if focus != '':
+                if focus.lower() not in focuses:
+                    raise Exception("That is not a valid focus. Please use only m, e, or d.")
             else:
                 focus = "None"
             if color in self.banned_colors:
@@ -139,8 +140,8 @@ class CNC(commands.Cog):
             await ctx.send(f"{ctx.author.name} has registered {nationame} in the Command and Conquer System!")
         # sends out any error
         except Exception as error:
-            self.bot.logger.warning(msg=error)
             await ctx.send(error)
+            self.bot.logger.warning(msg=error)
 
     @commands.command(usage="<nation name>", aliases=['cncv'])
     @CNCcheck()
@@ -159,7 +160,6 @@ class CNC(commands.Cog):
             # checks the author id against the list of registered users
             if author.id not in registeredlist:
                 await ctx.send(f"{ctx.author} does not appear to be registered.")
-
                 return
             # grabs the nation information
             userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
@@ -193,9 +193,8 @@ class CNC(commands.Cog):
                 relations = await conn.fetch('''SELECT nation, relation FROM relations WHERE name = $1;''',
                                              userinfo['username'])
             except Exception as error:
-                self.bot.logger.warning(msg=error)
                 await ctx.send(error)
-
+                self.bot.logger.warning(msg=error)
             alliances = list()
             wars = list()
             for r in relations:
