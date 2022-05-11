@@ -105,49 +105,7 @@
       <workItem from="1651500112401" duration="39000" />
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
-      <workItem from="1652197800527" duration="25143000" />
-    </task>
-    <task id="LOCAL-00041" summary="Fixing recruiter of the month feature">
-      <created>1648873301843</created>
-      <option name="number" value="00041" />
-      <option name="presentableId" value="LOCAL-00041" />
-      <option name="project" value="LOCAL" />
-      <updated>1648873301843</updated>
-    </task>
-    <task id="LOCAL-00042" summary="Update currency module">
-      <created>1649359584597</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1649359584597</updated>
-    </task>
-    <task id="LOCAL-00043" summary="Update currency module">
-      <created>1651672642011</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1651672642011</updated>
-    </task>
-    <task id="LOCAL-00044" summary="Update currency module">
-      <created>1651766711196</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1651766711196</updated>
-    </task>
-    <task id="LOCAL-00045" summary="Adding roleplay cog and commands.">
-      <created>1651766830020</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1651766830020</updated>
-    </task>
-    <task id="LOCAL-00046" summary="Fixing roleplay.py">
-      <created>1651768059679</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1651768059679</updated>
+      <workItem from="1652197800527" duration="25442000" />
     </task>
     <task id="LOCAL-00047" summary="Fixing roleplay.py">
       <created>1651769762416</created>
@@ -450,7 +408,49 @@
       <option name="project" value="LOCAL" />
       <updated>1652310963358</updated>
     </task>
-    <option name="localTasksCounter" value="90" />
+    <task id="LOCAL-00090" summary="CNC loop testing">
+      <created>1652311015061</created>
+      <option name="number" value="00090" />
+      <option name="presentableId" value="LOCAL-00090" />
+      <option name="project" value="LOCAL" />
+      <updated>1652311015061</updated>
+    </task>
+    <task id="LOCAL-00091" summary="CNC loop testing">
+      <created>1652311079148</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1652311079149</updated>
+    </task>
+    <task id="LOCAL-00092" summary="CNC loop testing">
+      <created>1652311109034</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1652311109034</updated>
+    </task>
+    <task id="LOCAL-00093" summary="CNC loop testing">
+      <created>1652311122532</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1652311122532</updated>
+    </task>
+    <task id="LOCAL-00094" summary="CNC loop testing">
+      <created>1652311225514</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1652311225514</updated>
+    </task>
+    <task id="LOCAL-00095" summary="CNC loop testing">
+      <created>1652311242317</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1652311242317</updated>
+    </task>
+    <option name="localTasksCounter" value="96" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
