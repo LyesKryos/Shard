@@ -2991,7 +2991,7 @@ class CNC(commands.Cog):
                             userlogembed.add_field(name="Moderator",
                                                    value=f"{(self.bot.get_user(entry['mod_id'])).name}#{(self.bot.get_user(entry['mod_id'])).discriminator}")
                             userlogembed.add_field(name="Active", value=str(entry['active']))
-                            userlogembed.set_footer(text=f"Page {entrynumber - 1} of {pages}")
+                            userlogembed.set_footer(text=f"Page {abs(entrynumber-1)} of {pages}")
                             await logmessage.clear_reactions()
                             await logmessage.edit(embed=userlogembed)
                             for r in reactions:
@@ -3141,7 +3141,7 @@ class CNC(commands.Cog):
                             modlogembed.add_field(name="Timeout",
                                                   value=f"{strftime('%a, %d %b %Y %H:%M:%S %Z', entry['end_time'])}")
                         modlogembed.add_field(name="Active", value=str(entry['active']))
-                        modlogembed.set_footer(text=f"Page {entrynumber - 1} of {pages}")
+                        modlogembed.set_footer(text=f"Page {abs(entrynumber-1)} of {pages}")
                         await logmessage.clear_reactions()
                         await logmessage.edit(embed=modlogembed)
                         for r in reactions:
