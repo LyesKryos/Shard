@@ -3251,7 +3251,7 @@ class CNC(commands.Cog):
     @tasks.loop(hours=6)
     # @commands.command()
     # @commands.is_owner()
-    async def cnc_resource_loop(self, ctx):
+    async def cnc_resource_loop(self):
         try:
             # channel to send to
             cncchannel = self.bot.get_channel(728444080908140575)
@@ -3399,8 +3399,8 @@ def setup(bot: Shard):
             update = now.replace(hour=12, minute=0, second=0)
             await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
-        elif now.time() < datetime.time(hour=13, minute=44):
-            update = now.replace(hour=13, minute=44, second=0)
+        elif now.time() < datetime.time(hour=13, minute=45):
+            update = now.replace(hour=13, minute=45, second=0)
             await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         elif now.time() > datetime.time(hour=18, minute=0):
