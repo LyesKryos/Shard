@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="CNC loop testing" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Channel resetting" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -105,21 +105,7 @@
       <workItem from="1651500112401" duration="39000" />
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
-      <workItem from="1652197800527" duration="26053000" />
-    </task>
-    <task id="LOCAL-00054" summary="Adding information command.">
-      <created>1652028203286</created>
-      <option name="number" value="00054" />
-      <option name="presentableId" value="LOCAL-00054" />
-      <option name="project" value="LOCAL" />
-      <updated>1652028203288</updated>
-    </task>
-    <task id="LOCAL-00055" summary="Editing information command.">
-      <created>1652064749790</created>
-      <option name="number" value="00055" />
-      <option name="presentableId" value="LOCAL-00055" />
-      <option name="project" value="LOCAL" />
-      <updated>1652064749790</updated>
+      <workItem from="1652197800527" duration="26353000" />
     </task>
     <task id="LOCAL-00056" summary="Fixing database operations">
       <created>1652066266421</created>
@@ -450,7 +436,21 @@
       <option name="project" value="LOCAL" />
       <updated>1652311894010</updated>
     </task>
-    <option name="localTasksCounter" value="103" />
+    <task id="LOCAL-00103" summary="CNC loop testing">
+      <created>1652312037352</created>
+      <option name="number" value="00103" />
+      <option name="presentableId" value="LOCAL-00103" />
+      <option name="project" value="LOCAL" />
+      <updated>1652312037352</updated>
+    </task>
+    <task id="LOCAL-00104" summary="Channel resetting">
+      <created>1652312173761</created>
+      <option name="number" value="00104" />
+      <option name="presentableId" value="LOCAL-00104" />
+      <option name="project" value="LOCAL" />
+      <updated>1652312173761</updated>
+    </task>
+    <option name="localTasksCounter" value="105" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -469,7 +469,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Adding currency.py" />
     <MESSAGE value="Fixing currency.py" />
     <MESSAGE value="Fixing recruiter of the month feature" />
     <MESSAGE value="Update currency module" />
@@ -494,7 +493,8 @@
     <MESSAGE value="Altering CNC checking" />
     <MESSAGE value="CNC checking overhaul" />
     <MESSAGE value="CNC loop testing" />
-    <option name="LAST_COMMIT_MESSAGE" value="CNC loop testing" />
+    <MESSAGE value="Channel resetting" />
+    <option name="LAST_COMMIT_MESSAGE" value="Channel resetting" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

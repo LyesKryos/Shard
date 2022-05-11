@@ -3382,7 +3382,7 @@ class CNC(commands.Cog):
 
     async def cncstartloop(self):
         await self.bot.wait_until_ready()
-        shardchannel = self.bot.get_channel(927288304301387816)
+        shardchannel = self.bot.get_channel(835579413625569322)
         if CNC.cnc_resource_loop.is_running():
             await shardchannel.send("Already running on_ready.")
             return
