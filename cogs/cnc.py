@@ -3255,7 +3255,7 @@ class CNC(commands.Cog):
     async def cnc_resource_loop(self):
         try:
             # channel to send to
-            cncchannel = self.bot.get_channel(835579413625569322)
+            cncchannel = self.bot.get_channel(927288304301387816)
             # connects to the database
             conn = self.bot.pool
             # fetches all the users and makes a list
@@ -3382,7 +3382,7 @@ class CNC(commands.Cog):
 
     async def cncstartloop(self):
         await self.bot.wait_until_ready()
-        shardchannel = self.bot.get_channel(835579413625569322)
+        shardchannel = self.bot.get_channel(927288304301387816)
         if CNC.cnc_resource_loop.is_running():
             await shardchannel.send("Already running on_ready.")
             return
