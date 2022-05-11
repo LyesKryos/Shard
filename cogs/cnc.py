@@ -113,7 +113,7 @@ class CNC(commands.Cog):
                                                 "The system is hosted on Shard, a purpose-built bot. For more "
                                                 "information about the Command and Conquer system, make sure to check "
                                                 "out the dispatch and use the command "
-                                                f" `{self.bot.command_prefix}help CommandAndConquest`.", inline=False)
+                                                f" `{self.bot.command_prefix}help CNC`.", inline=False)
         infoembed.add_field(name="Turns", value=f"It has currently turn {int(data['data_value'])}.")
         infoembed.add_field(name="Questions?",
                             value="Contact the creator: Lies Kryos#1734\nContact a moderator: [Insert_Person_Here]#6003")
@@ -3254,7 +3254,7 @@ class CNC(commands.Cog):
     async def cnc_resource_loop(self):
         try:
             # channel to send to
-            cncchannel = self.bot.get_channel(728444080908140575)
+            cncchannel = self.bot.get_channel(927288304301387816)
             # connects to the database
             conn = self.bot.pool
             # fetches all the users and makes a list
@@ -3359,7 +3359,7 @@ class CNC(commands.Cog):
             update += datetime.timedelta(days=1)
             await ctx.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
-        self.cnc_resource_loop.start()
+        self.cnc_resource_loop.start(self)
 
     @commands.command()
     @commands.is_owner()
@@ -3378,7 +3378,7 @@ class CNC(commands.Cog):
 
     async def cncstartloop(self):
         await self.bot.wait_until_ready()
-        shardchannel = self.bot.get_channel(835579413625569322)
+        shardchannel = self.bot.get_channel(927288304301387816)
         if CNC.cnc_resource_loop.is_running():
             await shardchannel.send("Already running on_ready.")
             return
@@ -3398,22 +3398,19 @@ class CNC(commands.Cog):
             await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         elif now.time() < datetime.time(hour=18, minute=0):
-            update = now.replace(hour=18, minute=51, second=0)
+            update = now.replace(hour=18, minute=0, second=0)
             await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
-        elif now.time() > datetime.time(hour=19, minute=0):
-            update = now.replace(hour=0, minute=0, second=0)
+        elif now.time() > datetime.time(hour=20, minute=0):
+            update = now.replace(hour=19, minute=16, second=30)
             update += datetime.timedelta(days=1)
             await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
-        CNC.cnc_resource_loop.start()
+        CNC.cnc_resource_loop.start(self)
 
 
 async def setup(bot: Shard):
     cog = CNC(bot)
-    try:
-        loop = bot.loop
-        loop.create_task(cog.cncstartloop())
-        await bot.add_cog(cog)
-    except Exception as error:
-        cog.bot.logger.warning(msg=error)
+    loop = bot.loop
+    loop.create_task(cog.cncstartloop())
+    await bot.add_cog(cog)
