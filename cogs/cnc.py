@@ -26,6 +26,42 @@ class CNC(commands.Cog):
 
     resourcesleeping = False
     banned_colors = ["#000000", "#ffffff", "#808080"]
+    
+    async def cog_check(self, ctx) -> bool:
+        if ctx.author.id in [293518673417732098 or 285855888336486400 or 674285995021041677]:
+            return True
+        else:
+            # if ctx.guild is None:
+            #     aroles = list()
+            #     guild = ctx.bot.get_guild(674259612580446230)
+            #     member = guild.get_member(ctx.author.id)
+            #     for ar in member.roles:
+            #         aroles.append(ar.id)
+            #     if 896886962710007808 not in aroles:
+            #         await ctx.send("You don't have the right role for that.")
+            #         return False
+            conn = self.bot.pool
+            blacklist = await conn.fetchrow('''SELECT * FROM blacklist WHERE user_id = $1 AND active = True;''',
+                                            ctx.author.id)
+            if blacklist is not None:
+                if blacklist['end_time'] is None:
+                    if blacklist['status'] == "mute":
+                        return False
+                    if blacklist['status'] == "ban":
+                        return False
+                if blacklist['end_time'] < datetime.datetime.now():
+                    try:
+                        await conn.execute(
+                            '''UPDATE blacklist SET active = False WHERE user_id = $1 AND end_time = $2;''',
+                            ctx.author.id, blacklist['end_time'])
+                    except Exception as error:
+                        await ctx.send(error)
+                        self.bot.logger.warning(msg=error)
+                else:
+                    return False
+
+
+
 
     def map_color(self, province, province_cord, hexcode, release: bool = False):
         province_cord = ((int(province_cord[0])), (int(province_cord[1])))
@@ -86,7 +122,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[nation name] [hexadecimal color id] <focus (m,e,s)>")
     @commands.guild_only()
-    @CNCcheck()
+
     async def cnc_register(self, ctx, nationame: str, color: str, focus: str = None):
         try:
             userid = ctx.author.id
@@ -144,7 +180,7 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
 
     @commands.command(usage="<nation name>", aliases=['cncv'])
-    @CNCcheck()
+    
     async def cnc_view(self, ctx, *args):
         # connects to the database
         conn = self.bot.pool
@@ -289,7 +325,7 @@ class CNC(commands.Cog):
             await ctx.send(embed=cncuserembed)
 
     @commands.command(aliases=['cncdv'])
-    @CNCcheck()
+    
     async def cnc_detailed_view(self, ctx):
         # connects to the database
         conn = self.bot.pool
@@ -383,7 +419,7 @@ class CNC(commands.Cog):
 
     @commands.command(aliases=['cncva'])
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_view_all(self, ctx):
         # connects to the database
         conn = self.bot.pool
@@ -399,7 +435,7 @@ class CNC(commands.Cog):
         await ctx.send(embed=viewallembed)
 
     @commands.command(aliases=['cncsv'])
-    @CNCcheck()
+    
     async def cnc_strategic_view(self, ctx):
         author = ctx.author
         # connects to the database
@@ -464,7 +500,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[nation name] <reason>")
     @commands.is_owner()
-    @CNCcheck()
+    
     async def cnc_remove(self, ctx, nationname: str, reason: str = None):
         # loop for thread
         loop = asyncio.get_running_loop()
@@ -506,7 +542,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[item being edited (color or focus)]")
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_edit(self, ctx, editing):
         loop = asyncio.get_running_loop()
         author = ctx.author
@@ -586,7 +622,7 @@ class CNC(commands.Cog):
     # ---------------------Province Commands------------------------------
 
     @commands.command(usage="[province id]", aliases=['cncp'])
-    @CNCcheck()
+    
     async def cnc_province(self, ctx, provinceid: int):
         # connects to the database
         conn = self.bot.pool
@@ -647,7 +683,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[province id]")
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_release(self, ctx, provinceid: int):
         loop = asyncio.get_running_loop()
         author = ctx.author
@@ -715,7 +751,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[province id] [deployed force]", aliases=['cncd'])
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_deploy(self, ctx, location: int, amount: int):
         author = ctx.author
         # connects to the database
@@ -768,7 +804,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[province id] [recipient nation]")
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_transfer(self, ctx, provinceid: int, recipient: str):
         loop = asyncio.get_running_loop()
         author = ctx.author
@@ -836,7 +872,7 @@ class CNC(commands.Cog):
     # ---------------------Interaction Commands------------------------------
 
     @commands.command(usage="<offer id>", aliases=['cncvi'])
-    @CNCcheck()
+    
     async def cnc_view_interaction(self, ctx, interactionid: int = None):
         author = ctx.author
         # connects to the database
@@ -871,7 +907,7 @@ class CNC(commands.Cog):
             with open(f"{self.interaction_directory}{interaction['id']}.txt", "r") as file:
                 await ctx.send(file=discord.File(file, f"{interaction['id']}.txt"))
     @commands.command(usage="[offer id]")
-    @CNCcheck()
+    
     async def cnc_offer(self, ctx, offerid: int):
         author = ctx.author
         # connects to the database
@@ -900,7 +936,7 @@ class CNC(commands.Cog):
                 await ctx.send(file=discord.File(file, f"{offer['id']}.txt"))
 
     @commands.command(usage="[interaction id] [interaction (accept, reject, cancel)]", aliases=['cnci'])
-    @CNCcheck()
+    
     async def cnc_interaction(self, ctx, interactionid: int, interaction: str):
         author = ctx.author
         # connects to the database
@@ -1006,7 +1042,7 @@ class CNC(commands.Cog):
             raise commands.UserInputError
 
     @commands.command()
-    @CNCcheck()
+    
     async def cnc_view_pending(self, ctx):
         author = ctx.author
         # connects to the database
@@ -1030,7 +1066,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[nation],, [terms]")
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_alliance(self, ctx, *args):
         author = ctx.author
         # connects to the database
@@ -1098,7 +1134,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[recipient],, <goal>")
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_declare(self, ctx, *args):
         author = ctx.author
         # connects to the database
@@ -1182,7 +1218,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[recipient],, [terms]")
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_peace(self, ctx, *args):
         author = ctx.author
         # connects to the database
@@ -1251,7 +1287,7 @@ class CNC(commands.Cog):
     # ---------------------Resource and Recruit Commands------------------------------
 
     @commands.command(usage="<nation name>", aliases=['cncb'])
-    @CNCcheck()
+    
     async def cnc_bank(self, ctx, *args):
         conn = self.bot.pool
         nationname = ' '.join(args[:])
@@ -1347,7 +1383,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[battalion amount] <province id>", aliases=['cncr'])
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_recruit(self, ctx, ramount: int, location: int = None):
         author = ctx.author
         # connects to the database
@@ -1417,7 +1453,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[battalion amount]")
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_mass_recruit(self, ctx, amount: int):
         author = ctx.author
         # connects to the database
@@ -1466,7 +1502,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[amount] [recipient nation]")
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_tribute(self, ctx, amount: int, recipient: str):
         if amount <= 0:
             raise commands.UserInputError
@@ -1506,7 +1542,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[province id]")
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_purchase(self, ctx, provinceid: int):
         loop = asyncio.get_running_loop()
         author = ctx.author
@@ -1587,7 +1623,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[province id] [structure (fort, port, city)]")
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_construct(self, ctx, provinceid: int, structure: str):
         author = ctx.author
         # connects to the database
@@ -1715,7 +1751,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[province id] [amount]", aliases=['cncw'])
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_withdraw(self, ctx, province: int, amount: int):
         author = ctx.author
         # connects to the database
@@ -1765,7 +1801,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[stationed target id] [target province id] [amount]", aliases=['cncm'])
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_move(self, ctx, stationed: int, target: int, amount: int):
         author = ctx.author
         # connects to the database
@@ -1830,7 +1866,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[stationed province] [target province] [attack force]", aliases=['cnca'])
     @commands.guild_only()
-    @CNCcheck()
+    
     async def cnc_attack(self, ctx, stationed: int, target: int, force: int):
         loop = asyncio.get_running_loop()
         author = ctx.author
@@ -2434,7 +2470,7 @@ class CNC(commands.Cog):
     # ------------------Map Commands----------------------------
 
     @commands.command()
-    @CNCcheck()
+    
     async def cnc_map(self, ctx, debug: bool = False):
         loop = asyncio.get_running_loop()
         reactions = ["\U0001f5fa", "\U000026f0", "\U0001f3f3", "\U0000274c"]
