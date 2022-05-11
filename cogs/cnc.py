@@ -837,13 +837,14 @@ class CNC(commands.Cog):
 
     @commands.command(usage="<offer id>", aliases=['cncvi'])
     @CNCcheck()
-    async def cnc_view_interactions(self, ctx, interactionid: int = None):
+    async def cnc_view_interaction(self, ctx, interactionid: int = None):
         author = ctx.author
         # connects to the database
         conn = self.bot.pool
         if interactionid is None:
             with open(f"{self.interaction_directory}{author.id}.txt", "rb") as file:
                 await author.send(file=discord.File(file, f"Interactions Log for {author.id}.txt"))
+                await ctx.send("Sent!")
                 return
         interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE id = $1;''', interactionid)
         if interaction is None:
@@ -2897,136 +2898,140 @@ class CNC(commands.Cog):
     @commands.command(usage="[user]")
     @modcheck()
     async def cnc_user_log(self, ctx, *args):
-        # connects to the database
-        conn = self.bot.pool
-        # parses out user ID and checks for existence
         try:
-            user = ' '.join(args[:])
-            user = await commands.converter.MemberConverter().convert(ctx, user)
-        except commands.BadArgument:
-            await ctx.send("That user does not appear to exist. User information is case and spelling sensitive.")
-            return
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', user.id)
-        if userinfo is None:
-            await ctx.send("That user does not appear to exist.")
-            return
-        logs = await conn.fetch('''SELECT * FROM blacklist WHERE user_id = $1 ORDER BY action_date DESC;''', user.id)
-        userobj = self.bot.get_user(user.id)
-        if len(logs) == 0:
-            await ctx.send("That user has no record.")
-            return
-        if len(logs) == 1:
-            entry = logs[0]
-            userlogembed = discord.Embed(title=f"Logs for {userobj.name}#{userobj.discriminator}",
-                                         color=discord.Color.red())
-            userlogembed.add_field(name="Reason", value=entry['reason'], inline=False)
-            userlogembed.add_field(name="Action ID", value=entry['action_id'])
-            userlogembed.add_field(name="Date",
-                                   value=f"{entry['action_date'].day}-{entry['action_date'].month}-{entry['action_date'].year}")
-            userlogembed.add_field(name="Type", value=entry['status'])
-            if entry['end_time'] is not None:
-                userlogembed.add_field(name="Timeout", value=f"{strftime('%a, %d %b %Y %H:%M:%S %Z')}")
-            userlogembed.add_field(name="Moderator",
-                                   value=f"{(self.bot.get_user(entry['mod_id'])).name}#{(self.bot.get_user(entry['mod_id'])).discriminator}")
-            userlogembed.add_field(name="Active", value=str(entry['active']))
-            await ctx.send(embed=userlogembed)
-            return
-        if len(logs) > 1:
-            reactions = ['\U000025c0', '\U0000274c', '\U000025b6']
-            entrynumber = 0
-            pages = len(logs) + 1
-            entry = logs[entrynumber]
-            userlogembed = discord.Embed(title=f"Logs for {userobj.name}#{userobj.discriminator}",
-                                         color=discord.Color.red())
-            userlogembed.add_field(name="Reason", value=entry['reason'], inline=False)
-            userlogembed.add_field(name="Action ID", value=entry['action_id'])
-            userlogembed.add_field(name="Date",
-                                   value=f"{entry['action_date'].day}-{entry['action_date'].month}-{entry['action_date'].year}")
-            userlogembed.add_field(name="Type", value=entry['status'])
-            if entry['end_time'] is not None:
-                userlogembed.add_field(name="Timeout", value=f"{entry['end_time'].strftime('%a, %d %b %Y %H:%M:%S')}")
-            userlogembed.add_field(name="Moderator",
-                                   value=f"{(self.bot.get_user(entry['mod_id'])).name}#{(self.bot.get_user(entry['mod_id'])).discriminator}")
-            userlogembed.add_field(name="Active", value=str(entry['active']))
-            userlogembed.set_footer(text=f"Page {entrynumber + 1} of {pages}")
-            logmessage = await ctx.send(embed=userlogembed)
-            for r in reactions:
-                await logmessage.add_reaction(r)
-            while True:
+            # connects to the database
+            conn = self.bot.pool
+            # parses out user ID and checks for existence
+            try:
+                user = ' '.join(args[:])
+                user = await commands.converter.MemberConverter().convert(ctx, user)
+            except commands.BadArgument:
+                await ctx.send("That user does not appear to exist. User information is case and spelling sensitive.")
+                return
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', user.id)
+            if userinfo is None:
+                await ctx.send("That user does not appear to exist.")
+                return
+            logs = await conn.fetch('''SELECT * FROM blacklist WHERE user_id = $1 ORDER BY action_date DESC;''', user.id)
+            userobj = self.bot.get_user(user.id)
+            if len(logs) == 0:
+                await ctx.send("That user has no record.")
+                return
+            if len(logs) == 1:
+                entry = logs[0]
+                userlogembed = discord.Embed(title=f"Logs for {userobj.name}#{userobj.discriminator}",
+                                             color=discord.Color.red())
+                userlogembed.add_field(name="Reason", value=entry['reason'], inline=False)
+                userlogembed.add_field(name="Action ID", value=entry['action_id'])
+                userlogembed.add_field(name="Date",
+                                       value=f"{entry['action_date'].day}-{entry['action_date'].month}-{entry['action_date'].year}")
+                userlogembed.add_field(name="Type", value=entry['status'])
+                if entry['end_time'] is not None:
+                    userlogembed.add_field(name="Timeout", value=f"{strftime('%a, %d %b %Y %H:%M:%S %Z')}")
+                userlogembed.add_field(name="Moderator",
+                                       value=f"{(self.bot.get_user(entry['mod_id'])).name}#{(self.bot.get_user(entry['mod_id'])).discriminator}")
+                userlogembed.add_field(name="Active", value=str(entry['active']))
+                await ctx.send(embed=userlogembed)
+                return
+            if len(logs) > 1:
+                reactions = ['\U000025c0', '\U0000274c', '\U000025b6']
+                entrynumber = 0
+                pages = len(logs) + 1
+                entry = logs[entrynumber]
+                userlogembed = discord.Embed(title=f"Logs for {userobj.name}#{userobj.discriminator}",
+                                             color=discord.Color.red())
+                userlogembed.add_field(name="Reason", value=entry['reason'], inline=False)
+                userlogembed.add_field(name="Action ID", value=entry['action_id'])
+                userlogembed.add_field(name="Date",
+                                       value=f"{entry['action_date'].day}-{entry['action_date'].month}-{entry['action_date'].year}")
+                userlogembed.add_field(name="Type", value=entry['status'])
+                if entry['end_time'] is not None:
+                    userlogembed.add_field(name="Timeout", value=f"{entry['end_time'].strftime('%a, %d %b %Y %H:%M:%S')}")
+                userlogembed.add_field(name="Moderator",
+                                       value=f"{(self.bot.get_user(entry['mod_id'])).name}#{(self.bot.get_user(entry['mod_id'])).discriminator}")
+                userlogembed.add_field(name="Active", value=str(entry['active']))
+                userlogembed.set_footer(text=f"Page {entrynumber + 1} of {pages}")
+                logmessage = await ctx.send(embed=userlogembed)
+                for r in reactions:
+                    await logmessage.add_reaction(r)
+                while True:
 
-                # the check for the emojis
-                def mapcheck(reaction, user):
-                    return user == ctx.message.author and str(reaction.emoji)
+                    # the check for the emojis
+                    def mapcheck(reaction, user):
+                        return user == ctx.message.author and str(reaction.emoji)
 
-                try:
-                    reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=mapcheck)
-                except asyncio.TimeoutError:
-                    await logmessage.clear_reactions()
-                    await logmessage.edit(content="Logs timed out.", embed=None)
-                    break
-                # if the reaction is back
-                if str(reaction) == '\U000025c0':
-                    # if the reaction is back and we are at entry 0
-                    if entrynumber == 0:
+                    try:
+                        reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=mapcheck)
+                    except asyncio.TimeoutError:
                         await logmessage.clear_reactions()
-                        for r in reactions:
-                            await logmessage.add_reaction(r)
-                    else:
-                        entrynumber -= 1
-                        entry = logs[entrynumber]
-                        userlogembed = discord.Embed(title=f"Logs for {userobj.name}#{userobj.discriminator}",
-                                                     color=discord.Color.red())
-                        userlogembed.add_field(name="Reason", value=entry['reason'], inline=False)
-                        userlogembed.add_field(name="Action ID", value=entry['action_id'])
-                        userlogembed.add_field(name="Date",
-                                               value=f"{entry['action_date'].day}-{entry['action_date'].month}-{entry['action_date'].year}")
-                        userlogembed.add_field(name="Type", value=entry['status'])
-                        if entry['end_time'] is not None:
-                            userlogembed.add_field(name="Timeout",
-                                                   value=f"{entry['end_time'].strftime('%a, %d %b %Y %H:%M:%S')}")
-                        userlogembed.add_field(name="Moderator",
-                                               value=f"{(self.bot.get_user(entry['mod_id'])).name}#{(self.bot.get_user(entry['mod_id'])).discriminator}")
-                        userlogembed.add_field(name="Active", value=str(entry['active']))
-                        userlogembed.set_footer(text=f"Page {entrynumber - 1} of {pages}")
+                        await logmessage.edit(content="Logs timed out.", embed=None)
+                        break
+                    # if the reaction is back
+                    if str(reaction) == '\U000025c0':
+                        # if the reaction is back and we are at entry 0
+                        if entrynumber == 0:
+                            await logmessage.clear_reactions()
+                            for r in reactions:
+                                await logmessage.add_reaction(r)
+                        else:
+                            entrynumber -= 1
+                            entry = logs[entrynumber]
+                            userlogembed = discord.Embed(title=f"Logs for {userobj.name}#{userobj.discriminator}",
+                                                         color=discord.Color.red())
+                            userlogembed.add_field(name="Reason", value=entry['reason'], inline=False)
+                            userlogembed.add_field(name="Action ID", value=entry['action_id'])
+                            userlogembed.add_field(name="Date",
+                                                   value=f"{entry['action_date'].day}-{entry['action_date'].month}-{entry['action_date'].year}")
+                            userlogembed.add_field(name="Type", value=entry['status'])
+                            if entry['end_time'] is not None:
+                                userlogembed.add_field(name="Timeout",
+                                                       value=f"{entry['end_time'].strftime('%a, %d %b %Y %H:%M:%S')}")
+                            userlogembed.add_field(name="Moderator",
+                                                   value=f"{(self.bot.get_user(entry['mod_id'])).name}#{(self.bot.get_user(entry['mod_id'])).discriminator}")
+                            userlogembed.add_field(name="Active", value=str(entry['active']))
+                            userlogembed.set_footer(text=f"Page {entrynumber - 1} of {pages}")
+                            await logmessage.clear_reactions()
+                            await logmessage.edit(embed=userlogembed)
+                            for r in reactions:
+                                await logmessage.add_reaction(r)
+                    # if the reaction is close
+                    if str(reaction) == "\U0000274c":
                         await logmessage.clear_reactions()
-                        await logmessage.edit(embed=userlogembed)
-                        for r in reactions:
-                            await logmessage.add_reaction(r)
-                # if the reaction is close
-                if str(reaction) == "\U0000274c":
-                    await logmessage.clear_reactions()
-                    await logmessage.edit(content="Closed.", embed=None)
+                        await logmessage.edit(content="Closed.", embed=None)
 
-                    break
-                # if the reaction is forward
-                if str(reaction) == "\U000025b6":
-                    # if the current page is the final page
-                    if entrynumber + 1 == len(logs):
-                        await logmessage.clear_reactions()
-                        for r in reactions:
-                            await logmessage.add_reaction(r)
-                    # if not the final page, display the next page
-                    else:
-                        entrynumber += 1
-                        entry = logs[entrynumber]
-                        userlogembed = discord.Embed(title=f"Logs for {userobj.name}#{userobj.discriminator}",
-                                                     color=discord.Color.red())
-                        userlogembed.add_field(name="Reason", value=entry['reason'], inline=False)
-                        userlogembed.add_field(name="Action ID", value=entry['action_id'])
-                        userlogembed.add_field(name="Date",
-                                               value=f"{entry['action_date'].day}-{entry['action_date'].month}-{entry['action_date'].year}")
-                        userlogembed.add_field(name="Type", value=entry['status'])
-                        if entry['end_time'] is not None:
-                            userlogembed.add_field(name="Timeout",
-                                                   value=f"{entry['end_time'].strftime('%a, %d %b %Y %H:%M:%S')}")
-                        userlogembed.add_field(name="Moderator",
-                                               value=f"{(self.bot.get_user(entry['mod_id'])).name}#{(self.bot.get_user(entry['mod_id'])).discriminator}")
-                        userlogembed.add_field(name="Active", value=str(entry['active']))
-                        userlogembed.set_footer(text=f"Page {entrynumber + 1} of {pages}")
-                        await logmessage.clear_reactions()
-                        await logmessage.edit(embed=userlogembed)
-                        for r in reactions:
-                            await logmessage.add_reaction(r)
+                        break
+                    # if the reaction is forward
+                    if str(reaction) == "\U000025b6":
+                        # if the current page is the final page
+                        if entrynumber + 1 == len(logs):
+                            await logmessage.clear_reactions()
+                            for r in reactions:
+                                await logmessage.add_reaction(r)
+                        # if not the final page, display the next page
+                        else:
+                            entrynumber += 1
+                            entry = logs[entrynumber]
+                            userlogembed = discord.Embed(title=f"Logs for {userobj.name}#{userobj.discriminator}",
+                                                         color=discord.Color.red())
+                            userlogembed.add_field(name="Reason", value=entry['reason'], inline=False)
+                            userlogembed.add_field(name="Action ID", value=entry['action_id'])
+                            userlogembed.add_field(name="Date",
+                                                   value=f"{entry['action_date'].day}-{entry['action_date'].month}-{entry['action_date'].year}")
+                            userlogembed.add_field(name="Type", value=entry['status'])
+                            if entry['end_time'] is not None:
+                                userlogembed.add_field(name="Timeout",
+                                                       value=f"{entry['end_time'].strftime('%a, %d %b %Y %H:%M:%S')}")
+                            userlogembed.add_field(name="Moderator",
+                                                   value=f"{(self.bot.get_user(entry['mod_id'])).name}#{(self.bot.get_user(entry['mod_id'])).discriminator}")
+                            userlogembed.add_field(name="Active", value=str(entry['active']))
+                            userlogembed.set_footer(text=f"Page {entrynumber + 1} of {pages}")
+                            await logmessage.clear_reactions()
+                            await logmessage.edit(embed=userlogembed)
+                            for r in reactions:
+                                await logmessage.add_reaction(r)
+        except Exception as error:
+            await ctx.send(error)
+            self.bot.logger.warning(msg=error)
 
     @commands.command(usage="[mod]")
     @modcheck()

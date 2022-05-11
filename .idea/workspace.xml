@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing small bugs">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing small bugs and adjusting to regular code standards">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -108,14 +108,7 @@
       <workItem from="1651500112401" duration="39000" />
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
-      <workItem from="1652197800527" duration="13482000" />
-    </task>
-    <task id="LOCAL-00022" summary="Altering roles for retention and notifications.">
-      <created>1647198454809</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1647198454810</updated>
+      <workItem from="1652197800527" duration="14126000" />
     </task>
     <task id="LOCAL-00023" summary="Altering roles for retention and notifications.">
       <created>1647198491625</created>
@@ -453,7 +446,14 @@
       <option name="project" value="LOCAL" />
       <updated>1652276373754</updated>
     </task>
-    <option name="localTasksCounter" value="71" />
+    <task id="LOCAL-00071" summary="Fixing small bugs and adjusting to regular code standards">
+      <created>1652277489743</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1652277489744</updated>
+    </task>
+    <option name="localTasksCounter" value="72" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -472,7 +472,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing loops" />
     <MESSAGE value="General bug fixes" />
     <MESSAGE value="Fixing retention to exclude CTEd nations" />
     <MESSAGE value="Adding the CNC cogs to the bot" />
@@ -497,7 +496,8 @@
     <MESSAGE value="Error correction: cnc.py" />
     <MESSAGE value="Map fixing for CNC" />
     <MESSAGE value="Fixing small bugs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing small bugs" />
+    <MESSAGE value="Fixing small bugs and adjusting to regular code standards" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing small bugs and adjusting to regular code standards" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
