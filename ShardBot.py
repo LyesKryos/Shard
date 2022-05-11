@@ -87,6 +87,8 @@ class Shard(commands.Bot):
             await ctx.send_help(ctx.invoked_with)
         elif isinstance(error, commands.CheckFailure):
             await ctx.send(str(error))
+        elif isinstance(error, commands.CheckFailure):
+            await ctx.send(str(error))
         else:
             logging.warning(
                 f"{self.time} {ctx.message.author} {ctx.message.id} caused the error \"{error}\" using the command "

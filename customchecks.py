@@ -3,55 +3,12 @@ import datetime
 from discord.utils import get
 
 
-class CNCFail(commands.CheckFailure):
+class SilentFail(commands.CommandError):
     pass
 
 
-def CNCcheck():
-    # custom check
-    async def predicate(ctx):
-        if ctx.author.id in [293518673417732098 or 285855888336486400 or 674285995021041677]:
-            return True
-        else:
-            if ctx.guild is None:
-                aroles = list()
-                guild = ctx.bot.get_guild(674259612580446230)
-                member = guild.get_member(ctx.author.id)
-                for ar in member.roles:
-                    aroles.append(ar.id)
-                if 896886962710007808 not in aroles:
-                    raise CNCFail("You do not have the right role for that!")
-                return True
-            # connects to the database
-            conn = ctx.bot.pool
-            blacklist = await conn.fetchrow('''SELECT * FROM blacklist WHERE user_id = $1 AND active = True;''',
-                                            ctx.author.id)
-            if blacklist is not None:
-                if blacklist['end_time'] is None:
-                    if blacklist['status'] == "mute":
-                        raise CNCFail("You are muted.")
-                    if blacklist['status'] == "ban":
-                        raise CNCFail("You are banned.")
-                if blacklist['end_time'] < datetime.datetime.now():
-                    try:
-                        await conn.execute(
-                            '''UPDATE blacklist SET active = False WHERE user_id = $1 AND end_time = $2;''',
-                            ctx.author.id, blacklist['end_time'])
-                    except Exception as error:
-                        await ctx.send(error)
-                else:
-                    raise CNCFail("You are muted.")
-
-            aroles = list()
-            for ar in ctx.author.roles:
-                aroles.append(ar.id)
-            if 896886962710007808 not in aroles:
-                raise CNCFail("You do not have the right role for that!")
-            elif ctx.channel.id != 896887449089867806:
-                raise CNCFail("This is the wrong channel for that command!")
-            return True
-
-    return commands.check(predicate)
+class CNCFail(commands.CheckFailure):
+    pass
 
 
 def modcheck():
@@ -119,4 +76,3 @@ def CurrencyCheck():
             raise CurrencyFail("This server is not registered for that command.")
 
     return commands.check(currency)
-

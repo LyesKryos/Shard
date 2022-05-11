@@ -14,7 +14,7 @@ import requests
 from time import sleep, localtime, time, strftime, perf_counter
 import os
 from pytz import timezone
-from customchecks import CNCcheck, modcheck
+from customchecks import modcheck, SilentFail
 
 
 class CNC(commands.Cog):
@@ -26,29 +26,29 @@ class CNC(commands.Cog):
 
     resourcesleeping = False
     banned_colors = ["#000000", "#ffffff", "#808080"]
-    
-    async def cog_check(self, ctx) -> bool:
-        if ctx.author.id in [293518673417732098 or 285855888336486400 or 674285995021041677]:
+
+    async def cog_check(self, ctx):
+        if ctx.author.id in [293518673417732098]:
             return True
         else:
-            # if ctx.guild is None:
-            #     aroles = list()
-            #     guild = ctx.bot.get_guild(674259612580446230)
-            #     member = guild.get_member(ctx.author.id)
-            #     for ar in member.roles:
-            #         aroles.append(ar.id)
-            #     if 896886962710007808 not in aroles:
-            #         await ctx.send("You don't have the right role for that.")
-            #         return False
+            if ctx.guild is None:
+                aroles = list()
+                guild = ctx.bot.get_guild(674259612580446230)
+                member = guild.get_member(ctx.author.id)
+                for ar in member.roles:
+                    aroles.append(ar.id)
+                if 896886962710007808 not in aroles:
+                    await ctx.send("You don't have the right role for that.")
+                    raise SilentFail
             conn = self.bot.pool
             blacklist = await conn.fetchrow('''SELECT * FROM blacklist WHERE user_id = $1 AND active = True;''',
                                             ctx.author.id)
             if blacklist is not None:
                 if blacklist['end_time'] is None:
                     if blacklist['status'] == "mute":
-                        return False
+                        raise SilentFail
                     if blacklist['status'] == "ban":
-                        return False
+                        raise SilentFail
                 if blacklist['end_time'] < datetime.datetime.now():
                     try:
                         await conn.execute(
