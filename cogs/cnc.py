@@ -3381,11 +3381,11 @@ class CNC(commands.Cog):
 
     async def cncstartloop(self):
         await self.bot.wait_until_ready()
-        shardchannel = self.bot.get_channel(927288304301387816)
-        if CNC.cnc_resource_loop.is_running():
+        shardchannel = self.bot.get_channel(835579413625569322)
+        if self.cnc_resource_loop.is_running():
             await shardchannel.send("Already running on_ready.")
             return
-        CNC.resourcesleeping = True
+        self.resourcesleeping = True
         eastern = timezone('US/Eastern')
         now = datetime.datetime.now(eastern)
         if now.time() < datetime.time(hour=0):
@@ -3405,11 +3405,11 @@ class CNC(commands.Cog):
             await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         elif now.time() > datetime.time(hour=18, minute=0):
-            update = now.replace(hour=19, minute=19, second=30)
+            update = now.replace(hour=19, minute=20, second=30)
             # update += datetime.timedelta(days=1)
             await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
-        CNC.cnc_resource_loop.start(self)
+        self.cnc_resource_loop.start(self)
 
 
 async def setup(bot: Shard):
