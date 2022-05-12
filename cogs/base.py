@@ -61,22 +61,22 @@ class BaseCommands(commands.Cog):
     @commands.command(brief="Loads cog")
     @commands.is_owner()
     async def load(self, ctx, extension):
-        await self.bot.load_extension(f"cogs.{extension}")
+        self.bot.load_extension(f"cogs.{extension}")
         await ctx.send(f"Loaded extension: `{extension}`")
 
 
     @commands.command(brief="Unloads cog")
     @commands.is_owner()
     async def unload(self, ctx, extension):
-        await self.bot.unload_extension(f"cogs.{extension}")
+        self.bot.unload_extension(f"cogs.{extension}")
         await ctx.send(f"Unloaded extension: `{extension}`")
 
 
     @commands.command(brief="Reloads cog")
     @commands.is_owner()
     async def reload(self, ctx, extension):
-        await self.bot.unload_extension(f"cogs.{extension}")
-        await self.bot.load_extension(f"cogs.{extension}")
+        self.bot.unload_extension(f"cogs.{extension}")
+        self.bot.load_extension(f"cogs.{extension}")
         await ctx.send(f"Reloaded extension: `{extension}`")
 
 
@@ -86,8 +86,8 @@ class BaseCommands(commands.Cog):
         await ctx.send("Recycling!")
         for filename in os.listdir("./cogs"):
             if filename.endswith(".py"):
-                await self.bot.unload_extension(f"cogs.{filename[:-3]}")
-                await self.bot.load_extension(f"cogs.{filename[:-3]}")
+                self.bot.unload_extension(f"cogs.{filename[:-3]}")
+                self.bot.load_extension(f"cogs.{filename[:-3]}")
         await ctx.send("Recycled all cogs.")
         
     @commands.command(brief="Measures latency between Discord and the host server.")
