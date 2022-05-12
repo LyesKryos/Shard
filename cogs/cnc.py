@@ -1077,7 +1077,6 @@ class CNC(commands.Cog):
         await author.send(sender_text)
 
     @commands.command(usage="[nation],, [terms]", brief="Sends an alliance offer to a nation")
-    @commands.guild_only()
     async def cnc_alliance(self, ctx, *args):
         author = ctx.author
         # connects to the database
@@ -1106,10 +1105,10 @@ class CNC(commands.Cog):
             await ctx.send(f"`{rrecipient}` not registered.")
             return
         # checks for existing active alliance
-        interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'alliance' AND active = True;''')
+        interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'alliance' AND active = True AND sender_id = $1 AND ;''',
+                                        author.id)
         for inter in interactions:
-            if (inter['recipient'].lower() == rrecipient.lower()) and (inter['sender'].lower() == rrecipient.lower()) \
-                    and (inter['sender_id'] == author.id) and (inter['recipient_id'] == author.id):
+            if inter['recipient'].lower() == rrecipient.lower():
                 await ctx.send(
                 f"An alliance with `{rrecipient}` already exists. To view, use $cnc_view_interaction {inter['id']}")
                 return
@@ -1176,11 +1175,10 @@ class CNC(commands.Cog):
             await ctx.send(f"`{rrecipient}` not registered.")
             return
         # ensures prior peace
-        interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'war' AND active = True;''')
+        interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'war' AND active = True AND sender_id = $1;''', author.id)
         for inter in interactions:
-            if (inter['recipient'].lower() == rrecipient.lower()) and (inter['sender'].lower() == rrecipient.lower()) \
-                    and (inter['sender_id'] == author.id) and (inter['recipient_id'] == author.id):
-                await ctx.send(f"A war with `{rrecipient}` already exists. To view, use $cnc_interaction {inter['id']}")
+            if inter['recipient'].lower() == rrecipient.lower():
+                await ctx.send(f"A war with `{rrecipient}` already exists. To view, use `$cnc_view_interaction {inter['id']}`")
                 return
         # fetches user information
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
@@ -1199,7 +1197,10 @@ class CNC(commands.Cog):
         # ensures no alliance
         alliance = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 AND nation = $2;''', sender,
                                        recipient)
-        if alliance['relation'] != 'peace':
+        if alliance['relation'] == 'war':
+            await ctx.send(f"It is not possible to declare war on {recipient} when you are already at war with them!")
+            return
+        elif alliance['relation'] != 'peace':
             await ctx.send(f"It is not possible to declare war on {recipient} when you have an alliance with them!")
             return
         try:
@@ -1229,7 +1230,6 @@ class CNC(commands.Cog):
             await ctx.send(error)
 
     @commands.command(usage="[recipient],, [terms]", brief="Sends a peace offer to a nation")
-    @commands.guild_only()
     async def cnc_peace(self, ctx, *args):
         author = ctx.author
         # connects to the database
