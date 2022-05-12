@@ -1130,9 +1130,8 @@ class CNC(commands.Cog):
             # connects to the database
             conn = self.bot.pool
             data = args.split(',,')
-            print(data)
-            if len(data) != 2:
-                raise commands.UserInputError
+            if len(data) != 1:
+                raise commands.UserInputError("See `$help cnc_alliance`")
             rrecipient = data[0]
             text = data[1]
             text = text.lstrip(' ')
