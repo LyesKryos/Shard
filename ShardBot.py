@@ -4,6 +4,7 @@ from discord.ext import commands
 import os
 import logging
 from datetime import datetime as dt
+from customchecks import SilentFail
 
 
 class Shard(commands.Bot):
@@ -85,8 +86,8 @@ class Shard(commands.Bot):
         # if there is a custom check error
         elif isinstance(error, commands.UserInputError):
             await ctx.send_help(ctx.invoked_with)
-        elif isinstance(error, commands.CheckFailure):
-            await ctx.send(str(error))
+        elif isinstance(error, SilentFail):
+            return
         elif isinstance(error, commands.CheckFailure):
             await ctx.send(str(error))
         else:

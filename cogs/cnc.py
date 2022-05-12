@@ -1228,7 +1228,7 @@ class CNC(commands.Cog):
             # ensures prior peace
             interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'war' AND active = True AND sender_id = $1;''', author.id)
             for inter in interactions:
-                if inter['recipient'].lower() == rrecipient.lower():
+                if (inter['recipient'].lower() == rrecipient.lower() and inter['sender_id'] == author.id) or (inter['recipient_id'] == author.id and inter['sender'] == rrecipient.lower()):
                     await ctx.send(f"A war with `{rrecipient}` already exists. To view, use `$cnc_view_interaction {inter['id']}`")
                     return
             # fetches user information

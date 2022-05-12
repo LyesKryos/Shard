@@ -3,6 +3,7 @@ import discord
 from ShardBot import Shard
 from discord.ext import commands
 import os
+from customchecks import SilentFail
 
 class BaseCommands(commands.Cog):
 
@@ -100,6 +101,16 @@ class BaseCommands(commands.Cog):
         await self.bot.change_presence(activity=discord.Game("m$help for commands"))
         channel = self.bot.get_channel(835579413625569322)
         await channel.send("We are online.")
+
+    @commands.command()
+    @commands.is_owner()
+    async def input_error(self, ctx, *, args):
+        raise commands.UserInputError
+
+    @commands.command()
+    @commands.is_owner()
+    async def silent_error(self, ctx, *, args):
+        raise SilentFail
 
 def setup(bot: Shard):
     async def alive(bot):
