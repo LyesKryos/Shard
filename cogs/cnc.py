@@ -292,7 +292,7 @@ class CNC(commands.Cog):
                 await ctx.send(f"{nationname} does not appear to be registered.")
                 return
             # pulls the specified nation data
-            nation = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1''', nationname.lower())
+            nation = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
             # sets the color properly
             if nation["usercolor"] == "":
                 color = discord.Color.random()
@@ -468,7 +468,7 @@ class CNC(commands.Cog):
             await ctx.send(f"{ctx.author} does not appear to be registered.")
             return
         # pulls the specified nation data
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
+        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
         provinces = list(userinfo['provinces_owned'])
         provinces.remove(0)
         provinces.sort()
@@ -479,7 +479,7 @@ class CNC(commands.Cog):
                                  color=discord.Color.blurple())
             sve1.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
             for p in provinces:
-                provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1''', p)
+                provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
                 sve1.add_field(name=f"**Province #{p}**",
                                value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}\nManpower: {provinceinfo['manpower']}")
             await author.send(embed=sve1)
@@ -490,7 +490,7 @@ class CNC(commands.Cog):
                                  color=discord.Color.blurple())
             sve1.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
             for p in provinces[:15]:
-                provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1''', p)
+                provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
                 sve1.add_field(name=f"**Province #{p}**",
                                value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}")
             await author.send(embed=sve1)
@@ -501,7 +501,7 @@ class CNC(commands.Cog):
             for i in range(1, length):
                 page = i * 15
                 for p in provinces[page:page + 15]:
-                    provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1''', p)
+                    provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
                     sve.add_field(name=f"**Province #{p}**",
                                   value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}")
                 await author.send(embed=sve)
@@ -510,7 +510,7 @@ class CNC(commands.Cog):
                                  color=discord.Color.blurple())
             lsve.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
             for p in provinces[(length * 15):]:
-                provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1''', p)
+                provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
                 lsve.add_field(name=f"**Province #{p}**",
                                value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}")
             await author.send(embed=lsve)
@@ -564,7 +564,7 @@ class CNC(commands.Cog):
         # connects to the database
         conn = self.bot.pool
         # grabs all the user info
-        usereditinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
+        usereditinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
         # if the author is not registered
         if usereditinfo is None:
             await ctx.send(f"{author} is not registered.")
@@ -598,7 +598,7 @@ class CNC(commands.Cog):
                 print(cord)
                 cord = (x, y) = (cord['cord'][0], cord['cord'][1])
                 await loop.run_in_executor(None, self.map_color, p, cord, colorreply.content)
-            await conn.execute('''UPDATE cncusers SET usercolor = $1 WHERE user_id = $2''', colorreply.content,
+            await conn.execute('''UPDATE cncusers SET usercolor = $1 WHERE user_id = $2;''', colorreply.content,
                                author.id)
             await ctx.send(f"Success! Your new color is {colorreply.content}.")
             return
@@ -619,7 +619,7 @@ class CNC(commands.Cog):
             if focusreply.content.lower() not in ["m", "e", "s"]:
                 raise commands.UserInputError
             # execute the information
-            await conn.execute('''UPDATE cncusers SET focus = $1 WHERE user_id = $2''', focusreply.content.lower(),
+            await conn.execute('''UPDATE cncusers SET focus = $1 WHERE user_id = $2;''', focusreply.content.lower(),
                                author.id)
             if focusreply.content.lower() == "m":
                 focus = "`military`"
@@ -724,7 +724,7 @@ class CNC(commands.Cog):
             await ctx.send(f"Location id `{provinceid}` is not a valid ID.")
             return
         # fetches user info
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
+        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
         # ensures province ownership
         if provinceid not in userinfo['provinces_owned']:
             await ctx.send(f"{userinfo['username']} does not own province #{provinceid}.")
@@ -849,7 +849,7 @@ class CNC(commands.Cog):
             await ctx.send(f"Location id `{provinceid}` is not a valid ID.")
             return
         # fetches user info
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
+        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
         # ensures province ownership
         if provinceid not in userinfo['provinces_owned']:
             await ctx.send(f"{userinfo['username']} does not own province #{provinceid}.")
@@ -1880,7 +1880,7 @@ class CNC(commands.Cog):
             author = ctx.author
             # connects to the database
             # fetches all user ids
-            allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
+            allusers = await conn.fetch('''SELECT user_id FROM cncusers;''')
             alluserids = list()
             for id in allusers:
                 alluserids.append(id['user_id'])
@@ -1889,7 +1889,7 @@ class CNC(commands.Cog):
                 await ctx.send(f"{author} not registered.")
                 return
             # fetches all province ids
-            allprovinces = await conn.fetch('''SELECT id FROM provinces''')
+            allprovinces = await conn.fetch('''SELECT id FROM provinces;''')
             allids = list()
             for pid in allprovinces:
                 allids.append(pid['id'])
@@ -1903,7 +1903,7 @@ class CNC(commands.Cog):
             # fetches target and stationed information
             targetownerid = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', target)
             stationedownerid = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', stationed)
-            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
             # checks to make sure the user has enough moves
             if userinfo['moves'] <= 0:
                 await ctx.send(f"{userinfo['username']} does not have any movement points left!")
@@ -2839,7 +2839,7 @@ class CNC(commands.Cog):
         try:
             # executes unmute
             await conn.execute(
-                '''INSERT INTO blacklist SET active = True WHERE user_id = $1 AND status = $2 AND active = True''',
+                '''INSERT INTO blacklist SET active = True WHERE user_id = $1 AND status = $2 AND active = True;''',
                 user.id, "mute")
             await conn.execute('''INSERT INTO mod_logs(id, mod_id, action, reason) VALUES($1,$2,$3,$4);''',
                                ctx.message.id, author.id, f"unmuted {user.id}", "n/a")
@@ -2891,7 +2891,7 @@ class CNC(commands.Cog):
             # executes ban
             await conn.execute(
                 '''INSERT INTO blacklist(user_id, action_id, status, mod_id, reason, action_date)
-                 VALUES($1,$2,$3,$4,$5,$6)''',
+                 VALUES($1,$2,$3,$4,$5,$6);''',
                 user.id, ctx.message.id, "ban", author.id, reason, datetime.datetime.now())
             await conn.execute('''INSERT INTO mod_logs(id, mod_id, action, reason) VALUES($1,$2,$3,$4);''',
                                ctx.message.id, author.id, f"banned {user.id}", reason)
@@ -2932,7 +2932,7 @@ class CNC(commands.Cog):
         try:
             # executes unban
             await conn.execute(
-                '''UPDATE blacklist SET active = False WHERE user_id = $1 AND status = $2 AND active = True''',
+                '''UPDATE blacklist SET active = False WHERE user_id = $1 AND status = $2 AND active = True;''',
                 user.id, "ban")
             await conn.execute('''INSERT INTO mod_logs(id, mod_id, action, reason) VALUES($1,$2,$3,$4);''',
                                ctx.message.id, author.id, f"unbanned {user.id}", "n/a")
