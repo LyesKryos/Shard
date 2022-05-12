@@ -1136,7 +1136,7 @@ class CNC(commands.Cog):
             text = data[1]
             text = text.lstrip(' ')
             # fetches all user ids
-            allusers = await conn.fetch('''SELECT user_id, username FROM cncusers''')
+            allusers = await conn.fetch('''SELECT user_id, username FROM cncusers;''')
             alluserids = list()
             allusernames = list()
             for id in allusers:
@@ -1152,7 +1152,7 @@ class CNC(commands.Cog):
                 await ctx.send(f"`{rrecipient}` not registered.")
                 return
             # checks for existing active alliance
-            interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'alliance' AND active = True AND sender_id = $1 AND ;''',
+            interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'alliance' AND active = True AND sender_id = $1;''',
                                             author.id)
             for inter in interactions:
                 if inter['recipient'].lower() == rrecipient.lower():
