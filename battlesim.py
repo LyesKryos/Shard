@@ -1,6 +1,8 @@
 import random
 import asyncpg
 import math
+import asyncio
+from ShardBot import Shard
 
 
 class calculations:
@@ -23,9 +25,13 @@ class calculations:
         self.RemainingAttackingArmy = 0
         self.RemainingDefendingArmy = 0
         self.maxcas = 0
-        
-    connectionstr = 'postgresql://postgres@127.0.0.1:5432'
-    database = "postgres"
+
+        loop = asyncio.get_event_loop()
+        # creates connection pool
+        self.pool: asyncpg.Pool = loop.run_until_complete(asyncpg.create_pool('postgres://postgres@127.0.0.1:5432',
+                                                      database="botdb",
+                                                      password="postgres"))
+
 
     async def ArmyDifference(self):
         # calculates the army difference between the two initial numbers
@@ -52,8 +58,7 @@ class calculations:
 
     async def TerrainMod(self):
         # connection to database and gathers the terrain modifier based on the terrain ID
-        conn = await asyncpg.connect(self.connectionstr, database=self.database,
-                                         password="Kingsfoil-4")
+        conn = self.pool
         rawtmod = await conn.fetchrow('''SELECT modifier FROM terrains WHERE id = $1''', self.TerrainID)
         self.terrainmod = float(rawtmod["modifier"])
         return self.terrainmod
@@ -74,8 +79,7 @@ class calculations:
         await self.Output()
         await self.TerrainMod()
         # connects to the database
-        conn = await asyncpg.connect(self.connectionstr, database=self.database,
-                             password="Kingsfoil-4")
+        conn = self.pool
         # selects all from maxcas where the modifier value is the same as the terrain mod for both the defense maxcas
         # and attack maxcas
         maxcasraw = await conn.fetchrow('''SELECT * FROM maxcas WHERE modifier = $1''', self.terrainmod)
