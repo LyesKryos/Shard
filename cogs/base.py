@@ -14,7 +14,6 @@ class BaseCommands(commands.Cog):
         await ctx.send("https://i.ibb.co/TtcdQ3d/image.png")
 
     @commands.command(brief="Displays information about the bot")
-    @commands.is_owner()
     async def info(self, ctx):
         infoembed = discord.Embed(color=discord.Color.blue(), title="Shard", description="A purpose-built machine for "
                                                                                          "quality of life,"
