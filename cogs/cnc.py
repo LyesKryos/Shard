@@ -2475,6 +2475,7 @@ class CNC(commands.Cog):
                         return
         except Exception as error:
             self.bot.logger.warning(msg=error)
+            await ctx.send(error)
 
     # ------------------Map Commands----------------------------
 
