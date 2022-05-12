@@ -1155,7 +1155,7 @@ class CNC(commands.Cog):
             interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'alliance' AND active = True AND sender_id = $1;''',
                                             author.id)
             for inter in interactions:
-                if inter['recipient'].lower() == rrecipient.lower():
+                if (inter['recipient'].lower() == rrecipient.lower() and inter['sender_id'] == author.id) or (inter['recipient_id'] == author.id and inter['sender'] == rrecipient.lower()):
                     await ctx.send(
                     f"An alliance with `{rrecipient}` already exists. To view, use $cnc_view_interaction {inter['id']}")
                     return
@@ -1955,10 +1955,10 @@ class CNC(commands.Cog):
     @commands.guild_only()
     async def cnc_attack(self, ctx, stationed: int, target: int, force: int):
         try:
+            # connects to the database
             conn = self.bot.pool
             loop = asyncio.get_running_loop()
             author = ctx.author
-            # connects to the database
             # fetches all user ids
             allusers = await conn.fetch('''SELECT user_id FROM cncusers;''')
             alluserids = list()
