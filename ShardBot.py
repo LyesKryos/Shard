@@ -22,8 +22,8 @@ class Shard(commands.Bot):
         handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
         self.logger.addHandler(handler)
         self.time = dt.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.version = "v.1.4"
-        self.version_name = "Repairman"
+        self.version = "v.1.5"
+        self.version_name = "Wargames"
         self.allowed_mentions = discord.AllowedMentions(
             users=True,  # Whether to ping individual user @mentions
             everyone=True,  # Whether to ping @everyone or @here mentions

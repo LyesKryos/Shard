@@ -120,6 +120,13 @@ class CNC(commands.Cog):
         infoembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
         await ctx.send(embed=infoembed)
 
+    @commands.command(brief="Sends turn count.")
+    @commands.guild_only()
+    async def cnc_turn(self, ctx):
+        conn = self.bot.pool
+        data = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
+        await ctx.send(f"It is currently turn #{int(data['data_value'])}.")
+
     @commands.command(usage="[nation name] [hexadecimal color id] <focus (m,e,s)>")
     @commands.guild_only()
     async def cnc_register(self, ctx, nationame: str, color: str, focus: str = None):
@@ -179,7 +186,6 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
 
     @commands.command(usage="<nation name>", aliases=['cncv'])
-    
     async def cnc_view(self, ctx, *args):
         # connects to the database
         conn = self.bot.pool
