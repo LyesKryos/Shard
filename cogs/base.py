@@ -23,7 +23,8 @@ class BaseCommands(commands.Cog):
         infoembed.set_thumbnail(url="https://i.ibb.co/Sc45nVZ/Shard.webp")
         infoembed.add_field(name="Created", value="By Lies Kryos#1734\nApril 24, 2021")
         infoembed.add_field(name="Current version", value=f"{self.bot.version} {self.bot.version_name}")
-        infoembed.add_field(name="Version Notes", value="None", inline=False)
+        infoembed.add_field(name="Version Notes", value="Increased optimization, added new minigame, "
+                                                        "and resolved multiple bugs.", inline=False)
         infoembed.add_field(name="Hosting Software", value="Oracle Virtual Cloud Network Virtual Machine")
         await ctx.send(embed=infoembed)
 
@@ -50,11 +51,11 @@ class BaseCommands(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def announce_global(self, ctx, *args):
+    async def announce_global(self, ctx, *, args):
         channel_ids = [674285035905613825, 319961144091738112, 606505493657288735]
         for id in channel_ids:
             channel = self.bot.get_channel(id)
-            await channel.send(' '.join(args[:]))
+            await channel.send(args)
 
     @commands.command()
     @commands.is_owner()
