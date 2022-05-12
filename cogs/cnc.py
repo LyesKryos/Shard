@@ -1875,10 +1875,10 @@ class CNC(commands.Cog):
     @commands.guild_only()
     async def cnc_attack(self, ctx, stationed: int, target: int, force: int):
         try:
+            conn = self.bot.pool
             loop = asyncio.get_running_loop()
             author = ctx.author
             # connects to the database
-            conn = self.bot.pool
             # fetches all user ids
             allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
             alluserids = list()
