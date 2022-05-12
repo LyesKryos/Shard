@@ -268,7 +268,7 @@ class Recruitment(commands.Cog):
 
         return
 
-    @commands.command()
+    @commands.command(brief="Adds or removes the recruiter role")
     @commands.guild_only()
     @commands.has_role(674260547897917460)
     async def recruiter(self, ctx):
@@ -301,7 +301,7 @@ class Recruitment(commands.Cog):
             await author.remove_roles(recruiterrole)
             await ctx.send("Role removed.")
 
-    @commands.command()
+    @commands.command(brief="Begins the recruitment process")
     @commands.guild_only()
     @RecruitmentCheck()
     async def recruit(self, ctx):
@@ -328,7 +328,7 @@ class Recruitment(commands.Cog):
         self.recruitment_gather_object = asyncio.gather(self.recruitment(ctx, template),
                                                         self.still_recruiting_check(ctx))
 
-    @commands.command()
+    @commands.command(brief="Stops the recruitment process")
     @commands.guild_only()
     @RecruitmentCheck()
     async def stop(self, ctx):
@@ -375,7 +375,8 @@ class Recruitment(commands.Cog):
         elif not self.retention_loop:
             await ctx.send("Retention not running.")
 
-    @commands.command()
+    @commands.command(usage="<(user, global)>",
+                      brief="Displays sent information for a specified user, the requesting user, or all sent telegrams")
     @commands.guild_only()
     @RecruitmentCheck()
     async def sent(self, ctx, *args):
@@ -432,7 +433,7 @@ class Recruitment(commands.Cog):
 
                 return
 
-    @commands.command(usage="<monthly? (m)>")
+    @commands.command(usage="<m>", brief="Displays the all time or monthly rnaks")
     @commands.guild_only()
     @RecruitmentCheck()
     async def rank(self, ctx, monthly: str = None):
@@ -477,7 +478,7 @@ class Recruitment(commands.Cog):
 
             return
 
-    @commands.command(usage='[template id]')
+    @commands.command(usage='[template id]', brief="Registers a user and a template")
     @commands.guild_only()
     @RecruitmentCheck()
     async def register(self, ctx, templateid):
@@ -502,7 +503,7 @@ class Recruitment(commands.Cog):
 
             return
 
-    @commands.command(usage='[template id]')
+    @commands.command(usage='[template id]', brief="Edits an existing template")
     @commands.guild_only()
     @RecruitmentCheck()
     async def edit_template(self, ctx, templateid):
@@ -527,7 +528,7 @@ class Recruitment(commands.Cog):
 
             return
 
-    @commands.command()
+    @commands.command(brief="Displays a user's template")
     @commands.guild_only()
     @RecruitmentCheck()
     async def view_template(self, ctx):
@@ -556,7 +557,7 @@ class Recruitment(commands.Cog):
 
             return
 
-    @commands.command()
+    @commands.command(brief="Generates a WA campaign")
     @commands.guild_only()
     async def campaign(self, ctx):
         version = 'WACU v.2.1'
@@ -627,7 +628,7 @@ class Recruitment(commands.Cog):
             async with ctx.channel.typing():
                 await ctx.send(file=discord.File(campaign, f"{regions['region'].lower()}_endo_campaign.html"))
 
-    @commands.command(usage="[hex color code] [name]")
+    @commands.command(usage="[hex color code] [name]", brief="Allows the Recruiter of the Month to customize their role")
     async def customize_recruiter_role(self, ctx, color: str, *args):
         recruiter_of_the_month_role = discord.utils.get(ctx.guild.roles, id=813953181234626582)
         name = ' '.join(args)
@@ -647,7 +648,7 @@ class Recruitment(commands.Cog):
                     await ctx.send(error)
                     return
 
-    @commands.command()
+    @commands.command(brief="Adds or removes the retention role")
     @RecruitmentCheck()
     async def retention(self, ctx):
         retention_role = discord.utils.get(ctx.guild.roles, id=950950836006187018)

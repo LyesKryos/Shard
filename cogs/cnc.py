@@ -60,9 +60,6 @@ class CNC(commands.Cog):
                 else:
                     return False
 
-
-
-
     def map_color(self, province, province_cord, hexcode, release: bool = False):
         province_cord = ((int(province_cord[0])), (int(province_cord[1])))
         color = ImageColor.getrgb(hexcode)
@@ -97,7 +94,7 @@ class CNC(commands.Cog):
 
     # ---------------------User Commands------------------------------
 
-    @commands.command(brief="Sends informational embed.")
+    @commands.command(brief="Displays information about the CNC system.")
     @commands.guild_only()
     async def cnc_info(self, ctx):
         conn = self.bot.pool
@@ -120,14 +117,14 @@ class CNC(commands.Cog):
         infoembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
         await ctx.send(embed=infoembed)
 
-    @commands.command(brief="Sends turn count.")
+    @commands.command(brief="Displays the turn count.")
     @commands.guild_only()
     async def cnc_turn(self, ctx):
         conn = self.bot.pool
         data = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
         await ctx.send(f"It is currently turn #{int(data['data_value'])}.")
 
-    @commands.command(usage="[nation name] [hexadecimal color id] <focus (m,e,s)>")
+    @commands.command(usage="[nation name] [hexadecimal color id] <focus (m,e,s)>", brief="Registers a new nation")
     @commands.guild_only()
     async def cnc_register(self, ctx, nationame: str, color: str, focus: str = None):
         try:
@@ -185,7 +182,7 @@ class CNC(commands.Cog):
             await ctx.send(error)
             self.bot.logger.warning(msg=error)
 
-    @commands.command(usage="<nation name>", aliases=['cncv'])
+    @commands.command(usage="<nation name>", aliases=['cncv'], brief="Displays information about a nation")
     async def cnc_view(self, ctx, *args):
         # connects to the database
         conn = self.bot.pool
@@ -329,8 +326,7 @@ class CNC(commands.Cog):
             cncuserembed.add_field(name="Wars", value=wars)
             await ctx.send(embed=cncuserembed)
 
-    @commands.command(aliases=['cncdv'])
-    
+    @commands.command(aliases=['cncdv'], brief="Displays detailed information about a nation, privately")
     async def cnc_detailed_view(self, ctx):
         # connects to the database
         conn = self.bot.pool
@@ -422,9 +418,8 @@ class CNC(commands.Cog):
         cncuserembed.add_field(name="Manpower Increase", value=str(added_manpower))
         await author.send(embed=cncuserembed)
 
-    @commands.command(aliases=['cncva'])
+    @commands.command(aliases=['cncva'], brief="Displays information about all nations")
     @commands.guild_only()
-    
     async def cnc_view_all(self, ctx):
         # connects to the database
         conn = self.bot.pool
@@ -439,8 +434,8 @@ class CNC(commands.Cog):
                                    inline=False)
         await ctx.send(embed=viewallembed)
 
-    @commands.command(aliases=['cncsv'])
-    
+    @commands.command(aliases=['cncsv'],
+                      brief="Displays detailed information about all provinces a nation owns, privately")
     async def cnc_strategic_view(self, ctx):
         author = ctx.author
         # connects to the database
@@ -503,9 +498,8 @@ class CNC(commands.Cog):
                                value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}")
             await author.send(embed=lsve)
 
-    @commands.command(usage="[nation name] <reason>")
+    @commands.command(usage="[nation name] <reason>", brief="Completely removes a user from the CNC system. Owner only")
     @commands.is_owner()
-    
     async def cnc_remove(self, ctx, nationname: str, reason: str = None):
         # loop for thread
         loop = asyncio.get_running_loop()
@@ -545,9 +539,8 @@ class CNC(commands.Cog):
         await user.send(
             f"Your registered Command and Conquer account, {nationamesave['username']}, has been deleted by moderator {ctx.author} for the following reason:```{reason}```")
 
-    @commands.command(usage="[item being edited (color or focus)]")
+    @commands.command(usage="[item being edited (color or focus)]", brief="Changes a nation's registered color")
     @commands.guild_only()
-    
     async def cnc_edit(self, ctx, editing):
         loop = asyncio.get_running_loop()
         author = ctx.author
@@ -626,8 +619,7 @@ class CNC(commands.Cog):
 
     # ---------------------Province Commands------------------------------
 
-    @commands.command(usage="[province id]", aliases=['cncp'])
-    
+    @commands.command(usage="[province id]", aliases=['cncp'], brief="Displays information about a specified province")
     async def cnc_province(self, ctx, provinceid: int):
         # connects to the database
         conn = self.bot.pool
@@ -686,9 +678,8 @@ class CNC(commands.Cog):
         provinceembed.add_field(name="Coastline", value=coastline)
         await ctx.send(embed=provinceembed)
 
-    @commands.command(usage="[province id]")
+    @commands.command(usage="[province id]", brief="Releases a specified province")
     @commands.guild_only()
-    
     async def cnc_release(self, ctx, provinceid: int):
         loop = asyncio.get_running_loop()
         author = ctx.author
@@ -754,9 +745,9 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
             await ctx.send(error)
 
-    @commands.command(usage="[province id] [deployed force]", aliases=['cncd'])
+    @commands.command(usage="[province id] [deployed force]",
+                      aliases=['cncd'], brief="Deploys a number of troops to a specified province")
     @commands.guild_only()
-    
     async def cnc_deploy(self, ctx, location: int, amount: int):
         author = ctx.author
         # connects to the database
@@ -807,9 +798,9 @@ class CNC(commands.Cog):
                 self.bot.logger.warning(msg=error)
                 await ctx.send(error)
 
-    @commands.command(usage="[province id] [recipient nation]")
+    @commands.command(usage="[province id] [recipient nation]",
+                      brief="Transfers a province to another nation's control")
     @commands.guild_only()
-    
     async def cnc_transfer(self, ctx, provinceid: int, recipient: str):
         loop = asyncio.get_running_loop()
         author = ctx.author
@@ -876,8 +867,8 @@ class CNC(commands.Cog):
 
     # ---------------------Interaction Commands------------------------------
 
-    @commands.command(usage="<offer id>", aliases=['cncvi'])
-    
+    @commands.command(usage="<offer id>", aliases=['cncvi'],
+                      brief="Displays information about a specific interaction or all interactions")
     async def cnc_view_interaction(self, ctx, interactionid: int = None):
         author = ctx.author
         # connects to the database
@@ -911,8 +902,8 @@ class CNC(commands.Cog):
         if upload is True:
             with open(f"{self.interaction_directory}{interaction['id']}.txt", "r") as file:
                 await ctx.send(file=discord.File(file, f"{interaction['id']}.txt"))
-    @commands.command(usage="[offer id]")
-    
+
+    @commands.command(usage="[offer id]", brief="Displays a specific offer with information")
     async def cnc_offer(self, ctx, offerid: int):
         author = ctx.author
         # connects to the database
@@ -940,8 +931,8 @@ class CNC(commands.Cog):
             with open(f"{self.interaction_directory}{offer['id']}.txt", "r") as file:
                 await ctx.send(file=discord.File(file, f"{offer['id']}.txt"))
 
-    @commands.command(usage="[interaction id] [interaction (accept, reject, cancel)]", aliases=['cnci'])
-    
+    @commands.command(usage="[interaction id] [interaction (accept, reject, cancel)]", aliases=['cnci'],
+                      brief="Allows for interacting with a proposed interaction")
     async def cnc_interaction(self, ctx, interactionid: int, interaction: str):
         author = ctx.author
         # connects to the database
@@ -1046,8 +1037,7 @@ class CNC(commands.Cog):
         else:
             raise commands.UserInputError
 
-    @commands.command()
-    
+    @commands.command(brief="Displays all pending interactions and offers")
     async def cnc_view_pending(self, ctx):
         author = ctx.author
         # connects to the database
@@ -1069,9 +1059,8 @@ class CNC(commands.Cog):
         await author.send(recipient_text)
         await author.send(sender_text)
 
-    @commands.command(usage="[nation],, [terms]")
+    @commands.command(usage="[nation],, [terms]", brief="Sends an alliance offer to a nation")
     @commands.guild_only()
-    
     async def cnc_alliance(self, ctx, *args):
         author = ctx.author
         # connects to the database
@@ -1137,9 +1126,8 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
             await ctx.send(error)
 
-    @commands.command(usage="[recipient],, <goal>")
+    @commands.command(usage="[recipient],, <goal>", brief="Declares war on a nation")
     @commands.guild_only()
-    
     async def cnc_declare(self, ctx, *args):
         author = ctx.author
         # connects to the database
@@ -1221,9 +1209,8 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
             await ctx.send(error)
 
-    @commands.command(usage="[recipient],, [terms]")
+    @commands.command(usage="[recipient],, [terms]", brief="Sends a peace offer to a nation")
     @commands.guild_only()
-    
     async def cnc_peace(self, ctx, *args):
         author = ctx.author
         # connects to the database
@@ -1291,8 +1278,7 @@ class CNC(commands.Cog):
 
     # ---------------------Resource and Recruit Commands------------------------------
 
-    @commands.command(usage="<nation name>", aliases=['cncb'])
-    
+    @commands.command(usage="<nation name>", aliases=['cncb'], brief="Displays information about a nation's income")
     async def cnc_bank(self, ctx, *args):
         conn = self.bot.pool
         nationname = ' '.join(args[:])
@@ -1386,9 +1372,9 @@ class CNC(commands.Cog):
             bankembed.add_field(name="Ports", value=ports)
             await ctx.send(embed=bankembed)
 
-    @commands.command(usage="[battalion amount] <province id>", aliases=['cncr'])
+    @commands.command(usage="[battalion amount] <province id>", aliases=['cncr'],
+                      brief="Recruits a number of battalions")
     @commands.guild_only()
-    
     async def cnc_recruit(self, ctx, ramount: int, location: int = None):
         author = ctx.author
         # connects to the database
@@ -1456,9 +1442,8 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
             await ctx.send(error)
 
-    @commands.command(usage="[battalion amount]")
+    @commands.command(usage="[battalion amount]", brief="Recruits a number of battalions in all controlled provinces")
     @commands.guild_only()
-    
     async def cnc_mass_recruit(self, ctx, amount: int):
         author = ctx.author
         # connects to the database
@@ -1505,9 +1490,8 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
             await ctx.send(f"{error} at mass_recruit")
 
-    @commands.command(usage="[amount] [recipient nation]")
+    @commands.command(usage="[amount] [recipient nation]", brief="Sends money to a specified nation")
     @commands.guild_only()
-    
     async def cnc_tribute(self, ctx, amount: int, recipient: str):
         if amount <= 0:
             raise commands.UserInputError
@@ -1545,9 +1529,8 @@ class CNC(commands.Cog):
         await ctx.send(f"{userinfo['username']} has sent \u03FE{amount} to {recipientinfo['username']}.")
         return
 
-    @commands.command(usage="[province id]")
+    @commands.command(usage="[province id]", brief="Purchases a specified province")
     @commands.guild_only()
-    
     async def cnc_purchase(self, ctx, provinceid: int):
         loop = asyncio.get_running_loop()
         author = ctx.author
@@ -1626,9 +1609,9 @@ class CNC(commands.Cog):
                 self.bot.logger.warning(msg=error)
                 return
 
-    @commands.command(usage="[province id] [structure (fort, port, city)]")
+    @commands.command(usage="[province id] [structure (fort, port, city)]",
+                      brief="Constructs a building in a specified province")
     @commands.guild_only()
-    
     async def cnc_construct(self, ctx, provinceid: int, structure: str):
         author = ctx.author
         # connects to the database
@@ -1754,9 +1737,9 @@ class CNC(commands.Cog):
 
     # -------------------Movement Commands----------------------------
 
-    @commands.command(usage="[province id] [amount]", aliases=['cncw'])
+    @commands.command(usage="[province id] [amount]", aliases=['cncw'],
+                      brief="Removes a number of troops from a specified province")
     @commands.guild_only()
-    
     async def cnc_withdraw(self, ctx, province: int, amount: int):
         author = ctx.author
         # connects to the database
@@ -1804,9 +1787,9 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
             return
 
-    @commands.command(usage="[stationed target id] [target province id] [amount]", aliases=['cncm'])
+    @commands.command(usage="[stationed target id] [target province id] [amount]", aliases=['cncm'],
+                      brief="Moves troops from one province to another")
     @commands.guild_only()
-    
     async def cnc_move(self, ctx, stationed: int, target: int, amount: int):
         author = ctx.author
         # connects to the database
@@ -1869,9 +1852,9 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
             return
 
-    @commands.command(usage="[stationed province] [target province] [attack force]", aliases=['cnca'])
+    @commands.command(usage="[stationed province] [target province] [attack force]", aliases=['cnca'],
+                      brief="Attacks from one province to another")
     @commands.guild_only()
-    
     async def cnc_attack(self, ctx, stationed: int, target: int, force: int):
         loop = asyncio.get_running_loop()
         author = ctx.author
@@ -2474,8 +2457,7 @@ class CNC(commands.Cog):
 
     # ------------------Map Commands----------------------------
 
-    @commands.command()
-    
+    @commands.command(brief="Displays the map")
     async def cnc_map(self, ctx, debug: bool = False):
         loop = asyncio.get_running_loop()
         reactions = ["\U0001f5fa", "\U000026f0", "\U0001f3f3", "\U0000274c"]
@@ -2573,7 +2555,7 @@ class CNC(commands.Cog):
 
     # ---------------------Moderation------------------------------
 
-    @commands.command(usage="[nation name] [amount] [reason]")
+    @commands.command(usage="[nation name] [amount] [reason]", brief="Gives a specified nation credits")
     @modcheck()
     async def cnc_award(self, ctx, username: str, amount: int, *args):
         # connects to the database
@@ -2605,7 +2587,7 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
             return
 
-    @commands.command(usage="[nation name] [province] [reason]")
+    @commands.command(usage="[nation name] [province] [reason]", brief="Gives a specified nation a specified province")
     @modcheck()
     async def cnc_cede(self, ctx, username: str, province: int, *args):
         # connects to the database
@@ -2713,7 +2695,7 @@ class CNC(commands.Cog):
                 self.bot.logger.warning(msg=error)
                 return
 
-    @commands.command(usage="[time(s,m,h,d)] [user]")
+    @commands.command(usage="[time(s,m,h,d)] [user]", brief="Mutes a user for a specified time or indefinitely")
     @modcheck()
     async def cnc_mute(self, ctx, mutetime, *args):
         # connects to the database
@@ -2807,7 +2789,7 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
             return
 
-    @commands.command(usage="[user]")
+    @commands.command(usage="[user]", brief="Unmutes a user")
     @modcheck()
     async def cnc_unmute(self, ctx, *args):
         # connects to the database
@@ -2846,7 +2828,7 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
             return
 
-    @commands.command(usage="[user]")
+    @commands.command(usage="[user]", brief="Bans a user")
     @modcheck()
     async def cnc_ban(self, ctx, *args):
         # connects to the database
@@ -2900,7 +2882,7 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
             return
 
-    @commands.command(usage="[user]")
+    @commands.command(usage="[user]", brief="Unbans a user")
     @modcheck()
     async def cnc_unban(self, ctx, *args):
         # connects to the database
@@ -2939,7 +2921,7 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
             return
 
-    @commands.command(usage="[user]")
+    @commands.command(usage="[user]", brief="Displays a user's record")
     @modcheck()
     async def cnc_user_log(self, ctx, *args):
         try:
@@ -2956,7 +2938,8 @@ class CNC(commands.Cog):
             if userinfo is None:
                 await ctx.send("That user does not appear to exist.")
                 return
-            logs = await conn.fetch('''SELECT * FROM blacklist WHERE user_id = $1 ORDER BY action_date DESC;''', user.id)
+            logs = await conn.fetch('''SELECT * FROM blacklist WHERE user_id = $1 ORDER BY action_date DESC;''',
+                                    user.id)
             userobj = self.bot.get_user(user.id)
             if len(logs) == 0:
                 await ctx.send("That user has no record.")
@@ -2990,11 +2973,12 @@ class CNC(commands.Cog):
                                        value=f"{entry['action_date'].day}-{entry['action_date'].month}-{entry['action_date'].year}")
                 userlogembed.add_field(name="Type", value=entry['status'])
                 if entry['end_time'] is not None:
-                    userlogembed.add_field(name="Timeout", value=f"{entry['end_time'].strftime('%a, %d %b %Y %H:%M:%S')}")
+                    userlogembed.add_field(name="Timeout",
+                                           value=f"{entry['end_time'].strftime('%a, %d %b %Y %H:%M:%S')}")
                 userlogembed.add_field(name="Moderator",
                                        value=f"{(self.bot.get_user(entry['mod_id'])).name}#{(self.bot.get_user(entry['mod_id'])).discriminator}")
                 userlogembed.add_field(name="Active", value=str(entry['active']))
-                userlogembed.set_footer(text=f"Page {abs(entrynumber+1)} of {pages}")
+                userlogembed.set_footer(text=f"Page {abs(entrynumber + 1)} of {pages}")
                 logmessage = await ctx.send(embed=userlogembed)
                 for r in reactions:
                     await logmessage.add_reaction(r)
@@ -3033,7 +3017,7 @@ class CNC(commands.Cog):
                             userlogembed.add_field(name="Moderator",
                                                    value=f"{(self.bot.get_user(entry['mod_id'])).name}#{(self.bot.get_user(entry['mod_id'])).discriminator}")
                             userlogembed.add_field(name="Active", value=str(entry['active']))
-                            userlogembed.set_footer(text=f"Page {abs(entrynumber-1)} of {pages}")
+                            userlogembed.set_footer(text=f"Page {abs(entrynumber - 1)} of {pages}")
                             await logmessage.clear_reactions()
                             await logmessage.edit(embed=userlogembed)
                             for r in reactions:
@@ -3068,7 +3052,7 @@ class CNC(commands.Cog):
                             userlogembed.add_field(name="Moderator",
                                                    value=f"{(self.bot.get_user(entry['mod_id'])).name}#{(self.bot.get_user(entry['mod_id'])).discriminator}")
                             userlogembed.add_field(name="Active", value=str(entry['active']))
-                            userlogembed.set_footer(text=f"Page {abs(entrynumber+1)} of {pages}")
+                            userlogembed.set_footer(text=f"Page {abs(entrynumber + 1)} of {pages}")
                             await logmessage.clear_reactions()
                             await logmessage.edit(embed=userlogembed)
                             for r in reactions:
@@ -3077,7 +3061,7 @@ class CNC(commands.Cog):
             await ctx.send(error)
             self.bot.logger.warning(msg=error)
 
-    @commands.command(usage="[mod]")
+    @commands.command(usage="[mod]", brief="Displays actions taken by a specific moderator")
     @modcheck()
     async def cnc_mod_log(self, ctx, *args):
         # connects to the database
@@ -3142,7 +3126,7 @@ class CNC(commands.Cog):
                 modlogembed.add_field(name="Timeout",
                                       value=f"{strftime('%a, %d %b %Y %H:%M:%S %Z', entry['end_time'])}")
             modlogembed.add_field(name="Active", value=str(entry['active']))
-            modlogembed.set_footer(text=f"Page {abs(entrynumber+1)} of {pages}")
+            modlogembed.set_footer(text=f"Page {abs(entrynumber + 1)} of {pages}")
             logmessage = await ctx.send(embed=modlogembed)
             for r in reactions:
                 await logmessage.add_reaction(r)
@@ -3183,7 +3167,7 @@ class CNC(commands.Cog):
                             modlogembed.add_field(name="Timeout",
                                                   value=f"{strftime('%a, %d %b %Y %H:%M:%S %Z', entry['end_time'])}")
                         modlogembed.add_field(name="Active", value=str(entry['active']))
-                        modlogembed.set_footer(text=f"Page {abs(entrynumber-1)} of {pages}")
+                        modlogembed.set_footer(text=f"Page {abs(entrynumber - 1)} of {pages}")
                         await logmessage.clear_reactions()
                         await logmessage.edit(embed=modlogembed)
                         for r in reactions:
@@ -3219,13 +3203,13 @@ class CNC(commands.Cog):
                             modlogembed.add_field(name="Timeout",
                                                   value=f"{strftime('%a, %d %b %Y %H:%M:%S %Z', entry['end_time'])}")
                         modlogembed.add_field(name="Active", value=str(entry['active']))
-                        modlogembed.set_footer(text=f"Page {abs(entrynumber+1)} of {pages}")
+                        modlogembed.set_footer(text=f"Page {abs(entrynumber + 1)} of {pages}")
                         await logmessage.clear_reactions()
                         await logmessage.edit(embed=modlogembed)
                         for r in reactions:
                             await logmessage.add_reaction(r)
 
-    @commands.command(usage="[action id]")
+    @commands.command(usage="[action id]", brief="Displays information about a specific moderation action")
     @modcheck()
     async def cnc_mod_action(self, ctx, action: int):
         # connects to the database
@@ -3258,7 +3242,7 @@ class CNC(commands.Cog):
     @tasks.loop(hours=6)
     # @commands.command()
     # @commands.is_owner()
-    async def cnc_resource_loop(self):
+    async def cnc_turn_loop(self):
         try:
             # channel to send to
             cncchannel = self.bot.get_channel(927288304301387816)
@@ -3330,8 +3314,8 @@ class CNC(commands.Cog):
                                    int(max_manpower), added_manpower, userinfo['user_id'])
             turns = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
             await conn.execute('''UPDATE cnc_data SET data_value = $2 WHERE data_name = $1;''', "turns",
-                               str(int(turns['data_value'])+1))
-            await cncchannel.send("Resource update complete.")
+                               str(int(turns['data_value']) + 1))
+            await cncchannel.send(f"New turn! It is now turn #{int(turns['data_value'])+1}.")
             return
         except Exception as error:
             self.bot.logger.warning(msg=error)
@@ -3344,7 +3328,7 @@ class CNC(commands.Cog):
         if self.resourcesleeping is True:
             await ctx.send("Already waiting!")
             return
-        if self.cnc_resource_loop.is_running():
+        if self.cnc_turn_loop.is_running():
             await ctx.send("Loop already going!")
             return
         self.resourcesleeping = True
@@ -3369,19 +3353,19 @@ class CNC(commands.Cog):
             update += datetime.timedelta(days=1)
             await ctx.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
-        self.cnc_resource_loop.start(self)
+        self.cnc_turn_loop.start(self)
 
     @commands.command()
     @commands.is_owner()
     async def cncstop(self, ctx):
-        self.cnc_resource_loop.cancel()
-        if self.cnc_resource_loop.is_running() is False:
+        self.cnc_turn_loop.cancel()
+        if self.cnc_turn_loop.is_running() is False:
             await ctx.send("Stopped.")
 
-    @commands.command()
+    @commands.command(brief="Displays the status of the CNC turn loop")
     @commands.is_owner()
     async def cncstatus(self, ctx):
-        if self.cnc_resource_loop.is_running():
+        if self.cnc_turn_loop.is_running():
             await ctx.send("CNC loop running")
         else:
             await ctx.send("CNC loop not running.")
@@ -3389,7 +3373,7 @@ class CNC(commands.Cog):
     async def cncstartloop(self):
         await self.bot.wait_until_ready()
         shardchannel = self.bot.get_channel(835579413625569322)
-        if CNC.cnc_resource_loop.is_running():
+        if CNC.cnc_turn_loop.is_running():
             await shardchannel.send("Already running on_ready.")
             return
         CNC.resourcesleeping = True
@@ -3416,7 +3400,7 @@ class CNC(commands.Cog):
             update += datetime.timedelta(days=1)
             await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
-        CNC.cnc_resource_loop.start(self)
+        CNC.cnc_turn_loop.start(self)
 
 
 def setup(bot: Shard):

@@ -11,7 +11,8 @@ class Currency(commands.Cog):
         self.bot = bot
 
     @commands.command(usage='[currency name] [worth] <symbol> <backed by> <nation of origin> '
-                            '\nRemember that multiple word names must be enclosed by quotation marks.')
+                            '\nRemember that multiple word names must be enclosed by quotation marks.',
+                      brief="Adds a new currency to the ledger")
     @commands.guild_only()
     # @CurrencyCheck()
     async def add_currency(self, ctx, currencyname: str, worth: float, symbol: str = '', backed: str = '',
@@ -39,7 +40,8 @@ class Currency(commands.Cog):
             self.bot.logger.warning(error)
 
     @commands.command(usage="[currency name] [worth] <symbol> <backed by> <nation>"
-                            "\nRemember that multiple word names must be enclosed by quotation marks.")
+                            "\nRemember that multiple word names must be enclosed by quotation marks.",
+                      brief="Edits an existing currency")
     @commands.guild_only()
     # @CurrencyCheck()
     async def edit_currency(self, ctx, currencyname: str, worth: float, symbol: str = "", backed: str = '',
@@ -74,7 +76,7 @@ class Currency(commands.Cog):
             await ctx.send(error)
             self.bot.logger.warning(error)
 
-    @commands.command(usage="[currency name]")
+    @commands.command(usage="[currency name]", brief="Removes an existing currency from the ledger")
     @commands.guild_only()
     # @CurrencyCheck()
     async def remove_currency(self, ctx, currencyname: str):
@@ -103,7 +105,7 @@ class Currency(commands.Cog):
             await ctx.send(error)
             self.bot.logger.warning(error)
 
-    @commands.command(usage="[currency name]")
+    @commands.command(usage="[currency name]", brief="Displays information about a specified currency")
     @commands.guild_only()
     # @CurrencyCheck()
     async def currency(self, ctx, currency_string: str):
@@ -137,7 +139,7 @@ class Currency(commands.Cog):
             await ctx.send(error)
             self.bot.logger.warning(error)
 
-    @commands.command(usage="[currency] [currency] [amount]")
+    @commands.command(usage="[currency] [currency] [amount]", brief="Calculates an exchange between two currencies")
     @commands.guild_only()
     # @CurrencyCheck()
     async def exchange(self, ctx, firstcurrencyraw: str, secondcurrencyraw: str, amount: float):
@@ -187,7 +189,7 @@ class Currency(commands.Cog):
         embed.add_field(name="Exchange Amount Out", value=output, inline=True)
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(brief="Displays information about all tracked currencies")
     @commands.guild_only()
     # @CurrencyCheck()
     async def ledger(self, ctx):

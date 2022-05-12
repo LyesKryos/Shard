@@ -9,7 +9,8 @@ class Roleplay(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
 
-    @commands.command(usage="[RSC/PPRC link]", aliases=['pprc_check'])
+    @commands.command(usage="[RSC/PPRC link]", aliases=['pprc_check'],
+                      brief="Calculates total points and percentages for a given dispatch")
     @commands.guild_only()
     async def rsc_check(self, ctx, dispatch_link):
         dispatch_id = (re.findall('\d+', dispatch_link))[0]
