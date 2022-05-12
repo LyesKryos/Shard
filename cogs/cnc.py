@@ -167,10 +167,10 @@ class CNC(commands.Cog):
                         f"{nationame} is an already registered nation name! Please choose a different username.")
                     return
             # checks the focus and ensures proper reading
-            focuses = ['m', 'e', 'd']
+            focuses = ['m', 'e', 's']
             if focus is not None:
                 if focus.lower() not in focuses:
-                    raise Exception("That is not a valid focus. Please use only m, e, or d.")
+                    raise Exception("That is not a valid focus. Please use only m, e, or s.")
             else:
                 focus = "None"
             if color in self.banned_colors:
@@ -1296,7 +1296,7 @@ class CNC(commands.Cog):
             text = data[1]
             text = text.lstrip(' ')
             # fetches all user ids
-            allusers = await conn.fetch('''SELECT user_id, username FROM cncusers''')
+            allusers = await conn.fetch('''SELECT user_id, username FROM cncusers;''')
             alluserids = list()
             allusernames = list()
             for id in allusers:
