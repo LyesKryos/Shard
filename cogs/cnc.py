@@ -114,32 +114,38 @@ class CNC(commands.Cog):
     @commands.command(brief="Displays information about the CNC system.")
     @commands.guild_only()
     async def cnc_info(self, ctx):
-        conn = self.bot.pool
-        data = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
-        infoembed = discord.Embed(title="Command And Conquest System", color=discord.Color.dark_red(),
-                                  description="This is the condensed information about the CNC system. For more information, "
-                                              "including commands, see the CNC Dispatch here: https://www.nationstates.net/page=dispatch/id=1641083")
-        infoembed.add_field(name="About", value="The Command and Conquest system is a simulated battle royale between "
-                                                "the various nations of Thegye. It is non-roleplay and is meant to be "
-                                                "an entertaining strategy game. The system makes used of combat "
-                                                "between armies, international relationships and intrigue, "
-                                                "resources, and more to bring players a fun and immersive experience. "
-                                                "The system is hosted on Shard, a purpose-built bot. For more "
-                                                "information about the Command and Conquer system, make sure to check "
-                                                "out the dispatch and use the command "
-                                                f" `{self.bot.command_prefix}help CNC`.", inline=False)
-        infoembed.add_field(name="Turns", value=f"It is currently turn {int(data['data_value'])}.")
-        infoembed.add_field(name="Questions?",
-                            value="Contact the creator: Lies Kryos#1734\nContact a moderator: [Insert_Person_Here]#6003")
-        infoembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-        await ctx.send(embed=infoembed)
+        try:
+            conn = self.bot.pool
+            data = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
+            infoembed = discord.Embed(title="Command And Conquest System", color=discord.Color.dark_red(),
+                                      description="This is the condensed information about the CNC system. For more information, "
+                                                  "including commands, see the CNC Dispatch here: https://www.nationstates.net/page=dispatch/id=1641083")
+            infoembed.add_field(name="About", value="The Command and Conquest system is a simulated battle royale between "
+                                                    "the various nations of Thegye. It is non-roleplay and is meant to be "
+                                                    "an entertaining strategy game. The system makes used of combat "
+                                                    "between armies, international relationships and intrigue, "
+                                                    "resources, and more to bring players a fun and immersive experience. "
+                                                    "The system is hosted on Shard, a purpose-built bot. For more "
+                                                    "information about the Command and Conquer system, make sure to check "
+                                                    "out the dispatch and use the command "
+                                                    f" `{self.bot.command_prefix}help CNC`.", inline=False)
+            infoembed.add_field(name="Turns", value=f"It is currently turn {int(data['data_value'])}.")
+            infoembed.add_field(name="Questions?",
+                                value="Contact the creator: Lies Kryos#1734\nContact a moderator: [Insert_Person_Here]#6003")
+            infoembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+            await ctx.send(embed=infoembed)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
 
     @commands.command(brief="Displays the turn count.")
     @commands.guild_only()
     async def cnc_turn(self, ctx):
-        conn = self.bot.pool
-        data = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
-        await ctx.send(f"It is currently turn #{int(data['data_value'])}.")
+        try:
+            conn = self.bot.pool
+            data = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
+            await ctx.send(f"It is currently turn #{int(data['data_value'])}.")
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
 
     @commands.command(usage="[nation name] [hexadecimal color id] <focus (m,e,s)>", brief="Registers a new nation")
     @commands.guild_only()
@@ -201,11 +207,156 @@ class CNC(commands.Cog):
 
     @commands.command(usage="<nation name>", aliases=['cncv'], brief="Displays information about a nation")
     async def cnc_view(self, ctx, *args):
-        # connects to the database
-        conn = self.bot.pool
-        nationname = ' '.join(args[:])
-        if nationname == '':
-            # if the nationame is left blank, the author id is used to find the nation information
+        try:
+            # connects to the database
+            conn = self.bot.pool
+            nationname = ' '.join(args[:])
+            if nationname == '':
+                # if the nationame is left blank, the author id is used to find the nation information
+                author = ctx.author
+                registeredusers = await conn.fetch('''SELECT user_id FROM cncusers;''')
+                registeredlist = list()
+                # makes a list of the registered users
+                for users in registeredusers:
+                    registeredlist.append(users["user_id"])
+                # checks the author id against the list of registered users
+                if author.id not in registeredlist:
+                    await ctx.send(f"{ctx.author} does not appear to be registered.")
+                    return
+                # grabs the nation information
+                userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+                # sets the color properly
+                if userinfo["usercolor"] == "":
+                    color = discord.Color.random()
+                    colorvalue = "No color set."
+                else:
+                    color = discord.Color(int(userinfo["usercolor"].lstrip('#'), 16))
+                    colorvalue = color
+                # grabs all provinces owned by the nation and makes them into a pretty list
+                if len(userinfo["provinces_owned"]) != 1:
+                    provinceslist = userinfo["provinces_owned"]
+                    provinceslist.remove(0)
+                    provinceslist.sort()
+                    provinces = ', '.join(str(i) for i in provinceslist)
+                else:
+                    provinceslist = []
+                    provinces = "None"
+                # sets focus
+                if userinfo['focus'] == "m":
+                    focus = "Military"
+                elif userinfo['focus'] == "e":
+                    focus = "Economy"
+                elif userinfo['focus'] == "s":
+                    focus = "Strategy"
+                elif userinfo['focus'] == "none":
+                    focus = "None"
+                # fetches relations information
+                try:
+                    relations = await conn.fetch('''SELECT nation, relation FROM relations WHERE name = $1;''',
+                                                 userinfo['username'])
+                except Exception as error:
+                    await ctx.send(error)
+                    self.bot.logger.warning(msg=error)
+                alliances = list()
+                wars = list()
+                for r in relations:
+                    if r['relation'] == 'war':
+                        wars.append(r)
+                    if r['relation'] == 'alliance':
+                        alliances.append(r)
+                if len(wars) != 0:
+                    wars.sort()
+                    wars = ', '.join(str(w['nation']) for w in wars)
+                else:
+                    wars = "None"
+                if len(alliances) != 0:
+                    alliances.sort()
+                    alliances = ', '.join(str(a['nation']) for a in alliances)
+                else:
+                    alliances = "None"
+                # creates the embed item
+                cncuserembed = discord.Embed(title=userinfo["username"], color=color,
+                                             description=f"Registered nation of {self.bot.get_user(userinfo['user_id']).name}.")
+                cncuserembed.add_field(name=f"Territory (Total: {len(provinceslist)})", value=provinces, inline=False)
+                cncuserembed.add_field(name="Total Troops", value=userinfo["totaltroops"])
+                cncuserembed.add_field(name="Undeployed Troops", value=userinfo['undeployed'])
+                cncuserembed.add_field(name="Resources", value=f"\u03FE{userinfo['resources']}")
+                cncuserembed.add_field(name="Strategic Focus", value=focus)
+                cncuserembed.add_field(name="Color", value=colorvalue)
+                cncuserembed.add_field(name="Movement Points", value=userinfo['moves'])
+                cncuserembed.add_field(name="Alliances", value=alliances)
+                cncuserembed.add_field(name="Wars", value=wars)
+                await ctx.send(embed=cncuserembed)
+    
+            else:
+                registeredusers = await conn.fetch('''SELECT username FROM cncusers;''')
+                registeredlist = list()
+                # makes a list of the registered users
+                for users in registeredusers:
+                    registeredlist.append(users["username"].lower())
+                # checks the author id against the list of registered users
+                if nationname.lower() not in registeredlist:
+                    await ctx.send(f"{nationname} does not appear to be registered.")
+                    return
+                # pulls the specified nation data
+                nation = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
+                # sets the color properly
+                if nation["usercolor"] == "":
+                    color = discord.Color.random()
+                    colorvalue = "No color set."
+                else:
+                    color = discord.Color(int(nation["usercolor"].lstrip('#'), 16))
+                    colorvalue = color
+                # grabs all provinces  owned by the nation and makes them into a pretty list
+                if len(nation["provinces_owned"]) != 1:
+                    provinceslist = nation["provinces_owned"]
+                    provinceslist.remove(0)
+                    provinceslist.sort()
+                    provinces = ', '.join(str(p) for p in provinceslist)
+                else:
+                    provinceslist = []
+                    provinces = "None"
+                # fetches relations information
+                relations = await conn.fetch('''SELECT nation, relation FROM relations WHERE name = $1;''',
+                                             nation['username'])
+                alliances = list()
+                wars = list()
+                for r in relations:
+                    if r['relation'] == 'war':
+                        wars.append(r)
+                    if r['relation'] == 'alliance':
+                        alliances.append(r)
+                if len(wars) != 0:
+                    wars.sort()
+                    wars = ', '.join(str(w['nation']) for w in wars)
+                else:
+                    wars = "None"
+                if len(alliances) != 0:
+                    alliances.sort()
+                    alliances = ', '.join(str(a['nation']) for a in alliances)
+                else:
+                    alliances = "None"
+                # creates the embed object
+                cncuserembed = discord.Embed(title=nation["username"], color=color,
+                                             description=f"Registered nation of {self.bot.get_user(nation['user_id']).name}.")
+                cncuserembed.add_field(name=f"Territory (Total: {len(provinceslist)})", value=provinces, inline=False)
+                cncuserembed.add_field(name="Total Troops", value=nation["totaltroops"])
+                cncuserembed.add_field(name="Undeployed Troops", value=nation['undeployed'])
+                cncuserembed.add_field(name="Resources", value=f"\u03FE{nation['resources']}")
+                cncuserembed.add_field(name="Strategic Focus", value=nation["focus"])
+                cncuserembed.add_field(name="Color", value=colorvalue)
+                cncuserembed.add_field(name="Movement Points", value=nation['moves'])
+                cncuserembed.add_field(name="Alliances", value=alliances)
+                cncuserembed.add_field(name="Wars", value=wars)
+                await ctx.send(embed=cncuserembed)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    @commands.command(aliases=['cncdv'], brief="Displays detailed information about a nation, privately")
+    async def cnc_detailed_view(self, ctx):
+        try:
+            # connects to the database
+            conn = self.bot.pool
             author = ctx.author
             registeredusers = await conn.fetch('''SELECT user_id FROM cncusers;''')
             registeredlist = list()
@@ -244,29 +395,37 @@ class CNC(commands.Cog):
             elif userinfo['focus'] == "none":
                 focus = "None"
             # fetches relations information
-            try:
-                relations = await conn.fetch('''SELECT nation, relation FROM relations WHERE name = $1;''',
-                                             userinfo['username'])
-            except Exception as error:
-                await ctx.send(error)
-                self.bot.logger.warning(msg=error)
-            alliances = list()
-            wars = list()
-            for r in relations:
-                if r['relation'] == 'war':
-                    wars.append(r)
-                if r['relation'] == 'alliance':
-                    alliances.append(r)
-            if len(wars) != 0:
-                wars.sort()
-                wars = ', '.join(str(w['nation']) for w in wars)
+            relations = await conn.fetch('''SELECT nation, relation FROM relations WHERE name = $1;''',
+                                         userinfo['username'])
+            if relations is not None:
+                alliances = list()
+                wars = list()
+                for r in relations:
+                    if r['relation'] == 'war':
+                        wars.append(r)
+                    if r['relation'] == 'alliance':
+                        alliances.append(r)
+                if len(wars) != 0:
+                    wars.sort()
+                    wars = ', '.join(str(w['nation']) for w in wars)
+                else:
+                    wars = "None"
+                if len(alliances) != 0:
+                    alliances.sort()
+                    alliances = ', '.join(str(a['nation']) for a in alliances)
+                else:
+                    alliances = "None"
             else:
                 wars = "None"
-            if len(alliances) != 0:
-                alliances.sort()
-                alliances = ', '.join(str(a['nation']) for a in alliances)
-            else:
                 alliances = "None"
+            max_manpower = 3000
+            manpower_mod = .1
+            if userinfo['focus'] == 'm':
+                manpower_mod = .2
+            for p in provinceslist:
+                provinceworth = await conn.fetchrow('''SELECT manpower FROM provinces  WHERE id = $1;''', p)
+                max_manpower += provinceworth['manpower']
+            added_manpower = math.ceil(max_manpower * manpower_mod)
             # creates the embed item
             cncuserembed = discord.Embed(title=userinfo["username"], color=color,
                                          description=f"Registered nation of {self.bot.get_user(userinfo['user_id']).name}.")
@@ -279,1479 +438,1394 @@ class CNC(commands.Cog):
             cncuserembed.add_field(name="Movement Points", value=userinfo['moves'])
             cncuserembed.add_field(name="Alliances", value=alliances)
             cncuserembed.add_field(name="Wars", value=wars)
-            await ctx.send(embed=cncuserembed)
-
-        else:
-            registeredusers = await conn.fetch('''SELECT username FROM cncusers;''')
-            registeredlist = list()
-            # makes a list of the registered users
-            for users in registeredusers:
-                registeredlist.append(users["username"].lower())
-            # checks the author id against the list of registered users
-            if nationname.lower() not in registeredlist:
-                await ctx.send(f"{nationname} does not appear to be registered.")
-                return
-            # pulls the specified nation data
-            nation = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
-            # sets the color properly
-            if nation["usercolor"] == "":
-                color = discord.Color.random()
-                colorvalue = "No color set."
-            else:
-                color = discord.Color(int(nation["usercolor"].lstrip('#'), 16))
-                colorvalue = color
-            # grabs all provinces  owned by the nation and makes them into a pretty list
-            if len(nation["provinces_owned"]) != 1:
-                provinceslist = nation["provinces_owned"]
-                provinceslist.remove(0)
-                provinceslist.sort()
-                provinces = ', '.join(str(p) for p in provinceslist)
-            else:
-                provinceslist = []
-                provinces = "None"
-            # fetches relations information
-            relations = await conn.fetch('''SELECT nation, relation FROM relations WHERE name = $1;''',
-                                         nation['username'])
-            alliances = list()
-            wars = list()
-            for r in relations:
-                if r['relation'] == 'war':
-                    wars.append(r)
-                if r['relation'] == 'alliance':
-                    alliances.append(r)
-            if len(wars) != 0:
-                wars.sort()
-                wars = ', '.join(str(w['nation']) for w in wars)
-            else:
-                wars = "None"
-            if len(alliances) != 0:
-                alliances.sort()
-                alliances = ', '.join(str(a['nation']) for a in alliances)
-            else:
-                alliances = "None"
-            # creates the embed object
-            cncuserembed = discord.Embed(title=nation["username"], color=color,
-                                         description=f"Registered nation of {self.bot.get_user(nation['user_id']).name}.")
-            cncuserembed.add_field(name=f"Territory (Total: {len(provinceslist)})", value=provinces, inline=False)
-            cncuserembed.add_field(name="Total Troops", value=nation["totaltroops"])
-            cncuserembed.add_field(name="Undeployed Troops", value=nation['undeployed'])
-            cncuserembed.add_field(name="Resources", value=f"\u03FE{nation['resources']}")
-            cncuserembed.add_field(name="Strategic Focus", value=nation["focus"])
-            cncuserembed.add_field(name="Color", value=colorvalue)
-            cncuserembed.add_field(name="Movement Points", value=nation['moves'])
-            cncuserembed.add_field(name="Alliances", value=alliances)
-            cncuserembed.add_field(name="Wars", value=wars)
-            await ctx.send(embed=cncuserembed)
-
-    @commands.command(aliases=['cncdv'], brief="Displays detailed information about a nation, privately")
-    async def cnc_detailed_view(self, ctx):
-        # connects to the database
-        conn = self.bot.pool
-        author = ctx.author
-        registeredusers = await conn.fetch('''SELECT user_id FROM cncusers;''')
-        registeredlist = list()
-        # makes a list of the registered users
-        for users in registeredusers:
-            registeredlist.append(users["user_id"])
-        # checks the author id against the list of registered users
-        if author.id not in registeredlist:
-            await ctx.send(f"{ctx.author} does not appear to be registered.")
-            return
-        # grabs the nation information
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-        # sets the color properly
-        if userinfo["usercolor"] == "":
-            color = discord.Color.random()
-            colorvalue = "No color set."
-        else:
-            color = discord.Color(int(userinfo["usercolor"].lstrip('#'), 16))
-            colorvalue = color
-        # grabs all provinces owned by the nation and makes them into a pretty list
-        if len(userinfo["provinces_owned"]) != 1:
-            provinceslist = userinfo["provinces_owned"]
-            provinceslist.remove(0)
-            provinceslist.sort()
-            provinces = ', '.join(str(i) for i in provinceslist)
-        else:
-            provinceslist = []
-            provinces = "None"
-        # sets focus
-        if userinfo['focus'] == "m":
-            focus = "Military"
-        elif userinfo['focus'] == "e":
-            focus = "Economy"
-        elif userinfo['focus'] == "s":
-            focus = "Strategy"
-        elif userinfo['focus'] == "none":
-            focus = "None"
-        # fetches relations information
-        relations = await conn.fetch('''SELECT nation, relation FROM relations WHERE name = $1;''',
-                                     userinfo['username'])
-        if relations is not None:
-            alliances = list()
-            wars = list()
-            for r in relations:
-                if r['relation'] == 'war':
-                    wars.append(r)
-                if r['relation'] == 'alliance':
-                    alliances.append(r)
-            if len(wars) != 0:
-                wars.sort()
-                wars = ', '.join(str(w['nation']) for w in wars)
-            else:
-                wars = "None"
-            if len(alliances) != 0:
-                alliances.sort()
-                alliances = ', '.join(str(a['nation']) for a in alliances)
-            else:
-                alliances = "None"
-        else:
-            wars = "None"
-            alliances = "None"
-        max_manpower = 3000
-        manpower_mod = .1
-        if userinfo['focus'] == 'm':
-            manpower_mod = .2
-        for p in provinceslist:
-            provinceworth = await conn.fetchrow('''SELECT manpower FROM provinces  WHERE id = $1;''', p)
-            max_manpower += provinceworth['manpower']
-        added_manpower = math.ceil(max_manpower * manpower_mod)
-        # creates the embed item
-        cncuserembed = discord.Embed(title=userinfo["username"], color=color,
-                                     description=f"Registered nation of {self.bot.get_user(userinfo['user_id']).name}.")
-        cncuserembed.add_field(name=f"Territory (Total: {len(provinceslist)})", value=provinces, inline=False)
-        cncuserembed.add_field(name="Total Troops", value=userinfo["totaltroops"])
-        cncuserembed.add_field(name="Undeployed Troops", value=userinfo['undeployed'])
-        cncuserembed.add_field(name="Resources", value=f"\u03FE{userinfo['resources']}")
-        cncuserembed.add_field(name="Strategic Focus", value=focus)
-        cncuserembed.add_field(name="Color", value=colorvalue)
-        cncuserembed.add_field(name="Movement Points", value=userinfo['moves'])
-        cncuserembed.add_field(name="Alliances", value=alliances)
-        cncuserembed.add_field(name="Wars", value=wars)
-        cncuserembed.add_field(name="City/Port/Fort Limit",
-                               value=f"{userinfo['citylimit'][1]}/{userinfo['portlimit'][1]}/{userinfo['fortlimit'][1]}")
-        cncuserembed.add_field(name="Manpower/Manpower Limit",
-                               value=f"{userinfo['manpower']}/{userinfo['maxmanpower']}")
-        cncuserembed.add_field(name="Manpower Increase", value=str(added_manpower))
-        await author.send(embed=cncuserembed)
+            cncuserembed.add_field(name="City/Port/Fort Limit",
+                                   value=f"{userinfo['citylimit'][1]}/{userinfo['portlimit'][1]}/{userinfo['fortlimit'][1]}")
+            cncuserembed.add_field(name="Manpower/Manpower Limit",
+                                   value=f"{userinfo['manpower']}/{userinfo['maxmanpower']}")
+            cncuserembed.add_field(name="Manpower Increase", value=str(added_manpower))
+            await author.send(embed=cncuserembed)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
 
     @commands.command(aliases=['cncva'], brief="Displays information about all nations")
     @commands.guild_only()
     async def cnc_view_all(self, ctx):
-        # connects to the database
-        conn = self.bot.pool
-        registeredusers = await conn.fetch('''SELECT * FROM cncusers;''')
-        viewallembed = discord.Embed(title="Registered Nations and Users", color=discord.Color.dark_red(),
-                                     description="This is list up to date with all users, ids, and information")
-        viewallembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-        for users in [userids['user_id'] for userids in registeredusers]:
-            individualinformation = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', users)
-            viewallembed.add_field(name=f"__{individualinformation['username']}__",
-                                   value=f"**ID:**\n {individualinformation['user_id']}\n**Color:**\n{individualinformation['usercolor']}",
-                                   inline=False)
-        await ctx.send(embed=viewallembed)
+        try:
+            # connects to the database
+            conn = self.bot.pool
+            registeredusers = await conn.fetch('''SELECT * FROM cncusers;''')
+            viewallembed = discord.Embed(title="Registered Nations and Users", color=discord.Color.dark_red(),
+                                         description="This is list up to date with all users, ids, and information")
+            viewallembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+            for users in [userids['user_id'] for userids in registeredusers]:
+                individualinformation = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', users)
+                viewallembed.add_field(name=f"__{individualinformation['username']}__",
+                                       value=f"**ID:**\n {individualinformation['user_id']}\n**Color:**\n{individualinformation['usercolor']}",
+                                       inline=False)
+            await ctx.send(embed=viewallembed)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
 
     @commands.command(aliases=['cncsv'],
                       brief="Displays detailed information about all provinces a nation owns, privately")
     async def cnc_strategic_view(self, ctx):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # if the nationame is left blank, the author id is used to find the nation information
-        registeredusers = await conn.fetch('''SELECT user_id FROM cncusers;''')
-        registeredlist = list()
-        # makes a list of the registered users
-        for users in registeredusers:
-            registeredlist.append(users["user_id"])
-        # checks the author id against the list of registered users
-        if author.id not in registeredlist:
-            await ctx.send(f"{ctx.author} does not appear to be registered.")
-            return
-        # pulls the specified nation data
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-        provinces = list(userinfo['provinces_owned'])
-        provinces.remove(0)
-        provinces.sort()
-        # creates the embed object
-        if len(provinces) <= 15:
-            sve1 = discord.Embed(title=f"{userinfo['username']} - Strategic View",
-                                 description="A strategic overlook at all troop placements and provinces.",
-                                 color=discord.Color.blurple())
-            sve1.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-            for p in provinces:
-                provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-                sve1.add_field(name=f"**Province #{p}**",
-                               value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}\nManpower: {provinceinfo['manpower']}")
-            await author.send(embed=sve1)
-        if len(provinces) > 15:
-            length = math.ceil(len(provinces) / 15) - 1
-            sve1 = discord.Embed(title=f"{userinfo['username']} - Strategic View",
-                                 description="A strategic overlook at all troop placements and provinces.",
-                                 color=discord.Color.blurple())
-            sve1.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-            for p in provinces[:15]:
-                provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-                sve1.add_field(name=f"**Province #{p}**",
-                               value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}")
-            await author.send(embed=sve1)
-            sve = discord.Embed(title=f"{userinfo['username']} - Strategic View",
-                                description="A strategic overlook at all troop placements and provinces.",
-                                color=discord.Color.blurple())
-            sve.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-            for i in range(1, length):
-                page = i * 15
-                for p in provinces[page:page + 15]:
-                    provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-                    sve.add_field(name=f"**Province #{p}**",
-                                  value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}")
-                await author.send(embed=sve)
-            lsve = discord.Embed(title=f"{userinfo['username']} - Strategic View",
-                                 description="A strategic overlook at all troop placements and provinces.",
-                                 color=discord.Color.blurple())
-            lsve.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-            for p in provinces[(length * 15):]:
-                provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-                lsve.add_field(name=f"**Province #{p}**",
-                               value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}")
-            await author.send(embed=lsve)
-
-    @commands.command(usage="[nation name] <reason>", brief="Completely removes a user from the CNC system. Owner only")
-    @commands.is_owner()
-    async def cnc_remove(self, ctx, nationname: str, reason: str = None):
-        # loop for thread
-        loop = asyncio.get_running_loop()
-        # connects to the database
-        conn = self.bot.pool
-        # grabs user information
-        users = await conn.fetch('''SELECT username FROM cncusers;''')
-        # makes a list of users
-        userlist = list()
-        for user in users:
-            userlist.append(user["username"].lower())
-        # checks to see if the nation is registered
-        if nationname.lower() not in userlist:
-            await ctx.send(f"The user `{nationname}` does not appear to be registered.")
-            return
-        # grabs all nation information
-        nationamesave = await conn.fetchrow('''SELECT username FROM cncusers WHERE lower(username) = $1;''',
-                                            nationname.lower())
-        # grabs the user id
-        userid = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
-        # deletes the user and sends them a DM with the notification
-        await conn.execute('''DELETE FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
-        # updates province and map information
-        for province in userid['provinces_owned'][1:]:
-            await conn.execute('''UPDATE provinces  SET owner_id = '', owner = 0, troops = 0 WHERE id = $1;''',
-                               province)
-            color = await conn.fetchrow('''SELECT color FROM terrains WHERE id = $1;''', province)
-            cord = await conn.fetchrow('''SELECT cord FROM provinces  WHERE id = $1;''', province)
-            await loop.run_in_executor(None, self.map_color, province, cord['cord'][0:2], color['color'], True)
-        # updates relations information
-        await conn.execute('''DELETE FROM relations ''')
-        await ctx.send("Deletion complete.")
-        user = self.bot.get_user(userid["user_id"])
-        if reason is None:
-            reason = "Your registered account has been terminated for an unlisted reason. If you have further " \
-                     "questions, contact a moderator."
-        await user.send(
-            f"Your registered Command and Conquer account, {nationamesave['username']}, has been deleted by moderator {ctx.author} for the following reason:```{reason}```")
-
-    @commands.command(usage="[item being edited (color or focus)]", brief="Changes a nation's registered color")
-    @commands.guild_only()
-    async def cnc_edit(self, ctx, editing):
-        loop = asyncio.get_running_loop()
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # grabs all the user info
-        usereditinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-        # if the author is not registered
-        if usereditinfo is None:
-            await ctx.send(f"{author} is not registered.")
-            return
-        # if the color is being edited
-        if editing.lower() == "color":
-            await ctx.send("What would you like your new color to be?")
-
-            def authorcheck(message):
-                return ctx.author == message.author and ctx.channel == message.channel
-
-            # waits for a reply
-            try:
-                colorreply = await self.bot.wait_for('message', check=authorcheck, timeout=60)
-            # if 60 seconds pass, timeout
-            except asyncio.TimeoutError:
-                return await ctx.send("Timed out. Please answer me next time!")
-            # makes sure color is not banned or taken
-            registered = await conn.fetch('''SELECT * FROM cncusers;''')
-            if colorreply.content.lower() in self.banned_colors:
-                await ctx.send("That color is a reserved color. Please pick another color.")
-                return
-            colors = [u['usercolor'].lower() for u in registered]
-            if colorreply.content.lower() in colors:
-                await ctx.send("That color is already taken by another user. Please pick another color.")
-                return
-            # updates map with colors
-            user = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-            for p in user['provinces_owned'][1:]:
-                cord = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-                print(cord)
-                cord = (x, y) = (cord['cord'][0], cord['cord'][1])
-                await loop.run_in_executor(None, self.map_color, p, cord, colorreply.content)
-            await conn.execute('''UPDATE cncusers SET usercolor = $1 WHERE user_id = $2;''', colorreply.content,
-                               author.id)
-            await ctx.send(f"Success! Your new color is {colorreply.content}.")
-            return
-        # if the focus is being edited
-        if editing.lower() == "focus":
-            await ctx.send("What would you like your new nation focus to be?")
-
-            def authorcheck(message):
-                return ctx.author == message.author and ctx.channel == message.channel
-
-            # wait for a reply
-            try:
-                focusreply = await self.bot.wait_for('message', check=authorcheck, timeout=60)
-            # if 60 seconds pass, timeout
-            except asyncio.TimeoutError:
-                return await ctx.send("Timed out. Please answer me next time!")
-            # if the content is not in the proper format
-            if focusreply.content.lower() not in ["m", "e", "s"]:
-                raise commands.UserInputError
-            # execute the information
-            await conn.execute('''UPDATE cncusers SET focus = $1 WHERE user_id = $2;''', focusreply.content.lower(),
-                               author.id)
-            if focusreply.content.lower() == "m":
-                focus = "`military`"
-            if focusreply.content.lower() == "e":
-                focus = "`economy`"
-            if focusreply.content.lower() == "s":
-                focus = "`strategy`"
-            await ctx.send(f"Success! Your new focus is {focus}.")
-            return
-        else:
-            # if the editing argument is not the proper argument
-            await ctx.send(f"`{editing}` is not a viable option for this command!")
-            return
-
-    # ---------------------Province Commands------------------------------
-
-    @commands.command(usage="[province id]", aliases=['cncp'], brief="Displays information about a specified province")
-    async def cnc_province(self, ctx, provinceid: int):
-        # connects to the database
-        conn = self.bot.pool
-        # ensures province existence
-        provinces = await conn.fetch('''SELECT id FROM provinces;''')
-        provinces = [p['id'] for p in provinces]
-        if provinceid not in provinces:
-            await ctx.send("No such province.")
-            return
-        # fetches province information
-        province = dict(await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid))
-        # fetches terrain name and color information
-        terrain = await conn.fetchrow('''SELECT name, color FROM terrains WHERE id = $1;''', province['terrain'])
-        # if there is no province owner
-        if province['owner'] == '':
-            owner = "None"
-        else:
-            owner = province['owner']
-        # sorts the bordering
-        borderinglist = province['bordering']
-        borderinglist.sort()
-        bordering = ', '.join(str(b) for b in borderinglist)
-        # gets the color set
-        color = discord.Color(int(terrain["color"].lstrip('#'), 16))
-        # checks for river presence
-        if province['river'] is not False:
-            riverstring = ", River"
-        else:
-            riverstring = ''
-        # sets up the structures
-        structures = []
-        if province['port'] is True:
-            structures.append('Port')
-        if province['fort'] is True:
-            structures.append('Fort')
-        if province['city'] is True:
-            structures.append('City')
-        structlist = ', '.join(s for s in structures)
-        if len(structures) == 0:
-            structlist = "None"
-        # creates the embed object
-        provinceembed = discord.Embed(title=f"Province #{province['id']}", color=color)
-        provinceembed.add_field(name="Terrain", value=terrain['name'] + riverstring)
-        provinceembed.add_field(name="Structures", value=structlist)
-        provinceembed.add_field(name="Bordering Provinces", value=bordering)
-        provinceembed.add_field(name="Occupying Nation", value=owner)
-        provinceembed.add_field(name="Troops Present", value=province['troops'])
-        provinceembed.add_field(name="Province Worth", value=province['worth'])
-        provinceembed.add_field(name="Manpower", value=province['manpower'])
-        provinceembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-        # sets the proper coastline
-        if province['coast'] is True:
-            coastline = "Yes"
-        else:
-            coastline = "No"
-        provinceembed.add_field(name="Coastline", value=coastline)
-        await ctx.send(embed=provinceembed)
-
-    @commands.command(usage="[province id]", brief="Releases a specified province")
-    @commands.guild_only()
-    async def cnc_release(self, ctx, provinceid: int):
-        loop = asyncio.get_running_loop()
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # fetches all user ids
-        allusers = await conn.fetch('''SELECT user_id, username FROM cncusers''')
-        alluserids = list()
-        allusernames = list()
-        for id in allusers:
-            alluserids.append(id['user_id'])
-        for names in allusers:
-            allusernames.append(names['username'].lower())
-        # ensures author registration
-        if author.id not in alluserids:
-            await ctx.send(f"{author} not registered.")
-            return
-        # fetches all province ids
-        allprovinces = await conn.fetch('''SELECT id FROM provinces''')
-        allids = list()
-        for pid in allprovinces:
-            allids.append(pid['id'])
-        # ensures province validity
-        if provinceid not in allids:
-            await ctx.send(f"Location id `{provinceid}` is not a valid ID.")
-            return
-        # fetches user info
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-        # ensures province ownership
-        if provinceid not in userinfo['provinces_owned']:
-            await ctx.send(f"{userinfo['username']} does not own province #{provinceid}.")
-            return
-        # fetches province information
-        provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
         try:
-            # clears province and return troops to owner, removes province from owner, places native troops
-            terrain = provinceinfo['terrain']
-            troops = 0
-            if terrain == 0:
-                troops = randrange(1000, 3000)
-            if terrain == 1:
-                troops = randrange(500, 1000)
-            if terrain == 2:
-                troops = randrange(1000, 3000)
-            if terrain == 5:
-                troops = randrange(200, 500)
-            if terrain == 7:
-                troops = randrange(200, 500)
-            if terrain == 9:
-                troops = randrange(100, 300)
-            ownedlist = userinfo['provinces_owned']
-            ownedlist.remove(provinceid)
-            await conn.execute('''UPDATE provinces SET owner = '', owner_id = 0, troops = $2 WHERE id = $1;''',
-                               provinceid, troops)
-            await conn.execute('''UPDATE cncusers SET undeployed = $1, provinces_owned = $2 WHERE user_id = $3;''',
-                               (userinfo['undeployed'] + provinceinfo['troops']), ownedlist, author.id)
-            await ctx.send(f"Province #{provinceid} has been released. Natives have retaken control of the province.")
-            color = await conn.fetchrow('''SELECT color FROM terrains WHERE id = $1;''', provinceinfo['terrain'])
-            await loop.run_in_executor(None, self.map_color, provinceid, provinceinfo['cord'][0:2], color['color'],
-                                       True)
-
-        except Exception as error:
-            self.bot.logger.warning(msg=error)
-            await ctx.send(error)
-
-    @commands.command(usage="[province id] [deployed force]",
-                      aliases=['cncd'], brief="Deploys a number of troops to a specified province")
-    @commands.guild_only()
-    async def cnc_deploy(self, ctx, location: int, amount: int):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # fetches all users
-        allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
-        alluserids = list()
-        for id in allusers:
-            alluserids.append(id['user_id'])
-        # checks if author is registered
-        if author.id not in alluserids:
-            await ctx.send(f"{author} not registered.")
-            return
-        # fetches all province ids
-        allprovinces = await conn.fetch('''SELECT id FROM provinces''')
-        allids = list()
-        for x in allprovinces:
-            allids.append(x['id'])
-        # ensures valid id
-        if location not in allids:
-            await ctx.send(f"Location id `{location}` is not a valid ID.")
-            return
-        # fetches user info
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-        userprovinces = userinfo['provinces_owned']
-        userundeployed = userinfo['undeployed']
-        # ensures location ownership
-        if location not in userprovinces:
-            await ctx.send(f"{userinfo['username']} does not own Province #{location} and cannot deploy troops there.")
-            return
-        # ensures troop sufficiency
-        elif amount > userundeployed:
-            await ctx.send(f"{userinfo['username']} does not have {amount} undeployed troops.")
-            return
-        else:
-            # updates all user and province information
-            try:
-                provinceinfo = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', location)
-                await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
-                                   (userundeployed - amount),
-                                   author.id)
-                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                   (provinceinfo['troops'] + amount),
-                                   location)
-                await ctx.send(
-                    f"{userinfo['username']} has successfully deployed {amount} troops to Province #{location}.")
-            except Exception as error:
-                self.bot.logger.warning(msg=error)
-                await ctx.send(error)
-
-    @commands.command(usage="[province id] [recipient nation]",
-                      brief="Transfers a province to another nation's control")
-    @commands.guild_only()
-    async def cnc_transfer(self, ctx, provinceid: int, recipient: str):
-        loop = asyncio.get_running_loop()
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # fetches all user ids
-        allusers = await conn.fetch('''SELECT user_id, username FROM cncusers''')
-        alluserids = list()
-        allusernames = list()
-        for id in allusers:
-            alluserids.append(id['user_id'])
-        for names in allusers:
-            allusernames.append(names['username'].lower())
-        # ensures author registration
-        if author.id not in alluserids:
-            await ctx.send(f"{author} not registered.")
-            return
-        # ensures recipient existance
-        if recipient.lower() not in allusernames:
-            await ctx.send(f"`{recipient}` not registered.")
-            return
-        # fetches all province ids
-        allprovinces = await conn.fetch('''SELECT id FROM provinces''')
-        allids = list()
-        for pid in allprovinces:
-            allids.append(pid['id'])
-        # ensures province validity
-        if provinceid not in allids:
-            await ctx.send(f"Location id `{provinceid}` is not a valid ID.")
-            return
-        # fetches user info
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-        # ensures province ownership
-        if provinceid not in userinfo['provinces_owned']:
-            await ctx.send(f"{userinfo['username']} does not own province #{provinceid}.")
-            return
-        # fetches province information
-        provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
-        try:
-            # clears province and return troops to owner, removes province from owner
-            ownedlist = userinfo['provinces_owned']
-            ownedlist.remove(provinceid)
-            await conn.execute('''UPDATE provinces  SET troops = 0 WHERE id = $1;''', provinceid)
-            await conn.execute('''UPDATE cncusers SET undeployed = $1, provinces_owned = $2 WHERE user_id = $3;''',
-                               (userinfo['undeployed'] + provinceinfo['troops']), ownedlist, author.id)
-            # adds province to recipient
-            recipientinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
-                                                recipient.lower())
-            recipientowned = recipientinfo['provinces_owned']
-            recipientowned.append(provinceid)
-            await conn.execute('''UPDATE cncusers SET provinces_owned = $1 WHERE lower(username) = $2;''',
-                               recipientowned, recipient.lower())
-            # sets province owner info
-            await conn.execute('''UPDATE provinces  SET owner = $1, owner_id = $2 WHERE id = $3;''',
-                               recipientinfo['username'], recipientinfo['user_id'], provinceid)
-            await ctx.send(
-                f"Province #{provinceid} transferred to the ownership of {recipientinfo['username']} by {userinfo['username']}."
-                f" All {provinceinfo['troops']} troops in province #{provinceid} have withdrawn.")
-            await loop.run_in_executor(None, self.map_color, provinceid, provinceinfo['cord'][0:2],
-                                       recipientinfo['usercolor'])
-        except Exception as error:
-            self.bot.logger.warning(msg=error)
-            await ctx.send(error)
-
-    # ---------------------Interaction Commands------------------------------
-
-    @commands.command(usage="<offer id>", aliases=['cncvi'],
-                      brief="Displays information about a specific interaction or all interactions")
-    async def cnc_view_interaction(self, ctx, interactionid: int = None):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        if interactionid is None:
-            with open(f"{self.interaction_directory}{author.id}.txt", "rb") as file:
-                await author.send(file=discord.File(file, f"Interactions Log for {author.id}.txt"))
-                await ctx.send("Sent!")
-                return
-        interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE id = $1;''', interactionid)
-        if interaction is None:
-            await ctx.send("No such interaction.")
-            return
-        if interaction['sender_id'] != author.id and interaction['recipient_id'] != author.id:
-            await ctx.send("You are not authorized to view that offer.")
-            return
-        upload = False
-        if len(interaction['terms']) > 1024:
-            terms = "See File Upload"
-            upload = True
-        else:
-            terms = interaction['terms']
-        embed = discord.Embed(title=f"Interaction #{interaction['id']}",
-                              description=f"An declaration of {interaction['type']} from {interaction['sender']}.")
-        embed.add_field(name="Interaction Type", value=f"{interaction['type'].title()}")
-        embed.add_field(name="Sender", value=f"{interaction['sender']}")
-        embed.add_field(name="Recipient", value=f"{interaction['recipient']}")
-        embed.add_field(name="Terms", value=f"{terms}", inline=False)
-        embed.add_field(name="Active", value=f"{interaction['active']}")
-        await ctx.send(embed=embed)
-        if upload is True:
-            with open(f"{self.interaction_directory}{interaction['id']}.txt", "r") as file:
-                await ctx.send(file=discord.File(file, f"{interaction['id']}.txt"))
-
-    @commands.command(usage="[offer id]", brief="Displays a specific offer with information")
-    async def cnc_offer(self, ctx, offerid: int):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        offer = await conn.fetchrow('''SELECT * FROM pending_interactions WHERE id = $1;''', offerid)
-        if offer is None:
-            await ctx.send("No such pending offer.")
-            return
-        if offer['sender_id'] != author.id and offer['recipient_id'] != author.id:
-            await ctx.send("You are not authorized to view that offer.")
-            return
-        upload = False
-        if len(offer['terms']) > 1024:
-            terms = "See File Upload"
-            upload = True
-        else:
-            terms = offer['terms']
-        embed = discord.Embed(title=f"Offer #{offer['id']}",
-                              description=f"An offer of {offer['type']} from {offer['sender']}.")
-        embed.add_field(name="Offer Type", value=f"{offer['type'].title()}")
-        embed.add_field(name="Sender", value=f"{offer['sender']}")
-        embed.add_field(name="Terms", value=f"{terms}", inline=False)
-        await ctx.send(embed=embed)
-        if upload is True:
-            with open(f"{self.interaction_directory}{offer['id']}.txt", "r") as file:
-                await ctx.send(file=discord.File(file, f"{offer['id']}.txt"))
-
-    @commands.command(usage="[interaction id] [interaction (accept, reject, cancel)]", aliases=['cnci'],
-                      brief="Allows for interacting with a proposed interaction")
-    async def cnc_interaction(self, ctx, interactionid: int, interaction: str):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        if interaction == "accept" or interaction == "reject":
-            # fetches interaction information
-            pending_int = await conn.fetchrow('''SELECT * FROM pending_interactions WHERE id = $1;''', interactionid)
-            # checks for existence
-            if pending_int is None:
-                await ctx.send("No such pending interaction.")
-                return
-            # checks for authority
-            if pending_int['recipient_id'] != author.id:
-                await ctx.send("You are not authorized to accept or reject that interaction.")
-                return
-            if interaction.lower() == "accept":
-                try:
-                    # update all the relevant information into interactions
-                    await conn.execute('''INSERT INTO interactions(id, type, sender, sender_id, recipient, recipient_id, terms) 
-                            SELECT id, type, sender, sender_id, recipient, recipient_id, terms 
-                            FROM pending_interactions WHERE id = $1;''', interactionid)
-                    await conn.execute('''UPDATE interactions SET active = True WHERE id = $1;''', interactionid)
-                    await conn.execute('''DELETE FROM pending_interactions WHERE id = $1;''', interactionid)
-                    # if a peace treaty, cancel war
-                    if pending_int['type'] == 'peace':
-                        await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''', interactionid)
-                        await conn.execute(
-                            '''UPDATE interactions SET active = False WHERE type = 'war' AND sender = $1 AND recipient = $2;''',
-                            pending_int['sender'], pending_int['recipient'])
-                    # update relations
-                    await conn.execute('''UPDATE relations SET relation = $3 WHERE name = $1 AND nation  = $2;''',
-                                       pending_int['recipient'], pending_int['sender'], pending_int['type'])
-                    await conn.execute('''UPDATE relations SET relation = $3 WHERE name = $1 AND nation = $2;''',
-                                       pending_int['sender'], pending_int['recipient'], pending_int['type'])
-                    # updates interaction files
-                    interaction_text = f"Offer #{pending_int['id']} of {pending_int['type']}.\nSent by: {pending_int['sender']}\nAccepted by: {pending_int['recipient']}\n**Terms**\n{pending_int['terms']}\nAccepted: {strftime('%D', localtime(time()))}"
-                    with open(f"{self.interaction_directory}{pending_int['sender_id']}.txt", "r+") as file:
-                        oldcontent = file.read()
-                        file.seek(0, 0)
-                        file.write(interaction_text.rstrip('\r\n') + '\n' + oldcontent)
-                    with open(f"{self.interaction_directory}{pending_int['recipient_id']}.txt", "r+") as file:
-                        oldcontent = file.read()
-                        file.seek(0, 0)
-                        file.write(interaction_text.rstrip('\r\n') + '\n' + oldcontent)
-                    # get user object and send message
-                    sender = self.bot.get_user(pending_int['sender_id'])
-                    await sender.send(f"{pending_int['recipient']} has accepted your offer of {pending_int['type']}. "
-                                      f"To view this, use `$cnc_view_interaction {interactionid}`.")
-                    await ctx.send("Accepted.")
-                except Exception as error:
-                    self.bot.logger.warning(msg=error)
-                    await ctx.send(error)
-            if interaction.lower() == "reject":
-                try:
-                    # removes terms file
-                    if os.path.exists(f"{self.interaction_directory}{interactionid}.txt"):
-                        os.remove(f"{self.interaction_directory}{interactionid}.txt")
-                    # remove pending interaction
-                    await conn.execute('''DELETE FROM pending_interactions WHERE id = $1;''', interactionid)
-                    sender = self.bot.get_user(pending_int['sender_id'])
-                    await sender.send(f"{pending_int['recipient']} has rejected your offer of {pending_int['type']}.")
-                    await ctx.send("Rejected.")
-                except Exception as error:
-                    self.bot.logger.warning(msg=error)
-                    await ctx.send(error)
-        elif interaction.lower() == "cancel":
-            # fetches interaction data
-            interact = await conn.fetchrow('''SELECT * FROM interactions WHERE id = $1;''', interactionid)
-            # checks for existence
-            if interact is None:
-                await ctx.send("No such interaction.")
-                return
-            # ensures correct type
-            if interact['type'] != 'alliance':
-                await ctx.send(
-                    "Only alliances can be cancelled. Wars must be resolved through using the peace command.")
-                return
-            # ensures authority
-            if (interact['recipient_id'] != author.id) and (interact['sender_id'] != author.id) and (
-                    not self.bot.is_owner(author)):
-                await ctx.send("You are not authorized to cancel that interaction.")
-                return
-            sender = interact['sender']
-            recipient = interact['recipient']
-            try:
-                # updates relation and interaction data
-                await conn.execute('''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
-                                   sender, recipient)
-                await conn.execute('''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
-                                   recipient,
-                                   sender)
-                await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''', interactionid)
-                await ctx.send(f"Alliance between {sender} and {recipient} canceled.")
-                # DMs relevant parties
-                sender = self.bot.get_user(interact['sender_id'])
-                await sender.send(f"Your alliance with {recipient} has been terminated.")
-                recipient = self.bot.get_user(interact['recipient_id'])
-                await recipient.send(f"Your alliance with {sender} has been terminated.")
-            except Exception as error:
-                self.bot.logger.warning(msg=error)
-                await ctx.send(error)
-        else:
-            raise commands.UserInputError
-
-    @commands.command(brief="Displays all pending interactions and offers")
-    async def cnc_view_pending(self, ctx):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        interactions = await conn.fetch(
-            '''SELECT * FROM pending_interactions WHERE sender_id = $1 or recipient_id = $1;''', author.id)
-        recipient_text = ''
-        sender_text = ''
-        for i in interactions:
-            text = f"Offer of `{i['type']}` from `{i['sender']}` to `{i['recipient']}` pending. `{self.bot.command_prefix}cnc_offer {i['id']}`.\n"
-            if i['sender'] == author.id:
-                sender_text += text
-            else:
-                recipient_text += text
-        if recipient_text == '':
-            recipient_text = "No incoming interactions pending."
-        if sender_text == '':
-            sender_text = "No outgoing interactions pending."
-        await author.send(recipient_text)
-        await author.send(sender_text)
-
-    @commands.command(usage="[nation],, [terms]", brief="Sends an alliance offer to a nation")
-    async def cnc_alliance(self, ctx, *, args):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        data = args.split(',,')
-        if len(data) < 2:
-            raise commands.UserInputError
-        rrecipient = data[0]
-        text = data[1]
-        text = text.lstrip(' ')
-        # fetches all user ids
-        allusers = await conn.fetch('''SELECT user_id, username FROM cncusers''')
-        alluserids = list()
-        allusernames = list()
-        for id in allusers:
-            alluserids.append(id['user_id'])
-        for names in allusers:
-            allusernames.append(names['username'].lower())
-        # ensures author registration
-        if author.id not in alluserids:
-            await ctx.send(f"{author} not registered.")
-            return
-        # ensures recipient existance
-        if rrecipient.lower() not in allusernames:
-            await ctx.send(f"`{rrecipient}` not registered.")
-            return
-        # checks for existing active alliance
-        interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'alliance' AND active = True AND sender_id = $1 AND ;''',
-                                        author.id)
-        for inter in interactions:
-            if inter['recipient'].lower() == rrecipient.lower():
-                await ctx.send(
-                f"An alliance with `{rrecipient}` already exists. To view, use $cnc_view_interaction {inter['id']}")
-                return
-        # fetches user information
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-        rinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', rrecipient.lower())
-        aid = ctx.message.id
-        atype = "alliance"
-        sender = userinfo['username']
-        sender_id = author.id
-        recipient = rinfo['username']
-        recipient_id = rinfo['user_id']
-        terms = text
-        if sender == recipient:
-            await ctx.send("You cannot ally with yourself.")
-            return
-        try:
-            # creates interaction text file
-            with open(f"{self.interaction_directory}{aid}.txt", "w") as afile:
-                afile.write(terms)
-            # inserts information into pending interactions
-            await conn.execute('''INSERT INTO pending_interactions (id, type, sender, sender_id, recipient,
-                    recipient_id, terms) VALUES($1, $2, $3, $4, $5, $6, $7);''', aid, atype, sender, sender_id,
-                               recipient,
-                               recipient_id, terms)
-            # sends DM
-            rsend = self.bot.get_user(recipient_id)
-            await rsend.send(
-                f"{sender} has sent an alliance offer to {recipient}. To view the terms, type `{self.bot.command_prefix}cnc_offer {aid}`. To accept or reject, use `{self.bot.command_prefix}cnc_interaction {aid} [accept/reject]`.")
-            await ctx.send(f"Alliance offer sent to {recipient}.")
-        except Exception as error:
-            self.bot.logger.warning(msg=error)
-            await ctx.send(error)
-
-    @commands.command(usage="[recipient],, <goal>", brief="Declares war on a nation")
-    @commands.guild_only()
-    async def cnc_declare(self, ctx, *args):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # consolidates terms
-        rawdata = ' '.join(args[:])
-        data = rawdata.split(',,')
-        rrecipient = data[0]
-        if len(data) == 1:
-            text = "None"
-        else:
-            text = data[1]
-            text = text.lstrip(' ')
-        # fetches all user ids
-        allusers = await conn.fetch('''SELECT user_id, username FROM cncusers''')
-        alluserids = list()
-        allusernames = list()
-        for id in allusers:
-            alluserids.append(id['user_id'])
-        for names in allusers:
-            allusernames.append(names['username'].lower())
-        # ensures author registration
-        if author.id not in alluserids:
-            await ctx.send(f"{author} not registered.")
-            return
-        # ensures recipient existance
-        if rrecipient.lower() not in allusernames:
-            await ctx.send(f"`{rrecipient}` not registered.")
-            return
-        # ensures prior peace
-        interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'war' AND active = True AND sender_id = $1;''', author.id)
-        for inter in interactions:
-            if inter['recipient'].lower() == rrecipient.lower():
-                await ctx.send(f"A war with `{rrecipient}` already exists. To view, use `$cnc_view_interaction {inter['id']}`")
-                return
-        # fetches user information
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-        rinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', rrecipient.lower())
-        aid = ctx.message.id
-        atype = "war"
-        sender = userinfo['username']
-        sender_id = author.id
-        recipient = rinfo['username']
-        recipient_id = rinfo['user_id']
-        terms = text
-        # ensures no self declarations
-        if sender == recipient:
-            await ctx.send("You cannot declare war on yourself.")
-            return
-        # ensures no alliance
-        alliance = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 AND nation = $2;''', sender,
-                                       recipient)
-        if alliance['relation'] == 'war':
-            await ctx.send(f"It is not possible to declare war on {recipient} when you are already at war with them!")
-            return
-        elif alliance['relation'] != 'peace':
-            await ctx.send(f"It is not possible to declare war on {recipient} when you have an alliance with them!")
-            return
-        try:
-            # creates text file for terms
-            with open(f"{self.interaction_directory}{aid}.txt", "w") as afile:
-                afile.write(terms)
-            # inserts information into interactions
-            await conn.execute('''INSERT INTO interactions (id, type, sender, sender_id, recipient,
-                    recipient_id, terms, active) VALUES($1, $2, $3, $4, $5, $6, $7, $8);''', aid, atype, sender,
-                               sender_id,
-                               recipient,
-                               recipient_id, terms, True)
-            # updates relations
-            await conn.execute('''UPDATE relations SET relation = 'war' WHERE name = $1 AND nation = $2;''', recipient,
-                               sender)
-            await conn.execute('''UPDATE relations SET relation = 'war' WHERE name = $1 AND nation = $2;''', sender,
-                               recipient)
-            # sends DM
-            rsend = self.bot.get_user(recipient_id)
-            await rsend.send(
-                f"{sender} has declared war on {recipient}. To view the terms, type `$cnc_view_interaction {aid}`.")
-            await author.send(
-                f"{sender} has declared war on {recipient}. To view the terms, type `$cnc_view_interaction {aid}`.")
-            await ctx.send(f"War declared on {recipient}!")
-        except Exception as error:
-            self.bot.logger.warning(msg=error)
-            await ctx.send(error)
-
-    @commands.command(usage="[recipient],, [terms]", brief="Sends a peace offer to a nation")
-    async def cnc_peace(self, ctx, *args):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # consolidates terms
-        rawdata = ' '.join(args[:])
-        data = rawdata.split(',,')
-        if len(data) < 2:
-            raise commands.UserInputError
-        rrecipient = data[0]
-        text = data[1]
-        text = text.lstrip(' ')
-        # fetches all user ids
-        allusers = await conn.fetch('''SELECT user_id, username FROM cncusers''')
-        alluserids = list()
-        allusernames = list()
-        for id in allusers:
-            alluserids.append(id['user_id'])
-        for names in allusers:
-            allusernames.append(names['username'].lower())
-        # ensures author registration
-        if author.id not in alluserids:
-            await ctx.send(f"{author} not registered.")
-            return
-        # ensures recipient existance
-        if rrecipient.lower() not in allusernames:
-            await ctx.send(f"`{rrecipient}` not registered.")
-            return
-        # fetches user information
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-        rinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', rrecipient.lower())
-        aid = ctx.message.id
-        atype = "peace"
-        sender = userinfo['username']
-        sender_id = author.id
-        recipient = rinfo['username']
-        recipient_id = rinfo['user_id']
-        terms = text
-        if sender == recipient:
-            await ctx.send("You cannot negotiatee peace with yourself.")
-            return
-        # ensures war status
-        war = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 AND nation = $2;''', sender,
-                                  recipient)
-        if war['relation'] != 'war':
-            await ctx.send(f"You cannot negotiate peace with {sender} if you are not at war!")
-            return
-        try:
-            # creates text file of terms
-            with open(f"{self.interaction_directory}{aid}.txt", "w") as afile:
-                afile.write(terms)
-            # inserts information into pending interactions
-            await conn.execute('''INSERT INTO pending_interactions (id, type, sender, sender_id, recipient,
-                    recipient_id, terms) VALUES($1, $2, $3, $4, $5, $6, $7);''', aid, atype, sender, sender_id,
-                               recipient,
-                               recipient_id, terms)
-            # sends DM
-            rsend = self.bot.get_user(recipient_id)
-            await rsend.send(
-                f"{sender} has sent an peace offer to {recipient}. To view the terms, type `{self.bot.command_prefix}cnc_offer {aid}`. To accept or reject, use `{self.bot.command_prefix}cnc_interaction {aid}")
-            await ctx.send(f"Peace offer sent to {recipient}.")
-        except Exception as error:
-            self.bot.logger.warning(msg=error)
-            await ctx.send(error)
-
-    # ---------------------Resource and Recruit Commands------------------------------
-
-    @commands.command(usage="<nation name>", aliases=['cncb'], brief="Displays information about a nation's income")
-    async def cnc_bank(self, ctx, *args):
-        conn = self.bot.pool
-        nationname = ' '.join(args[:])
-        if nationname == '':
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
             # if the nationame is left blank, the author id is used to find the nation information
-            authorid = ctx.author.id
             registeredusers = await conn.fetch('''SELECT user_id FROM cncusers;''')
             registeredlist = list()
             # makes a list of the registered users
             for users in registeredusers:
                 registeredlist.append(users["user_id"])
             # checks the author id against the list of registered users
-            if authorid not in registeredlist:
-                await ctx.send(f"{ctx.author} is not registered.")
+            if author.id not in registeredlist:
+                await ctx.send(f"{ctx.author} does not appear to be registered.")
                 return
-            # grabs the nation information
-            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', authorid)
-            # creates a list of provinces  owned
-            ownedprovinces = [p for p in userinfo['provinces_owned']]
-            ownedprovinces.remove(0)
-            resource_gain = 0
-            cities = 0
-            ports = 0
-            cp_gain = 0
-            # creates the accurate resource gain data
-            for p in ownedprovinces:
-                worth = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', p)
-                resource_gain += worth['worth']
-                if worth['city'] is True:
-                    resource_gain += 1000
-                    cities += 1
-                    cp_gain += 1000
-                if worth['port'] is True:
-                    resource_gain += .5 * worth['worth']
-                    ports += 1
-                    cp_gain += .5 * worth['worth']
-            if cities == 0:
-                cities = "None"
-            if ports == 0:
-                ports = "None"
-            # sends the embed
-            bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
-                                      description="An overview of the resource status of a nation.")
-            bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']}")
-            bankembed.add_field(name="Current Gain", value=f"\u03FE{math.ceil(resource_gain)}")
-            bankembed.add_field(name="City and Port Gain", value=f"\u03FE{math.ceil(cp_gain)}")
-            bankembed.add_field(name="Cities", value=cities)
-            bankembed.add_field(name="Ports", value=ports)
-            await ctx.send(embed=bankembed)
-        else:
-            registeredusers = await conn.fetch('''SELECT username FROM cncusers;''')
-            # makes a list of the registered users
-            registeredlist = list()
-            for users in registeredusers:
-                registeredlist.append(users["username"].lower())
-            # checks the author id against the list of registered users
-            if nationname.lower() not in registeredlist:
-                await ctx.send(f"{nationname} does not appear to be registered.")
-            # fetches specified nation data
-            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1''', nationname.lower())
-            # creates a list of provinces  owned
-            ownedprovinces = [p for p in userinfo['provinces_owned']]
-            ownedprovinces.remove(0)
-            resource_gain = 0
-            cp_gain = 0
-            cities = 0
-            ports = 0
-            # creates the accurate resource gain data
-            for p in ownedprovinces:
-                worth = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', p)
-                resource_gain += worth['worth']
-                if worth['city'] is True:
-                    resource_gain += 1000
-                    cities += 1
-                    cp_gain += 1000
-                if worth['port'] is True:
-                    resource_gain += .5 * worth['worth']
-                    ports += 1
-                    cp_gain += .5 * worth['worth']
-            if cities == 0:
-                cities = "None"
-            if ports == 0:
-                ports = "None"
-            # sends the embed
-            bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
-                                      description="An overview of the resource status of a nation.")
-            bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']}")
-            bankembed.add_field(name="Current Gain", value=f"\u03FE{math.ceil(resource_gain)}")
-            bankembed.add_field(name="City and Port Gain", value=f"\u03FE{math.ceil(cp_gain)}")
-            bankembed.add_field(name="Cities", value=cities)
-            bankembed.add_field(name="Ports", value=ports)
-            await ctx.send(embed=bankembed)
+            # pulls the specified nation data
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+            provinces = list(userinfo['provinces_owned'])
+            provinces.remove(0)
+            provinces.sort()
+            # creates the embed object
+            if len(provinces) <= 15:
+                sve1 = discord.Embed(title=f"{userinfo['username']} - Strategic View",
+                                     description="A strategic overlook at all troop placements and provinces.",
+                                     color=discord.Color.blurple())
+                sve1.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+                for p in provinces:
+                    provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+                    sve1.add_field(name=f"**Province #{p}**",
+                                   value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}\nManpower: {provinceinfo['manpower']}")
+                await author.send(embed=sve1)
+            if len(provinces) > 15:
+                length = math.ceil(len(provinces) / 15) - 1
+                sve1 = discord.Embed(title=f"{userinfo['username']} - Strategic View",
+                                     description="A strategic overlook at all troop placements and provinces.",
+                                     color=discord.Color.blurple())
+                sve1.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+                for p in provinces[:15]:
+                    provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+                    sve1.add_field(name=f"**Province #{p}**",
+                                   value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}")
+                await author.send(embed=sve1)
+                sve = discord.Embed(title=f"{userinfo['username']} - Strategic View",
+                                    description="A strategic overlook at all troop placements and provinces.",
+                                    color=discord.Color.blurple())
+                sve.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+                for i in range(1, length):
+                    page = i * 15
+                    for p in provinces[page:page + 15]:
+                        provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+                        sve.add_field(name=f"**Province #{p}**",
+                                      value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}")
+                    await author.send(embed=sve)
+                lsve = discord.Embed(title=f"{userinfo['username']} - Strategic View",
+                                     description="A strategic overlook at all troop placements and provinces.",
+                                     color=discord.Color.blurple())
+                lsve.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+                for p in provinces[(length * 15):]:
+                    provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+                    lsve.add_field(name=f"**Province #{p}**",
+                                   value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}")
+                await author.send(embed=lsve)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    @commands.command(usage="[nation name] <reason>", brief="Completely removes a user from the CNC system. Owner only")
+    @commands.is_owner()
+    async def cnc_remove(self, ctx, nationname: str, reason: str = None):
+        try:
+            # loop for thread
+            loop = asyncio.get_running_loop()
+            # connects to the database
+            conn = self.bot.pool
+            # grabs user information
+            users = await conn.fetch('''SELECT username FROM cncusers;''')
+            # makes a list of users
+            userlist = list()
+            for user in users:
+                userlist.append(user["username"].lower())
+            # checks to see if the nation is registered
+            if nationname.lower() not in userlist:
+                await ctx.send(f"The user `{nationname}` does not appear to be registered.")
+                return
+            # grabs all nation information
+            nationamesave = await conn.fetchrow('''SELECT username FROM cncusers WHERE lower(username) = $1;''',
+                                                nationname.lower())
+            # grabs the user id
+            userid = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
+            # deletes the user and sends them a DM with the notification
+            await conn.execute('''DELETE FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
+            # updates province and map information
+            for province in userid['provinces_owned'][1:]:
+                await conn.execute('''UPDATE provinces  SET owner_id = '', owner = 0, troops = 0 WHERE id = $1;''',
+                                   province)
+                color = await conn.fetchrow('''SELECT color FROM terrains WHERE id = $1;''', province)
+                cord = await conn.fetchrow('''SELECT cord FROM provinces  WHERE id = $1;''', province)
+                await loop.run_in_executor(None, self.map_color, province, cord['cord'][0:2], color['color'], True)
+            # updates relations information
+            await conn.execute('''DELETE FROM relations ''')
+            await ctx.send("Deletion complete.")
+            user = self.bot.get_user(userid["user_id"])
+            if reason is None:
+                reason = "Your registered account has been terminated for an unlisted reason. If you have further " \
+                         "questions, contact a moderator."
+            await user.send(
+                f"Your registered Command and Conquer account, {nationamesave['username']}, has been deleted by moderator {ctx.author} for the following reason:```{reason}```")
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    @commands.command(usage="[item being edited (color or focus)]", brief="Changes a nation's registered color")
+    @commands.guild_only()
+    async def cnc_edit(self, ctx, editing):
+        try:
+            loop = asyncio.get_running_loop()
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            # grabs all the user info
+            usereditinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+            # if the author is not registered
+            if usereditinfo is None:
+                await ctx.send(f"{author} is not registered.")
+                return
+            # if the color is being edited
+            if editing.lower() == "color":
+                await ctx.send("What would you like your new color to be?")
+    
+                def authorcheck(message):
+                    return ctx.author == message.author and ctx.channel == message.channel
+    
+                # waits for a reply
+                try:
+                    colorreply = await self.bot.wait_for('message', check=authorcheck, timeout=60)
+                # if 60 seconds pass, timeout
+                except asyncio.TimeoutError:
+                    return await ctx.send("Timed out. Please answer me next time!")
+                # makes sure color is not banned or taken
+                registered = await conn.fetch('''SELECT * FROM cncusers;''')
+                if colorreply.content.lower() in self.banned_colors:
+                    await ctx.send("That color is a reserved color. Please pick another color.")
+                    return
+                colors = [u['usercolor'].lower() for u in registered]
+                if colorreply.content.lower() in colors:
+                    await ctx.send("That color is already taken by another user. Please pick another color.")
+                    return
+                # updates map with colors
+                user = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+                for p in user['provinces_owned'][1:]:
+                    cord = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+                    print(cord)
+                    cord = (x, y) = (cord['cord'][0], cord['cord'][1])
+                    await loop.run_in_executor(None, self.map_color, p, cord, colorreply.content)
+                await conn.execute('''UPDATE cncusers SET usercolor = $1 WHERE user_id = $2;''', colorreply.content,
+                                   author.id)
+                await ctx.send(f"Success! Your new color is {colorreply.content}.")
+                return
+            # if the focus is being edited
+            if editing.lower() == "focus":
+                await ctx.send("What would you like your new nation focus to be?")
+    
+                def authorcheck(message):
+                    return ctx.author == message.author and ctx.channel == message.channel
+    
+                # wait for a reply
+                try:
+                    focusreply = await self.bot.wait_for('message', check=authorcheck, timeout=60)
+                # if 60 seconds pass, timeout
+                except asyncio.TimeoutError:
+                    return await ctx.send("Timed out. Please answer me next time!")
+                # if the content is not in the proper format
+                if focusreply.content.lower() not in ["m", "e", "s"]:
+                    raise commands.UserInputError
+                # execute the information
+                await conn.execute('''UPDATE cncusers SET focus = $1 WHERE user_id = $2;''', focusreply.content.lower(),
+                                   author.id)
+                if focusreply.content.lower() == "m":
+                    focus = "`military`"
+                if focusreply.content.lower() == "e":
+                    focus = "`economy`"
+                if focusreply.content.lower() == "s":
+                    focus = "`strategy`"
+                await ctx.send(f"Success! Your new focus is {focus}.")
+                return
+            else:
+                # if the editing argument is not the proper argument
+                await ctx.send(f"`{editing}` is not a viable option for this command!")
+                return
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    # ---------------------Province Commands------------------------------
+
+    @commands.command(usage="[province id]", aliases=['cncp'], brief="Displays information about a specified province")
+    async def cnc_province(self, ctx, provinceid: int):
+        try:
+            # connects to the database
+            conn = self.bot.pool
+            # ensures province existence
+            provinces = await conn.fetch('''SELECT id FROM provinces;''')
+            provinces = [p['id'] for p in provinces]
+            if provinceid not in provinces:
+                await ctx.send("No such province.")
+                return
+            # fetches province information
+            province = dict(await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid))
+            # fetches terrain name and color information
+            terrain = await conn.fetchrow('''SELECT name, color FROM terrains WHERE id = $1;''', province['terrain'])
+            # if there is no province owner
+            if province['owner'] == '':
+                owner = "None"
+            else:
+                owner = province['owner']
+            # sorts the bordering
+            borderinglist = province['bordering']
+            borderinglist.sort()
+            bordering = ', '.join(str(b) for b in borderinglist)
+            # gets the color set
+            color = discord.Color(int(terrain["color"].lstrip('#'), 16))
+            # checks for river presence
+            if province['river'] is not False:
+                riverstring = ", River"
+            else:
+                riverstring = ''
+            # sets up the structures
+            structures = []
+            if province['port'] is True:
+                structures.append('Port')
+            if province['fort'] is True:
+                structures.append('Fort')
+            if province['city'] is True:
+                structures.append('City')
+            structlist = ', '.join(s for s in structures)
+            if len(structures) == 0:
+                structlist = "None"
+            # creates the embed object
+            provinceembed = discord.Embed(title=f"Province #{province['id']}", color=color)
+            provinceembed.add_field(name="Terrain", value=terrain['name'] + riverstring)
+            provinceembed.add_field(name="Structures", value=structlist)
+            provinceembed.add_field(name="Bordering Provinces", value=bordering)
+            provinceembed.add_field(name="Occupying Nation", value=owner)
+            provinceembed.add_field(name="Troops Present", value=province['troops'])
+            provinceembed.add_field(name="Province Worth", value=province['worth'])
+            provinceembed.add_field(name="Manpower", value=province['manpower'])
+            provinceembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+            # sets the proper coastline
+            if province['coast'] is True:
+                coastline = "Yes"
+            else:
+                coastline = "No"
+            provinceembed.add_field(name="Coastline", value=coastline)
+            await ctx.send(embed=provinceembed)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    @commands.command(usage="[province id]", brief="Releases a specified province")
+    @commands.guild_only()
+    async def cnc_release(self, ctx, provinceid: int):
+        try:
+            loop = asyncio.get_running_loop()
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            # fetches all user ids
+            allusers = await conn.fetch('''SELECT user_id, username FROM cncusers''')
+            alluserids = list()
+            allusernames = list()
+            for id in allusers:
+                alluserids.append(id['user_id'])
+            for names in allusers:
+                allusernames.append(names['username'].lower())
+            # ensures author registration
+            if author.id not in alluserids:
+                await ctx.send(f"{author} not registered.")
+                return
+            # fetches all province ids
+            allprovinces = await conn.fetch('''SELECT id FROM provinces''')
+            allids = list()
+            for pid in allprovinces:
+                allids.append(pid['id'])
+            # ensures province validity
+            if provinceid not in allids:
+                await ctx.send(f"Location id `{provinceid}` is not a valid ID.")
+                return
+            # fetches user info
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+            # ensures province ownership
+            if provinceid not in userinfo['provinces_owned']:
+                await ctx.send(f"{userinfo['username']} does not own province #{provinceid}.")
+                return
+            # fetches province information
+            provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
+            try:
+                # clears province and return troops to owner, removes province from owner, places native troops
+                terrain = provinceinfo['terrain']
+                troops = 0
+                if terrain == 0:
+                    troops = randrange(1000, 3000)
+                if terrain == 1:
+                    troops = randrange(500, 1000)
+                if terrain == 2:
+                    troops = randrange(1000, 3000)
+                if terrain == 5:
+                    troops = randrange(200, 500)
+                if terrain == 7:
+                    troops = randrange(200, 500)
+                if terrain == 9:
+                    troops = randrange(100, 300)
+                ownedlist = userinfo['provinces_owned']
+                ownedlist.remove(provinceid)
+                await conn.execute('''UPDATE provinces SET owner = '', owner_id = 0, troops = $2 WHERE id = $1;''',
+                                   provinceid, troops)
+                await conn.execute('''UPDATE cncusers SET undeployed = $1, provinces_owned = $2 WHERE user_id = $3;''',
+                                   (userinfo['undeployed'] + provinceinfo['troops']), ownedlist, author.id)
+                await ctx.send(f"Province #{provinceid} has been released. Natives have retaken control of the province.")
+                color = await conn.fetchrow('''SELECT color FROM terrains WHERE id = $1;''', provinceinfo['terrain'])
+                await loop.run_in_executor(None, self.map_color, provinceid, provinceinfo['cord'][0:2], color['color'],
+                                           True)    
+            except Exception as error:
+                self.bot.logger.warning(msg=error)
+                await ctx.send(error)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    @commands.command(usage="[province id] [deployed force]",
+                      aliases=['cncd'], brief="Deploys a number of troops to a specified province")
+    @commands.guild_only()
+    async def cnc_deploy(self, ctx, location: int, amount: int):
+        try:
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            # fetches all users
+            allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
+            alluserids = list()
+            for id in allusers:
+                alluserids.append(id['user_id'])
+            # checks if author is registered
+            if author.id not in alluserids:
+                await ctx.send(f"{author} not registered.")
+                return
+            # fetches all province ids
+            allprovinces = await conn.fetch('''SELECT id FROM provinces''')
+            allids = list()
+            for x in allprovinces:
+                allids.append(x['id'])
+            # ensures valid id
+            if location not in allids:
+                await ctx.send(f"Location id `{location}` is not a valid ID.")
+                return
+            # fetches user info
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+            userprovinces = userinfo['provinces_owned']
+            userundeployed = userinfo['undeployed']
+            # ensures location ownership
+            if location not in userprovinces:
+                await ctx.send(f"{userinfo['username']} does not own Province #{location} and cannot deploy troops there.")
+                return
+            # ensures troop sufficiency
+            elif amount > userundeployed:
+                await ctx.send(f"{userinfo['username']} does not have {amount} undeployed troops.")
+                return
+            else:
+                # updates all user and province information
+                try:
+                    provinceinfo = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', location)
+                    await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
+                                       (userundeployed - amount),
+                                       author.id)
+                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                       (provinceinfo['troops'] + amount),
+                                       location)
+                    await ctx.send(
+                        f"{userinfo['username']} has successfully deployed {amount} troops to Province #{location}.")
+                except Exception as error:
+                    self.bot.logger.warning(msg=error)
+                    await ctx.send(error)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    @commands.command(usage="[province id] [recipient nation]",
+                      brief="Transfers a province to another nation's control")
+    @commands.guild_only()
+    async def cnc_transfer(self, ctx, provinceid: int, recipient: str):
+        try:
+            loop = asyncio.get_running_loop()
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            # fetches all user ids
+            allusers = await conn.fetch('''SELECT user_id, username FROM cncusers''')
+            alluserids = list()
+            allusernames = list()
+            for id in allusers:
+                alluserids.append(id['user_id'])
+            for names in allusers:
+                allusernames.append(names['username'].lower())
+            # ensures author registration
+            if author.id not in alluserids:
+                await ctx.send(f"{author} not registered.")
+                return
+            # ensures recipient existance
+            if recipient.lower() not in allusernames:
+                await ctx.send(f"`{recipient}` not registered.")
+                return
+            # fetches all province ids
+            allprovinces = await conn.fetch('''SELECT id FROM provinces''')
+            allids = list()
+            for pid in allprovinces:
+                allids.append(pid['id'])
+            # ensures province validity
+            if provinceid not in allids:
+                await ctx.send(f"Location id `{provinceid}` is not a valid ID.")
+                return
+            # fetches user info
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+            # ensures province ownership
+            if provinceid not in userinfo['provinces_owned']:
+                await ctx.send(f"{userinfo['username']} does not own province #{provinceid}.")
+                return
+            # fetches province information
+            provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
+            try:
+                # clears province and return troops to owner, removes province from owner
+                ownedlist = userinfo['provinces_owned']
+                ownedlist.remove(provinceid)
+                await conn.execute('''UPDATE provinces  SET troops = 0 WHERE id = $1;''', provinceid)
+                await conn.execute('''UPDATE cncusers SET undeployed = $1, provinces_owned = $2 WHERE user_id = $3;''',
+                                   (userinfo['undeployed'] + provinceinfo['troops']), ownedlist, author.id)
+                # adds province to recipient
+                recipientinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
+                                                    recipient.lower())
+                recipientowned = recipientinfo['provinces_owned']
+                recipientowned.append(provinceid)
+                await conn.execute('''UPDATE cncusers SET provinces_owned = $1 WHERE lower(username) = $2;''',
+                                   recipientowned, recipient.lower())
+                # sets province owner info
+                await conn.execute('''UPDATE provinces  SET owner = $1, owner_id = $2 WHERE id = $3;''',
+                                   recipientinfo['username'], recipientinfo['user_id'], provinceid)
+                await ctx.send(
+                    f"Province #{provinceid} transferred to the ownership of {recipientinfo['username']} by {userinfo['username']}."
+                    f" All {provinceinfo['troops']} troops in province #{provinceid} have withdrawn.")
+                await loop.run_in_executor(None, self.map_color, provinceid, provinceinfo['cord'][0:2],
+                                           recipientinfo['usercolor'])
+            except Exception as error:
+                self.bot.logger.warning(msg=error)
+                await ctx.send(error)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    # ---------------------Interaction Commands------------------------------
+
+    @commands.command(usage="<offer id>", aliases=['cncvi'],
+                      brief="Displays information about a specific interaction or all interactions")
+    async def cnc_view_interaction(self, ctx, interactionid: int = None):
+        try:
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            if interactionid is None:
+                with open(f"{self.interaction_directory}{author.id}.txt", "rb") as file:
+                    await author.send(file=discord.File(file, f"Interactions Log for {author.id}.txt"))
+                    await ctx.send("Sent!")
+                    return
+            interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE id = $1;''', interactionid)
+            if interaction is None:
+                await ctx.send("No such interaction.")
+                return
+            if interaction['sender_id'] != author.id and interaction['recipient_id'] != author.id:
+                await ctx.send("You are not authorized to view that offer.")
+                return
+            upload = False
+            if len(interaction['terms']) > 1024:
+                terms = "See File Upload"
+                upload = True
+            else:
+                terms = interaction['terms']
+            embed = discord.Embed(title=f"Interaction #{interaction['id']}",
+                                  description=f"An declaration of {interaction['type']} from {interaction['sender']}.")
+            embed.add_field(name="Interaction Type", value=f"{interaction['type'].title()}")
+            embed.add_field(name="Sender", value=f"{interaction['sender']}")
+            embed.add_field(name="Recipient", value=f"{interaction['recipient']}")
+            embed.add_field(name="Terms", value=f"{terms}", inline=False)
+            embed.add_field(name="Active", value=f"{interaction['active']}")
+            await ctx.send(embed=embed)
+            if upload is True:
+                with open(f"{self.interaction_directory}{interaction['id']}.txt", "r") as file:
+                    await ctx.send(file=discord.File(file, f"{interaction['id']}.txt"))
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    @commands.command(usage="[offer id]", brief="Displays a specific offer with information")
+    async def cnc_offer(self, ctx, offerid: int):
+        try:
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            offer = await conn.fetchrow('''SELECT * FROM pending_interactions WHERE id = $1;''', offerid)
+            if offer is None:
+                await ctx.send("No such pending offer.")
+                return
+            if offer['sender_id'] != author.id and offer['recipient_id'] != author.id:
+                await ctx.send("You are not authorized to view that offer.")
+                return
+            upload = False
+            if len(offer['terms']) > 1024:
+                terms = "See File Upload"
+                upload = True
+            else:
+                terms = offer['terms']
+            embed = discord.Embed(title=f"Offer #{offer['id']}",
+                                  description=f"An offer of {offer['type']} from {offer['sender']}.")
+            embed.add_field(name="Offer Type", value=f"{offer['type'].title()}")
+            embed.add_field(name="Sender", value=f"{offer['sender']}")
+            embed.add_field(name="Terms", value=f"{terms}", inline=False)
+            await ctx.send(embed=embed)
+            if upload is True:
+                with open(f"{self.interaction_directory}{offer['id']}.txt", "r") as file:
+                    await ctx.send(file=discord.File(file, f"{offer['id']}.txt"))
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    @commands.command(usage="[interaction id] [interaction (accept, reject, cancel)]", aliases=['cnci'],
+                      brief="Allows for interacting with a proposed interaction")
+    async def cnc_interaction(self, ctx, interactionid: int, interaction: str):
+        try:
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            if interaction == "accept" or interaction == "reject":
+                # fetches interaction information
+                pending_int = await conn.fetchrow('''SELECT * FROM pending_interactions WHERE id = $1;''', interactionid)
+                # checks for existence
+                if pending_int is None:
+                    await ctx.send("No such pending interaction.")
+                    return
+                # checks for authority
+                if pending_int['recipient_id'] != author.id:
+                    await ctx.send("You are not authorized to accept or reject that interaction.")
+                    return
+                if interaction.lower() == "accept":
+                    try:
+                        # update all the relevant information into interactions
+                        await conn.execute('''INSERT INTO interactions(id, type, sender, sender_id, recipient, recipient_id, terms) 
+                                SELECT id, type, sender, sender_id, recipient, recipient_id, terms 
+                                FROM pending_interactions WHERE id = $1;''', interactionid)
+                        await conn.execute('''UPDATE interactions SET active = True WHERE id = $1;''', interactionid)
+                        await conn.execute('''DELETE FROM pending_interactions WHERE id = $1;''', interactionid)
+                        # if a peace treaty, cancel war
+                        if pending_int['type'] == 'peace':
+                            await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''', interactionid)
+                            await conn.execute(
+                                '''UPDATE interactions SET active = False WHERE type = 'war' AND sender = $1 AND recipient = $2;''',
+                                pending_int['sender'], pending_int['recipient'])
+                        # update relations
+                        await conn.execute('''UPDATE relations SET relation = $3 WHERE name = $1 AND nation  = $2;''',
+                                           pending_int['recipient'], pending_int['sender'], pending_int['type'])
+                        await conn.execute('''UPDATE relations SET relation = $3 WHERE name = $1 AND nation = $2;''',
+                                           pending_int['sender'], pending_int['recipient'], pending_int['type'])
+                        # updates interaction files
+                        interaction_text = f"Offer #{pending_int['id']} of {pending_int['type']}.\nSent by: {pending_int['sender']}\nAccepted by: {pending_int['recipient']}\n**Terms**\n{pending_int['terms']}\nAccepted: {strftime('%D', localtime(time()))}"
+                        with open(f"{self.interaction_directory}{pending_int['sender_id']}.txt", "r+") as file:
+                            oldcontent = file.read()
+                            file.seek(0, 0)
+                            file.write(interaction_text.rstrip('\r\n') + '\n' + oldcontent)
+                        with open(f"{self.interaction_directory}{pending_int['recipient_id']}.txt", "r+") as file:
+                            oldcontent = file.read()
+                            file.seek(0, 0)
+                            file.write(interaction_text.rstrip('\r\n') + '\n' + oldcontent)
+                        # get user object and send message
+                        sender = self.bot.get_user(pending_int['sender_id'])
+                        await sender.send(f"{pending_int['recipient']} has accepted your offer of {pending_int['type']}. "
+                                          f"To view this, use `$cnc_view_interaction {interactionid}`.")
+                        await ctx.send("Accepted.")
+                    except Exception as error:
+                        self.bot.logger.warning(msg=error)
+                        await ctx.send(error)
+                if interaction.lower() == "reject":
+                    try:
+                        # removes terms file
+                        if os.path.exists(f"{self.interaction_directory}{interactionid}.txt"):
+                            os.remove(f"{self.interaction_directory}{interactionid}.txt")
+                        # remove pending interaction
+                        await conn.execute('''DELETE FROM pending_interactions WHERE id = $1;''', interactionid)
+                        sender = self.bot.get_user(pending_int['sender_id'])
+                        await sender.send(f"{pending_int['recipient']} has rejected your offer of {pending_int['type']}.")
+                        await ctx.send("Rejected.")
+                    except Exception as error:
+                        self.bot.logger.warning(msg=error)
+                        await ctx.send(error)
+            elif interaction.lower() == "cancel":
+                # fetches interaction data
+                interact = await conn.fetchrow('''SELECT * FROM interactions WHERE id = $1;''', interactionid)
+                # checks for existence
+                if interact is None:
+                    await ctx.send("No such interaction.")
+                    return
+                # ensures correct type
+                if interact['type'] != 'alliance':
+                    await ctx.send(
+                        "Only alliances can be cancelled. Wars must be resolved through using the peace command.")
+                    return
+                # ensures authority
+                if (interact['recipient_id'] != author.id) and (interact['sender_id'] != author.id) and (
+                        not self.bot.is_owner(author)):
+                    await ctx.send("You are not authorized to cancel that interaction.")
+                    return
+                sender = interact['sender']
+                recipient = interact['recipient']
+                try:
+                    # updates relation and interaction data
+                    await conn.execute('''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
+                                       sender, recipient)
+                    await conn.execute('''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
+                                       recipient,
+                                       sender)
+                    await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''', interactionid)
+                    await ctx.send(f"Alliance between {sender} and {recipient} canceled.")
+                    # DMs relevant parties
+                    sender = self.bot.get_user(interact['sender_id'])
+                    await sender.send(f"Your alliance with {recipient} has been terminated.")
+                    recipient = self.bot.get_user(interact['recipient_id'])
+                    await recipient.send(f"Your alliance with {sender} has been terminated.")
+                except Exception as error:
+                    self.bot.logger.warning(msg=error)
+                    await ctx.send(error)
+            else:
+                raise commands.UserInputError
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    @commands.command(brief="Displays all pending interactions and offers")
+    async def cnc_view_pending(self, ctx):
+        try:
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            interactions = await conn.fetch(
+                '''SELECT * FROM pending_interactions WHERE sender_id = $1 or recipient_id = $1;''', author.id)
+            recipient_text = ''
+            sender_text = ''
+            for i in interactions:
+                text = f"Offer of `{i['type']}` from `{i['sender']}` to `{i['recipient']}` pending. `{self.bot.command_prefix}cnc_offer {i['id']}`.\n"
+                if i['sender'] == author.id:
+                    sender_text += text
+                else:
+                    recipient_text += text
+            if recipient_text == '':
+                recipient_text = "No incoming interactions pending."
+            if sender_text == '':
+                sender_text = "No outgoing interactions pending."
+            await author.send(recipient_text)
+            await author.send(sender_text)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    @commands.command(usage="[nation],, [terms]", brief="Sends an alliance offer to a nation")
+    async def cnc_alliance(self, ctx, *, args):
+        try:
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            data = args.split(',,')
+            if len(data) < 2:
+                raise commands.UserInputError
+            rrecipient = data[0]
+            text = data[1]
+            text = text.lstrip(' ')
+            # fetches all user ids
+            allusers = await conn.fetch('''SELECT user_id, username FROM cncusers''')
+            alluserids = list()
+            allusernames = list()
+            for id in allusers:
+                alluserids.append(id['user_id'])
+            for names in allusers:
+                allusernames.append(names['username'].lower())
+            # ensures author registration
+            if author.id not in alluserids:
+                await ctx.send(f"{author} not registered.")
+                return
+            # ensures recipient existance
+            if rrecipient.lower() not in allusernames:
+                await ctx.send(f"`{rrecipient}` not registered.")
+                return
+            # checks for existing active alliance
+            interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'alliance' AND active = True AND sender_id = $1 AND ;''',
+                                            author.id)
+            for inter in interactions:
+                if inter['recipient'].lower() == rrecipient.lower():
+                    await ctx.send(
+                    f"An alliance with `{rrecipient}` already exists. To view, use $cnc_view_interaction {inter['id']}")
+                    return
+            # fetches user information
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+            rinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', rrecipient.lower())
+            aid = ctx.message.id
+            atype = "alliance"
+            sender = userinfo['username']
+            sender_id = author.id
+            recipient = rinfo['username']
+            recipient_id = rinfo['user_id']
+            terms = text
+            if sender == recipient:
+                await ctx.send("You cannot ally with yourself.")
+                return
+            try:
+                # creates interaction text file
+                with open(f"{self.interaction_directory}{aid}.txt", "w") as afile:
+                    afile.write(terms)
+                # inserts information into pending interactions
+                await conn.execute('''INSERT INTO pending_interactions (id, type, sender, sender_id, recipient,
+                        recipient_id, terms) VALUES($1, $2, $3, $4, $5, $6, $7);''', aid, atype, sender, sender_id,
+                                   recipient,
+                                   recipient_id, terms)
+                # sends DM
+                rsend = self.bot.get_user(recipient_id)
+                await rsend.send(
+                    f"{sender} has sent an alliance offer to {recipient}. To view the terms, type `{self.bot.command_prefix}cnc_offer {aid}`. To accept or reject, use `{self.bot.command_prefix}cnc_interaction {aid} [accept/reject]`.")
+                await ctx.send(f"Alliance offer sent to {recipient}.")
+            except Exception as error:
+                self.bot.logger.warning(msg=error)
+                await ctx.send(error)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    @commands.command(usage="[recipient],, <goal>", brief="Declares war on a nation")
+    @commands.guild_only()
+    async def cnc_declare(self, ctx, *args):
+        try:
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            # consolidates terms
+            rawdata = ' '.join(args[:])
+            data = rawdata.split(',,')
+            rrecipient = data[0]
+            if len(data) == 1:
+                text = "None"
+            else:
+                text = data[1]
+                text = text.lstrip(' ')
+            # fetches all user ids
+            allusers = await conn.fetch('''SELECT user_id, username FROM cncusers''')
+            alluserids = list()
+            allusernames = list()
+            for id in allusers:
+                alluserids.append(id['user_id'])
+            for names in allusers:
+                allusernames.append(names['username'].lower())
+            # ensures author registration
+            if author.id not in alluserids:
+                await ctx.send(f"{author} not registered.")
+                return
+            # ensures recipient existance
+            if rrecipient.lower() not in allusernames:
+                await ctx.send(f"`{rrecipient}` not registered.")
+                return
+            # ensures prior peace
+            interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'war' AND active = True AND sender_id = $1;''', author.id)
+            for inter in interactions:
+                if inter['recipient'].lower() == rrecipient.lower():
+                    await ctx.send(f"A war with `{rrecipient}` already exists. To view, use `$cnc_view_interaction {inter['id']}`")
+                    return
+            # fetches user information
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+            rinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', rrecipient.lower())
+            aid = ctx.message.id
+            atype = "war"
+            sender = userinfo['username']
+            sender_id = author.id
+            recipient = rinfo['username']
+            recipient_id = rinfo['user_id']
+            terms = text
+            # ensures no self declarations
+            if sender == recipient:
+                await ctx.send("You cannot declare war on yourself.")
+                return
+            # ensures no alliance
+            alliance = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 AND nation = $2;''', sender,
+                                           recipient)
+            if alliance['relation'] == 'war':
+                await ctx.send(f"It is not possible to declare war on {recipient} when you are already at war with them!")
+                return
+            elif alliance['relation'] != 'peace':
+                await ctx.send(f"It is not possible to declare war on {recipient} when you have an alliance with them!")
+                return
+            try:
+                # creates text file for terms
+                with open(f"{self.interaction_directory}{aid}.txt", "w") as afile:
+                    afile.write(terms)
+                # inserts information into interactions
+                await conn.execute('''INSERT INTO interactions (id, type, sender, sender_id, recipient,
+                        recipient_id, terms, active) VALUES($1, $2, $3, $4, $5, $6, $7, $8);''', aid, atype, sender,
+                                   sender_id,
+                                   recipient,
+                                   recipient_id, terms, True)
+                # updates relations
+                await conn.execute('''UPDATE relations SET relation = 'war' WHERE name = $1 AND nation = $2;''', recipient,
+                                   sender)
+                await conn.execute('''UPDATE relations SET relation = 'war' WHERE name = $1 AND nation = $2;''', sender,
+                                   recipient)
+                # sends DM
+                rsend = self.bot.get_user(recipient_id)
+                await rsend.send(
+                    f"{sender} has declared war on {recipient}. To view the terms, type `$cnc_view_interaction {aid}`.")
+                await author.send(
+                    f"{sender} has declared war on {recipient}. To view the terms, type `$cnc_view_interaction {aid}`.")
+                await ctx.send(f"War declared on {recipient}!")
+            except Exception as error:
+                self.bot.logger.warning(msg=error)
+                await ctx.send(error)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    @commands.command(usage="[recipient],, [terms]", brief="Sends a peace offer to a nation")
+    async def cnc_peace(self, ctx, *args):
+        try:
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            # consolidates terms
+            rawdata = ' '.join(args[:])
+            data = rawdata.split(',,')
+            if len(data) < 2:
+                raise commands.UserInputError
+            rrecipient = data[0]
+            text = data[1]
+            text = text.lstrip(' ')
+            # fetches all user ids
+            allusers = await conn.fetch('''SELECT user_id, username FROM cncusers''')
+            alluserids = list()
+            allusernames = list()
+            for id in allusers:
+                alluserids.append(id['user_id'])
+            for names in allusers:
+                allusernames.append(names['username'].lower())
+            # ensures author registration
+            if author.id not in alluserids:
+                await ctx.send(f"{author} not registered.")
+                return
+            # ensures recipient existance
+            if rrecipient.lower() not in allusernames:
+                await ctx.send(f"`{rrecipient}` not registered.")
+                return
+            # fetches user information
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+            rinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', rrecipient.lower())
+            aid = ctx.message.id
+            atype = "peace"
+            sender = userinfo['username']
+            sender_id = author.id
+            recipient = rinfo['username']
+            recipient_id = rinfo['user_id']
+            terms = text
+            if sender == recipient:
+                await ctx.send("You cannot negotiatee peace with yourself.")
+                return
+            # ensures war status
+            war = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 AND nation = $2;''', sender,
+                                      recipient)
+            if war['relation'] != 'war':
+                await ctx.send(f"You cannot negotiate peace with {sender} if you are not at war!")
+                return
+            try:
+                # creates text file of terms
+                with open(f"{self.interaction_directory}{aid}.txt", "w") as afile:
+                    afile.write(terms)
+                # inserts information into pending interactions
+                await conn.execute('''INSERT INTO pending_interactions (id, type, sender, sender_id, recipient,
+                        recipient_id, terms) VALUES($1, $2, $3, $4, $5, $6, $7);''', aid, atype, sender, sender_id,
+                                   recipient,
+                                   recipient_id, terms)
+                # sends DM
+                rsend = self.bot.get_user(recipient_id)
+                await rsend.send(
+                    f"{sender} has sent an peace offer to {recipient}. To view the terms, type `{self.bot.command_prefix}cnc_offer {aid}`. To accept or reject, use `{self.bot.command_prefix}cnc_interaction {aid}")
+                await ctx.send(f"Peace offer sent to {recipient}.")
+            except Exception as error:
+                self.bot.logger.warning(msg=error)
+                await ctx.send(error)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    # ---------------------Resource and Recruit Commands------------------------------
+
+    @commands.command(usage="<nation name>", aliases=['cncb'], brief="Displays information about a nation's income")
+    async def cnc_bank(self, ctx, *args):
+        try:
+            conn = self.bot.pool
+            nationname = ' '.join(args[:])
+            if nationname == '':
+                # if the nationame is left blank, the author id is used to find the nation information
+                authorid = ctx.author.id
+                registeredusers = await conn.fetch('''SELECT user_id FROM cncusers;''')
+                registeredlist = list()
+                # makes a list of the registered users
+                for users in registeredusers:
+                    registeredlist.append(users["user_id"])
+                # checks the author id against the list of registered users
+                if authorid not in registeredlist:
+                    await ctx.send(f"{ctx.author} is not registered.")
+                    return
+                # grabs the nation information
+                userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', authorid)
+                # creates a list of provinces  owned
+                ownedprovinces = [p for p in userinfo['provinces_owned']]
+                ownedprovinces.remove(0)
+                resource_gain = 0
+                cities = 0
+                ports = 0
+                cp_gain = 0
+                # creates the accurate resource gain data
+                for p in ownedprovinces:
+                    worth = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', p)
+                    resource_gain += worth['worth']
+                    if worth['city'] is True:
+                        resource_gain += 1000
+                        cities += 1
+                        cp_gain += 1000
+                    if worth['port'] is True:
+                        resource_gain += .5 * worth['worth']
+                        ports += 1
+                        cp_gain += .5 * worth['worth']
+                if cities == 0:
+                    cities = "None"
+                if ports == 0:
+                    ports = "None"
+                # sends the embed
+                bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
+                                          description="An overview of the resource status of a nation.")
+                bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']}")
+                bankembed.add_field(name="Current Gain", value=f"\u03FE{math.ceil(resource_gain)}")
+                bankembed.add_field(name="City and Port Gain", value=f"\u03FE{math.ceil(cp_gain)}")
+                bankembed.add_field(name="Cities", value=cities)
+                bankembed.add_field(name="Ports", value=ports)
+                await ctx.send(embed=bankembed)
+            else:
+                registeredusers = await conn.fetch('''SELECT username FROM cncusers;''')
+                # makes a list of the registered users
+                registeredlist = list()
+                for users in registeredusers:
+                    registeredlist.append(users["username"].lower())
+                # checks the author id against the list of registered users
+                if nationname.lower() not in registeredlist:
+                    await ctx.send(f"{nationname} does not appear to be registered.")
+                # fetches specified nation data
+                userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1''', nationname.lower())
+                # creates a list of provinces  owned
+                ownedprovinces = [p for p in userinfo['provinces_owned']]
+                ownedprovinces.remove(0)
+                resource_gain = 0
+                cp_gain = 0
+                cities = 0
+                ports = 0
+                # creates the accurate resource gain data
+                for p in ownedprovinces:
+                    worth = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', p)
+                    resource_gain += worth['worth']
+                    if worth['city'] is True:
+                        resource_gain += 1000
+                        cities += 1
+                        cp_gain += 1000
+                    if worth['port'] is True:
+                        resource_gain += .5 * worth['worth']
+                        ports += 1
+                        cp_gain += .5 * worth['worth']
+                if cities == 0:
+                    cities = "None"
+                if ports == 0:
+                    ports = "None"
+                # sends the embed
+                bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
+                                          description="An overview of the resource status of a nation.")
+                bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']}")
+                bankembed.add_field(name="Current Gain", value=f"\u03FE{math.ceil(resource_gain)}")
+                bankembed.add_field(name="City and Port Gain", value=f"\u03FE{math.ceil(cp_gain)}")
+                bankembed.add_field(name="Cities", value=cities)
+                bankembed.add_field(name="Ports", value=ports)
+                await ctx.send(embed=bankembed)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
 
     @commands.command(usage="[battalion amount] <province id>", aliases=['cncr'],
                       brief="Recruits a number of battalions")
     @commands.guild_only()
     async def cnc_recruit(self, ctx, ramount: int, location: int = None):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # fetches user info
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-        nationname = userinfo['username']
-        monies = userinfo['resources']
-        manpower = ramount * 1000
-        cost = ramount * 1000
-        # checks if the focus is military
-        if userinfo['focus'] == "m":
-            cost = round(cost * uniform(.89, .99))
-        # if the nation does not have enough resources
-        if monies < cost:
-            await ctx.send(
-                f"{nationname} does not have enough resources to purchase {ramount * 1000} troops at \u03FE{cost}.")
-            return
-        # if the nation does not have enough manpower
-        elif manpower > userinfo['manpower']:
-            await ctx.send(f"{nationname} does not have enough manpower to recruit {ramount * 1000} troops, "
-                           f"lacking {-(userinfo['manpower'] - manpower)} manpower. ")
-            return
-        # if the location is not set
-        if location is None:
-            # updates all user information
-            try:
-                await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
-                                   ((ramount * 1000) + (userinfo['undeployed'])), author.id)
-                await conn.execute('''UPDATE cncusers SET totaltroops = $1 WHERE user_id = $2;''',
-                                   ((ramount * 1000) + (userinfo['totaltroops'])), author.id)
-                await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''', (monies - cost),
-                                   author.id)
+        try:
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            # fetches user info
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+            nationname = userinfo['username']
+            monies = userinfo['resources']
+            manpower = ramount * 1000
+            cost = ramount * 1000
+            # checks if the focus is military
+            if userinfo['focus'] == "m":
+                cost = round(cost * uniform(.89, .99))
+            # if the nation does not have enough resources
+            if monies < cost:
                 await ctx.send(
-                    f"{nationname} has recruited {ramount * 1000} troops to their recruitment pool. \u03FE{cost} have been spent.")
+                    f"{nationname} does not have enough resources to purchase {ramount * 1000} troops at \u03FE{cost}.")
                 return
+            # if the nation does not have enough manpower
+            elif manpower > userinfo['manpower']:
+                await ctx.send(f"{nationname} does not have enough manpower to recruit {ramount * 1000} troops, "
+                               f"lacking {-(userinfo['manpower'] - manpower)} manpower. ")
+                return
+            # if the location is not set
+            if location is None:
+                # updates all user information
+                try:
+                    await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
+                                       ((ramount * 1000) + (userinfo['undeployed'])), author.id)
+                    await conn.execute('''UPDATE cncusers SET totaltroops = $1 WHERE user_id = $2;''',
+                                       ((ramount * 1000) + (userinfo['totaltroops'])), author.id)
+                    await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''', (monies - cost),
+                                       author.id)
+                    await ctx.send(
+                        f"{nationname} has recruited {ramount * 1000} troops to their recruitment pool. \u03FE{cost} have been spent.")
+                    return
+                except Exception as error:
+                    self.bot.logger.warning(msg=error)
+                    await ctx.send(error)
+            else:
+                # fetches all province ids and makes them into a list
+                allprovinces = await conn.fetch('''SELECT id FROM provinces''')
+                allids = list()
+                for x in allprovinces:
+                    allids.append(x["id"])
+                # if the location is invalid
+                if location not in allids:
+                    await ctx.send(f"Location id `{location}` is not a valid ID.")
+                    return
+                # if the location is not owned by the user
+                if location not in userinfo['provinces_owned']:
+                    await ctx.send(
+                        f"{nationname} does not own province #{location}. Please select a location that {nationname} owns.")
+                    return
+            # updates all province and user information
+            try:
+                await conn.execute('''UPDATE cncusers SET totaltroops = $1, manpower= $2 WHERE user_id = $3;''',
+                                   userinfo['totaltroops'] + (ramount * 1000), userinfo['manpower'] - manpower, author.id)
+                troops = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', location)
+                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                   (troops['troops'] + (ramount * 1000)), location)
+                await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''', (monies - cost), author.id)
+                await ctx.send(f"{nationname} has successfully deployed {ramount * 1000} to Province #{location}.")
             except Exception as error:
                 self.bot.logger.warning(msg=error)
                 await ctx.send(error)
-        else:
-            # fetches all province ids and makes them into a list
-            allprovinces = await conn.fetch('''SELECT id FROM provinces''')
-            allids = list()
-            for x in allprovinces:
-                allids.append(x["id"])
-            # if the location is invalid
-            if location not in allids:
-                await ctx.send(f"Location id `{location}` is not a valid ID.")
-                return
-            # if the location is not owned by the user
-            if location not in userinfo['provinces_owned']:
-                await ctx.send(
-                    f"{nationname} does not own province #{location}. Please select a location that {nationname} owns.")
-                return
-        # updates all province and user information
-        try:
-            await conn.execute('''UPDATE cncusers SET totaltroops = $1, manpower= $2 WHERE user_id = $3;''',
-                               userinfo['totaltroops'] + (ramount * 1000), userinfo['manpower'] - manpower, author.id)
-            troops = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', location)
-            await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                               (troops['troops'] + (ramount * 1000)), location)
-            await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''', (monies - cost), author.id)
-            await ctx.send(f"{nationname} has successfully deployed {ramount * 1000} to Province #{location}.")
         except Exception as error:
             self.bot.logger.warning(msg=error)
-            await ctx.send(error)
 
     @commands.command(usage="[battalion amount]", brief="Recruits a number of battalions in all controlled provinces")
     @commands.guild_only()
     async def cnc_mass_recruit(self, ctx, amount: int):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # fetches all users
-        allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
-        alluserids = list()
-        for id in allusers:
-            alluserids.append(id['user_id'])
-        # checks if author is registered
-        if author.id not in alluserids:
-            await ctx.send(f"{author} not registered.")
-            return
         try:
-            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-            provinces = await conn.fetchrow('''SELECT provinces_owned FROM cncusers WHERE user_id = $1;''', author.id)
-            provincelist = provinces['provinces_owned']
-            provincelist.remove(0)
-            manpower = (amount * 1000) * len(provincelist)
-            cost = (amount * 1000) * len(provincelist)
-            # checks if the focus is military
-            if userinfo['focus'] == "m":
-                cost = round(cost * uniform(.89, .99))
-            # checks for enough resources
-            if userinfo['resources'] < cost:
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            # fetches all users
+            allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
+            alluserids = list()
+            for id in allusers:
+                alluserids.append(id['user_id'])
+            # checks if author is registered
+            if author.id not in alluserids:
+                await ctx.send(f"{author} not registered.")
+                return
+            try:
+                userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+                provinces = await conn.fetchrow('''SELECT provinces_owned FROM cncusers WHERE user_id = $1;''', author.id)
+                provincelist = provinces['provinces_owned']
+                provincelist.remove(0)
+                manpower = (amount * 1000) * len(provincelist)
+                cost = (amount * 1000) * len(provincelist)
+                # checks if the focus is military
+                if userinfo['focus'] == "m":
+                    cost = round(cost * uniform(.89, .99))
+                # checks for enough resources
+                if userinfo['resources'] < cost:
+                    await ctx.send(
+                        f"{userinfo['username']} does not have enough resources to purchase {amount * 1000} for every "
+                        f"province at \u03FE{cost}.")
+                    return
+                # checks for enough manpower
+                elif manpower > userinfo['manpower']:
+                    await ctx.send(f"{userinfo['username']} does not have enough manpower to recruit {amount * 1000} troops"
+                                   f" for every province, lacking {-(userinfo['manpower'] - manpower)} manpower. ")
+                    return
+                await conn.execute('''UPDATE cncusers SET totaltroops = $1, manpower= $2 WHERE user_id = $3;''',
+                                   userinfo['totaltroops'] + (amount * 1000), userinfo['manpower'] - manpower, author.id)
+                for p in provincelist:
+                    troops = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', p)
+                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''', (troops['troops'] + amount),
+                                       p)
                 await ctx.send(
-                    f"{userinfo['username']} does not have enough resources to purchase {amount * 1000} for every "
-                    f"province at \u03FE{cost}.")
-                return
-            # checks for enough manpower
-            elif manpower > userinfo['manpower']:
-                await ctx.send(f"{userinfo['username']} does not have enough manpower to recruit {amount * 1000} troops"
-                               f" for every province, lacking {-(userinfo['manpower'] - manpower)} manpower. ")
-                return
-            await conn.execute('''UPDATE cncusers SET totaltroops = $1, manpower= $2 WHERE user_id = $3;''',
-                               userinfo['totaltroops'] + (amount * 1000), userinfo['manpower'] - manpower, author.id)
-            for p in provincelist:
-                troops = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', p)
-                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''', (troops['troops'] + amount),
-                                   p)
-            await ctx.send(
-                f"{userinfo['username']} has succssfully deployed {amount} troops to all {len(provincelist)} provinces.")
+                    f"{userinfo['username']} has succssfully deployed {amount} troops to all {len(provincelist)} provinces.")
+            except Exception as error:
+                self.bot.logger.warning(msg=error)
+                await ctx.send(f"{error} at mass_recruit")
         except Exception as error:
             self.bot.logger.warning(msg=error)
-            await ctx.send(f"{error} at mass_recruit")
 
     @commands.command(usage="[amount] [recipient nation]", brief="Sends money to a specified nation")
     @commands.guild_only()
     async def cnc_tribute(self, ctx, amount: int, recipient: str):
-        if amount <= 0:
-            raise commands.UserInputError
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # fetches all user ids
-        allusers = await conn.fetch('''SELECT user_id, username FROM cncusers''')
-        alluserids = list()
-        allusernames = list()
-        for id in allusers:
-            alluserids.append(id['user_id'])
-        for names in allusers:
-            allusernames.append(names['username'].lower())
-        # ensures author registration
-        if author.id not in alluserids:
-            await ctx.send(f"{author} not registered.")
+        try:
+            if amount <= 0:
+                raise commands.UserInputError
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            # fetches all user ids
+            allusers = await conn.fetch('''SELECT user_id, username FROM cncusers''')
+            alluserids = list()
+            allusernames = list()
+            for id in allusers:
+                alluserids.append(id['user_id'])
+            for names in allusers:
+                allusernames.append(names['username'].lower())
+            # ensures author registration
+            if author.id not in alluserids:
+                await ctx.send(f"{author} not registered.")
+                return
+            # ensures recipient existance
+            if recipient.lower() not in allusernames:
+                await ctx.send(f"`{recipient}` not registered.")
+                return
+            # fetches user info
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
+            # ensures resource sufficiency
+            if amount > userinfo['resources']:
+                await ctx.send(f"{userinfo['username']} does not have \u03FE{amount}!")
+            # fetches recipient info
+            recipientinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', recipient.lower())
+            # subtract resource amount and transfer to recipient
+            await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
+                               (userinfo['resources'] - amount), author.id)
+            await conn.execute('''UPDATE cncusers SET resources = $1 WHERE username = $2;''',
+                               (recipientinfo['resources'] + amount), recipientinfo['username'])
+            await ctx.send(f"{userinfo['username']} has sent \u03FE{amount} to {recipientinfo['username']}.")
             return
-        # ensures recipient existance
-        if recipient.lower() not in allusernames:
-            await ctx.send(f"`{recipient}` not registered.")
-            return
-        # fetches user info
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
-        # ensures resource sufficiency
-        if amount > userinfo['resources']:
-            await ctx.send(f"{userinfo['username']} does not have \u03FE{amount}!")
-        # fetches recipient info
-        recipientinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', recipient.lower())
-        # subtract resource amount and transfer to recipient
-        await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
-                           (userinfo['resources'] - amount), author.id)
-        await conn.execute('''UPDATE cncusers SET resources = $1 WHERE username = $2;''',
-                           (recipientinfo['resources'] + amount), recipientinfo['username'])
-        await ctx.send(f"{userinfo['username']} has sent \u03FE{amount} to {recipientinfo['username']}.")
-        return
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
 
     @commands.command(usage="[province id]", brief="Purchases a specified province")
     @commands.guild_only()
     async def cnc_purchase(self, ctx, provinceid: int):
-        loop = asyncio.get_running_loop()
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # fetches all user ids
-        allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
-        alluserids = list()
-        for id in allusers:
-            alluserids.append(id['user_id'])
-        # ensures author registration
-        if author.id not in alluserids:
-            await ctx.send(f"{author} not registered.")
-            return
-        # fetches all province ids
-        allprovinces = await conn.fetch('''SELECT id FROM provinces''')
-        allids = list()
-        for pid in allprovinces:
-            allids.append(pid['id'])
-        # ensures province validity
-        if provinceid not in allids:
-            await ctx.send(f"Location id `{provinceid}` is not a valid ID.")
-            return
-        # fetches province and user information
-        provinceowner = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
-        cost = 3000 + provinceowner['worth']
-        # checks for economic focus
-        if userinfo['focus'] == "e":
-            cost = 3000 * uniform(.89, .99)
-        # ensures user disownership
-        if provinceid in userinfo['provinces_owned']:
-            await ctx.send(f"{userinfo['username']} already owns Province #{provinceid}")
-            return
-        # ensures province availability
-        elif provinceowner['owner_id'] != 0:
-            await ctx.send(f"Province #{provinceid} is already owned!")
-            return
-        # ensures province's coastal proximity
-        elif provinceowner['coast'] is False:
-            await ctx.send(f"Province #{provinceid} is not a coastal province and cannot be purchased!")
-            return
-        # ensures resource sufficiency
-        elif userinfo['resources'] < cost:
-            difference = cost - userinfo['resources']
-            await ctx.send(
-                f"{userinfo['username']} possesses {difference} fewer credit resources than needed to buy a province.")
-            return
-        # ensures that the user has less than 3 provinces
-        elif len(userinfo['provinces_owned']) >= 4:
-            await ctx.send(f"{userinfo['username']} already controls enough provinces  and is not eligible to "
-                           f"purchase another.")
-            return
-        else:
-            # fetches necessary ownership information
-            provincesowned = await conn.fetchrow('''SELECT provinces_owned FROM cncusers WHERE user_id = $1;''',
-                                                 author.id)
-            ownedlist = provincesowned['provinces_owned']
-            if ownedlist is None:
-                ownedlist = list()
-            ownedlist.append(provinceid)
-            # updates all relevant information
-            try:
-                await conn.execute('''UPDATE cncusers SET provinces_owned = $1 WHERE user_id = $2;''', ownedlist,
-                                   author.id)
-                await conn.execute('''UPDATE provinces  SET owner = $1, owner_id = $2 WHERE id = $3;''',
-                                   userinfo['username'], author.id, provinceid)
-                await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
-                                   (userinfo['resources'] - cost), author.id)
-                await ctx.send(f"{userinfo['username']} has purchased Province #{provinceid} successfully!")
-                await loop.run_in_executor(None, self.map_color, provinceid, provinceowner['cord'][0:2],
-                                           userinfo['usercolor'])
+        try:
+            loop = asyncio.get_running_loop()
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            # fetches all user ids
+            allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
+            alluserids = list()
+            for id in allusers:
+                alluserids.append(id['user_id'])
+            # ensures author registration
+            if author.id not in alluserids:
+                await ctx.send(f"{author} not registered.")
                 return
-            except Exception as error:
-                await ctx.send(error)
-                self.bot.logger.warning(msg=error)
+            # fetches all province ids
+            allprovinces = await conn.fetch('''SELECT id FROM provinces''')
+            allids = list()
+            for pid in allprovinces:
+                allids.append(pid['id'])
+            # ensures province validity
+            if provinceid not in allids:
+                await ctx.send(f"Location id `{provinceid}` is not a valid ID.")
                 return
+            # fetches province and user information
+            provinceowner = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
+            cost = 3000 + provinceowner['worth']
+            # checks for economic focus
+            if userinfo['focus'] == "e":
+                cost = 3000 * uniform(.89, .99)
+            # ensures user disownership
+            if provinceid in userinfo['provinces_owned']:
+                await ctx.send(f"{userinfo['username']} already owns Province #{provinceid}")
+                return
+            # ensures province availability
+            elif provinceowner['owner_id'] != 0:
+                await ctx.send(f"Province #{provinceid} is already owned!")
+                return
+            # ensures province's coastal proximity
+            elif provinceowner['coast'] is False:
+                await ctx.send(f"Province #{provinceid} is not a coastal province and cannot be purchased!")
+                return
+            # ensures resource sufficiency
+            elif userinfo['resources'] < cost:
+                difference = cost - userinfo['resources']
+                await ctx.send(
+                    f"{userinfo['username']} possesses {difference} fewer credit resources than needed to buy a province.")
+                return
+            # ensures that the user has less than 3 provinces
+            elif len(userinfo['provinces_owned']) >= 4:
+                await ctx.send(f"{userinfo['username']} already controls enough provinces  and is not eligible to "
+                               f"purchase another.")
+                return
+            else:
+                # fetches necessary ownership information
+                provincesowned = await conn.fetchrow('''SELECT provinces_owned FROM cncusers WHERE user_id = $1;''',
+                                                     author.id)
+                ownedlist = provincesowned['provinces_owned']
+                if ownedlist is None:
+                    ownedlist = list()
+                ownedlist.append(provinceid)
+                # updates all relevant information
+                try:
+                    await conn.execute('''UPDATE cncusers SET provinces_owned = $1 WHERE user_id = $2;''', ownedlist,
+                                       author.id)
+                    await conn.execute('''UPDATE provinces  SET owner = $1, owner_id = $2 WHERE id = $3;''',
+                                       userinfo['username'], author.id, provinceid)
+                    await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
+                                       (userinfo['resources'] - cost), author.id)
+                    await ctx.send(f"{userinfo['username']} has purchased Province #{provinceid} successfully!")
+                    await loop.run_in_executor(None, self.map_color, provinceid, provinceowner['cord'][0:2],
+                                               userinfo['usercolor'])
+                    return
+                except Exception as error:
+                    await ctx.send(error)
+                    self.bot.logger.warning(msg=error)
+                    return
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
 
     @commands.command(usage="[province id] [structure (fort, port, city)]",
                       brief="Constructs a building in a specified province")
     @commands.guild_only()
     async def cnc_construct(self, ctx, provinceid: int, structure: str):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # fetches all user ids
-        allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
-        alluserids = list()
-        for id in allusers:
-            alluserids.append(id['user_id'])
-        # ensures author registration
-        if author.id not in alluserids:
-            await ctx.send(f"{author} not registered.")
-            return
-        # fetches all province ids
-        allprovinces = await conn.fetch('''SELECT id FROM provinces''')
-        allids = list()
-        for pid in allprovinces:
-            allids.append(pid['id'])
-        # ensures province validity
-        if provinceid not in allids:
-            await ctx.send(f"Location id `{provinceid}` is not a valid ID.")
-            return
-        # fetches province and user information
-        provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
-        # ensures user disownership
-        if provinceid not in userinfo['provinces_owned']:
-            await ctx.send(f"{userinfo['username']} does not own Province #{provinceid}!")
-            return
-        if structure.lower() not in ['fort', 'port', 'city']:
-            raise commands.UserInputError
-        if structure.lower() == 'port':
-            pcost = 10000
-            if provinceinfo['coast'] is False:
-                await ctx.send(f"Province #{provinceid} is not a coastal province.")
+        try:
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            # fetches all user ids
+            allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
+            alluserids = list()
+            for id in allusers:
+                alluserids.append(id['user_id'])
+            # ensures author registration
+            if author.id not in alluserids:
+                await ctx.send(f"{author} not registered.")
                 return
-            elif userinfo['portlimit'][0] == userinfo['portlimit'][1]:
-                await ctx.send(f"{userinfo['username']} has reached its port building limit.")
+            # fetches all province ids
+            allprovinces = await conn.fetch('''SELECT id FROM provinces''')
+            allids = list()
+            for pid in allprovinces:
+                allids.append(pid['id'])
+            # ensures province validity
+            if provinceid not in allids:
+                await ctx.send(f"Location id `{provinceid}` is not a valid ID.")
                 return
-            if userinfo['focus'] == "e":
-                pcost = 10000 * uniform(.89, .99)
-            if userinfo['resources'] < pcost:
-                difference = pcost - userinfo['resources']
-                await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a port."
-                               f"\n**Resource Deficit:** \u03FE{difference}")
+            # fetches province and user information
+            provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
+            # ensures user disownership
+            if provinceid not in userinfo['provinces_owned']:
+                await ctx.send(f"{userinfo['username']} does not own Province #{provinceid}!")
                 return
-            elif provinceinfo['port'] is True:
-                await ctx.send(f"Province #{provinceid} already has a port constructed!")
-                return
-            elif provinceinfo['terrain'] == 5:
-                await ctx.send("It is impossible to build a port on a mountain!")
-                return
-            else:
-                try:
-                    await conn.execute('''UPDATE provinces  SET port = TRUE WHERE id = $1;''', provinceid)
-                    await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
-                                       (userinfo['resources'] - pcost), author.id)
-                    await ctx.send(f"{userinfo['username']} successfully constructed a port in province #{provinceid}.")
+            if structure.lower() not in ['fort', 'port', 'city']:
+                raise commands.UserInputError
+            if structure.lower() == 'port':
+                pcost = 10000
+                if provinceinfo['coast'] is False:
+                    await ctx.send(f"Province #{provinceid} is not a coastal province.")
                     return
-                except Exception as error:
-                    await ctx.send(f"{error} at build_port.")
-                    self.bot.logger.warning(msg=error)
+                elif userinfo['portlimit'][0] == userinfo['portlimit'][1]:
+                    await ctx.send(f"{userinfo['username']} has reached its port building limit.")
                     return
-        if structure.lower() == 'city':
-            ccost = 25000
-            if userinfo['resources'] < ccost:
-                difference = ccost - userinfo['resources']
-                await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a city."
-                               f"\n**Resource Deficit:** \u03FE{difference}")
-                return
-            elif userinfo['citylimit'][0] == userinfo['citylimit'][1]:
-                await ctx.send(f"{userinfo['username']} has reached its city building limit.")
-                return
-            elif provinceinfo['city'] is True:
-                await ctx.send(f"Province #{provinceid} already has a city constructed!")
-                return
-            elif provinceinfo['terrain'] == 5:
-                await ctx.send("It is impossible to build a port on a mountain!")
+                if userinfo['focus'] == "e":
+                    pcost = 10000 * uniform(.89, .99)
+                if userinfo['resources'] < pcost:
+                    difference = pcost - userinfo['resources']
+                    await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a port."
+                                   f"\n**Resource Deficit:** \u03FE{difference}")
+                    return
+                elif provinceinfo['port'] is True:
+                    await ctx.send(f"Province #{provinceid} already has a port constructed!")
+                    return
+                elif provinceinfo['terrain'] == 5:
+                    await ctx.send("It is impossible to build a port on a mountain!")
+                    return
+                else:
+                    try:
+                        await conn.execute('''UPDATE provinces  SET port = TRUE WHERE id = $1;''', provinceid)
+                        await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
+                                           (userinfo['resources'] - pcost), author.id)
+                        await ctx.send(f"{userinfo['username']} successfully constructed a port in province #{provinceid}.")
+                        return
+                    except Exception as error:
+                        await ctx.send(f"{error} at build_port.")
+                        self.bot.logger.warning(msg=error)
+                        return
+            if structure.lower() == 'city':
+                ccost = 25000
+                if userinfo['resources'] < ccost:
+                    difference = ccost - userinfo['resources']
+                    await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a city."
+                                   f"\n**Resource Deficit:** \u03FE{difference}")
+                    return
+                elif userinfo['citylimit'][0] == userinfo['citylimit'][1]:
+                    await ctx.send(f"{userinfo['username']} has reached its city building limit.")
+                    return
+                elif provinceinfo['city'] is True:
+                    await ctx.send(f"Province #{provinceid} already has a city constructed!")
+                    return
+                elif provinceinfo['terrain'] == 5:
+                    await ctx.send("It is impossible to build a port on a mountain!")
 
-                return
-            else:
-                try:
-                    await conn.execute('''UPDATE provinces  SET city = TRUE WHERE id = $1;''', provinceid)
-                    await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
-                                       (userinfo['resources'] - ccost), author.id)
-                    await ctx.send(f"{userinfo['username']} successfully constructed a city in province #{provinceid}.")
                     return
-                except Exception as error:
-                    await ctx.send(f"{error} at build_city.")
-                    self.bot.logger.warning(msg=error)
+                else:
+                    try:
+                        await conn.execute('''UPDATE provinces  SET city = TRUE WHERE id = $1;''', provinceid)
+                        await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
+                                           (userinfo['resources'] - ccost), author.id)
+                        await ctx.send(f"{userinfo['username']} successfully constructed a city in province #{provinceid}.")
+                        return
+                    except Exception as error:
+                        await ctx.send(f"{error} at build_city.")
+                        self.bot.logger.warning(msg=error)
+                        return
+            if structure.lower() == 'fort':
+                fcost = 15000
+                if userinfo['focus'] == "s":
+                    fcost = 15000 * uniform(.89, .99)
+                if userinfo['resources'] < fcost:
+                    difference = fcost - userinfo['resources']
+                    await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a fort."
+                                   f"\n**Resource Deficit:** \u03FE{difference}")
                     return
-        if structure.lower() == 'fort':
-            fcost = 15000
-            if userinfo['focus'] == "s":
-                fcost = 15000 * uniform(.89, .99)
-            if userinfo['resources'] < fcost:
-                difference = fcost - userinfo['resources']
-                await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a fort."
-                               f"\n**Resource Deficit:** \u03FE{difference}")
-                return
-            elif userinfo['fortlimit'][0] == userinfo['fortlimit'][1]:
-                await ctx.send(f"{userinfo['username']} has reached its fort building limit.")
-                return
-            elif provinceinfo['fort'] is True:
-                await ctx.send(f"Province #{provinceid} already has a fort constructed!")
-                return
-            elif provinceinfo['terrain'] == 5:
-                await ctx.send("Mountainous terrains are impossible to build forts on!")
-                return
-            else:
-                try:
-                    fortlimit = userinfo['fortlimit']
-                    newfortlimit = [(fortlimit[0] + 1), fortlimit[1]]
-                    await conn.execute('''UPDATE provinces  SET fort = TRUE WHERE id = $1;''', provinceid)
-                    await conn.execute('''UPDATE cncusers SET resources = $1, fortlimit = $2 WHERE user_id = $3;''',
-                                       (userinfo['resources'] - fcost), newfortlimit, author.id)
-                    await ctx.send(f"{userinfo['username']} successfully constructed a fort in province #{provinceid}.")
+                elif userinfo['fortlimit'][0] == userinfo['fortlimit'][1]:
+                    await ctx.send(f"{userinfo['username']} has reached its fort building limit.")
                     return
-                except Exception as error:
-                    await ctx.send(f"{error} at build_fort.")
-                    self.bot.logger.warning(msg=error)
+                elif provinceinfo['fort'] is True:
+                    await ctx.send(f"Province #{provinceid} already has a fort constructed!")
                     return
+                elif provinceinfo['terrain'] == 5:
+                    await ctx.send("Mountainous terrains are impossible to build forts on!")
+                    return
+                else:
+                    try:
+                        fortlimit = userinfo['fortlimit']
+                        newfortlimit = [(fortlimit[0] + 1), fortlimit[1]]
+                        await conn.execute('''UPDATE provinces  SET fort = TRUE WHERE id = $1;''', provinceid)
+                        await conn.execute('''UPDATE cncusers SET resources = $1, fortlimit = $2 WHERE user_id = $3;''',
+                                           (userinfo['resources'] - fcost), newfortlimit, author.id)
+                        await ctx.send(f"{userinfo['username']} successfully constructed a fort in province #{provinceid}.")
+                        return
+                    except Exception as error:
+                        await ctx.send(f"{error} at build_fort.")
+                        self.bot.logger.warning(msg=error)
+                        return
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
 
     # -------------------Movement Commands----------------------------
 
@@ -1759,116 +1833,122 @@ class CNC(commands.Cog):
                       brief="Removes a number of troops from a specified province")
     @commands.guild_only()
     async def cnc_withdraw(self, ctx, province: int, amount: int):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # fetches all user ids
-        allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
-        alluserids = list()
-        for id in allusers:
-            alluserids.append(id['user_id'])
-        # ensures author registration
-        if author.id not in alluserids:
-            await ctx.send(f"{author} not registered.")
-            return
-        # fetches all province ids
-        allprovinces = await conn.fetch('''SELECT id FROM provinces''')
-        allids = list()
-        for pid in allprovinces:
-            allids.append(pid['id'])
-        # ensures province existence
-        if province not in allids:
-            await ctx.send(f"Location id `{province}` is not a valid ID.")
-            return
-        # ensures province ownership
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-        ownedprovinces = userinfo['provinces_owned']
-        if province not in ownedprovinces:
-            await ctx.send(f"{userinfo['username']} does not own province #{province}.")
-            return
-        provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', province)
-        # ensures the amount is in the province
-        if amount > provinceinfo['troops']:
-            await ctx.send(f"There are not {amount} troops in province #{province}.")
-            return
         try:
-            await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                               (provinceinfo['troops'] - amount),
-                               province)
-            await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
-                               (userinfo['undeployed'] + amount), author.id)
-            await ctx.send(
-                f"{amount} troops removed from province #{province} and returned to the undeployed stockpile.")
-            return
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            # fetches all user ids
+            allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
+            alluserids = list()
+            for id in allusers:
+                alluserids.append(id['user_id'])
+            # ensures author registration
+            if author.id not in alluserids:
+                await ctx.send(f"{author} not registered.")
+                return
+            # fetches all province ids
+            allprovinces = await conn.fetch('''SELECT id FROM provinces''')
+            allids = list()
+            for pid in allprovinces:
+                allids.append(pid['id'])
+            # ensures province existence
+            if province not in allids:
+                await ctx.send(f"Location id `{province}` is not a valid ID.")
+                return
+            # ensures province ownership
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+            ownedprovinces = userinfo['provinces_owned']
+            if province not in ownedprovinces:
+                await ctx.send(f"{userinfo['username']} does not own province #{province}.")
+                return
+            provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', province)
+            # ensures the amount is in the province
+            if amount > provinceinfo['troops']:
+                await ctx.send(f"There are not {amount} troops in province #{province}.")
+                return
+            try:
+                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                   (provinceinfo['troops'] - amount),
+                                   province)
+                await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
+                                   (userinfo['undeployed'] + amount), author.id)
+                await ctx.send(
+                    f"{amount} troops removed from province #{province} and returned to the undeployed stockpile.")
+                return
+            except Exception as error:
+                await ctx.send(error)
+                self.bot.logger.warning(msg=error)
+                return
         except Exception as error:
-            await ctx.send(error)
             self.bot.logger.warning(msg=error)
-            return
 
     @commands.command(usage="[stationed target id] [target province id] [amount]", aliases=['cncm'],
                       brief="Moves troops from one province to another")
     @commands.guild_only()
     async def cnc_move(self, ctx, stationed: int, target: int, amount: int):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # fetches all user ids
-        allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
-        alluserids = list()
-        for id in allusers:
-            alluserids.append(id['user_id'])
-        # ensures author registration
-        if author.id not in alluserids:
-            await ctx.send(f"{author} not registered.")
-            return
-        # fetches all province ids
-        allprovinces = await conn.fetch('''SELECT id FROM provinces''')
-        allids = list()
-        for pid in allprovinces:
-            allids.append(pid['id'])
-        # ensures province existence
-        if target not in allids:
-            await ctx.send(f"Location id `{target}` is not a valid ID.")
-            return
-        elif stationed not in allids:
-            await ctx.send(f"Location id `{stationed}` is not a valid ID.")
-            return
-        # fetches target and stationed information
-        targetowner = await conn.fetchrow('''SELECT owner_id FROM provinces  WHERE id = $1;''', target)
-        stationedowner = await conn.fetchrow('''SELECT owner_id FROM provinces  WHERE id = $1;''', stationed)
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
-        # ensures province ownership
-        if targetowner['owner_id'] != author.id:
-            await ctx.send(f"{userinfo['username']} does not own Province #{target}!")
-            return
-        elif stationedowner['owner_id'] != author.id:
-            await ctx.send(f"{userinfo['username']} does not own Province #{stationed}!")
-            return
-        # gathers specific province information
-        targetinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', target)
-        stationedinfo = await conn.fetchrow('''SELECT owner_id, coast, troops FROM provinces  WHERE id = $1;''',
-                                            stationed)
-        # ensures bordering
-        if (targetinfo['coast'] is False) or (stationedinfo['coast'] is False):
-            if stationed not in targetinfo['bordering']:
-                await ctx.send(f"Province #{stationed} does not border province #{target}!")
-                return
-        # ensures sufficient troops reside in province
-        if stationedinfo['troops'] < amount:
-            await ctx.send(f"Province #{stationed} does not contain {amount} troops!")
-            return
         try:
-            await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''', (targetinfo['troops'] + amount),
-                               target)
-            await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                               (stationedinfo['troops'] - amount),
-                               stationed)
-            await ctx.send(f"{amount} troops moved to Province #{target} successfully!")
-            return
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            # fetches all user ids
+            allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
+            alluserids = list()
+            for id in allusers:
+                alluserids.append(id['user_id'])
+            # ensures author registration
+            if author.id not in alluserids:
+                await ctx.send(f"{author} not registered.")
+                return
+            # fetches all province ids
+            allprovinces = await conn.fetch('''SELECT id FROM provinces''')
+            allids = list()
+            for pid in allprovinces:
+                allids.append(pid['id'])
+            # ensures province existence
+            if target not in allids:
+                await ctx.send(f"Location id `{target}` is not a valid ID.")
+                return
+            elif stationed not in allids:
+                await ctx.send(f"Location id `{stationed}` is not a valid ID.")
+                return
+            # fetches target and stationed information
+            targetowner = await conn.fetchrow('''SELECT owner_id FROM provinces  WHERE id = $1;''', target)
+            stationedowner = await conn.fetchrow('''SELECT owner_id FROM provinces  WHERE id = $1;''', stationed)
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
+            # ensures province ownership
+            if targetowner['owner_id'] != author.id:
+                await ctx.send(f"{userinfo['username']} does not own Province #{target}!")
+                return
+            elif stationedowner['owner_id'] != author.id:
+                await ctx.send(f"{userinfo['username']} does not own Province #{stationed}!")
+                return
+            # gathers specific province information
+            targetinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', target)
+            stationedinfo = await conn.fetchrow('''SELECT owner_id, coast, troops FROM provinces  WHERE id = $1;''',
+                                                stationed)
+            # ensures bordering
+            if (targetinfo['coast'] is False) or (stationedinfo['coast'] is False):
+                if stationed not in targetinfo['bordering']:
+                    await ctx.send(f"Province #{stationed} does not border province #{target}!")
+                    return
+            # ensures sufficient troops reside in province
+            if stationedinfo['troops'] < amount:
+                await ctx.send(f"Province #{stationed} does not contain {amount} troops!")
+                return
+            try:
+                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''', (targetinfo['troops'] + amount),
+                                   target)
+                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                   (stationedinfo['troops'] - amount),
+                                   stationed)
+                await ctx.send(f"{amount} troops moved to Province #{target} successfully!")
+                return
+            except Exception as error:
+                await ctx.send(error)
+                self.bot.logger.warning(msg=error)
+                return
         except Exception as error:
-            await ctx.send(error)
             self.bot.logger.warning(msg=error)
-            return
 
     @commands.command(usage="[stationed province] [target province] [attack force]", aliases=['cnca'],
                       brief="Attacks from one province to another")
@@ -2481,99 +2561,108 @@ class CNC(commands.Cog):
 
     @commands.command(brief="Displays the map")
     async def cnc_map(self, ctx, debug: bool = False):
-        loop = asyncio.get_running_loop()
-        reactions = ["\U0001f5fa", "\U000026f0", "\U0001f3f3", "\U0000274c"]
-        map = await ctx.send("https://i.ibb.co/cTsg1x5/wargame-large.png")
-        for react in reactions:
-            await map.add_reaction(react)
+        try:
+            loop = asyncio.get_running_loop()
+            reactions = ["\U0001f5fa", "\U000026f0", "\U0001f3f3", "\U0000274c"]
+            map = await ctx.send("https://i.ibb.co/cTsg1x5/wargame-large.png")
+            for react in reactions:
+                await map.add_reaction(react)
 
-        # the check for the emojis
-        def mapcheck(reaction, user):
-            return user == ctx.message.author and str(reaction.emoji)
+            # the check for the emojis
+            def mapcheck(reaction, user):
+                return user == ctx.message.author and str(reaction.emoji)
 
-        while True:
-            try:
-                reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=mapcheck)
-                # terrain map
-                if str(reaction.emoji) == "\U000026f0":
-                    await map.clear_reactions()
-                    await map.edit(content="https://i.ibb.co/pXg4Fj1/wargame.png")
-                    for react in reactions:
-                        await map.add_reaction(react)
-                # numbers + terrain
-                if str(reaction.emoji) == "\U0001f5fa":
-                    await map.clear_reactions()
-                    await map.edit(content="https://i.ibb.co/cTsg1x5/wargame-large.png")
-                    for react in reactions:
-                        await map.add_reaction(react)
-                # numbers + nations
-                if str(reaction.emoji) == "\U0001f3f3":
-                    await map.clear_reactions()
-                    await map.edit(content="Loading...")
-                    async with ctx.typing():
-                        initiate = perf_counter()
-                        await loop.run_in_executor(None, self.add_ids)
-                        with open(fr"{self.map_directory}/Maps/wargame_nations_map.png", "rb") as preimg:
-                            img = b64encode(preimg.read())
-                        image = perf_counter()
-                        params = {"key": "a64d9505a13854ff660980db67ee3596",
-                                  "image": img}
-                        sleep(1)
-                        upload_initate = perf_counter()
-                        upload = await loop.run_in_executor(None, requests.post, "https://api.imgbb.com/1/upload",
-                                                            params)
-                        upload_complete = perf_counter()
-                        response = upload.json()
-                        await map.edit(content=response["data"]["url"])
-                        if debug is True:
-                            await ctx.send(
-                                f"Image compiled = {image - initiate}\nStarted upload = {upload_initate - initiate}\nUpload Complete = {upload_complete - initiate}")
-                    for react in reactions:
-                        await map.add_reaction(react)
-                # close
-                if str(reaction.emoji) == "\U0000274c":
+            while True:
+                try:
+                    reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=mapcheck)
+                    # terrain map
+                    if str(reaction.emoji) == "\U000026f0":
+                        await map.clear_reactions()
+                        await map.edit(content="https://i.ibb.co/pXg4Fj1/wargame.png")
+                        for react in reactions:
+                            await map.add_reaction(react)
+                    # numbers + terrain
+                    if str(reaction.emoji) == "\U0001f5fa":
+                        await map.clear_reactions()
+                        await map.edit(content="https://i.ibb.co/cTsg1x5/wargame-large.png")
+                        for react in reactions:
+                            await map.add_reaction(react)
+                    # numbers + nations
+                    if str(reaction.emoji) == "\U0001f3f3":
+                        await map.clear_reactions()
+                        await map.edit(content="Loading...")
+                        async with ctx.typing():
+                            initiate = perf_counter()
+                            await loop.run_in_executor(None, self.add_ids)
+                            with open(fr"{self.map_directory}/Maps/wargame_nations_map.png", "rb") as preimg:
+                                img = b64encode(preimg.read())
+                            image = perf_counter()
+                            params = {"key": "a64d9505a13854ff660980db67ee3596",
+                                      "image": img}
+                            sleep(1)
+                            upload_initate = perf_counter()
+                            upload = await loop.run_in_executor(None, requests.post, "https://api.imgbb.com/1/upload",
+                                                                params)
+                            upload_complete = perf_counter()
+                            response = upload.json()
+                            await map.edit(content=response["data"]["url"])
+                            if debug is True:
+                                await ctx.send(
+                                    f"Image compiled = {image - initiate}\nStarted upload = {upload_initate - initiate}\nUpload Complete = {upload_complete - initiate}")
+                        for react in reactions:
+                            await map.add_reaction(react)
+                    # close
+                    if str(reaction.emoji) == "\U0000274c":
+                        await map.clear_reactions()
+                        return
+                except asyncio.TimeoutError:
                     await map.clear_reactions()
                     return
-            except asyncio.TimeoutError:
-                await map.clear_reactions()
-                return
-            except Exception as error:
-                if debug is True:
-                    await ctx.send(f"Error encountered: `{error}`")
-                self.bot.logger.warning(msg=error)
-                return
+                except Exception as error:
+                    if debug is True:
+                        await ctx.send(f"Error encountered: `{error}`")
+                    self.bot.logger.warning(msg=error)
+                    return
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
 
     @commands.command()
     @commands.is_owner()
     async def cnc_wipe_all_data_reset(self, ctx):
-        # connects to the database
-        conn = self.bot.pool
-        await conn.execute('''DELETE FROM cncusers;''')
-        await conn.execute('''UPDATE provinces  SET owner = '', owner_id = 0, troops = 0;''')
-        provinceinfo = await conn.fetch('''SELECT * FROM provinces;''')
-        province_ids = [p['id'] for p in provinceinfo]
-        for p in province_ids:
-            terrain = await conn.fetchrow('''SELECT terrain FROM provinces  WHERE id = $1;''', p)
-            if terrain['terrain'] == 0:
-                await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(250, 400), p)
-            if terrain['terrain'] == 1:
-                await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(100, 180), p)
-            if terrain['terrain'] == 2:
-                await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(300, 400), p)
-            if terrain['terrain'] == 5:
-                await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(1000, 1300), p)
-            if terrain['terrain'] == 7:
-                await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(100, 180), p)
-        await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = $2;''', "0", "turns")
-        await ctx.send("https://tenor.com/view/finished-elijah-wood-lord-of-the-rings-lava-fire-gif-5894611")
-        return
+        try:
+            # connects to the database
+            conn = self.bot.pool
+            await conn.execute('''DELETE FROM cncusers;''')
+            await conn.execute('''UPDATE provinces  SET owner = '', owner_id = 0, troops = 0;''')
+            provinceinfo = await conn.fetch('''SELECT * FROM provinces;''')
+            province_ids = [p['id'] for p in provinceinfo]
+            for p in province_ids:
+                terrain = await conn.fetchrow('''SELECT terrain FROM provinces  WHERE id = $1;''', p)
+                if terrain['terrain'] == 0:
+                    await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(250, 400), p)
+                if terrain['terrain'] == 1:
+                    await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(100, 180), p)
+                if terrain['terrain'] == 2:
+                    await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(300, 400), p)
+                if terrain['terrain'] == 5:
+                    await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(1000, 1300), p)
+                if terrain['terrain'] == 7:
+                    await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', randrange(100, 180), p)
+            await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = $2;''', "0", "turns")
+            await ctx.send("https://tenor.com/view/finished-elijah-wood-lord-of-the-rings-lava-fire-gif-5894611")
+            return
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
 
     @commands.command()
     @commands.is_owner()
     async def cnc_reset_map(self, ctx):
-        map = Image.open(fr"{self.map_directory}/Maps/wargame_blank_save.png").convert("RGBA")
-        map.save(fr"{self.map_directory}/Maps/wargame_provinces.png")
-        await ctx.send("Map reset.")
+        try:
+            map = Image.open(fr"{self.map_directory}/Maps/wargame_blank_save.png").convert("RGBA")
+            map.save(fr"{self.map_directory}/Maps/wargame_provinces.png")
+            await ctx.send("Map reset.")
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
 
     # ---------------------Moderation------------------------------
 
