@@ -1130,6 +1130,7 @@ class CNC(commands.Cog):
             # connects to the database
             conn = self.bot.pool
             data = args.split(',,')
+            print(data)
             if len(data) != 2:
                 raise commands.UserInputError
             rrecipient = data[0]
