@@ -160,7 +160,7 @@ class Recruitment(commands.Cog):
                         await asyncio.sleep(.6)
                     membersoup = BeautifulSoup(members, 'lxml')
                     members = set(membersoup.members.text.split(','))
-                    Recruitment.all_wa = members.difference(nations)
+                    Recruitment.all_wa = nations.difference(members)
                     while True:
                         headers = {"User-Agent": "Bassiliya"}
                         params = {'q': 'nations',
