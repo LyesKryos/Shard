@@ -37,7 +37,7 @@ class CNC(commands.Cog):
                 member = guild.get_member(ctx.author.id)
                 for ar in member.roles:
                     aroles.append(ar.id)
-                if 896886962710007808 not in aroles:
+                if 674260547897917460 not in aroles:
                     await ctx.send("You don't have the right role for that.")
                     raise SilentFail
             conn = self.bot.pool
