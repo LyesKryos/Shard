@@ -1109,10 +1109,12 @@ class CNC(commands.Cog):
         interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'alliance' AND active = True;''')
         for inter in interactions:
             if inter['recipient'].lower() == rrecipient.lower():
-                if inter['sender_id'] == author.id:
-                    await ctx.send(
-                        f"An alliance with `{rrecipient}` already exists. To view, use $cnc_view_interaction {inter['id']}")
-                    return
+                if inter['sender'].lower() == rrecipient.lower():
+                    if inter['sender_id'] == author.id:
+                        if inter['recipient_id'] == author.id:
+                            await ctx.send(
+                            f"An alliance with `{rrecipient}` already exists. To view, use $cnc_view_interaction {inter['id']}")
+                            return
         # fetches user information
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
         rinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', rrecipient.lower())
@@ -1179,9 +1181,11 @@ class CNC(commands.Cog):
         interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'war' AND active = True;''')
         for inter in interactions:
             if inter['recipient'].lower() == rrecipient.lower():
-                if inter['sender_id'] == author.id:
-                    await ctx.send(f"A war with `{rrecipient}` already exists. To view, use $cnc_interaction {inter['id']}")
-                    return
+                if inter['sender'].lower() == rrecipient.lower():
+                    if inter['sender_id'] == author.id:
+                        if inter['recipient_id'] == author.id:
+                            await ctx.send(f"A war with `{rrecipient}` already exists. To view, use $cnc_interaction {inter['id']}")
+                            return
         # fetches user information
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
         rinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', rrecipient.lower())
