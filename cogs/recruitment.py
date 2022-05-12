@@ -135,9 +135,63 @@ class Recruitment(commands.Cog):
                         continue
             except Exception as error:
                 await crashchannel.send(f"`{error}` in retention module.")
+
+        async def world_assembly_notification(bot):
+            await bot.wait_until_ready()
+            wa_pings = bot.get_channel(676437972819640357)
+            thegye_server = bot.get_guild(674259612580446230)
+            wa_role = discord.utils.get(thegye_server.roles, id=674283915870994442)
+            async with aiohttp.ClientSession() as session:
+                headers = {"User-Agent": "Bassiliya"}
+                params = {'q': 'nations',
+                          'region': 'thegye'}
+                waparams = {'wa': '1',
+                            'q': 'members'}
+                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                       headers=headers, params=params) as nationsresp:
+                    nations = await nationsresp.text()
+                    await asyncio.sleep(.6)
+                nationsoup = BeautifulSoup(nations, 'lxml')
+                nations = set(nationsoup.nations.text.split(':'))
+                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                       headers=headers, params=waparams) as membersresp:
+                    members = await membersresp.text()
+                    await asyncio.sleep(.6)
+                membersoup = BeautifulSoup(members, 'lxml')
+                members = set(membersoup.members.text.split(','))
+                Recruitment.all_wa = members.difference(nations)
+                while True:
+                    headers = {"User-Agent": "Bassiliya"}
+                    params = {'q': 'nations',
+                              'region': 'thegye'}
+                    waparams = {'wa': '1',
+                                'q': 'members'}
+                    async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                           headers=headers, params=params) as nationsresp:
+                        nations = await nationsresp.text()
+                        await asyncio.sleep(.6)
+                    nationsoup = BeautifulSoup(nations, 'lxml')
+                    nations = set(nationsoup.nations.text.split(':'))
+                    async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                           headers=headers, params=waparams) as membersresp:
+                        members = await membersresp.text()
+                        await asyncio.sleep(.6)
+                    membersoup = BeautifulSoup(members, 'lxml')
+                    members = set(membersoup.members.text.split(','))
+                    Recruitment.new_wa = members.difference(Recruitment.all_wa)
+                    if Recruitment.new_wa:
+                        for n in Recruitment.new_wa:
+                            wa_notif = await wa_pings.send(f"New World Assembly nation, {wa_role.mention}!"
+                                                           f"\n Please endorse: https://www.nationstates.net/nation={n}.")
+                            await wa_notif.reaction_add("\U0001f310")
+                    Recruitment.all_wa = members
+                    await asyncio.sleep(300)
+                    continue
+
         loop = bot.loop
         self.monthly_loop = loop.create_task(monthly_recruiter_scheduler(bot))
         self.retention_loop = loop.create_task(retention(bot))
+        self.world_assembly_notification_loop = loop.create_task(world_assembly_notification(bot))
 
     def sanitize_links_percent(self, url: str) -> str:
         # sanitizes links with %s
@@ -155,6 +209,10 @@ class Recruitment(commands.Cog):
 
     do_not_recruit = list()
     sending_to = list()
+    all_nations = set()
+    new_nations = set()
+    all_wa = set()
+    new_wa = set()
     user_sent = 0
     running = False
     recruitment_gather_object = None
@@ -374,6 +432,10 @@ class Recruitment(commands.Cog):
             await ctx.send("Retention running.")
         elif not self.retention_loop:
             await ctx.send("Retention not running.")
+        if self.world_assembly_notification_loop:
+            await ctx.send("WA notification running.")
+        elif not self.world_assembly_notification_loop:
+            await ctx.send("WA notification not running.")
 
     @commands.command(usage="<(user, global)>",
                       brief="Displays sent information for a specified user, the requesting user, or all sent telegrams")
