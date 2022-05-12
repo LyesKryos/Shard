@@ -1132,7 +1132,7 @@ class CNC(commands.Cog):
             data = args.split(',,')
             print(len(data))
             if len(data) != 2:
-                raise commands.UserInputError()
+                raise commands.UserInputError
             rrecipient = data[0]
             text = data[1]
             text = text.lstrip(' ')
