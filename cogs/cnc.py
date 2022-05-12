@@ -28,7 +28,7 @@ class CNC(commands.Cog):
     banned_colors = ["#000000", "#ffffff", "#808080"]
 
     async def cog_check(self, ctx):
-        if ctx.author.id in [293518673417732098]:
+        if ctx.author.id in [0]:
             return True
         else:
             if ctx.guild is None:
@@ -142,19 +142,19 @@ class CNC(commands.Cog):
             conn = self.bot.pool
             # checks to see if the user is registered
             registered = await conn.fetch('''SELECT * FROM cncusers''')
-            for x in registered:
+            for u in registered:
                 # if the user is already registered
-                if userid == x["user_id"]:
+                if userid == u["user_id"]:
                     await ctx.send(
                         f"{ctx.author.name} is already registered! Use `$cnc_view` to view your registered nation.")
                     return
-                elif nationame.lower() == x['username'].lower():
+                elif nationame.lower() == u['username'].lower():
                     await ctx.send(
                         f"{nationame} is an already registered nation name! Please choose a different username.")
                     return
             # checks the focus and ensures proper reading
             focuses = ['m', 'e', 'd']
-            if focus != '':
+            if focus is not None:
                 if focus.lower() not in focuses:
                     raise Exception("That is not a valid focus. Please use only m, e, or d.")
             else:
