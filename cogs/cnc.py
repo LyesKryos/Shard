@@ -144,7 +144,7 @@ class CNC(commands.Cog):
             # connects to the database
             conn = self.bot.pool
             # checks to see if the user is registered
-            registered = await conn.fetch('''SELECT * FROM cncusers''')
+            registered = await conn.fetch('''SELECT * FROM cncusers;''')
             for u in registered:
                 # if the user is already registered
                 if userid == u["user_id"]:
