@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Small bug fix">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="World Assembly notification system">
       <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -108,14 +107,7 @@
       <workItem from="1651500112401" duration="39000" />
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
-      <workItem from="1652197800527" duration="33107000" />
-    </task>
-    <task id="LOCAL-00062" summary="Renaming CNC to allow for more smooth usage">
-      <created>1652207516595</created>
-      <option name="number" value="00062" />
-      <option name="presentableId" value="LOCAL-00062" />
-      <option name="project" value="LOCAL" />
-      <updated>1652207516595</updated>
+      <workItem from="1652197800527" duration="33465000" />
     </task>
     <task id="LOCAL-00063" summary="Error correction: cnc.py">
       <created>1652217997773</created>
@@ -453,7 +445,14 @@
       <option name="project" value="LOCAL" />
       <updated>1652317706189</updated>
     </task>
-    <option name="localTasksCounter" value="111" />
+    <task id="LOCAL-00111" summary="World Assembly notification system">
+      <created>1652367409614</created>
+      <option name="number" value="00111" />
+      <option name="presentableId" value="LOCAL-00111" />
+      <option name="project" value="LOCAL" />
+      <updated>1652367409614</updated>
+    </task>
+    <option name="localTasksCounter" value="112" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -472,7 +471,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Adding roleplay cog and commands." />
     <MESSAGE value="Fixing roleplay.py" />
     <MESSAGE value="Fixing rsc_check command" />
     <MESSAGE value="Adding database connection error checking for recruitment.py" />
@@ -497,7 +495,8 @@
     <MESSAGE value="Version update: v.1.5 Wargames" />
     <MESSAGE value="Adding briefs to all commands." />
     <MESSAGE value="Small bug fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="Small bug fix" />
+    <MESSAGE value="World Assembly notification system" />
+    <option name="LAST_COMMIT_MESSAGE" value="World Assembly notification system" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
