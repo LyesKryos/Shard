@@ -28,13 +28,13 @@ class CNC(commands.Cog):
     banned_colors = ["#000000", "#ffffff", "#808080"]
 
     async def cog_check(self, ctx):
-        if ctx.author.id in [293518673417732098]:
+        if ctx.author.id in [0]:
             return True
         else:
             if ctx.guild is None:
                 aroles = list()
-                guild = ctx.bot.get_guild(674259612580446230)
-                member = guild.get_member(ctx.author.id)
+                thegye = ctx.bot.get_guild(674259612580446230)
+                member = thegye.get_member(ctx.author.id)
                 for ar in member.roles:
                     aroles.append(ar.id)
                 if 674260547897917460 not in aroles:
