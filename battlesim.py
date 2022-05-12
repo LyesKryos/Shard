@@ -2,7 +2,6 @@ import random
 import asyncpg
 import math
 import asyncio
-from ShardBot import Shard
 
 
 class calculations:
@@ -59,7 +58,7 @@ class calculations:
     async def TerrainMod(self):
         # connection to database and gathers the terrain modifier based on the terrain ID
         conn = self.pool
-        rawtmod = await conn.fetchrow('''SELECT modifier FROM terrains WHERE id = $1''', self.TerrainID)
+        rawtmod = await conn.fetchrow('''SELECT modifier FROM terrains WHERE id = $1;''', self.TerrainID)
         self.terrainmod = float(rawtmod["modifier"])
         return self.terrainmod
 
@@ -82,8 +81,8 @@ class calculations:
         conn = self.pool
         # selects all from maxcas where the modifier value is the same as the terrain mod for both the defense maxcas
         # and attack maxcas
-        maxcasraw = await conn.fetchrow('''SELECT * FROM maxcas WHERE modifier = $1''', self.terrainmod)
-        defensecasraw = await conn.fetchrow('''SELECT * FROM maxcas WHERE modifier = 0.0''')
+        maxcasraw = await conn.fetchrow('''SELECT * FROM maxcas WHERE modifier = $1;''', self.terrainmod)
+        defensecasraw = await conn.fetchrow('''SELECT * FROM maxcas WHERE modifier = 0.0;''')
         self.maxcas = maxcasraw[str(self.defenseroll)]
         defensemaxcas = defensecasraw[str(self.attackroll)]
         # if the attacking army is larger than the defending army
