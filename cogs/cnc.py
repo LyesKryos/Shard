@@ -40,6 +40,15 @@ class CNC(commands.Cog):
                 if 674260547897917460 not in aroles:
                     await ctx.send("You don't have the right role for that.")
                     raise SilentFail
+            elif ctx.guild is not None:
+                aroles = list()
+                if ctx.guild.id != 674259612580446230:
+                    member = ctx.guild.get_member(ctx.author.id)
+                    for ar in member.roles:
+                        aroles.append(ar.id)
+                    if 674260547897917460 not in aroles:
+                        await ctx.send("You don't have the right role for that.")
+                        raise SilentFail
             conn = self.bot.pool
             blacklist = await conn.fetchrow('''SELECT * FROM blacklist WHERE user_id = $1 AND active = True;''',
                                             ctx.author.id)
