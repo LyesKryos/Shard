@@ -1077,12 +1077,11 @@ class CNC(commands.Cog):
         await author.send(sender_text)
 
     @commands.command(usage="[nation],, [terms]", brief="Sends an alliance offer to a nation")
-    async def cnc_alliance(self, ctx, *args):
+    async def cnc_alliance(self, ctx, *, args):
         author = ctx.author
         # connects to the database
         conn = self.bot.pool
-        rawdata = ' '.join(args[:])
-        data = rawdata.split(',,')
+        data = args.split(',,')
         if len(data) < 2:
             raise commands.UserInputError
         rrecipient = data[0]

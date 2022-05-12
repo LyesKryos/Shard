@@ -108,14 +108,7 @@
       <workItem from="1651500112401" duration="39000" />
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
-      <workItem from="1652197800527" duration="41585000" />
-    </task>
-    <task id="LOCAL-00079" summary="CNC checking overhaul">
-      <created>1652289793386</created>
-      <option name="number" value="00079" />
-      <option name="presentableId" value="LOCAL-00079" />
-      <option name="project" value="LOCAL" />
-      <updated>1652289793386</updated>
+      <workItem from="1652197800527" duration="42832000" />
     </task>
     <task id="LOCAL-00080" summary="CNC loop testing">
       <created>1652290534008</created>
@@ -453,7 +446,14 @@
       <option name="project" value="LOCAL" />
       <updated>1652377642450</updated>
     </task>
-    <option name="localTasksCounter" value="128" />
+    <task id="LOCAL-00128" summary="CNC hotfixes">
+      <created>1652379245662</created>
+      <option name="number" value="00128" />
+      <option name="presentableId" value="LOCAL-00128" />
+      <option name="project" value="LOCAL" />
+      <updated>1652379245662</updated>
+    </task>
+    <option name="localTasksCounter" value="129" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
