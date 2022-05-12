@@ -40,6 +40,8 @@ class CNC(commands.Cog):
                 if 674260547897917460 not in aroles:
                     await ctx.send("You don't have the right role for that.")
                     raise SilentFail
+                else:
+                    return True
             elif ctx.guild is not None:
                 aroles = list()
                 if ctx.guild.id == 674259612580446230:
@@ -48,6 +50,8 @@ class CNC(commands.Cog):
                     if 674260547897917460 not in aroles:
                         await ctx.send("You don't have the right role for that.")
                         raise SilentFail
+                    else:
+                        return True
                 else:
                     await ctx.send("This is not the right server for that command.")
                     raise SilentFail
@@ -68,8 +72,10 @@ class CNC(commands.Cog):
                     except Exception as error:
                         await ctx.send(error)
                         self.bot.logger.warning(msg=error)
-                else:
-                    return False
+            else:
+                return True
+
+
 
     def map_color(self, province, province_cord, hexcode, release: bool = False):
         province_cord = ((int(province_cord[0])), (int(province_cord[1])))
