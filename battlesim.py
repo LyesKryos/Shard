@@ -26,11 +26,7 @@ class calculations:
         self.RemainingDefendingArmy = 0
         self.maxcas = 0
 
-        loop = Shard().loop
-        # creates connection pool
-        self.pool: asyncpg.Pool = loop.run_until_complete(asyncpg.create_pool('postgres://postgres@127.0.0.1:5432',
-                                                      database="botdb",
-                                                      password="postgres"))
+        self.pool = Shard().pool
 
 
     async def ArmyDifference(self):
