@@ -28,7 +28,7 @@ class CNC(commands.Cog):
     banned_colors = ["#000000", "#ffffff", "#808080"]
 
     async def cog_check(self, ctx):
-        if ctx.author.id in [0]:
+        if ctx.author.id in [293518673417732098]:
             return True
         else:
             if ctx.guild is None:
