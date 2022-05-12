@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="CNC hotfixes">
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="CNC hotfixes" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -107,28 +105,7 @@
       <workItem from="1651500112401" duration="39000" />
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
-      <workItem from="1652197800527" duration="35560000" />
-    </task>
-    <task id="LOCAL-00069" summary="Map fixing for CNC">
-      <created>1652267837415</created>
-      <option name="number" value="00069" />
-      <option name="presentableId" value="LOCAL-00069" />
-      <option name="project" value="LOCAL" />
-      <updated>1652267837415</updated>
-    </task>
-    <task id="LOCAL-00070" summary="Fixing small bugs">
-      <created>1652276373754</created>
-      <option name="number" value="00070" />
-      <option name="presentableId" value="LOCAL-00070" />
-      <option name="project" value="LOCAL" />
-      <updated>1652276373754</updated>
-    </task>
-    <task id="LOCAL-00071" summary="Fixing small bugs and adjusting to regular code standards">
-      <created>1652277489743</created>
-      <option name="number" value="00071" />
-      <option name="presentableId" value="LOCAL-00071" />
-      <option name="project" value="LOCAL" />
-      <updated>1652277489744</updated>
+      <workItem from="1652197800527" duration="35878000" />
     </task>
     <task id="LOCAL-00072" summary="Bug fixes">
       <created>1652278183168</created>
@@ -452,7 +429,28 @@
       <option name="project" value="LOCAL" />
       <updated>1652372320101</updated>
     </task>
-    <option name="localTasksCounter" value="118" />
+    <task id="LOCAL-00118" summary="CNC hotfixes">
+      <created>1652372365991</created>
+      <option name="number" value="00118" />
+      <option name="presentableId" value="LOCAL-00118" />
+      <option name="project" value="LOCAL" />
+      <updated>1652372365991</updated>
+    </task>
+    <task id="LOCAL-00119" summary="CNC hotfixes">
+      <created>1652372441383</created>
+      <option name="number" value="00119" />
+      <option name="presentableId" value="LOCAL-00119" />
+      <option name="project" value="LOCAL" />
+      <updated>1652372441383</updated>
+    </task>
+    <task id="LOCAL-00120" summary="CNC hotfixes">
+      <created>1652372609997</created>
+      <option name="number" value="00120" />
+      <option name="presentableId" value="LOCAL-00120" />
+      <option name="project" value="LOCAL" />
+      <updated>1652372609997</updated>
+    </task>
+    <option name="localTasksCounter" value="121" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

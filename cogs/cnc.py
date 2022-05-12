@@ -43,8 +43,7 @@ class CNC(commands.Cog):
             elif ctx.guild is not None:
                 aroles = list()
                 if ctx.guild.id == 674259612580446230:
-                    member = ctx.guild.get_member(ctx.author.id)
-                    for ar in member.roles:
+                    for ar in ctx.author.roles:
                         aroles.append(ar.id)
                     if 674260547897917460 not in aroles:
                         await ctx.send("You don't have the right role for that.")
