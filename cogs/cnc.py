@@ -611,11 +611,13 @@ class CNC(commands.Cog):
             provinces = list(userinfo['provinces_owned'])
             provinces.remove(0)
             provinces.sort()
+            color = discord.Color(int(userinfo["usercolor"].lstrip('#'), 16))
+            colorvalue = color
             # creates the embed object
             if len(provinces) <= 15:
                 sve1 = discord.Embed(title=f"{userinfo['username']} - Strategic View",
                                      description="A strategic overlook at all troop placements and provinces.",
-                                     color=discord.Color.blurple())
+                                     color=colorvalue)
                 sve1.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
                 for p in provinces:
                     provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
