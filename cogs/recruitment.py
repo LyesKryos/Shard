@@ -160,7 +160,7 @@ class Recruitment(commands.Cog):
                         await asyncio.sleep(.6)
                     membersoup = BeautifulSoup(members, 'lxml')
                     members = set(membersoup.members.text.split(','))
-                    Recruitment.all_wa = nations.difference(members)
+                    Recruitment.all_wa = nations.intersection(members)
                     while True:
                         headers = {"User-Agent": "Bassiliya"}
                         params = {'q': 'nations',
@@ -178,7 +178,7 @@ class Recruitment(commands.Cog):
                             members = await membersresp.text()
                             await asyncio.sleep(.6)
                         membersoup = BeautifulSoup(members, 'lxml')
-                        members = nations.difference(set(membersoup.members.text.split(',')))
+                        members = nations.intersection(set(membersoup.members.text.split(',')))
                         Recruitment.new_wa = members.difference(Recruitment.all_wa)
                         if Recruitment.new_wa:
                             for n in Recruitment.new_wa:

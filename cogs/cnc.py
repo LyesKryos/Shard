@@ -13,8 +13,7 @@ from base64 import b64encode
 import requests
 from time import sleep, localtime, time, strftime, perf_counter
 import os
-from pytz import timezone
-from customchecks import modcheck, SilentFail
+from customchecks import modcheck, SilentFail, WrongInput
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from pytz import timezone
@@ -26,10 +25,12 @@ class CNC(commands.Cog):
         self.map_directory = r"/root/Documents/Shard/CNC/Map Files"
         self.interaction_directory = r"/root/Documents/Shard/CNC/Interaction Files/"
         self.bot = bot
+        turn_run = False
 
         async def cnc_turn_loop(bot):
             try:
                 if self.turn_run:
+                    self.turn_run = False
                     return
                 # channel to send to
                 cncchannel = bot.get_channel(927288304301387816)
@@ -106,6 +107,7 @@ class CNC(commands.Cog):
                 await conn.execute('''UPDATE cnc_data SET data_value = $2 WHERE data_name = $1;''', "turns",
                                    str(int(turns['data_value']) + 1))
                 await cncchannel.send(f"New turn! It is now turn #{int(turns['data_value']) + 1}.")
+                self.turn_run = True
                 return
             except Exception as error:
                 bot.logger.warning(msg=error)
@@ -1263,7 +1265,7 @@ class CNC(commands.Cog):
             data = args.split(',,')
             print(len(data))
             if len(data) != 2:
-                raise commands.UserInputError
+                raise WrongInput
             rrecipient = data[0]
             text = data[1]
             text = text.lstrip(' ')
@@ -1476,6 +1478,68 @@ class CNC(commands.Cog):
                 await rsend.send(
                     f"{sender} has sent an peace offer to {recipient}. To view the terms, type `{self.bot.command_prefix}cnc_offer {aid}`. To accept or reject, use `{self.bot.command_prefix}cnc_interaction {aid}")
                 await ctx.send(f"Peace offer sent to {recipient}.")
+            except Exception as error:
+                self.bot.logger.warning(msg=error)
+                await ctx.send(error)
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    @commands.command(usage="[recipient],, [terms]", brief="One-time agreement with a nation.")
+    async def cnc_treaty(self, ctx, *, args):
+        try:
+            author = ctx.author
+            # connects to the database
+            conn = self.bot.pool
+            data = args.split(',,')
+            print(len(data))
+            if len(data) != 2:
+                raise WrongInput
+            rrecipient = data[0]
+            text = data[1]
+            text = text.lstrip(' ')
+            # fetches all user ids
+            allusers = await conn.fetch('''SELECT user_id, username FROM cncusers;''')
+            alluserids = list()
+            allusernames = list()
+            for id in allusers:
+                alluserids.append(id['user_id'])
+            for names in allusers:
+                allusernames.append(names['username'].lower())
+            # ensures author registration
+            if author.id not in alluserids:
+                await ctx.send(f"{author} not registered.")
+                return
+            # ensures recipient existance
+            if rrecipient.lower() not in allusernames:
+                await ctx.send(f"`{rrecipient}` not registered.")
+                return
+            # fetches user information
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+            rinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', rrecipient.lower())
+            aid = ctx.message.id
+            atype = "treaty"
+            sender = userinfo['username']
+            sender_id = author.id
+            recipient = rinfo['username']
+            recipient_id = rinfo['user_id']
+            terms = text
+            if sender == recipient:
+                await ctx.send("You cannot send yourself a treaty.")
+                return
+            try:
+                # creates interaction text file
+                with open(f"{self.interaction_directory}{aid}.txt", "w") as afile:
+                    afile.write(terms)
+                # inserts information into pending interactions
+                await conn.execute('''INSERT INTO pending_interactions (id, type, sender, sender_id, recipient,
+                        recipient_id, terms) VALUES($1, $2, $3, $4, $5, $6, $7);''', aid, atype, sender, sender_id,
+                                   recipient,
+                                   recipient_id, terms)
+                # sends DM
+                rsend = self.bot.get_user(recipient_id)
+                await rsend.send(
+                    f"{sender} has sent an treaty offer to {recipient}. To view the terms, type `{self.bot.command_prefix}cnc_offer {aid}`. To accept or reject, use `{self.bot.command_prefix}cnc_interaction {aid} [accept/reject]`.")
+                await ctx.send(f"Treaty offer sent to {recipient}.")
             except Exception as error:
                 self.bot.logger.warning(msg=error)
                 await ctx.send(error)

@@ -7,6 +7,10 @@ class SilentFail(commands.CommandError):
     pass
 
 
+class WrongInput:
+    pass
+
+
 class CNCFail(commands.CheckFailure):
     pass
 
