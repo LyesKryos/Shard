@@ -2710,7 +2710,7 @@ class CNC(commands.Cog):
                     # terrain map
                     if str(reaction.emoji) == "\U000026f0":
                         await map.clear_reactions()
-                        await map.edit(content="https://i.ibb.co/pXg4Fj1/wargame.png")
+                        await map.edit(content="https://i.ibb.co/RC5yv5m/wargame-large.png")
                         for react in reactions:
                             await map.add_reaction(react)
                         continue
