@@ -259,7 +259,7 @@ class CNC(commands.Cog):
             eastern = timezone('US/Eastern')
             # adds the job with cron designator
             turnscheduler.add_job(print,
-                                  CronTrigger.from_crontab("8 8 * * *", timezone=eastern),
+                                  CronTrigger.from_crontab("* */6 * * *", timezone=eastern),
                                   args=("",),
                                   id="turn")
             # starts the schedule, fetches the job information, and sends the confirmation that it has begun
@@ -267,7 +267,7 @@ class CNC(commands.Cog):
             turnjob = turnscheduler.get_job("turn")
             conn = self.bot.pool
             data = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
-            await ctx.send(f"It is currently turn #{int(data['data_value'])}."
+            await ctx.send(f"It is currently turn #{int(data['data_value'])}. "
                            f"Next turn is <t:{math.floor(turnjob.next_run_time.timestamp())}:R>")
         except Exception as error:
             self.bot.logger.warning(msg=error)
