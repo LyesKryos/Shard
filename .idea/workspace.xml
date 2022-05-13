@@ -5,7 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Amending map">
+      <change afterPath="$PROJECT_DIR$/CNC/Map Files/Province Layers/516.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CNC/Map Files/Maps/wargame numbers.png" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/Map Files/Maps/wargame numbers.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CNC/Map Files/Province Layers/289.png" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/Map Files/Province Layers/289.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
