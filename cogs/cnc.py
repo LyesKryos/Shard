@@ -1095,7 +1095,7 @@ class CNC(commands.Cog):
                     await ctx.send("No such interaction.")
                     return
                 # ensures correct type
-                if interact['type'] != 'alliance' or interact['type'] != 'treaty':
+                if interact['type'] != 'alliance' and interact['type'] != 'treaty':
                     await ctx.send("Only alliances and treaties can be cancelled. Wars must be resolved through using "
                                    "the peace command.")
                     return
