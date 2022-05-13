@@ -2,12 +2,13 @@ import random
 import asyncpg
 import math
 import asyncio
-from ShardBot import Shard
+import psycopg2
+import discord.ext
 
 
 class calculations:
 
-    def __init__(self, AttackingArmySize: int, DefendingArmySize: int, TerrainID: int):
+    def __init__(self, AttackingArmySize: int, DefendingArmySize: int, TerrainID: int, ctx: discord.ext.commands.Context):
         self.AttackingArmySize = AttackingArmySize
         self.DefendingArmySize = DefendingArmySize
         self.TerrainID = TerrainID
@@ -27,8 +28,7 @@ class calculations:
         self.maxcas = 0
 
         # creates connection pool
-        self.pool = asyncpg.create_pool('postgres://postgres@127.0.0.1:5432',
-                                                      database="botdb")
+        self.pool: asyncpg.pool = ctx.bot.pool
 
 
     async def ArmyDifference(self):
