@@ -6,7 +6,7 @@ import discord.ext
 
 class calculations:
 
-    def __init__(self, AttackingArmySize: int, DefendingArmySize: int, TerrainID: int, ctx: discord.ext.commands.Context):
+    def __init__(self, AttackingArmySize: int, DefendingArmySize: int, TerrainID: int, ctx):
         self.AttackingArmySize = AttackingArmySize
         self.DefendingArmySize = DefendingArmySize
         self.TerrainID = TerrainID
@@ -28,7 +28,7 @@ class calculations:
         # creates connection pool
         try:
             self.pool: asyncpg.pool = ctx.bot.pool
-        except Exception as error:
+        except Exception:
             print("broke at battlesim's pool")
 
 
