@@ -2504,7 +2504,7 @@ class CNC(commands.Cog):
                             battleembed.set_footer(
                                 text=f"The natives have lost control of province #{target}!"
                                      f" All {targetinfo['troops']} troops have "
-                                     f"been killed!")
+                                     f"been killed or captured!")
                             await ctx.send(embed=battleembed)
                             await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
                                                        userinfo['usercolor'])
