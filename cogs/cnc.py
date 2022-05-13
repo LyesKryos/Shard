@@ -624,6 +624,7 @@ class CNC(commands.Cog):
                     sve1.add_field(name=f"**Province #{p}**",
                                    value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}\nManpower: {provinceinfo['manpower']}")
                 await author.send(embed=sve1)
+                await ctx.send("Sent!")
             if len(provinces) > 15:
                 length = math.ceil(len(provinces) / 15) - 1
                 sve1 = discord.Embed(title=f"{userinfo['username']} - Strategic View",
@@ -1674,15 +1675,16 @@ class CNC(commands.Cog):
                 provinces = await conn.fetchrow('''SELECT provinces_owned FROM cncusers WHERE user_id = $1;''', author.id)
                 provincelist = provinces['provinces_owned']
                 provincelist.remove(0)
-                manpower = (amount * 1000) * len(provincelist)
-                cost = (amount * 1000) * len(provincelist)
+                amount *= 1000
+                manpower = (amount ) * len(provincelist)
+                cost = (amount) * len(provincelist)
                 # checks if the focus is military
                 if userinfo['focus'] == "m":
                     cost = round(cost * uniform(.89, .99))
                 # checks for enough resources
                 if userinfo['resources'] < cost:
                     await ctx.send(
-                        f"{userinfo['username']} does not have enough resources to purchase {amount * 1000} for every "
+                        f"{userinfo['username']} does not have enough resources to purchase {amount} for every "
                         f"province at \u03FE{cost}.")
                     return
                 # checks for enough manpower

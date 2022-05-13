@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Small bug fixes">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -108,13 +109,6 @@
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
-    </task>
-    <task id="LOCAL-00121" summary="CNC hotfixes">
-      <created>1652372906485</created>
-      <option name="number" value="00121" />
-      <option name="presentableId" value="LOCAL-00121" />
-      <option name="project" value="LOCAL" />
-      <updated>1652372906485</updated>
     </task>
     <task id="LOCAL-00122" summary="CNC hotfixes">
       <created>1652373042884</created>
@@ -452,7 +446,14 @@
       <option name="project" value="LOCAL" />
       <updated>1652467005564</updated>
     </task>
-    <option name="localTasksCounter" value="170" />
+    <task id="LOCAL-00170" summary="Small bug fixes">
+      <created>1652467259456</created>
+      <option name="number" value="00170" />
+      <option name="presentableId" value="LOCAL-00170" />
+      <option name="project" value="LOCAL" />
+      <updated>1652467259456</updated>
+    </task>
+    <option name="localTasksCounter" value="171" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
