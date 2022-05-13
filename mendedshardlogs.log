@@ -1,0 +1,9 @@
+2022-05-10 17:20:18,341 WARNING: [Errno 2] No such file or directory: '/Documents/Shard/CNC/Map Files/Maps/wargame_provinces.png'
+2022-05-10 17:25:20,385 WARNING: [Errno 2] No such file or directory: '/Documents/Shard/CNC/Map Files/Maps/wargame_provinces.png'
+2022-05-10 17:26:58,271 WARNING: [Errno 2] No such file or directory: '/Documents/Shard/CNC/Map Files/Maps/wargame_provinces.png'
+2022-05-10 17:33:21,851 WARNING: [Errno 2] No such file or directory: '~/Documents/Shard/CNC/Map Files/Maps/wargame_provinces.png'
+2022-05-10 17:33:43,082 WARNING: [Errno 2] No such file or directory: '~/Documents/Shard/CNC/Map Files/Maps/wargame_provinces.png'
+2022-05-10 17:36:36,895 WARNING: [Errno 2] No such file or directory: '/root/Documents/Shard/CNC/Map Files\\Maps\\wargame_nations_map.png'
+2022-05-10 17:46:41,828 WARNING: 
+2022-05-10 17:47:57,187 WARNING: [Errno 2] No such file or directory: '/root/Documents/Shard/CNC/Interaction Files/293518673417732098.txt'
+2022-05-10 21:45:41,644 WARNING: relation "mod_logs" does not exist
