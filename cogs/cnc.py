@@ -1067,7 +1067,7 @@ class CNC(commands.Cog):
                         # get user object and send message
                         sender = self.bot.get_user(pending_int['sender_id'])
                         await sender.send(
-                            f"{pending_int['recipient']} has accepted your offer of {pending_int['type']}. "
+                            f"{pending_int['recipient']} has accepted your offer of a(n) {pending_int['type']}. "
                             f"To view this, use `$cnc_view_interaction {interactionid}`.")
                         await ctx.send("Accepted.")
                     except Exception as error:
@@ -1082,7 +1082,7 @@ class CNC(commands.Cog):
                         await conn.execute('''DELETE FROM pending_interactions WHERE id = $1;''', interactionid)
                         sender = self.bot.get_user(pending_int['sender_id'])
                         await sender.send(
-                            f"{pending_int['recipient']} has rejected your offer of {pending_int['type']}.")
+                            f"{pending_int['recipient']} has rejected your offer of a(n) {pending_int['type']}.")
                         await ctx.send("Rejected.")
                     except Exception as error:
                         self.bot.logger.warning(msg=error)
@@ -1095,9 +1095,9 @@ class CNC(commands.Cog):
                     await ctx.send("No such interaction.")
                     return
                 # ensures correct type
-                if interact['type'] != 'alliance':
-                    await ctx.send(
-                        "Only alliances can be cancelled. Wars must be resolved through using the peace command.")
+                if interact['type'] != 'alliance' or interact['type'] != 'treaty':
+                    await ctx.send("Only alliances and treaties can be cancelled. Wars must be resolved through using "
+                                   "the peace command.")
                     return
                 # ensures authority
                 if (interact['recipient_id'] != author.id) and (interact['sender_id'] != author.id) and (
@@ -1108,18 +1108,19 @@ class CNC(commands.Cog):
                 recipient = interact['recipient']
                 try:
                     # updates relation and interaction data
-                    await conn.execute('''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
-                                       sender, recipient)
-                    await conn.execute('''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
-                                       recipient,
-                                       sender)
+                    if interact['type'] == 'alliance':
+                        await conn.execute('''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
+                                           sender, recipient)
+                        await conn.execute('''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
+                                           recipient,
+                                           sender)
                     await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''', interactionid)
-                    await ctx.send(f"Alliance between {sender} and {recipient} canceled.")
+                    await ctx.send(f"{interact['type'].title()} between {sender} and {recipient} canceled.")
                     # DMs relevant parties
                     sender = self.bot.get_user(interact['sender_id'])
-                    await sender.send(f"Your alliance with {recipient} has been terminated.")
+                    await sender.send(f"Your {interact['type']} with {recipient} has been terminated.")
                     recipient = self.bot.get_user(interact['recipient_id'])
-                    await recipient.send(f"Your alliance with {sender} has been terminated.")
+                    await recipient.send(f"Your {interact['type']} with {sender} has been terminated.")
                 except Exception as error:
                     self.bot.logger.warning(msg=error)
                     await ctx.send(error)
