@@ -137,7 +137,7 @@ class CNC(commands.Cog):
         self.turn_loop.cancel()
 
     resourcesleeping = False
-    banned_colors = ["#000000", "#ffffff", "#808080"]
+    banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2"]
     turn_run = False
 
     async def cog_check(self, ctx):
@@ -151,7 +151,6 @@ class CNC(commands.Cog):
                 for ar in member.roles:
                     aroles.append(ar.id)
                 if 674260547897917460 not in aroles:
-                    await ctx.send("You don't have the right role for that.")
                     raise SilentFail
                 else:
                     return True
@@ -161,12 +160,10 @@ class CNC(commands.Cog):
                     for ar in ctx.author.roles:
                         aroles.append(ar.id)
                     if 674260547897917460 not in aroles:
-                        await ctx.send("You don't have the right role for that.")
                         raise SilentFail
                     else:
                         return True
                 else:
-                    await ctx.send("This is not the right server for that command.")
                     raise SilentFail
             conn = self.bot.pool
             blacklist = await conn.fetchrow('''SELECT * FROM blacklist WHERE user_id = $1 AND active = True;''',
