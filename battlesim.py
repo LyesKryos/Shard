@@ -1,4 +1,4 @@
-import random
+from random import random, randint
 import asyncpg
 import math
 
@@ -16,8 +16,8 @@ class calculations:
         self.terrainmod = 0
         self.defenseoutput = 0
         self.attackoutput = 0
-        self.attackroll = random.randint(1, 6)
-        self.defenseroll = random.randint(1, 6)
+        self.attackroll = randint(1, 6)
+        self.defenseroll = randint(1, 6)
         self.AttackingCasualties = 0
         self.DefendingCasualties = 0
         self.RemainingAttackingArmy = 0

@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="CNC hotfixes">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battlesim.py" beforeDir="false" afterPath="$PROJECT_DIR$/battlesim.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="CNC attack command fix" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -109,42 +105,7 @@
       <workItem from="1651500112401" duration="39000" />
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
-      <workItem from="1652197800527" duration="52311000" />
-    </task>
-    <task id="LOCAL-00102" summary="CNC loop testing">
-      <created>1652311894010</created>
-      <option name="number" value="00102" />
-      <option name="presentableId" value="LOCAL-00102" />
-      <option name="project" value="LOCAL" />
-      <updated>1652311894010</updated>
-    </task>
-    <task id="LOCAL-00103" summary="CNC loop testing">
-      <created>1652312037352</created>
-      <option name="number" value="00103" />
-      <option name="presentableId" value="LOCAL-00103" />
-      <option name="project" value="LOCAL" />
-      <updated>1652312037352</updated>
-    </task>
-    <task id="LOCAL-00104" summary="Channel resetting">
-      <created>1652312173761</created>
-      <option name="number" value="00104" />
-      <option name="presentableId" value="LOCAL-00104" />
-      <option name="project" value="LOCAL" />
-      <updated>1652312173761</updated>
-    </task>
-    <task id="LOCAL-00105" summary="Channel resetting">
-      <created>1652312214590</created>
-      <option name="number" value="00105" />
-      <option name="presentableId" value="LOCAL-00105" />
-      <option name="project" value="LOCAL" />
-      <updated>1652312214590</updated>
-    </task>
-    <task id="LOCAL-00106" summary="Version update: v.1.5 Wargames">
-      <created>1652314054147</created>
-      <option name="number" value="00106" />
-      <option name="presentableId" value="LOCAL-00106" />
-      <option name="project" value="LOCAL" />
-      <updated>1652314054147</updated>
+      <workItem from="1652197800527" duration="52632000" />
     </task>
     <task id="LOCAL-00107" summary="Small bug fix">
       <created>1652314511514</created>
@@ -454,7 +415,42 @@
       <option name="project" value="LOCAL" />
       <updated>1652400488120</updated>
     </task>
-    <option name="localTasksCounter" value="151" />
+    <task id="LOCAL-00151" summary="CNC attack command fix">
+      <created>1652401427610</created>
+      <option name="number" value="00151" />
+      <option name="presentableId" value="LOCAL-00151" />
+      <option name="project" value="LOCAL" />
+      <updated>1652401427610</updated>
+    </task>
+    <task id="LOCAL-00152" summary="CNC attack command fix">
+      <created>1652401487001</created>
+      <option name="number" value="00152" />
+      <option name="presentableId" value="LOCAL-00152" />
+      <option name="project" value="LOCAL" />
+      <updated>1652401487001</updated>
+    </task>
+    <task id="LOCAL-00153" summary="CNC attack command fix">
+      <created>1652401595001</created>
+      <option name="number" value="00153" />
+      <option name="presentableId" value="LOCAL-00153" />
+      <option name="project" value="LOCAL" />
+      <updated>1652401595001</updated>
+    </task>
+    <task id="LOCAL-00154" summary="CNC attack command fix">
+      <created>1652401683633</created>
+      <option name="number" value="00154" />
+      <option name="presentableId" value="LOCAL-00154" />
+      <option name="project" value="LOCAL" />
+      <updated>1652401683633</updated>
+    </task>
+    <task id="LOCAL-00155" summary="CNC attack command fix">
+      <created>1652401691022</created>
+      <option name="number" value="00155" />
+      <option name="presentableId" value="LOCAL-00155" />
+      <option name="project" value="LOCAL" />
+      <updated>1652401691022</updated>
+    </task>
+    <option name="localTasksCounter" value="156" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -473,7 +469,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing rsc_check command" />
     <MESSAGE value="Adding database connection error checking for recruitment.py" />
     <MESSAGE value="Working on databases" />
     <MESSAGE value="Adding information command." />
@@ -498,7 +493,8 @@
     <MESSAGE value="Small bug fix" />
     <MESSAGE value="World Assembly notification system" />
     <MESSAGE value="CNC hotfixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="CNC hotfixes" />
+    <MESSAGE value="CNC attack command fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="CNC attack command fix" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
