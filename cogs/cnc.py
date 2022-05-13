@@ -1743,7 +1743,7 @@ class CNC(commands.Cog):
                     await ctx.send(f"{userinfo['username']} has reached its port building limit.")
                     return
                 if userinfo['focus'] == "e":
-                    pcost = 10000 * uniform(.89, .99)
+                    pcost = math.ceil(10000 * uniform(.89, .99))
                 if userinfo['resources'] < pcost:
                     difference = pcost - userinfo['resources']
                     await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a port."
@@ -1781,7 +1781,6 @@ class CNC(commands.Cog):
                     return
                 elif provinceinfo['terrain'] == 5:
                     await ctx.send("It is impossible to build a port on a mountain!")
-
                     return
                 else:
                     try:
@@ -1797,7 +1796,7 @@ class CNC(commands.Cog):
             if structure.lower() == 'fort':
                 fcost = 15000
                 if userinfo['focus'] == "s":
-                    fcost = 15000 * uniform(.89, .99)
+                    fcost = math.ceil(15000 * uniform(.89, .99))
                 if userinfo['resources'] < fcost:
                     difference = fcost - userinfo['resources']
                     await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a fort."
@@ -2575,7 +2574,7 @@ class CNC(commands.Cog):
 
             while True:
                 try:
-                    reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=mapcheck)
+                    reaction, user = await self.bot.wait_for('reaction_add', timeout=60, check=mapcheck)
                     # terrain map
                     if str(reaction.emoji) == "\U000026f0":
                         await map.clear_reactions()
