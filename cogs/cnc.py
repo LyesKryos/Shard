@@ -566,6 +566,7 @@ class CNC(commands.Cog):
                                    value=f"{userinfo['manpower']}/{userinfo['maxmanpower']}")
             cncuserembed.add_field(name="Manpower Increase", value=str(added_manpower))
             await author.send(embed=cncuserembed)
+            await ctx.send("Sent!")
         except Exception as error:
             self.bot.logger.warning(msg=error)
 
@@ -652,6 +653,7 @@ class CNC(commands.Cog):
                     lsve.add_field(name=f"**Province #{p}**",
                                    value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}")
                 await author.send(embed=lsve)
+                await ctx.send("Sent!")
         except Exception as error:
             self.bot.logger.warning(msg=error)
 
