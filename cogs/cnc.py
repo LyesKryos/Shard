@@ -2002,6 +2002,7 @@ class CNC(commands.Cog):
             targetinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', target)
             stationedinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''',
                                                 stationed)
+            defenderinfo = None
             if targetinfo['owner_id'] != 0:
                 defenderinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', targetinfo['owner_id'])
             # ensures valid conflict

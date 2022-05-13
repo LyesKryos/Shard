@@ -109,13 +109,6 @@
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
     </task>
-    <task id="LOCAL-00109" summary="Small bug fix">
-      <created>1652317576767</created>
-      <option name="number" value="00109" />
-      <option name="presentableId" value="LOCAL-00109" />
-      <option name="project" value="LOCAL" />
-      <updated>1652317576767</updated>
-    </task>
     <task id="LOCAL-00110" summary="Small bug fix">
       <created>1652317706189</created>
       <option name="number" value="00110" />
@@ -452,7 +445,14 @@
       <option name="project" value="LOCAL" />
       <updated>1652404155397</updated>
     </task>
-    <option name="localTasksCounter" value="158" />
+    <task id="LOCAL-00158" summary="CNC: wording and math presentation corrections">
+      <created>1652404553719</created>
+      <option name="number" value="00158" />
+      <option name="presentableId" value="LOCAL-00158" />
+      <option name="project" value="LOCAL" />
+      <updated>1652404553719</updated>
+    </task>
+    <option name="localTasksCounter" value="159" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
