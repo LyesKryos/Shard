@@ -2714,7 +2714,7 @@ class CNC(commands.Cog):
                     # numbers + terrain
                     if str(reaction.emoji) == "\U0001f5fa":
                         await map.clear_reactions()
-                        await map.edit(content="https://i.ibb.co/RC5yv5m/wargame-large.png")
+                        await map.edit(content="https://i.ibb.co/cTsg1x5/wargame-large.png")
                         for react in reactions:
                             await map.add_reaction(react)
                         continue
