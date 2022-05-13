@@ -25,122 +25,13 @@ class CNC(commands.Cog):
         self.map_directory = r"/root/Documents/Shard/CNC/Map Files"
         self.interaction_directory = r"/root/Documents/Shard/CNC/Interaction Files/"
         self.bot = bot
-        turn_run = False
-
-        async def cnc_turn_loop(bot):
-            try:
-                if self.turn_run:
-                    self.turn_run = False
-                    return
-                # channel to send to
-                cncchannel = bot.get_channel(927288304301387816)
-                # connects to the database
-                conn = bot.pool
-                # fetches all the users and makes a list
-                users = await conn.fetch('''SELECT user_id FROM cncusers;''')
-                userids = [ids['user_id'] for ids in users]
-                # for every user in the list
-                for u in userids:
-                    # fetch all provinces  owned by the user
-                    userinfo = await conn.fetchrow(
-                        '''SELECT * FROM cncusers WHERE user_id = $1;''', u)
-                    provinceslist = userinfo['provinces_owned']
-                    provinceslist.remove(0)
-                    added_resources = 0
-                    manpower_mod = .1
-                    if userinfo['focus'] == 'm':
-                        manpower_mod = .2
-                    max_manpower = 3000
-                    manpower = userinfo['manpower']
-                    # for every province, check the worth/manpower and add it to the overall amount
-                    for p in userinfo['provinces_owned']:
-                        provinceworth = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', p)
-                        added_resources += provinceworth['worth']
-                        # if there is a port, add 1/2 the province worth
-                        if provinceworth['port'] is True:
-                            added_resources += .5 * provinceworth['worth']
-                        # if there is a city, add 1000 to the resources
-                        if provinceworth['city'] is True:
-                            added_resources += 1000
-                        max_manpower += provinceworth['manpower']
-                    added_manpower = math.ceil(manpower + (max_manpower * manpower_mod))
-                    # ensure manpower limit
-                    if added_manpower > max_manpower:
-                        added_manpower = max_manpower
-                    # calculate and add all movement points, resources, manpower, and other limits
-                    # moves
-                    if len(provinceslist) <= 5:
-                        await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', 5,
-                                           userinfo['user_id'])
-                    elif len(provinceslist) > 5:
-                        movementpoints = math.floor((len(provinceslist) - 5) / 5) + 5
-                        if userinfo['focus'] == "s":
-                            movementpoints += math.ceil(movementpoints * .5)
-                        await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', movementpoints,
-                                           userinfo['user_id'])
-                    # fort/city/port limit update
-                    if len(provinceslist) <= 5:
-                        await conn.execute(
-                            '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;'''
-                            , [userinfo['citylimit'][0], 1], [userinfo['portlimit'][0], 1],
-                            [userinfo['fortlimit'][0], 1],
-                            userinfo['user_id'])
-                    elif len(provinceslist) > 5:
-                        fortlimit = math.floor((len(provinceslist) - 5) / 5) + 1
-                        portlimit = math.floor((len(provinceslist) - 5) / 3) + 1
-                        citylimit = math.floor((len(provinceslist) - 5) / 7) + 1
-                        if userinfo['focus'] == 's':
-                            fortlimit += fortlimit + 1
-                        if userinfo['focus'] == 'e':
-                            portlimit += portlimit + 1
-                        await conn.execute(
-                            '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;'''
-                            , [userinfo['citylimit'][0], citylimit], [userinfo['portlimit'][0], portlimit],
-                            [userinfo['fortlimit'][0], fortlimit],
-                            userinfo['user_id'])
-                    await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
-                                       (userinfo['resources'] + math.ceil(added_resources)), u)
-                    await conn.execute('''UPDATE cncusers SET maxmanpower = $1, manpower = $2 WHERE user_id = $3;''',
-                                       int(max_manpower), added_manpower, userinfo['user_id'])
-                # update turn and post message
-                turns = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
-                await conn.execute('''UPDATE cnc_data SET data_value = $2 WHERE data_name = $1;''', "turns",
-                                   str(int(turns['data_value']) + 1))
-                await cncchannel.send(f"New turn! It is now turn #{int(turns['data_value']) + 1}.")
-                self.turn_run = True
-                return
-            except Exception as error:
-                bot.logger.warning(msg=error)
-
-        async def turn_scheduler(bot):
-            await bot.wait_until_ready()
-            # fetches channel object
-            crashchannel = bot.get_channel(835579413625569322)
-            try:
-                # sets up asyncio scheduler
-                turnscheduler = AsyncIOScheduler()
-                eastern = timezone('US/Eastern')
-                # adds the job with cron designator
-                turnscheduler.add_job(cnc_turn_loop,
-                                         CronTrigger.from_crontab("0 */6 * * *", timezone=eastern),
-                                         args=(bot,),
-                                         id="turn")
-                # starts the schedule, fetches the job information, and sends the confirmation that it has begun
-                turnscheduler.start()
-                turnjob = turnscheduler.get_job("turn")
-                await crashchannel.send(f"CNC turn next run: {turnjob.next_run_time}")
-            except Exception as error:
-                await crashchannel.send(error)
-
-        loop = bot.loop
-        self.turn_loop = loop.create_task(turn_scheduler(bot))
 
     def cog_unload(self):
-        self.turn_loop.cancel()
+        self.turn_loop.stop()
+        self.turn_task.cancel()
 
-    resourcesleeping = False
+    turn_task = None
     banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2"]
-    turn_run = False
 
     async def cog_check(self, ctx):
         if ctx.author.id in [293518673417732098]:
@@ -3555,12 +3446,128 @@ class CNC(commands.Cog):
     @commands.command(brief="Displays the status of the CNC turn loop")
     @commands.is_owner()
     async def cnc_turn_status(self, ctx):
-        if self.turn_loop:
+        if self.turn_loop.is_running():
             await ctx.send("Turn loop running")
         else:
             await ctx.send("Turn loop not running.")
 
+    @tasks.loop(hours=6)
+    async def turn_loop(self):
+        try:
+            # channel to send to
+            cncchannel = self.bot.get_channel(835579413625569322)
+            # connects to the database
+            conn = self.bot.pool
+            # fetches all the users and makes a list
+            users = await conn.fetch('''SELECT user_id FROM cncusers;''')
+            userids = [ids['user_id'] for ids in users]
+            # for every user in the list
+            for u in userids:
+                # fetch all provinces  owned by the user
+                userinfo = await conn.fetchrow(
+                    '''SELECT * FROM cncusers WHERE user_id = $1;''', u)
+                provinceslist = userinfo['provinces_owned']
+                provinceslist.remove(0)
+                added_resources = 0
+                manpower_mod = .1
+                if userinfo['focus'] == 'm':
+                    manpower_mod = .2
+                max_manpower = 3000
+                manpower = userinfo['manpower']
+                # for every province, check the worth/manpower and add it to the overall amount
+                for p in userinfo['provinces_owned']:
+                    provinceworth = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', p)
+                    added_resources += provinceworth['worth']
+                    # if there is a port, add 1/2 the province worth
+                    if provinceworth['port'] is True:
+                        added_resources += .5 * provinceworth['worth']
+                    # if there is a city, add 1000 to the resources
+                    if provinceworth['city'] is True:
+                        added_resources += 1000
+                    max_manpower += provinceworth['manpower']
+                added_manpower = math.ceil(manpower + (max_manpower * manpower_mod))
+                # ensure manpower limit
+                if added_manpower > max_manpower:
+                    added_manpower = max_manpower
+                # calculate and add all movement points, resources, manpower, and other limits
+                # moves
+                if len(provinceslist) <= 5:
+                    await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', 5,
+                                       userinfo['user_id'])
+                elif len(provinceslist) > 5:
+                    movementpoints = math.floor((len(provinceslist) - 5) / 5) + 5
+                    if userinfo['focus'] == "s":
+                        movementpoints += math.ceil(movementpoints * .5)
+                    await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', movementpoints,
+                                       userinfo['user_id'])
+                # fort/city/port limit update
+                if len(provinceslist) <= 5:
+                    await conn.execute(
+                        '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;'''
+                        , [userinfo['citylimit'][0], 1], [userinfo['portlimit'][0], 1],
+                        [userinfo['fortlimit'][0], 1],
+                        userinfo['user_id'])
+                elif len(provinceslist) > 5:
+                    fortlimit = math.floor((len(provinceslist) - 5) / 5) + 1
+                    portlimit = math.floor((len(provinceslist) - 5) / 3) + 1
+                    citylimit = math.floor((len(provinceslist) - 5) / 7) + 1
+                    if userinfo['focus'] == 's':
+                        fortlimit += fortlimit + 1
+                    if userinfo['focus'] == 'e':
+                        portlimit += portlimit + 1
+                    await conn.execute(
+                        '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;'''
+                        , [userinfo['citylimit'][0], citylimit], [userinfo['portlimit'][0], portlimit],
+                        [userinfo['fortlimit'][0], fortlimit],
+                        userinfo['user_id'])
+                await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
+                                   (userinfo['resources'] + math.ceil(added_resources)), u)
+                await conn.execute('''UPDATE cncusers SET maxmanpower = $1, manpower = $2 WHERE user_id = $3;''',
+                                   int(max_manpower), added_manpower, userinfo['user_id'])
+            # update turn and post message
+            turns = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
+            await conn.execute('''UPDATE cnc_data SET data_value = $2 WHERE data_name = $1;''', "turns",
+                               str(int(turns['data_value']) + 1))
+            await cncchannel.send(f"New turn! It is now turn #{int(turns['data_value']) + 1}.")
+            return
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    async def cncstartloop(self):
+        await self.bot.wait_until_ready()
+        shardchannel = self.bot.get_channel(835579413625569322)
+        if self.turn_loop.is_running():
+            await shardchannel.send("Already running on_ready.")
+            return
+        eastern = timezone('US/Eastern')
+        now = datetime.datetime.now(eastern)
+        if now.time() < datetime.time(hour=0):
+            update = now.replace(hour=0, minute=0, second=0, microsecond=1)
+            await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await discord.utils.sleep_until(update)
+        elif now.time() < datetime.time(hour=6):
+            update = now.replace(hour=6, minute=0, second=0)
+            await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await discord.utils.sleep_until(update)
+        elif now.time() < datetime.time(hour=12):
+            update = now.replace(hour=12, minute=0, second=0)
+            await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await discord.utils.sleep_until(update)
+        elif now.time() < datetime.time(hour=18, minute=0):
+            update = now.replace(hour=18, minute=0, second=0)
+            await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await discord.utils.sleep_until(update)
+        elif now.time() > datetime.time(hour=18, minute=0):
+            update = now.replace(hour=0, minute=0, second=0)
+            update += datetime.timedelta(days=1)
+            await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await discord.utils.sleep_until(update)
+        self.turn_loop.start()
+
+
 
 def setup(bot: Shard):
     cog = CNC(bot)
+    loop = bot.loop
+    CNC.turn_task = loop.create_task(cog.cncstartloop())
     bot.add_cog(cog)
