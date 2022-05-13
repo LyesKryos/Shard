@@ -1,8 +1,6 @@
 import random
 import asyncpg
 import math
-import asyncio
-import psycopg2
 import discord.ext
 
 
