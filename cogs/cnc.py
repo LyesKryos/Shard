@@ -613,11 +613,15 @@ class CNC(commands.Cog):
                 if colorreply.content.lower() in colors:
                     await ctx.send("That color is already taken by another user. Please pick another color.")
                     return
+                try:
+                    ImageColor.getrgb(colorreply.content)
+                except ValueError:
+                    await ctx.send("That doesn't appear to be a valid hex color code.")
+                    return
                 # updates map with colors
                 user = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
                 for p in user['provinces_owned'][1:]:
                     cord = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-                    print(cord)
                     cord = (x, y) = (cord['cord'][0], cord['cord'][1])
                     await loop.run_in_executor(None, self.map_color, p, cord, colorreply.content)
                 await conn.execute('''UPDATE cncusers SET usercolor = $1 WHERE user_id = $2;''', colorreply.content,
