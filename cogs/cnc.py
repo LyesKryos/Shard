@@ -1689,11 +1689,11 @@ class CNC(commands.Cog):
                     return
                 # checks for enough manpower
                 elif manpower > userinfo['manpower']:
-                    await ctx.send(f"{userinfo['username']} does not have enough manpower to recruit {amount * 1000} troops"
+                    await ctx.send(f"{userinfo['username']} does not have enough manpower to recruit {amount} troops"
                                    f" for every province, lacking {-(userinfo['manpower'] - manpower)} manpower. ")
                     return
                 await conn.execute('''UPDATE cncusers SET totaltroops = $1, manpower= $2 WHERE user_id = $3;''',
-                                   userinfo['totaltroops'] + (amount * 1000), userinfo['manpower'] - manpower, author.id)
+                                   userinfo['totaltroops'] + (amount), userinfo['manpower'] - manpower, author.id)
                 for p in provincelist:
                     troops = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', p)
                     await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''', (troops['troops'] + amount),
