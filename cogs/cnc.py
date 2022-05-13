@@ -565,8 +565,8 @@ class CNC(commands.Cog):
             cncuserembed.add_field(name="Manpower/Manpower Limit",
                                    value=f"{userinfo['manpower']}/{userinfo['maxmanpower']}")
             cncuserembed.add_field(name="Manpower Increase", value=str(added_manpower))
-            await author.send(embed=cncuserembed)
             await ctx.send("Sent!")
+            await author.send(embed=cncuserembed)
         except Exception as error:
             self.bot.logger.warning(msg=error)
 
