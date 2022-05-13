@@ -41,7 +41,7 @@ class Recruitment(commands.Cog):
             except Exception as error:
                 await crashchannel.send(error)
 
-        async def monthly_recruiter(bot: Shard):
+        async def monthly_recruiter(bot):
             await bot.wait_until_ready()
             # connects to database
             conn = bot.pool
