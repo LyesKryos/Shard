@@ -1665,7 +1665,7 @@ class CNC(commands.Cog):
             elif userinfo['resources'] < cost:
                 difference = cost - userinfo['resources']
                 await ctx.send(
-                    f"{userinfo['username']} possesses {difference} fewer credit resources than needed to buy a province.")
+                    f"{userinfo['username']} possesses {math.ceil(difference)} fewer credit resources than needed to buy a province.")
                 return
             # ensures that the user has less than 3 provinces
             elif len(userinfo['provinces_owned']) >= 4:
@@ -1747,7 +1747,7 @@ class CNC(commands.Cog):
                 if userinfo['resources'] < pcost:
                     difference = pcost - userinfo['resources']
                     await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a port."
-                                   f"\n**Resource Deficit:** \u03FE{difference}")
+                                   f"\n**Resource Deficit:** \u03FE{math.ceil(difference)}")
                     return
                 elif provinceinfo['port'] is True:
                     await ctx.send(f"Province #{provinceid} already has a port constructed!")
@@ -1771,7 +1771,7 @@ class CNC(commands.Cog):
                 if userinfo['resources'] < ccost:
                     difference = ccost - userinfo['resources']
                     await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a city."
-                                   f"\n**Resource Deficit:** \u03FE{difference}")
+                                   f"\n**Resource Deficit:** \u03FE{math.ceil(difference)}")
                     return
                 elif userinfo['citylimit'][0] == userinfo['citylimit'][1]:
                     await ctx.send(f"{userinfo['username']} has reached its city building limit.")
@@ -1801,7 +1801,7 @@ class CNC(commands.Cog):
                 if userinfo['resources'] < fcost:
                     difference = fcost - userinfo['resources']
                     await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a fort."
-                                   f"\n**Resource Deficit:** \u03FE{difference}")
+                                   f"\n**Resource Deficit:** \u03FE{math.ceil(difference)}")
                     return
                 elif userinfo['fortlimit'][0] == userinfo['fortlimit'][1]:
                     await ctx.send(f"{userinfo['username']} has reached its fort building limit.")
@@ -2582,12 +2582,14 @@ class CNC(commands.Cog):
                         await map.edit(content="https://i.ibb.co/pXg4Fj1/wargame.png")
                         for react in reactions:
                             await map.add_reaction(react)
+                        continue
                     # numbers + terrain
                     if str(reaction.emoji) == "\U0001f5fa":
                         await map.clear_reactions()
                         await map.edit(content="https://i.ibb.co/cTsg1x5/wargame-large.png")
                         for react in reactions:
                             await map.add_reaction(react)
+                        continue
                     # numbers + nations
                     if str(reaction.emoji) == "\U0001f3f3":
                         await map.clear_reactions()
@@ -2612,6 +2614,7 @@ class CNC(commands.Cog):
                                     f"Image compiled = {image - initiate}\nStarted upload = {upload_initate - initiate}\nUpload Complete = {upload_complete - initiate}")
                         for react in reactions:
                             await map.add_reaction(react)
+                            continue
                     # close
                     if str(reaction.emoji) == "\U0000274c":
                         await map.clear_reactions()
