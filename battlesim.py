@@ -26,7 +26,11 @@ class calculations:
         self.maxcas = 0
 
         # creates connection pool
-        self.pool: asyncpg.pool = ctx.bot.pool
+        try:
+            self.pool: asyncpg.pool = ctx.bot.pool
+        except Exception as error:
+            print("broke at battlesim's pool")
+
 
 
     async def ArmyDifference(self):
