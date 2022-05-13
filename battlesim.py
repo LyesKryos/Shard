@@ -1,7 +1,6 @@
 import random
 import asyncpg
 import math
-import discord.ext
 
 
 class calculations:
