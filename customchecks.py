@@ -6,10 +6,6 @@ class SilentFail(commands.CommandError):
     pass
 
 
-class WrongInput(commands.CommandInvokeError):
-    pass
-
-
 class CNCFail(commands.CheckFailure):
     pass
 
@@ -79,3 +75,6 @@ def CurrencyCheck():
             raise CurrencyFail("This server is not registered for that command.")
 
     return commands.check(currency)
+
+class WrongInput(commands.CommandInvokeError):
+    pass
