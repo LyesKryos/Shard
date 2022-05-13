@@ -732,3 +732,71 @@ asyncio.exceptions.CancelledError
 2022-03-13 11:25:58 ERROR: _GatheringFuture exception was never retrieved
 future: <_GatheringFuture finished exception=CancelledError()>
 asyncio.exceptions.CancelledError
+2022-05-11 07:20:33,442 WARNING: 
+2022-05-11 10:03:17,388 WARNING: relation "mod_logs" does not exist
+2022-05-11 10:10:15,598 WARNING: column "action_date" does not exist
+HINT:  Perhaps you meant to reference the column "blacklist.actiondate".
+2022-05-11 10:11:46,672 WARNING: 'NoneType' object has no attribute 'day'
+2022-05-11 10:22:52,225 WARNING: 'NoneType' object has no attribute 'day'
+2022-05-11 10:23:04,888 WARNING: 'NoneType' object has no attribute 'day'
+2022-05-12 11:02:43,365 WARNING: 'Message' object has no attribute 'reaction_add'
+2022-05-12 12:14:32,329 WARNING: 'NoneType' object has no attribute 'lower'
+2022-05-12 12:34:23,694 WARNING: That is not a valid focus. Please use only m, e, or d.
+2022-05-12 12:59:58,875 WARNING: That is not a valid focus. Please use only m, e, or d.
+2022-05-12 13:01:17,281 WARNING: That is not a valid focus. Please use only m, e, or d.
+2022-05-12 13:01:30,922 WARNING: That is not a valid focus. Please use only m, e, or d.
+2022-05-12 13:04:01,168 WARNING: invalid input for query argument $4: 637939981691912202 (expected str, got int)
+2022-05-12 13:18:35,798 WARNING: password authentication failed for user "postgres"
+2022-05-12 13:20:10,682 WARNING: password authentication failed for user "postgres"
+2022-05-12 14:35:18,059 WARNING: password authentication failed for user "postgres"
+2022-05-12 14:38:04,419 WARNING: password authentication failed for user "postgres"
+2022-05-12 14:41:10,533 WARNING: password authentication failed for user "postgres"
+2022-05-12 14:45:12,367 WARNING: password authentication failed for user "postgres"
+2022-05-12 14:49:42,171 WARNING: password authentication failed for user "postgres"
+2022-05-12 15:36:28,425 WARNING: 
+2022-05-12 15:37:43,027 WARNING: 
+2022-05-12 15:38:31,039 WARNING: 
+2022-05-12 15:40:14,441 WARNING: list index out of range
+2022-05-12 15:41:21,939 WARNING: 
+2022-05-12 15:42:10,896 WARNING: 
+2022-05-12 16:02:36,252 WARNING: password authentication failed for user "postgres"
+2022-05-12 16:03:28,669 WARNING: password authentication failed for user "postgres"
+2022-05-12 16:04:09,040 WARNING: relation "terrains" does not exist
+2022-05-12 17:02:15,939 WARNING: relation "terrains" does not exist
+2022-05-12 17:04:15,728 WARNING: This event loop is already running
+2022-05-12 17:05:57,370 WARNING: 'NoneType' object is not subscriptable
+2022-05-12 17:06:20,621 WARNING: This event loop is already running
+2022-05-12 17:06:49,785 WARNING: 'NoneType' object is not subscriptable
+2022-05-12 17:06:56,117 WARNING: 'NoneType' object is not subscriptable
+2022-05-12 17:07:39,710 WARNING: 'NoneType' object is not subscriptable
+2022-05-12 17:16:27,213 WARNING: This event loop is already running
+2022-05-12 17:18:51,573 WARNING: This event loop is already running
+2022-05-12 17:18:51,573 WARNING: This event loop is already running
+2022-05-12 17:20:11,210 WARNING: This event loop is already running
+2022-05-12 17:20:11,210 WARNING: This event loop is already running
+2022-05-12 17:30:53,676 WARNING: a coroutine was expected, got <asyncpg.pool.Pool object at 0xffff98251380>
+2022-05-12 18:14:15,437 WARNING: 
+2022-05-12 20:09:00,646 WARNING: pool is not initialized
+2022-05-12 20:25:24,367 WARNING: 'module' object is not callable
+2022-05-12 20:27:21,047 WARNING: 'module' object is not callable
+2022-05-12 20:28:50,299 WARNING: 'module' object is not callable
+2022-05-12 20:31:49,777 WARNING: local variable 'defenderinfo' referenced before assignment
+2022-05-12 20:58:35,613 WARNING: That is not a valid focus. Please use only m, e, or s.
+2022-05-12 21:13:51,491 WARNING: local variable 'defenderinfo' referenced before assignment
+2022-05-12 21:27:16,253 WARNING: 'NoneType' object is not subscriptable
+2022-05-13 01:48:35,673 WARNING: 
+2022-05-13 04:56:37,718 WARNING: [Errno 5] Input/output error
+2022-05-13 04:57:20,594 WARNING: [Errno 5] Input/output error
+2022-05-13 05:01:49,078 WARNING: invalid literal for int() with base 16: 'blue'
+2022-05-13 05:04:06,556 WARNING: invalid literal for int() with base 16: 'blue'
+2022-05-13 05:05:30,097 WARNING: 'Message' object has no attribute 'reaction_add'
+2022-05-13 05:06:21,163 WARNING: invalid literal for int() with base 16: 'blue'
+2022-05-13 05:27:52,567 WARNING: invalid literal for int() with base 16: 'blue'
+2022-05-13 05:28:11,092 WARNING: invalid literal for int() with base 16: 'blue'
+2022-05-13 07:19:35,522 WARNING: column "mod" of relation "mod_logs" does not exist
+2022-05-13 07:32:31,119 WARNING: [Errno 5] Input/output error
+2022-05-13 07:35:04,582 WARNING: [Errno 5] Input/output error
+2022-05-13 08:31:52,225 WARNING: [Errno 5] Input/output error
+2022-05-13 09:12:19,236 WARNING: 403 Forbidden (error code: 50003): Cannot execute action on a DM channel
+2022-05-13 11:17:06,143 WARNING: [Errno 5] Input/output error
+2022-05-13 11:43:53,940 WARNING: [Errno 2] No such file or directory: '/root/Documents/Shard/CNC/Map Files/Province Layers/253.png'
