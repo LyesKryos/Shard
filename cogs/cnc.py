@@ -78,8 +78,6 @@ class CNC(commands.Cog):
             else:
                 return True
 
-
-
     def map_color(self, province, province_cord, hexcode, release: bool = False):
         province_cord = ((int(province_cord[0])), (int(province_cord[1])))
         color = ImageColor.getrgb(hexcode)
@@ -123,15 +121,16 @@ class CNC(commands.Cog):
             infoembed = discord.Embed(title="Command And Conquest System", color=discord.Color.dark_red(),
                                       description="This is the condensed information about the CNC system. For more information, "
                                                   "including commands, see the CNC Dispatch here: https://www.nationstates.net/page=dispatch/id=1641083")
-            infoembed.add_field(name="About", value="The Command and Conquest system is a simulated battle royale between "
-                                                    "the various nations of Thegye. It is non-roleplay and is meant to be "
-                                                    "an entertaining strategy game. The system makes used of combat "
-                                                    "between armies, international relationships and intrigue, "
-                                                    "resources, and more to bring players a fun and immersive experience. "
-                                                    "The system is hosted on Shard, a purpose-built bot. For more "
-                                                    "information about the Command and Conquer system, make sure to check "
-                                                    "out the dispatch and use the command "
-                                                    f" `{self.bot.command_prefix}help CNC`.", inline=False)
+            infoembed.add_field(name="About",
+                                value="The Command and Conquest system is a simulated battle royale between "
+                                      "the various nations of Thegye. It is non-roleplay and is meant to be "
+                                      "an entertaining strategy game. The system makes used of combat "
+                                      "between armies, international relationships and intrigue, "
+                                      "resources, and more to bring players a fun and immersive experience. "
+                                      "The system is hosted on Shard, a purpose-built bot. For more "
+                                      "information about the Command and Conquer system, make sure to check "
+                                      "out the dispatch and use the command "
+                                      f" `{self.bot.command_prefix}help CNC`.", inline=False)
             infoembed.add_field(name="Turns", value=f"It is currently turn {int(data['data_value'])}.")
             infoembed.add_field(name="Questions?",
                                 value="Contact the creator: Lies Kryos#1734\nContact a moderator: [Insert_Person_Here]#6003")
@@ -302,7 +301,7 @@ class CNC(commands.Cog):
                 cncuserembed.add_field(name="Alliances", value=alliances)
                 cncuserembed.add_field(name="Wars", value=wars)
                 await ctx.send(embed=cncuserembed)
-    
+
             else:
                 registeredusers = await conn.fetch('''SELECT username FROM cncusers;''')
                 registeredlist = list()
@@ -314,7 +313,8 @@ class CNC(commands.Cog):
                     await ctx.send(f"{nationname} does not appear to be registered.")
                     return
                 # pulls the specified nation data
-                nation = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
+                nation = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
+                                             nationname.lower())
                 # sets the color properly
                 if nation["usercolor"] == "":
                     color = discord.Color.random()
@@ -614,10 +614,10 @@ class CNC(commands.Cog):
             # if the color is being edited
             if editing.lower() == "color":
                 await ctx.send("What would you like your new color to be?")
-    
+
                 def authorcheck(message):
                     return ctx.author == message.author and ctx.channel == message.channel
-    
+
                 # waits for a reply
                 try:
                     colorreply = await self.bot.wait_for('message', check=authorcheck, timeout=60)
@@ -651,10 +651,10 @@ class CNC(commands.Cog):
             # if the focus is being edited
             if editing.lower() == "focus":
                 await ctx.send("What would you like your new nation focus to be?")
-    
+
                 def authorcheck(message):
                     return ctx.author == message.author and ctx.channel == message.channel
-    
+
                 # wait for a reply
                 try:
                     focusreply = await self.bot.wait_for('message', check=authorcheck, timeout=60)
@@ -805,10 +805,11 @@ class CNC(commands.Cog):
                                    provinceid, troops)
                 await conn.execute('''UPDATE cncusers SET undeployed = $1, provinces_owned = $2 WHERE user_id = $3;''',
                                    (userinfo['undeployed'] + provinceinfo['troops']), ownedlist, author.id)
-                await ctx.send(f"Province #{provinceid} has been released. Natives have retaken control of the province.")
+                await ctx.send(
+                    f"Province #{provinceid} has been released. Natives have retaken control of the province.")
                 color = await conn.fetchrow('''SELECT color FROM terrains WHERE id = $1;''', provinceinfo['terrain'])
                 await loop.run_in_executor(None, self.map_color, provinceid, provinceinfo['cord'][0:2], color['color'],
-                                           True)    
+                                           True)
             except Exception as error:
                 self.bot.logger.warning(msg=error)
                 await ctx.send(error)
@@ -847,7 +848,8 @@ class CNC(commands.Cog):
             userundeployed = userinfo['undeployed']
             # ensures location ownership
             if location not in userprovinces:
-                await ctx.send(f"{userinfo['username']} does not own Province #{location} and cannot deploy troops there.")
+                await ctx.send(
+                    f"{userinfo['username']} does not own Province #{location} and cannot deploy troops there.")
                 return
             # ensures troop sufficiency
             elif amount > userundeployed:
@@ -1022,7 +1024,8 @@ class CNC(commands.Cog):
             conn = self.bot.pool
             if interaction == "accept" or interaction == "reject":
                 # fetches interaction information
-                pending_int = await conn.fetchrow('''SELECT * FROM pending_interactions WHERE id = $1;''', interactionid)
+                pending_int = await conn.fetchrow('''SELECT * FROM pending_interactions WHERE id = $1;''',
+                                                  interactionid)
                 # checks for existence
                 if pending_int is None:
                     await ctx.send("No such pending interaction.")
@@ -1041,7 +1044,8 @@ class CNC(commands.Cog):
                         await conn.execute('''DELETE FROM pending_interactions WHERE id = $1;''', interactionid)
                         # if a peace treaty, cancel war
                         if pending_int['type'] == 'peace':
-                            await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''', interactionid)
+                            await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''',
+                                               interactionid)
                             await conn.execute(
                                 '''UPDATE interactions SET active = False WHERE type = 'war' AND sender = $1 AND recipient = $2;''',
                                 pending_int['sender'], pending_int['recipient'])
@@ -1062,8 +1066,9 @@ class CNC(commands.Cog):
                             file.write(interaction_text.rstrip('\r\n') + '\n' + oldcontent)
                         # get user object and send message
                         sender = self.bot.get_user(pending_int['sender_id'])
-                        await sender.send(f"{pending_int['recipient']} has accepted your offer of {pending_int['type']}. "
-                                          f"To view this, use `$cnc_view_interaction {interactionid}`.")
+                        await sender.send(
+                            f"{pending_int['recipient']} has accepted your offer of {pending_int['type']}. "
+                            f"To view this, use `$cnc_view_interaction {interactionid}`.")
                         await ctx.send("Accepted.")
                     except Exception as error:
                         self.bot.logger.warning(msg=error)
@@ -1076,7 +1081,8 @@ class CNC(commands.Cog):
                         # remove pending interaction
                         await conn.execute('''DELETE FROM pending_interactions WHERE id = $1;''', interactionid)
                         sender = self.bot.get_user(pending_int['sender_id'])
-                        await sender.send(f"{pending_int['recipient']} has rejected your offer of {pending_int['type']}.")
+                        await sender.send(
+                            f"{pending_int['recipient']} has rejected your offer of {pending_int['type']}.")
                         await ctx.send("Rejected.")
                     except Exception as error:
                         self.bot.logger.warning(msg=error)
@@ -1177,12 +1183,14 @@ class CNC(commands.Cog):
                 await ctx.send(f"`{rrecipient}` not registered.")
                 return
             # checks for existing active alliance
-            interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'alliance' AND active = True AND sender_id = $1;''',
-                                            author.id)
+            interactions = await conn.fetch(
+                '''SELECT * FROM interactions WHERE type = 'alliance' AND active = True AND sender_id = $1;''',
+                author.id)
             for inter in interactions:
-                if (inter['recipient'].lower() == rrecipient.lower() and inter['sender_id'] == author.id) or (inter['recipient_id'] == author.id and inter['sender'] == rrecipient.lower()):
+                if (inter['recipient'].lower() == rrecipient.lower() and inter['sender_id'] == author.id) or (
+                        inter['recipient_id'] == author.id and inter['sender'] == rrecipient.lower()):
                     await ctx.send(
-                    f"An alliance with `{rrecipient}` already exists. To view, use $cnc_view_interaction {inter['id']}")
+                        f"An alliance with `{rrecipient}` already exists. To view, use $cnc_view_interaction {inter['id']}")
                     return
             # fetches user information
             userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
@@ -1250,10 +1258,13 @@ class CNC(commands.Cog):
                 await ctx.send(f"`{rrecipient}` not registered.")
                 return
             # ensures prior peace
-            interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'war' AND active = True AND sender_id = $1;''', author.id)
+            interactions = await conn.fetch(
+                '''SELECT * FROM interactions WHERE type = 'war' AND active = True AND sender_id = $1;''', author.id)
             for inter in interactions:
-                if (inter['recipient'].lower() == rrecipient.lower() and inter['sender_id'] == author.id) or (inter['recipient_id'] == author.id and inter['sender'] == rrecipient.lower()):
-                    await ctx.send(f"A war with `{rrecipient}` already exists. To view, use `$cnc_view_interaction {inter['id']}`")
+                if (inter['recipient'].lower() == rrecipient.lower() and inter['sender_id'] == author.id) or (
+                        inter['recipient_id'] == author.id and inter['sender'] == rrecipient.lower()):
+                    await ctx.send(
+                        f"A war with `{rrecipient}` already exists. To view, use `$cnc_view_interaction {inter['id']}`")
                     return
             # fetches user information
             userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
@@ -1270,10 +1281,12 @@ class CNC(commands.Cog):
                 await ctx.send("You cannot declare war on yourself.")
                 return
             # ensures no alliance
-            alliance = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 AND nation = $2;''', sender,
+            alliance = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 AND nation = $2;''',
+                                           sender,
                                            recipient)
             if alliance['relation'] == 'war':
-                await ctx.send(f"It is not possible to declare war on {recipient} when you are already at war with them!")
+                await ctx.send(
+                    f"It is not possible to declare war on {recipient} when you are already at war with them!")
                 return
             elif alliance['relation'] != 'peace':
                 await ctx.send(f"It is not possible to declare war on {recipient} when you have an alliance with them!")
@@ -1289,7 +1302,8 @@ class CNC(commands.Cog):
                                    recipient,
                                    recipient_id, terms, True)
                 # updates relations
-                await conn.execute('''UPDATE relations SET relation = 'war' WHERE name = $1 AND nation = $2;''', recipient,
+                await conn.execute('''UPDATE relations SET relation = 'war' WHERE name = $1 AND nation = $2;''',
+                                   recipient,
                                    sender)
                 await conn.execute('''UPDATE relations SET relation = 'war' WHERE name = $1 AND nation = $2;''', sender,
                                    recipient)
@@ -1500,7 +1514,8 @@ class CNC(commands.Cog):
                 if nationname.lower() not in registeredlist:
                     await ctx.send(f"{nationname} does not appear to be registered.")
                 # fetches specified nation data
-                userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1''', nationname.lower())
+                userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1''',
+                                               nationname.lower())
                 # creates a list of provinces  owned
                 ownedprovinces = [p for p in userinfo['provinces_owned']]
                 ownedprovinces.remove(0)
@@ -1597,11 +1612,13 @@ class CNC(commands.Cog):
             # updates all province and user information
             try:
                 await conn.execute('''UPDATE cncusers SET totaltroops = $1, manpower= $2 WHERE user_id = $3;''',
-                                   userinfo['totaltroops'] + (ramount * 1000), userinfo['manpower'] - manpower, author.id)
+                                   userinfo['totaltroops'] + (ramount * 1000), userinfo['manpower'] - manpower,
+                                   author.id)
                 troops = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', location)
                 await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                    (troops['troops'] + (ramount * 1000)), location)
-                await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''', (monies - cost), author.id)
+                await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''', (monies - cost),
+                                   author.id)
                 await ctx.send(f"{nationname} has successfully deployed {ramount * 1000} to Province #{location}.")
             except Exception as error:
                 self.bot.logger.warning(msg=error)
@@ -1627,11 +1644,12 @@ class CNC(commands.Cog):
                 return
             try:
                 userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-                provinces = await conn.fetchrow('''SELECT provinces_owned FROM cncusers WHERE user_id = $1;''', author.id)
+                provinces = await conn.fetchrow('''SELECT provinces_owned FROM cncusers WHERE user_id = $1;''',
+                                                author.id)
                 provincelist = provinces['provinces_owned']
                 provincelist.remove(0)
                 amount *= 1000
-                manpower = (amount ) * len(provincelist)
+                manpower = (amount) * len(provincelist)
                 cost = (amount) * len(provincelist)
                 # checks if the focus is military
                 if userinfo['focus'] == "m":
@@ -1651,7 +1669,8 @@ class CNC(commands.Cog):
                                    userinfo['totaltroops'] + (amount), userinfo['manpower'] - manpower, author.id)
                 for p in provincelist:
                     troops = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', p)
-                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''', (troops['troops'] + amount),
+                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                       (troops['troops'] + amount),
                                        p)
                 await ctx.send(
                     f"{userinfo['username']} has succssfully deployed {amount} troops to all {len(provincelist)} provinces.")
@@ -1692,7 +1711,8 @@ class CNC(commands.Cog):
             if amount > userinfo['resources']:
                 await ctx.send(f"{userinfo['username']} does not have \u03FE{amount}!")
             # fetches recipient info
-            recipientinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', recipient.lower())
+            recipientinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
+                                                recipient.lower())
             # subtract resource amount and transfer to recipient
             await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
                                (userinfo['resources'] - amount), author.id)
@@ -1847,7 +1867,8 @@ class CNC(commands.Cog):
                         await conn.execute('''UPDATE provinces  SET port = TRUE WHERE id = $1;''', provinceid)
                         await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
                                            (userinfo['resources'] - pcost), author.id)
-                        await ctx.send(f"{userinfo['username']} successfully constructed a port in province #{provinceid}.")
+                        await ctx.send(
+                            f"{userinfo['username']} successfully constructed a port in province #{provinceid}.")
                         return
                     except Exception as error:
                         await ctx.send(f"{error} at build_port.")
@@ -1874,7 +1895,8 @@ class CNC(commands.Cog):
                         await conn.execute('''UPDATE provinces  SET city = TRUE WHERE id = $1;''', provinceid)
                         await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
                                            (userinfo['resources'] - ccost), author.id)
-                        await ctx.send(f"{userinfo['username']} successfully constructed a city in province #{provinceid}.")
+                        await ctx.send(
+                            f"{userinfo['username']} successfully constructed a city in province #{provinceid}.")
                         return
                     except Exception as error:
                         await ctx.send(f"{error} at build_city.")
@@ -1905,7 +1927,8 @@ class CNC(commands.Cog):
                         await conn.execute('''UPDATE provinces  SET fort = TRUE WHERE id = $1;''', provinceid)
                         await conn.execute('''UPDATE cncusers SET resources = $1, fortlimit = $2 WHERE user_id = $3;''',
                                            (userinfo['resources'] - fcost), newfortlimit, author.id)
-                        await ctx.send(f"{userinfo['username']} successfully constructed a fort in province #{provinceid}.")
+                        await ctx.send(
+                            f"{userinfo['username']} successfully constructed a fort in province #{provinceid}.")
                         return
                     except Exception as error:
                         await ctx.send(f"{error} at build_fort.")
@@ -2023,7 +2046,8 @@ class CNC(commands.Cog):
                 await ctx.send(f"Province #{stationed} does not contain {amount} troops!")
                 return
             try:
-                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''', (targetinfo['troops'] + amount),
+                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                   (targetinfo['troops'] + amount),
                                    target)
                 await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                    (stationedinfo['troops'] - amount),
@@ -2086,7 +2110,8 @@ class CNC(commands.Cog):
             stationedinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''',
                                                 stationed)
             if targetinfo['owner_id'] != 0:
-                defenderinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', targetinfo['owner_id'])
+                defenderinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
+                                                   targetinfo['owner_id'])
             # ensures valid conflict
             if targetinfo['owner_id'] != 0:
                 war = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 and nation = $2;''',
@@ -2111,8 +2136,9 @@ class CNC(commands.Cog):
                 if userinfo['focus'] == 'm':
                     crossingfee = math.ceil(force * .40)
                 if crossingfee > userinfo['resources']:
-                    await ctx.send(f"{userinfo['username']} does not have enough resources to cross with {force} troops!\n"
-                                   f"**Resources Required:** \u03FE{math.ceil(force * .05)}")
+                    await ctx.send(
+                        f"{userinfo['username']} does not have enough resources to cross with {force} troops!\n"
+                        f"**Resources Required:** \u03FE{math.ceil(force * .05)}")
                     return
                 if stationedinfo['port'] is True:
                     crossingfee *= .5
@@ -2154,7 +2180,8 @@ class CNC(commands.Cog):
                     await ctx.send(
                         f"Province #{target} is undefended! It has been overrun by {userinfo['username']} with {force}"
                         f" troops, seizing the province from {owner}!")
-                    await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2], userinfo['usercolor'])
+                    await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
+                                               userinfo['usercolor'])
                     self.map_color(target, targetinfo['cord'][0:2], userinfo['usercolor'])
                     return
                 except Exception as error:
@@ -2253,8 +2280,10 @@ class CNC(commands.Cog):
                                 battleembed.add_field(name="Defending Force", value=defending_troops)
                                 battleembed.add_field(name="Terrain", value="River")
                                 battleembed.add_field(name="Outcome", value=victor, inline=False)
-                                battleembed.add_field(name="Attacking Casualties", value=str(battle.AttackingCasualties))
-                                battleembed.add_field(name="Defending Casualties", value=str(battle.DefendingCasualties))
+                                battleembed.add_field(name="Attacking Casualties",
+                                                      value=str(battle.AttackingCasualties))
+                                battleembed.add_field(name="Defending Casualties",
+                                                      value=str(battle.DefendingCasualties))
                                 battleembed.add_field(name="Crossing Fee", value=str(crossingfee), inline=False)
                                 battleembed.add_field(name="Remaining Attacking Force",
                                                       value=str(battle.RemainingAttackingArmy))
@@ -2272,8 +2301,9 @@ class CNC(commands.Cog):
                         # default result is retreat on the timeout error
                         except asyncio.TimeoutError:
                             await battlenotif.clear_reactions()
-                            battleembed.set_footer(text=f"The attacker retreated from the ford and the province has been "
-                                                        f"returned to the control of {owner}.")
+                            battleembed.set_footer(
+                                text=f"The attacker retreated from the ford and the province has been "
+                                     f"returned to the control of {owner}.")
                             await battlenotif.edit(embed=battleembed)
                             return
                 if advance is True:
@@ -2336,8 +2366,10 @@ class CNC(commands.Cog):
                                 battleembed.add_field(name="Defending Force", value=defending_troops)
                                 battleembed.add_field(name="Terrain", value="Fort")
                                 battleembed.add_field(name="Outcome", value=victor, inline=False)
-                                battleembed.add_field(name="Attacking Casualties", value=str(battle.AttackingCasualties))
-                                battleembed.add_field(name="Defending Casualties", value=str(battle.DefendingCasualties))
+                                battleembed.add_field(name="Attacking Casualties",
+                                                      value=str(battle.AttackingCasualties))
+                                battleembed.add_field(name="Defending Casualties",
+                                                      value=str(battle.DefendingCasualties))
                                 battleembed.add_field(name="Crossing Fee", value=str(crossingfee), inline=False)
                                 battleembed.add_field(name="Remaining Attacking Force",
                                                       value=str(battle.RemainingAttackingArmy))
@@ -2347,16 +2379,18 @@ class CNC(commands.Cog):
                             # if the reaction is retreat, the attack does not continue
                             if str(reaction.emoji) == "\U0001f3f3":
                                 await battlenotif.clear_reactions()
-                                battleembed.set_footer(text=f"The attacker retreated from the fort and the province has "
-                                                            f"been returned to the control of {owner}.")
+                                battleembed.set_footer(
+                                    text=f"The attacker retreated from the fort and the province has "
+                                         f"been returned to the control of {owner}.")
                                 await battlenotif.edit(embed=battleembed)
 
                                 return
                         # default result is retreat on the timeout error
                         except asyncio.TimeoutError:
                             await battlenotif.clear_reactions()
-                            battleembed.set_footer(text=f"The attacker retreated from the fort and the province has been "
-                                                        f"returned to the control of {owner}.")
+                            battleembed.set_footer(
+                                text=f"The attacker retreated from the fort and the province has been "
+                                     f"returned to the control of {owner}.")
                             await battlenotif.edit(embed=battleembed)
                             return
                 if advance is True:
@@ -2419,8 +2453,10 @@ class CNC(commands.Cog):
                                 battleembed.add_field(name="Defending Force", value=defending_troops)
                                 battleembed.add_field(name="Terrain", value="City")
                                 battleembed.add_field(name="Outcome", value=victor, inline=False)
-                                battleembed.add_field(name="Attacking Casualties", value=str(battle.AttackingCasualties))
-                                battleembed.add_field(name="Defending Casualties", value=str(battle.DefendingCasualties))
+                                battleembed.add_field(name="Attacking Casualties",
+                                                      value=str(battle.AttackingCasualties))
+                                battleembed.add_field(name="Defending Casualties",
+                                                      value=str(battle.DefendingCasualties))
                                 battleembed.add_field(name="Crossing Fee", value=str(crossingfee), inline=False)
                                 battleembed.add_field(name="Remaining Attacking Force",
                                                       value=str(battle.RemainingAttackingArmy))
@@ -2439,8 +2475,9 @@ class CNC(commands.Cog):
                         # default result is retreat on the timeout error
                         except asyncio.TimeoutError:
                             await battlenotif.clear_reactions()
-                            battleembed.set_footer(text=f"The attacker retreated from the city and the province has been "
-                                                        f"returned to the control of {owner}.")
+                            battleembed.set_footer(
+                                text=f"The attacker retreated from the city and the province has been "
+                                     f"returned to the control of {owner}.")
                             await battlenotif.edit(embed=battleembed)
                             return
                 # if the attackers are victorious in all battles, force the defenders to retreat
@@ -2622,9 +2659,10 @@ class CNC(commands.Cog):
                             return
                     try:
                         # updates the relevant information and sends the embed
-                        await conn.execute('''UPDATE cncusers SET totaltroops = $1, resources = $2 WHERE user_id = $3;''',
-                                           (userinfo['totaltroops'] - battle.AttackingCasualties),
-                                           (userinfo['resources'] - crossingfee), author.id)
+                        await conn.execute(
+                            '''UPDATE cncusers SET totaltroops = $1, resources = $2 WHERE user_id = $3;''',
+                            (userinfo['totaltroops'] - battle.AttackingCasualties),
+                            (userinfo['resources'] - crossingfee), author.id)
                         await conn.execute('''UPDATE cncusers SET totaltroops = $1 WHERE user_id = $2;''',
                                            (defenderinfo['totaltroops'] - battle.DefendingCasualties),
                                            defenderinfo['user_id'])
@@ -2645,7 +2683,6 @@ class CNC(commands.Cog):
         except Exception as error:
             self.bot.logger.warning(msg=error)
             await ctx.send(error)
-
 
     # ------------------Map Commands----------------------------
 
@@ -2732,15 +2769,25 @@ class CNC(commands.Cog):
             for p in province_ids:
                 terrain = await conn.fetchrow('''SELECT terrain FROM provinces  WHERE id = $1;''', p)
                 if terrain['terrain'] == 0:
-                    await conn.execute('''UPDATE provinces SET troops = $1, port = FALSE, city = FALSE, fort = FALSE WHERE id = $2;''', randrange(250, 400), p)
+                    await conn.execute(
+                        '''UPDATE provinces SET troops = $1, port = FALSE, city = FALSE, fort = FALSE WHERE id = $2;''',
+                        randrange(250, 400), p)
                 if terrain['terrain'] == 1:
-                    await conn.execute('''UPDATE provinces SET troops = $1, port = FALSE, city = FALSE, fort = FALSE WHERE id = $2;''', randrange(100, 180), p)
+                    await conn.execute(
+                        '''UPDATE provinces SET troops = $1, port = FALSE, city = FALSE, fort = FALSE WHERE id = $2;''',
+                        randrange(100, 180), p)
                 if terrain['terrain'] == 2:
-                    await conn.execute('''UPDATE provinces SET troops = $1, port = FALSE, city = FALSE, fort = FALSE WHERE id = $2;''', randrange(300, 400), p)
+                    await conn.execute(
+                        '''UPDATE provinces SET troops = $1, port = FALSE, city = FALSE, fort = FALSE WHERE id = $2;''',
+                        randrange(300, 400), p)
                 if terrain['terrain'] == 5:
-                    await conn.execute('''UPDATE provinces SET troops = $1, port = FALSE, city = FALSE, fort = FALSE WHERE id = $2;''', randrange(1000, 1300), p)
+                    await conn.execute(
+                        '''UPDATE provinces SET troops = $1, port = FALSE, city = FALSE, fort = FALSE WHERE id = $2;''',
+                        randrange(1000, 1300), p)
                 if terrain['terrain'] == 7:
-                    await conn.execute('''UPDATE provinces SET troops = $1, port = FALSE, city = FALSE, fort = FALSE WHERE id = $2;''', randrange(100, 180), p)
+                    await conn.execute(
+                        '''UPDATE provinces SET troops = $1, port = FALSE, city = FALSE, fort = FALSE WHERE id = $2;''',
+                        randrange(100, 180), p)
             await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = $2;''', "0", "turns")
             await ctx.send("https://tenor.com/view/finished-elijah-wood-lord-of-the-rings-lava-fire-gif-5894611")
             return
@@ -3563,7 +3610,6 @@ class CNC(commands.Cog):
             await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         self.turn_loop.start()
-
 
 
 def setup(bot: Shard):

@@ -1,5 +1,4 @@
 from discord.ext import commands
-import datetime
 from discord.utils import get
 
 
@@ -7,7 +6,7 @@ class SilentFail(commands.CommandError):
     pass
 
 
-class WrongInput:
+class WrongInput(commands.CommandInvokeError):
     pass
 
 
