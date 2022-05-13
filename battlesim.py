@@ -27,8 +27,8 @@ class calculations:
         self.maxcas = 0
 
         # creates connection pool
-        self.pool = asyncio.create_task(asyncpg.create_pool('postgres://postgres@127.0.0.1:5432',
-                                                      database="botdb"))
+        self.pool = asyncpg.create_pool('postgres://postgres@127.0.0.1:5432',
+                                                      database="botdb")
 
 
     async def ArmyDifference(self):
