@@ -1387,7 +1387,7 @@ class CNC(commands.Cog):
                 # sends DM
                 rsend = self.bot.get_user(recipient_id)
                 await rsend.send(
-                    f"{sender} has sent an peace offer to {recipient}. To view the terms, type `{self.bot.command_prefix}cnc_offer {aid}`. To accept or reject, use `{self.bot.command_prefix}cnc_interaction {aid}")
+                    f"{sender} has sent an peace offer to {recipient}. To view the terms, type `{self.bot.command_prefix}cnc_offer {aid}`. To accept or reject, use `{self.bot.command_prefix}cnc_interaction {aid} [(accept,reject)]`")
                 await ctx.send(f"Peace offer sent to {recipient}.")
             except Exception as error:
                 self.bot.logger.warning(msg=error)
