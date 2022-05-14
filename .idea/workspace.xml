@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing treaties" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="(Hopefully) final turn fix">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -106,13 +109,6 @@
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
-    </task>
-    <task id="LOCAL-00131" summary="CNC hotfixes">
-      <created>1652380820054</created>
-      <option name="number" value="00131" />
-      <option name="presentableId" value="LOCAL-00131" />
-      <option name="project" value="LOCAL" />
-      <updated>1652380820054</updated>
     </task>
     <task id="LOCAL-00132" summary="CNC hotfixes">
       <created>1652381085363</created>
@@ -450,7 +446,14 @@
       <option name="project" value="LOCAL" />
       <updated>1652474745971</updated>
     </task>
-    <option name="localTasksCounter" value="180" />
+    <task id="LOCAL-00180" summary="(Hopefully) final turn fix">
+      <created>1652491493076</created>
+      <option name="number" value="00180" />
+      <option name="presentableId" value="LOCAL-00180" />
+      <option name="project" value="LOCAL" />
+      <updated>1652491493076</updated>
+    </task>
+    <option name="localTasksCounter" value="181" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -469,7 +472,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing small bugs" />
     <MESSAGE value="Fixing small bugs and adjusting to regular code standards" />
     <MESSAGE value="Bug fixes" />
     <MESSAGE value="Bug fixes for the CNC moderator module" />
@@ -494,7 +496,8 @@
     <MESSAGE value="Fixing big turn bug" />
     <MESSAGE value="Removing a war crime" />
     <MESSAGE value="Fixing treaties" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing treaties" />
+    <MESSAGE value="(Hopefully) final turn fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="(Hopefully) final turn fix" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

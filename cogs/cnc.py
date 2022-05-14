@@ -80,7 +80,10 @@ class CNC(commands.Cog):
 
     def map_color(self, province, province_cord, hexcode, release: bool = False):
         province_cord = ((int(province_cord[0])), (int(province_cord[1])))
-        color = ImageColor.getrgb(hexcode)
+        try:
+            color = ImageColor.getrgb(hexcode)
+        except ValueError:
+            return ValueError
         map = Image.open(fr"{self.map_directory}/Maps/wargame_provinces.png").convert("RGBA")
         prov = Image.open(fr"{self.map_directory}/Province Layers/{province}.png").convert("RGBA")
         width = prov.size[0]
@@ -1109,11 +1112,13 @@ class CNC(commands.Cog):
                 try:
                     # updates relation and interaction data
                     if interact['type'] == 'alliance':
-                        await conn.execute('''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
-                                           sender, recipient)
-                        await conn.execute('''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
-                                           recipient,
-                                           sender)
+                        await conn.execute(
+                            '''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
+                            sender, recipient)
+                        await conn.execute(
+                            '''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
+                            recipient,
+                            sender)
                     await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''', interactionid)
                     await ctx.send(f"{interact['type'].title()} between {sender} and {recipient} canceled.")
                     # DMs relevant parties
@@ -3488,6 +3493,24 @@ class CNC(commands.Cog):
         userlogembed.add_field(name="Active", value=str(entry['active']))
         await ctx.send(embed=userlogembed)
         return
+
+    @commands.command(usage="[province id] [hexcode]", brief="Recolors a province")
+    @modcheck()
+    async def cnc_paint_province(self, ctx, provinceid: int, hexcode: str):
+        try:
+            loop = self.bot.loop
+            conn = self.bot.pool
+            pinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', provinceid)
+            if pinfo is None:
+                await ctx.send("That province doesn't exist.")
+                return
+            await loop.run_in_executor(None, self.map_color, provinceid, pinfo['cord'][0:2],
+                                       hexcode)
+            await ctx.send(f"Done! Province #{provinceid} is now {hexcode}")
+        except ValueError:
+            await ctx.send("That doesn't seem to be a proper hexcode.")
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
 
     # ---------------------Updating------------------------------
 
