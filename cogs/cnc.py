@@ -27,7 +27,9 @@ class CNC(commands.Cog):
         self.bot = bot
 
     def cog_unload(self):
+        # stop the running turnloop
         self.turn_loop.stop()
+        # cancel the running turn task
         self.turn_task.cancel()
 
     turn_task = None
@@ -507,19 +509,28 @@ class CNC(commands.Cog):
             provinces = list(userinfo['provinces_owned'])
             provinces.remove(0)
             provinces.sort()
+            # gets user's color in Discord format
+            color = discord.Color(int(userinfo["usercolor"].lstrip('#'), 16))
+            colorvalue = color
+            # creates embed
             sv_emebed = discord.Embed(title=f"{userinfo['username']} - Strategic View",
                                  description="A strategic overlook at all troop placements and provinces.",
-                                 color=discord.Color.blurple())
+                                 color=colorvalue)
+            # counts off numbers
             province_number = 0
             for p in provinces:
+                # fetches province information, adds it to the embed, and increases the count
                 provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
                 sv_emebed.add_field(name=f"**Province #{p}**",
                                value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}\nManpower: {provinceinfo['manpower']}")
                 province_number += 1
-                if province_number%15 == 0:
+                # if there are 15 provinces queued, send the embed, clear it, and start over
+                # (unless this is the last set)
+                if province_number % 15 == 0 and province_number != len(provinces):
                     await author.send(embed=sv_emebed)
                     sv_emebed.clear_fields()
                     continue
+                # if the maximum provinces have been reached, send the final set
                 if province_number == len(provinces):
                     await author.send(embed=sv_emebed)
                     await ctx.send("Sent!")
@@ -3599,29 +3610,38 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
 
     async def cncstartloop(self):
+        # wait until the bot is ready
         await self.bot.wait_until_ready()
+        # fetch the Shard testing channel
         shardchannel = self.bot.get_channel(835579413625569322)
+        # ensure there is no lingering loop
         if self.turn_loop.is_running():
             await shardchannel.send("Already running on_ready.")
             return
+        # grab the timezone and the curren time
         eastern = timezone('US/Eastern')
         now = datetime.datetime.now(eastern)
+        # if the hour is less than midnight but not somehow also a negative hour (hey, it happens)
         if now.time() < datetime.time(hour=0):
             update = now.replace(hour=0, minute=0, second=0, microsecond=1)
             await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
+        # if the hour is less than 0600 but greater than 0600
         elif now.time() < datetime.time(hour=6):
             update = now.replace(hour=6, minute=0, second=0)
             await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
+        # if the hour is greater than 0600 but less than noon
         elif now.time() < datetime.time(hour=12):
             update = now.replace(hour=12, minute=0, second=0)
             await shardchannel.send(f"Turn loop until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
+        # if the hour is greater than noon but less than 1800
         elif now.time() < datetime.time(hour=18, minute=0):
             update = now.replace(hour=18, minute=0, second=0)
             await shardchannel.send(f"Turn loop until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
+        # if the hour is greater than 1800 but less than midnight
         elif now.time() > datetime.time(hour=18, minute=0):
             update = now.replace(hour=0, minute=0, second=0)
             update += datetime.timedelta(days=1)
@@ -3631,6 +3651,7 @@ class CNC(commands.Cog):
 
 
 def setup(bot: Shard):
+    # define the cog, set the loop, set the turnloop running, and add the cog
     cog = CNC(bot)
     loop = bot.loop
     CNC.turn_task = loop.create_task(cog.cncstartloop())
