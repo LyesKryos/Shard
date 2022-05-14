@@ -517,11 +517,11 @@ class CNC(commands.Cog):
                                value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}\nManpower: {provinceinfo['manpower']}")
                 province_number += 1
                 if province_number%15 == 0:
-                    await author.send(sv_emebed)
+                    await author.send(embed=sv_emebed)
                     sv_emebed.clear_fields()
                     continue
                 if province_number == len(provinces):
-                    await author.send(sv_emebed)
+                    await author.send(embed=sv_emebed)
                     await ctx.send("Sent!")
                     return
         # creates the embed object
