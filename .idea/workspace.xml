@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Removing a war crime">
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing treaties" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -108,20 +106,6 @@
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
-    </task>
-    <task id="LOCAL-00129" summary="CNC hotfixes">
-      <created>1652380659374</created>
-      <option name="number" value="00129" />
-      <option name="presentableId" value="LOCAL-00129" />
-      <option name="project" value="LOCAL" />
-      <updated>1652380659374</updated>
-    </task>
-    <task id="LOCAL-00130" summary="CNC hotfixes">
-      <created>1652380762366</created>
-      <option name="number" value="00130" />
-      <option name="presentableId" value="LOCAL-00130" />
-      <option name="project" value="LOCAL" />
-      <updated>1652380762366</updated>
     </task>
     <task id="LOCAL-00131" summary="CNC hotfixes">
       <created>1652380820054</created>
@@ -452,7 +436,21 @@
       <option name="project" value="LOCAL" />
       <updated>1652474248511</updated>
     </task>
-    <option name="localTasksCounter" value="178" />
+    <task id="LOCAL-00178" summary="Fixing treaties">
+      <created>1652474657783</created>
+      <option name="number" value="00178" />
+      <option name="presentableId" value="LOCAL-00178" />
+      <option name="project" value="LOCAL" />
+      <updated>1652474657783</updated>
+    </task>
+    <task id="LOCAL-00179" summary="Fixing treaties">
+      <created>1652474745971</created>
+      <option name="number" value="00179" />
+      <option name="presentableId" value="LOCAL-00179" />
+      <option name="project" value="LOCAL" />
+      <updated>1652474745971</updated>
+    </task>
+    <option name="localTasksCounter" value="180" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -471,7 +469,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Map fixing for CNC" />
     <MESSAGE value="Fixing small bugs" />
     <MESSAGE value="Fixing small bugs and adjusting to regular code standards" />
     <MESSAGE value="Bug fixes" />
@@ -496,7 +493,8 @@
     <MESSAGE value="Small bug fixes and fixing the WA welcoming" />
     <MESSAGE value="Fixing big turn bug" />
     <MESSAGE value="Removing a war crime" />
-    <option name="LAST_COMMIT_MESSAGE" value="Removing a war crime" />
+    <MESSAGE value="Fixing treaties" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing treaties" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

@@ -3503,7 +3503,7 @@ class CNC(commands.Cog):
     async def turn_loop(self):
         try:
             # channel to send to
-            cncchannel = self.bot.get_channel(835579413625569322)
+            cncchannel = self.bot.get_channel(927288304301387816)
             # connects to the database
             conn = self.bot.pool
             # fetches all the users and makes a list
