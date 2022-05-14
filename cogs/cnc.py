@@ -534,7 +534,7 @@ class CNC(commands.Cog):
                 await author.send(embed=sve1)
                 sve = discord.Embed(title=f"{userinfo['username']} - Strategic View",
                                     description="A strategic overlook at all troop placements and provinces.",
-                                    color=discord.Color.blurple())
+                                    color=colorvalue)
                 sve.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
                 for i in range(1, length):
                     page = i * 15
