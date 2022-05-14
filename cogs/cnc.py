@@ -524,49 +524,6 @@ class CNC(commands.Cog):
                     await author.send(embed=sv_emebed)
                     await ctx.send("Sent!")
                     return
-        # creates the embed object
-            # if len(provinces) <= 15:
-            #     sve1 = discord.Embed(title=f"{userinfo['username']} - Strategic View",
-            #                          description="A strategic overlook at all troop placements and provinces.",
-            #                          color=discord.Color.blurple())
-            #     sve1.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-            #     for p in provinces:
-            #         provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-            #         sve1.add_field(name=f"**Province #{p}**",
-            #                        value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}\nManpower: {provinceinfo['manpower']}")
-            #     await author.send(embed=sve1)
-            # if len(provinces) > 15:
-            #     length = math.ceil(len(provinces) / 15) -1
-            #     sve1 = discord.Embed(title=f"{userinfo['username']} - Strategic View",
-            #                          description="A strategic overlook at all troop placements and provinces.",
-            #                          color=discord.Color.blurple())
-            #     sve1.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-            #     for p in provinces[:15]:
-            #         provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-            #         sve1.add_field(name=f"**Province #{p}**",
-            #                        value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}")
-            #     await author.send(embed=sve1)
-            #     sve = discord.Embed(title=f"{userinfo['username']} - Strategic View",
-            #                         description="A strategic overlook at all troop placements and provinces.",
-            #                         color=discord.Color.blurple())
-            #     sve.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-            #     for i in range(1, length):
-            #         page = i * 15
-            #         for p in provinces[page:page + 15]:
-            #             provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-            #             sve.add_field(name=f"**Province #{p}**",
-            #                           value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}")
-            #         await author.send(embed=sve)
-            #     lsve = discord.Embed(title=f"{userinfo['username']} - Strategic View",
-            #                          description="A strategic overlook at all troop placements and provinces.",
-            #                          color=discord.Color.blurple())
-            #     lsve.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-            #     for p in provinces[(length * 15):]:
-            #         provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-            #         lsve.add_field(name=f"**Province #{p}**",
-            #                        value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}")
-            #     await author.send(embed=lsve)
-            #     await ctx.send("Sent!")
         except Exception as error:
             self.bot.logger.warning(msg=error)
 
