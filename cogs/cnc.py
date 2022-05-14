@@ -522,7 +522,7 @@ class CNC(commands.Cog):
                 await author.send(embed=sve1)
                 await ctx.send("Sent!")
             if len(provinces) > 15:
-                length = math.ceil(len(provinces) / 15) - 1
+                length = math.ceil(len(provinces) / 15)
                 sve1 = discord.Embed(title=f"{userinfo['username']} - Strategic View",
                                      description="A strategic overlook at all troop placements and provinces.",
                                      color=discord.Color.blurple())

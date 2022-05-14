@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding map color checking command">
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing province error">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,20 +108,6 @@
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
-    </task>
-    <task id="LOCAL-00134" summary="CNC hotfixes">
-      <created>1652381984929</created>
-      <option name="number" value="00134" />
-      <option name="presentableId" value="LOCAL-00134" />
-      <option name="project" value="LOCAL" />
-      <updated>1652381984929</updated>
-    </task>
-    <task id="LOCAL-00135" summary="CNC hotfixes">
-      <created>1652383086997</created>
-      <option name="number" value="00135" />
-      <option name="presentableId" value="LOCAL-00135" />
-      <option name="project" value="LOCAL" />
-      <updated>1652383086997</updated>
     </task>
     <task id="LOCAL-00136" summary="CNC hotfixes">
       <created>1652383567997</created>
@@ -452,7 +438,21 @@
       <option name="project" value="LOCAL" />
       <updated>1652493778026</updated>
     </task>
-    <option name="localTasksCounter" value="183" />
+    <task id="LOCAL-00183" summary="Fixing province error">
+      <created>1652567013217</created>
+      <option name="number" value="00183" />
+      <option name="presentableId" value="LOCAL-00183" />
+      <option name="project" value="LOCAL" />
+      <updated>1652567013217</updated>
+    </task>
+    <task id="LOCAL-00184" summary="Fixing province error">
+      <created>1652567071993</created>
+      <option name="number" value="00184" />
+      <option name="presentableId" value="LOCAL-00184" />
+      <option name="project" value="LOCAL" />
+      <updated>1652567071993</updated>
+    </task>
+    <option name="localTasksCounter" value="185" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -471,7 +471,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Bug fixes for the CNC moderator module" />
     <MESSAGE value="Altering CNC checking" />
     <MESSAGE value="CNC checking overhaul" />
     <MESSAGE value="CNC loop testing" />
@@ -496,7 +495,8 @@
     <MESSAGE value="(Hopefully) final turn fix" />
     <MESSAGE value="Adding paint province command for fixing random provinces" />
     <MESSAGE value="Adding map color checking command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding map color checking command" />
+    <MESSAGE value="Fixing province error" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing province error" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
