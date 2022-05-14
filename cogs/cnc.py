@@ -3637,24 +3637,24 @@ class CNC(commands.Cog):
         now = datetime.datetime.now(eastern)
         if now.time() < datetime.time(hour=0):
             update = now.replace(hour=0, minute=0, second=0, microsecond=1)
-            await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         elif now.time() < datetime.time(hour=6):
             update = now.replace(hour=6, minute=0, second=0)
-            await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         elif now.time() < datetime.time(hour=12):
             update = now.replace(hour=12, minute=0, second=0)
-            await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await shardchannel.send(f"Turn loop until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         elif now.time() < datetime.time(hour=18, minute=0):
             update = now.replace(hour=18, minute=0, second=0)
-            await shardchannel.send(f"Waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await shardchannel.send(f"Turn loop until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         elif now.time() > datetime.time(hour=18, minute=0):
             update = now.replace(hour=0, minute=0, second=0)
             update += datetime.timedelta(days=1)
-            await shardchannel.send(f"CnC loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+            await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
             await discord.utils.sleep_until(update)
         self.turn_loop.start()
 
