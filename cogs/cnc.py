@@ -3512,6 +3512,29 @@ class CNC(commands.Cog):
         except Exception as error:
             self.bot.logger.warning(msg=error)
 
+    @commands.command(brief="Checks all provinces and ensures proper map color")
+    @modcheck()
+    async def cnc_map_check(self, ctx):
+        try:
+            conn = self.bot.pool
+            loop = self.bot.loop
+            users = await conn.fetch('''SELECT username, usercolor FROM cncusers;''')
+            usersncolors = dict()
+            for u in users:
+                usersncolors.update({u['username']: u['usercolor']})
+            provinces = await conn.fetch('''SELECT * FROM provinces WHERE owner_id != 0;''')
+            for p in provinces:
+                p_id = p['id']
+                p_cord = p['cord'][0:2]
+                p_owner = p['owner']
+                color = usersncolors[p_owner]
+                await loop.run_in_executor(None, self.map_color, p_id, p_cord,
+                                           color)
+            await ctx.send("All owned provinces checked and colored.")
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+
     # ---------------------Updating------------------------------
 
     @commands.command(brief="Displays the status of the CNC turn loop")

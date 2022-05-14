@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="(Hopefully) final turn fix">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding paint province command for fixing random provinces">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -109,13 +109,6 @@
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
-    </task>
-    <task id="LOCAL-00132" summary="CNC hotfixes">
-      <created>1652381085363</created>
-      <option name="number" value="00132" />
-      <option name="presentableId" value="LOCAL-00132" />
-      <option name="project" value="LOCAL" />
-      <updated>1652381085363</updated>
     </task>
     <task id="LOCAL-00133" summary="CNC hotfixes">
       <created>1652381365971</created>
@@ -453,7 +446,14 @@
       <option name="project" value="LOCAL" />
       <updated>1652491493076</updated>
     </task>
-    <option name="localTasksCounter" value="181" />
+    <task id="LOCAL-00181" summary="Adding paint province command for fixing random provinces">
+      <created>1652492567882</created>
+      <option name="number" value="00181" />
+      <option name="presentableId" value="LOCAL-00181" />
+      <option name="project" value="LOCAL" />
+      <updated>1652492567882</updated>
+    </task>
+    <option name="localTasksCounter" value="182" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -472,7 +472,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing small bugs and adjusting to regular code standards" />
     <MESSAGE value="Bug fixes" />
     <MESSAGE value="Bug fixes for the CNC moderator module" />
     <MESSAGE value="Altering CNC checking" />
@@ -497,7 +496,8 @@
     <MESSAGE value="Removing a war crime" />
     <MESSAGE value="Fixing treaties" />
     <MESSAGE value="(Hopefully) final turn fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="(Hopefully) final turn fix" />
+    <MESSAGE value="Adding paint province command for fixing random provinces" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding paint province command for fixing random provinces" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
