@@ -514,15 +514,15 @@ class CNC(commands.Cog):
             colorvalue = color
             # creates embed
             sv_emebed = discord.Embed(title=f"{userinfo['username']} - Strategic View",
-                                 description="A strategic overlook at all troop placements and provinces.",
-                                 color=colorvalue)
+                                      description="A strategic overlook at all troop placements and provinces.",
+                                      color=colorvalue)
             # counts off numbers
             province_number = 0
             for p in provinces:
                 # fetches province information, adds it to the embed, and increases the count
                 provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
                 sv_emebed.add_field(name=f"**Province #{p}**",
-                               value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}\nManpower: {provinceinfo['manpower']}")
+                                    value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}\nManpower: {provinceinfo['manpower']}")
                 province_number += 1
                 # if there are 15 provinces queued, send the embed, clear it, and start over
                 # (unless this is the last set)
@@ -2678,7 +2678,7 @@ class CNC(commands.Cog):
     async def cnc_map(self, ctx, debug: bool = False):
         try:
             loop = asyncio.get_running_loop()
-            reactions = ["\U0001f5fa", "\U000026f0", "\U0001f3f3","\U0001f4cc", "\U0000274c"]
+            reactions = ["\U0001f5fa", "\U000026f0", "\U0001f3f3", "\U0001f4cc", "\U0000274c"]
             map = await ctx.send("https://i.ibb.co/cTsg1x5/wargame-large.png")
             for react in reactions:
                 await map.add_reaction(react)
@@ -3520,6 +3520,24 @@ class CNC(commands.Cog):
                 await loop.run_in_executor(None, self.map_color, p_id, p_cord,
                                            color)
             await ctx.send("All owned provinces checked and colored.")
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
+    @commands.command()
+    @modcheck()
+    async def cnc_troop_check(self, ctx, *, args):
+        try:
+            conn = self.bot.pool
+            user = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', args.lower())
+            if user is None:
+                await ctx.send(f"`{args}` does not appear to be registered.")
+            all_troops_in_provinces = await conn.fetch('''SELECT troops FROM provinces WHERE lower(owner) = $1;''', args.lower())
+            total_troops = 0
+            for troops in all_troops_in_provinces:
+                total_troops += troops['troops']
+            total_troops += user['undeployed']
+            await conn.execute('''UPDATE cncusers SET totaltroops = $1 WHERE lower(username) = $2;''', total_troops, args.lower())
+            await ctx.send("Done!")
         except Exception as error:
             self.bot.logger.warning(msg=error)
 
