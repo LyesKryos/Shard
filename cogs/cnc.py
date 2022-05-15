@@ -3505,6 +3505,8 @@ class CNC(commands.Cog):
     @modcheck()
     async def cnc_map_check(self, ctx):
         try:
+            map = Image.open(fr"{self.map_directory}/Maps/wargame_blank_save.png").convert("RGBA")
+            map.save(fr"{self.map_directory}/Maps/wargame_provinces.png")
             conn = self.bot.pool
             loop = self.bot.loop
             users = await conn.fetch('''SELECT username, usercolor FROM cncusers;''')
