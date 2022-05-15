@@ -6,6 +6,7 @@
     <file url="file://$PROJECT_DIR$/cogs/currency.py" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/cogs/recruitment.py" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/customchecks.py" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/province_naming.py" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/resources_updating_cnc.py" dialect="GenericSQL" />
   </component>
 </project>
