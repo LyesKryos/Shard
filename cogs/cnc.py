@@ -3525,21 +3525,21 @@ class CNC(commands.Cog):
 
     @commands.command()
     @modcheck()
-    async def cnc_troop_check(self, ctx, *, args):
+    async def cnc_troop_check(self, ctx, ):
         try:
             conn = self.bot.pool
-            user = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', args.lower())
-            if user is None:
-                await ctx.send(f"`{args}` does not appear to be registered.")
-            all_troops_in_provinces = await conn.fetch('''SELECT troops FROM provinces WHERE lower(owner) = $1;''',
-                                                       args.lower())
-            total_troops = 0
-            for troops in all_troops_in_provinces:
-                total_troops += troops['troops']
-            total_troops += user['undeployed']
-            total_troops /= 2
-            await conn.execute('''UPDATE cncusers SET totaltroops = $1 WHERE lower(username) = $2;''', total_troops,
-                               args.lower())
+            user = await conn.fetch('''SELECT * FROM cncusers;''')
+            for u in user:
+                username = u['username']
+                all_troops_in_provinces = await conn.fetch('''SELECT troops FROM provinces WHERE owner = $1;''',
+                                                           username)
+                total_troops = 0
+                for troops in all_troops_in_provinces:
+                    total_troops += troops['troops']
+                total_troops += u['undeployed']
+                total_troops /= 2
+                await conn.execute('''UPDATE cncusers SET totaltroops = $1 WHERE username = $2;''', total_troops,
+                                   username)
             await ctx.send("Done!")
         except Exception as error:
             self.bot.logger.warning(msg=error)
