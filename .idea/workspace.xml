@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing map: Doubled province">
-      <change afterPath="$PROJECT_DIR$/province_naming.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding province names">
+      <change beforePath="$PROJECT_DIR$/province_naming.py" beforeDir="false" afterPath="$PROJECT_DIR$/province_naming.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,13 +115,6 @@
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
-    </task>
-    <task id="LOCAL-00148" summary="CNC hotfixes">
-      <created>1652390366379</created>
-      <option name="number" value="00148" />
-      <option name="presentableId" value="LOCAL-00148" />
-      <option name="project" value="LOCAL" />
-      <updated>1652390366379</updated>
     </task>
     <task id="LOCAL-00149" summary="CNC hotfixes">
       <created>1652390945958</created>
@@ -460,7 +452,14 @@
       <option name="project" value="LOCAL" />
       <updated>1652619175881</updated>
     </task>
-    <option name="localTasksCounter" value="197" />
+    <task id="LOCAL-00197" summary="Adding province names">
+      <created>1652620429910</created>
+      <option name="number" value="00197" />
+      <option name="presentableId" value="LOCAL-00197" />
+      <option name="project" value="LOCAL" />
+      <updated>1652620429910</updated>
+    </task>
+    <option name="localTasksCounter" value="198" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -479,7 +478,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="World Assembly notification system" />
     <MESSAGE value="CNC hotfixes" />
     <MESSAGE value="CNC attack command fix" />
     <MESSAGE value="CNC: wording and math presentation corrections" />
@@ -504,7 +502,8 @@
     <MESSAGE value="Fixing total troops issue" />
     <MESSAGE value="Fixing map: 322 province" />
     <MESSAGE value="Fixing map: Doubled province" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing map: Doubled province" />
+    <MESSAGE value="Adding province names" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding province names" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

@@ -6,9 +6,7 @@ async def resources():
     conn = await asyncpg.connect('postgresql://postgres@127.0.0.1:5432', database="botdb", password="postgres")
     provinceinfo = await conn.fetch('''SELECT * FROM provinces;''')
     province_ids = [p['id'] for p in provinceinfo]
-    province_name = 0
     for p in province_ids:
-        await conn.execute('''UPDATE provinces SET name = $1 WHERE id = $2;''', names[province_name], p)
-        province_name += 1
+        await conn.execute('''UPDATE provinces SET name = $1 WHERE id = $2;''', names[p-1], p)
 asyncio.get_event_loop().run_until_complete(resources())
 print("Done")
