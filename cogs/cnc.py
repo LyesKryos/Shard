@@ -564,14 +564,14 @@ class CNC(commands.Cog):
             # deletes the user and sends them a DM with the notification
             await conn.execute('''DELETE FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
             # updates province and map information
-            for province in userid['provinces_owned'][1:]:
+            for province in userid['provinces_owned'][0:]:
                 await conn.execute('''UPDATE provinces  SET owner_id = '', owner = 0, troops = 0 WHERE id = $1;''',
                                    province)
-                color = await conn.fetchrow('''SELECT color FROM terrains WHERE id = $1;''', province)
-                cord = await conn.fetchrow('''SELECT cord FROM provinces  WHERE id = $1;''', province)
-                await loop.run_in_executor(None, self.map_color, province, cord['cord'][0:2], color['color'], True)
+                color = "#808080"
+                cord = await conn.fetchrow('''SELECT cord FROM provinces WHERE id = $1;''', province)
+                await loop.run_in_executor(None, self.map_color, province, cord['cord'][0:2], color, True)
             # updates relations information
-            await conn.execute('''DELETE FROM relations ''')
+            await conn.execute('''DELETE FROM relations WHERE name = $1 and nation = $1;''', nationname.lower())
             await ctx.send("Deletion complete.")
             user = self.bot.get_user(userid["user_id"])
             if reason is None:
@@ -2678,7 +2678,7 @@ class CNC(commands.Cog):
     async def cnc_map(self, ctx, debug: bool = False):
         try:
             loop = asyncio.get_running_loop()
-            reactions = ["\U0001f5fa", "\U000026f0", "\U0001f3f3", "\U0000274c"]
+            reactions = ["\U0001f5fa", "\U000026f0", "\U0001f3f3","\U0001f4cc", "\U0000274c"]
             map = await ctx.send("https://i.ibb.co/cTsg1x5/wargame-large.png")
             for react in reactions:
                 await map.add_reaction(react)
@@ -2729,6 +2729,13 @@ class CNC(commands.Cog):
                         for react in reactions:
                             await map.add_reaction(react)
                             continue
+                    # name map
+                    if str(reaction.emoji) == "\U0001f4cc":
+                        await map.clear_reactions()
+                        await map.edit(content="https://i.ibb.co/TBTMRxK/CNC-name-map.png")
+                        for react in reactions:
+                            await map.add_reaction(react)
+                        continue
                     # close
                     if str(reaction.emoji) == "\U0000274c":
                         await map.clear_reactions()
@@ -3537,6 +3544,7 @@ class CNC(commands.Cog):
             # fetches all the users and makes a list
             users = await conn.fetch('''SELECT user_id FROM cncusers;''')
             userids = [ids['user_id'] for ids in users]
+            total_resources = 0
             # for every user in the list
             for u in userids:
                 # fetch all provinces  owned by the user
@@ -3596,14 +3604,18 @@ class CNC(commands.Cog):
                         , [userinfo['citylimit'][0], citylimit], [userinfo['portlimit'][0], portlimit],
                         [userinfo['fortlimit'][0], fortlimit],
                         userinfo['user_id'])
+                total_resources += added_resources
                 await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
                                    (userinfo['resources'] + math.ceil(added_resources)), u)
                 await conn.execute('''UPDATE cncusers SET maxmanpower = $1, manpower = $2 WHERE user_id = $3;''',
                                    int(max_manpower), added_manpower, userinfo['user_id'])
             # update turn and post message
             turns = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
+            resources = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "resources")
             await conn.execute('''UPDATE cnc_data SET data_value = $2 WHERE data_name = $1;''', "turns",
                                str(int(turns['data_value']) + 1))
+            await conn.execute('''UPDATE cnc_data SET data_value = $2 WHERE data_name = $1;''', "resources",
+                               str(int(resources['data_value']) + total_resources))
             await cncchannel.send(f"New turn! It is now turn #{int(turns['data_value']) + 1}.")
             return
         except Exception as error:
