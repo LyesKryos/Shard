@@ -800,3 +800,181 @@ HINT:  Perhaps you meant to reference the column "blacklist.actiondate".
 2022-05-13 09:12:19,236 WARNING: 403 Forbidden (error code: 50003): Cannot execute action on a DM channel
 2022-05-13 11:17:06,143 WARNING: [Errno 5] Input/output error
 2022-05-13 11:43:53,940 WARNING: [Errno 2] No such file or directory: '/root/Documents/Shard/CNC/Map Files/Province Layers/253.png'
+2022-05-13 15:31:32,903 WARNING: 
+2022-05-13 15:46:17,019 WARNING: 
+2022-05-13 15:49:24,275 WARNING: 
+2022-05-13 15:50:46,695 WARNING: 'Message' object has no attribute 'reaction_add'
+2022-05-13 18:03:28,355 WARNING: image file is truncated
+2022-05-13 21:27:25,252 WARNING: invalid input syntax for type bigint: ""
+2022-05-14 00:56:15,229 WARNING: [Errno 2] No such file or directory: '/root/Documents/Shard/CNC/Map Files/Province Layers/204.png'
+2022-05-14 02:35:41,534 WARNING: [Errno 2] No such file or directory: '/root/Documents/Shard/CNC/Map Files/Province Layers/246.png'
+2022-05-14 05:54:25,956 WARNING: [Errno 2] No such file or directory: '/root/Documents/Shard/CNC/Map Files/Province Layers/246.png'
+2022-05-14 09:16:09,003 WARNING: 
+2022-05-14 09:17:03,323 WARNING: 
+2022-05-14 09:17:52,182 WARNING: 
+2022-05-14 09:17:57,488 WARNING: 
+2022-05-14 09:18:08,881 WARNING: 
+2022-05-14 09:19:01,526 WARNING: 
+2022-05-14 10:07:48,039 WARNING: That is not a valid focus. Please use only m, e, or s.
+2022-05-14 15:46:29,678 WARNING: 'NoneType' object is not subscriptable
+2022-05-14 17:13:49,840 WARNING: 'NoneType' object is not subscriptable
+2022-05-14 17:31:05,264 WARNING: 
+2022-05-14 17:33:33,843 WARNING: 
+2022-05-14 17:33:46,652 WARNING: 
+2022-05-14 18:01:29,829 WARNING: 'Message' object has no attribute 'reaction_add'
+2022-05-15 00:00:44,979 WARNING: invalid literal for int() with base 16: 'blue'
+2022-05-15 00:01:06,499 WARNING: invalid literal for int() with base 16: 'blue'
+2022-05-15 02:58:38,989 WARNING: invalid literal for int() with base 16: 'blue'
+2022-05-15 03:05:30,104 WARNING: invalid literal for int() with base 16: 'blue'
+2022-05-15 03:07:50,166 WARNING: invalid literal for int() with base 16: 'blue'
+2022-05-15 04:20:48,196 WARNING: 
+2022-05-15 06:00:01,132 WARNING: invalid literal for int() with base 10: '151601.0'
+2022-05-15 06:48:24,895 WARNING: [Errno 2] No such file or directory: '/root/Documents/Shard/CNC/Map Files/Province Layers/321.png'
+2022-05-15 08:15:30,665 WARNING: image file is truncated
+2022-05-15 08:16:13,422 WARNING: cannot identify image file '/root/Documents/Shard/CNC/Map Files/Maps/wargame_provinces.png'
+2022-05-15 10:55:36,927 WARNING: 403 Forbidden (error code: 50003): Cannot execute action on a DM channel
+2022-05-15 11:14:42,243 WARNING: invalid literal for int() with base 16: 'blue'
+2022-05-15 11:14:55,210 WARNING: invalid literal for int() with base 16: 'blue'
+2022-05-15 11:15:16,420 WARNING: invalid literal for int() with base 16: 'blue'
+2022-05-15 11:34:16,601 WARNING: 403 Forbidden (error code: 50003): Cannot execute action on a DM channel
+2022-05-15 11:34:35,750 WARNING: 504 Gateway Time-out (error code: 0): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en-US"> <!--<![endif]-->
+<head>
+
+
+<title>discord.com | 504: Gateway time-out</title>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" id="cf_styles-css" href="/cdn-cgi/styles/main.css" />
+
+
+<script>
+(function(){if(document.addEventListener&&window.XMLHttpRequest&&JSON&&JSON.stringify){var e=function(a){var c=document.getElementById("error-feedback-survey"),d=document.getElementById("error-feedback-success"),b=new XMLHttpRequest;a={event:"feedback clicked",properties:{errorCode:504,helpful:a,version:1}};b.open("POST","https://sparrow.cloudflare.com/api/v1/event");b.setRequestHeader("Content-Type","application/json");b.setRequestHeader("Sparrow-Source-Key","c771f0e4b54944bebf4261d44bd79a1e");
+b.send(JSON.stringify(a));c.classList.add("feedback-hidden");d.classList.remove("feedback-hidden")};document.addEventListener("DOMContentLoaded",function(){var a=document.getElementById("error-feedback"),c=document.getElementById("feedback-button-yes"),d=document.getElementById("feedback-button-no");"classList"in a&&(a.classList.remove("feedback-hidden"),c.addEventListener("click",function(){e(!0)}),d.addEventListener("click",function(){e(!1)}))})}})();
+</script>
+
+</head>
+<body>
+<div id="cf-wrapper">
+
+    
+
+    <div id="cf-error-details" class="p-0">
+        <header class="mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-8">
+            <h1 class="inline-block sm:block sm:mb-2 font-light text-60 lg:text-4xl text-black-dark leading-tight mr-2">
+              
+              <span class="cf-error-type">Error</span>
+              <span class="cf-error-code">504</span>
+            </h1>
+            <span class="inline-block sm:block font-mono text-15 lg:text-sm lg:leading-relaxed">Ray ID: 70bcf00a4a5a9c8b &bull;</span>
+            <span class="inline-block sm:block font-mono text-15 lg:text-sm lg:leading-relaxed">2022-05-15 15:34:35 UTC</span>
+            <h2 class="text-gray-600 leading-1.3 text-3xl font-light">Gateway time-out</h2>
+        </header>
+        
+        <div class="my-8 bg-gradient-gray">
+            <div class="w-240 lg:w-full mx-auto">
+                <div class="clearfix md:px-8">
+                  
+<div id="cf-browser-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    <span class="cf-icon-browser block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+  </div>
+  <span class="md:block w-full truncate">You</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">Browser</h3>
+  <span class="leading-1.3 text-2xl text-green-success">Working</span>
+</div>
+
+<div id="cf-cloudflare-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    <span class="cf-icon-cloud block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+  </div>
+  <span class="md:block w-full truncate">Ashburn</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">Cloudflare</h3>
+  <span class="leading-1.3 text-2xl text-green-success">Working</span>
+</div>
+
+<div id="cf-host-status" class="cf-error-source relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    <span class="cf-icon-server block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-error w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+  </div>
+  <span class="md:block w-full truncate">discord.com</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">Host</h3>
+  <span class="leading-1.3 text-2xl text-red-error">Error</span>
+</div>
+
+                </div>
+              
+            </div>
+        </div>
+
+        <div class="w-240 lg:w-full mx-auto mb-8 lg:px-8">
+            <div class="clearfix">
+                <div class="w-1/2 md:w-full float-left pr-6 md:pb-10 md:pr-0 leading-relaxed">
+                    <h2 class="text-3xl font-normal leading-1.3 mb-4">What happened?</h2>
+                    <p>The web server reported a gateway time-out error.</p>
+                </div>
+              
+                <div class="w-1/2 md:w-full float-left leading-relaxed">
+                    <h2 class="text-3xl font-normal leading-1.3 mb-4">What can I do?</h2>
+                    <p class="mb-6">Please try again in a few minutes.</p>
+                </div>
+            </div>
+              
+        </div>
+
+        <div class="feedback-hidden py-8 text-center" id="error-feedback">
+    <div id="error-feedback-survey" class="footer-line-wrapper">
+        Was this page helpful?
+        <button class="border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded" id="feedback-button-yes" type="button">Yes</button>
+        <button class="border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded" id="feedback-button-no" type="button">No</button>
+    </div>
+    <div class="feedback-success feedback-hidden" id="error-feedback-success">
+        Thank you for your feedback!
+    </div>
+</div>
+
+
+        <div class="cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300">
+  <p class="text-13">
+    <span class="cf-footer-item sm:block sm:mb-1">Cloudflare Ray ID: <strong class="font-semibold">70bcf00a4a5a9c8b</strong></span>
+    <span class="cf-footer-separator sm:hidden">&bull;</span>
+    <span class="cf-footer-item sm:block sm:mb-1"><span>Your IP</span>: 129.80.78.252</span>
+    <span class="cf-footer-separator sm:hidden">&bull;</span>
+    <span class="cf-footer-item sm:block sm:mb-1"><span>Performance &amp; security by</span> <a rel="noopener noreferrer" href="https://www.cloudflare.com/5xx-error-landing" id="brand_link" target="_blank">Cloudflare</a></span>
+    
+  </p>
+</div><!-- /.error-footer -->
+
+
+    </div>
+</div>
+</body>
+</html>
+
+
+2022-05-15 11:34:35,851 WARNING: 400 Bad Request (error code: 50035): Invalid Form Body
+In content: Must be 4000 or fewer in length.
+2022-05-15 11:37:56,749 WARNING: 403 Forbidden (error code: 50003): Cannot execute action on a DM channel
+2022-05-15 11:38:08,749 WARNING: 403 Forbidden (error code: 50003): Cannot execute action on a DM channel
+2022-05-15 11:40:20,116 WARNING: 403 Forbidden (error code: 50003): Cannot execute action on a DM channel
+2022-05-15 12:00:00,527 WARNING: invalid literal for int() with base 10: '151601.0'
+2022-05-15 12:08:31,566 WARNING: image file is truncated
+2022-05-15 12:41:25,212 WARNING: 
+2022-05-15 12:42:04,902 WARNING: 
+2022-05-15 12:47:02,573 WARNING: image file is truncated
+2022-05-15 12:55:36,145 WARNING: 
+2022-05-15 13:30:44,379 WARNING: 'NoneType' object is not subscriptable
+2022-05-15 13:45:50,090 WARNING: invalid input syntax for type bigint: ""
+2022-05-15 14:25:21,640 WARNING: image file is truncated
+2022-05-15 14:25:37,607 WARNING: image file is truncated
+2022-05-15 14:26:13,844 WARNING: image file is truncated
+2022-05-15 14:27:24,572 WARNING: image file is truncated
