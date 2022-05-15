@@ -3531,16 +3531,18 @@ class CNC(commands.Cog):
             user = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', args.lower())
             if user is None:
                 await ctx.send(f"`{args}` does not appear to be registered.")
-            all_troops_in_provinces = await conn.fetch('''SELECT troops FROM provinces WHERE lower(owner) = $1;''', args.lower())
+            all_troops_in_provinces = await conn.fetch('''SELECT troops FROM provinces WHERE lower(owner) = $1;''',
+                                                       args.lower())
             total_troops = 0
             for troops in all_troops_in_provinces:
                 total_troops += troops['troops']
             total_troops += user['undeployed']
-            await conn.execute('''UPDATE cncusers SET totaltroops = $1 WHERE lower(username) = $2;''', total_troops, args.lower())
+            total_troops /= 2
+            await conn.execute('''UPDATE cncusers SET totaltroops = $1 WHERE lower(username) = $2;''', total_troops,
+                               args.lower())
             await ctx.send("Done!")
         except Exception as error:
             self.bot.logger.warning(msg=error)
-
 
     # ---------------------Updating------------------------------
 
