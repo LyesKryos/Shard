@@ -712,7 +712,7 @@ class CNC(commands.Cog):
             if len(structures) == 0:
                 structlist = "None"
             # creates the embed object
-            provinceembed = discord.Embed(title=f"Province {province['name']} (#{province['id']})", color=color)
+            provinceembed = discord.Embed(title=f"{province['name']} (Province #{province['id']})", color=color)
             provinceembed.add_field(name="Terrain", value=terrain['name'] + riverstring)
             provinceembed.add_field(name="Structures", value=structlist)
             provinceembed.add_field(name="Bordering Provinces", value=bordering)
