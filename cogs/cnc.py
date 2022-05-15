@@ -565,7 +565,7 @@ class CNC(commands.Cog):
             await conn.execute('''DELETE FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
             # updates province and map information
             for province in userid['provinces_owned'][0:]:
-                await conn.execute('''UPDATE provinces  SET owner_id = '', owner = 0, troops = 0 WHERE id = $1;''',
+                await conn.execute('''UPDATE provinces  SET owner_id = 0, owner = '', troops = 0 WHERE id = $1;''',
                                    province)
                 color = "#808080"
                 cord = await conn.fetchrow('''SELECT cord FROM provinces WHERE id = $1;''', province)
@@ -2194,7 +2194,7 @@ class CNC(commands.Cog):
                     victor = "The attackers are victorious!"
                     advance = True
                 # create battleembed object
-                battleembed = discord.Embed(title=f"Battle of Province #{target}",
+                battleembed = discord.Embed(title=f"Battle of {targetinfo['name']} (Province #{target})",
                                             description=f"Attack from Province #{stationed} by {userinfo['username']} on Province #{target} with {force} troops.",
                                             color=discord.Color.red())
                 battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
@@ -2261,7 +2261,7 @@ class CNC(commands.Cog):
                                     victor = "The attackers are victorious!"
                                     advance = True
                                 # create battleembed object
-                                battleembed = discord.Embed(title=f"Battle of Province #{target}",
+                                battleembed = discord.Embed(title=f"Battle of {targetinfo['name']} (Province #{target})",
                                                             description=f"Attack from Province #{stationed} by {userinfo['username']} on Province #{target} with {force} troops.",
                                                             color=discord.Color.red())
                                 battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
@@ -2434,7 +2434,7 @@ class CNC(commands.Cog):
                                     victor = "The attackers are victorious!"
                                     advance = True
                                 # create battleembed object
-                                battleembed = discord.Embed(title=f"Battle of the City of Province #{target}",
+                                battleembed = discord.Embed(title=f"Battle of the City of {targetinfo['name']} (Province #{target})",
                                                             description=f"Attack from Province #{stationed} by {userinfo['username']} on Province #{target} with {force} troops.",
                                                             color=discord.Color.red())
                                 battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
