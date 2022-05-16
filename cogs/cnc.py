@@ -801,6 +801,23 @@ class CNC(commands.Cog):
         except Exception as error:
             self.bot.logger.warning(msg=error)
 
+    @commands.command(usage="[province id] [name]", brief="Renames a province.")
+    @commands.guild_only()
+    async def cnc_rename_province(self, ctx, provinceid: int, name: str):
+        try:
+            conn = self.bot.pool
+            province = await conn.fetchrow('''SELECT owner_id FROM provinces WHERE id = $1;''', provinceid)
+            if province is None:
+                await ctx.send(f"`{provinceid}` is not a valid province ID.")
+                return
+            elif province['owner_id'] != ctx.author.id:
+                await ctx.send("You can only rename provinces that you own!")
+                return
+            await conn.execute('''UPDATE provinces SET name = $1 WHERE id = $2;''', name, provinceid)
+            await ctx.send(f"Province #{provinceid} is now {name}!")
+        except Exception as error:
+            self.bot.logger.warning(msg=error)
+
     @commands.command(usage="[province id] [deployed force]",
                       aliases=['cncd'], brief="Deploys a number of troops to a specified province")
     @commands.guild_only()
