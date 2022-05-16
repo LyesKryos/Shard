@@ -3688,7 +3688,7 @@ class CNC(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def turn_loop(self):
+    async def cnc_turn_loop(self):
         try:
             # channel to send to
             cncchannel = self.bot.get_channel(927288304301387816)
