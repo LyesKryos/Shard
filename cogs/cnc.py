@@ -1,4 +1,4 @@
-# cnc v1.1b
+# cnc v1.2b
 
 from ShardBot import Shard
 import discord
@@ -1763,7 +1763,7 @@ class CNC(commands.Cog):
                     f"{userinfo['username']} possesses {math.ceil(difference)} fewer credit resources than needed to buy a province.")
                 return
             # ensures that the user has less than 3 provinces
-            elif len(userinfo['provinces_owned']) >= 4:
+            elif len(userinfo['provinces_owned']) >= 2:
                 await ctx.send(f"{userinfo['username']} already controls enough provinces and is not eligible to "
                                f"purchase another.")
                 return
@@ -2207,6 +2207,9 @@ class CNC(commands.Cog):
                 battleembed.add_field(name="Remaining Attacking Force", value=str(battle.RemainingAttackingArmy))
                 battleembed.add_field(name="Remaining Defending Force", value=str(battle.RemainingDefendingArmy))
                 battleembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+                deaths = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                                   (deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties))
                 # if there is a river battle to be fought
                 if advance is True:
                     # if there is a river, the attackers must ford the river
@@ -2229,6 +2232,9 @@ class CNC(commands.Cog):
                                            (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
                         await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                            (targetinfo['troops'] - battle.DefendingCasualties), target)
+                        deaths = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                        await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                                           (deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties))
                         # sends the embed object and adds the reactions
                         battlenotif = await ctx.send(embed=battleembed)
                         await battlenotif.add_reaction("\U00002694")
@@ -2278,6 +2284,11 @@ class CNC(commands.Cog):
                                 battleembed.add_field(name="Remaining Defending Force",
                                                       value=str(battle.RemainingDefendingArmy))
                                 battleembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+                                deaths = await conn.fetchrow(
+                                    '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                                await conn.execute(
+                                    '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                                    (deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties))
                             # if the reaction is retreat, the attack does not continue
                             if str(reaction.emoji) == "\U0001f3f3":
                                 await battlenotif.clear_reactions()
@@ -2315,6 +2326,9 @@ class CNC(commands.Cog):
                                            (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
                         await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                            (targetinfo['troops'] - battle.DefendingCasualties), target)
+                        deaths = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                        await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                                           (deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties))
                         # sends the embed object and adds the reactions
                         battlenotif = await ctx.send(embed=battleembed)
                         await battlenotif.add_reaction("\U00002694")
@@ -2364,6 +2378,11 @@ class CNC(commands.Cog):
                                 battleembed.add_field(name="Remaining Defending Force",
                                                       value=str(battle.RemainingDefendingArmy))
                                 battleembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+                                deaths = await conn.fetchrow(
+                                    '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                                await conn.execute(
+                                    '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                                    (deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties))
                             # if the reaction is retreat, the attack does not continue
                             if str(reaction.emoji) == "\U0001f3f3":
                                 await battlenotif.clear_reactions()
@@ -2450,6 +2469,11 @@ class CNC(commands.Cog):
                                                       value=str(battle.RemainingAttackingArmy))
                                 battleembed.add_field(name="Remaining Defending Force",
                                                       value=str(battle.RemainingDefendingArmy))
+                                deaths = await conn.fetchrow(
+                                    '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                                await conn.execute(
+                                    '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                                    (deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties))
                                 battleembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
                             # if the reaction is retreat, the attack does not continue
                             if str(reaction.emoji) == "\U0001f3f3":
@@ -2569,6 +2593,11 @@ class CNC(commands.Cog):
                                 (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
                             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                                (stationedinfo['troops'] - force), stationed)
+                            deaths = await conn.fetchrow(
+                                '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                            await conn.execute(
+                                '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                                (deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties))
                             battleembed.set_footer(
                                 text=f"{defenderinfo['username']} has lost control of province #{target}!"
                                      f" With nowhere to retreat, all {battle.RemainingDefendingArmy} troops have "
@@ -2612,6 +2641,11 @@ class CNC(commands.Cog):
                                 (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
                             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                                (stationedinfo['troops'] - force), stationed)
+                            deaths = await conn.fetchrow(
+                                '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                            await conn.execute(
+                                '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                                (deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties))
                             battleembed.set_footer(
                                 text=f"{defenderinfo['username']} has lost control of province #{target}!"
                                      f" Their {battle.RemainingDefendingArmy} troops have retreated to "
@@ -2637,6 +2671,11 @@ class CNC(commands.Cog):
                                                (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
                             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                                (targetinfo['troops'] - battle.DefendingCasualties), target)
+                            deaths = await conn.fetchrow(
+                                '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                            await conn.execute(
+                                '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                                (deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties))
                             battleembed.set_footer(
                                 text=f"The natives have successfully defended province #{target}!")
                             await ctx.send(embed=battleembed)
@@ -2658,6 +2697,11 @@ class CNC(commands.Cog):
                                            (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
                         await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                            (targetinfo['troops'] - battle.DefendingCasualties), target)
+                        deaths = await conn.fetchrow(
+                            '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                        await conn.execute(
+                            '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                            (deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties))
                         battleembed.set_footer(
                             text=f"{defenderinfo['username']} has successfully defended province #{target}!")
                         await ctx.send(embed=battleembed)
@@ -2679,7 +2723,7 @@ class CNC(commands.Cog):
         try:
             loop = asyncio.get_running_loop()
             reactions = ["\U0001f5fa", "\U000026f0", "\U0001f3f3", "\U0001f4cc", "\U0000274c"]
-            map = await ctx.send("https://i.ibb.co/cTsg1x5/wargame-large.png")
+            map = await ctx.send("https://i.ibb.co/kMCVN4K/wargame-terrain-with-numbers.png")
             for react in reactions:
                 await map.add_reaction(react)
 
@@ -2700,7 +2744,7 @@ class CNC(commands.Cog):
                     # numbers + terrain
                     if str(reaction.emoji) == "\U0001f5fa":
                         await map.clear_reactions()
-                        await map.edit(content="https://i.ibb.co/cTsg1x5/wargame-large.png")
+                        await map.edit(content="https://i.ibb.co/kMCVN4K/wargame-terrain-with-numbers.png")
                         for react in reactions:
                             await map.add_reaction(react)
                         continue
@@ -2784,6 +2828,7 @@ class CNC(commands.Cog):
                         '''UPDATE provinces SET troops = $1, port = FALSE, city = FALSE, fort = FALSE WHERE id = $2;''',
                         randrange(100, 180), p)
             await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = $2;''', "0", "turns")
+            await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = $2;''', "0", "resources")
             await ctx.send("https://tenor.com/view/finished-elijah-wood-lord-of-the-rings-lava-fire-gif-5894611")
             return
         except Exception as error:
@@ -3540,7 +3585,6 @@ class CNC(commands.Cog):
                 for troops in all_troops_in_provinces:
                     total_troops += troops['troops']
                 total_troops += u['undeployed']
-                total_troops /= 2
                 await conn.execute('''UPDATE cncusers SET totaltroops = $1 WHERE username = $2;''', total_troops,
                                    username)
             await ctx.send("Done!")
@@ -3598,13 +3642,13 @@ class CNC(commands.Cog):
                     added_manpower = max_manpower
                 # calculate and add all movement points, resources, manpower, and other limits
                 # moves
-                if len(provinceslist) <= 5:
-                    await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', 5,
+                if len(provinceslist) <= 10:
+                    await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', 2,
                                        userinfo['user_id'])
-                elif len(provinceslist) > 5:
-                    movementpoints = math.floor((len(provinceslist) - 5) / 5) + 5
+                elif len(provinceslist) > 10:
+                    movementpoints = math.floor((len(provinceslist) - 10) / 10) + 2
                     if userinfo['focus'] == "s":
-                        movementpoints += math.ceil(movementpoints * .5)
+                        movementpoints += math.ceil(movementpoints * .1)
                     await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', movementpoints,
                                        userinfo['user_id'])
                 # fort/city/port limit update
