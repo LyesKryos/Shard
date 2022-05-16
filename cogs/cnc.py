@@ -206,9 +206,9 @@ class CNC(commands.Cog):
                 return
             # inserts the users id into the databases
             await conn.execute(
-                '''INSERT INTO cncusers (user_id, username, usercolor, totaltroops, provinces_owned, resources, 
-                focus, undeployed, moves) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);''',
-                userid, nationame, color, 0, [0], randint(9000, 10000), focus.lower(), 0, 5)
+                '''INSERT INTO cncusers (user_id, username, usercolor, provinces_owned, resources, 
+                focus, undeployed, moves) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);''',
+                userid, nationame, color, [0], randint(9000, 10000), focus.lower(), 0, 5)
             allnations = await conn.fetch('''SELECT username FROM cncusers;''')
             allnations = [n['username'] for n in allnations]
             for n in allnations:
@@ -257,9 +257,15 @@ class CNC(commands.Cog):
                     provinceslist.remove(0)
                     provinceslist.sort()
                     provinces = ', '.join(str(i) for i in provinceslist)
+                    total_troops = 0
+                    for p in provinceslist:
+                        provinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+                        total_troops += provinfo['troops']
+                    total_troops += userinfo['undeployed']
                 else:
                     provinceslist = []
                     provinces = "None"
+                    total_troops = userinfo['undeployed']
                 # sets focus
                 if userinfo['focus'] == "m":
                     focus = "Military"
@@ -297,7 +303,7 @@ class CNC(commands.Cog):
                 cncuserembed = discord.Embed(title=userinfo["username"], color=color,
                                              description=f"Registered nation of {self.bot.get_user(userinfo['user_id']).name}.")
                 cncuserembed.add_field(name=f"Territory (Total: {len(provinceslist)})", value=provinces, inline=False)
-                cncuserembed.add_field(name="Total Troops", value=userinfo["totaltroops"])
+                cncuserembed.add_field(name="Total Troops", value=total_troops)
                 cncuserembed.add_field(name="Undeployed Troops", value=userinfo['undeployed'])
                 cncuserembed.add_field(name="Resources", value=f"\u03FE{userinfo['resources']}")
                 cncuserembed.add_field(name="National Focus", value=focus)
@@ -333,9 +339,15 @@ class CNC(commands.Cog):
                     provinceslist.remove(0)
                     provinceslist.sort()
                     provinces = ', '.join(str(p) for p in provinceslist)
+                    total_troops = 0
+                    for p in provinceslist:
+                        provinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+                        total_troops += provinfo['troops']
+                    total_troops += nation['undeployed']
                 else:
                     provinceslist = []
                     provinces = "None"
+                    total_troops = nation['undeployed']
                 # fetches relations information
                 relations = await conn.fetch('''SELECT nation, relation FROM relations WHERE name = $1;''',
                                              nation['username'])
@@ -360,7 +372,7 @@ class CNC(commands.Cog):
                 cncuserembed = discord.Embed(title=nation["username"], color=color,
                                              description=f"Registered nation of {self.bot.get_user(nation['user_id']).name}.")
                 cncuserembed.add_field(name=f"Territory (Total: {len(provinceslist)})", value=provinces, inline=False)
-                cncuserembed.add_field(name="Total Troops", value=nation["totaltroops"])
+                cncuserembed.add_field(name="Total Troops", value=total_troops)
                 cncuserembed.add_field(name="Undeployed Troops", value=nation['undeployed'])
                 cncuserembed.add_field(name="Resources", value=f"\u03FE{nation['resources']}")
                 cncuserembed.add_field(name="National Focus", value=nation["focus"])
@@ -402,9 +414,15 @@ class CNC(commands.Cog):
                 provinceslist.remove(0)
                 provinceslist.sort()
                 provinces = ', '.join(str(i) for i in provinceslist)
+                total_troops = 0
+                for p in provinceslist:
+                    provinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+                    total_troops += provinfo['troops']
+                total_troops += userinfo['undeployed']
             else:
                 provinceslist = []
                 provinces = "None"
+                total_troops = userinfo['undeployed']
             # sets focus
             if userinfo['focus'] == "m":
                 focus = "Military"
@@ -450,7 +468,7 @@ class CNC(commands.Cog):
             cncuserembed = discord.Embed(title=userinfo["username"], color=color,
                                          description=f"Registered nation of {self.bot.get_user(userinfo['user_id']).name}.")
             cncuserembed.add_field(name=f"Territory (Total: {len(provinceslist)})", value=provinces, inline=False)
-            cncuserembed.add_field(name="Total Troops", value=userinfo["totaltroops"])
+            cncuserembed.add_field(name="Total Troops", value=total_troops)
             cncuserembed.add_field(name="Undeployed Troops", value=userinfo['undeployed'])
             cncuserembed.add_field(name="Resources", value=f"\u03FE{userinfo['resources']}")
             cncuserembed.add_field(name="National Focus", value=focus)
@@ -1589,8 +1607,6 @@ class CNC(commands.Cog):
                 try:
                     await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
                                        ((ramount * 1000) + (userinfo['undeployed'])), author.id)
-                    await conn.execute('''UPDATE cncusers SET totaltroops = $1 WHERE user_id = $2;''',
-                                       ((ramount * 1000) + (userinfo['totaltroops'])), author.id)
                     await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''', (monies - cost),
                                        author.id)
                     await ctx.send(
@@ -1616,8 +1632,7 @@ class CNC(commands.Cog):
                     return
             # updates all province and user information
             try:
-                await conn.execute('''UPDATE cncusers SET totaltroops = $1, manpower= $2 WHERE user_id = $3;''',
-                                   userinfo['totaltroops'] + (ramount * 1000), userinfo['manpower'] - manpower,
+                await conn.execute('''UPDATE cncusers SET manpower= $1 WHERE user_id = $2;''', userinfo['manpower'] - manpower,
                                    author.id)
                 troops = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', location)
                 await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
@@ -1670,8 +1685,7 @@ class CNC(commands.Cog):
                     await ctx.send(f"{userinfo['username']} does not have enough manpower to recruit {amount} troops"
                                    f" for every province, lacking {-(userinfo['manpower'] - manpower)} manpower. ")
                     return
-                await conn.execute('''UPDATE cncusers SET totaltroops = $1, manpower= $2 WHERE user_id = $3;''',
-                                   userinfo['totaltroops'] + (amount), userinfo['manpower'] - manpower, author.id)
+                await conn.execute('''UPDATE cncusers SET manpower= $1 WHERE user_id = $2;''', userinfo['manpower'] - manpower, author.id)
                 for p in provincelist:
                     troops = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', p)
                     await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
@@ -2242,8 +2256,7 @@ class CNC(commands.Cog):
                                                     f" \U00002694 to attack again or \U0001f3f3 to retreat.")
                         # updates the relevant information
                         await conn.execute(
-                            '''UPDATE cncusers SET totaltroops = $1, resources = $2 WHERE user_id = $3;''',
-                            (userinfo['totaltroops'] - battle.AttackingCasualties),
+                            '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
                             (userinfo['resources'] - crossingfee), author.id)
                         await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                            (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
@@ -2336,8 +2349,7 @@ class CNC(commands.Cog):
                                                     f"React with \U00002694 to attack again or \U0001f3f3 to retreat.")
                         # updates the relevant information
                         await conn.execute(
-                            '''UPDATE cncusers SET totaltroops = $1, resources = $2 WHERE user_id = $3;''',
-                            (userinfo['totaltroops'] - battle.AttackingCasualties),
+                            '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
                             (userinfo['resources'] - crossingfee), author.id)
                         await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                            (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
@@ -2431,8 +2443,7 @@ class CNC(commands.Cog):
                                                     f"React with \U00002694 to attack again or \U0001f3f3 to retreat.")
                         # updates the relevant information
                         await conn.execute(
-                            '''UPDATE cncusers SET totaltroops = $1, resources = $2 WHERE user_id = $3;''',
-                            (userinfo['totaltroops'] - battle.AttackingCasualties),
+                            '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
                             (userinfo['resources'] - crossingfee), author.id)
                         await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                            (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
@@ -2524,9 +2535,8 @@ class CNC(commands.Cog):
                                 '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
                                 battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
                             await conn.execute(
-                                '''UPDATE cncusers SET provinces_owned = $1, totaltroops = $2, moves = $3, resources = $4 WHERE user_id = $5;''',
-                                victorownedlist, (userinfo['totaltroops'] - battle.AttackingCasualties),
-                                (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
+                                '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
+                                victorownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
                             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                                (stationedinfo['troops'] - force), stationed)
                             # sets the footer and sends the embed object
@@ -2560,16 +2570,14 @@ class CNC(commands.Cog):
                             victorownedlist.append(target)
                             # updates all troop and province information and sends the embed
                             await conn.execute(
-                                '''UPDATE cncusers SET provinces_owned = $1, totaltroops = $2 WHERE user_id = $3;''',
-                                defownedlist, (defenderinfo['totaltroops'] - battle.DefendingCasualties),
-                                defenderinfo['user_id'])
+                                '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
+                                (userinfo['resources'] - crossingfee), author.id)
                             await conn.execute(
                                 '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
                                 battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
                             await conn.execute(
-                                '''UPDATE cncusers SET provinces_owned = $1, totaltroops = $2, moves = $3, resources = $4 WHERE user_id = $5;''',
-                                victorownedlist, (userinfo['totaltroops'] - battle.AttackingCasualties),
-                                (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
+                                '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
+                                victorownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
                             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                                (stationedinfo['troops'] - force), stationed)
                             battleembed.set_footer(
@@ -2598,16 +2606,15 @@ class CNC(commands.Cog):
                             victorownedlist.append(target)
                             # updates all relevant information and sends the embed
                             await conn.execute(
-                                '''UPDATE cncusers SET provinces_owned = $1, undeployed = $2, totaltroops = $3 WHERE user_id = $4;''',
+                                '''UPDATE cncusers SET provinces_owned = $1, undeployed = $2 WHERE user_id = $3;''',
                                 defownedlist, (defenderinfo['undeployed'] + battle.RemainingDefendingArmy),
-                                (defenderinfo['totaltroops'] - battle.DefendingCasualties), defenderinfo['user_id'])
+                                defenderinfo['user_id'])
                             await conn.execute(
                                 '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
                                 battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
                             await conn.execute(
-                                '''UPDATE cncusers SET provinces_owned = $1, totaltroops = $2, moves = $3, resources = $4 WHERE user_id = $5;''',
-                                victorownedlist, (userinfo['totaltroops'] - battle.AttackingCasualties),
-                                (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
+                                '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
+                                victorownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
                             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                                (stationedinfo['troops'] - force), stationed)
                             deaths = await conn.fetchrow(
@@ -2646,16 +2653,14 @@ class CNC(commands.Cog):
                             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                                (battle.RemainingDefendingArmy + retreatinfo['troops']), retreatprovince)
                             await conn.execute(
-                                '''UPDATE cncusers SET provinces_owned = $1, totaltroops = $2 WHERE user_id = $3;''',
-                                defownedlist, (defenderinfo['totaltroops'] - battle.DefendingCasualties),
-                                targetownerid['owner_id'])
+                                '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
+                                (userinfo['resources'] - crossingfee), author.id)
                             await conn.execute(
                                 '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
                                 battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
                             await conn.execute(
-                                '''UPDATE cncusers SET provinces_owned = $1, totaltroops = $2, moves = $3, resources = $4 WHERE user_id = $5;''',
-                                victorownedlist, (userinfo['totaltroops'] - battle.AttackingCasualties),
-                                (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
+                                '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
+                                victorownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
                             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                                (stationedinfo['troops'] - force), stationed)
                             deaths = await conn.fetchrow(
@@ -2681,8 +2686,7 @@ class CNC(commands.Cog):
                         try:
                             # updates the relevant information and sends the embed
                             await conn.execute(
-                                '''UPDATE cncusers SET totaltroops = $1, resources = $2 WHERE user_id = $3;''',
-                                (userinfo['totaltroops'] - battle.AttackingCasualties),
+                                '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
                                 (userinfo['resources'] - crossingfee), author.id)
                             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                                (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
@@ -2704,12 +2708,8 @@ class CNC(commands.Cog):
                     try:
                         # updates the relevant information and sends the embed
                         await conn.execute(
-                            '''UPDATE cncusers SET totaltroops = $1, resources = $2 WHERE user_id = $3;''',
-                            (userinfo['totaltroops'] - battle.AttackingCasualties),
+                            '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
                             (userinfo['resources'] - crossingfee), author.id)
-                        await conn.execute('''UPDATE cncusers SET totaltroops = $1 WHERE user_id = $2;''',
-                                           (defenderinfo['totaltroops'] - battle.DefendingCasualties),
-                                           defenderinfo['user_id'])
                         await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                            (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
                         await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
@@ -3588,25 +3588,6 @@ class CNC(commands.Cog):
         except Exception as error:
             self.bot.logger.warning(msg=error)
 
-    @commands.command()
-    @modcheck()
-    async def cnc_troop_check(self, ctx, ):
-        try:
-            conn = self.bot.pool
-            user = await conn.fetch('''SELECT * FROM cncusers;''')
-            for u in user:
-                username = u['username']
-                all_troops_in_provinces = await conn.fetch('''SELECT troops FROM provinces WHERE owner = $1;''',
-                                                           username)
-                total_troops = 0
-                for troops in all_troops_in_provinces:
-                    total_troops += troops['troops']
-                total_troops += u['undeployed']
-                await conn.execute('''UPDATE cncusers SET totaltroops = $1 WHERE username = $2;''', total_troops,
-                                   username)
-            await ctx.send("Done!")
-        except Exception as error:
-            self.bot.logger.warning(msg=error)
 
     # ---------------------Updating------------------------------
 
