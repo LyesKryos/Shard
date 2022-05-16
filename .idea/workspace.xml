@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding renaming of provinces for province owners.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing the deaths thing" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -125,21 +122,7 @@
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
-      <workItem from="1652651101974" duration="5115000" />
-    </task>
-    <task id="LOCAL-00155" summary="CNC attack command fix">
-      <created>1652401691022</created>
-      <option name="number" value="00155" />
-      <option name="presentableId" value="LOCAL-00155" />
-      <option name="project" value="LOCAL" />
-      <updated>1652401691022</updated>
-    </task>
-    <task id="LOCAL-00156" summary="CNC attack command fix">
-      <created>1652401851840</created>
-      <option name="number" value="00156" />
-      <option name="presentableId" value="LOCAL-00156" />
-      <option name="project" value="LOCAL" />
-      <updated>1652401851840</updated>
+      <workItem from="1652651101974" duration="5489000" />
     </task>
     <task id="LOCAL-00157" summary="CNC: wording and math presentation corrections">
       <created>1652404155397</created>
@@ -470,7 +453,21 @@
       <option name="project" value="LOCAL" />
       <updated>1652662614713</updated>
     </task>
-    <option name="localTasksCounter" value="204" />
+    <task id="LOCAL-00204" summary="Fixing the deaths thing">
+      <created>1652725720132</created>
+      <option name="number" value="00204" />
+      <option name="presentableId" value="LOCAL-00204" />
+      <option name="project" value="LOCAL" />
+      <updated>1652725720132</updated>
+    </task>
+    <task id="LOCAL-00205" summary="Fixing the deaths thing">
+      <created>1652725895452</created>
+      <option name="number" value="00205" />
+      <option name="presentableId" value="LOCAL-00205" />
+      <option name="project" value="LOCAL" />
+      <updated>1652725895452</updated>
+    </task>
+    <option name="localTasksCounter" value="206" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -489,7 +486,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Addition of dynamic turn display and turn loop corrections" />
     <MESSAGE value="Changing CNC Maps" />
     <MESSAGE value="Fixing role permissions and adding to banned colors" />
     <MESSAGE value="Adding wording corrections" />
@@ -514,7 +510,8 @@
     <MESSAGE value="Fixing removal commands" />
     <MESSAGE value="Altering variables, adding death data. CnC v1.2b" />
     <MESSAGE value="Adding renaming of provinces for province owners." />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding renaming of provinces for province owners." />
+    <MESSAGE value="Fixing the deaths thing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing the deaths thing" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
