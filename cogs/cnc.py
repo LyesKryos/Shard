@@ -3687,7 +3687,7 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=error)
 
     @commands.command()
-    @commands.is_owner()
+    @modcheck()
     async def cnc_turn_loop(self):
         try:
             # channel to send to
