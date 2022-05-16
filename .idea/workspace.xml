@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing turn command" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing turn">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -122,28 +124,7 @@
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
-      <workItem from="1652651101974" duration="8303000" />
-    </task>
-    <task id="LOCAL-00160" summary="CNC: wording and math presentation corrections">
-      <created>1652405429390</created>
-      <option name="number" value="00160" />
-      <option name="presentableId" value="LOCAL-00160" />
-      <option name="project" value="LOCAL" />
-      <updated>1652405429390</updated>
-    </task>
-    <task id="LOCAL-00161" summary="Addition of dynamic turn display and turn loop corrections">
-      <created>1652452986064</created>
-      <option name="number" value="00161" />
-      <option name="presentableId" value="LOCAL-00161" />
-      <option name="project" value="LOCAL" />
-      <updated>1652452986064</updated>
-    </task>
-    <task id="LOCAL-00162" summary="Addition of dynamic turn display and turn loop corrections">
-      <created>1652453086599</created>
-      <option name="number" value="00162" />
-      <option name="presentableId" value="LOCAL-00162" />
-      <option name="project" value="LOCAL" />
-      <updated>1652453086599</updated>
+      <workItem from="1652651101974" duration="8622000" />
     </task>
     <task id="LOCAL-00163" summary="Changing CNC Maps">
       <created>1652454277589</created>
@@ -467,7 +448,28 @@
       <option name="project" value="LOCAL" />
       <updated>1652738972250</updated>
     </task>
-    <option name="localTasksCounter" value="209" />
+    <task id="LOCAL-00209" summary="Fixing turn command">
+      <created>1652739082759</created>
+      <option name="number" value="00209" />
+      <option name="presentableId" value="LOCAL-00209" />
+      <option name="project" value="LOCAL" />
+      <updated>1652739082759</updated>
+    </task>
+    <task id="LOCAL-00210" summary="Fixing turn">
+      <created>1652739272677</created>
+      <option name="number" value="00210" />
+      <option name="presentableId" value="LOCAL-00210" />
+      <option name="project" value="LOCAL" />
+      <updated>1652739272679</updated>
+    </task>
+    <task id="LOCAL-00211" summary="Fixing turn">
+      <created>1652739339296</created>
+      <option name="number" value="00211" />
+      <option name="presentableId" value="LOCAL-00211" />
+      <option name="project" value="LOCAL" />
+      <updated>1652739339296</updated>
+    </task>
+    <option name="localTasksCounter" value="212" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -486,7 +488,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Adding wording corrections" />
     <MESSAGE value="Amending map" />
     <MESSAGE value="Small bug fixes" />
     <MESSAGE value="Small bug fixes and fixing the WA welcoming" />
@@ -511,7 +512,8 @@
     <MESSAGE value="Fixing the deaths thing" />
     <MESSAGE value="Fixing total troops" />
     <MESSAGE value="Fixing turn command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing turn command" />
+    <MESSAGE value="Fixing turn" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing turn" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
