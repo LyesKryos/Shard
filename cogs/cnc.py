@@ -498,9 +498,10 @@ class CNC(commands.Cog):
             viewallembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
             for users in [userids['user_id'] for userids in registeredusers]:
                 individualinformation = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', users)
+                user = self.bot.get_user(individualinformation['user_id'])
                 viewallembed.add_field(name=f"__{individualinformation['username']}__",
-                                       value=f"**ID:**\n {individualinformation['user_id']}\n**Color:**\n{individualinformation['usercolor']}",
-                                       inline=False)
+                                       value=f"**Discord Username:** {user.display_name}\n"
+                                             f"**Color:** {individualinformation['usercolor']}")
             await ctx.send(embed=viewallembed)
         except Exception as error:
             self.bot.logger.warning(msg=error)
