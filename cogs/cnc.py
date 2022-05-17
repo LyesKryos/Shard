@@ -2224,7 +2224,7 @@ class CNC(commands.Cog):
                 terrain_id = targetinfo['terrain']
                 terrain = await conn.fetchrow('''SELECT name FROM terrains WHERE id = $1;''', terrain_id)
                 terrain = terrain['name']
-                battle = calculations(attacking_troops, defending_troops, terrain, ctx)
+                battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
                 # simulate battle
                 await battle.Casualties()
                 # if the defenders win the battle roll, no retreat
@@ -2296,7 +2296,7 @@ class CNC(commands.Cog):
                                 defending_troops = battle.RemainingDefendingArmy
                                 attacking_troops = battle.RemainingAttackingArmy
                                 terrain = 3
-                                battle = calculations(attacking_troops, defending_troops, terrain, ctx)
+                                battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
                                 # simulate battle
                                 await battle.Casualties()
                                 # if the defenders win the battle roll, no retreat
@@ -2389,7 +2389,7 @@ class CNC(commands.Cog):
                                 defending_troops = battle.RemainingDefendingArmy
                                 attacking_troops = battle.RemainingAttackingArmy
                                 terrain = 8
-                                battle = calculations(attacking_troops, defending_troops, terrain, ctx)
+                                battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
                                 # simulate battle
                                 await battle.Casualties()
                                 # if the defenders win the battle roll, no retreat
@@ -2480,7 +2480,7 @@ class CNC(commands.Cog):
                                 defending_troops = battle.RemainingDefendingArmy
                                 attacking_troops = battle.RemainingAttackingArmy
                                 terrain = 4
-                                battle = calculations(attacking_troops, defending_troops, terrain, ctx)
+                                battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
                                 # simulate battle
                                 await battle.Casualties()
                                 # if the defenders win the battle roll, no retreat
