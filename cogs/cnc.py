@@ -368,6 +368,14 @@ class CNC(commands.Cog):
                     alliances = ', '.join(str(a['nation']) for a in alliances)
                 else:
                     alliances = "None"
+                if nation['focus'] == "m":
+                    focus = "Military"
+                elif nation['focus'] == "e":
+                    focus = "Economy"
+                elif nation['focus'] == "s":
+                    focus = "Strategy"
+                elif nation['focus'] == "none":
+                    focus = "None"
                 # creates the embed object
                 cncuserembed = discord.Embed(title=nation["username"], color=color,
                                              description=f"Registered nation of {self.bot.get_user(nation['user_id']).name}.")
@@ -375,7 +383,7 @@ class CNC(commands.Cog):
                 cncuserembed.add_field(name="Total Troops", value=total_troops)
                 cncuserembed.add_field(name="Undeployed Troops", value=nation['undeployed'])
                 cncuserembed.add_field(name="Resources", value=f"\u03FE{nation['resources']}")
-                cncuserembed.add_field(name="National Focus", value=nation["focus"])
+                cncuserembed.add_field(name="National Focus", value=focus)
                 cncuserembed.add_field(name="Color", value=colorvalue)
                 cncuserembed.add_field(name="Movement Points", value=nation['moves'])
                 cncuserembed.add_field(name="Alliances", value=alliances)
@@ -2213,7 +2221,8 @@ class CNC(commands.Cog):
                 # fetch proper information
                 defending_troops = int(targetinfo['troops'])
                 attacking_troops = force
-                terrain = int(targetinfo['terrain'])
+                terrain_id = targetinfo['terrain']
+                terrain = await conn.fetchrow('''SELECT name FROM terrains WHERE id = $1;''', terrain_id)
                 battle = calculations(attacking_troops, defending_troops, terrain, ctx)
                 # simulate battle
                 await battle.Casualties()
@@ -2231,7 +2240,7 @@ class CNC(commands.Cog):
                                             color=discord.Color.red())
                 battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
                 battleembed.add_field(name="Defending Force", value=str(defending_troops))
-                battleembed.add_field(name="Terrain", value=str(terrain))
+                battleembed.add_field(name="Terrain", value=terrain)
                 battleembed.add_field(name="Outcome", value=str(victor), inline=False)
                 battleembed.add_field(name="Attacking Casualties", value=str(battle.AttackingCasualties))
                 battleembed.add_field(name="Defending Casualties", value=str(battle.DefendingCasualties))
@@ -3648,7 +3657,7 @@ class CNC(commands.Cog):
                 elif len(provinceslist) > 10:
                     movementpoints = math.floor((len(provinceslist) - 10) / 10) + 2
                     if userinfo['focus'] == "s":
-                        movementpoints += math.ceil(movementpoints * .1)
+                        movementpoints += math.floor(movementpoints * .1)
                     await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', movementpoints,
                                        userinfo['user_id'])
                 # fort/city/port limit update
