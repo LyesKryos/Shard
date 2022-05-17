@@ -2223,6 +2223,7 @@ class CNC(commands.Cog):
                 attacking_troops = force
                 terrain_id = targetinfo['terrain']
                 terrain = await conn.fetchrow('''SELECT name FROM terrains WHERE id = $1;''', terrain_id)
+                terrain = terrain['name']
                 battle = calculations(attacking_troops, defending_troops, terrain, ctx)
                 # simulate battle
                 await battle.Casualties()
