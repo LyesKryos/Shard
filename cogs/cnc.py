@@ -2747,6 +2747,7 @@ class CNC(commands.Cog):
     # ------------------Map Commands----------------------------
 
     @commands.command(brief="Displays the map")
+    @commands.guild_only()
     async def cnc_map(self, ctx, debug: bool = False):
         try:
             loop = asyncio.get_running_loop()
