@@ -611,7 +611,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="[item being edited (color or focus)]", brief="Changes a nation's registered color")
     @commands.guild_only()
-    async def cnc_edit(self, ctx, editing):
+    async def cnc_edit(self, ctx, editing: str):
         try:
             loop = asyncio.get_running_loop()
             author = ctx.author
@@ -1644,7 +1644,8 @@ class CNC(commands.Cog):
                                    (troops['troops'] + (ramount * 1000)), location)
                 await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''', (monies - cost),
                                    author.id)
-                await ctx.send(f"{nationname} has successfully deployed {ramount * 1000} to Province #{location}.")
+                await ctx.send(f"{nationname} has successfully deployed {ramount * 1000} to Province #{location}. "
+                               f"\u03FE{cost} have been spent.")
             except Exception as error:
                 self.bot.logger.warning(msg=error)
                 await ctx.send(error)
@@ -2384,7 +2385,6 @@ class CNC(commands.Cog):
                                 await battlenotif.edit(embed=battleembed)
                                 defending_troops = battle.RemainingDefendingArmy
                                 attacking_troops = battle.RemainingAttackingArmy
-                                terrain = 8
                                 battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
                                 # simulate battle
                                 await battle.Casualties()
