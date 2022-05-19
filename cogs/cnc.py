@@ -1625,14 +1625,15 @@ class CNC(commands.Cog):
                     await ctx.send(error)
             else:
                 # fetches all province ids and makes them into a list
-                province = await conn.fetchrow('''SELECT id FROM provinces WHERE id = $1;''', location)
+                province = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', location)
                 if province is None:
-                    await ctx.send(f"Location id `{location}` is not a valid ID.")
+                    await ctx.send(f"`{location}` is not a valid province ID.")
                     return
                 # if the location is not owned by the user
                 if province['owner_id'] != author.id:
                     await ctx.send(
-                        f"{nationname} does not own province #{location}. Please select a location that {nationname} owns.")
+                        f"{nationname} does not own province #{location}. "
+                        f"Please select a location that {nationname} owns.")
                     return
             # updates all province and user information
             try:
