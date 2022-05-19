@@ -83,6 +83,8 @@ class Shard(commands.Bot):
             await ctx.send(f"I cannot run `${ctx.invoked_with}` in DMs! Return to the safety of a server.")
         elif isinstance(error, commands.PrivateMessageOnly):
             await ctx.send(f"I cannot run `${ctx.invoked_with}` outside of DMs!")
+        elif isinstance(error, commands.MaxConcurrencyReached):
+            await ctx.send(f"You're already using `${ctx.invoked_with}`.")
         # if there is a custom check error
         elif isinstance(error, commands.UserInputError):
             await ctx.send_help(ctx.invoked_with)
