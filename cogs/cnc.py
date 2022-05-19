@@ -559,7 +559,8 @@ class CNC(commands.Cog):
                 # if the maximum provinces have been reached, send the final set
                 if province_number == len(provinces):
                     await author.send(embed=sv_emebed)
-                    await ctx.send("Sent!")
+                    if ctx.guild is not None:
+                        await ctx.send("Sent!")
                     return
         except Exception as error:
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
@@ -1167,20 +1168,16 @@ class CNC(commands.Cog):
             conn = self.bot.pool
             interactions = await conn.fetch(
                 '''SELECT * FROM pending_interactions WHERE sender_id = $1 or recipient_id = $1;''', author.id)
-            recipient_text = ''
-            sender_text = ''
+            if interactions is None:
+                await ctx.send("No pending interactions found.")
+            interactions_text = ''
             for i in interactions:
-                text = f"Offer of `{i['type']}` from `{i['sender']}` to `{i['recipient']}` pending. `{self.bot.command_prefix}cnc_offer {i['id']}`.\n"
-                if i['sender'] == author.id:
-                    sender_text += text
-                else:
-                    recipient_text += text
-            if recipient_text == '':
-                recipient_text = "No incoming interactions pending."
-            if sender_text == '':
-                sender_text = "No outgoing interactions pending."
-            await author.send(recipient_text)
-            await author.send(sender_text)
+                text = f"Offer of `{i['type']}` from `{i['sender']}` to `{i['recipient']}` pending. " \
+                       f"`{self.bot.command_prefix}cnc_offer {i['id']}`.\n"
+                interactions_text += text
+            await author.send(interactions_text)
+            if ctx.guild is not None:
+                await ctx.send("Sent!")
         except Exception as error:
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
