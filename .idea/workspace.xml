@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing terrain on attack">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing map in DM issue">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -124,14 +125,7 @@
       <workItem from="1651670712730" duration="2595000" />
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
-      <workItem from="1652651101974" duration="20008000" />
-    </task>
-    <task id="LOCAL-00169" summary="Small bug fixes">
-      <created>1652467005564</created>
-      <option name="number" value="00169" />
-      <option name="presentableId" value="LOCAL-00169" />
-      <option name="project" value="LOCAL" />
-      <updated>1652467005564</updated>
+      <workItem from="1652651101974" duration="21698000" />
     </task>
     <task id="LOCAL-00170" summary="Small bug fixes">
       <created>1652467259456</created>
@@ -469,7 +463,14 @@
       <option name="project" value="LOCAL" />
       <updated>1652822446517</updated>
     </task>
-    <option name="localTasksCounter" value="218" />
+    <task id="LOCAL-00218" summary="Fixing map in DM issue">
+      <created>1652872587643</created>
+      <option name="number" value="00218" />
+      <option name="presentableId" value="LOCAL-00218" />
+      <option name="project" value="LOCAL" />
+      <updated>1652872587644</updated>
+    </task>
+    <option name="localTasksCounter" value="219" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -488,7 +489,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Removing a war crime" />
     <MESSAGE value="Fixing treaties" />
     <MESSAGE value="(Hopefully) final turn fix" />
     <MESSAGE value="Adding paint province command for fixing random provinces" />
@@ -513,7 +513,8 @@
     <MESSAGE value="Changing cncva to something easier to read" />
     <MESSAGE value="Fixing movement points and cncv aesthetics" />
     <MESSAGE value="Fixing terrain on attack" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing terrain on attack" />
+    <MESSAGE value="Fixing map in DM issue" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing map in DM issue" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

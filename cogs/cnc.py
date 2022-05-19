@@ -1626,16 +1626,12 @@ class CNC(commands.Cog):
                     await ctx.send(error)
             else:
                 # fetches all province ids and makes them into a list
-                allprovinces = await conn.fetch('''SELECT id FROM provinces''')
-                allids = list()
-                for x in allprovinces:
-                    allids.append(x["id"])
-                # if the location is invalid
-                if location not in allids:
+                province = await conn.fetchrow('''SELECT id FROM provinces WHERE id = $1;''', location)
+                if province is None:
                     await ctx.send(f"Location id `{location}` is not a valid ID.")
                     return
                 # if the location is not owned by the user
-                if location not in userinfo['provinces_owned']:
+                if province['owner_id'] != author.id:
                     await ctx.send(
                         f"{nationname} does not own province #{location}. Please select a location that {nationname} owns.")
                     return
@@ -2670,8 +2666,9 @@ class CNC(commands.Cog):
                                 '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
                                 battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
                             await conn.execute(
-                                '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
-                                victorownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
+                                '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id 
+                                = $4;''', victorownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee),
+                                author.id)
                             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                                (stationedinfo['troops'] - force), stationed)
                             deaths = await conn.fetchrow(
@@ -2748,6 +2745,7 @@ class CNC(commands.Cog):
 
     @commands.command(brief="Displays the map")
     @commands.guild_only()
+    @commands.max_concurrency(1, commands.BucketType.user)
     async def cnc_map(self, ctx, debug: bool = False):
         try:
             loop = asyncio.get_running_loop()
