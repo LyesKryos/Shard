@@ -142,7 +142,7 @@ class CNC(commands.Cog):
             infoembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
             await ctx.send(embed=infoembed)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(brief="Displays the turn count.")
     @commands.guild_only()
@@ -164,7 +164,7 @@ class CNC(commands.Cog):
             await ctx.send(f"It is currently turn #{data['data_value']}. "
                            f"Next turn is <t:{math.floor(turnjob.next_run_time.timestamp())}:R>")
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[nation name] #[hexadecimal color id] <focus (m,e,s)>", brief="Registers a new nation")
     @commands.guild_only()
@@ -221,8 +221,7 @@ class CNC(commands.Cog):
             await ctx.send(f"{ctx.author.name} has registered {nationame} in the Command and Conquer System!")
         # sends out any error
         except Exception as error:
-            await ctx.send(error)
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="<nation name>", aliases=['cncv'], brief="Displays information about a nation")
     async def cnc_view(self, ctx, *args):
@@ -390,7 +389,7 @@ class CNC(commands.Cog):
                 cncuserembed.add_field(name="Wars", value=wars)
                 await ctx.send(embed=cncuserembed)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(aliases=['cncdv'], brief="Displays detailed information about a nation, privately")
     async def cnc_detailed_view(self, ctx):
@@ -492,7 +491,7 @@ class CNC(commands.Cog):
             await ctx.send("Sent!")
             await author.send(embed=cncuserembed)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(aliases=['cncva'], brief="Displays information about all nations")
     @commands.guild_only()
@@ -512,7 +511,7 @@ class CNC(commands.Cog):
                                              f"**Color:** {individualinformation['usercolor']}")
             await ctx.send(embed=viewallembed)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(aliases=['cncsv'],
                       brief="Displays detailed information about all provinces a nation owns, privately")
@@ -563,7 +562,7 @@ class CNC(commands.Cog):
                     await ctx.send("Sent!")
                     return
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[nation name] <reason>", brief="Completely removes a user from the CNC system. Owner only")
     @commands.is_owner()
@@ -607,7 +606,7 @@ class CNC(commands.Cog):
             await user.send(
                 f"Your registered Command and Conquer account, {nationamesave['username']}, has been deleted by moderator {ctx.author} for the following reason:```{reason}```")
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[item being edited (color or focus)]", brief="Changes a nation's registered color")
     @commands.guild_only()
@@ -692,7 +691,7 @@ class CNC(commands.Cog):
                 await ctx.send(f"`{editing}` is not a viable option for this command!")
                 return
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     # ---------------------Province Commands------------------------------
 
@@ -756,7 +755,7 @@ class CNC(commands.Cog):
             provinceembed.add_field(name="Coastline", value=coastline)
             await ctx.send(embed=provinceembed)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[province id]", brief="Releases a specified province")
     @commands.guild_only()
@@ -826,7 +825,7 @@ class CNC(commands.Cog):
                 self.bot.logger.warning(msg=error)
                 await ctx.send(error)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[province id] [name]", brief="Renames a province.")
     @commands.guild_only()
@@ -843,7 +842,7 @@ class CNC(commands.Cog):
             await conn.execute('''UPDATE provinces SET name = $1 WHERE id = $2;''', name, provinceid)
             await ctx.send(f"Province #{provinceid} is now {name}!")
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[province id] [deployed force]",
                       aliases=['cncd'], brief="Deploys a number of troops to a specified province")
@@ -900,7 +899,7 @@ class CNC(commands.Cog):
                     self.bot.logger.warning(msg=error)
                     await ctx.send(error)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[province id] [recipient nation]",
                       brief="Transfers a province to another nation's control")
@@ -970,7 +969,7 @@ class CNC(commands.Cog):
                 self.bot.logger.warning(msg=error)
                 await ctx.send(error)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     # ---------------------Interaction Commands------------------------------
 
@@ -1011,7 +1010,7 @@ class CNC(commands.Cog):
                 with open(f"{self.interaction_directory}{interaction['id']}.txt", "r") as file:
                     await ctx.send(file=discord.File(file, f"{interaction['id']}.txt"))
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[offer id]", brief="Displays a specific offer with information")
     async def cnc_offer(self, ctx, offerid: int):
@@ -1042,7 +1041,7 @@ class CNC(commands.Cog):
                 with open(f"{self.interaction_directory}{offer['id']}.txt", "r") as file:
                     await ctx.send(file=discord.File(file, f"{offer['id']}.txt"))
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[interaction id] [interaction (accept, reject, cancel)]", aliases=['cnci'],
                       brief="Allows for interacting with a proposed interaction")
@@ -1158,7 +1157,7 @@ class CNC(commands.Cog):
             else:
                 raise commands.UserInputError
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(brief="Displays all pending interactions and offers")
     async def cnc_view_pending(self, ctx):
@@ -1183,7 +1182,7 @@ class CNC(commands.Cog):
             await author.send(recipient_text)
             await author.send(sender_text)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[nation],, [terms]", brief="Sends an alliance offer to a nation")
     async def cnc_alliance(self, ctx, *, args):
@@ -1255,7 +1254,7 @@ class CNC(commands.Cog):
                 self.bot.logger.warning(msg=error)
                 await ctx.send(error)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[recipient],, <goal>", brief="Declares war on a nation")
     @commands.guild_only()
@@ -1350,7 +1349,7 @@ class CNC(commands.Cog):
                 self.bot.logger.warning(msg=error)
                 await ctx.send(error)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[recipient],, [terms]", brief="Sends a peace offer to a nation")
     async def cnc_peace(self, ctx, *args):
@@ -1419,7 +1418,7 @@ class CNC(commands.Cog):
                 self.bot.logger.warning(msg=error)
                 await ctx.send(error)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[recipient],, [terms]", brief="One-time agreement with a nation.")
     async def cnc_treaty(self, ctx, *, args):
@@ -1481,7 +1480,7 @@ class CNC(commands.Cog):
                 self.bot.logger.warning(msg=error)
                 await ctx.send(error)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     # ---------------------Resource and Recruit Commands------------------------------
 
@@ -1581,7 +1580,7 @@ class CNC(commands.Cog):
                 bankembed.add_field(name="Ports", value=ports)
                 await ctx.send(embed=bankembed)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[battalion amount] <province id>", aliases=['cncr'],
                       brief="Recruits a number of battalions")
@@ -1650,7 +1649,7 @@ class CNC(commands.Cog):
                 self.bot.logger.warning(msg=error)
                 await ctx.send(error)
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[battalion amount]", brief="Recruits a number of battalions in all controlled provinces")
     @commands.guild_only()
@@ -1703,7 +1702,7 @@ class CNC(commands.Cog):
                 self.bot.logger.warning(msg=error)
                 await ctx.send(f"{error} at mass_recruit")
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+                self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[amount] [recipient nation]", brief="Sends money to a specified nation")
     @commands.guild_only()
@@ -1746,7 +1745,7 @@ class CNC(commands.Cog):
             await ctx.send(f"{userinfo['username']} has sent \u03FE{amount} to {recipientinfo['username']}.")
             return
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[province id]", brief="Purchases a specified province")
     @commands.guild_only()
@@ -1829,7 +1828,7 @@ class CNC(commands.Cog):
                     self.bot.logger.warning(msg=error)
                     return
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[province id] [structure (fort, port, city)]",
                       brief="Constructs a building in a specified province")
@@ -1960,7 +1959,7 @@ class CNC(commands.Cog):
                         self.bot.logger.warning(msg=error)
                         return
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     # -------------------Movement Commands----------------------------
 
@@ -2015,7 +2014,7 @@ class CNC(commands.Cog):
                 self.bot.logger.warning(msg=error)
                 return
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[stationed target id] [target province id] [amount]", aliases=['cncm'],
                       brief="Moves troops from one province to another")
@@ -2084,7 +2083,7 @@ class CNC(commands.Cog):
                 self.bot.logger.warning(msg=error)
                 return
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[stationed province] [target province] [attack force]", aliases=['cnca'],
                       brief="Attacks from one province to another")
@@ -2738,7 +2737,7 @@ class CNC(commands.Cog):
         except UnboundLocalError:
             pass
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
             await ctx.send(error)
 
     # ------------------Map Commands----------------------------
@@ -2820,7 +2819,7 @@ class CNC(commands.Cog):
                     self.bot.logger.warning(msg=error)
                     return
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command()
     @commands.is_owner()
@@ -2860,7 +2859,7 @@ class CNC(commands.Cog):
             await ctx.send("https://tenor.com/view/finished-elijah-wood-lord-of-the-rings-lava-fire-gif-5894611")
             return
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command()
     @commands.is_owner()
@@ -2870,7 +2869,7 @@ class CNC(commands.Cog):
             map.save(fr"{self.map_directory}/Maps/wargame_provinces.png")
             await ctx.send("Map reset.")
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     # ---------------------Moderation------------------------------
 
@@ -2902,8 +2901,7 @@ class CNC(commands.Cog):
                                author.name, author.id, f"awarded {amount} credit resources to {username}", reason)
             return
         except Exception as error:
-            await ctx.send(error)
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
             return
 
     @commands.command(usage="[nation name] [province] [reason]", brief="Gives a specified nation a specified province")
@@ -3104,8 +3102,7 @@ class CNC(commands.Cog):
                 await ctx.send(f"User muted indefinitely.")
                 return
         except Exception as error:
-            await ctx.send(error)
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
             return
 
     @commands.command(usage="[user]", brief="Unmutes a user")
@@ -3143,8 +3140,7 @@ class CNC(commands.Cog):
             await ctx.send("User unmuted.")
             return
         except Exception as error:
-            await ctx.send(error)
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
             return
 
     @commands.command(usage="[user]", brief="Bans a user")
@@ -3197,8 +3193,7 @@ class CNC(commands.Cog):
             await ctx.send("User banned.")
             return
         except Exception as error:
-            await ctx.send(error)
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
             return
 
     @commands.command(usage="[user]", brief="Unbans a user")
@@ -3236,8 +3231,7 @@ class CNC(commands.Cog):
             await ctx.send("User unbanned.")
             return
         except Exception as error:
-            await ctx.send(error)
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
             return
 
     @commands.command(usage="[user]", brief="Displays a user's record")
@@ -3377,8 +3371,7 @@ class CNC(commands.Cog):
                             for r in reactions:
                                 await logmessage.add_reaction(r)
         except Exception as error:
-            await ctx.send(error)
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[mod]", brief="Displays actions taken by a specific moderator")
     @modcheck()
@@ -3572,7 +3565,7 @@ class CNC(commands.Cog):
         except ValueError:
             await ctx.send("That doesn't seem to be a proper hexcode.")
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(brief="Checks all provinces and ensures proper map color")
     @modcheck()
@@ -3597,7 +3590,7 @@ class CNC(commands.Cog):
                                                color)
             await ctx.send("All owned provinces checked and colored.")
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
 
     # ---------------------Updating------------------------------
@@ -3695,7 +3688,7 @@ class CNC(commands.Cog):
             await cncchannel.send(f"New turn! It is now turn #{int(turns['data_value']) + 1}.")
             return
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"cnc_turn_loop: {error}")
 
     @commands.command()
     @modcheck()
@@ -3783,7 +3776,7 @@ class CNC(commands.Cog):
             await cncchannel.send(f"New turn! It is now turn #{int(turns['data_value']) + 1}.")
             return
         except Exception as error:
-            self.bot.logger.warning(msg=error)
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     async def cncstartloop(self):
         # wait until the bot is ready
