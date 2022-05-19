@@ -984,7 +984,8 @@ class CNC(commands.Cog):
             if interactionid is None:
                 with open(f"{self.interaction_directory}{author.id}.txt", "rb") as file:
                     await author.send(file=discord.File(file, f"Interactions Log for {author.id}.txt"))
-                    await ctx.send("Sent!")
+                    if ctx.guild is not None:
+                        await ctx.send("Sent!")
                     return
             interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE id = $1;''', interactionid)
             if interaction is None:
