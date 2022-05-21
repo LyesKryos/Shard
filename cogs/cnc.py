@@ -223,12 +223,12 @@ class CNC(commands.Cog):
         except Exception as error:
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
-    @commands.command(usage="<nation name>", aliases=['cncv'], brief="Displays information about a nation")
+    @commands.command(usage="<nation name or Discord username>", aliases=['cncv'], brief="Displays information about a nation")
     async def cnc_view(self, ctx, *, args):
         try:
             # connects to the database
             conn = self.bot.pool
-            nationname = args
+            nationname = args[:]
             if nationname == '':
                 # if the nationame is left blank, the author id is used to find the nation information
                 author = ctx.author
