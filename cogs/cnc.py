@@ -224,11 +224,11 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="<nation name>", aliases=['cncv'], brief="Displays information about a nation")
-    async def cnc_view(self, ctx, *args):
+    async def cnc_view(self, ctx, *, args):
         try:
             # connects to the database
             conn = self.bot.pool
-            nationname = ' '.join(args[:])
+            nationname = args
             if nationname == '':
                 # if the nationame is left blank, the author id is used to find the nation information
                 author = ctx.author
@@ -311,20 +311,35 @@ class CNC(commands.Cog):
                 cncuserembed.add_field(name="Alliances", value=alliances)
                 cncuserembed.add_field(name="Wars", value=wars)
                 await ctx.send(embed=cncuserembed)
-
             else:
-                registeredusers = await conn.fetch('''SELECT username FROM cncusers;''')
+                registeredusers = await conn.fetch('''SELECT username, user_id FROM cncusers;''')
                 registeredlist = list()
+                id_list = list()
+                snowflake = False
+                try:
+                    user = await commands.converter.MemberConverter().convert(ctx, nationname)
+                    snowflake = True
+                except commands.BadArgument:
+                    pass
                 # makes a list of the registered users
                 for users in registeredusers:
                     registeredlist.append(users["username"].lower())
-                # checks the author id against the list of registered users
-                if nationname.lower() not in registeredlist:
-                    await ctx.send(f"{nationname} does not appear to be registered.")
-                    return
-                # pulls the specified nation data
-                nation = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
-                                             nationname.lower())
+                    id_list.append(users['user_id'])
+                # checks for user snowflake and the list of registered users
+                if snowflake is False:
+                    if nationname.lower() not in registeredlist:
+                        await ctx.send(f"{nationname} does not appear to be registered.")
+                        return
+                    else:
+                        nation = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
+                                                     nationname.lower())
+                else:
+                    if user.id not in id_list:
+                        await ctx.send(f"{user.display_name} does not appear to be registered.")
+                        return
+                    else:
+                        nation = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
+                                                     user.id)
                 # sets the color properly
                 if nation["usercolor"] == "":
                     color = discord.Color.random()
@@ -338,15 +353,9 @@ class CNC(commands.Cog):
                     provinceslist.remove(0)
                     provinceslist.sort()
                     provinces = ', '.join(str(p) for p in provinceslist)
-                    total_troops = 0
-                    for p in provinceslist:
-                        provinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-                        total_troops += provinfo['troops']
-                    total_troops += nation['undeployed']
                 else:
                     provinceslist = []
                     provinces = "None"
-                    total_troops = nation['undeployed']
                 # fetches relations information
                 relations = await conn.fetch('''SELECT nation, relation FROM relations WHERE name = $1;''',
                                              nation['username'])
@@ -367,22 +376,14 @@ class CNC(commands.Cog):
                     alliances = ', '.join(str(a['nation']) for a in alliances)
                 else:
                     alliances = "None"
-                if nation['focus'] == "m":
-                    focus = "Military"
-                elif nation['focus'] == "e":
-                    focus = "Economy"
-                elif nation['focus'] == "s":
-                    focus = "Strategy"
-                elif nation['focus'] == "none":
-                    focus = "None"
                 # creates the embed object
                 cncuserembed = discord.Embed(title=nation["username"], color=color,
                                              description=f"Registered nation of {self.bot.get_user(nation['user_id']).name}.")
                 cncuserembed.add_field(name=f"Territory (Total: {len(provinceslist)})", value=provinces, inline=False)
-                cncuserembed.add_field(name="Total Troops", value=total_troops)
+                cncuserembed.add_field(name="Total Troops", value=nation["totaltroops"])
                 cncuserembed.add_field(name="Undeployed Troops", value=nation['undeployed'])
                 cncuserembed.add_field(name="Resources", value=f"\u03FE{nation['resources']}")
-                cncuserembed.add_field(name="National Focus", value=focus)
+                cncuserembed.add_field(name="Strategic Focus", value=nation["focus"])
                 cncuserembed.add_field(name="Color", value=colorvalue)
                 cncuserembed.add_field(name="Movement Points", value=nation['moves'])
                 cncuserembed.add_field(name="Alliances", value=alliances)

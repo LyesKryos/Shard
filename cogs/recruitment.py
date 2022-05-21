@@ -495,7 +495,6 @@ class Recruitment(commands.Cog):
                 return
             except Exception as error:
                 await ctx.send(error)
-
                 return
 
     @commands.command(usage="<m>", brief="Displays the all time or monthly rnaks")
