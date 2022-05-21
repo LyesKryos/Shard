@@ -1734,6 +1734,7 @@ class CNC(commands.Cog):
             # ensures resource sufficiency
             if amount > userinfo['resources']:
                 await ctx.send(f"{userinfo['username']} does not have \u03FE{amount}!")
+                return
             # fetches recipient info
             recipientinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
                                                 recipient.lower())
