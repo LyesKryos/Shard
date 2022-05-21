@@ -224,12 +224,12 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="<nation name or Discord username>", aliases=['cncv'], brief="Displays information about a nation")
-    async def cnc_view(self, ctx, *, args):
+    async def cnc_view(self, ctx, *, args = None):
         try:
             # connects to the database
             conn = self.bot.pool
-            nationname = args[:]
-            if nationname == '':
+            nationname = args
+            if nationname is None:
                 # if the nationame is left blank, the author id is used to find the nation information
                 author = ctx.author
                 registeredusers = await conn.fetch('''SELECT user_id FROM cncusers;''')
