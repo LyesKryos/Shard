@@ -355,7 +355,7 @@ class CNC(commands.Cog):
                     provinceslist.sort()
                     provinces = ', '.join(str(p) for p in provinceslist)
                     p_total_troops = await conn.fetchrow('''SELECT SUM(troops::int) FROM provinces WHERE owner_id = $1;''',
-                                                         user.id)
+                                                         nation['user_id'])
                     total_troops += p_total_troops['sum']
                 else:
                     provinceslist = []
