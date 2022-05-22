@@ -347,15 +347,20 @@ class CNC(commands.Cog):
                 else:
                     color = discord.Color(int(nation["usercolor"].lstrip('#'), 16))
                     colorvalue = color
+                total_troops = 0
                 # grabs all provinces  owned by the nation and makes them into a pretty list
                 if len(nation["provinces_owned"]) != 1:
                     provinceslist = nation["provinces_owned"]
                     provinceslist.remove(0)
                     provinceslist.sort()
                     provinces = ', '.join(str(p) for p in provinceslist)
+                    p_total_troops = await conn.fetchrow('''SELECT SUM(troops::int) FROM provinces WHERE owner_id = $1;''',
+                                                         user.id)
+                    total_troops += p_total_troops['sum']
                 else:
                     provinceslist = []
                     provinces = "None"
+                total_troops += nation['undeployed']
                 # fetches relations information
                 relations = await conn.fetch('''SELECT nation, relation FROM relations WHERE name = $1;''',
                                              nation['username'])
@@ -380,7 +385,7 @@ class CNC(commands.Cog):
                 cncuserembed = discord.Embed(title=nation["username"], color=color,
                                              description=f"Registered nation of {self.bot.get_user(nation['user_id']).name}.")
                 cncuserembed.add_field(name=f"Territory (Total: {len(provinceslist)})", value=provinces, inline=False)
-                cncuserembed.add_field(name="Total Troops", value=nation["totaltroops"])
+                cncuserembed.add_field(name="Total Troops", value=str(total_troops))
                 cncuserembed.add_field(name="Undeployed Troops", value=nation['undeployed'])
                 cncuserembed.add_field(name="Resources", value=f"\u03FE{nation['resources']}")
                 cncuserembed.add_field(name="Strategic Focus", value=nation["focus"])
