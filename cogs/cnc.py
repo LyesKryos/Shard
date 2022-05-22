@@ -875,7 +875,7 @@ class CNC(commands.Cog):
                 allids.append(x['id'])
             # ensures valid id
             if location not in allids:
-                await ctx.send(f"Location id `{location}` is not a valid ID.")
+                await ctx.send(f"`{location}` is not a valid location ID.")
                 return
             # fetches user info
             userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
@@ -887,27 +887,21 @@ class CNC(commands.Cog):
                     f"{userinfo['username']} does not own Province #{location} and cannot deploy troops there.")
                 return
             # ensures troop sufficiency
-            elif amount is not None:
+            if amount is not None:
                 if amount > userundeployed:
                     await ctx.send(f"{userinfo['username']} does not have {amount} undeployed troops.")
                     return
-            else:
-                # updates all user and province information
-                try:
-                    if amount is None:
-                        amount = userundeployed
-                    provinceinfo = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', location)
-                    await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
-                                       (userundeployed - amount),
-                                       author.id)
-                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                       (provinceinfo['troops'] + amount),
-                                       location)
-                    await ctx.send(
-                        f"{userinfo['username']} has successfully deployed {amount} troops to Province #{location}.")
-                except Exception as error:
-                    self.bot.logger.warning(msg=error)
-                    await ctx.send(error)
+            # updates all user and province information
+            if amount is None:
+                amount = userundeployed
+            provinceinfo = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', location)
+            await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
+                               (userundeployed - amount),
+                               author.id)
+            await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''',
+                               (provinceinfo['troops'] + amount),
+                               location)
+            await ctx.send(f"{userinfo['username']} has successfully deployed {amount} troops to Province #{location}.")
         except Exception as error:
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
