@@ -851,10 +851,10 @@ class CNC(commands.Cog):
         except Exception as error:
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
-    @commands.command(usage="[province id] [deployed force]",
+    @commands.command(usage="[province id] <deployed force>",
                       aliases=['cncd'], brief="Deploys a number of troops to a specified province")
     @commands.guild_only()
-    async def cnc_deploy(self, ctx, location: int, amount: int):
+    async def cnc_deploy(self, ctx, location: int, amount: int = None):
         try:
             author = ctx.author
             # connects to the database
@@ -893,6 +893,8 @@ class CNC(commands.Cog):
             else:
                 # updates all user and province information
                 try:
+                    if amount is None:
+                        amount = userundeployed
                     provinceinfo = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', location)
                     await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
                                        (userundeployed - amount),
@@ -1969,10 +1971,10 @@ class CNC(commands.Cog):
 
     # -------------------Movement Commands----------------------------
 
-    @commands.command(usage="[province id] [amount]", aliases=['cncw'],
+    @commands.command(usage="[province id] <amount>", aliases=['cncw'],
                       brief="Removes a number of troops from a specified province")
     @commands.guild_only()
-    async def cnc_withdraw(self, ctx, province: int, amount: int):
+    async def cnc_withdraw(self, ctx, province: int, amount: int = None):
         try:
             author = ctx.author
             # connects to the database
@@ -2007,6 +2009,8 @@ class CNC(commands.Cog):
                 await ctx.send(f"There are not {amount} troops in province #{province}.")
                 return
             try:
+                if amount is None:
+                    amount = provinceinfo['troops']
                 await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                    (provinceinfo['troops'] - amount),
                                    province)
@@ -2833,7 +2837,7 @@ class CNC(commands.Cog):
         try:
             # connects to the database
             conn = self.bot.pool
-            await conn.execute('''DELETE FROM cncusers;''')
+            await conn.execute('''DELETE FROM cncusers, relations, interactions, pending_interactions;''')
             await conn.execute('''UPDATE provinces  SET owner = '', owner_id = 0, troops = 0;''')
             provinceinfo = await conn.fetch('''SELECT * FROM provinces;''')
             province_ids = [p['id'] for p in provinceinfo]
