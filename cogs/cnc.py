@@ -887,9 +887,10 @@ class CNC(commands.Cog):
                     f"{userinfo['username']} does not own Province #{location} and cannot deploy troops there.")
                 return
             # ensures troop sufficiency
-            elif amount > userundeployed:
-                await ctx.send(f"{userinfo['username']} does not have {amount} undeployed troops.")
-                return
+            elif amount is not None:
+                if amount > userundeployed:
+                    await ctx.send(f"{userinfo['username']} does not have {amount} undeployed troops.")
+                    return
             else:
                 # updates all user and province information
                 try:
@@ -2004,10 +2005,11 @@ class CNC(commands.Cog):
                 await ctx.send(f"{userinfo['username']} does not own province #{province}.")
                 return
             provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', province)
+            if amount is not None:
+                if amount > provinceinfo['troops']:
+                    await ctx.send(f"There are not {amount} troops in province #{province}.")
+                    return
             # ensures the amount is in the province
-            if amount > provinceinfo['troops']:
-                await ctx.send(f"There are not {amount} troops in province #{province}.")
-                return
             try:
                 if amount is None:
                     amount = provinceinfo['troops']
