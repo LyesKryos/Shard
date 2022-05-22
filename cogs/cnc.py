@@ -593,25 +593,26 @@ class CNC(commands.Cog):
             nationamesave = await conn.fetchrow('''SELECT username FROM cncusers WHERE lower(username) = $1;''',
                                                 nationname.lower())
             # grabs the user id
-            userid = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
+            user_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
             # deletes the user and sends them a DM with the notification
             await conn.execute('''DELETE FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
             # updates province and map information
-            for province in userid['provinces_owned'][0:]:
+            for province in user_info['provinces_owned']:
                 await conn.execute('''UPDATE provinces  SET owner_id = 0, owner = '', troops = 0 WHERE id = $1;''',
                                    province)
                 color = "#808080"
                 cord = await conn.fetchrow('''SELECT cord FROM provinces WHERE id = $1;''', province)
                 await loop.run_in_executor(None, self.map_color, province, cord['cord'][0:2], color, True)
             # updates relations information
-            await conn.execute('''DELETE FROM relations WHERE name = $1 and nation = $1;''', nationname.lower())
+            await conn.execute('''DELETE FROM relations WHERE name = $1 or nation = $1;''', nationname.lower())
             await ctx.send("Deletion complete.")
-            user = self.bot.get_user(userid["user_id"])
+            user = self.bot.get_user(user_info["user_id"])
             if reason is None:
-                reason = "Your registered account has been terminated for an unlisted reason. If you have further " \
-                         "questions, contact a moderator."
+                reason = "Your registered Command and Conquest account has been terminated for an unlisted reason. " \
+                         "If you have further questions, contact a moderator."
             await user.send(
-                f"Your registered Command and Conquer account, {nationamesave['username']}, has been deleted by moderator {ctx.author} for the following reason:```{reason}```")
+                f"Your registered Command and Conquer account, {nationamesave['username']}, "
+                f"has been deleted by moderator {ctx.author} for the following reason:```{reason}```")
         except Exception as error:
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
@@ -3591,7 +3592,10 @@ class CNC(commands.Cog):
                     p_id = p['id']
                     p_cord = p['cord'][0:2]
                     p_owner = p['owner']
-                    color = usersncolors[p_owner]
+                    if p_owner != '':
+                        color = usersncolors[p_owner]
+                    else:
+                        color = "#808080"
                     await loop.run_in_executor(None, self.map_color, p_id, p_cord,
                                                color)
             await ctx.send("All owned provinces checked and colored.")
