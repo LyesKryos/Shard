@@ -47,8 +47,6 @@ class CNC(commands.Cog):
                     aroles.append(ar.id)
                 if 674260547897917460 not in aroles:
                     raise SilentFail
-                else:
-                    return True
             elif ctx.guild is not None:
                 aroles = list()
                 if ctx.guild.id == 674259612580446230:
@@ -56,10 +54,6 @@ class CNC(commands.Cog):
                         aroles.append(ar.id)
                     if 674260547897917460 not in aroles:
                         raise SilentFail
-                    else:
-                        return True
-                else:
-                    raise SilentFail
             conn = self.bot.pool
             blacklist = await conn.fetchrow('''SELECT * FROM blacklist WHERE user_id = $1 AND active = True;''',
                                             ctx.author.id)
