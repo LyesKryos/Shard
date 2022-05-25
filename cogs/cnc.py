@@ -1609,12 +1609,14 @@ class CNC(commands.Cog):
             if location is None:
                 # updates all user information
                 try:
-                    await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
-                                       ((ramount * 1000) + (userinfo['undeployed'])), author.id)
+                    await conn.execute('''UPDATE cncusers SET undeployed = $1, manpower = $2 WHERE user_id = $3;''',
+                                       ((ramount * 1000) + (userinfo['undeployed'])),
+                                       userinfo['manpower']-(ramount*1000), author.id)
                     await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''', (monies - cost),
                                        author.id)
                     await ctx.send(
-                        f"{nationname} has recruited {ramount * 1000} troops to their recruitment pool. \u03FE{cost} have been spent.")
+                        f"{nationname} has recruited {ramount * 1000} troops to their recruitment pool. "
+                        f"\u03FE{cost} have been spent.")
                     return
                 except Exception as error:
                     self.bot.logger.warning(msg=error)
