@@ -62,7 +62,8 @@ class Recruitment(commands.Cog):
                     monthly_total = 0
                     for s in top_recruiter:
                         monthly_total += s['sent_this_month']
-                    await recruiter_of_the_month_role.edit(color=discord.Color.light_grey(), name="Recruiter of the Month")
+                    await recruiter_of_the_month_role.edit(color=discord.Color.light_grey(),
+                                                           name="Recruiter of the Month")
                     announce = await announcements.send(
                         f"**Congratulations to {user.mention}!**\n{user.display_name} has earned the "
                         f"distinction of being this month's top recruiter! This month, they have sent "
@@ -191,7 +192,6 @@ class Recruitment(commands.Cog):
             except Exception as error:
                 self.bot.logger.warning(msg=error)
 
-
         async def api_recruitment(bot):
             try:
                 await bot.wait_until_ready()
@@ -225,7 +225,7 @@ class Recruitment(commands.Cog):
                                 self.do_not_recruit.append(nation)
                         sending_to = [n for n in non_puppets]
                         params.update({'to': sending_to})
-                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?a=sendTG',
                                                headers=headers, params=params) as api_send:
                             await asyncio.sleep(.6)
                             if api_send.status != 200:
@@ -736,7 +736,8 @@ class Recruitment(commands.Cog):
             async with ctx.channel.typing():
                 await ctx.send(file=discord.File(campaign, f"{regions['region'].lower()}_endo_campaign.html"))
 
-    @commands.command(usage="[hex color code] [name]", brief="Allows the Recruiter of the Month to customize their role")
+    @commands.command(usage="[hex color code] [name]",
+                      brief="Allows the Recruiter of the Month to customize their role")
     async def customize_recruiter_role(self, ctx, color: str, *args):
         recruiter_of_the_month_role = discord.utils.get(ctx.guild.roles, id=813953181234626582)
         name = ' '.join(args)
