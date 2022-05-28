@@ -191,10 +191,55 @@ class Recruitment(commands.Cog):
             except Exception as error:
                 self.bot.logger.warning(msg=error)
 
+
+        async def api_recruitment(bot):
+            try:
+                await bot.wait_until_ready()
+                headers = {'User-Agent': 'Bassiliya'}
+                params = {'client': '85eb458e',
+                          'tgid': '25352330',
+                          'key': 'b777d3383626'}
+                while True:
+                    async with aiohttp.ClientSession() as session:
+                        newnationsparams = {'q': 'newnations'}
+                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                               headers=headers, params=newnationsparams) as nnresp:
+                            await asyncio.sleep(.6)
+                            newnationsraw = await nnresp.text()
+                            nnresp.close()
+                        # after the list is called, the xml is parsed and the list is made
+                        nnsoup = BeautifulSoup(newnationsraw, "lxml")
+                        newnations_prefilter = set(nnsoup.newnations.string.split(","))
+                        # filters out any do not send to nations
+                        newnations_post_filter = list(newnations_prefilter.difference(set(self.do_not_recruit)))
+                        # grabs only the first eight
+                        newnations = newnations_post_filter[0]
+                        non_puppets = list()
+                        # puppet filter
+                        for nation in newnations:
+                            # searches for numbers in names
+                            number_puppet = re.search("\d+", nation)
+                            # if there is a number, remove that nation and add it to the do not send list
+                            if not number_puppet:
+                                non_puppets.append(nation)
+                                self.do_not_recruit.append(nation)
+                        sending_to = [n for n in non_puppets]
+                        params.update({'to': sending_to})
+                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                               headers=headers, params=params) as api_send:
+                            await asyncio.sleep(.6)
+                            if api_send.status != 200:
+                                raise Exception(f"API received faulty response code: {api_send.status}")
+                            await asyncio.sleep(180)
+                            api_send.close()
+            except Exception as error:
+                await self.bot.logger.warning(msg=error)
+
         loop = bot.loop
         self.monthly_loop = loop.create_task(monthly_recruiter_scheduler(bot))
         self.retention_loop = loop.create_task(retention(bot))
         self.world_assembly_notification_loop = loop.create_task(world_assembly_notification(bot))
+        self.api_loop = loop.create_task(api_recruitment(bot))
 
     def sanitize_links_percent(self, url: str) -> str:
         # sanitizes links with %s
@@ -209,6 +254,8 @@ class Recruitment(commands.Cog):
     def cog_unload(self):
         self.retention_loop.cancel()
         self.monthly_loop.cancel()
+        self.world_assembly_notification_loop.cancel()
+        self.api_loop.cancel()
 
     do_not_recruit = list()
     sending_to = list()
@@ -497,7 +544,7 @@ class Recruitment(commands.Cog):
                 await ctx.send(error)
                 return
 
-    @commands.command(usage="<m>", brief="Displays the all time or monthly rnaks")
+    @commands.command(usage="<m>", brief="Displays the all time or monthly ranks")
     @commands.guild_only()
     @RecruitmentCheck()
     async def rank(self, ctx, monthly: str = None):
@@ -521,7 +568,7 @@ class Recruitment(commands.Cog):
 
                 return
             # if the user wants the sent monthly list
-            elif monthly in ['m']:
+            elif monthly in ['m', 'month', 'monthly']:
                 # fetches relevant user data, sorted by 'sent_this_month`
                 userinfo = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month DESC LIMIT 10;''')
                 ranksstr = "**__Top 10 Recruiters (this month)__**\n"
@@ -532,14 +579,11 @@ class Recruitment(commands.Cog):
                     ranksstr += userstring
                     rank += 1
                 await ctx.send(f"{ranksstr}")
-
                 return
             else:
-
                 raise commands.UserInputError()
         except Exception as error:
             await ctx.send(error)
-
             return
 
     @commands.command(usage='[template id]', brief="Registers a user and a template")

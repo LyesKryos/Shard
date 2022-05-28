@@ -118,8 +118,9 @@ class CNC(commands.Cog):
             conn = self.bot.pool
             data = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
             infoembed = discord.Embed(title="Command And Conquest System", color=discord.Color.dark_red(),
-                                      description="This is the condensed information about the CNC system. For more information, "
-                                                  "including commands, see the CNC Dispatch here: https://www.nationstates.net/page=dispatch/id=1641083")
+                                      description="This is the condensed information about the CNC system. "
+                                                  "For more information, including commands, see the CNC Dispatch here:"
+                                                  " https://www.nationstates.net/page=dispatch/id=1641083")
             infoembed.add_field(name="About",
                                 value="The Command and Conquest system is a simulated battle royale between "
                                       "the various nations of Thegye. It is non-roleplay and is meant to be "
@@ -132,7 +133,8 @@ class CNC(commands.Cog):
                                       f" `{self.bot.command_prefix}help CNC`.", inline=False)
             infoembed.add_field(name="Turns", value=f"It is currently turn {data['data_value']}.")
             infoembed.add_field(name="Questions?",
-                                value="Contact the creator: Lies Kryos#1734\nContact a moderator: [Insert_Person_Here]#6003")
+                                value="Contact the creator: Lies Kryos#1734\n"
+                                      "Contact a moderator: Lies Kryos#1734, [Insert_Person_Here]#6003")
             infoembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
             await ctx.send(embed=infoembed)
         except Exception as error:
@@ -217,8 +219,9 @@ class CNC(commands.Cog):
         except Exception as error:
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
-    @commands.command(usage="<nation name or Discord username>", aliases=['cncv'], brief="Displays information about a nation")
-    async def cnc_view(self, ctx, *, args = None):
+    @commands.command(usage="<nation name or Discord username>", aliases=['cncv'],
+                      brief="Displays information about a nation")
+    async def cnc_view(self, ctx, *, args=None):
         try:
             # connects to the database
             conn = self.bot.pool
@@ -473,7 +476,8 @@ class CNC(commands.Cog):
             added_manpower = math.ceil(max_manpower * manpower_mod)
             # creates the embed item
             cncuserembed = discord.Embed(title=userinfo["username"], color=color,
-                                         description=f"Registered nation of {self.bot.get_user(userinfo['user_id']).name}.")
+                                         description=f"Registered nation of "
+                                                     f"{self.bot.get_user(userinfo['user_id']).name}.")
             cncuserembed.add_field(name=f"Territory (Total: {len(provinceslist)})", value=provinces, inline=False)
             cncuserembed.add_field(name="Total Troops", value=total_troops)
             cncuserembed.add_field(name="Undeployed Troops", value=userinfo['undeployed'])
@@ -484,7 +488,8 @@ class CNC(commands.Cog):
             cncuserembed.add_field(name="Alliances", value=alliances)
             cncuserembed.add_field(name="Wars", value=wars)
             cncuserembed.add_field(name="City/Port/Fort Limit",
-                                   value=f"{userinfo['citylimit'][1]}/{userinfo['portlimit'][1]}/{userinfo['fortlimit'][1]}")
+                                   value=f"{userinfo['citylimit'][1]}/{userinfo['portlimit'][1]}/"
+                                         f"{userinfo['fortlimit'][1]}")
             cncuserembed.add_field(name="Manpower/Manpower Limit",
                                    value=f"{userinfo['manpower']}/{userinfo['maxmanpower']}")
             cncuserembed.add_field(name="Manpower Increase", value=str(added_manpower))
@@ -548,7 +553,8 @@ class CNC(commands.Cog):
                 # fetches province information, adds it to the embed, and increases the count
                 provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
                 sv_emebed.add_field(name=f"**Province #{p}**",
-                                    value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}\nManpower: {provinceinfo['manpower']}")
+                                    value=f"Troops: {provinceinfo['troops']}\nResource Gain: {provinceinfo['worth']}\n"
+                                          f"Manpower: {provinceinfo['manpower']}")
                 province_number += 1
                 # if there are 15 provinces queued, send the embed, clear it, and start over
                 # (unless this is the last set)
@@ -960,8 +966,9 @@ class CNC(commands.Cog):
                 await conn.execute('''UPDATE provinces  SET owner = $1, owner_id = $2 WHERE id = $3;''',
                                    recipientinfo['username'], recipientinfo['user_id'], provinceid)
                 await ctx.send(
-                    f"Province #{provinceid} transferred to the ownership of {recipientinfo['username']} by {userinfo['username']}."
-                    f" All {provinceinfo['troops']} troops in province #{provinceid} have withdrawn.")
+                    f"Province #{provinceid} transferred to the ownership of {recipientinfo['username']} "
+                    f"by {userinfo['username']}. All {provinceinfo['troops']} troops in province #{provinceid} "
+                    f"have withdrawn.")
                 await loop.run_in_executor(None, self.map_color, provinceid, provinceinfo['cord'][0:2],
                                            recipientinfo['usercolor'])
             except Exception as error:
@@ -1065,9 +1072,9 @@ class CNC(commands.Cog):
                 if interaction.lower() == "accept":
                     try:
                         # update all the relevant information into interactions
-                        await conn.execute('''INSERT INTO interactions(id, type, sender, sender_id, recipient, recipient_id, terms) 
-                                SELECT id, type, sender, sender_id, recipient, recipient_id, terms 
-                                FROM pending_interactions WHERE id = $1;''', interactionid)
+                        await conn.execute('''INSERT INTO interactions(id, type, sender, sender_id, recipient, 
+                        recipient_id, terms) SELECT id, type, sender, sender_id, recipient, recipient_id, terms 
+                        FROM pending_interactions WHERE id = $1;''', interactionid)
                         await conn.execute('''UPDATE interactions SET active = True WHERE id = $1;''', interactionid)
                         await conn.execute('''DELETE FROM pending_interactions WHERE id = $1;''', interactionid)
                         # if a peace treaty, cancel war
@@ -1075,15 +1082,18 @@ class CNC(commands.Cog):
                             await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''',
                                                interactionid)
                             await conn.execute(
-                                '''UPDATE interactions SET active = False WHERE type = 'war' AND sender = $1 AND recipient = $2;''',
-                                pending_int['sender'], pending_int['recipient'])
+                                '''UPDATE interactions SET active = False WHERE type = 'war' AND sender = $1 AND 
+                                recipient = $2;''', pending_int['sender'], pending_int['recipient'])
                         # update relations
                         await conn.execute('''UPDATE relations SET relation = $3 WHERE name = $1 AND nation  = $2;''',
                                            pending_int['recipient'], pending_int['sender'], pending_int['type'])
                         await conn.execute('''UPDATE relations SET relation = $3 WHERE name = $1 AND nation = $2;''',
                                            pending_int['sender'], pending_int['recipient'], pending_int['type'])
                         # updates interaction files
-                        interaction_text = f"Offer #{pending_int['id']} of {pending_int['type']}.\nSent by: {pending_int['sender']}\nAccepted by: {pending_int['recipient']}\n**Terms**\n{pending_int['terms']}\nAccepted: {strftime('%D', localtime(time()))}"
+                        interaction_text = f"Offer #{pending_int['id']} of {pending_int['type']}.\nSent by: " \
+                                           f"{pending_int['sender']}\nAccepted by: {pending_int['recipient']}" \
+                                           f"\n**Terms**\n{pending_int['terms']}\n" \
+                                           f"Accepted: {strftime('%D', localtime(time()))}"
                         with open(f"{self.interaction_directory}{pending_int['sender_id']}.txt", "r+") as file:
                             oldcontent = file.read()
                             file.seek(0, 0)
@@ -1217,7 +1227,8 @@ class CNC(commands.Cog):
                 if (inter['recipient'].lower() == rrecipient.lower() and inter['sender_id'] == author.id) or (
                         inter['recipient_id'] == author.id and inter['sender'] == rrecipient.lower()):
                     await ctx.send(
-                        f"An alliance with `{rrecipient}` already exists. To view, use $cnc_view_interaction {inter['id']}")
+                        f"An alliance with `{rrecipient}` already exists. "
+                        f"To view, use $cnc_view_interaction {inter['id']}")
                     return
             # fetches user information
             userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
@@ -1244,7 +1255,9 @@ class CNC(commands.Cog):
                 # sends DM
                 rsend = self.bot.get_user(recipient_id)
                 await rsend.send(
-                    f"{sender} has sent an alliance offer to {recipient}. To view the terms, type `{self.bot.command_prefix}cnc_offer {aid}`. To accept or reject, use `{self.bot.command_prefix}cnc_interaction {aid} [accept/reject]`.")
+                    f"{sender} has sent an alliance offer to {recipient}. To view the terms, type "
+                    f"`{self.bot.command_prefix}cnc_offer {aid}`. To accept or reject, use "
+                    f"`{self.bot.command_prefix}cnc_interaction {aid} [accept/reject]`.")
                 await ctx.send(f"Alliance offer sent to {recipient}.")
             except Exception as error:
                 self.bot.logger.warning(msg=error)
@@ -1408,7 +1421,9 @@ class CNC(commands.Cog):
                 # sends DM
                 rsend = self.bot.get_user(recipient_id)
                 await rsend.send(
-                    f"{sender} has sent an peace offer to {recipient}. To view the terms, type `{self.bot.command_prefix}cnc_offer {aid}`. To accept or reject, use `{self.bot.command_prefix}cnc_interaction {aid} [(accept,reject)]`")
+                    f"{sender} has sent an peace offer to {recipient}. To view the terms, type "
+                    f"`{self.bot.command_prefix}cnc_offer {aid}`. To accept or reject, use "
+                    f"`{self.bot.command_prefix}cnc_interaction {aid} [(accept,reject)]`")
                 await ctx.send(f"Peace offer sent to {recipient}.")
             except Exception as error:
                 self.bot.logger.warning(msg=error)
@@ -1470,7 +1485,9 @@ class CNC(commands.Cog):
                 # sends DM
                 rsend = self.bot.get_user(recipient_id)
                 await rsend.send(
-                    f"{sender} has sent an treaty offer to {recipient}. To view the terms, type `{self.bot.command_prefix}cnc_offer {aid}`. To accept or reject, use `{self.bot.command_prefix}cnc_interaction {aid} [accept/reject]`.")
+                    f"{sender} has sent an treaty offer to {recipient}. To view the terms, type "
+                    f"`{self.bot.command_prefix}cnc_offer {aid}`. To accept or reject, use "
+                    f"`{self.bot.command_prefix}cnc_interaction {aid} [accept/reject]`.")
                 await ctx.send(f"Treaty offer sent to {recipient}.")
             except Exception as error:
                 self.bot.logger.warning(msg=error)
