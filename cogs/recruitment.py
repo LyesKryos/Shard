@@ -239,7 +239,7 @@ class Recruitment(commands.Cog):
         self.monthly_loop = loop.create_task(monthly_recruiter_scheduler(bot))
         self.retention_loop = loop.create_task(retention(bot))
         self.world_assembly_notification_loop = loop.create_task(world_assembly_notification(bot))
-        self.api_loop = loop.create_task(api_recruitment(bot))
+        # self.api_loop = loop.create_task(api_recruitment(bot))
 
     def sanitize_links_percent(self, url: str) -> str:
         # sanitizes links with %s
@@ -271,6 +271,7 @@ class Recruitment(commands.Cog):
         try:
             # runs the code until the stop command is given
             author = ctx.author
+            self.api_loop.cancel()
             while self.running:
                 # call headers
                 headers = {"User-Agent": "Bassiliya"}
@@ -323,6 +324,14 @@ class Recruitment(commands.Cog):
             return
         except asyncio.CancelledError:
             await ctx.send("Recuitment stopped. Another link may post.")
+            conn = self.bot.pool
+            self.running = False
+            await ctx.send("The recruitment bot has run into an issue. Recruitment has stopped.")
+            userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', ctx.author.id)
+            await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
+                               (self.user_sent + userinfo['sent']),
+                               (self.user_sent + userinfo['sent_this_month']),
+                               ctx.author.id)
         except Exception as error:
             conn = self.bot.pool
             self.running = False
