@@ -255,7 +255,7 @@ class Recruitment(commands.Cog):
         self.retention_loop.cancel()
         self.monthly_loop.cancel()
         self.world_assembly_notification_loop.cancel()
-        self.api_loop.cancel()
+        # self.api_loop.cancel()
 
     do_not_recruit = list()
     sending_to = list()
@@ -271,7 +271,7 @@ class Recruitment(commands.Cog):
         try:
             # runs the code until the stop command is given
             author = ctx.author
-            self.api_loop.cancel()
+            # self.api_loop.cancel()
             while self.running:
                 # call headers
                 headers = {"User-Agent": "Bassiliya"}
