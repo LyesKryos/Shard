@@ -13,6 +13,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from time import perf_counter, strftime
 from PIL import ImageColor
 from customchecks import RecruitmentCheck
+import traceback
 
 
 class Recruitment(commands.Cog):
@@ -343,7 +344,7 @@ class Recruitment(commands.Cog):
                                ctx.author.id)
             self.user_sent = 0
             crashchannel = self.bot.get_channel(835579413625569322)
-            await crashchannel.send(error)
+            await crashchannel.send(f"{traceback.format_exc()}")
 
     async def still_recruiting_check(self, ctx):
         while self.running:
