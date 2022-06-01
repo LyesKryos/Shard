@@ -324,16 +324,15 @@ class Recruitment(commands.Cog):
                     self.sending_to.clear()
             return
         except asyncio.CancelledError:
-            await ctx.send("Recuitment stopped. Another link may post.")
+            await ctx.send("Recruitment stopped. Another link may post.")
             conn = self.bot.pool
             self.running = False
-            await ctx.send("The recruitment bot has run into an issue. Recruitment has stopped.")
             userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', ctx.author.id)
             await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
                                (self.user_sent + userinfo['sent']),
                                (self.user_sent + userinfo['sent_this_month']),
                                ctx.author.id)
-        except Exception as error:
+        except Exception:
             conn = self.bot.pool
             self.running = False
             await ctx.send("The recruitment bot has run into an issue. Recruitment has stopped.")
@@ -344,7 +343,7 @@ class Recruitment(commands.Cog):
                                ctx.author.id)
             self.user_sent = 0
             crashchannel = self.bot.get_channel(835579413625569322)
-            await crashchannel.send(f"{traceback.format_exc()}")
+            await crashchannel.send(f"```{traceback.format_exc()}```")
 
     async def still_recruiting_check(self, ctx):
         while self.running:
