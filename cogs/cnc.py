@@ -521,6 +521,7 @@ class CNC(commands.Cog):
             cncuserembed.add_field(name="Action Points", value=userinfo['moves'])
             cncuserembed.add_field(name="Alliances", value=alliances)
             cncuserembed.add_field(name="Wars", value=wars)
+            cncuserembed.add_field(name="National Unrest", value=str(userinfo['national_unrest']))
             cncuserembed.add_field(name="City/Port/Fort Limit",
                                    value=f"City Limit: {userinfo['citylimit'][1]}\n"
                                          f"Port Limit: {userinfo['portlimit'][1]}\n"
@@ -798,7 +799,8 @@ class CNC(commands.Cog):
             provinceembed.add_field(name="Bordering Provinces", value=bordering)
             provinceembed.add_field(name="Occupying Nation", value=owner)
             provinceembed.add_field(name="Troops Present", value=province['troops'])
-            provinceembed.add_field(name="Province Worth", value=province['trade_value'])
+            provinceembed.add_field(name="Local Unrest", value=str(province['unrest']))
+            provinceembed.add_field(name="Trade Value", value=province['trade_value'])
             provinceembed.add_field(name="Manpower", value=province['manpower'])
             provinceembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
             # sets the proper coastline
