@@ -2222,7 +2222,7 @@ class CNC(commands.Cog):
                 await ctx.send(f"{author} does not appear to be registered.")
                 return
             if changed not in ['tax', 'military', 'services', 't', 'm', 's']:
-                raise commands.UserInputError
+                await ctx.send_help(ctx.invoked_with)
             if rate < 0:
                 raise commands.UserInputError
             if changed == 'tax' or changed == 't':
@@ -2242,7 +2242,7 @@ class CNC(commands.Cog):
             current_rate = userinfo[changed]
             await conn.execute('''UPDATE cncusers SET $1 = $2 WHERE userid = $3;''', changed, rate, author.id)
             changed.replace("_", " ")
-            await ctx.send(f"{changed.title()} rate changed from {current_rate} to {rate} successfully!")
+            await ctx.send(f"{changed.title()} rate changed from {current_rate}% to {rate}% successfully!")
         except Exception:
             await self.bot.logger(traceback.format_exc())
 
