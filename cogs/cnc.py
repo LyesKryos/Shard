@@ -2222,7 +2222,7 @@ class CNC(commands.Cog):
                 await ctx.send(f"{author} does not appear to be registered.")
                 return
             if changed not in ['tax', 'military', 'services', 't', 'm', 's']:
-                await ctx.send_help(ctx.invoked_with)
+                raise commands.UserInputError
             if rate < 0:
                 raise commands.UserInputError
             if changed == 'tax' or changed == 't':
@@ -2244,7 +2244,7 @@ class CNC(commands.Cog):
             changed.replace("_", " ")
             await ctx.send(f"{changed.title()} rate changed from {current_rate}% to {rate}% successfully!")
         except Exception:
-            await self.bot.logger(traceback.format_exc())
+            self.bot.logger(traceback.format_exc())
 
     # -------------------Movement Commands----------------------------
 
