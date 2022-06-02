@@ -528,7 +528,7 @@ class CNC(commands.Cog):
             cncuserembed.add_field(name="Trade Route Overview",
                                    value=f"Outgoing Routes: {userinfo['trade_routes'][0]}\n"
                                          f"Incoming Routes: {userinfo['trade_routes'][1]}\n"
-                                         f"Active Routes ({len(trade_list)}): {trade}"
+                                         f"Active Routes ({len(trade_list)}): {trade}\n"
                                          f"Max Routes: {userinfo['trade_routes'][2]}")
             cncuserembed.add_field(name="Manpower/Manpower Limit",
                                    value=f"{userinfo['manpower']}/{userinfo['maxmanpower']}")
@@ -2210,7 +2210,7 @@ class CNC(commands.Cog):
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
     @commands.command(usage="[rate changing (tax, military, services; t,m,s)] [whole number rate]",
-                      brief="Changes the rate of the given spending rate.", aliases=['cnccr'])
+                      brief="Changes the rate of the given spending rate.")
     async def cnc_change_rate(self, ctx, changed: str, rate: int):
         try:
             # defines author and connection pool
