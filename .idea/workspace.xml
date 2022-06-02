@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing recruitment.py">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Changing to v.1 Released&#10;- Added new turn mechanics: rebellions, taxation, economic updates, great powers&#10;- Updated all relevant viewing commands&#10;- Added mercenary command&#10;- Added rate changing command">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -129,14 +129,7 @@
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
-      <workItem from="1653752887539" duration="19213000" />
-    </task>
-    <task id="LOCAL-00192" summary="Fixing total troops issue">
-      <created>1652615997581</created>
-      <option name="number" value="00192" />
-      <option name="presentableId" value="LOCAL-00192" />
-      <option name="project" value="LOCAL" />
-      <updated>1652615997581</updated>
+      <workItem from="1653752887539" duration="21395000" />
     </task>
     <task id="LOCAL-00193" summary="Fixing total troops issue">
       <created>1652616157470</created>
@@ -474,7 +467,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654078368503</updated>
     </task>
-    <option name="localTasksCounter" value="241" />
+    <task id="LOCAL-00241" summary="Changing to v.1 Released&#10;- Added new turn mechanics: rebellions, taxation, economic updates, great powers&#10;- Updated all relevant viewing commands&#10;- Added mercenary command&#10;- Added rate changing command">
+      <created>1654191789365</created>
+      <option name="number" value="00241" />
+      <option name="presentableId" value="LOCAL-00241" />
+      <option name="project" value="LOCAL" />
+      <updated>1654191789365</updated>
+    </task>
+    <option name="localTasksCounter" value="242" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,7 +493,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing the deaths thing" />
     <MESSAGE value="Fixing total troops" />
     <MESSAGE value="Fixing turn command" />
     <MESSAGE value="Fixing turn" />
@@ -518,7 +517,8 @@
     <MESSAGE value="Fixing API" />
     <MESSAGE value="Turning off API" />
     <MESSAGE value="Fixing recruitment.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing recruitment.py" />
+    <MESSAGE value="Changing to v.1 Released&#10;- Added new turn mechanics: rebellions, taxation, economic updates, great powers&#10;- Updated all relevant viewing commands&#10;- Added mercenary command&#10;- Added rate changing command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changing to v.1 Released&#10;- Added new turn mechanics: rebellions, taxation, economic updates, great powers&#10;- Updated all relevant viewing commands&#10;- Added mercenary command&#10;- Added rate changing command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

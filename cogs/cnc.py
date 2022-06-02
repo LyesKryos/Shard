@@ -528,15 +528,15 @@ class CNC(commands.Cog):
             cncuserembed.add_field(name="Trade Route Overview",
                                    value=f"Outgoing Routes: {userinfo['trade_routes'][0]}\n"
                                          f"Incoming Routes: {userinfo['trade_routes'][1]}\n"
-                                         f"Active Routes ({len(trade_list)}: {trade}"
+                                         f"Active Routes ({len(trade_list)}): {trade}"
                                          f"Max Routes: {userinfo['trade_routes'][2]}")
             cncuserembed.add_field(name="Manpower/Manpower Limit",
                                    value=f"{userinfo['manpower']}/{userinfo['maxmanpower']}")
             cncuserembed.add_field(name="Manpower Increase", value=str(added_manpower))
             cncuserembed.add_field(name="Economic Status",
-                                   value=f"Taxation Rate: {userinfo['taxation'] / 100}%\n"
-                                         f"Military Upkeep: {userinfo['military_upkeep']/100}%\n"
-                                         f"Public Services: {userinfo['public_services']/100}%")
+                                   value=f"Taxation Rate: {userinfo['taxation']}%\n"
+                                         f"Military Upkeep: {userinfo['military_upkeep']}%\n"
+                                         f"Public Services: {userinfo['public_services']}%")
             if ctx.guild is not None:
                 await ctx.send("Sent!")
             await author.send(embed=cncuserembed)
@@ -1121,7 +1121,7 @@ class CNC(commands.Cog):
                         await conn.execute('''INSERT INTO interactions(id, type, sender, sender_id, recipient, 
                         recipient_id, terms) SELECT id, type, sender, sender_id, recipient, recipient_id, terms 
                         FROM pending_interactions WHERE id = $1;''', interactionid)
-                        await conn.execute('''UPDATE interactions SET active = True WHERE id = $1;''', interactionid)
+                        await conn.execute('''  UPDATE interactions SET active = True WHERE id = $1;''', interactionid)
                         await conn.execute('''DELETE FROM pending_interactions WHERE id = $1;''', interactionid)
                         # if a peace treaty, cancel war
                         if pending_int['type'] == 'peace':
@@ -1130,11 +1130,31 @@ class CNC(commands.Cog):
                             await conn.execute(
                                 '''UPDATE interactions SET active = False WHERE type = 'war' AND sender = $1 AND 
                                 recipient = $2;''', pending_int['sender'], pending_int['recipient'])
+                        # if trade, update user information
+                        if pending_int == 'trade':
+                            senderinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
+                                                             pending_int['sender_id'])
+                            recipinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
+                                                            pending_int['recipient_id'])
+                            sender_trs = senderinfo['trade_routes']
+                            sender_trs[0] += 1
+                            recip_trs = recipinfo['trade_routes']
+                            recip_trs[1] += 1
+                            await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE user_id = $2;''',
+                                               sender_trs, senderinfo['user_id'])
+                            await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE user_id = $2;''',
+                                               recip_trs, recipinfo['user_id'])
                         # update relations
-                        await conn.execute('''UPDATE relations SET relation = $3 WHERE name = $1 AND nation  = $2;''',
-                                           pending_int['recipient'], pending_int['sender'], pending_int['type'])
-                        await conn.execute('''UPDATE relations SET relation = $3 WHERE name = $1 AND nation = $2;''',
-                                           pending_int['sender'], pending_int['recipient'], pending_int['type'])
+                        if pending_int['type'] != 'trade':
+                            await conn.execute('''UPDATE relations SET relation = $3 WHERE name = $1 AND nation  = $2;''',
+                                               pending_int['recipient'], pending_int['sender'], pending_int['type'])
+                            await conn.execute('''UPDATE relations SET relation = $3 WHERE name = $1 AND nation = $2;''',
+                                               pending_int['sender'], pending_int['recipient'], pending_int['type'])
+                        elif pending_int['type'] == 'trade':
+                            await conn.execute('''UPDATE relations SET trade = True WHERE name = $1 AND nation = $2;''',
+                                               pending_int['sender'], pending_int['recipient'])
+                            await conn.execute('''UPDATE relations SET trade = True WHERE name = $1 AND nation = $2;''',
+                                               pending_int['recipient'], pending_int['sender'])
                         # updates interaction files
                         interaction_text = f"Offer #{pending_int['id']} of {pending_int['type']}.\nSent by: " \
                                            f"{pending_int['sender']}\nAccepted by: {pending_int['recipient']}" \
@@ -1148,6 +1168,12 @@ class CNC(commands.Cog):
                             oldcontent = file.read()
                             file.seek(0, 0)
                             file.write(interaction_text.rstrip('\r\n') + '\n' + oldcontent)
+                        # subtracts action point from sender
+                        if pending_int['type'] != 'peace':
+                            sender_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
+                                                         pending_int['sender_id'])
+                            await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''',
+                                               sender_info['moves']-1, pending_int['sender_id'])
                         # get user object and send message
                         sender = self.bot.get_user(pending_int['sender_id'])
                         await sender.send(
@@ -1278,6 +1304,10 @@ class CNC(commands.Cog):
                     return
             # fetches user information
             userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+            # checks for enough action points
+            if userinfo['moves'] <= 0:
+                await ctx.send("You do not have enough action points for that!")
+                return
             rinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', rrecipient.lower())
             aid = ctx.message.id
             atype = "alliance"
@@ -1354,6 +1384,9 @@ class CNC(commands.Cog):
                     return
             # fetches user information
             userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+            if userinfo['moves'] <= 0:
+                await ctx.send("You do not have enough action points for that!")
+                return
             rinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', rrecipient.lower())
             aid = ctx.message.id
             atype = "war"
@@ -1393,6 +1426,9 @@ class CNC(commands.Cog):
                                    sender)
                 await conn.execute('''UPDATE relations SET relation = 'war' WHERE name = $1 AND nation = $2;''', sender,
                                    recipient)
+                # subtracts action point
+                await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''',
+                                   userinfo['moves']-1, author.id)
                 # sends DM
                 rsend = self.bot.get_user(recipient_id)
                 await rsend.send(
@@ -1541,6 +1577,47 @@ class CNC(commands.Cog):
         except Exception as error:
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
+    @commands.command(usage="[recipient]", brief="Proposes trade between nations.")
+    async def cnc_trade_route(self, ctx, *, args):
+        try:
+            # establishes connection and author
+            author = ctx.author
+            conn = self.bot.pool
+            # ensures existence
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+            if userinfo is None:
+                await ctx.send("You are not registered.")
+                return
+            recipient = args
+            recip_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
+                                             recipient.lower())
+            if recip_info is None:
+                await ctx.send(f"`{recipient}` does not appear to be registered.")
+                return
+            if userinfo['moves'] <= 0:
+                await ctx.send("You do not have enough action points for that!")
+                return
+            if userinfo['trade_routes'][2] <= userinfo['trade_routes'][0]:
+                await ctx.send("You do not have enough available trade routes to establish a new one.")
+                return
+            sender = userinfo['username']
+            sender_id = author.id
+            recipient = recip_info['username']
+            recipient_id = recip_info['user_id']
+            if sender == recipient:
+                await ctx.send("You cannot send yourself a trade route.")
+                return
+            await conn.execute('''INSERT INTO pending_interactions (id, type, sender, sender_id, recipient,
+                                    recipient_id, terms) VALUES($1, $2, $3, $4, $5, $6, "trade");''', ctx.message.id,
+                               "trade", sender, sender_id, recipient, recipient_id)
+            recipient_user = self.bot.get_user(recipient_id)
+            await recipient_user.send(f"{sender} has sent an offer to establish a trade route with you. To accept or "
+                                      f"reject, use `$cnc_interaction {ctx.message.id} [accept/reject]`.")
+            await ctx.send(f"Trade offer sent to {recipient}!")
+        except Exception:
+            self.bot.logger.warning(msg=traceback.format_exc())
+
+
     # ---------------------Resource and Recruit Commands------------------------------
 
     @commands.command(usage="<nation name>", aliases=['cncb'], brief="Displays information about a nation's income")
@@ -1580,6 +1657,8 @@ class CNC(commands.Cog):
                 initial_trade_value = 0
                 total_troops = 0
                 for p in userinfo['provinces_owned']:
+                    if p == 0:
+                        continue
                     p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
                     total_troops += p_info['troops']
                     if userinfo['trade_routes'][0] != 0:
@@ -1636,6 +1715,8 @@ class CNC(commands.Cog):
                 initial_trade_value = 0
                 total_troops = 0
                 for p in userinfo['provinces_owned']:
+                    if p == 0:
+                        continue
                     p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
                     total_troops += p_info['troops']
                     if userinfo['trade_routes'][0] != 0:
