@@ -2243,8 +2243,9 @@ class CNC(commands.Cog):
             await conn.execute('''UPDATE cncusers SET $1 = $2 WHERE userid = $3;''', changed, rate, author.id)
             changed.replace("_", " ")
             await ctx.send(f"{changed.title()} rate changed from {current_rate}% to {rate}% successfully!")
-        except Exception:
+        except Exception as error:
             self.bot.logger(traceback.format_exc())
+            await ctx.send(error)
 
     # -------------------Movement Commands----------------------------
 
