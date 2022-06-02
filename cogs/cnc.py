@@ -2217,7 +2217,7 @@ class CNC(commands.Cog):
             author = ctx.author
             conn = self.bot.pool
             # fetches user information
-            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE userid = $1;''', author.id)
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
             if userinfo is None:
                 await ctx.send(f"{author} does not appear to be registered.")
                 return
@@ -2230,22 +2230,35 @@ class CNC(commands.Cog):
                 if rate > 25:
                     await ctx.send("The maximum tax rate is 25%.")
                     return
+                current_rate = userinfo[changed]
+                if current_rate == rate:
+                    await ctx.send(f"Your rate is already {rate}%!")
+                    return
+                await conn.execute('''UPDATE cncusers SET taxation = $1 WHERE user_id = $2;''', rate, author.id)
             if changed == 'military' or changed == 'm':
                 changed = 'military_upkeep'
                 if rate > 30:
                     await ctx.send("The maximum military upkeep rate is 30%.")
                     return
+                current_rate = userinfo[changed]
+                if current_rate == rate:
+                    await ctx.send(f"Your rate is already {rate}%!")
+                    return
+                await conn.execute('''UPDATE cncusers SET military_upkeep = $1 WHERE user_id = $2;''', rate, author.id)
             if changed == 'services' or changed == 's':
                 changed = 'public_services'
                 if rate > 50:
                     await ctx.send("The maximum public services rate is 50%.")
-            current_rate = userinfo[changed]
-            await conn.execute('''UPDATE cncusers SET $1 = $2 WHERE userid = $3;''', changed, rate, author.id)
-            changed.replace("_", " ")
+                    return
+                current_rate = userinfo[changed]
+                if current_rate == rate:
+                    await ctx.send(f"Your rate is already {rate}%!")
+                    return
+                await conn.execute('''UPDATE cncusers SET public_services = $1 WHERE user_id = $2;''', rate, author.id)
+            changed = changed.replace("_", " ")
             await ctx.send(f"{changed.title()} rate changed from {current_rate}% to {rate}% successfully!")
-        except Exception as error:
+        except Exception:
             self.bot.logger(traceback.format_exc())
-            await ctx.send(error)
 
     # -------------------Movement Commands----------------------------
 
