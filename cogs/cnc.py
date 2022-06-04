@@ -4206,7 +4206,7 @@ class CNC(commands.Cog):
             ORDER BY great_power_score DESC LIMIT 3;''')
             for gp in great_powers:
                 if gp['great_power_score'] > 50:
-                    userid = gp['userid']
+                    userid = gp['user_id']
                     await conn.execute('''UPDATE cncusers SET great_power = True WHERE user_id = $1;''', userid)
             await cncchannel.send("Update complete.")
         except Exception:
@@ -4429,7 +4429,7 @@ class CNC(commands.Cog):
             ORDER BY great_power_score DESC LIMIT 3;''')
             for gp in great_powers:
                 if gp['great_power_score'] > 100:
-                    userid = gp['userid']
+                    userid = gp['user_id']
                     await conn.execute('''UPDATE cncusers SET great_power = True WHERE user_id = $1;''', userid)
             await cncchannel.send("Update complete.")
         except Exception:
