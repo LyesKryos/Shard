@@ -1802,11 +1802,11 @@ class CNC(commands.Cog):
             manpower = ramount * 1000
             cost = ramount * 1000
             # reduces or increases cost based on military spending
-            if userinfo['military_spending'] >= 10:
-                cost_reduction = (userinfo['military_spending'] - 10) / 100
+            if userinfo['military_upkeep'] >= 10:
+                cost_reduction = (userinfo['military_upkeep'] - 10) / 100
                 cost *= 1 - cost_reduction
             else:
-                cost_increase = (userinfo['military_spending'] - 10) / 100
+                cost_increase = (userinfo['military_upkeep'] - 10) / 100
                 cost *= 1 + cost_increase
             # checks if the focus is military
             if userinfo['focus'] == "m":
