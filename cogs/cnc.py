@@ -4202,12 +4202,12 @@ class CNC(commands.Cog):
                 gp_points += alliances['count'] * 0.5
                 await conn.execute('''UPDATE cncusers SET great_power_score = $1 WHERE username = $2;''',
                                    gp_points, userinfo['username'])
-            great_powers = await conn.fetch('''SELECT userid, great_power_score FROM cncusers 
+            great_powers = await conn.fetch('''SELECT user_id, great_power_score FROM cncusers 
             ORDER BY great_power_score DESC LIMIT 3;''')
             for gp in great_powers:
                 if gp['great_power_score'] > 50:
                     userid = gp['userid']
-                    await conn.execute('''UPDATE cncusers SET great_power = True WHERE userid = $1;''', userid)
+                    await conn.execute('''UPDATE cncusers SET great_power = True WHERE user_id = $1;''', userid)
             await cncchannel.send("Update complete.")
         except Exception:
             self.bot.logger.warning(msg=traceback.format_exc())
@@ -4425,12 +4425,12 @@ class CNC(commands.Cog):
                 gp_points += alliances['count'] * 0.5
                 await conn.execute('''UPDATE cncusers SET great_power_score = $1 WHERE username = $2;''',
                                    gp_points, userinfo['username'])
-            great_powers = await conn.fetch('''SELECT userid, great_power_score FROM cncusers 
+            great_powers = await conn.fetch('''SELECT user_id, great_power_score FROM cncusers 
             ORDER BY great_power_score DESC LIMIT 3;''')
             for gp in great_powers:
                 if gp['great_power_score'] > 100:
                     userid = gp['userid']
-                    await conn.execute('''UPDATE cncusers SET great_power = True WHERE userid = $1;''', userid)
+                    await conn.execute('''UPDATE cncusers SET great_power = True WHERE user_id = $1;''', userid)
             await cncchannel.send("Update complete.")
         except Exception:
             self.bot.logger.warning(msg=traceback.format_exc())
