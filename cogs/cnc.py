@@ -299,7 +299,7 @@ class CNC(commands.Cog):
                 if userinfo['capital'] == 0:
                     capital = "None"
                 else:
-                    captial = f"Province #{userinfo['capital']}"
+                    capital = f"Province #{userinfo['capital']}"
                 # creates the embed item
                 cncuserembed = discord.Embed(title=userinfo["username"], color=color,
                                              description=f"Registered nation of {self.bot.get_user(userinfo['user_id']).name}.")
@@ -1148,10 +1148,12 @@ class CNC(commands.Cog):
                                                recip_trs, recipinfo['user_id'])
                         # update relations
                         if pending_int['type'] != 'trade':
-                            await conn.execute('''UPDATE relations SET relation = $3 WHERE name = $1 AND nation  = $2;''',
-                                               pending_int['recipient'], pending_int['sender'], pending_int['type'])
-                            await conn.execute('''UPDATE relations SET relation = $3 WHERE name = $1 AND nation = $2;''',
-                                               pending_int['sender'], pending_int['recipient'], pending_int['type'])
+                            await conn.execute(
+                                '''UPDATE relations SET relation = $3 WHERE name = $1 AND nation  = $2;''',
+                                pending_int['recipient'], pending_int['sender'], pending_int['type'])
+                            await conn.execute(
+                                '''UPDATE relations SET relation = $3 WHERE name = $1 AND nation = $2;''',
+                                pending_int['sender'], pending_int['recipient'], pending_int['type'])
                         elif pending_int['type'] == 'trade':
                             await conn.execute('''UPDATE relations SET trade = True WHERE name = $1 AND nation = $2;''',
                                                pending_int['sender'], pending_int['recipient'])
@@ -1173,9 +1175,9 @@ class CNC(commands.Cog):
                         # subtracts action point from sender
                         if pending_int['type'] != 'peace':
                             sender_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
-                                                         pending_int['sender_id'])
+                                                              pending_int['sender_id'])
                             await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''',
-                                               sender_info['moves']-1, pending_int['sender_id'])
+                                               sender_info['moves'] - 1, pending_int['sender_id'])
                         # get user object and send message
                         sender = self.bot.get_user(pending_int['sender_id'])
                         await sender.send(
@@ -1228,6 +1230,25 @@ class CNC(commands.Cog):
                             '''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
                             recipient,
                             sender)
+                    # removes trade routes and information
+                    elif interact['type'] == 'trade':
+                        await conn.execute('''UPDATE relations SET trade = False WHERE name = $1 AND nation = $2
+                            OR name = $3 AND nation = $4;''',
+                                           sender, recipient, recipient, sender)
+                        trade_interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE type = 'trade' AND 
+                        active = True AND sender = $1 AND recipient = $2 OR sender = $1 AND recipient = $2;''',
+                                                                sender, recipient, recipient, sender)
+                        trade_sender = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
+                                                           trade_interaction['sender'])
+                        trade_recipient = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
+                                                              trade_interaction['recipient'])
+                        trade_sender_routes = trade_sender['trade_routes'][0]- 1
+                        trade_recip_routes = trade_recipient['trade_routes'][1] - 1
+                        await conn.execute('''UPDATE cncusers SET trade = $1 WHERE username = $2;''',
+                                           trade_sender_routes, trade_sender['username'])
+                        await conn.execute('''UPDATE cncusers SET trade = $1 WHERE username = $2;''',
+                                           trade_recip_routes, trade_recipient['username'])
+
                     await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''', interactionid)
                     await ctx.send(f"{interact['type'].title()} between {sender} and {recipient} canceled.")
                     # DMs relevant parties
@@ -1311,6 +1332,9 @@ class CNC(commands.Cog):
                 await ctx.send("You do not have enough action points for that!")
                 return
             rinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', rrecipient.lower())
+            if userinfo['great_power'] and rinfo['great_power']:
+                await ctx.send("Great Powers cannot be allied.")
+                return
             aid = ctx.message.id
             atype = "alliance"
             sender = userinfo['username']
@@ -1402,9 +1426,8 @@ class CNC(commands.Cog):
                 await ctx.send("You cannot declare war on yourself.")
                 return
             # ensures no alliance
-            alliance = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 AND nation = $2;''',
-                                           sender,
-                                           recipient)
+            alliance = await conn.fetchrow('''SELECT * FROM relations WHERE name = $1 AND nation = $2;''',
+                                           sender, recipient)
             if alliance['relation'] == 'war':
                 await ctx.send(
                     f"It is not possible to declare war on {recipient} when you are already at war with them!")
@@ -1422,15 +1445,27 @@ class CNC(commands.Cog):
                                    sender_id,
                                    recipient,
                                    recipient_id, terms, True)
-                # updates relations
-                await conn.execute('''UPDATE relations SET relation = 'war' WHERE name = $1 AND nation = $2;''',
-                                   recipient,
-                                   sender)
-                await conn.execute('''UPDATE relations SET relation = 'war' WHERE name = $1 AND nation = $2;''', sender,
-                                   recipient)
+                # updates relations and trade routes
+                await conn.execute('''UPDATE relations SET trade = False WHERE name = $1 AND nation = $2
+                                            OR name = $3 AND nation = $4;''',
+                                   sender, recipient, recipient, sender)
+                if alliance['trade'] is True:
+                    trade_interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE type = 'trade' AND 
+                                            active = True AND sender = $1 AND recipient = $2 OR sender = $1 AND recipient = $2;''',
+                                                            sender, recipient, recipient, sender)
+                    trade_sender = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
+                                                       trade_interaction['sender'])
+                    trade_recipient = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
+                                                          trade_interaction['recipient'])
+                    trade_sender_routes = trade_sender['trade_routes'][0] - 1
+                    trade_recip_routes = trade_recipient['trade_routes'][1] - 1
+                    await conn.execute('''UPDATE cncusers SET trade = $1 WHERE username = $2;''',
+                                       trade_sender_routes, trade_sender['username'])
+                    await conn.execute('''UPDATE cncusers SET trade = $1 WHERE username = $2;''',
+                                       trade_recip_routes, trade_recipient['username'])
                 # subtracts action point
                 await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''',
-                                   userinfo['moves']-1, author.id)
+                                   userinfo['moves'] - 1, author.id)
                 # sends DM
                 rsend = self.bot.get_user(recipient_id)
                 await rsend.send(
@@ -1602,6 +1637,12 @@ class CNC(commands.Cog):
             if userinfo['trade_routes'][2] <= userinfo['trade_routes'][0]:
                 await ctx.send("You do not have enough available trade routes to establish a new one.")
                 return
+            relations = await conn.fetchrow(
+                '''SELECT * FROM relations WHERE lower(name) = $1 AND lower(nation) = $2;''',
+                userinfo['username'].lower(), recipient.lower())
+            if relations['relation'] == 'war':
+                await ctx.send("You cannot establish a trade route with a nation you are at war with!")
+                return
             sender = userinfo['username']
             sender_id = author.id
             recipient = recip_info['username']
@@ -1618,7 +1659,6 @@ class CNC(commands.Cog):
             await ctx.send(f"Trade offer sent to {recipient}!")
         except Exception:
             self.bot.logger.warning(msg=traceback.format_exc())
-
 
     # ---------------------Resource and Recruit Commands------------------------------
 
@@ -1942,7 +1982,8 @@ class CNC(commands.Cog):
                 await ctx.send("You are not registered!")
                 return
             # fetch recipient info and check existence
-            recip_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', recipient.lower())
+            recip_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
+                                             recipient.lower())
             if recip_info is None:
                 await ctx.send(f"{recipient} does not appear to be registered.")
                 return
@@ -1953,15 +1994,13 @@ class CNC(commands.Cog):
                 return
             # execute changes
             await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
-                               undeployed-amount, author.id)
+                               undeployed - amount, author.id)
             await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
-                               recip_info['undeployed']+amount, recip_info['user_id'])
+                               recip_info['undeployed'] + amount, recip_info['user_id'])
             await ctx.send(f"{userinfo['username']} has sent an expeditionary force of {amount} troops to "
                            f"{recip_info['username']}.")
         except Exception:
             self.bot.logger.warning(msg=traceback.format_exc())
-
-
 
     @commands.command(usage="[province id]", brief="Purchases a specified province")
     @commands.guild_only()
@@ -2136,7 +2175,8 @@ class CNC(commands.Cog):
                     try:
                         city_limit = userinfo['citylimit']
                         city_limit[0] += 1
-                        await conn.execute('''UPDATE provinces  SET city = TRUE WHERE id = $1;''', provinceid)
+                        await conn.execute('''UPDATE provinces  SET city = TRUE WHERE id = $1;''',
+                                            provinceid)
                         await conn.execute('''UPDATE cncusers SET resources = $1, citylimit = $2 WHERE user_id = $3;''',
                                            (userinfo['resources'] - ccost), city_limit, author.id)
                         await ctx.send(
@@ -2187,6 +2227,9 @@ class CNC(commands.Cog):
                     await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a capital."
                                    f"\n**Resource Deficit:** \u03FE{math.ceil(difference)}")
                     return
+                if provinceinfo['city'] is False:
+                    await ctx.send("A capital can only be built in a province with an existing city.")
+                    return
                 await conn.execute('''UPDATE cncusers SET capital = $1, resources = $2 WHERE user_id = $3;''',
                                    provinceid, userinfo['resources'] - 50000, author.id)
                 await ctx.send(f"{userinfo['username']} successfully constructed a capital in province # {provinceid}.")
@@ -2204,8 +2247,16 @@ class CNC(commands.Cog):
                     await ctx.send(f"{userinfo['username']} does not have enough credit resources to move the capital."
                                    f"\n**Resource Deficit:** \u03FE{math.ceil(difference)}")
                     return
-                await conn.execute('''UPDATE cncusers SET capital = $1, resources = $2 WHERE user_id = $3;''',
-                                   provinceid, userinfo['resources'] - 25000, author.id)
+                elif provinceinfo['city'] is False:
+                    await ctx.send("A capital can only be moved to a province with an existing city.")
+                    return
+                turn = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'turn';''')
+                if userinfo['capital_move'] == turn['data_value']:
+                    await ctx.send("You have already moved your capital this turn and cannot move it again.")
+                    return
+                await conn.execute('''UPDATE cncusers SET capital = $1, resources = $2, capital_move = $3 
+                WHERE user_id = $4;''',
+                                   provinceid, userinfo['resources'] - 25000, turn['data_valye'], author.id)
                 await ctx.send(f"Capital successfully moved to province #{provinceid}.")
                 return
         except Exception as error:
@@ -2900,6 +2951,10 @@ class CNC(commands.Cog):
                                 text=f"{defenderinfo['username']} has lost control of province #{target}!"
                                      f" With nowhere to retreat, all {targetinfo['troops']} troops have "
                                      f"been killed!")
+                            # if the province is the capital province, add 50 national unrest
+                            if userinfo['capital'] == target:
+                                await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
+                                                   userinfo['national_unrest'] + 50, userinfo['username'])
                             await ctx.send(embed=battleembed)
                             await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
                                                        userinfo['usercolor'])
@@ -2943,6 +2998,10 @@ class CNC(commands.Cog):
                                 text=f"{defenderinfo['username']} has lost control of province #{target}!"
                                      f" With nowhere to retreat, all {battle.RemainingDefendingArmy} troops have "
                                      f"returned to the stockpile!")
+                            # if the province is the capital province, add 50 national unrest
+                            if userinfo['capital'] == target:
+                                await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
+                                                   userinfo['national_unrest'] + 50, userinfo['username'])
                             await ctx.send(embed=battleembed)
                             await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
                                                        userinfo['usercolor'])
@@ -2991,6 +3050,10 @@ class CNC(commands.Cog):
                                 text=f"{defenderinfo['username']} has lost control of province #{target}!"
                                      f" Their {battle.RemainingDefendingArmy} troops have retreated to "
                                      f"province #{retreatprovince}!")
+                            # if the province is the capital province, add 50 national unrest
+                            if userinfo['capital'] == target:
+                                await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
+                                                   userinfo['national_unrest']+50, userinfo['username'])
                             await ctx.send(embed=battleembed)
                             await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
                                                        userinfo['usercolor'])
@@ -4015,57 +4078,39 @@ class CNC(commands.Cog):
             # fetches all the users and makes a list
             users = await conn.fetch('''SELECT user_id FROM cncusers;''')
             userids = [ids['user_id'] for ids in users]
-            total_resources = 0
             # for every user in the list
             for u in userids:
-                # fetch all provinces  owned by the user
-                userinfo = await conn.fetchrow(
-                    '''SELECT * FROM cncusers WHERE user_id = $1;''', u)
-                provinceslist = userinfo['provinces_owned']
-                provinceslist.remove(0)
-                added_resources = 0
-                manpower_mod = .1
-                if userinfo['focus'] == 'm':
-                    manpower_mod = .2
-                max_manpower = 3000
-                manpower = userinfo['manpower']
-                # for every province, check the worth/manpower and add it to the overall amount
-                for p in userinfo['provinces_owned']:
-                    provinceworth = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', p)
-                    added_resources += provinceworth['trade_value']
-                    # if there is a port, add 1/2 the province worth
-                    if provinceworth['port'] is True:
-                        added_resources += .5 * provinceworth['trade_value']
-                    # if there is a city, add 1000 to the resources
-                    if provinceworth['city'] is True:
-                        added_resources += 1000
-                    max_manpower += provinceworth['manpower']
-                added_manpower = math.ceil(manpower + (max_manpower * manpower_mod))
-                # ensure manpower limit
-                if added_manpower > max_manpower:
-                    added_manpower = max_manpower
-                # calculate and add all movement points, resources, manpower, and other limits
-                # moves
-                if len(provinceslist) <= 10:
-                    await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', 2,
-                                       userinfo['user_id'])
-                elif len(provinceslist) > 10:
-                    movementpoints = math.floor((len(provinceslist) - 10) / 10) + 5
-                    if userinfo['focus'] == "s":
-                        movementpoints += math.ceil(movementpoints * .1)
-                    await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', movementpoints,
-                                       userinfo['user_id'])
-                # fort/city/port limit update
-                if len(provinceslist) <= 5:
+                user = self.bot.get_user(u)
+                credits_added = 0
+                # pull out the data and get a list of provinces and trade routes
+                userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', u)
+                provinces = userinfo['provinces_owned']
+                # for every province, collect manpower data, trade value, local Unrest, troops, and city, port,
+                # and fort data
+                initial_manpower = userinfo['manpower']
+                # calculate tax income and deductions
+                tax_rate = userinfo['taxation'] / 100
+                taxes = initial_manpower * tax_rate
+                military_upkeep = userinfo['military_upkeep'] / 100
+                public_services = userinfo['public_services'] / 100
+                taxes *= 1 - (military_upkeep + public_services)
+                credits_added += taxes
+                # establish variables
+                trade_routes = userinfo['trade_routes']
+                initial_trade_value = 0
+                total_troops = userinfo['undeployed']
+                civil_war = False
+                # fort/city/port/trade route limit update
+                if len(userinfo['provinces_owned']) <= 5:
                     await conn.execute(
                         '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;'''
                         , [userinfo['citylimit'][0], 1], [userinfo['portlimit'][0], 1],
                         [userinfo['fortlimit'][0], 1],
                         userinfo['user_id'])
-                elif len(provinceslist) > 5:
-                    fortlimit = math.floor((len(provinceslist) - 5) / 5) + 1
-                    portlimit = math.floor((len(provinceslist) - 5) / 3) + 1
-                    citylimit = math.floor((len(provinceslist) - 5) / 7) + 1
+                elif len(userinfo['provinces_owned']) > 5:
+                    fortlimit = math.floor((len(userinfo['provinces_owned']) - 5) / 5) + 1
+                    portlimit = math.floor((len(userinfo['provinces_owned']) - 5) / 3) + 1
+                    citylimit = math.floor((len(userinfo['provinces_owned']) - 5) / 7) + 1
                     if userinfo['focus'] == 's':
                         fortlimit += fortlimit + 1
                     if userinfo['focus'] == 'e':
@@ -4075,22 +4120,185 @@ class CNC(commands.Cog):
                         , [userinfo['citylimit'][0], citylimit], [userinfo['portlimit'][0], portlimit],
                         [userinfo['fortlimit'][0], fortlimit],
                         userinfo['user_id'])
-                total_resources += added_resources
-                await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
-                                   (userinfo['resources'] + math.ceil(added_resources)), u)
-                await conn.execute('''UPDATE cncusers SET maxmanpower = $1, manpower = $2 WHERE user_id = $3;''',
-                                   int(max_manpower), added_manpower, userinfo['user_id'])
-            # update turn and post message
-            turns = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
-            resources = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "resources")
-            await conn.execute('''UPDATE cnc_data SET data_value = $2 WHERE data_name = $1;''', "turns",
-                               turns['data_value'] + 1)
-            await conn.execute('''UPDATE cnc_data SET data_value = $2 WHERE data_name = $1;''', "resources",
-                               resources['data_value'] + total_resources)
-            await cncchannel.send(f"New turn! It is now turn #{int(turns['data_value']) + 1}.")
-            return
-        except Exception as error:
-            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
+                trade_route_limit = 0
+                # if the user is a great power, +1 trade route
+                if userinfo['great_power']:
+                    trade_route_limit += 1
+                if userinfo['citylimit'][0] != 0 and userinfo['portlimit'][0] != 0:
+                    # for every city +1 and for every two ports +1
+                    trade_route_limit += userinfo['citylimit'][0]
+                    trade_route_limit += math.floor(userinfo['portlimit'][0] / 2)
+                    # if the current trade route number is too high, close a random trade route
+                if trade_routes[0] < trade_route_limit:
+                    closed_route = await conn.fetchrow('''SELECT * FROM relations WHERE name = $1 AND trade = 
+                    True ORDER BY RAND();''', userinfo['username'])
+                    await conn.execute('''UPDATE relations SET trade = False WHERE name = $1 AND nation = $2;''',
+                                       userinfo['username'], closed_route['nation'])
+                tax_rate *= 100
+                military_upkeep *= 100
+                public_services *= 100
+                # check national Unrest for civil war and add national Unrest
+                national_unrest = userinfo['national_unrest']
+                # if the national unrest is above 80
+                if len(provinces) > 9:
+                    if national_unrest >= 80:
+                        # roll a d100
+                        unrest_roll = randint(0, 100)
+                        # if the d100 is below or equal to the national unrest, trigger civil war
+                        if unrest_roll <= national_unrest:
+                            provinces_owned = userinfo['provinces_owned']
+                            half_owned = math.floor(len(provinces_owned) / 2)
+                            provinces_rebelling = sample(provinces_owned, half_owned)
+                            for pr in provinces_rebelling:
+                                p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', pr)
+                                provinces_owned.remove(pr)
+                                undeployed = userinfo['undeployed']
+                                troops_remaining = p_info['troops'] - (p_info['manpower'] * 2)
+                                if troops_remaining <= 0:
+                                    troops_remaining = 0
+                                await conn.execute('''UPDATE cncusers SET provinces_owned = $1, undeployed = $2 WHERE 
+                                user_id = $3;''', provinces_owned, undeployed + troops_remaining, u)
+                                await conn.execute('''UPDATE provinces SET owner = '', owner_id = '0', unrest = 0, 
+                                troops = $1 WHERE id = $2;''', p_info['manpower'] * 2, pr)
+                                # await self.bot.loop.run_in_executor(None, self.map_color, pr, p_info['cord'][0:2],
+                                #                                     "#808080", True)
+                            provinces_rebelling.sort()
+                            provinces_rebelling_string = ', '.join(str(e) for e in provinces_rebelling)
+                            await user.send(f"Province(s) {provinces_rebelling_string} have rebelled in a civil war!")
+                            civil_war = True
+                # add national Unrest
+                national_unrest = 0
+                tax_unrest = math.ceil(5 * (1 + 1) ** ((tax_rate / 5) - 1))
+                military_upkeep_unrest = -math.ceil((1 * (1 + 1) ** ((military_upkeep / 5) - 1)) * 1.75)
+                if public_services < 15:
+                    public_service_unrest = math.ceil(30 - public_services * 2)
+                else:
+                    public_service_unrest = -math.ceil((3 * (1 + 0.75) ** ((military_upkeep - 15 / 5) - 1)))
+                if userinfo['great_power'] is False:
+                    if len(provinces) > 50:
+                        national_unrest += len(provinces) - 50
+                else:
+                    if len(provinces) > 75:
+                        national_unrest += len(provinces) - 75
+                national_unrest += tax_unrest + public_service_unrest + military_upkeep_unrest
+                await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE user_id = $2;''',
+                                   national_unrest, u)
+                # gather each province information
+                provinces_rebelled = list()
+                for p in provinces:
+                    if p == 0:
+                        continue
+                    p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+                    total_troops += p_info['troops']
+                    if trade_routes[0] != 0:
+                        # for every province, calculate local trade value
+                        trade_value = p_info['trade_value']
+                        if p_info['city'] and p_info['port']:
+                            trade_value *= 1.6
+                        elif p_info['city']:
+                            trade_value *= 1.1
+                        elif p_info['port']:
+                            trade_value *= 1.5
+                        if userinfo['capital'] == p:
+                            if userinfo['capital'] in provinces:
+                                trade_value += 500
+                        initial_trade_value += trade_value
+                    # check local Unrest for local uprising and add local Unrest
+                    local_unrest = p_info['unrest']
+                    # if the local Unrest is greater than 50
+                    if not civil_war:
+                        if len(provinces) > 4:
+                            if local_unrest >= 50:
+                                # roll a d100
+                                unrest_roll = randint(0, 100)
+                                # if the d100 is greater than the local Unrest, trigger an uprising
+                                if userinfo['capital'] != p:
+                                    if unrest_roll <= local_unrest:
+                                        # fetch necessary information and update provicnes owned, undeployed, and rebel power
+                                        provinces_owned = userinfo['provinces_owned']
+                                        provinces_owned.remove(p)
+                                        undeployed = userinfo['undeployed']
+                                        rebels = p_info['manpower'] * 2 + 1000
+                                        troops_remaining = p_info['troops'] - rebels
+                                        if troops_remaining <= 0:
+                                            troops_remaining = 0
+                                        await conn.execute('''UPDATE cncusers SET provinces_owned = $1, undeployed = $2 WHERE 
+                                        user_id = $3;''', provinces_owned, undeployed + troops_remaining, u)
+                                        await conn.execute('''UPDATE provinces SET owner = '', owner_id = '0', troops = $1 WHERE
+                                        id = $2;''', p_info['manpower'] * 2, p)
+                                        # await self.bot.loop.run_in_executor(None, self.map_color, p, p_info['cord'][0:2],
+                                        #                                     "#808080", True)
+                                        provinces_rebelled.append(p)
+                    # add Unrest
+                    unrest = 0
+                    if civil_war:
+                        unrest -= 20
+                    troops_unrest = p_info['troops'] / -100
+                    tax_unrest = math.ceil(5 * (1 + 1) ** ((tax_rate / 5) - 1))
+                    military_upkeep_unrest = -math.ceil((1 * (1 + 1) ** ((military_upkeep / 5) - 1)) * 1.75)
+                    if public_services < 15:
+                        public_service_unrest = math.ceil(30 - public_services * 2)
+                    else:
+                        public_service_unrest = -math.ceil((3 * (1 + 0.75) ** ((public_services - 15 / 5) - 1)))
+                    unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
+                    await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
+                if len(provinces_rebelled) != 0:
+                    provinces_rebelled_string = ', '.join(str(p) for p in provinces_rebelled)
+                    await user.send(f"Province(s) {provinces_rebelled_string} have rebelled due to high unrest!")
+                # for every domestic trade route, +10%. For every foreign trade route, +5%
+                initial_trade_value *= trade_routes[1] / 10
+                initial_trade_value *= (trade_routes[2] * 5) / 100
+                credits_added += initial_trade_value
+                credits_added -= total_troops * 0.01
+                # calculate manpower increase and max manpower
+                max_manpower_raw = await conn.fetchrow('''SELECT sum(manpower::int) FROM provinces WHERE
+                owner_id = $1;''', u)
+                max_manpower = max_manpower_raw['sum']
+                if max_manpower is None:
+                    max_manpower = 3000
+                added_manpower = (public_services / 100) * max_manpower
+                added_manpower += userinfo['citylimit'][0] * 1000
+                if userinfo['capital'] != 0:
+                    if userinfo['capital'] in provinces:
+                        added_manpower += 2500
+                manpower = added_manpower + userinfo['manpower']
+                if manpower > max_manpower:
+                    manpower = max_manpower
+                # calculates action points
+                moves = 4
+                if len(provinces) <= 10:
+                    moves += 0
+                elif len(provinces) > 10:
+                    moves += math.floor((len(provinces) - 10) / 10)
+                    if userinfo['focus'] == "s":
+                        moves += math.floor(moves * .1)
+                if userinfo['great_power']:
+                    moves += 1
+                # add all credits, manpower, moves to the user
+                await conn.execute('''UPDATE cncusers SET resources = $1, manpower = $2, maxmanpower = $3, moves = $4 
+                WHERE user_id = $5;''', credits_added + userinfo['resources'], manpower, max_manpower, moves, u)
+                # great power calculations
+                gp_points = 0
+                gp_points += credits_added * 0.001
+                gp_points += total_troops * 0.001
+                gp_points += initial_manpower * 0.001
+                gp_points += userinfo['fortlimit'][0] + userinfo['citylimit'][0]
+                gp_points += len(provinces) * 0.5
+                alliances = await conn.fetchrow(
+                    '''SELECT COUNT(name) FROM relations WHERE name = $1 AND relation = 'alliance';''',
+                    userinfo['username'])
+                gp_points += alliances['count'] * 0.5
+                await conn.execute('''UPDATE cncusers SET great_power_score = $1 WHERE username = $2;''',
+                                   gp_points, userinfo['username'])
+            great_powers = await conn.fetch('''SELECT userid, great_power_score FROM cncusers 
+            ORDER BY great_power_score DESC LIMIT 3;''')
+            for gp in great_powers:
+                if gp['great_power_score'] > 50:
+                    userid = gp['userid']
+                    await conn.execute('''UPDATE cncusers SET great_power = True WHERE userid = $1;''', userid)
+            await cncchannel.send("Update complete.")
+        except Exception:
+            self.bot.logger.warning(msg=traceback.format_exc())
 
     @commands.command()
     @commands.is_owner()
@@ -4224,8 +4432,9 @@ class CNC(commands.Cog):
                             trade_value *= 1.1
                         elif p_info['port']:
                             trade_value *= 1.5
-                        if u['capital'] == p:
-                            trade_value += 500
+                        if userinfo['capital'] == p:
+                            if userinfo['capital'] in provinces:
+                                trade_value += 500
                         initial_trade_value += trade_value
                     # check local Unrest for local uprising and add local Unrest
                     local_unrest = p_info['unrest']
@@ -4281,6 +4490,10 @@ class CNC(commands.Cog):
                 if max_manpower is None:
                     max_manpower = 3000
                 added_manpower = (public_services / 100) * max_manpower
+                added_manpower += userinfo['citylimit'][0]*1000
+                if userinfo['capital'] != 0:
+                    if userinfo['capital'] in provinces:
+                        added_manpower += 2500
                 manpower = added_manpower + userinfo['manpower']
                 if manpower > max_manpower:
                     manpower = max_manpower

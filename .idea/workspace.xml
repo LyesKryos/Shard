@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing change_rate command">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding unrest to province and detailed view commands">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,14 +129,7 @@
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
-      <workItem from="1653752887539" duration="24402000" />
-    </task>
-    <task id="LOCAL-00199" summary="Adding province names">
-      <created>1652620785190</created>
-      <option name="number" value="00199" />
-      <option name="presentableId" value="LOCAL-00199" />
-      <option name="project" value="LOCAL" />
-      <updated>1652620785190</updated>
+      <workItem from="1653752887539" duration="32962000" />
     </task>
     <task id="LOCAL-00200" summary="Adding province names">
       <created>1652620896815</created>
@@ -473,7 +467,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654196279313</updated>
     </task>
-    <option name="localTasksCounter" value="248" />
+    <task id="LOCAL-00248" summary="Adding unrest to province and detailed view commands">
+      <created>1654199120018</created>
+      <option name="number" value="00248" />
+      <option name="presentableId" value="LOCAL-00248" />
+      <option name="project" value="LOCAL" />
+      <updated>1654199120023</updated>
+    </task>
+    <option name="localTasksCounter" value="249" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -492,7 +493,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Altering database info" />
     <MESSAGE value="Changing cncva to something easier to read" />
     <MESSAGE value="Fixing movement points and cncv aesthetics" />
     <MESSAGE value="Fixing terrain on attack" />
@@ -517,7 +517,8 @@
     <MESSAGE value="- Adding trade interactions&#10;- Adding interaction action point depletion&#10;- Small errata fixes" />
     <MESSAGE value="Small errata fixes" />
     <MESSAGE value="Fixing change_rate command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing change_rate command" />
+    <MESSAGE value="Adding unrest to province and detailed view commands" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding unrest to province and detailed view commands" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
