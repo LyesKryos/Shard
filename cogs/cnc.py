@@ -3202,12 +3202,15 @@ class CNC(commands.Cog):
         try:
             # connects to the database
             conn = self.bot.pool
-            await conn.execute('''DELETE FROM cncusers, relations, interactions, pending_interactions;''')
+            await conn.execute('''DELETE FROM cncusers;''')
+            await conn.execute('''DELETE FROM relations;''')
+            await conn.execute('''DELETE FROM interactions;''')
+            await conn.execute('''DELETE FROM pending_interactions;''')
             await conn.execute('''UPDATE provinces  SET owner = '', owner_id = 0, troops = 0;''')
             provinceinfo = await conn.fetch('''SELECT * FROM provinces;''')
             province_ids = [p['id'] for p in provinceinfo]
             for p in province_ids:
-                terrain = await conn.fetchrow('''SELECT terrain FROM provinces  WHERE id = $1;''', p)
+                terrain = await conn.fetchrow('''SELECT terrain FROM provinces WHERE id = $1;''', p)
                 if terrain['terrain'] == 0:
                     await conn.execute(
                         '''UPDATE provinces SET troops = $1, port = FALSE, city = FALSE, fort = FALSE WHERE id = $2;''',
@@ -3233,6 +3236,8 @@ class CNC(commands.Cog):
             await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = $2;''', 0, "deaths")
             await ctx.send("https://tenor.com/view/finished-elijah-wood-lord-of-the-rings-lava-fire-gif-5894611")
             return
+        except Exception:
+            self.bot.logger.warning(msg=traceback.format_exc())
         except Exception as error:
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
