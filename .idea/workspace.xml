@@ -129,21 +129,7 @@
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
-      <workItem from="1653752887539" duration="33590000" />
-    </task>
-    <task id="LOCAL-00202" summary="Altering variables, adding death data. CnC v1.2b">
-      <created>1652661970421</created>
-      <option name="number" value="00202" />
-      <option name="presentableId" value="LOCAL-00202" />
-      <option name="project" value="LOCAL" />
-      <updated>1652661970422</updated>
-    </task>
-    <task id="LOCAL-00203" summary="Adding renaming of provinces for province owners.">
-      <created>1652662614713</created>
-      <option name="number" value="00203" />
-      <option name="presentableId" value="LOCAL-00203" />
-      <option name="project" value="LOCAL" />
-      <updated>1652662614713</updated>
+      <workItem from="1653752887539" duration="35180000" />
     </task>
     <task id="LOCAL-00204" summary="Fixing the deaths thing">
       <created>1652725720132</created>
@@ -474,7 +460,21 @@
       <option name="project" value="LOCAL" />
       <updated>1654358534725</updated>
     </task>
-    <option name="localTasksCounter" value="251" />
+    <task id="LOCAL-00251" summary="Fixing turn loop">
+      <created>1654358884258</created>
+      <option name="number" value="00251" />
+      <option name="presentableId" value="LOCAL-00251" />
+      <option name="project" value="LOCAL" />
+      <updated>1654358884258</updated>
+    </task>
+    <task id="LOCAL-00252" summary="Fixing turn loop">
+      <created>1654358933629</created>
+      <option name="number" value="00252" />
+      <option name="presentableId" value="LOCAL-00252" />
+      <option name="project" value="LOCAL" />
+      <updated>1654358933629</updated>
+    </task>
+    <option name="localTasksCounter" value="253" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
