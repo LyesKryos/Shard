@@ -4091,7 +4091,7 @@ class CNC(commands.Cog):
                 if public_services < 15:
                     public_service_unrest = round(30 - public_services * 2)
                 else:
-                    public_service_unrest = -round((3 * (1 + 0.75) ** ((military_upkeep - 15 / 5) - 1)))
+                    public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 15) / 5) - 1))
                 if userinfo['great_power'] is False:
                     if len(provinces) > 50:
                         national_unrest += len(provinces) - 50
@@ -4157,7 +4157,7 @@ class CNC(commands.Cog):
                     if public_services < 15:
                         public_service_unrest = math.ceil(30 - public_services * 2)
                     else:
-                        public_service_unrest = -math.ceil((3 * (1 + 0.75) ** ((public_services - 15 / 5) - 1)))
+                        public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 15) / 5) - 1))
                     unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
                     await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
                 if len(provinces_rebelled) != 0:
