@@ -1720,9 +1720,8 @@ class CNC(commands.Cog):
                 # creates a list of provinces  owned
                 ownedprovinces = [p for p in userinfo['provinces_owned']]
                 ownedprovinces.remove(0)
-                cities = 0
-                ports = 0
-                cp_gain = 0
+                cities = userinfo['citylimit'][0]
+                ports = userinfo['portlimit'][0]
                 # creates the projected resource gain data
                 manpower = userinfo['manpower']
                 taxation = userinfo['taxation']
@@ -1758,7 +1757,7 @@ class CNC(commands.Cog):
                                           description="An overview of the resource status of a nation.")
                 bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']}")
                 bankembed.add_field(name="Total Projected Gain", value=f"\u03FE{math.ceil(base_gain)}")
-                bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(cp_gain)}")
+                bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(initial_trade_value)}")
                 bankembed.add_field(name="Cities", value=cities)
                 bankembed.add_field(name="Ports", value=ports)
                 await ctx.send(embed=bankembed)
@@ -1777,10 +1776,8 @@ class CNC(commands.Cog):
                 # creates a list of provinces  owned
                 ownedprovinces = [p for p in userinfo['provinces_owned']]
                 ownedprovinces.remove(0)
-                resource_gain = 0
-                cp_gain = 0
-                cities = 0
-                ports = 0
+                cities = userinfo['citylimit'][0]
+                ports = userinfo['portlimit'][0]
                 # creates the projected resource gain data
                 manpower = userinfo['manpower']
                 taxation = userinfo['taxation']
@@ -1817,8 +1814,8 @@ class CNC(commands.Cog):
                 bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']}")
                 bankembed.add_field(name="Current Gain", value=f"\u03FE{math.ceil(base_gain)}")
                 bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(initial_trade_value)}")
-                bankembed.add_field(name="Cities", value=cities)
-                bankembed.add_field(name="Ports", value=ports)
+                bankembed.add_field(name="Cities", value=str(cities))
+                bankembed.add_field(name="Ports", value=str(ports))
                 await ctx.send(embed=bankembed)
         except Exception:
             self.bot.logger.warning(msg=traceback.format_exc())
