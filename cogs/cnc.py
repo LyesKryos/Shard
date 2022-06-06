@@ -4248,8 +4248,8 @@ class CNC(commands.Cog):
                 if gp['great_power_score'] > 50:
                     userid = gp['user_id']
                     await conn.execute('''UPDATE cncusers SET great_power = True WHERE user_id = $1;''', userid)
-            turn = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'turn';''')
-            await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'turn';''',
+            turn = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'turns';''')
+            await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'turns';''',
                                turn['data_value'] + 1)
             await cncchannel.send(f"New turn! It is now turn #{turn['data_value'] + 1}.")
         except Exception:
@@ -4486,8 +4486,8 @@ class CNC(commands.Cog):
                 if gp['great_power_score'] > 50:
                     userid = gp['user_id']
                     await conn.execute('''UPDATE cncusers SET great_power = True WHERE user_id = $1;''', userid)
-            turn = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'turn';''')
-            await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'turn';''', turn['data_value'] + 1)
+            turn = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'turns';''')
+            await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'turns';''', turn['data_value'] + 1)
             await cncchannel.send(f"New turn! It is now turn #{turn['data_value'] + 1}.")
         except Exception:
             self.bot.logger.warning(msg=traceback.format_exc())
