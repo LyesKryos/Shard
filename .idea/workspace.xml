@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Deployed troops only cost upkeep change and fixing bank display">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing turns" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -129,21 +126,7 @@
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
-      <workItem from="1653752887539" duration="46128000" />
-    </task>
-    <task id="LOCAL-00218" summary="Fixing map in DM issue">
-      <created>1652872587643</created>
-      <option name="number" value="00218" />
-      <option name="presentableId" value="LOCAL-00218" />
-      <option name="project" value="LOCAL" />
-      <updated>1652872587644</updated>
-    </task>
-    <task id="LOCAL-00219" summary="Allowing maps one per user">
-      <created>1652921652112</created>
-      <option name="number" value="00219" />
-      <option name="presentableId" value="LOCAL-00219" />
-      <option name="project" value="LOCAL" />
-      <updated>1652921652113</updated>
+      <workItem from="1653752887539" duration="46944000" />
     </task>
     <task id="LOCAL-00220" summary="Allowing maps one per user">
       <created>1652921806845</created>
@@ -474,7 +457,21 @@
       <option name="project" value="LOCAL" />
       <updated>1654548373764</updated>
     </task>
-    <option name="localTasksCounter" value="267" />
+    <task id="LOCAL-00267" summary="Fixing turns">
+      <created>1654553226976</created>
+      <option name="number" value="00267" />
+      <option name="presentableId" value="LOCAL-00267" />
+      <option name="project" value="LOCAL" />
+      <updated>1654553226976</updated>
+    </task>
+    <task id="LOCAL-00268" summary="Fixing turns">
+      <created>1654553400520</created>
+      <option name="number" value="00268" />
+      <option name="presentableId" value="LOCAL-00268" />
+      <option name="project" value="LOCAL" />
+      <updated>1654553400521</updated>
+    </task>
+    <option name="localTasksCounter" value="269" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,7 +490,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Adding withdraw and deploy all." />
     <MESSAGE value="Fixing deploy bug" />
     <MESSAGE value="Fixing small moderation bugs" />
     <MESSAGE value="Fixing manpower bug in recruitment" />
@@ -518,7 +514,8 @@
     <MESSAGE value="Fixing turn loop" />
     <MESSAGE value="Deployed troops only cost upkeep change" />
     <MESSAGE value="Deployed troops only cost upkeep change and fixing bank display" />
-    <option name="LAST_COMMIT_MESSAGE" value="Deployed troops only cost upkeep change and fixing bank display" />
+    <MESSAGE value="Fixing turns" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing turns" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

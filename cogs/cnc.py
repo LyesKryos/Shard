@@ -599,8 +599,8 @@ class CNC(commands.Cog):
                 # fetches province information, adds it to the embed, and increases the count
                 provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
                 sv_emebed.add_field(name=f"**Province #{p}**",
-                                    value=f"Troops: {provinceinfo['troops']}\nTrade Value: {provinceinfo['trade_value']}\n"
-                                          f"Manpower: {provinceinfo['manpower']}")
+                                    value=f"Troops: {provinceinfo['troops']}\nTrade Value: {provinceinfo['trade_value']}"
+                                          f"\nManpower: {provinceinfo['manpower']}\nUnrest: {provinceinfo['unrest']}")
                 province_number += 1
                 # if there are 15 provinces queued, send the embed, clear it, and start over
                 # (unless this is the last set)
