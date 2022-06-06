@@ -617,6 +617,41 @@ class CNC(commands.Cog):
         except Exception as error:
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
+    @commands.command()
+    @commands.guild_only()
+    async def cnc_great_powers(self, ctx):
+        try:
+            conn = self.bot.pool
+            powers = await conn.fetch('''SELECT * FROM cncusers ORDER BY great_power_score DESC LIMIT 10;''')
+            power = 1
+            power_string = ""
+            for p in powers:
+                if p['great_power_score'] > 50:
+                    power_string += f"`{power}. {p['username']}"
+                    spaces = 50 - len(p['username'])
+                    for s in range(spaces):
+                        power_string += " "
+                    power_string += f"` `{p['great_power_score']}`\n"
+                    power += 1
+                else:
+                    for n in range(4-power):
+                        power_string += f"`{power}. "
+                        for n in range(50):
+                            power_string += " "
+                        power_string += f"` `50`\n"
+                        power += 1
+                    power_string += f"`{power}. {p['username']}"
+                    spaces = 50 - len(p['username'])
+                    for s in range(spaces):
+                        power_string += " "
+                    power_string += f"` `{p['great_power_score']}`\n"
+                    power += 1
+            gpembed = discord.Embed(title="Great Power List",
+                                    description=power_string)
+            await ctx.send(embed=gpembed)
+        except Exception:
+            self.bot.logger.warning(traceback.format_exc())
+            await ctx.send(f"```py \n {traceback.format_exc()}```")
 
     @commands.command(usage="[nation name] <reason>", brief="Completely removes a user from the CNC system. Owner only")
     @commands.is_owner()
