@@ -617,6 +617,7 @@ class CNC(commands.Cog):
         except Exception as error:
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
+
     @commands.command(usage="[nation name] <reason>", brief="Completely removes a user from the CNC system. Owner only")
     @commands.is_owner()
     async def cnc_remove(self, ctx, nationname: str, reason: str = None):
@@ -747,6 +748,7 @@ class CNC(commands.Cog):
                 return
         except Exception as error:
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
+
 
     # ---------------------Province Commands------------------------------
 
@@ -3127,7 +3129,6 @@ class CNC(commands.Cog):
             map = await ctx.send("https://i.ibb.co/kMCVN4K/wargame-terrain-with-numbers.png")
             for react in reactions:
                 await map.add_reaction(react)
-
             # the check for the emojis
             def mapcheck(reaction, user):
                 return user == ctx.message.author and str(reaction.emoji)
@@ -4153,9 +4154,9 @@ class CNC(commands.Cog):
                         unrest -= 20
                     troops_unrest = p_info['troops'] / -100
                     tax_unrest = math.ceil(5 * (1 + 1) ** ((tax_rate / 5) - 1))
-                    military_upkeep_unrest = -math.ceil((1 * (1 + 1) ** ((military_upkeep / 5) - 1)) * 1.75)
+                    military_upkeep_unrest = -round((1 * (1 + 1) ** ((military_upkeep / 5) - 1)) * 1.75)
                     if public_services < 15:
-                        public_service_unrest = math.ceil(30 - public_services * 2)
+                        public_service_unrest = round(30 - public_services * 2)
                     else:
                         public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 15) / 5) - 1))
                     unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
