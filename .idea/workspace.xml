@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing unrest calculations and adding GP list">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing small GP list error">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -128,21 +129,7 @@
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
-      <workItem from="1653752887539" duration="41526000" />
-    </task>
-    <task id="LOCAL-00211" summary="Fixing turn">
-      <created>1652739339296</created>
-      <option name="number" value="00211" />
-      <option name="presentableId" value="LOCAL-00211" />
-      <option name="project" value="LOCAL" />
-      <updated>1652739339296</updated>
-    </task>
-    <task id="LOCAL-00212" summary="Fixing turn">
-      <created>1652739386009</created>
-      <option name="number" value="00212" />
-      <option name="presentableId" value="LOCAL-00212" />
-      <option name="project" value="LOCAL" />
-      <updated>1652739386009</updated>
+      <workItem from="1653752887539" duration="42157000" />
     </task>
     <task id="LOCAL-00213" summary="Altering database info">
       <created>1652798131972</created>
@@ -473,7 +460,21 @@
       <option name="project" value="LOCAL" />
       <updated>1654475011957</updated>
     </task>
-    <option name="localTasksCounter" value="260" />
+    <task id="LOCAL-00260" summary="Fixing small GP list error">
+      <created>1654475228955</created>
+      <option name="number" value="00260" />
+      <option name="presentableId" value="LOCAL-00260" />
+      <option name="project" value="LOCAL" />
+      <updated>1654475228955</updated>
+    </task>
+    <task id="LOCAL-00261" summary="Fixing small GP list error">
+      <created>1654475314773</created>
+      <option name="number" value="00261" />
+      <option name="presentableId" value="LOCAL-00261" />
+      <option name="project" value="LOCAL" />
+      <updated>1654475314773</updated>
+    </task>
+    <option name="localTasksCounter" value="262" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -492,7 +493,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Added user lookup to the cncv command" />
     <MESSAGE value="Fixing CNCV user command" />
     <MESSAGE value="Fixing debt bug" />
     <MESSAGE value="Fixing total troop bug" />
@@ -517,7 +517,8 @@
     <MESSAGE value="Fixing local unrest" />
     <MESSAGE value="Fixing unrest calculations" />
     <MESSAGE value="Fixing unrest calculations and adding GP list" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing unrest calculations and adding GP list" />
+    <MESSAGE value="Fixing small GP list error" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing small GP list error" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
