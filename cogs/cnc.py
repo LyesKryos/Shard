@@ -4249,8 +4249,9 @@ class CNC(commands.Cog):
                     userid = gp['user_id']
                     await conn.execute('''UPDATE cncusers SET great_power = True WHERE user_id = $1;''', userid)
             turn = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'turn';''')
-            await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'turn';''', turn['turn']+1)
-            await cncchannel.send(f"New turn! It is now turn #{turn['turn']+1}.")
+            await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'turn';''',
+                               turn['data_value'] + 1)
+            await cncchannel.send(f"New turn! It is now turn #{turn['data_value'] + 1}.")
         except Exception:
             self.bot.logger.warning(msg=traceback.format_exc())
             await crashchannel.send(content=str(traceback.format_exc()))
@@ -4286,7 +4287,7 @@ class CNC(commands.Cog):
                 # establish variables
                 trade_routes = userinfo['trade_routes']
                 initial_trade_value = 0
-                total_troops = userinfo['undeployed']
+                total_troops = 0
                 civil_war = False
                 # fort/city/port/trade route limit update
                 if len(userinfo['provinces_owned']) <= 5:
@@ -4317,9 +4318,9 @@ class CNC(commands.Cog):
                     trade_route_limit += userinfo['citylimit'][0]
                     trade_route_limit += math.floor(userinfo['portlimit'][0] / 2)
                     # if the current trade route number is too high, close a random trade route
-                if trade_routes[0] < trade_route_limit:
+                if trade_routes[0] > trade_route_limit:
                     closed_route = await conn.fetchrow('''SELECT * FROM relations WHERE name = $1 AND trade = 
-                    True ORDER BY RAND();''', userinfo['username'])
+                    True ORDER BY RANDOM();''', userinfo['username'])
                     await conn.execute('''UPDATE relations SET trade = False WHERE name = $1 AND nation = $2;''',
                                        userinfo['username'], closed_route['nation'])
                 tax_rate *= 100
@@ -4480,12 +4481,14 @@ class CNC(commands.Cog):
                 await conn.execute('''UPDATE cncusers SET great_power_score = $1 WHERE username = $2;''',
                                    gp_points, userinfo['username'])
             great_powers = await conn.fetch('''SELECT user_id, great_power_score FROM cncusers 
-                   ORDER BY great_power_score DESC LIMIT 3;''')
+            ORDER BY great_power_score DESC LIMIT 3;''')
             for gp in great_powers:
                 if gp['great_power_score'] > 50:
                     userid = gp['user_id']
                     await conn.execute('''UPDATE cncusers SET great_power = True WHERE user_id = $1;''', userid)
-            await cncchannel.send("Update complete.")
+            turn = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'turn';''')
+            await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'turn';''', turn['data_value'] + 1)
+            await cncchannel.send(f"New turn! It is now turn #{turn['data_value'] + 1}.")
         except Exception:
             self.bot.logger.warning(msg=traceback.format_exc())
             await ctx.send(f"```py\n{traceback.format_exc()}```")
