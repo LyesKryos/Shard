@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing local unrest">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing unrest calculations and adding GP list">
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -129,28 +128,7 @@
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
-      <workItem from="1653752887539" duration="41196000" />
-    </task>
-    <task id="LOCAL-00208" summary="Fixing turn command">
-      <created>1652738972250</created>
-      <option name="number" value="00208" />
-      <option name="presentableId" value="LOCAL-00208" />
-      <option name="project" value="LOCAL" />
-      <updated>1652738972250</updated>
-    </task>
-    <task id="LOCAL-00209" summary="Fixing turn command">
-      <created>1652739082759</created>
-      <option name="number" value="00209" />
-      <option name="presentableId" value="LOCAL-00209" />
-      <option name="project" value="LOCAL" />
-      <updated>1652739082759</updated>
-    </task>
-    <task id="LOCAL-00210" summary="Fixing turn">
-      <created>1652739272677</created>
-      <option name="number" value="00210" />
-      <option name="presentableId" value="LOCAL-00210" />
-      <option name="project" value="LOCAL" />
-      <updated>1652739272679</updated>
+      <workItem from="1653752887539" duration="41526000" />
     </task>
     <task id="LOCAL-00211" summary="Fixing turn">
       <created>1652739339296</created>
@@ -474,7 +452,28 @@
       <option name="project" value="LOCAL" />
       <updated>1654362155348</updated>
     </task>
-    <option name="localTasksCounter" value="257" />
+    <task id="LOCAL-00257" summary="Fixing unrest calculations">
+      <created>1654474894978</created>
+      <option name="number" value="00257" />
+      <option name="presentableId" value="LOCAL-00257" />
+      <option name="project" value="LOCAL" />
+      <updated>1654474894980</updated>
+    </task>
+    <task id="LOCAL-00258" summary="Fixing unrest calculations">
+      <created>1654474926933</created>
+      <option name="number" value="00258" />
+      <option name="presentableId" value="LOCAL-00258" />
+      <option name="project" value="LOCAL" />
+      <updated>1654474926933</updated>
+    </task>
+    <task id="LOCAL-00259" summary="Fixing unrest calculations and adding GP list">
+      <created>1654475011956</created>
+      <option name="number" value="00259" />
+      <option name="presentableId" value="LOCAL-00259" />
+      <option name="project" value="LOCAL" />
+      <updated>1654475011957</updated>
+    </task>
+    <option name="localTasksCounter" value="260" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,8 +492,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Adding consistent error logging" />
-    <MESSAGE value="Fixing recruit bug and adding cosmetic changes" />
     <MESSAGE value="Added user lookup to the cncv command" />
     <MESSAGE value="Fixing CNCV user command" />
     <MESSAGE value="Fixing debt bug" />
@@ -518,7 +515,9 @@
     <MESSAGE value="Fixing reset" />
     <MESSAGE value="Fixing recruitment" />
     <MESSAGE value="Fixing local unrest" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing local unrest" />
+    <MESSAGE value="Fixing unrest calculations" />
+    <MESSAGE value="Fixing unrest calculations and adding GP list" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing unrest calculations and adding GP list" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

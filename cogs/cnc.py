@@ -628,7 +628,7 @@ class CNC(commands.Cog):
             for p in powers:
                 if p['great_power_score'] > 50:
                     power_string += f"`{power}. {p['username']}"
-                    spaces = 50 - len(p['username'])
+                    spaces = 50 - len(power_string)
                     for s in range(spaces):
                         power_string += " "
                     power_string += f"` `{p['great_power_score']}`\n"
@@ -641,7 +641,7 @@ class CNC(commands.Cog):
                         power_string += f"` `50`\n"
                         power += 1
                     power_string += f"`{power}. {p['username']}"
-                    spaces = 50 - len(p['username'])
+                    spaces = 50 - len(power_string)
                     for s in range(spaces):
                         power_string += " "
                     power_string += f"` `{p['great_power_score']}`\n"
