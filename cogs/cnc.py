@@ -617,7 +617,7 @@ class CNC(commands.Cog):
         except Exception as error:
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
-    @commands.command()
+    @commands.command(aliases=['cncgp'], brief="Displays list of top 10 great powers and their scores")
     @commands.guild_only()
     async def cnc_great_powers(self, ctx):
         try:
@@ -783,7 +783,6 @@ class CNC(commands.Cog):
                 return
         except Exception as error:
             self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
-
 
     # ---------------------Province Commands------------------------------
 
@@ -1279,7 +1278,7 @@ class CNC(commands.Cog):
                                                            trade_interaction['sender'])
                         trade_recipient = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
                                                               trade_interaction['recipient'])
-                        trade_sender_routes = trade_sender['trade_routes'][0]- 1
+                        trade_sender_routes = trade_sender['trade_routes'][0] - 1
                         trade_recip_routes = trade_recipient['trade_routes'][1] - 1
                         await conn.execute('''UPDATE cncusers SET trade = $1 WHERE username = $2;''',
                                            trade_sender_routes, trade_sender['username'])
@@ -2213,7 +2212,7 @@ class CNC(commands.Cog):
                         city_limit = userinfo['citylimit']
                         city_limit[0] += 1
                         await conn.execute('''UPDATE provinces  SET city = TRUE WHERE id = $1;''',
-                                            provinceid)
+                                           provinceid)
                         await conn.execute('''UPDATE cncusers SET resources = $1, citylimit = $2 WHERE user_id = $3;''',
                                            (userinfo['resources'] - ccost), city_limit, author.id)
                         await ctx.send(
@@ -3090,7 +3089,7 @@ class CNC(commands.Cog):
                             # if the province is the capital province, add 50 national unrest
                             if userinfo['capital'] == target:
                                 await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
-                                                   userinfo['national_unrest']+50, userinfo['username'])
+                                                   userinfo['national_unrest'] + 50, userinfo['username'])
                             await ctx.send(embed=battleembed)
                             await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
                                                        userinfo['usercolor'])
@@ -3164,6 +3163,7 @@ class CNC(commands.Cog):
             map = await ctx.send("https://i.ibb.co/kMCVN4K/wargame-terrain-with-numbers.png")
             for react in reactions:
                 await map.add_reaction(react)
+
             # the check for the emojis
             def mapcheck(reaction, user):
                 return user == ctx.message.author and str(reaction.emoji)
@@ -4180,7 +4180,8 @@ class CNC(commands.Cog):
                                         user_id = $3;''', provinces_owned, undeployed + troops_remaining, u)
                                         await conn.execute('''UPDATE provinces SET owner = '', owner_id = '0', troops = $1 WHERE
                                         id = $2;''', p_info['manpower'] * 2, p)
-                                        await self.bot.loop.run_in_executor(None, self.map_color, p, p_info['cord'][0:2],
+                                        await self.bot.loop.run_in_executor(None, self.map_color, p,
+                                                                            p_info['cord'][0:2],
                                                                             "#808080", True)
                                         provinces_rebelled.append(p)
                     # add Unrest
@@ -4489,7 +4490,6 @@ class CNC(commands.Cog):
         except Exception:
             self.bot.logger.warning(msg=traceback.format_exc())
             await ctx.send(f"```py\n{traceback.format_exc()}```")
-            
 
     async def cncstartloop(self):
         # wait until the bot is ready
