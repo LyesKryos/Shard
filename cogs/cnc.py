@@ -4052,7 +4052,7 @@ class CNC(commands.Cog):
                 # establish variables
                 trade_routes = userinfo['trade_routes']
                 initial_trade_value = 0
-                total_troops = userinfo['undeployed']
+                total_troops = 0
                 civil_war = False
                 # fort/city/port/trade route limit update
                 if len(userinfo['provinces_owned']) <= 5:
