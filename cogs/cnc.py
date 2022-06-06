@@ -636,7 +636,7 @@ class CNC(commands.Cog):
                 else:
                     for n in range(4-power):
                         power_string += f"`{power}. "
-                        for n in range(50):
+                        for n in range(50-len(power_string)):
                             power_string += " "
                         power_string += f"` `50`\n"
                         power += 1
