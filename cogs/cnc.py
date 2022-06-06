@@ -4083,9 +4083,9 @@ class CNC(commands.Cog):
                     trade_route_limit += userinfo['citylimit'][0]
                     trade_route_limit += math.floor(userinfo['portlimit'][0] / 2)
                     # if the current trade route number is too high, close a random trade route
-                if trade_routes[0] < trade_route_limit:
+                if trade_routes[0] > trade_route_limit:
                     closed_route = await conn.fetchrow('''SELECT * FROM relations WHERE name = $1 AND trade = 
-                    True ORDER BY RAND();''', userinfo['username'])
+                    True ORDER BY RANDOM();''', userinfo['username'])
                     await conn.execute('''UPDATE relations SET trade = False WHERE name = $1 AND nation = $2;''',
                                        userinfo['username'], closed_route['nation'])
                 tax_rate *= 100
@@ -4251,7 +4251,9 @@ class CNC(commands.Cog):
                 if gp['great_power_score'] > 50:
                     userid = gp['user_id']
                     await conn.execute('''UPDATE cncusers SET great_power = True WHERE user_id = $1;''', userid)
-            await cncchannel.send("Update complete.")
+            turn = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'turn';''')
+            await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'turn';''', turn['turn']+1)
+            await cncchannel.send(f"New turn! It is now turn #{turn['turn']+1}.")
         except Exception:
             self.bot.logger.warning(msg=traceback.format_exc())
             await crashchannel.send(content=str(traceback.format_exc()))
