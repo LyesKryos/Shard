@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding unrest to strategic view">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing war declarations">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,14 +128,7 @@
       <workItem from="1651766364192" duration="12819000" />
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
-      <workItem from="1653752887539" duration="47658000" />
-    </task>
-    <task id="LOCAL-00221" summary="Small cosmetic fixes">
-      <created>1652963278985</created>
-      <option name="number" value="00221" />
-      <option name="presentableId" value="LOCAL-00221" />
-      <option name="project" value="LOCAL" />
-      <updated>1652963278986</updated>
+      <workItem from="1653752887539" duration="48461000" />
     </task>
     <task id="LOCAL-00222" summary="Adding consistent error logging">
       <created>1652963943451</created>
@@ -473,7 +466,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654554168616</updated>
     </task>
-    <option name="localTasksCounter" value="270" />
+    <task id="LOCAL-00270" summary="Fixing war declarations">
+      <created>1654624819997</created>
+      <option name="number" value="00270" />
+      <option name="presentableId" value="LOCAL-00270" />
+      <option name="project" value="LOCAL" />
+      <updated>1654624819997</updated>
+    </task>
+    <option name="localTasksCounter" value="271" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -492,7 +492,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing small moderation bugs" />
     <MESSAGE value="Fixing manpower bug in recruitment" />
     <MESSAGE value="Adding API recruitment to recruitment.py and fixing line length and linter errors in cnc.py" />
     <MESSAGE value="Fixing API" />
@@ -517,7 +516,8 @@
     <MESSAGE value="Deployed troops only cost upkeep change and fixing bank display" />
     <MESSAGE value="Fixing turns" />
     <MESSAGE value="Adding unrest to strategic view" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding unrest to strategic view" />
+    <MESSAGE value="Fixing war declarations" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing war declarations" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

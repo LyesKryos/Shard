@@ -1209,7 +1209,7 @@ class CNC(commands.Cog):
                             file.seek(0, 0)
                             file.write(interaction_text.rstrip('\r\n') + '\n' + oldcontent)
                         # subtracts action point from sender
-                        if pending_int['type'] != 'peace':
+                        if pending_int['type'] not in ['peace','treaty']:
                             sender_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
                                                               pending_int['sender_id'])
                             await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''',
