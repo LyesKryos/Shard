@@ -1740,17 +1740,17 @@ class CNC(commands.Cog):
                     elif p_info['port']:
                         province_value *= 1.5
                     initial_trade_value += province_value
-                trade_value = 0
-                trade_value += initial_trade_value * (userinfo['trade_routes'][0] / 10)
-                trade_value += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
-                base_gain += trade_value
+                trade_gain = 0
+                trade_gain += initial_trade_value * (userinfo['trade_routes'][0] / 10)
+                trade_gain += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
+                base_gain += trade_gain
                 base_gain -= total_troops * 0.01
                 # sends the embed
                 bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
                                           description="An overview of the resource status of a nation.")
                 bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']}")
                 bankembed.add_field(name="Total Projected Gain", value=f"\u03FE{math.ceil(base_gain)}")
-                bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(trade_value)}")
+                bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(trade_gain)}")
                 bankembed.add_field(name="Cities", value=cities)
                 bankembed.add_field(name="Ports", value=ports)
                 await ctx.send(embed=bankembed)
@@ -1795,16 +1795,17 @@ class CNC(commands.Cog):
                     elif p_info['port']:
                         province_value *= 1.5
                     initial_trade_value += province_value
-                initial_trade_value += initial_trade_value * (userinfo['trade_routes'][0] / 10)
-                initial_trade_value += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
-                base_gain += initial_trade_value
+                trade_gain = 0
+                trade_gain += initial_trade_value * (userinfo['trade_routes'][0] / 10)
+                trade_gain += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
+                base_gain += trade_gain
                 base_gain -= total_troops * 0.01
                 # sends the embed
                 bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
                                           description="An overview of the resource status of a nation.")
                 bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']}")
                 bankembed.add_field(name="Current Gain", value=f"\u03FE{math.ceil(base_gain)}")
-                bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(initial_trade_value)}")
+                bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(trade_gain)}")
                 bankembed.add_field(name="Cities", value=str(cities))
                 bankembed.add_field(name="Ports", value=str(ports))
                 await ctx.send(embed=bankembed)
