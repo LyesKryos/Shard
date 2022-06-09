@@ -1256,48 +1256,44 @@ class CNC(commands.Cog):
                     return
                 sender = interact['sender']
                 recipient = interact['recipient']
-                try:
-                    # updates relation and interaction data
-                    if interact['type'] == 'alliance':
-                        await conn.execute(
-                            '''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
-                            sender, recipient)
-                        await conn.execute(
-                            '''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
-                            recipient, sender)
-                    # removes trade routes and information
-                    elif interact['type'] == 'trade':
-                        await conn.execute('''UPDATE relations SET trade = False WHERE name = $1 AND nation = $2
-                            OR name = $2 AND nation = $1;''',
-                                           sender, recipient)
-                        trade_interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE type = 'trade' AND 
-                        active = True AND sender = $1 AND recipient = $2 OR sender = $2 AND recipient = $1;''',
-                                                                sender, recipient)
-                        trade_sender = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
-                                                           trade_interaction['sender'])
-                        trade_recipient = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
-                                                              trade_interaction['recipient'])
-                        trade_sender_routes = trade_sender['trade_routes'][0] - 1
-                        trade_recip_routes = trade_recipient['trade_routes'][1] - 1
-                        await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE username = $2;''',
-                                           trade_sender_routes, trade_sender['username'])
-                        await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE username = $2;''',
-                                           trade_recip_routes, trade_recipient['username'])
+                # updates relation and interaction data
+                if interact['type'] == 'alliance':
+                    await conn.execute(
+                        '''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
+                        sender, recipient)
+                    await conn.execute(
+                        '''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
+                        recipient, sender)
+                # removes trade routes and information
+                elif interact['type'] == 'trade':
+                    await conn.execute('''UPDATE relations SET trade = False WHERE name = $1 AND nation = $2
+                        OR name = $2 AND nation = $1;''',
+                                       sender, recipient)
+                    trade_interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE type = 'trade' AND 
+                    active = True AND sender = $1 AND recipient = $2 OR sender = $2 AND recipient = $1;''',
+                                                            sender, recipient)
+                    trade_sender = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
+                                                       trade_interaction['sender'])
+                    trade_recipient = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
+                                                          trade_interaction['recipient'])
+                    trade_sender_routes = trade_sender['trade_routes'][0] - 1
+                    trade_recip_routes = trade_recipient['trade_routes'][1] - 1
+                    await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE username = $2;''',
+                                       trade_sender_routes, trade_sender['username'])
+                    await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE username = $2;''',
+                                       trade_recip_routes, trade_recipient['username'])
 
-                    await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''', interactionid)
-                    await ctx.send(f"{interact['type'].title()} between {sender} and {recipient} canceled.")
-                    # DMs relevant parties
-                    sender = self.bot.get_user(interact['sender_id'])
-                    await sender.send(f"Your {interact['type']} with {recipient} has been terminated.")
-                    recipient = self.bot.get_user(interact['recipient_id'])
-                    await recipient.send(f"Your {interact['type']} with {sender} has been terminated.")
-                except Exception as error:
-                    self.bot.logger.warning(msg=error)
-                    await ctx.send(error)
+                await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''', interactionid)
+                await ctx.send(f"{interact['type'].title()} between {sender} and {recipient} canceled.")
+                # DMs relevant parties
+                sender = self.bot.get_user(interact['sender_id'])
+                await sender.send(f"Your {interact['type']} with {recipient} has been terminated.")
+                recipient = self.bot.get_user(interact['recipient_id'])
+                await recipient.send(f"Your {interact['type']} with {sender} has been terminated.")
             else:
                 raise commands.UserInputError
-        except Exception as error:
-            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
+        except Exception:
+            self.bot.logger.warning(msg=traceback.format_exc())
 
     @commands.command(brief="Displays all pending interactions and offers")
     async def cnc_view_pending(self, ctx):
