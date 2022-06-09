@@ -1307,6 +1307,7 @@ class CNC(commands.Cog):
                 '''SELECT * FROM pending_interactions WHERE sender_id = $1 or recipient_id = $1;''', author.id)
             if interactions is None:
                 await ctx.send("No pending interactions found.")
+                return
             interactions_text = ''
             for i in interactions:
                 text = f"Offer of `{i['type']}` from `{i['sender']}` to `{i['recipient']}` pending. " \
@@ -1316,7 +1317,7 @@ class CNC(commands.Cog):
             if ctx.guild is not None:
                 await ctx.send("Sent!")
         except Exception as error:
-            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
+            self.bot.logger.warning(msg=traceback.format_exc())
 
     @commands.command(usage="[nation],, [terms]", brief="Sends an alliance offer to a nation")
     async def cnc_alliance(self, ctx, *, args):
@@ -1684,6 +1685,7 @@ class CNC(commands.Cog):
             await conn.execute('''INSERT INTO pending_interactions (id, type, sender, sender_id, recipient,
                                     recipient_id, terms) VALUES($1, $2, $3, $4, $5, $6, $7);''', ctx.message.id,
                                "trade", sender, sender_id, recipient, recipient_id, "Establish a Trade Route.")
+            await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', userinfo['moves']-1, author.id)
             recipient_user = self.bot.get_user(recipient_id)
             await recipient_user.send(f"{sender} has sent an offer to establish a trade route with you. To accept or "
                                       f"reject, use `$cnc_interaction {ctx.message.id} [accept/reject]`.")
