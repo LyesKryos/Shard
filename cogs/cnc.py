@@ -2145,7 +2145,7 @@ class CNC(commands.Cog):
             if provinceid not in userinfo['provinces_owned']:
                 await ctx.send(f"{userinfo['username']} does not own Province #{provinceid}!")
                 return
-            if structure.lower() not in ['fort', 'port', 'city']:
+            if structure.lower() not in ['fort', 'port', 'city', 'captial', 'move_capital']:
                 raise commands.UserInputError
             if structure.lower() == 'port':
                 pcost = 10000
