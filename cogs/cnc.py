@@ -1325,7 +1325,6 @@ class CNC(commands.Cog):
             # connects to the database
             conn = self.bot.pool
             data = args.split(',,')
-            print(len(data))
             if len(data) != 2:
                 raise WrongInput
             rrecipient = data[0]
@@ -1590,7 +1589,6 @@ class CNC(commands.Cog):
             # connects to the database
             conn = self.bot.pool
             data = args.split(',,')
-            print(len(data))
             if len(data) != 2:
                 raise WrongInput
             rrecipient = data[0]
@@ -1733,17 +1731,17 @@ class CNC(commands.Cog):
                         continue
                     p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
                     total_troops += p_info['troops']
-                    if userinfo['trade_routes'][0] != 0:
-                        # for every province, calculate local trade value
-                        trade_value = p_info['trade_value']
-                        if p_info['city'] and p_info['port']:
-                            trade_value *= 1.6
-                        elif p_info['city']:
-                            trade_value *= 1.1
-                        elif p_info['port']:
-                            trade_value *= 1.5
-                        initial_trade_value += trade_value
-                trade_value = initial_trade_value * (userinfo['trade_routes'][0] / 10)
+                    # for every province, calculate local trade value
+                    province_value = p_info['trade_value']
+                    if p_info['city'] and p_info['port']:
+                        province_value *= 1.6
+                    elif p_info['city']:
+                        province_value *= 1.1
+                    elif p_info['port']:
+                        province_value *= 1.5
+                    initial_trade_value += province_value
+                trade_value = 0
+                trade_value += initial_trade_value * (userinfo['trade_routes'][0] / 10)
                 trade_value += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
                 base_gain += trade_value
                 base_gain -= total_troops * 0.01
@@ -1789,26 +1787,24 @@ class CNC(commands.Cog):
                         continue
                     p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
                     total_troops += p_info['troops']
-                    if userinfo['trade_routes'][0] != 0:
-                        # for every province, calculate local trade value
-                        trade_value = p_info['trade_value']
-                        if p_info['city'] and p_info['port']:
-                            trade_value *= 1.6
-                        elif p_info['city']:
-                            trade_value *= 1.1
-                        elif p_info['port']:
-                            trade_value *= 1.5
-                        initial_trade_value += trade_value
-                trade_value = initial_trade_value * (userinfo['trade_routes'][0] / 10)
-                trade_value += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
-                base_gain += trade_value
+                    province_value = p_info['trade_value']
+                    if p_info['city'] and p_info['port']:
+                        province_value *= 1.6
+                    elif p_info['city']:
+                        province_value *= 1.1
+                    elif p_info['port']:
+                        province_value *= 1.5
+                    initial_trade_value += province_value
+                initial_trade_value += initial_trade_value * (userinfo['trade_routes'][0] / 10)
+                initial_trade_value += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
+                base_gain += initial_trade_value
                 base_gain -= total_troops * 0.01
                 # sends the embed
                 bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
                                           description="An overview of the resource status of a nation.")
                 bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']}")
-                bankembed.add_field(name="Total Projected Gain", value=f"\u03FE{math.ceil(base_gain)}")
-                bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(trade_value)}")
+                bankembed.add_field(name="Current Gain", value=f"\u03FE{math.ceil(base_gain)}")
+                bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(initial_trade_value)}")
                 bankembed.add_field(name="Cities", value=str(cities))
                 bankembed.add_field(name="Ports", value=str(ports))
                 await ctx.send(embed=bankembed)
@@ -4154,19 +4150,14 @@ class CNC(commands.Cog):
                             await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
                             continue
                     total_troops += p_info['troops']
-                    if trade_routes[0] != 0:
-                        # for every province, calculate local trade value
-                        trade_value = p_info['trade_value']
-                        if p_info['city'] and p_info['port']:
-                            trade_value *= 1.6
-                        elif p_info['city']:
-                            trade_value *= 1.1
-                        elif p_info['port']:
-                            trade_value *= 1.5
-                        if userinfo['capital'] == p:
-                            if userinfo['capital'] in provinces:
-                                trade_value += 500
-                        initial_trade_value += trade_value
+                    province_value = p_info['trade_value']
+                    if p_info['city'] and p_info['port']:
+                        province_value *= 1.6
+                    elif p_info['city']:
+                        province_value *= 1.1
+                    elif p_info['port']:
+                        province_value *= 1.5
+                    initial_trade_value += province_value
                     # check local Unrest for local uprising and add local Unrest
                     local_unrest = p_info['unrest']
                     # if the local Unrest is greater than 50
