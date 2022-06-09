@@ -1745,7 +1745,7 @@ class CNC(commands.Cog):
                         initial_trade_value += trade_value
                 trade_value = initial_trade_value * (userinfo['trade_routes'][0] / 10)
                 trade_value += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
-                base_gain += initial_trade_value
+                base_gain += trade_value
                 base_gain -= total_troops * 0.01
                 # sends the embed
                 bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
@@ -1801,7 +1801,7 @@ class CNC(commands.Cog):
                         initial_trade_value += trade_value
                 trade_value = initial_trade_value * (userinfo['trade_routes'][0] / 10)
                 trade_value += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
-                base_gain += initial_trade_value
+                base_gain += trade_value
                 base_gain -= total_troops * 0.01
                 # sends the embed
                 bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
