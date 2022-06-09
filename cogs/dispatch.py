@@ -618,5 +618,5 @@ class Dispatch(commands.Cog):
         await ctx.send("All done!")
 
 
-def setup(bot):
-    bot.add_cog(Dispatch(bot))
+async def setup(bot):
+    await bot.add_cog(Dispatch(bot))

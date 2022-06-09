@@ -4600,9 +4600,9 @@ class CNC(commands.Cog):
         self.turn_loop.start()
 
 
-def setup(bot: Shard):
+async def setup(bot: Shard):
     # define the cog, set the loop, set the turnloop running, and add the cog
     cog = CNC(bot)
     loop = bot.loop
     CNC.turn_task = loop.create_task(cog.cncstartloop())
-    bot.add_cog(cog)
+    await bot.add_cog(cog)

@@ -4,8 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing view_pending">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding small things I forgot last time">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ShardBot.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShardBot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/base.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/currency.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/currency.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/dispatch.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/dispatch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/roleplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/roleplay.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -129,14 +137,7 @@
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="13865000" />
-    </task>
-    <task id="LOCAL-00241" summary="Changing to v.1 Released&#10;- Added new turn mechanics: rebellions, taxation, economic updates, great powers&#10;- Updated all relevant viewing commands&#10;- Added mercenary command&#10;- Added rate changing command">
-      <created>1654191789365</created>
-      <option name="number" value="00241" />
-      <option name="presentableId" value="LOCAL-00241" />
-      <option name="project" value="LOCAL" />
-      <updated>1654191789365</updated>
+      <workItem from="1654788589345" duration="14863000" />
     </task>
     <task id="LOCAL-00242" summary="- Adding trade interactions&#10;- Adding interaction action point depletion&#10;- Small errata fixes">
       <created>1654195380445</created>
@@ -474,7 +475,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654805598971</updated>
     </task>
-    <option name="localTasksCounter" value="290" />
+    <task id="LOCAL-00290" summary="Adding small things I forgot last time">
+      <created>1654805996211</created>
+      <option name="number" value="00290" />
+      <option name="presentableId" value="LOCAL-00290" />
+      <option name="project" value="LOCAL" />
+      <updated>1654805996211</updated>
+    </task>
+    <option name="localTasksCounter" value="291" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,7 +501,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing reset" />
     <MESSAGE value="Fixing recruitment" />
     <MESSAGE value="Fixing local unrest" />
     <MESSAGE value="Fixing unrest calculations" />
@@ -518,7 +525,8 @@
     <MESSAGE value="Fixing bank display" />
     <MESSAGE value="Updating military upkeep unrest modifier" />
     <MESSAGE value="Fixing view_pending" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing view_pending" />
+    <MESSAGE value="Adding small things I forgot last time" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding small things I forgot last time" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

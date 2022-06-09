@@ -112,7 +112,7 @@ class BaseCommands(commands.Cog):
     async def silent_error(self, ctx, *, args):
         raise SilentFail
 
-def setup(bot: Shard):
+async def setup(bot: Shard):
     async def alive(bot):
         await bot.wait_until_ready()
         try:
@@ -123,4 +123,5 @@ def setup(bot: Shard):
             print(error)
     loop = bot.loop
     loop.create_task(alive(bot))
-    bot.add_cog(BaseCommands(bot))
+    await bot.add_cog(BaseCommands(bot))
+

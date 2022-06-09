@@ -36,5 +36,5 @@ class Roleplay(commands.Cog):
         return
 
 
-def setup(bot: Shard):
-    bot.add_cog(Roleplay(bot))
+async def setup(bot: Shard):
+    await bot.add_cog(Roleplay(bot))
