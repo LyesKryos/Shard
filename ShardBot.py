@@ -10,7 +10,7 @@ from customchecks import SilentFail
 class Shard(commands.Bot):
     def __init__(self):
         # sets prefix, initiates bot, and loads cogs
-        self.prefix = "m$"
+        self.prefix = "$"
         super().__init__(command_prefix=self.prefix, intents=discord.Intents.all(),
                          activity=discord.Game(f"{self.prefix}help for commands"),
                          application_id=849028002406858753)
