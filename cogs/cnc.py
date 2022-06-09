@@ -1305,7 +1305,7 @@ class CNC(commands.Cog):
             conn = self.bot.pool
             interactions = await conn.fetch(
                 '''SELECT * FROM pending_interactions WHERE sender_id = $1 or recipient_id = $1;''', author.id)
-            if interactions is None:
+            if not interactions:
                 await ctx.send("No pending interactions found.")
                 return
             interactions_text = ''

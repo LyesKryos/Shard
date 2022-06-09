@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating military upkeep unrest modifier">
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing view_pending" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -129,14 +127,7 @@
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="13206000" />
-    </task>
-    <task id="LOCAL-00239" summary="Fixing recruitment.py">
-      <created>1654078233376</created>
-      <option name="number" value="00239" />
-      <option name="presentableId" value="LOCAL-00239" />
-      <option name="project" value="LOCAL" />
-      <updated>1654078233376</updated>
+      <workItem from="1654788589345" duration="13514000" />
     </task>
     <task id="LOCAL-00240" summary="Fixing recruitment.py">
       <created>1654078368503</created>
@@ -474,7 +465,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654805083684</updated>
     </task>
-    <option name="localTasksCounter" value="288" />
+    <task id="LOCAL-00288" summary="Fixing view_pending">
+      <created>1654805484175</created>
+      <option name="number" value="00288" />
+      <option name="presentableId" value="LOCAL-00288" />
+      <option name="project" value="LOCAL" />
+      <updated>1654805484175</updated>
+    </task>
+    <option name="localTasksCounter" value="289" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,7 +491,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing national unrest problem" />
     <MESSAGE value="Fixing reset" />
     <MESSAGE value="Fixing recruitment" />
     <MESSAGE value="Fixing local unrest" />
@@ -518,7 +515,8 @@
     <MESSAGE value="Fixing trade outgoing gain" />
     <MESSAGE value="Fixing bank display" />
     <MESSAGE value="Updating military upkeep unrest modifier" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating military upkeep unrest modifier" />
+    <MESSAGE value="Fixing view_pending" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing view_pending" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
