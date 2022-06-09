@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing war declarations">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing trade route interaction">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -130,21 +130,7 @@
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="907000" />
-    </task>
-    <task id="LOCAL-00222" summary="Adding consistent error logging">
-      <created>1652963943451</created>
-      <option name="number" value="00222" />
-      <option name="presentableId" value="LOCAL-00222" />
-      <option name="project" value="LOCAL" />
-      <updated>1652963943451</updated>
-    </task>
-    <task id="LOCAL-00223" summary="Fixing recruit bug and adding cosmetic changes">
-      <created>1652964202639</created>
-      <option name="number" value="00223" />
-      <option name="presentableId" value="LOCAL-00223" />
-      <option name="project" value="LOCAL" />
-      <updated>1652964202639</updated>
+      <workItem from="1654788589345" duration="7374000" />
     </task>
     <task id="LOCAL-00224" summary="Added user lookup to the cncv command">
       <created>1653093005031</created>
@@ -475,7 +461,21 @@
       <option name="project" value="LOCAL" />
       <updated>1654624819997</updated>
     </task>
-    <option name="localTasksCounter" value="271" />
+    <task id="LOCAL-00271" summary="Fixing trade route limits">
+      <created>1654789561383</created>
+      <option name="number" value="00271" />
+      <option name="presentableId" value="LOCAL-00271" />
+      <option name="project" value="LOCAL" />
+      <updated>1654789561384</updated>
+    </task>
+    <task id="LOCAL-00272" summary="Fixing trade route interaction">
+      <created>1654791032769</created>
+      <option name="number" value="00272" />
+      <option name="presentableId" value="LOCAL-00272" />
+      <option name="project" value="LOCAL" />
+      <updated>1654791032769</updated>
+    </task>
+    <option name="localTasksCounter" value="273" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -494,8 +494,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing manpower bug in recruitment" />
-    <MESSAGE value="Adding API recruitment to recruitment.py and fixing line length and linter errors in cnc.py" />
     <MESSAGE value="Fixing API" />
     <MESSAGE value="Turning off API" />
     <MESSAGE value="Fixing recruitment.py" />
@@ -519,7 +517,9 @@
     <MESSAGE value="Fixing turns" />
     <MESSAGE value="Adding unrest to strategic view" />
     <MESSAGE value="Fixing war declarations" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing war declarations" />
+    <MESSAGE value="Fixing trade route limits" />
+    <MESSAGE value="Fixing trade route interaction" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing trade route interaction" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
