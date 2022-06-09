@@ -5,6 +5,7 @@ import os
 import logging
 from datetime import datetime as dt
 from customchecks import SilentFail
+import traceback
 
 
 class Shard(commands.Bot):
@@ -95,6 +96,4 @@ class Shard(commands.Bot):
         elif isinstance(error, commands.CheckFailure):
             await ctx.send(str(error))
         else:
-            logging.warning(
-                f"{self.time} {ctx.message.author} {ctx.message.id} caused the error \"{error}\" using the command "
-                f"{ctx.invoked_with}")
+            logging.warning(msg=traceback.format_exc())
