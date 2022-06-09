@@ -4113,7 +4113,8 @@ class CNC(commands.Cog):
                 # add national Unrest
                 national_unrest = 0
                 tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
-                military_upkeep_unrest = -round((1 * (1 + 1) ** ((military_upkeep / 5) - 1)) * 1.75)
+                military_upkeep_unrest = -round((1 * (1+1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
+                            military_upkeep / 10 - 1)) * 0.75))
                 if public_services < 15:
                     public_service_unrest = round(30 - public_services * 2)
                 else:
@@ -4142,7 +4143,9 @@ class CNC(commands.Cog):
                             unrest = 0
                             troops_unrest = p_info['troops'] / -100
                             tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
-                            military_upkeep_unrest = -round((1 * (1 + 1) ** ((military_upkeep / 5) - 1)) * 1.75)
+                            military_upkeep_unrest = -round(
+                                (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
+                                        military_upkeep / 10 - 1)) * 0.75))
                             if public_services < 15:
                                 public_service_unrest = round(30 - public_services * 2)
                             else:
@@ -4203,7 +4206,8 @@ class CNC(commands.Cog):
                         unrest -= 20
                     troops_unrest = p_info['troops'] / -100
                     tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
-                    military_upkeep_unrest = -round((1 * (1 + 1) ** ((military_upkeep / 5) - 1)) * 1.75)
+                    military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
+                            military_upkeep / 10 - 1)) * 0.75))
                     if public_services < 15:
                         public_service_unrest = round(30 - public_services * 2)
                     else:
@@ -4379,7 +4383,8 @@ class CNC(commands.Cog):
                 # add national Unrest
                 national_unrest = 0
                 tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
-                military_upkeep_unrest = -round((1 * (1 + 1) ** ((military_upkeep / 5) - 1)) * 1.75)
+                military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
+                        military_upkeep / 10 - 1)) * 0.75))
                 if public_services < 15:
                     public_service_unrest = round(30 - public_services * 2)
                 else:
@@ -4408,7 +4413,9 @@ class CNC(commands.Cog):
                             unrest = 0
                             troops_unrest = p_info['troops'] / -100
                             tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
-                            military_upkeep_unrest = -round((1 * (1 + 1) ** ((military_upkeep / 5) - 1)) * 1.75)
+                            military_upkeep_unrest = -round(
+                                (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
+                                        military_upkeep / 10 - 1)) * 0.75))
                             if public_services < 15:
                                 public_service_unrest = round(30 - public_services * 2)
                             else:
@@ -4474,7 +4481,8 @@ class CNC(commands.Cog):
                         unrest -= 20
                     troops_unrest = p_info['troops'] / -100
                     tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
-                    military_upkeep_unrest = -round((1 * (1 + 1) ** ((military_upkeep / 5) - 1)) * 1.75)
+                    military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
+                            military_upkeep / 10 - 1)) * 0.75))
                     if public_services < 15:
                         public_service_unrest = round(30 - public_services * 2)
                     else:
