@@ -1279,9 +1279,9 @@ class CNC(commands.Cog):
                                                               trade_interaction['recipient'])
                         trade_sender_routes = trade_sender['trade_routes'][0] - 1
                         trade_recip_routes = trade_recipient['trade_routes'][1] - 1
-                        await conn.execute('''UPDATE cncusers SET trade = $1 WHERE username = $2;''',
+                        await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE username = $2;''',
                                            trade_sender_routes, trade_sender['username'])
-                        await conn.execute('''UPDATE cncusers SET trade = $1 WHERE username = $2;''',
+                        await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE username = $2;''',
                                            trade_recip_routes, trade_recipient['username'])
 
                     await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''', interactionid)
