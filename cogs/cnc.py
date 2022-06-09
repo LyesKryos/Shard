@@ -1169,7 +1169,7 @@ class CNC(commands.Cog):
                                 '''UPDATE interactions SET active = False WHERE type = 'war' AND sender = $1 AND 
                                 recipient = $2;''', pending_int['sender'], pending_int['recipient'])
                         # if trade, update user information
-                        if pending_int == 'trade':
+                        if pending_int['type'] == 'trade':
                             senderinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
                                                              pending_int['sender_id'])
                             recipinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
