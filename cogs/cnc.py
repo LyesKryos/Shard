@@ -4106,8 +4106,8 @@ class CNC(commands.Cog):
                                 user_id = $3;''', provinces_owned, undeployed + troops_remaining, u)
                                 await conn.execute('''UPDATE provinces SET owner = '', owner_id = '0', unrest = 0, 
                                 troops = $1 WHERE id = $2;''', p_info['manpower'] * 2, pr)
-                                # await self.bot.loop.run_in_executor(None, self.map_color, pr, p_info['cord'][0:2],
-                                #                                     "#808080", True)
+                                await self.bot.loop.run_in_executor(None, self.map_color, pr, p_info['cord'][0:2],
+                                                                    "#808080", True)
                             provinces_rebelling.sort()
                             provinces_rebelling_string = ', '.join(str(e) for e in provinces_rebelling)
                             await user.send(f"Province(s) {provinces_rebelling_string} have rebelled in a civil war!")
@@ -4123,10 +4123,10 @@ class CNC(commands.Cog):
                     public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
                 if userinfo['great_power'] is False:
                     if len(provinces) > 50:
-                        national_unrest += len(provinces) - 50
+                        national_unrest += math.ceil(10 * (1 + 1) ** (((len(provinces) - 50) / 5) - 1))
                 else:
                     if len(provinces) > 75:
-                        national_unrest += len(provinces) - 75
+                        national_unrest += math.ceil(10 * (1 + 1) ** (((len(provinces) - 75) / 5) - 1))
                 national_unrest += tax_unrest + public_service_unrest + military_upkeep_unrest
                 await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE user_id = $2;''',
                                    national_unrest, u)
@@ -4144,6 +4144,8 @@ class CNC(commands.Cog):
                         else:
                             unrest = 0
                             troops_unrest = p_info['troops'] / -100
+                            if userinfo['great_power']:
+                                troops_unrest *= 2
                             tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
                             military_upkeep_unrest = -round(
                                 (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (

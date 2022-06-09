@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing view_pending" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing view_pending">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -127,14 +129,7 @@
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="13514000" />
-    </task>
-    <task id="LOCAL-00240" summary="Fixing recruitment.py">
-      <created>1654078368503</created>
-      <option name="number" value="00240" />
-      <option name="presentableId" value="LOCAL-00240" />
-      <option name="project" value="LOCAL" />
-      <updated>1654078368503</updated>
+      <workItem from="1654788589345" duration="13865000" />
     </task>
     <task id="LOCAL-00241" summary="Changing to v.1 Released&#10;- Added new turn mechanics: rebellions, taxation, economic updates, great powers&#10;- Updated all relevant viewing commands&#10;- Added mercenary command&#10;- Added rate changing command">
       <created>1654191789365</created>
@@ -472,7 +467,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654805484175</updated>
     </task>
-    <option name="localTasksCounter" value="289" />
+    <task id="LOCAL-00289" summary="Fixing view_pending">
+      <created>1654805598971</created>
+      <option name="number" value="00289" />
+      <option name="presentableId" value="LOCAL-00289" />
+      <option name="project" value="LOCAL" />
+      <updated>1654805598971</updated>
+    </task>
+    <option name="localTasksCounter" value="290" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
