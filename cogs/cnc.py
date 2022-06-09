@@ -1264,16 +1264,15 @@ class CNC(commands.Cog):
                             sender, recipient)
                         await conn.execute(
                             '''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
-                            recipient,
-                            sender)
+                            recipient, sender)
                     # removes trade routes and information
                     elif interact['type'] == 'trade':
                         await conn.execute('''UPDATE relations SET trade = False WHERE name = $1 AND nation = $2
-                            OR name = $3 AND nation = $4;''',
-                                           sender, recipient, recipient, sender)
+                            OR name = $2 AND nation = $1;''',
+                                           sender, recipient)
                         trade_interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE type = 'trade' AND 
-                        active = True AND sender = $1 AND recipient = $2 OR sender = $1 AND recipient = $2;''',
-                                                                sender, recipient, recipient, sender)
+                        active = True AND sender = $1 AND recipient = $2 OR sender = $2 AND recipient = $1;''',
+                                                                sender, recipient)
                         trade_sender = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
                                                            trade_interaction['sender'])
                         trade_recipient = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
