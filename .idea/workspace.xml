@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing provinces">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing bank">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -129,21 +129,7 @@
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="10472000" />
-    </task>
-    <task id="LOCAL-00230" summary="Adding withdraw and deploy all.">
-      <created>1653223181953</created>
-      <option name="number" value="00230" />
-      <option name="presentableId" value="LOCAL-00230" />
-      <option name="project" value="LOCAL" />
-      <updated>1653223181953</updated>
-    </task>
-    <task id="LOCAL-00231" summary="Adding withdraw and deploy all.">
-      <created>1653223361533</created>
-      <option name="number" value="00231" />
-      <option name="presentableId" value="LOCAL-00231" />
-      <option name="project" value="LOCAL" />
-      <updated>1653223361533</updated>
+      <workItem from="1654788589345" duration="11082000" />
     </task>
     <task id="LOCAL-00232" summary="Fixing deploy bug">
       <created>1653239247946</created>
@@ -474,7 +460,21 @@
       <option name="project" value="LOCAL" />
       <updated>1654800964389</updated>
     </task>
-    <option name="localTasksCounter" value="279" />
+    <task id="LOCAL-00279" summary="Fixing bank">
+      <created>1654802580185</created>
+      <option name="number" value="00279" />
+      <option name="presentableId" value="LOCAL-00279" />
+      <option name="project" value="LOCAL" />
+      <updated>1654802580185</updated>
+    </task>
+    <task id="LOCAL-00280" summary="Fixing bank">
+      <created>1654802723615</created>
+      <option name="number" value="00280" />
+      <option name="presentableId" value="LOCAL-00280" />
+      <option name="project" value="LOCAL" />
+      <updated>1654802723615</updated>
+    </task>
+    <option name="localTasksCounter" value="281" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,7 +493,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Changing to v.1 Released&#10;- Added new turn mechanics: rebellions, taxation, economic updates, great powers&#10;- Updated all relevant viewing commands&#10;- Added mercenary command&#10;- Added rate changing command" />
     <MESSAGE value="- Adding trade interactions&#10;- Adding interaction action point depletion&#10;- Small errata fixes" />
     <MESSAGE value="Small errata fixes" />
     <MESSAGE value="Fixing change_rate command" />
@@ -518,7 +517,8 @@
     <MESSAGE value="Nerfed and buffed public services and tax unrest rates, respectively. Added new Unrest mechanic for local provinces. Fixed trade route display issue." />
     <MESSAGE value="Fixing trade cancelling" />
     <MESSAGE value="Fixing provinces" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing provinces" />
+    <MESSAGE value="Fixing bank" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing bank" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

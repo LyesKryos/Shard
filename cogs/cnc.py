@@ -1743,8 +1743,8 @@ class CNC(commands.Cog):
                         elif p_info['port']:
                             trade_value *= 1.5
                         initial_trade_value += trade_value
-                initial_trade_value += initial_trade_value * (userinfo['trade_routes'][0] / 10)
-                initial_trade_value += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
+                trade_value = initial_trade_value * (userinfo['trade_routes'][0] / 10)
+                trade_value += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
                 base_gain += initial_trade_value
                 base_gain -= total_troops * 0.01
                 # sends the embed
@@ -1752,7 +1752,7 @@ class CNC(commands.Cog):
                                           description="An overview of the resource status of a nation.")
                 bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']}")
                 bankembed.add_field(name="Total Projected Gain", value=f"\u03FE{math.ceil(base_gain)}")
-                bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(initial_trade_value)}")
+                bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(trade_value)}")
                 bankembed.add_field(name="Cities", value=cities)
                 bankembed.add_field(name="Ports", value=ports)
                 await ctx.send(embed=bankembed)
@@ -4224,9 +4224,9 @@ class CNC(commands.Cog):
                                     f"have risen up due to high unrest! {structures_destroyed} structures have been"
                                     f"destroyed by the rioters.")
                 # for every domestic trade route, +10%. For every foreign trade route, +5%
-                initial_trade_value += initial_trade_value * (userinfo['trade_routes'][0] / 10)
-                initial_trade_value += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
-                credits_added += initial_trade_value
+                trade_gain = initial_trade_value * (userinfo['trade_routes'][0] / 10)
+                trade_gain += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
+                credits_added += trade_gain
                 credits_added -= total_troops * 0.01
                 # calculate manpower increase and max manpower
                 max_manpower_raw = await conn.fetchrow('''SELECT sum(manpower::int) FROM provinces WHERE
