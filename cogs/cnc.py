@@ -1748,8 +1748,8 @@ class CNC(commands.Cog):
                         elif p_info['port']:
                             trade_value *= 1.5
                         initial_trade_value += trade_value
-                initial_trade_value *= userinfo['trade_routes'][1] / 10
-                initial_trade_value *= (userinfo['trade_routes'][2] * 5) / 100
+                initial_trade_value *= userinfo['trade_routes'][0] / 10
+                initial_trade_value *= (userinfo['trade_routes'][1] * 5) / 100
                 base_gain += initial_trade_value
                 base_gain -= total_troops * 0.01
                 # sends the embed
@@ -1804,8 +1804,8 @@ class CNC(commands.Cog):
                         elif p_info['port']:
                             trade_value *= 1.5
                         initial_trade_value += trade_value
-                initial_trade_value *= userinfo['trade_routes'][1] / 10
-                initial_trade_value *= (userinfo['trade_routes'][2] * 5) / 100
+                initial_trade_value *= userinfo['trade_routes'][0] / 10
+                initial_trade_value *= (userinfo['trade_routes'][1] * 5) / 100
                 base_gain += initial_trade_value
                 base_gain -= total_troops * 0.01
                 # sends the embed
@@ -4075,16 +4075,17 @@ class CNC(commands.Cog):
                 # if the user is a great power, +1 trade route
                 if userinfo['great_power']:
                     trade_route_limit += 1
-                if userinfo['citylimit'][0] != 0 and userinfo['portlimit'][0] != 0:
-                    # for every city +1 and for every two ports +1
-                    trade_route_limit += userinfo['citylimit'][0]
-                    trade_route_limit += math.floor(userinfo['portlimit'][0] / 2)
+                # for every city +1 and for every two ports +1
+                trade_route_limit += userinfo['citylimit'][0]
+                trade_route_limit += math.floor(userinfo['portlimit'][0] / 2)
                     # if the current trade route number is too high, close a random trade route
                 if trade_routes[0] > trade_route_limit:
                     closed_route = await conn.fetchrow('''SELECT * FROM relations WHERE name = $1 AND trade = 
                     True ORDER BY RANDOM();''', userinfo['username'])
                     await conn.execute('''UPDATE relations SET trade = False WHERE name = $1 AND nation = $2;''',
                                        userinfo['username'], closed_route['nation'])
+                trade_routes = userinfo['trade_routes']
+                trade_routes[2] = trade_route_limit
                 tax_rate *= 100
                 military_upkeep *= 100
                 public_services *= 100
@@ -4198,8 +4199,8 @@ class CNC(commands.Cog):
                     provinces_rebelled_string = ', '.join(str(p) for p in provinces_rebelled)
                     await user.send(f"Province(s) {provinces_rebelled_string} have rebelled due to high unrest!")
                 # for every domestic trade route, +10%. For every foreign trade route, +5%
-                initial_trade_value *= trade_routes[1] / 10
-                initial_trade_value *= (trade_routes[2] * 5) / 100
+                initial_trade_value *= trade_routes[0] / 10
+                initial_trade_value *= (trade_routes[1] * 5) / 100
                 credits_added += initial_trade_value
                 credits_added -= total_troops * 0.01
                 # calculate manpower increase and max manpower
@@ -4227,8 +4228,9 @@ class CNC(commands.Cog):
                 if userinfo['great_power']:
                     moves += 1
                 # add all credits, manpower, moves to the user
-                await conn.execute('''UPDATE cncusers SET resources = $1, manpower = $2, maxmanpower = $3, moves = $4 
-                WHERE user_id = $5;''', credits_added + userinfo['resources'], manpower, max_manpower, moves, u)
+                await conn.execute('''UPDATE cncusers SET resources = $1, manpower = $2, maxmanpower = $3, moves = $4, 
+                trade_routes = $5 WHERE user_id = $6;''',
+                                   credits_added + userinfo['resources'], manpower, max_manpower, moves, trade_routes, u)
                 # great power calculations
                 gp_points = 0
                 gp_points += credits_added * 0.001
@@ -4313,16 +4315,17 @@ class CNC(commands.Cog):
                 # if the user is a great power, +1 trade route
                 if userinfo['great_power']:
                     trade_route_limit += 1
-                if userinfo['citylimit'][0] != 0 and userinfo['portlimit'][0] != 0:
-                    # for every city +1 and for every two ports +1
-                    trade_route_limit += userinfo['citylimit'][0]
-                    trade_route_limit += math.floor(userinfo['portlimit'][0] / 2)
-                    # if the current trade route number is too high, close a random trade route
+                # for every city +1 and for every two ports +1
+                trade_route_limit += userinfo['citylimit'][0]
+                trade_route_limit += math.floor(userinfo['portlimit'][0] / 2)
+                # if the current trade route number is too high, close a random trade route
                 if trade_routes[0] > trade_route_limit:
                     closed_route = await conn.fetchrow('''SELECT * FROM relations WHERE name = $1 AND trade = 
                     True ORDER BY RANDOM();''', userinfo['username'])
                     await conn.execute('''UPDATE relations SET trade = False WHERE name = $1 AND nation = $2;''',
                                        userinfo['username'], closed_route['nation'])
+                trade_routes = userinfo['trade_routes']
+                trade_routes[2] = trade_route_limit
                 tax_rate *= 100
                 military_upkeep *= 100
                 public_services *= 100
@@ -4436,8 +4439,8 @@ class CNC(commands.Cog):
                     provinces_rebelled_string = ', '.join(str(p) for p in provinces_rebelled)
                     await user.send(f"Province(s) {provinces_rebelled_string} have rebelled due to high unrest!")
                 # for every domestic trade route, +10%. For every foreign trade route, +5%
-                initial_trade_value *= trade_routes[1] / 10
-                initial_trade_value *= (trade_routes[2] * 5) / 100
+                initial_trade_value *= trade_routes[0] / 10
+                initial_trade_value *= (trade_routes[1] * 5) / 100
                 credits_added += initial_trade_value
                 credits_added -= total_troops * 0.01
                 # calculate manpower increase and max manpower
@@ -4465,8 +4468,10 @@ class CNC(commands.Cog):
                 if userinfo['great_power']:
                     moves += 1
                 # add all credits, manpower, moves to the user
-                await conn.execute('''UPDATE cncusers SET resources = $1, manpower = $2, maxmanpower = $3, moves = $4 
-                WHERE user_id = $5;''', credits_added + userinfo['resources'], manpower, max_manpower, moves, u)
+                await conn.execute('''UPDATE cncusers SET resources = $1, manpower = $2, maxmanpower = $3, moves = $4, 
+                trade_routes = $5 WHERE user_id = $6;''',
+                                   credits_added + userinfo['resources'], manpower, max_manpower, moves, trade_routes,
+                                   u)
                 # great power calculations
                 gp_points = 0
                 gp_points += credits_added * 0.001
@@ -4487,7 +4492,8 @@ class CNC(commands.Cog):
                     userid = gp['user_id']
                     await conn.execute('''UPDATE cncusers SET great_power = True WHERE user_id = $1;''', userid)
             turn = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'turns';''')
-            await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'turns';''', turn['data_value'] + 1)
+            await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'turns';''',
+                               turn['data_value'] + 1)
             await cncchannel.send(f"New turn! It is now turn #{turn['data_value'] + 1}.")
         except Exception:
             self.bot.logger.warning(msg=traceback.format_exc())
