@@ -1687,8 +1687,8 @@ class CNC(commands.Cog):
                 await ctx.send("You cannot send yourself a trade route.")
                 return
             await conn.execute('''INSERT INTO pending_interactions (id, type, sender, sender_id, recipient,
-                                    recipient_id, terms) VALUES($1, $2, $3, $4, $5, $6, "trade");''', ctx.message.id,
-                               "trade", sender, sender_id, recipient, recipient_id)
+                                    recipient_id, terms) VALUES($1, $2, $3, $4, $5, $6, $7);''', ctx.message.id,
+                               "trade", sender, sender_id, recipient, recipient_id, "Establish a Trade Route.")
             recipient_user = self.bot.get_user(recipient_id)
             await recipient_user.send(f"{sender} has sent an offer to establish a trade route with you. To accept or "
                                       f"reject, use `$cnc_interaction {ctx.message.id} [accept/reject]`.")
