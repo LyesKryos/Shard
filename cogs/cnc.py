@@ -1743,7 +1743,7 @@ class CNC(commands.Cog):
                         elif p_info['port']:
                             trade_value *= 1.5
                         initial_trade_value += trade_value
-                initial_trade_value += initial_trade_value * userinfo['trade_routes'][0] / 10
+                initial_trade_value += initial_trade_value * (userinfo['trade_routes'][0] / 10)
                 initial_trade_value += initial_trade_value * (userinfo['trade_routes'][1] * 5) / 100
                 base_gain += initial_trade_value
                 base_gain -= total_troops * 0.01
@@ -1799,7 +1799,7 @@ class CNC(commands.Cog):
                         elif p_info['port']:
                             trade_value *= 1.5
                         initial_trade_value += trade_value
-                initial_trade_value += initial_trade_value * userinfo['trade_routes'][0] / 10
+                initial_trade_value += initial_trade_value * (userinfo['trade_routes'][0] / 10)
                 initial_trade_value += initial_trade_value * (userinfo['trade_routes'][1] * 5) / 100
                 base_gain += initial_trade_value
                 base_gain -= total_troops * 0.01
@@ -4199,7 +4199,7 @@ class CNC(commands.Cog):
                                         await conn.execute(
                                             '''UPDATE cnc_users SET portlimit = $1 WHERE user_id = $2;''', portlimit, u)
                                 troops_attacked = p_info['troops'] - \
-                                                  (randint((p_info['manpower'])/2, p_info['manpower']))
+                                                  (randint((p_info['manpower']) / 2, p_info['manpower']))
                                 if troops_attacked < 0:
                                     troops_attacked = 0
                                 await conn.execute('''UPDATE provinces SET uprising = True, troops = $2
@@ -4224,8 +4224,8 @@ class CNC(commands.Cog):
                                     f"have risen up due to high unrest! {structures_destroyed} structures have been"
                                     f"destroyed by the rioters.")
                 # for every domestic trade route, +10%. For every foreign trade route, +5%
-                initial_trade_value +=  initial_trade_value * userinfo['trade_routes'][0] / 10
-                initial_trade_value +=  initial_trade_value * (userinfo['trade_routes'][1] * 5) / 100
+                initial_trade_value += initial_trade_value * (userinfo['trade_routes'][0] / 10)
+                initial_trade_value += initial_trade_value * (userinfo['trade_routes'][1] * 5) / 100
                 credits_added += initial_trade_value
                 credits_added -= total_troops * 0.01
                 # calculate manpower increase and max manpower
@@ -4495,7 +4495,7 @@ class CNC(commands.Cog):
                                     f"have risen up due to high unrest! {structures_destroyed} structures have been"
                                     f"destroyed by the rioters.")
                 # for every domestic trade route, +10%. For every foreign trade route, +5%
-                initial_trade_value += initial_trade_value * userinfo['trade_routes'][0] / 10
+                initial_trade_value += initial_trade_value * (userinfo['trade_routes'][0] / 10)
                 initial_trade_value += initial_trade_value * (userinfo['trade_routes'][1] * 5) / 100
                 credits_added += initial_trade_value
                 credits_added -= total_troops * 0.01

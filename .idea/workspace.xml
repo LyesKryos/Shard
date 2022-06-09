@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing trade cancelling">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing provinces">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -129,14 +129,7 @@
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="8900000" />
-    </task>
-    <task id="LOCAL-00229" summary="Fixing total troop bug">
-      <created>1653180927801</created>
-      <option name="number" value="00229" />
-      <option name="presentableId" value="LOCAL-00229" />
-      <option name="project" value="LOCAL" />
-      <updated>1653180927801</updated>
+      <workItem from="1654788589345" duration="10472000" />
     </task>
     <task id="LOCAL-00230" summary="Adding withdraw and deploy all.">
       <created>1653223181953</created>
@@ -474,7 +467,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654799896355</updated>
     </task>
-    <option name="localTasksCounter" value="278" />
+    <task id="LOCAL-00278" summary="Fixing provinces">
+      <created>1654800964389</created>
+      <option name="number" value="00278" />
+      <option name="presentableId" value="LOCAL-00278" />
+      <option name="project" value="LOCAL" />
+      <updated>1654800964389</updated>
+    </task>
+    <option name="localTasksCounter" value="279" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,7 +493,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing recruitment.py" />
     <MESSAGE value="Changing to v.1 Released&#10;- Added new turn mechanics: rebellions, taxation, economic updates, great powers&#10;- Updated all relevant viewing commands&#10;- Added mercenary command&#10;- Added rate changing command" />
     <MESSAGE value="- Adding trade interactions&#10;- Adding interaction action point depletion&#10;- Small errata fixes" />
     <MESSAGE value="Small errata fixes" />
@@ -518,7 +517,8 @@
     <MESSAGE value="Fixing trade route interaction" />
     <MESSAGE value="Nerfed and buffed public services and tax unrest rates, respectively. Added new Unrest mechanic for local provinces. Fixed trade route display issue." />
     <MESSAGE value="Fixing trade cancelling" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing trade cancelling" />
+    <MESSAGE value="Fixing provinces" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing provinces" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
