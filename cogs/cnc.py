@@ -1685,7 +1685,8 @@ class CNC(commands.Cog):
             await conn.execute('''INSERT INTO pending_interactions (id, type, sender, sender_id, recipient,
                                     recipient_id, terms) VALUES($1, $2, $3, $4, $5, $6, $7);''', ctx.message.id,
                                "trade", sender, sender_id, recipient, recipient_id, "Establish a Trade Route.")
-            await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', userinfo['moves']-1, author.id)
+            await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''', userinfo['moves'] - 1,
+                               author.id)
             recipient_user = self.bot.get_user(recipient_id)
             await recipient_user.send(f"{sender} has sent an offer to establish a trade route with you. To accept or "
                                       f"reject, use `$cnc_interaction {ctx.message.id} [accept/reject]`.")
@@ -4114,8 +4115,8 @@ class CNC(commands.Cog):
                 # add national Unrest
                 national_unrest = 0
                 tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
-                military_upkeep_unrest = -round((1 * (1+1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
-                            military_upkeep / 10 - 1)) * 0.75))
+                military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
+                        military_upkeep / 10 - 1)) * 0.75))
                 if public_services < 15:
                     public_service_unrest = round(30 - public_services * 2)
                 else:
@@ -4281,7 +4282,7 @@ class CNC(commands.Cog):
             await cncchannel.send(f"New turn! It is now turn #{turn['data_value'] + 1}.")
         except Exception:
             self.bot.logger.warning(msg=traceback.format_exc())
-            await crashchannel.send(content=str(traceback.format_exc()))
+            await crashchannel.send(content=f"```py\n{traceback.format_exc()}```")
 
     @commands.command()
     @commands.is_owner()
@@ -4559,44 +4560,45 @@ class CNC(commands.Cog):
             await ctx.send(f"```py\n{traceback.format_exc()}```")
 
     async def cncstartloop(self):
-        # wait until the bot is ready
-        await self.bot.wait_until_ready()
-        # fetch the Shard testing channel
-        shardchannel = self.bot.get_channel(835579413625569322)
-        # ensure there is no lingering loop
-        if self.turn_loop.is_running():
-            await shardchannel.send("Already running on_ready.")
-            return
-        # grab the timezone and the curren time
-        eastern = timezone('US/Eastern')
-        now = datetime.datetime.now(eastern)
-        # if the hour is less than midnight but not somehow also a negative hour (hey, it happens)
-        if now.time() < datetime.time(hour=0):
-            update = now.replace(hour=0, minute=0, second=0, microsecond=1)
-            await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-            await discord.utils.sleep_until(update)
-        # if the hour is less than 0600 but greater than 0600
-        elif now.time() < datetime.time(hour=6):
-            update = now.replace(hour=6, minute=0, second=0)
-            await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-            await discord.utils.sleep_until(update)
-        # if the hour is greater than 0600 but less than noon
-        elif now.time() < datetime.time(hour=12):
-            update = now.replace(hour=12, minute=0, second=0)
-            await shardchannel.send(f"Turn loop until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-            await discord.utils.sleep_until(update)
-        # if the hour is greater than noon but less than 1800
-        elif now.time() < datetime.time(hour=18, minute=0):
-            update = now.replace(hour=18, minute=0, second=0)
-            await shardchannel.send(f"Turn loop until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-            await discord.utils.sleep_until(update)
-        # if the hour is greater than 1800 but less than midnight
-        elif now.time() > datetime.time(hour=18, minute=0):
-            update = now.replace(hour=0, minute=0, second=0)
-            update += datetime.timedelta(days=1)
-            await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
-            await discord.utils.sleep_until(update)
-        self.turn_loop.start()
+        try:
+            # fetch the Shard testing channel
+            shardchannel = self.bot.get_channel(835579413625569322)
+            # ensure there is no lingering loop
+            if self.turn_loop.is_running():
+                await shardchannel.send("Already running on_ready.")
+                return
+            # grab the timezone and the curren time
+            eastern = timezone('US/Eastern')
+            now = datetime.datetime.now(eastern)
+            # if the hour is less than midnight but not somehow also a negative hour (hey, it happens)
+            if now.time() < datetime.time(hour=0):
+                update = now.replace(hour=0, minute=0, second=0, microsecond=1)
+                await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await discord.utils.sleep_until(update)
+            # if the hour is less than 0600 but greater than 0600
+            elif now.time() < datetime.time(hour=6):
+                update = now.replace(hour=6, minute=0, second=0)
+                await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await discord.utils.sleep_until(update)
+            # if the hour is greater than 0600 but less than noon
+            elif now.time() < datetime.time(hour=12):
+                update = now.replace(hour=12, minute=0, second=0)
+                await shardchannel.send(f"Turn loop until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await discord.utils.sleep_until(update)
+            # if the hour is greater than noon but less than 1800
+            elif now.time() < datetime.time(hour=18, minute=0):
+                update = now.replace(hour=18, minute=0, second=0)
+                await shardchannel.send(f"Turn loop until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await discord.utils.sleep_until(update)
+            # if the hour is greater than 1800 but less than midnight
+            elif now.time() > datetime.time(hour=18, minute=0):
+                update = now.replace(hour=0, minute=0, second=0)
+                update += datetime.timedelta(days=1)
+                await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await discord.utils.sleep_until(update)
+            self.turn_loop.start()
+        except Exception:
+            self.bot.logger.warning(msg=traceback.format_exc())
 
 
 async def setup(bot: Shard):
