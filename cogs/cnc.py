@@ -883,57 +883,6 @@ class CNC(commands.Cog):
         await conn.execute('''UPDATE provinces SET name = $1 WHERE id = $2;''', name, provinceid)
         await ctx.send(f"Province #{provinceid} is now {name}!")
 
-    @commands.command(usage="[province id] <deployed force>",
-                      aliases=['cncd'], brief="Deploys a number of troops to a specified province")
-    @commands.guild_only()
-    async def cnc_deploy(self, ctx, location: int, amount: int = None):
-        author = ctx.author
-        # connects to the database
-        conn = self.bot.pool
-        # fetches all users
-        allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
-        alluserids = list()
-        for id in allusers:
-            alluserids.append(id['user_id'])
-        # checks if author is registered
-        if author.id not in alluserids:
-            await ctx.send(f"{author} not registered.")
-            return
-        # fetches all province ids
-        allprovinces = await conn.fetch('''SELECT id FROM provinces''')
-        allids = list()
-        for x in allprovinces:
-            allids.append(x['id'])
-        # ensures valid id
-        if location not in allids:
-            await ctx.send(f"`{location}` is not a valid location ID.")
-            return
-        # fetches user info
-        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-        userprovinces = userinfo['provinces_owned']
-        userundeployed = userinfo['undeployed']
-        # ensures location ownership
-        if location not in userprovinces:
-            await ctx.send(
-                f"{userinfo['username']} does not own Province #{location} and cannot deploy troops there.")
-            return
-        # ensures troop sufficiency
-        if amount is not None:
-            if amount > userundeployed:
-                await ctx.send(f"{userinfo['username']} does not have {amount} undeployed troops.")
-                return
-        # updates all user and province information
-        if amount is None:
-            amount = userundeployed
-        provinceinfo = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', location)
-        await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
-                           (userundeployed - amount),
-                           author.id)
-        await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''',
-                           (provinceinfo['troops'] + amount),
-                           location)
-        await ctx.send(f"{userinfo['username']} has successfully deployed {amount} troops to Province #{location}.")
-
     @commands.command(usage="[province id] [recipient nation]",
                       brief="Transfers a province to another nation's control")
     @commands.guild_only()
@@ -2209,6 +2158,107 @@ class CNC(commands.Cog):
             f"{amount} troops removed from province #{province} and returned to the undeployed stockpile.")
         return
 
+    @commands.command(brief="Removes all troops from all provinces")
+    @commands.guild_only()
+    async def cnc_withdraw_all(self, ctx):
+        author = ctx.author
+        # connects to the database
+        conn = self.bot.pool
+        # fetches all user ids
+        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+        # ensures author registration
+        if userinfo is None:
+            await ctx.send(f"{author} not registered.")
+            return
+        withdrawn_raw = await conn.fetchrow('''SELECT sum(troops::int) FROM provinces WHERE owner_id = $1;''',
+                                            author.id)
+        withdrawn = withdrawn_raw['sum']
+        await conn.execute('''UPDATE provinces SET troops = 0 WHERE owner_id = $1;''',
+                           author.id)
+        await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
+                           (userinfo['undeployed'] + withdrawn), author.id)
+        await ctx.send(f"{withdrawn} troops removed from all provinces and returned to the undeployed stockpile.")
+        return
+
+    @commands.command(usage="[province id] <deployed force>",
+                      aliases=['cncd'], brief="Deploys a number of troops to a specified province")
+    @commands.guild_only()
+    async def cnc_deploy(self, ctx, location: int, amount: int = None):
+        author = ctx.author
+        # connects to the database
+        conn = self.bot.pool
+        # fetches all users
+        allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
+        alluserids = list()
+        for id in allusers:
+            alluserids.append(id['user_id'])
+        # checks if author is registered
+        if author.id not in alluserids:
+            await ctx.send(f"{author} not registered.")
+            return
+        # fetches all province ids
+        allprovinces = await conn.fetch('''SELECT id FROM provinces''')
+        allids = list()
+        for x in allprovinces:
+            allids.append(x['id'])
+        # ensures valid id
+        if location not in allids:
+            await ctx.send(f"`{location}` is not a valid location ID.")
+            return
+        # fetches user info
+        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+        userprovinces = userinfo['provinces_owned']
+        userundeployed = userinfo['undeployed']
+        # ensures location ownership
+        if location not in userprovinces:
+            await ctx.send(
+                f"{userinfo['username']} does not own Province #{location} and cannot deploy troops there.")
+            return
+        # ensures troop sufficiency
+        if amount is not None:
+            if amount > userundeployed:
+                await ctx.send(f"{userinfo['username']} does not have {amount} undeployed troops.")
+                return
+        # updates all user and province information
+        if amount is None:
+            amount = userundeployed
+        provinceinfo = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', location)
+        await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
+                           (userundeployed - amount),
+                           author.id)
+        await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''',
+                           (provinceinfo['troops'] + amount),
+                           location)
+        await ctx.send(f"{userinfo['username']} has successfully deployed {amount} troops to Province #{location}.")
+
+    @commands.command(usage="[amount]", brief="Removes all troops from all provinces")
+    @commands.guild_only()
+    async def cnc_mass_deploy(self, ctx, amount: int):
+        author = ctx.author
+        # connects to the database
+        conn = self.bot.pool
+        # fetches all user ids
+        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+        # ensures author registration
+        if userinfo is None:
+            await ctx.send(f"{author} not registered.")
+            return
+        total_deployed = amount * len(userinfo['provinces_owned'])
+        if amount <= 0:
+            raise commands.UserInputError
+        if total_deployed < userinfo['undeployed']:
+            await ctx.send(f"{userinfo['username']} does not have enough undeployed troops to deploy {amount} troops "
+                           f"to all {len(userinfo['provinces_owned'])} provinces.")
+            return
+        await conn.execute('''UPDATE cncusers SET undeployed_troops = $1 WHERE user_id = $2;''',
+                           userinfo['undeployed'] - total_deployed, author.id)
+        for p in userinfo['provinces_owned']:
+            p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+            troops = p_info['troops']
+            await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', troops + amount, p)
+        await ctx.send(f"{amount} troops deployed to all {len(userinfo['provinces_owned'])} provinces.")
+        return
+
     @commands.command(usage="[stationed target id] [target province id] [amount]", aliases=['cncm'],
                       brief="Moves troops from one province to another")
     @commands.guild_only()
@@ -2272,7 +2322,7 @@ class CNC(commands.Cog):
     @commands.command(usage="[stationed province] [target province] [attack force]", aliases=['cnca'],
                       brief="Attacks from one province to another")
     @commands.guild_only()
-    async def cnc_attack(self, ctx, stationed: int, target: int, force: int):
+    async def cnc_attack(self, ctx, stationed: int, target: int, force: int = None):
         # connects to the database
         conn = self.bot.pool
         loop = asyncio.get_running_loop()
@@ -2316,6 +2366,8 @@ class CNC(commands.Cog):
         targetinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', target)
         stationedinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''',
                                             stationed)
+        if force is None:
+            force = stationedinfo['troops']
         if targetinfo['owner_id'] != 0:
             defenderinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
                                                targetinfo['owner_id'])
@@ -4043,6 +4095,9 @@ class CNC(commands.Cog):
                 trade_route_limit = 0
                 # if the user is a great power, +1 trade route
                 if userinfo['great_power']:
+                    trade_route_limit += 1
+                # if the user has built a capital, +1 trade route
+                if userinfo['capital'] != 0:
                     trade_route_limit += 1
                 # for every city +1 and for every two ports +1
                 trade_route_limit += userinfo['citylimit'][0]
