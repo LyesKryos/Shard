@@ -1,3 +1,4 @@
+import traceback
 from random import random, randint
 import asyncpg
 import math
@@ -28,8 +29,7 @@ class calculations:
         try:
             self.pool: asyncpg.pool = ctx.bot.pool
         except Exception:
-            print("broke at battlesim's pool")
-
+            ctx.bot.logger.warning(traceback.format_exc())
 
 
     async def ArmyDifference(self):
@@ -113,4 +113,3 @@ class calculations:
         if self.TerrainID == 8:
             self.defenseroll += 1
         return self.RemainingAttackingArmy, self.RemainingDefendingArmy, self.AttackingCasualties, self.DefendingCasualties, self.attackroll, self.defenseroll
-

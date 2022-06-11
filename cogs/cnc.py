@@ -2455,7 +2455,6 @@ class CNC(commands.Cog):
                     battlenotif = await ctx.send(embed=battleembed)
                     await battlenotif.add_reaction("\U00002694")
                     await battlenotif.add_reaction("\U0001f3f3")
-
                 try:
                     # the check for the emojis
                     def fordcheck(reaction, user):
@@ -2470,7 +2469,10 @@ class CNC(commands.Cog):
                         defending_troops = battle.RemainingDefendingArmy
                         attacking_troops = battle.RemainingAttackingArmy
                         terrain_id = 3
-                        battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
+                        try:
+                            battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
+                        except Exception:
+                            self.bot.logger.warning(traceback.format_exc())
                         # simulate battle
                         await battle.Casualties()
                         # if the defenders win the battle roll, no retreat
