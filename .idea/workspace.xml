@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Capitals add a trade route">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adds mass_deploy, withdraw_all, and all attacking with optional force" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -133,14 +130,7 @@
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="29697000" />
-    </task>
-    <task id="LOCAL-00266" summary="Deployed troops only cost upkeep change and fixing bank display">
-      <created>1654548373763</created>
-      <option name="number" value="00266" />
-      <option name="presentableId" value="LOCAL-00266" />
-      <option name="project" value="LOCAL" />
-      <updated>1654548373764</updated>
+      <workItem from="1654788589345" duration="30054000" />
     </task>
     <task id="LOCAL-00267" summary="Fixing turns">
       <created>1654553226976</created>
@@ -478,7 +468,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654953769078</updated>
     </task>
-    <option name="localTasksCounter" value="315" />
+    <task id="LOCAL-00315" summary="Adds mass_deploy, withdraw_all, and all attacking with optional force">
+      <created>1654963343292</created>
+      <option name="number" value="00315" />
+      <option name="presentableId" value="LOCAL-00315" />
+      <option name="project" value="LOCAL" />
+      <updated>1654963343292</updated>
+    </task>
+    <option name="localTasksCounter" value="316" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -497,7 +494,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Nerfed and buffed public services and tax unrest rates, respectively. Added new Unrest mechanic for local provinces. Fixed trade route display issue." />
     <MESSAGE value="Fixing trade cancelling" />
     <MESSAGE value="Fixing provinces" />
     <MESSAGE value="Fixing bank" />
@@ -522,7 +518,8 @@
     <MESSAGE value="Fixing attack command" />
     <MESSAGE value="Fixing error handler" />
     <MESSAGE value="Capitals add a trade route" />
-    <option name="LAST_COMMIT_MESSAGE" value="Capitals add a trade route" />
+    <MESSAGE value="Adds mass_deploy, withdraw_all, and all attacking with optional force" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adds mass_deploy, withdraw_all, and all attacking with optional force" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
