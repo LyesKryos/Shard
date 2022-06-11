@@ -2273,197 +2273,291 @@ class CNC(commands.Cog):
                       brief="Attacks from one province to another")
     @commands.guild_only()
     async def cnc_attack(self, ctx, stationed: int, target: int, force: int):
-        try:
-            # connects to the database
-            conn = self.bot.pool
-            loop = asyncio.get_running_loop()
-            author = ctx.author
-            # fetches all user ids
-            allusers = await conn.fetch('''SELECT user_id FROM cncusers;''')
-            alluserids = list()
-            for id in allusers:
-                alluserids.append(id['user_id'])
-            # ensures author registration
-            if author.id not in alluserids:
-                await ctx.send(f"{author} not registered.")
+        # connects to the database
+        conn = self.bot.pool
+        loop = asyncio.get_running_loop()
+        author = ctx.author
+        # fetches all user ids
+        allusers = await conn.fetch('''SELECT user_id FROM cncusers;''')
+        alluserids = list()
+        for id in allusers:
+            alluserids.append(id['user_id'])
+        # ensures author registration
+        if author.id not in alluserids:
+            await ctx.send(f"{author} not registered.")
+            return
+        # fetches all province ids
+        allprovinces = await conn.fetch('''SELECT id FROM provinces;''')
+        allids = list()
+        for pid in allprovinces:
+            allids.append(pid['id'])
+        # ensures province existence
+        if target not in allids:
+            await ctx.send(f"Location id `{target}` is not a valid ID.")
+            return
+        elif stationed not in allids:
+            await ctx.send(f"Location id `{stationed}` is not a valid ID.")
+            return
+        # fetches target and stationed information
+        targetownerid = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', target)
+        stationedownerid = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', stationed)
+        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+        # checks to make sure the user has enough moves
+        if userinfo['moves'] <= 0:
+            await ctx.send(f"{userinfo['username']} does not have any movement points left!")
+            return
+        # checks ownership conflicts
+        if stationedownerid['owner_id'] != author.id:
+            await ctx.send(f"{userinfo['username']} does not own Province #{stationed}!")
+            return
+        if targetownerid['owner_id'] == author.id:
+            await ctx.send(f"You cannot attack a province you already own!")
+            return
+        targetinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', target)
+        stationedinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''',
+                                            stationed)
+        if targetinfo['owner_id'] != 0:
+            defenderinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
+                                               targetinfo['owner_id'])
+        # ensures valid conflict
+        if targetinfo['owner_id'] != 0:
+            war = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 and nation = $2;''',
+                                      userinfo['username'], defenderinfo['username'])
+            if war['relation'] != 'war':
+                await ctx.send("You cannot attack a province owned by someone you are not at war with.")
                 return
-            # fetches all province ids
-            allprovinces = await conn.fetch('''SELECT id FROM provinces;''')
-            allids = list()
-            for pid in allprovinces:
-                allids.append(pid['id'])
-            # ensures province existence
-            if target not in allids:
-                await ctx.send(f"Location id `{target}` is not a valid ID.")
+        # ensures bordering
+        if (targetinfo['coast'] is False) and (stationedinfo['coast'] is False):
+            if stationed not in targetinfo['bordering']:
+                await ctx.send(f"Province #{stationed} does not border province #{target}!")
                 return
-            elif stationed not in allids:
-                await ctx.send(f"Location id `{stationed}` is not a valid ID.")
-                return
-            # fetches target and stationed information
-            targetownerid = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', target)
-            stationedownerid = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', stationed)
-            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-            # checks to make sure the user has enough moves
-            if userinfo['moves'] <= 0:
-                await ctx.send(f"{userinfo['username']} does not have any movement points left!")
-                return
-            # checks ownership conflicts
-            if stationedownerid['owner_id'] != author.id:
-                await ctx.send(f"{userinfo['username']} does not own Province #{stationed}!")
-                return
-            if targetownerid['owner_id'] == author.id:
-                await ctx.send(f"You cannot attack a province you already own!")
-                return
-            targetinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', target)
-            stationedinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''',
-                                                stationed)
-            if targetinfo['owner_id'] != 0:
-                defenderinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
-                                                   targetinfo['owner_id'])
-            # ensures valid conflict
-            if targetinfo['owner_id'] != 0:
-                war = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 and nation = $2;''',
-                                          userinfo['username'], defenderinfo['username'])
-                if war['relation'] != 'war':
-                    await ctx.send("You cannot attack a province owned by someone you are not at war with.")
-                    return
-            # ensures bordering
-            if (targetinfo['coast'] is False) and (stationedinfo['coast'] is False):
-                if stationed not in targetinfo['bordering']:
-                    await ctx.send(f"Province #{stationed} does not border province #{target}!")
-                    return
-            # ensures sufficient troops reside in province
-            if stationedinfo['troops'] < force:
-                await ctx.send(f"Province #{stationed} does not contain {force} troops!")
-                return
-            # calculates crossing fee if the provinces do not border
-            if (targetinfo['coast'] is True) and (stationedinfo['coast'] is True) and (
-                    stationed not in targetinfo['bordering']):
-                # checks for sufficient resources
-                crossingfee = math.ceil(force * .50)
-                if userinfo['focus'] == 'm':
-                    crossingfee = math.ceil(force * .40)
-                if crossingfee > userinfo['resources']:
-                    await ctx.send(
-                        f"{userinfo['username']} does not have enough resources to cross with {force} troops!\n"
-                        f"**Resources Required:** \u03FE{math.ceil(force * .05)}")
-                    return
-                if stationedinfo['port'] is True:
-                    crossingfee *= .5
-                    math.ceil(crossingfee)
-            else:
-                crossingfee = 0
-            # checks for terrain/defensive modifiers
-            river = targetinfo['river']
-            fort = targetinfo['fort']
-            city = targetinfo['city']
-            # if there are no troops in the target province
-            if targetinfo['troops'] == 0:
-                # fetches necessary ownership information
-                provincesowned = await conn.fetchrow('''SELECT provinces_owned FROM cncusers WHERE user_id = $1;''',
-                                                     author.id)
-                ownedlist = provincesowned['provinces_owned']
-                if ownedlist is None:
-                    ownedlist = list()
-                ownedlist.append(target)
-                # execute all data changes
-                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                   (targetinfo['troops'] + force), target)
-                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                   (stationedinfo['troops'] - force), stationed)
-                await conn.execute('''UPDATE provinces  SET owner_id = $1, owner = $2 WHERE id = $3;''', author.id,
-                                   userinfo['username'], target)
-                await conn.execute(
-                    '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
-                    ownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
-                owner = "the natives"
-                # if there is an owner, all relevant information updated
-                if targetinfo['owner_id'] != 0:
-                    defenderownedlist = [id for id in defenderinfo['provinces_owned']]
-                    defenderownedlist.remove(target)
-                    await conn.execute('''UPDATE cncusers SET provinces_owned = $1 WHERE user_id = $2;''',
-                                       defenderownedlist, defenderinfo['user_id'])
-                    owner = targetinfo['owner']
+        # ensures sufficient troops reside in province
+        if stationedinfo['troops'] < force:
+            await ctx.send(f"Province #{stationed} does not contain {force} troops!")
+            return
+        # calculates crossing fee if the provinces do not border
+        if (targetinfo['coast'] is True) and (stationedinfo['coast'] is True) and (
+                stationed not in targetinfo['bordering']):
+            # checks for sufficient resources
+            crossingfee = math.ceil(force * .50)
+            if userinfo['focus'] == 'm':
+                crossingfee = math.ceil(force * .40)
+            if crossingfee > userinfo['resources']:
                 await ctx.send(
-                    f"Province #{target} is undefended! It has been overrun by {userinfo['username']} with {force}"
-                    f" troops, seizing the province from {owner}!")
-                await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
-                                           userinfo['usercolor'])
-                self.map_color(target, targetinfo['cord'][0:2], userinfo['usercolor'])
+                    f"{userinfo['username']} does not have enough resources to cross with {force} troops!\n"
+                    f"**Resources Required:** \u03FE{math.ceil(force * .05)}")
                 return
-            # if there are any stationed troops
-            else:
-                # fetch proper information
-                defending_troops = int(targetinfo['troops'])
-                attacking_troops = force
-                terrain_id = targetinfo['terrain']
-                terrain = await conn.fetchrow('''SELECT name FROM terrains WHERE id = $1;''', terrain_id)
-                terrain = terrain['name']
-                battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
-                # simulate battle
-                await battle.Casualties()
-                # if the defenders win the battle roll, no retreat
-                if battle.defenseroll >= battle.attackroll:
-                    victor = "The defenders are victorious!"
-                    advance = False
-                # if the attackers win the battle roll, retreat
-                elif battle.attackroll > battle.defenseroll:
-                    victor = "The attackers are victorious!"
-                    advance = True
-                # create battleembed object
-                battleembed = discord.Embed(title=f"Battle of {targetinfo['name']} (Province #{target})",
-                                            description=f"Attack from Province #{stationed} by {userinfo['username']} on Province #{target} with {force} troops.",
-                                            color=discord.Color.red())
-                battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
-                battleembed.add_field(name="Defending Force", value=str(defending_troops))
-                battleembed.add_field(name="Terrain", value=terrain)
-                battleembed.add_field(name="Outcome", value=str(victor), inline=False)
-                battleembed.add_field(name="Attacking Casualties", value=str(battle.AttackingCasualties))
-                battleembed.add_field(name="Defending Casualties", value=str(battle.DefendingCasualties))
-                battleembed.add_field(name="Crossing Fee", value=str(crossingfee), inline=False)
-                battleembed.add_field(name="Remaining Attacking Force", value=str(battle.RemainingAttackingArmy))
-                battleembed.add_field(name="Remaining Defending Force", value=str(battle.RemainingDefendingArmy))
-                battleembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-                deaths = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
-                await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
-                                   deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
-                # if there is a river battle to be fought
-                if advance is True:
-                    # if there is a river, the attackers must ford the river
-                    if river is True:
-                        # if there is no owner
-                        if targetinfo['owner_id'] == 0:
-                            owner = "the Natives"
-                        else:
-                            owner = targetinfo['owner']
-                        # sets the relevant battle information
-                        battleembed.set_footer(text=f"{userinfo['username']} has successfully defeated the initial "
-                                                    f"defense. Province #{target} has a river, which must be forded. React with"
-                                                    f" \U00002694 to attack again or \U0001f3f3 to retreat.")
-                        # updates the relevant information
+            if stationedinfo['port'] is True:
+                crossingfee *= .5
+                math.ceil(crossingfee)
+        else:
+            crossingfee = 0
+        # checks for terrain/defensive modifiers
+        river = targetinfo['river']
+        fort = targetinfo['fort']
+        city = targetinfo['city']
+        # if there are no troops in the target province
+        if targetinfo['troops'] == 0:
+            # fetches necessary ownership information
+            provincesowned = await conn.fetchrow('''SELECT provinces_owned FROM cncusers WHERE user_id = $1;''',
+                                                 author.id)
+            ownedlist = provincesowned['provinces_owned']
+            if ownedlist is None:
+                ownedlist = list()
+            ownedlist.append(target)
+            # execute all data changes
+            await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                               (targetinfo['troops'] + force), target)
+            await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                               (stationedinfo['troops'] - force), stationed)
+            await conn.execute('''UPDATE provinces  SET owner_id = $1, owner = $2 WHERE id = $3;''', author.id,
+                               userinfo['username'], target)
+            await conn.execute(
+                '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
+                ownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
+            owner = "the natives"
+            # if there is an owner, all relevant information updated
+            if targetinfo['owner_id'] != 0:
+                defenderownedlist = [id for id in defenderinfo['provinces_owned']]
+                defenderownedlist.remove(target)
+                await conn.execute('''UPDATE cncusers SET provinces_owned = $1 WHERE user_id = $2;''',
+                                   defenderownedlist, defenderinfo['user_id'])
+                owner = targetinfo['owner']
+            await ctx.send(
+                f"Province #{target} is undefended! It has been overrun by {userinfo['username']} with {force}"
+                f" troops, seizing the province from {owner}!")
+            await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
+                                       userinfo['usercolor'])
+            self.map_color(target, targetinfo['cord'][0:2], userinfo['usercolor'])
+            return
+        # if there are any stationed troops
+        else:
+            # fetch proper information
+            defending_troops = int(targetinfo['troops'])
+            attacking_troops = force
+            terrain_id = targetinfo['terrain']
+            terrain = await conn.fetchrow('''SELECT name FROM terrains WHERE id = $1;''', terrain_id)
+            terrain = terrain['name']
+            battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
+            # simulate battle
+            await battle.Casualties()
+            # if the defenders win the battle roll, no retreat
+            if battle.defenseroll >= battle.attackroll:
+                victor = "The defenders are victorious!"
+                advance = False
+            # if the attackers win the battle roll, retreat
+            elif battle.attackroll > battle.defenseroll:
+                victor = "The attackers are victorious!"
+                advance = True
+            # create battleembed object
+            battleembed = discord.Embed(title=f"Battle of {targetinfo['name']} (Province #{target})",
+                                        description=f"Attack from Province #{stationed} by {userinfo['username']} on Province #{target} with {force} troops.",
+                                        color=discord.Color.red())
+            battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
+            battleembed.add_field(name="Defending Force", value=str(defending_troops))
+            battleembed.add_field(name="Terrain", value=terrain)
+            battleembed.add_field(name="Outcome", value=str(victor), inline=False)
+            battleembed.add_field(name="Attacking Casualties", value=str(battle.AttackingCasualties))
+            battleembed.add_field(name="Defending Casualties", value=str(battle.DefendingCasualties))
+            battleembed.add_field(name="Crossing Fee", value=str(crossingfee), inline=False)
+            battleembed.add_field(name="Remaining Attacking Force", value=str(battle.RemainingAttackingArmy))
+            battleembed.add_field(name="Remaining Defending Force", value=str(battle.RemainingDefendingArmy))
+            battleembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+            deaths = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+            await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                               deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
+            # if there is a river battle to be fought
+            if advance is True:
+                # if there is a river, the attackers must ford the river
+                if river is True:
+                    # if there is no owner
+                    if targetinfo['owner_id'] == 0:
+                        owner = "the Natives"
+                    else:
+                        owner = targetinfo['owner']
+                    # sets the relevant battle information
+                    battleembed.set_footer(text=f"{userinfo['username']} has successfully defeated the initial "
+                                                f"defense. Province #{target} has a river, which must be forded. React with"
+                                                f" \U00002694 to attack again or \U0001f3f3 to retreat.")
+                    # updates the relevant information
+                    await conn.execute(
+                        '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
+                        (userinfo['resources'] - crossingfee), author.id)
+                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                       (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
+                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                       (targetinfo['troops'] - battle.DefendingCasualties), target)
+                    deaths = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                    await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                                       deaths[
+                                           'data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
+                    # sends the embed object and adds the reactions
+                    battlenotif = await ctx.send(embed=battleembed)
+                    await battlenotif.add_reaction("\U00002694")
+                    await battlenotif.add_reaction("\U0001f3f3")
+
+                    # the check for the emojis
+                    def fordcheck(reaction, user):
+                        return user == ctx.message.author and str(reaction.emoji)
+
+                    # waits for the correct emoji response
+                try:
+                    reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=fordcheck)
+                    # if the reaction is the attack, the attack commences and the footer is updated
+                    if str(reaction.emoji) == "\U00002694":
+                        await battlenotif.clear_reactions()
+                        battleembed.set_footer(text=f"The attack continues!")
+                        await battlenotif.edit(embed=battleembed)
+                        defending_troops = battle.RemainingDefendingArmy
+                        attacking_troops = battle.RemainingAttackingArmy
+                        terrain = 3
+                        battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
+                        # simulate battle
+                        await battle.Casualties()
+                        # if the defenders win the battle roll, no retreat
+                        if battle.defenseroll >= battle.attackroll:
+                            victor = "The defenders are victorious!"
+                            advance = False
+                        # if the attackers win the battle roll, retreat
+                        elif battle.attackroll > battle.defenseroll:
+                            victor = "The attackers are victorious!"
+                            advance = True
+                        # create battleembed object
+                        battleembed = discord.Embed(
+                            title=f"Battle of {targetinfo['name']} (Province #{target})",
+                            description=f"Attack from Province #{stationed} by {userinfo['username']} on Province #{target} with {force} troops.",
+                            color=discord.Color.red())
+                        battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
+                        battleembed.add_field(name="Defending Force", value=defending_troops)
+                        battleembed.add_field(name="Terrain", value="River")
+                        battleembed.add_field(name="Outcome", value=victor, inline=False)
+                        battleembed.add_field(name="Attacking Casualties",
+                                              value=str(battle.AttackingCasualties))
+                        battleembed.add_field(name="Defending Casualties",
+                                              value=str(battle.DefendingCasualties))
+                        battleembed.add_field(name="Crossing Fee", value=str(crossingfee), inline=False)
+                        battleembed.add_field(name="Remaining Attacking Force",
+                                              value=str(battle.RemainingAttackingArmy))
+                        battleembed.add_field(name="Remaining Defending Force",
+                                              value=str(battle.RemainingDefendingArmy))
+                        battleembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+                        deaths = await conn.fetchrow(
+                            '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
                         await conn.execute(
-                            '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
-                            (userinfo['resources'] - crossingfee), author.id)
-                        await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                           (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
-                        await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                           (targetinfo['troops'] - battle.DefendingCasualties), target)
-                        deaths = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
-                        await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
-                                           deaths[
-                                               'data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
-                        # sends the embed object and adds the reactions
-                        battlenotif = await ctx.send(embed=battleembed)
-                        await battlenotif.add_reaction("\U00002694")
-                        await battlenotif.add_reaction("\U0001f3f3")
+                            '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                            deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
+                    # if the reaction is retreat, the attack does not continue
+                    if str(reaction.emoji) == "\U0001f3f3":
+                        await battlenotif.clear_reactions()
+                        battleembed.set_footer(
+                            text=f"The attacker retreated from the ford and the province has been "
+                                 f"returned to the control of {owner}.")
+                        await battlenotif.edit(embed=battleembed)
+                        return
+                    # default result is retreat on the timeout error
+                except asyncio.TimeoutError:
+                    await battlenotif.clear_reactions()
+                    battleembed.set_footer(
+                        text=f"The attacker retreated from the ford and the province has been "
+                             f"returned to the control of {owner}.")
+                    await battlenotif.edit(embed=battleembed)
+                    return
+            if advance is True:
+                # if there is a fort, the attackers must attack the fort
+                if fort is True:
+                    # if there is no owner
+                    if targetinfo['owner_id'] == 0:
+                        owner = "the Natives"
+                    else:
+                        owner = targetinfo['owner']
+                    # sets the relevant battle information
+                    battleembed.set_footer(text=f"{userinfo['username']} has successfully defeated the initial "
+                                                f"defense. Province #{target} has a fort, which must be captured. "
+                                                f"React with \U00002694 to attack again or \U0001f3f3 to retreat.")
+                    # updates the relevant information
+                    await conn.execute(
+                        '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
+                        (userinfo['resources'] - crossingfee), author.id)
+                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                       (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
+                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                       (targetinfo['troops'] - battle.DefendingCasualties), target)
+                    deaths = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                    await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                                       deaths[
+                                           'data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
+                    # sends the embed object and adds the reactions
+                    battlenotif = await ctx.send(embed=battleembed)
+                    await battlenotif.add_reaction("\U00002694")
+                    await battlenotif.add_reaction("\U0001f3f3")
 
-                        # the check for the emojis
-                        def fordcheck(reaction, user):
-                            return user == ctx.message.author and str(reaction.emoji)
+                    # the check for the emojis
+                    def siegecheck(reaction, user):
+                        return user == ctx.message.author and str(reaction.emoji)
 
-                        # waits for the correct emoji response
+                    # waits for the correct emoji response
                     try:
-                        reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=fordcheck)
+                        reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=siegecheck)
                         # if the reaction is the attack, the attack commences and the footer is updated
                         if str(reaction.emoji) == "\U00002694":
                             await battlenotif.clear_reactions()
@@ -2471,7 +2565,6 @@ class CNC(commands.Cog):
                             await battlenotif.edit(embed=battleembed)
                             defending_troops = battle.RemainingDefendingArmy
                             attacking_troops = battle.RemainingAttackingArmy
-                            terrain = 3
                             battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
                             # simulate battle
                             await battle.Casualties()
@@ -2484,13 +2577,12 @@ class CNC(commands.Cog):
                                 victor = "The attackers are victorious!"
                                 advance = True
                             # create battleembed object
-                            battleembed = discord.Embed(
-                                title=f"Battle of {targetinfo['name']} (Province #{target})",
-                                description=f"Attack from Province #{stationed} by {userinfo['username']} on Province #{target} with {force} troops.",
-                                color=discord.Color.red())
+                            battleembed = discord.Embed(title=f"Siege of Province #{target}",
+                                                        description=f"Attack from Province #{stationed} by {userinfo['username']} on the fort in Province #{target} with {force} troops.",
+                                                        color=discord.Color.red())
                             battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
                             battleembed.add_field(name="Defending Force", value=defending_troops)
-                            battleembed.add_field(name="Terrain", value="River")
+                            battleembed.add_field(name="Terrain", value="Fort")
                             battleembed.add_field(name="Outcome", value=victor, inline=False)
                             battleembed.add_field(name="Attacking Casualties",
                                                   value=str(battle.AttackingCasualties))
@@ -2511,381 +2603,271 @@ class CNC(commands.Cog):
                         if str(reaction.emoji) == "\U0001f3f3":
                             await battlenotif.clear_reactions()
                             battleembed.set_footer(
-                                text=f"The attacker retreated from the ford and the province has been "
-                                     f"returned to the control of {owner}.")
+                                text=f"The attacker retreated from the fort and the province has "
+                                     f"been returned to the control of {owner}.")
                             await battlenotif.edit(embed=battleembed)
+
                             return
-                        # default result is retreat on the timeout error
+                    # default result is retreat on the timeout error
                     except asyncio.TimeoutError:
                         await battlenotif.clear_reactions()
                         battleembed.set_footer(
-                            text=f"The attacker retreated from the ford and the province has been "
+                            text=f"The attacker retreated from the fort and the province has been "
                                  f"returned to the control of {owner}.")
                         await battlenotif.edit(embed=battleembed)
                         return
-                if advance is True:
-                    # if there is a fort, the attackers must attack the fort
-                    if fort is True:
-                        # if there is no owner
-                        if targetinfo['owner_id'] == 0:
-                            owner = "the Natives"
-                        else:
-                            owner = targetinfo['owner']
-                        # sets the relevant battle information
-                        battleembed.set_footer(text=f"{userinfo['username']} has successfully defeated the initial "
-                                                    f"defense. Province #{target} has a fort, which must be captured. "
-                                                    f"React with \U00002694 to attack again or \U0001f3f3 to retreat.")
-                        # updates the relevant information
-                        await conn.execute(
-                            '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
-                            (userinfo['resources'] - crossingfee), author.id)
-                        await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                           (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
-                        await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                           (targetinfo['troops'] - battle.DefendingCasualties), target)
-                        deaths = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
-                        await conn.execute('''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
-                                           deaths[
-                                               'data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
-                        # sends the embed object and adds the reactions
-                        battlenotif = await ctx.send(embed=battleembed)
-                        await battlenotif.add_reaction("\U00002694")
-                        await battlenotif.add_reaction("\U0001f3f3")
+            if advance is True:
+                # if there is a city, the attackers must sack the city
+                if city is True:
+                    # if there is no owner
+                    if targetinfo['owner_id'] == 0:
+                        owner = "the Natives"
+                    else:
+                        owner = targetinfo['owner']
+                    # sets the relevant battle information
+                    battleembed.set_footer(text=f"{userinfo['username']} has successfully defeated the initial "
+                                                f"defense. Province #{target} has a city, which must be captured. "
+                                                f"React with \U00002694 to attack again or \U0001f3f3 to retreat.")
+                    # updates the relevant information
+                    await conn.execute(
+                        '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
+                        (userinfo['resources'] - crossingfee), author.id)
+                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                       (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
+                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                       (targetinfo['troops'] - battle.DefendingCasualties), target)
+                    # sends the embed object and adds the reactions
+                    battlenotif = await ctx.send(embed=battleembed)
+                    await battlenotif.add_reaction("\U00002694")
+                    await battlenotif.add_reaction("\U0001f3f3")
 
-                        # the check for the emojis
-                        def siegecheck(reaction, user):
-                            return user == ctx.message.author and str(reaction.emoji)
+                    # the check for the emojis
+                    def sackcheck(reaction, user):
+                        return user == ctx.message.author and str(reaction.emoji)
 
-                        # waits for the correct emoji response
-                        try:
-                            reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=siegecheck)
-                            # if the reaction is the attack, the attack commences and the footer is updated
-                            if str(reaction.emoji) == "\U00002694":
-                                await battlenotif.clear_reactions()
-                                battleembed.set_footer(text=f"The attack continues!")
-                                await battlenotif.edit(embed=battleembed)
-                                defending_troops = battle.RemainingDefendingArmy
-                                attacking_troops = battle.RemainingAttackingArmy
-                                battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
-                                # simulate battle
-                                await battle.Casualties()
-                                # if the defenders win the battle roll, no retreat
-                                if battle.defenseroll >= battle.attackroll:
-                                    victor = "The defenders are victorious!"
-                                    advance = False
-                                # if the attackers win the battle roll, retreat
-                                elif battle.attackroll > battle.defenseroll:
-                                    victor = "The attackers are victorious!"
-                                    advance = True
-                                # create battleembed object
-                                battleembed = discord.Embed(title=f"Siege of Province #{target}",
-                                                            description=f"Attack from Province #{stationed} by {userinfo['username']} on the fort in Province #{target} with {force} troops.",
-                                                            color=discord.Color.red())
-                                battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
-                                battleembed.add_field(name="Defending Force", value=defending_troops)
-                                battleembed.add_field(name="Terrain", value="Fort")
-                                battleembed.add_field(name="Outcome", value=victor, inline=False)
-                                battleembed.add_field(name="Attacking Casualties",
-                                                      value=str(battle.AttackingCasualties))
-                                battleembed.add_field(name="Defending Casualties",
-                                                      value=str(battle.DefendingCasualties))
-                                battleembed.add_field(name="Crossing Fee", value=str(crossingfee), inline=False)
-                                battleembed.add_field(name="Remaining Attacking Force",
-                                                      value=str(battle.RemainingAttackingArmy))
-                                battleembed.add_field(name="Remaining Defending Force",
-                                                      value=str(battle.RemainingDefendingArmy))
-                                battleembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-                                deaths = await conn.fetchrow(
-                                    '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
-                                await conn.execute(
-                                    '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
-                                    deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
-                            # if the reaction is retreat, the attack does not continue
-                            if str(reaction.emoji) == "\U0001f3f3":
-                                await battlenotif.clear_reactions()
-                                battleembed.set_footer(
-                                    text=f"The attacker retreated from the fort and the province has "
-                                         f"been returned to the control of {owner}.")
-                                await battlenotif.edit(embed=battleembed)
-
-                                return
-                        # default result is retreat on the timeout error
-                        except asyncio.TimeoutError:
+                    # waits for the correct emoji response
+                    try:
+                        reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=sackcheck)
+                        # if the reaction is the attack, the attack commences and the footer is updated
+                        if str(reaction.emoji) == "\U00002694":
                             await battlenotif.clear_reactions()
-                            battleembed.set_footer(
-                                text=f"The attacker retreated from the fort and the province has been "
-                                     f"returned to the control of {owner}.")
+                            battleembed.set_footer(text=f"The attack continues!")
                             await battlenotif.edit(embed=battleembed)
-                            return
-                if advance is True:
-                    # if there is a city, the attackers must sack the city
-                    if city is True:
-                        # if there is no owner
-                        if targetinfo['owner_id'] == 0:
-                            owner = "the Natives"
-                        else:
-                            owner = targetinfo['owner']
-                        # sets the relevant battle information
-                        battleembed.set_footer(text=f"{userinfo['username']} has successfully defeated the initial "
-                                                    f"defense. Province #{target} has a city, which must be captured. "
-                                                    f"React with \U00002694 to attack again or \U0001f3f3 to retreat.")
-                        # updates the relevant information
-                        await conn.execute(
-                            '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
-                            (userinfo['resources'] - crossingfee), author.id)
-                        await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                           (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
-                        await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                           (targetinfo['troops'] - battle.DefendingCasualties), target)
-                        # sends the embed object and adds the reactions
-                        battlenotif = await ctx.send(embed=battleembed)
-                        await battlenotif.add_reaction("\U00002694")
-                        await battlenotif.add_reaction("\U0001f3f3")
-
-                        # the check for the emojis
-                        def sackcheck(reaction, user):
-                            return user == ctx.message.author and str(reaction.emoji)
-
-                        # waits for the correct emoji response
-                        try:
-                            reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=sackcheck)
-                            # if the reaction is the attack, the attack commences and the footer is updated
-                            if str(reaction.emoji) == "\U00002694":
-                                await battlenotif.clear_reactions()
-                                battleembed.set_footer(text=f"The attack continues!")
-                                await battlenotif.edit(embed=battleembed)
-                                defending_troops = battle.RemainingDefendingArmy
-                                attacking_troops = battle.RemainingAttackingArmy
-                                terrain = 4
-                                battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
-                                # simulate battle
-                                await battle.Casualties()
-                                # if the defenders win the battle roll, no retreat
-                                if battle.defenseroll >= battle.attackroll:
-                                    victor = "The defenders are victorious!"
-                                    advance = False
-                                # if the attackers win the battle roll, retreat
-                                elif battle.attackroll > battle.defenseroll:
-                                    victor = "The attackers are victorious!"
-                                    advance = True
-                                # create battleembed object
-                                battleembed = discord.Embed(
-                                    title=f"Battle of the City of {targetinfo['name']} (Province #{target})",
-                                    description=f"Attack from Province #{stationed} by {userinfo['username']} on Province #{target} with {force} troops.",
-                                    color=discord.Color.red())
-                                battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
-                                battleembed.add_field(name="Defending Force", value=defending_troops)
-                                battleembed.add_field(name="Terrain", value="City")
-                                battleembed.add_field(name="Outcome", value=victor, inline=False)
-                                battleembed.add_field(name="Attacking Casualties",
-                                                      value=str(battle.AttackingCasualties))
-                                battleembed.add_field(name="Defending Casualties",
-                                                      value=str(battle.DefendingCasualties))
-                                battleembed.add_field(name="Crossing Fee", value=str(crossingfee), inline=False)
-                                battleembed.add_field(name="Remaining Attacking Force",
-                                                      value=str(battle.RemainingAttackingArmy))
-                                battleembed.add_field(name="Remaining Defending Force",
-                                                      value=str(battle.RemainingDefendingArmy))
-                                deaths = await conn.fetchrow(
-                                    '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
-                                await conn.execute(
-                                    '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
-                                    deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
-                                battleembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-                            # if the reaction is retreat, the attack does not continue
-                            if str(reaction.emoji) == "\U0001f3f3":
-                                await battlenotif.clear_reactions()
-                                battleembed.set_footer(
-                                    text=f"The attacker retreated from the city and the province has been "
-                                         f"returned to the control of {owner}.")
-                                await battlenotif.edit(embed=battleembed)
-
-                                return
-                        # default result is retreat on the timeout error
-                        except asyncio.TimeoutError:
+                            defending_troops = battle.RemainingDefendingArmy
+                            attacking_troops = battle.RemainingAttackingArmy
+                            terrain = 4
+                            battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
+                            # simulate battle
+                            await battle.Casualties()
+                            # if the defenders win the battle roll, no retreat
+                            if battle.defenseroll >= battle.attackroll:
+                                victor = "The defenders are victorious!"
+                                advance = False
+                            # if the attackers win the battle roll, retreat
+                            elif battle.attackroll > battle.defenseroll:
+                                victor = "The attackers are victorious!"
+                                advance = True
+                            # create battleembed object
+                            battleembed = discord.Embed(
+                                title=f"Battle of the City of {targetinfo['name']} (Province #{target})",
+                                description=f"Attack from Province #{stationed} by {userinfo['username']} on Province #{target} with {force} troops.",
+                                color=discord.Color.red())
+                            battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
+                            battleembed.add_field(name="Defending Force", value=defending_troops)
+                            battleembed.add_field(name="Terrain", value="City")
+                            battleembed.add_field(name="Outcome", value=victor, inline=False)
+                            battleembed.add_field(name="Attacking Casualties",
+                                                  value=str(battle.AttackingCasualties))
+                            battleembed.add_field(name="Defending Casualties",
+                                                  value=str(battle.DefendingCasualties))
+                            battleembed.add_field(name="Crossing Fee", value=str(crossingfee), inline=False)
+                            battleembed.add_field(name="Remaining Attacking Force",
+                                                  value=str(battle.RemainingAttackingArmy))
+                            battleembed.add_field(name="Remaining Defending Force",
+                                                  value=str(battle.RemainingDefendingArmy))
+                            deaths = await conn.fetchrow(
+                                '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                            await conn.execute(
+                                '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                                deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
+                            battleembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+                        # if the reaction is retreat, the attack does not continue
+                        if str(reaction.emoji) == "\U0001f3f3":
                             await battlenotif.clear_reactions()
                             battleembed.set_footer(
                                 text=f"The attacker retreated from the city and the province has been "
                                      f"returned to the control of {owner}.")
                             await battlenotif.edit(embed=battleembed)
+
                             return
-                # if the attackers are victorious in all battles, force the defenders to retreat
-                if advance is True:
-                    # if the natives own the province
-                    if targetinfo['owner_id'] == 0:
-                        # adds the target to the owned list
-                        victorownedlist = userinfo['provinces_owned']
-                        if victorownedlist is None:
-                            victorownedlist = list()
-                        victorownedlist.append(target)
-                        # updates the relevant information
-                        await conn.execute(
-                            '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
-                            battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
-                        await conn.execute(
-                            '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
-                            victorownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee),
-                            author.id)
-                        await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                           (stationedinfo['troops'] - force), stationed)
-                        # sets the footer and sends the embed object
+                    # default result is retreat on the timeout error
+                    except asyncio.TimeoutError:
+                        await battlenotif.clear_reactions()
                         battleembed.set_footer(
-                            text=f"The natives have lost control of province #{target}!"
-                                 f" All {targetinfo['troops']} troops have "
-                                 f"been killed or captured!")
-                        await ctx.send(embed=battleembed)
-                        await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
-                                                   userinfo['usercolor'])
-                    # fetches potential retreat options for the defender
-                    defenderprovs = set(prov for prov in defenderinfo['provinces_owned'])
-                    targetborder = set(p for p in targetinfo['bordering'])
-                    retreatoptions = list(defenderprovs.intersection(targetborder))
-                    if (len(retreatoptions) == 0) and (targetinfo['coast'] is False):
-                        # if the retreat options are none and the defending land is not a coastline
-                        # all troops will be destroyed and the attacker takes control of the province
-                        # gets the list of all owned provinces  for both parties
-                        defownedlist = defenderinfo['provinces_owned']
-                        if defownedlist is None:
-                            defownedlist = list()
-                        defownedlist.remove(target)
-                        victorownedlist = userinfo['provinces_owned']
-                        if victorownedlist is None:
-                            victorownedlist = list()
-                        victorownedlist.append(target)
-                        # updates all troop and province information and sends the embed
-                        await conn.execute(
-                            '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
-                            (userinfo['resources'] - crossingfee), author.id)
-                        await conn.execute(
-                            '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
-                            battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
-                        await conn.execute(
-                            '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
-                            victorownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee),
-                            author.id)
-                        await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                           (stationedinfo['troops'] - force), stationed)
-                        battleembed.set_footer(
-                            text=f"{defenderinfo['username']} has lost control of province #{target}!"
-                                 f" With nowhere to retreat, all {targetinfo['troops']} troops have "
-                                 f"been killed!")
-                        # if the province is the capital province, add 50 national unrest
-                        if userinfo['capital'] == target:
-                            await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
-                                               userinfo['national_unrest'] + 50, userinfo['username'])
-                        await ctx.send(embed=battleembed)
-                        await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
-                                                   userinfo['usercolor'])
-                    if (len(retreatoptions) == 0) and (targetinfo['coast'] is True):
-                        # if the target is a coastline and there are no retreat options by land, the army will be
-                        # returned to the defender's stockpile
-                        # gets the list of all owned provinces  for both parties
-                        defownedlist = defenderinfo['provinces_owned']
-                        if defownedlist is None:
-                            defownedlist = list()
-                        defownedlist.remove(target)
-                        victorownedlist = userinfo['provinces_owned']
-                        if victorownedlist is None:
-                            victorownedlist = list()
-                        victorownedlist.append(target)
-                        # updates all relevant information and sends the embed
-                        await conn.execute(
-                            '''UPDATE cncusers SET provinces_owned = $1, undeployed = $2 WHERE user_id = $3;''',
-                            defownedlist, (defenderinfo['undeployed'] + battle.RemainingDefendingArmy),
-                            defenderinfo['user_id'])
-                        await conn.execute(
-                            '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
-                            battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
-                        await conn.execute(
-                            '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
-                            victorownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee),
-                            author.id)
-                        await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                           (stationedinfo['troops'] - force), stationed)
-                        deaths = await conn.fetchrow(
-                            '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
-                        await conn.execute(
-                            '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
-                            deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
-                        battleembed.set_footer(
-                            text=f"{defenderinfo['username']} has lost control of province #{target}!"
-                                 f" With nowhere to retreat, all {battle.RemainingDefendingArmy} troops have "
-                                 f"returned to the stockpile!")
-                        # if the province is the capital province, add 50 national unrest
-                        if userinfo['capital'] == target:
-                            await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
-                                               userinfo['national_unrest'] + 50, userinfo['username'])
-                        await ctx.send(embed=battleembed)
-                        await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
-                                                   userinfo['usercolor'])
-                    else:
-                        # if there are retreat options, one will be randomly selected and all remaining troops will
-                        # retreat there
-                        # gets the list of all owned provinces  for both parties
-                        defownedlist = defenderinfo['provinces_owned']
-                        if defownedlist is None:
-                            defownedlist = list()
-                        defownedlist.remove(target)
-                        victorownedlist = userinfo['provinces_owned']
-                        if victorownedlist is None:
-                            victorownedlist = list()
-                        victorownedlist.append(target)
-                        retreatprovince = choice(retreatoptions)
-                        retreatinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''',
-                                                          retreatprovince)
-                        # updates all relevant information and sends the embed
-                        await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                           (battle.RemainingDefendingArmy + retreatinfo['troops']), retreatprovince)
-                        await conn.execute(
-                            '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
-                            (userinfo['resources'] - crossingfee), author.id)
-                        await conn.execute(
-                            '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
-                            battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
-                        await conn.execute(
-                            '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id 
-                            = $4;''', victorownedlist, (userinfo['moves'] - 1),
-                            (userinfo['resources'] - crossingfee),
-                            author.id)
-                        await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                           (stationedinfo['troops'] - force), stationed)
-                        deaths = await conn.fetchrow(
-                            '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
-                        await conn.execute(
-                            '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
-                            deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
-                        battleembed.set_footer(
-                            text=f"{defenderinfo['username']} has lost control of province #{target}!"
-                                 f" Their {battle.RemainingDefendingArmy} troops have retreated to "
-                                 f"province #{retreatprovince}!")
-                        # if the province is the capital province, add 50 national unrest
-                        if userinfo['capital'] == target:
-                            await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
-                                               userinfo['national_unrest'] + 50, userinfo['username'])
-                        await ctx.send(embed=battleembed)
-                        await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
-                                                   userinfo['usercolor'])
-                    return
-                # if the attacker is not victorious, no provinces change hands
-                else:
-                    if targetinfo['owner_id'] == 0:
-                        # updates the relevant information and sends the embed
-                        await conn.execute(
-                            '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
-                            (userinfo['resources'] - crossingfee), author.id)
-                        await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                           (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
-                        await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                           (targetinfo['troops'] - battle.DefendingCasualties), target)
-                        deaths = await conn.fetchrow(
-                            '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
-                        await conn.execute(
-                            '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
-                            deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
-                        battleembed.set_footer(
-                            text=f"The natives have successfully defended province #{target}!")
-                        await ctx.send(embed=battleembed)
+                            text=f"The attacker retreated from the city and the province has been "
+                                 f"returned to the control of {owner}.")
+                        await battlenotif.edit(embed=battleembed)
                         return
+            # if the attackers are victorious in all battles, force the defenders to retreat
+            if advance is True:
+                # if the natives own the province
+                if targetinfo['owner_id'] == 0:
+                    # adds the target to the owned list
+                    victorownedlist = userinfo['provinces_owned']
+                    if victorownedlist is None:
+                        victorownedlist = list()
+                    victorownedlist.append(target)
+                    # updates the relevant information
+                    await conn.execute(
+                        '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
+                        battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
+                    await conn.execute(
+                        '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
+                        victorownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee),
+                        author.id)
+                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                       (stationedinfo['troops'] - force), stationed)
+                    # sets the footer and sends the embed object
+                    battleembed.set_footer(
+                        text=f"The natives have lost control of province #{target}!"
+                             f" All {targetinfo['troops']} troops have "
+                             f"been killed or captured!")
+                    await ctx.send(embed=battleembed)
+                    await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
+                                               userinfo['usercolor'])
+                # fetches potential retreat options for the defender
+                defenderprovs = set(prov for prov in defenderinfo['provinces_owned'])
+                targetborder = set(p for p in targetinfo['bordering'])
+                retreatoptions = list(defenderprovs.intersection(targetborder))
+                if (len(retreatoptions) == 0) and (targetinfo['coast'] is False):
+                    # if the retreat options are none and the defending land is not a coastline
+                    # all troops will be destroyed and the attacker takes control of the province
+                    # gets the list of all owned provinces  for both parties
+                    defownedlist = defenderinfo['provinces_owned']
+                    if defownedlist is None:
+                        defownedlist = list()
+                    defownedlist.remove(target)
+                    victorownedlist = userinfo['provinces_owned']
+                    if victorownedlist is None:
+                        victorownedlist = list()
+                    victorownedlist.append(target)
+                    # updates all troop and province information and sends the embed
+                    await conn.execute(
+                        '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
+                        (userinfo['resources'] - crossingfee), author.id)
+                    await conn.execute(
+                        '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
+                        battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
+                    await conn.execute(
+                        '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
+                        victorownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee),
+                        author.id)
+                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                       (stationedinfo['troops'] - force), stationed)
+                    battleembed.set_footer(
+                        text=f"{defenderinfo['username']} has lost control of province #{target}!"
+                             f" With nowhere to retreat, all {targetinfo['troops']} troops have "
+                             f"been killed!")
+                    # if the province is the capital province, add 50 national unrest
+                    if userinfo['capital'] == target:
+                        await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
+                                           userinfo['national_unrest'] + 50, userinfo['username'])
+                    await ctx.send(embed=battleembed)
+                    await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
+                                               userinfo['usercolor'])
+                if (len(retreatoptions) == 0) and (targetinfo['coast'] is True):
+                    # if the target is a coastline and there are no retreat options by land, the army will be
+                    # returned to the defender's stockpile
+                    # gets the list of all owned provinces  for both parties
+                    defownedlist = defenderinfo['provinces_owned']
+                    if defownedlist is None:
+                        defownedlist = list()
+                    defownedlist.remove(target)
+                    victorownedlist = userinfo['provinces_owned']
+                    if victorownedlist is None:
+                        victorownedlist = list()
+                    victorownedlist.append(target)
+                    # updates all relevant information and sends the embed
+                    await conn.execute(
+                        '''UPDATE cncusers SET provinces_owned = $1, undeployed = $2 WHERE user_id = $3;''',
+                        defownedlist, (defenderinfo['undeployed'] + battle.RemainingDefendingArmy),
+                        defenderinfo['user_id'])
+                    await conn.execute(
+                        '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
+                        battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
+                    await conn.execute(
+                        '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
+                        victorownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee),
+                        author.id)
+                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                       (stationedinfo['troops'] - force), stationed)
+                    deaths = await conn.fetchrow(
+                        '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                    await conn.execute(
+                        '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                        deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
+                    battleembed.set_footer(
+                        text=f"{defenderinfo['username']} has lost control of province #{target}!"
+                             f" With nowhere to retreat, all {battle.RemainingDefendingArmy} troops have "
+                             f"returned to the stockpile!")
+                    # if the province is the capital province, add 50 national unrest
+                    if userinfo['capital'] == target:
+                        await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
+                                           userinfo['national_unrest'] + 50, userinfo['username'])
+                    await ctx.send(embed=battleembed)
+                    await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
+                                               userinfo['usercolor'])
+                else:
+                    # if there are retreat options, one will be randomly selected and all remaining troops will
+                    # retreat there
+                    # gets the list of all owned provinces  for both parties
+                    defownedlist = defenderinfo['provinces_owned']
+                    if defownedlist is None:
+                        defownedlist = list()
+                    defownedlist.remove(target)
+                    victorownedlist = userinfo['provinces_owned']
+                    if victorownedlist is None:
+                        victorownedlist = list()
+                    victorownedlist.append(target)
+                    retreatprovince = choice(retreatoptions)
+                    retreatinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''',
+                                                      retreatprovince)
+                    # updates all relevant information and sends the embed
+                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                       (battle.RemainingDefendingArmy + retreatinfo['troops']), retreatprovince)
+                    await conn.execute(
+                        '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
+                        (userinfo['resources'] - crossingfee), author.id)
+                    await conn.execute(
+                        '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
+                        battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
+                    await conn.execute(
+                        '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id 
+                        = $4;''', victorownedlist, (userinfo['moves'] - 1),
+                        (userinfo['resources'] - crossingfee),
+                        author.id)
+                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                       (stationedinfo['troops'] - force), stationed)
+                    deaths = await conn.fetchrow(
+                        '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                    await conn.execute(
+                        '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                        deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
+                    battleembed.set_footer(
+                        text=f"{defenderinfo['username']} has lost control of province #{target}!"
+                             f" Their {battle.RemainingDefendingArmy} troops have retreated to "
+                             f"province #{retreatprovince}!")
+                    # if the province is the capital province, add 50 national unrest
+                    if userinfo['capital'] == target:
+                        await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
+                                           userinfo['national_unrest'] + 50, userinfo['username'])
+                    await ctx.send(embed=battleembed)
+                    await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
+                                               userinfo['usercolor'])
+                return
+            # if the attacker is not victorious, no provinces change hands
+            else:
+                if targetinfo['owner_id'] == 0:
                     # updates the relevant information and sends the embed
                     await conn.execute(
                         '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
@@ -2900,11 +2882,26 @@ class CNC(commands.Cog):
                         '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
                         deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
                     battleembed.set_footer(
-                        text=f"{defenderinfo['username']} has successfully defended province #{target}!")
+                        text=f"The natives have successfully defended province #{target}!")
                     await ctx.send(embed=battleembed)
                     return
-        except UnboundLocalError:
-            pass
+                # updates the relevant information and sends the embed
+                await conn.execute(
+                    '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
+                    (userinfo['resources'] - crossingfee), author.id)
+                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                   (stationedinfo['troops'] - battle.AttackingCasualties), stationed)
+                await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
+                                   (targetinfo['troops'] - battle.DefendingCasualties), target)
+                deaths = await conn.fetchrow(
+                    '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                await conn.execute(
+                    '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                    deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
+                battleembed.set_footer(
+                    text=f"{defenderinfo['username']} has successfully defended province #{target}!")
+                await ctx.send(embed=battleembed)
+                return
 
     # ------------------Map Commands----------------------------
 
