@@ -240,9 +240,9 @@ class CNC(commands.Cog):
                 provinceslist.sort()
                 provinces = ', '.join(str(i) for i in provinceslist)
                 total_troops = 0
-                for p in provinceslist:
-                    provinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-                    total_troops += provinfo['troops']
+                province_troops = await conn.fetchrow('''SELECT sum(troops::int) FROM provinces WHERE owner_id = $1;''',
+                                                      author.id)
+                total_troops += province_troops['sum']
                 total_troops += userinfo['undeployed']
             else:
                 provinceslist = []
