@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Removing error handler cog" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing error handling" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -69,6 +69,9 @@
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\cogs" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\cogs" />
+    </key>
   </component>
   <component name="RunManager" selected="Database Script.botdb.sql">
     <configuration name="botdb.sql" type="DatabaseScript" editBeforeRun="true" temporary="true" nameIsGenerated="true">
@@ -127,14 +130,7 @@
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="25128000" />
-    </task>
-    <task id="LOCAL-00258" summary="Fixing unrest calculations">
-      <created>1654474926933</created>
-      <option name="number" value="00258" />
-      <option name="presentableId" value="LOCAL-00258" />
-      <option name="project" value="LOCAL" />
-      <updated>1654474926933</updated>
+      <workItem from="1654788589345" duration="25464000" />
     </task>
     <task id="LOCAL-00259" summary="Fixing unrest calculations and adding GP list">
       <created>1654475011956</created>
@@ -472,7 +468,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654950141962</updated>
     </task>
-    <option name="localTasksCounter" value="307" />
+    <task id="LOCAL-00307" summary="Fixing error handling">
+      <created>1654950492515</created>
+      <option name="number" value="00307" />
+      <option name="presentableId" value="LOCAL-00307" />
+      <option name="project" value="LOCAL" />
+      <updated>1654950492515</updated>
+    </task>
+    <option name="localTasksCounter" value="308" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -491,7 +494,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing war declarations" />
     <MESSAGE value="Fixing trade route limits" />
     <MESSAGE value="Fixing trade route interaction" />
     <MESSAGE value="Nerfed and buffed public services and tax unrest rates, respectively. Added new Unrest mechanic for local provinces. Fixed trade route display issue." />
@@ -516,7 +518,8 @@
     <MESSAGE value="Adding error handler cog" />
     <MESSAGE value="Fixing attack command" />
     <MESSAGE value="Removing error handler cog" />
-    <option name="LAST_COMMIT_MESSAGE" value="Removing error handler cog" />
+    <MESSAGE value="Fixing error handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing error handling" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

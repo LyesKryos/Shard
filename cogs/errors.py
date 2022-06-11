@@ -13,6 +13,7 @@ class ShardErrorHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
+        crashchannel = self.bot.get_channel(835579413625569322)
         # parses the error
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
@@ -55,6 +56,7 @@ class ShardErrorHandler(commands.Cog):
             await ctx.send("A check failed. Check the logs.")
             self.bot.logger.warning(msg=traceback.format_exc())
         else:
+            await crashchannel.send(f"```py\n{traceback.format_exc()}```")
             self.bot.logger.warning(msg=traceback.format_exc())
 
 async def setup(bot: Shard):
