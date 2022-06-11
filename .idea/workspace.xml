@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing loop">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding better error logging" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -131,14 +127,7 @@
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="22593000" />
-    </task>
-    <task id="LOCAL-00252" summary="Fixing turn loop">
-      <created>1654358933629</created>
-      <option name="number" value="00252" />
-      <option name="presentableId" value="LOCAL-00252" />
-      <option name="project" value="LOCAL" />
-      <updated>1654358933629</updated>
+      <workItem from="1654788589345" duration="22854000" />
     </task>
     <task id="LOCAL-00253" summary="Fixing national unrest problem">
       <created>1654360854932</created>
@@ -476,7 +465,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654893316933</updated>
     </task>
-    <option name="localTasksCounter" value="301" />
+    <task id="LOCAL-00301" summary="Adding better error logging">
+      <created>1654918074685</created>
+      <option name="number" value="00301" />
+      <option name="presentableId" value="LOCAL-00301" />
+      <option name="project" value="LOCAL" />
+      <updated>1654918074685</updated>
+    </task>
+    <option name="localTasksCounter" value="302" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -495,7 +491,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing turn loop" />
     <MESSAGE value="Deployed troops only cost upkeep change" />
     <MESSAGE value="Deployed troops only cost upkeep change and fixing bank display" />
     <MESSAGE value="Fixing turns" />
@@ -520,7 +515,8 @@
     <MESSAGE value="Fixing loading and reloading" />
     <MESSAGE value="Fixing construction" />
     <MESSAGE value="Fixing loop" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing loop" />
+    <MESSAGE value="Adding better error logging" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding better error logging" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

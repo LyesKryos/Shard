@@ -64,14 +64,8 @@ class Shard(commands.Bot):
         # if the command used does not exist
         if isinstance(error, commands.CommandNotFound):
             await ctx.send(f"Command `{self.prefix}{ctx.invoked_with}` not found.")
-            logging.warning(
-                f"{self.time} {ctx.message.author} {ctx.message.id} caused the error \"{error}\" using the command "
-                f"{ctx.invoked_with}")
         if isinstance(error, RuntimeError):
             await ctx.send("Command already running.")
-            logging.warning(
-                f"{self.time} {ctx.message.author} {ctx.message.id} caused the error \"{error}\" using the command "
-                f"{ctx.invoked_with}")
         # if the user is not authorized
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(f"I do not have the proper permissions for `{ctx.invoked_with}`.")
