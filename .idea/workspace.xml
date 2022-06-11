@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Temporarily revering logging method" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing mass_deploy" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -130,21 +130,7 @@
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="30357000" />
-    </task>
-    <task id="LOCAL-00268" summary="Fixing turns">
-      <created>1654553400520</created>
-      <option name="number" value="00268" />
-      <option name="presentableId" value="LOCAL-00268" />
-      <option name="project" value="LOCAL" />
-      <updated>1654553400521</updated>
-    </task>
-    <task id="LOCAL-00269" summary="Adding unrest to strategic view">
-      <created>1654554168616</created>
-      <option name="number" value="00269" />
-      <option name="presentableId" value="LOCAL-00269" />
-      <option name="project" value="LOCAL" />
-      <updated>1654554168616</updated>
+      <workItem from="1654788589345" duration="30799000" />
     </task>
     <task id="LOCAL-00270" summary="Fixing war declarations">
       <created>1654624819997</created>
@@ -475,7 +461,21 @@
       <option name="project" value="LOCAL" />
       <updated>1654963814179</updated>
     </task>
-    <option name="localTasksCounter" value="317" />
+    <task id="LOCAL-00317" summary="Fixing mass_deploy">
+      <created>1654963880363</created>
+      <option name="number" value="00317" />
+      <option name="presentableId" value="LOCAL-00317" />
+      <option name="project" value="LOCAL" />
+      <updated>1654963880363</updated>
+    </task>
+    <task id="LOCAL-00318" summary="Fixing mass_deploy">
+      <created>1654963931591</created>
+      <option name="number" value="00318" />
+      <option name="presentableId" value="LOCAL-00318" />
+      <option name="project" value="LOCAL" />
+      <updated>1654963931591</updated>
+    </task>
+    <option name="localTasksCounter" value="319" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -494,7 +494,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing provinces" />
     <MESSAGE value="Fixing bank" />
     <MESSAGE value="Fixing trade gain" />
     <MESSAGE value="Fixing trade gain bank" />
@@ -519,7 +518,8 @@
     <MESSAGE value="Capitals add a trade route" />
     <MESSAGE value="Adds mass_deploy, withdraw_all, and all attacking with optional force" />
     <MESSAGE value="Temporarily revering logging method" />
-    <option name="LAST_COMMIT_MESSAGE" value="Temporarily revering logging method" />
+    <MESSAGE value="Fixing mass_deploy" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing mass_deploy" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

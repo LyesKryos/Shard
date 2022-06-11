@@ -2246,7 +2246,7 @@ class CNC(commands.Cog):
         total_deployed = amount * len(userinfo['provinces_owned'])
         if amount <= 0:
             raise commands.UserInputError
-        if total_deployed < userinfo['undeployed']:
+        if total_deployed > userinfo['undeployed']:
             await ctx.send(f"{userinfo['username']} does not have enough undeployed troops to deploy {amount} troops "
                            f"to all {len(userinfo['provinces_owned'])} provinces.")
             return
