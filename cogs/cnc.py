@@ -3770,6 +3770,8 @@ class CNC(commands.Cog):
                 # if the user is a great power, +1 trade route
                 if userinfo['great_power']:
                     trade_route_limit += 1
+                if userinfo['capital'] != 0:
+                    trade_route_limit += 1
                 # for every city +1 and for every two ports +1
                 trade_route_limit += userinfo['citylimit'][0]
                 trade_route_limit += math.floor(userinfo['portlimit'][0] / 2)
