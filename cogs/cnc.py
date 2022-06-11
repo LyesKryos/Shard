@@ -2239,6 +2239,8 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # fetches all user ids
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+        provinces = userinfo['provinces_owned']
+        provinces.remove(0)
         # ensures author registration
         if userinfo is None:
             await ctx.send(f"{author} not registered.")
