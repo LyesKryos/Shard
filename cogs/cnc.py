@@ -4285,12 +4285,12 @@ class CNC(commands.Cog):
             # if the hour is greater than 0600 but less than noon
             elif now.time() < datetime.time(hour=12):
                 update = now.replace(hour=12, minute=0, second=0)
-                await shardchannel.send(f"Turn loop until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
                 await discord.utils.sleep_until(update)
             # if the hour is greater than noon but less than 1800
             elif now.time() < datetime.time(hour=18, minute=0):
                 update = now.replace(hour=18, minute=0, second=0)
-                await shardchannel.send(f"Turn loop until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
                 await discord.utils.sleep_until(update)
             # if the hour is greater than 1800 but less than midnight
             elif now.time() > datetime.time(hour=18, minute=0):
