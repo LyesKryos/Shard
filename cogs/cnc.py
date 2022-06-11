@@ -2250,7 +2250,7 @@ class CNC(commands.Cog):
             await ctx.send(f"{userinfo['username']} does not have enough undeployed troops to deploy {amount} troops "
                            f"to all {len(userinfo['provinces_owned'])} provinces.")
             return
-        await conn.execute('''UPDATE cncusers SET undeployed_troops = $1 WHERE user_id = $2;''',
+        await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
                            userinfo['undeployed'] - total_deployed, author.id)
         for p in userinfo['provinces_owned']:
             p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
