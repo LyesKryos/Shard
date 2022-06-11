@@ -1,4 +1,6 @@
 import asyncio
+import traceback
+
 import discord
 from ShardBot import Shard
 from discord.ext import commands
@@ -9,7 +11,7 @@ class BaseCommands(commands.Cog):
 
     def __init__(self, bot: Shard):
         self.bot = bot
-   
+
     @commands.command(aliases=["1080"])
     async def teneighty(self, ctx):
         await ctx.send("https://i.ibb.co/TtcdQ3d/image.png")
@@ -54,10 +56,13 @@ class BaseCommands(commands.Cog):
     @commands.command(brief="Sends a plaintext message to all channels associated.")
     @commands.is_owner()
     async def announce_global(self, ctx, *, args):
-        channel_ids = [674285035905613825, 319961144091738112, 606505493657288735]
-        for id in channel_ids:
-            channel = self.bot.get_channel(id)
-            await channel.send(args)
+        try:
+            channel_ids = [674285035905613825, 319961144091738112, 606505493657288735]
+            for id in channel_ids:
+                channel = self.bot.get_channel(id)
+                await channel.send(args)
+        except Exception:
+            self.bot.logger.warning(msg=traceback.format_exc())
 
     @commands.command(brief="Loads cog")
     @commands.is_owner()
@@ -90,7 +95,7 @@ class BaseCommands(commands.Cog):
                 await self.bot.unload_extension(f"cogs.{filename[:-3]}")
                 await self.bot.load_extension(f"cogs.{filename[:-3]}")
         await ctx.send("Recycled all cogs.")
-        
+
     @commands.command(brief="Measures latency between Discord and the host server.")
     async def ping(self, ctx):
         msg = await ctx.send(f"Round trip {round(self.bot.latency * 1000, 2)}ms!")
@@ -119,8 +124,8 @@ async def setup(bot: Shard):
             server = bot.get_guild(728444080908140575)
             channel = server.get_channel(835579413625569322)
             await channel.send("We are online.")
-        except Exception as error:
-            print(error)
+        except Exception:
+            bot.logger.warning(msg=traceback.format_exc())
     loop = bot.loop
     loop.create_task(alive(bot))
     await bot.add_cog(BaseCommands(bot))
