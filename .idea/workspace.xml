@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing turn loop">
-      <change afterPath="$PROJECT_DIR$/errors.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ShardBot.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShardBot.py" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing attack command">
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -132,21 +129,7 @@
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="24356000" />
-    </task>
-    <task id="LOCAL-00255" summary="Fixing recruitment">
-      <created>1654361904198</created>
-      <option name="number" value="00255" />
-      <option name="presentableId" value="LOCAL-00255" />
-      <option name="project" value="LOCAL" />
-      <updated>1654361904198</updated>
-    </task>
-    <task id="LOCAL-00256" summary="Fixing local unrest">
-      <created>1654362155348</created>
-      <option name="number" value="00256" />
-      <option name="presentableId" value="LOCAL-00256" />
-      <option name="project" value="LOCAL" />
-      <updated>1654362155348</updated>
+      <workItem from="1654788589345" duration="24792000" />
     </task>
     <task id="LOCAL-00257" summary="Fixing unrest calculations">
       <created>1654474894978</created>
@@ -477,7 +460,21 @@
       <option name="project" value="LOCAL" />
       <updated>1654948571870</updated>
     </task>
-    <option name="localTasksCounter" value="304" />
+    <task id="LOCAL-00304" summary="Adding error handler cog">
+      <created>1654949672079</created>
+      <option name="number" value="00304" />
+      <option name="presentableId" value="LOCAL-00304" />
+      <option name="project" value="LOCAL" />
+      <updated>1654949672079</updated>
+    </task>
+    <task id="LOCAL-00305" summary="Fixing attack command">
+      <created>1654949939855</created>
+      <option name="number" value="00305" />
+      <option name="presentableId" value="LOCAL-00305" />
+      <option name="project" value="LOCAL" />
+      <updated>1654949939855</updated>
+    </task>
+    <option name="localTasksCounter" value="306" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -496,8 +493,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Deployed troops only cost upkeep change and fixing bank display" />
-    <MESSAGE value="Fixing turns" />
     <MESSAGE value="Adding unrest to strategic view" />
     <MESSAGE value="Fixing war declarations" />
     <MESSAGE value="Fixing trade route limits" />
@@ -521,7 +516,9 @@
     <MESSAGE value="Fixing loop" />
     <MESSAGE value="Adding better error logging" />
     <MESSAGE value="Fixing turn loop" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing turn loop" />
+    <MESSAGE value="Adding error handler cog" />
+    <MESSAGE value="Fixing attack command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing attack command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
