@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing error handling">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing attack command">
+      <change beforePath="$PROJECT_DIR$/battlesim.py" beforeDir="false" afterPath="$PROJECT_DIR$/battlesim.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -132,21 +133,7 @@
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="25894000" />
-    </task>
-    <task id="LOCAL-00260" summary="Fixing small GP list error">
-      <created>1654475228955</created>
-      <option name="number" value="00260" />
-      <option name="presentableId" value="LOCAL-00260" />
-      <option name="project" value="LOCAL" />
-      <updated>1654475228955</updated>
-    </task>
-    <task id="LOCAL-00261" summary="Fixing small GP list error">
-      <created>1654475314773</created>
-      <option name="number" value="00261" />
-      <option name="presentableId" value="LOCAL-00261" />
-      <option name="project" value="LOCAL" />
-      <updated>1654475314773</updated>
+      <workItem from="1654788589345" duration="26471000" />
     </task>
     <task id="LOCAL-00262" summary="Fixing small GP list error">
       <created>1654475938406</created>
@@ -477,7 +464,21 @@
       <option name="project" value="LOCAL" />
       <updated>1654950842434</updated>
     </task>
-    <option name="localTasksCounter" value="309" />
+    <task id="LOCAL-00309" summary="Fixing attack command">
+      <created>1654951107164</created>
+      <option name="number" value="00309" />
+      <option name="presentableId" value="LOCAL-00309" />
+      <option name="project" value="LOCAL" />
+      <updated>1654951107164</updated>
+    </task>
+    <task id="LOCAL-00310" summary="Fixing attack command">
+      <created>1654951627557</created>
+      <option name="number" value="00310" />
+      <option name="presentableId" value="LOCAL-00310" />
+      <option name="project" value="LOCAL" />
+      <updated>1654951627557</updated>
+    </task>
+    <option name="localTasksCounter" value="311" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -518,10 +519,10 @@
     <MESSAGE value="Adding better error logging" />
     <MESSAGE value="Fixing turn loop" />
     <MESSAGE value="Adding error handler cog" />
-    <MESSAGE value="Fixing attack command" />
     <MESSAGE value="Removing error handler cog" />
     <MESSAGE value="Fixing error handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing error handling" />
+    <MESSAGE value="Fixing attack command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing attack command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

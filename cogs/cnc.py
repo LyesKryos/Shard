@@ -2736,6 +2736,7 @@ class CNC(commands.Cog):
                     await ctx.send(embed=battleembed)
                     await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
                                                userinfo['usercolor'])
+                    return
                 # fetches potential retreat options for the defender
                 defenderprovs = set(prov for prov in defenderinfo['provinces_owned'])
                 targetborder = set(p for p in targetinfo['bordering'])
@@ -2776,6 +2777,7 @@ class CNC(commands.Cog):
                     await ctx.send(embed=battleembed)
                     await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
                                                userinfo['usercolor'])
+                    return
                 if (len(retreatoptions) == 0) and (targetinfo['coast'] is True):
                     # if the target is a coastline and there are no retreat options by land, the army will be
                     # returned to the defender's stockpile
@@ -2818,6 +2820,7 @@ class CNC(commands.Cog):
                     await ctx.send(embed=battleembed)
                     await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
                                                userinfo['usercolor'])
+                    return
                 else:
                     # if there are retreat options, one will be randomly selected and all remaining troops will
                     # retreat there
@@ -2865,7 +2868,7 @@ class CNC(commands.Cog):
                     await ctx.send(embed=battleembed)
                     await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
                                                userinfo['usercolor'])
-                return
+                    return
             # if the attacker is not victorious, no provinces change hands
             else:
                 if targetinfo['owner_id'] == 0:
