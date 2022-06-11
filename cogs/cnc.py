@@ -2406,7 +2406,7 @@ class CNC(commands.Cog):
                 victor = "The defenders are victorious!"
                 advance = False
             # if the attackers win the battle roll, retreat
-            elif battle.attackroll > battle.defenseroll:
+            else:
                 victor = "The attackers are victorious!"
                 advance = True
             # create battleembed object
@@ -2456,12 +2456,11 @@ class CNC(commands.Cog):
                     await battlenotif.add_reaction("\U00002694")
                     await battlenotif.add_reaction("\U0001f3f3")
 
+                try:
                     # the check for the emojis
                     def fordcheck(reaction, user):
                         return user == ctx.message.author and str(reaction.emoji)
-
                     # waits for the correct emoji response
-                try:
                     reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=fordcheck)
                     # if the reaction is the attack, the attack commences and the footer is updated
                     if str(reaction.emoji) == "\U00002694":
@@ -2470,7 +2469,7 @@ class CNC(commands.Cog):
                         await battlenotif.edit(embed=battleembed)
                         defending_troops = battle.RemainingDefendingArmy
                         attacking_troops = battle.RemainingAttackingArmy
-                        terrain = 3
+                        terrain_id = 3
                         battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
                         # simulate battle
                         await battle.Casualties()
