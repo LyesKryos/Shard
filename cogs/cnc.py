@@ -4262,6 +4262,7 @@ class CNC(commands.Cog):
 
     async def cncstartloop(self):
         try:
+            await self.bot.wait_until_ready()
             # fetch the Shard testing channel
             shardchannel = self.bot.get_channel(835579413625569322)
             # ensure there is no lingering loop
