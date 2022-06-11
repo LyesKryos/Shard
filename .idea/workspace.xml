@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing attack command">
-      <change beforePath="$PROJECT_DIR$/battlesim.py" beforeDir="false" afterPath="$PROJECT_DIR$/battlesim.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -133,14 +132,7 @@
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="26471000" />
-    </task>
-    <task id="LOCAL-00262" summary="Fixing small GP list error">
-      <created>1654475938406</created>
-      <option name="number" value="00262" />
-      <option name="presentableId" value="LOCAL-00262" />
-      <option name="project" value="LOCAL" />
-      <updated>1654475938406</updated>
+      <workItem from="1654788589345" duration="26772000" />
     </task>
     <task id="LOCAL-00263" summary="Adding GP alias">
       <created>1654476264217</created>
@@ -478,7 +470,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654951627557</updated>
     </task>
-    <option name="localTasksCounter" value="311" />
+    <task id="LOCAL-00311" summary="Fixing attack command">
+      <created>1654951812799</created>
+      <option name="number" value="00311" />
+      <option name="presentableId" value="LOCAL-00311" />
+      <option name="project" value="LOCAL" />
+      <updated>1654951812799</updated>
+    </task>
+    <option name="localTasksCounter" value="312" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

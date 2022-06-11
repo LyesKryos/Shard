@@ -2455,74 +2455,74 @@ class CNC(commands.Cog):
                     battlenotif = await ctx.send(embed=battleembed)
                     await battlenotif.add_reaction("\U00002694")
                     await battlenotif.add_reaction("\U0001f3f3")
-                try:
-                    # the check for the emojis
-                    def fordcheck(reaction, user):
-                        return user == ctx.message.author and str(reaction.emoji)
-                    # waits for the correct emoji response
-                    reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=fordcheck)
-                    # if the reaction is the attack, the attack commences and the footer is updated
-                    if str(reaction.emoji) == "\U00002694":
-                        await battlenotif.clear_reactions()
-                        battleembed.set_footer(text=f"The attack continues!")
-                        await battlenotif.edit(embed=battleembed)
-                        defending_troops = battle.RemainingDefendingArmy
-                        attacking_troops = battle.RemainingAttackingArmy
-                        terrain_id = 3
-                        try:
-                            battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
-                        except Exception:
-                            self.bot.logger.warning(traceback.format_exc())
-                        # simulate battle
-                        await battle.Casualties()
-                        # if the defenders win the battle roll, no retreat
-                        if battle.defenseroll >= battle.attackroll:
-                            victor = "The defenders are victorious!"
-                            advance = False
-                        # if the attackers win the battle roll, retreat
-                        elif battle.attackroll > battle.defenseroll:
-                            victor = "The attackers are victorious!"
-                            advance = True
-                        # create battleembed object
-                        battleembed = discord.Embed(
-                            title=f"Battle of {targetinfo['name']} (Province #{target})",
-                            description=f"Attack from Province #{stationed} by {userinfo['username']} on Province #{target} with {force} troops.",
-                            color=discord.Color.red())
-                        battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
-                        battleembed.add_field(name="Defending Force", value=defending_troops)
-                        battleembed.add_field(name="Terrain", value="River")
-                        battleembed.add_field(name="Outcome", value=victor, inline=False)
-                        battleembed.add_field(name="Attacking Casualties",
-                                              value=str(battle.AttackingCasualties))
-                        battleembed.add_field(name="Defending Casualties",
-                                              value=str(battle.DefendingCasualties))
-                        battleembed.add_field(name="Crossing Fee", value=str(crossingfee), inline=False)
-                        battleembed.add_field(name="Remaining Attacking Force",
-                                              value=str(battle.RemainingAttackingArmy))
-                        battleembed.add_field(name="Remaining Defending Force",
-                                              value=str(battle.RemainingDefendingArmy))
-                        battleembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
-                        deaths = await conn.fetchrow(
-                            '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
-                        await conn.execute(
-                            '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
-                            deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
-                    # if the reaction is retreat, the attack does not continue
-                    if str(reaction.emoji) == "\U0001f3f3":
+                    try:
+                        # the check for the emojis
+                        def fordcheck(reaction, user):
+                            return user == ctx.message.author and str(reaction.emoji)
+                        # waits for the correct emoji response
+                        reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=fordcheck)
+                        # if the reaction is the attack, the attack commences and the footer is updated
+                        if str(reaction.emoji) == "\U00002694":
+                            await battlenotif.clear_reactions()
+                            battleembed.set_footer(text=f"The attack continues!")
+                            await battlenotif.edit(embed=battleembed)
+                            defending_troops = battle.RemainingDefendingArmy
+                            attacking_troops = battle.RemainingAttackingArmy
+                            terrain_id = 3
+                            try:
+                                battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
+                            except Exception:
+                                self.bot.logger.warning(traceback.format_exc())
+                            # simulate battle
+                            await battle.Casualties()
+                            # if the defenders win the battle roll, no retreat
+                            if battle.defenseroll >= battle.attackroll:
+                                victor = "The defenders are victorious!"
+                                advance = False
+                            # if the attackers win the battle roll, retreat
+                            elif battle.attackroll > battle.defenseroll:
+                                victor = "The attackers are victorious!"
+                                advance = True
+                            # create battleembed object
+                            battleembed = discord.Embed(
+                                title=f"Battle of {targetinfo['name']} (Province #{target})",
+                                description=f"Attack from Province #{stationed} by {userinfo['username']} on Province #{target} with {force} troops.",
+                                color=discord.Color.red())
+                            battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
+                            battleembed.add_field(name="Defending Force", value=defending_troops)
+                            battleembed.add_field(name="Terrain", value="River")
+                            battleembed.add_field(name="Outcome", value=victor, inline=False)
+                            battleembed.add_field(name="Attacking Casualties",
+                                                  value=str(battle.AttackingCasualties))
+                            battleembed.add_field(name="Defending Casualties",
+                                                  value=str(battle.DefendingCasualties))
+                            battleembed.add_field(name="Crossing Fee", value=str(crossingfee), inline=False)
+                            battleembed.add_field(name="Remaining Attacking Force",
+                                                  value=str(battle.RemainingAttackingArmy))
+                            battleembed.add_field(name="Remaining Defending Force",
+                                                  value=str(battle.RemainingDefendingArmy))
+                            battleembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+                            deaths = await conn.fetchrow(
+                                '''SELECT data_value FROM cnc_data WHERE data_name = 'deaths';''')
+                            await conn.execute(
+                                '''UPDATE cnc_data SET data_value = $1 WHERE data_name = 'deaths';''',
+                                deaths['data_value'] + battle.AttackingCasualties + battle.DefendingCasualties)
+                        # if the reaction is retreat, the attack does not continue
+                        if str(reaction.emoji) == "\U0001f3f3":
+                            await battlenotif.clear_reactions()
+                            battleembed.set_footer(
+                                text=f"The attacker retreated from the ford and the province has been "
+                                     f"returned to the control of {owner}.")
+                            await battlenotif.edit(embed=battleembed)
+                            return
+                        # default result is retreat on the timeout error
+                    except asyncio.TimeoutError:
                         await battlenotif.clear_reactions()
                         battleembed.set_footer(
                             text=f"The attacker retreated from the ford and the province has been "
                                  f"returned to the control of {owner}.")
                         await battlenotif.edit(embed=battleembed)
                         return
-                    # default result is retreat on the timeout error
-                except asyncio.TimeoutError:
-                    await battlenotif.clear_reactions()
-                    battleembed.set_footer(
-                        text=f"The attacker retreated from the ford and the province has been "
-                             f"returned to the control of {owner}.")
-                    await battlenotif.edit(embed=battleembed)
-                    return
             if advance is True:
                 # if there is a fort, the attackers must attack the fort
                 if fort is True:
@@ -2566,6 +2566,7 @@ class CNC(commands.Cog):
                             await battlenotif.edit(embed=battleembed)
                             defending_troops = battle.RemainingDefendingArmy
                             attacking_troops = battle.RemainingAttackingArmy
+                            terrain_id = 8
                             battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
                             # simulate battle
                             await battle.Casualties()
@@ -2607,7 +2608,6 @@ class CNC(commands.Cog):
                                 text=f"The attacker retreated from the fort and the province has "
                                      f"been returned to the control of {owner}.")
                             await battlenotif.edit(embed=battleembed)
-
                             return
                     # default result is retreat on the timeout error
                     except asyncio.TimeoutError:
@@ -2656,7 +2656,7 @@ class CNC(commands.Cog):
                             await battlenotif.edit(embed=battleembed)
                             defending_troops = battle.RemainingDefendingArmy
                             attacking_troops = battle.RemainingAttackingArmy
-                            terrain = 4
+                            terrain_id = 4
                             battle = calculations(attacking_troops, defending_troops, terrain_id, ctx)
                             # simulate battle
                             await battle.Casualties()
@@ -2699,7 +2699,6 @@ class CNC(commands.Cog):
                                 text=f"The attacker retreated from the city and the province has been "
                                      f"returned to the control of {owner}.")
                             await battlenotif.edit(embed=battleembed)
-
                             return
                     # default result is retreat on the timeout error
                     except asyncio.TimeoutError:
