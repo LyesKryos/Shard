@@ -4350,7 +4350,7 @@ class CNC(commands.Cog):
             if self.turn_loop.is_running():
                 await shardchannel.send("Already running on_ready.")
                 return
-            # grab the timezone and the curren time
+            # grab the timezone and the current time
             eastern = timezone('US/Eastern')
             now = datetime.datetime.now(eastern)
             # if the hour is less than midnight but not somehow also a negative hour (hey, it happens)
