@@ -284,7 +284,7 @@ class CNC(commands.Cog):
                 focus = "Economy"
             elif userinfo['focus'] == "s":
                 focus = "Strategy"
-            elif userinfo['focus'] == "none":
+            else:
                 focus = "None"
             # fetches relations information
             relations = await conn.fetch('''SELECT nation, relation FROM relations WHERE name = $1;''',
@@ -4128,6 +4128,12 @@ class CNC(commands.Cog):
                         recipient = $1 AND type = 'trade' AND active = True ORDER BY RANDOM();''', userinfo['username'])
                         await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''',
                                            closed_interaction['id'])
+                        recip_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
+                                                         closed_interaction['recipient_id'])
+                        recip_routes = recip_info['trade_routes']
+                        recip_routes[1] -= 1
+                        await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE user_id = $2;''',
+                                           recip_routes, recip_info['user_id'])
                     trade_routes[0] = trade_route_limit
                     await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE user_id = $2;''',
                                        trade_routes, u)

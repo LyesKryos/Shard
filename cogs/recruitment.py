@@ -258,6 +258,7 @@ class Recruitment(commands.Cog):
         self.world_assembly_notification_loop.cancel()
         # self.api_loop.cancel()
 
+    # cog variables
     do_not_recruit = list()
     sending_to = list()
     all_nations = set()
@@ -349,41 +350,35 @@ class Recruitment(commands.Cog):
         while self.running:
             # connects to database
             conn = self.bot.pool
+            # sleep for 10 minutes
+            await asyncio.sleep(600)
+            if self.running is False:
+                break
+            # sends mesage. if the reaction is hit, recruitment continues
+            msg = await ctx.send(f"Still recruiting,{ctx.author.mention}? Hit the reaction within 3 minutes to "
+                                 f"continue.")
+            await msg.add_reaction("\U0001f4e8")
+
+            def check(reaction, user):
+                return user == ctx.message.author and str(reaction.emoji) == "\U0001f4e8"
+
             try:
-                # sleep for 10 minutes
-                await asyncio.sleep(600)
-                if self.running is False:
-                    break
-                # sends mesage. if the reaction is hit, recruitment continues
-                msg = await ctx.send(f"Still recruiting,{ctx.author.mention}? Hit the reaction within 3 minutes to "
-                                     f"continue.")
-                await msg.add_reaction("\U0001f4e8")
+                # if reaction is hit, do nothing
+                await self.bot.wait_for('reaction_add', timeout=180, check=check)
 
-                def check(reaction, user):
-                    return user == ctx.message.author and str(reaction.emoji) == "\U0001f4e8"
+            except asyncio.TimeoutError:
+                # if the reaction times out, stop the code
+                self.running = False
+                # updates information
+                userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', ctx.author.id)
+                await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
+                                   (self.user_sent + userinfo['sent']),
+                                   (self.user_sent + userinfo['sent_this_month']),
+                                   ctx.author.id)
+                self.user_sent = 0
+                self.recruitment_gather_object.cancel()
 
-                try:
-                    # if reaction is hit, do nothing
-                    await self.bot.wait_for('reaction_add', timeout=180, check=check)
-
-                except asyncio.TimeoutError:
-                    # if the reaction times out, stop the code
-                    self.running = False
-                    # updates information
-                    userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', ctx.author.id)
-                    await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
-                                       (self.user_sent + userinfo['sent']),
-                                       (self.user_sent + userinfo['sent_this_month']),
-                                       ctx.author.id)
-                    self.user_sent = 0
-                    self.recruitment_gather_object.cancel()
-
-                    break
-            except Exception as error:
-                crashchannel = self.bot.get_channel(835579413625569322)
-                await crashchannel.send(error)
-
-        return
+                break
 
     @commands.command(brief="Adds or removes the recruiter role")
     @commands.guild_only()
@@ -458,21 +453,15 @@ class Recruitment(commands.Cog):
         self.running = False
         # connects to database
         conn = self.bot.pool
-        try:
-            # fetches relevant user info
-            userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', author.id)
-            # updates relevant user info
-            await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
-                               (self.user_sent + userinfo['sent']), (self.user_sent + userinfo['sent_this_month']),
-                               ctx.author.id)
-            self.user_sent = 0
-
-            self.recruitment_gather_object.cancel()
-            return
-        except Exception as error:
-            await ctx.send(error)
-
-            return
+        # fetches relevant user info
+        userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', author.id)
+        # updates relevant user info
+        await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
+                           (self.user_sent + userinfo['sent']), (self.user_sent + userinfo['sent_this_month']),
+                           ctx.author.id)
+        self.user_sent = 0
+        self.recruitment_gather_object.cancel()
+        return
 
     @commands.command()
     @commands.guild_only()
@@ -507,51 +496,35 @@ class Recruitment(commands.Cog):
         conn = self.bot.pool
         # if the call is for the author
         if args == ():
-            try:
-                # fetches relevant user data
-                userinfo = await conn.fetchrow('''SELECT sent FROM recruitment WHERE user_id = $1;''', author.id)
-                sent = userinfo['sent']
-                # sends amount
-                await ctx.send(f"{author} has sent {sent} telegrams.")
-
-                return
-            except Exception as error:
-                await ctx.send(error)
-
-                return
+            # fetches relevant user data
+            userinfo = await conn.fetchrow('''SELECT sent FROM recruitment WHERE user_id = $1;''', author.id)
+            sent = userinfo['sent']
+            # sends amount
+            await ctx.send(f"{author} has sent {sent} telegrams.")
+            return
         elif ' '.join(args).lower() == "global":
-            try:
-                # fetches relevant user data
-                allsent = await conn.fetch('''SELECT sent, sent_this_month FROM recruitment;''')
-                totalsent = 0
-                monthlytotal = 0
-                for s in allsent:
-                    totalsent += s['sent']
-                    monthlytotal += s['sent_this_month']
-                # sends amount
-                await ctx.send(
-                    f"A total of {totalsent:,} telegrams have been sent.\nA total of {monthlytotal:,} telegrams "
-                    f"have been sent this month.")
-
-                return
-            except Exception as error:
-                await ctx.send(error)
-
-                return
+            # fetches relevant user data
+            allsent = await conn.fetch('''SELECT sent, sent_this_month FROM recruitment;''')
+            totalsent = 0
+            monthlytotal = 0
+            for s in allsent:
+                totalsent += s['sent']
+                monthlytotal += s['sent_this_month']
+            # sends amount
+            await ctx.send(
+                f"A total of {totalsent:,} telegrams have been sent.\nA total of {monthlytotal:,} telegrams "
+                f"have been sent this month.")
+            return
         elif args != ():
-            try:
-                # fetches the user object via the converter
-                user = ' '.join(args[:])
-                user = await commands.converter.MemberConverter().convert(ctx, user)
-                # connects to the database
-                conn = self.bot.pool  # fetches relevant user data and sends it
-                userinfo = await conn.fetchrow('''SELECT sent FROM recruitment WHERE user_id = $1;''', user.id)
-                sent = userinfo['sent']
-                await ctx.send(f"{user} has sent {sent} telegrams.")
-                return
-            except Exception as error:
-                await ctx.send(error)
-                return
+            # fetches the user object via the converter
+            user = ' '.join(args[:])
+            user = await commands.converter.MemberConverter().convert(ctx, user)
+            # connects to the database
+            conn = self.bot.pool  # fetches relevant user data and sends it
+            userinfo = await conn.fetchrow('''SELECT sent FROM recruitment WHERE user_id = $1;''', user.id)
+            sent = userinfo['sent']
+            await ctx.send(f"{user} has sent {sent} telegrams.")
+
 
     @commands.command(usage="<m>", brief="Displays the all time or monthly ranks")
     @commands.guild_only()
@@ -559,41 +532,38 @@ class Recruitment(commands.Cog):
     async def rank(self, ctx, monthly: str = None):
         # connects to the database
         conn = self.bot.pool
-        try:
-            # if the user wants the regular ranks
-            if monthly is None:
-                # fetches all user information, sorted by 'sent'
-                userinfo = await conn.fetch('''SELECT * FROM recruitment 
-                                            ORDER BY sent DESC
-                                            LIMIT 10;''')
-                ranksstr = "**__Top 10 Recruiters__**\n"
-                # adds each user, by rank, to the list
-                rank = 1
-                for ranks in userinfo:
-                    userstring = f"**{rank}.** {self.bot.get_user(ranks['user_id'])}: {ranks['sent']}\n"
-                    ranksstr += userstring
-                    rank += 1
-                await ctx.send(f"{ranksstr}")
+        # if the user wants the regular ranks
+        if monthly is None:
+            # fetches all user information, sorted by 'sent'
+            userinfo = await conn.fetch('''SELECT * FROM recruitment 
+                                        ORDER BY sent DESC
+                                        LIMIT 10;''')
+            ranksstr = "**__Top 10 Recruiters__**\n"
+            # adds each user, by rank, to the list
+            rank = 1
+            for ranks in userinfo:
+                userstring = f"**{rank}.** {self.bot.get_user(ranks['user_id'])}: {ranks['sent']}\n"
+                ranksstr += userstring
+                rank += 1
+            await ctx.send(f"{ranksstr}")
 
-                return
-            # if the user wants the sent monthly list
-            elif monthly in ['m', 'month', 'monthly']:
-                # fetches relevant user data, sorted by 'sent_this_month`
-                userinfo = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month DESC LIMIT 10;''')
-                ranksstr = "**__Top 10 Recruiters (this month)__**\n"
-                # adds each user, by rank, to the list
-                rank = 1
-                for ranks in userinfo:
-                    userstring = f"**{rank}.** {self.bot.get_user(ranks['user_id'])}: {ranks['sent_this_month']}\n"
-                    ranksstr += userstring
-                    rank += 1
-                await ctx.send(f"{ranksstr}")
-                return
-            else:
-                raise commands.UserInputError()
-        except Exception as error:
-            await ctx.send(error)
             return
+        # if the user wants the sent monthly list
+        elif monthly in ['m', 'month', 'monthly']:
+            # fetches relevant user data, sorted by 'sent_this_month`
+            userinfo = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month DESC LIMIT 10;''')
+            ranksstr = "**__Top 10 Recruiters (this month)__**\n"
+            # adds each user, by rank, to the list
+            rank = 1
+            for ranks in userinfo:
+                userstring = f"**{rank}.** {self.bot.get_user(ranks['user_id'])}: {ranks['sent_this_month']}\n"
+                ranksstr += userstring
+                rank += 1
+            await ctx.send(f"{ranksstr}")
+            return
+        else:
+            raise commands.UserInputError()
+
 
     @commands.command(usage='[template id]', brief="Registers a user and a template")
     @commands.guild_only()
@@ -602,23 +572,15 @@ class Recruitment(commands.Cog):
         author = ctx.author
         # connects to the database
         conn = self.bot.pool
-        try:
-            # fetches data to ensure that the user doesn't exist
-            exist = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', author.id)
-            # if the user already exists
-            if exist is not None:
-                await ctx.send("You are already registered!")
-
-                return
-            # inserts data into database
-            await conn.execute('''INSERT INTO recruitment(user_id, template) VALUES($1, $2);''', author.id, templateid)
-            await ctx.send(f"Registered successfully with template ID: `{templateid}`.")
-
+        # fetches data to ensure that the user doesn't exist
+        exist = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', author.id)
+        # if the user already exists
+        if exist is not None:
+            await ctx.send("You are already registered!")
             return
-        except Exception as error:
-            await ctx.send(error)
-
-            return
+        # inserts data into database
+        await conn.execute('''INSERT INTO recruitment(user_id, template) VALUES($1, $2);''', author.id, templateid)
+        await ctx.send(f"Registered successfully with template ID: `{templateid}`.")
 
     @commands.command(usage='[template id]', brief="Edits an existing template")
     @commands.guild_only()
@@ -627,23 +589,15 @@ class Recruitment(commands.Cog):
         author = ctx.author
         # connects to database
         conn = self.bot.pool
-        try:
-            # checks for user existance
-            exist = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', author.id)
-            # if the user does not exist
-            if exist is None:
-                await ctx.send("You are not registered!")
-
-                return
-            # updates the template
-            await conn.execute('''UPDATE recruitment SET template = $2 WHERE user_id = $1;''', author.id, templateid)
-            await ctx.send(f"Template ID for {author} set to `{templateid}` successfully.")
-
+        # checks for user existance
+        exist = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', author.id)
+        # if the user does not exist
+        if exist is None:
+            await ctx.send("You are not registered!")
             return
-        except Exception as error:
-            await ctx.send(error)
-
-            return
+        # updates the template
+        await conn.execute('''UPDATE recruitment SET template = $2 WHERE user_id = $1;''', author.id, templateid)
+        await ctx.send(f"Template ID for {author} set to `{templateid}` successfully.")
 
     @commands.command(brief="Displays a user's template")
     @commands.guild_only()
@@ -667,7 +621,6 @@ class Recruitment(commands.Cog):
             await ctx.send(f"{author.name}'s template is {template}.\n"
                            f"The telegram template can be found here: "
                            f"https://www.nationstates.net/page=tg/tgid={templateid[0]}")
-
             return
         except Exception as error:
             await ctx.send(error)
@@ -738,7 +691,7 @@ class Recruitment(commands.Cog):
                    f"{htmlstring}\n" \
                    "</body>\n" \
                    "</html>\n" \
-            # writes the html to a file
+        # writes the html to a file
         with open(fr"{self.directory}{regions['region'].lower()}_endo_campaign.html", "w+") as writefile:
             writefile.write(htmlfile)
         with open(fr"{self.directory}{regions['region'].lower()}_endo_campaign.html", "r") as campaign:
@@ -748,29 +701,31 @@ class Recruitment(commands.Cog):
     @commands.command(usage="[hex color code] [name]",
                       brief="Allows the Recruiter of the Month to customize their role")
     async def customize_recruiter_role(self, ctx, color: str, *args):
+        # check to see if the author has the proper role
         recruiter_of_the_month_role = discord.utils.get(ctx.guild.roles, id=813953181234626582)
         name = ' '.join(args)
+        # if they do not, return the error
         if recruiter_of_the_month_role not in ctx.author.roles:
             raise commands.MissingRole(recruiter_of_the_month_role)
         else:
             try:
+                # get the color, catch any color input errors, and change the role name and color
                 color = (x, y, z) = ImageColor.getrgb(color)
                 rolecolor = discord.Color.from_rgb(*color)
                 await recruiter_of_the_month_role.edit(color=rolecolor, name=f"{name} (Recruiter of the Month)")
                 await ctx.send(f"Color changed to `{rolecolor}` and name changed to `{name}` successfully!")
-            except Exception as error:
-                if isinstance(error, ValueError):
+            except ValueError:
                     await ctx.send("That doesn't appear to be a valid hex color code.")
                     return
-                else:
-                    await ctx.send(error)
-                    return
+
 
     @commands.command(brief="Adds or removes the retention role")
     @RecruitmentCheck()
     async def retention(self, ctx):
+        # get the retention role and channel
         retention_role = discord.utils.get(ctx.guild.roles, id=950950836006187018)
         recruitment_channel = self.bot.get_channel(674342850296807454)
+        # add the role if the author does not already have it and send instruction message
         if retention_role not in ctx.author.roles:
             await ctx.author.add_roles(retention_role)
             await recruitment_channel.send(f"**Welcome to the Order of Saint Julian, {ctx.author.mention}!**"
@@ -778,6 +733,7 @@ class Recruitment(commands.Cog):
                                            f"When a nation leaves or enters Thegye, you'll be notified via ping. If you"
                                            f" send a telegram to the nation, hit the \U0001f4ec emoji to let everyone"
                                            f" else know you've done so. Good luck!")
+        # remove the role from the author if they already have it
         elif retention_role in ctx.author.roles:
             await ctx.author.remove_roles(retention_role)
             await ctx.send("Role removed.")

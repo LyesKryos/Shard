@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing port and fort limits">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing trade route closing and establishment. Fixing action point problem">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/dispatch.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/dispatch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/roleplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/roleplay.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -133,14 +136,7 @@
       <workItem from="1652197800527" duration="53290000" />
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="39965000" />
-    </task>
-    <task id="LOCAL-00275" summary="Fixing trade cancelling">
-      <created>1654799642410</created>
-      <option name="number" value="00275" />
-      <option name="presentableId" value="LOCAL-00275" />
-      <option name="project" value="LOCAL" />
-      <updated>1654799642410</updated>
+      <workItem from="1654788589345" duration="43847000" />
     </task>
     <task id="LOCAL-00276" summary="Fixing trade cancelling">
       <created>1654799735116</created>
@@ -478,7 +474,14 @@
       <option name="project" value="LOCAL" />
       <updated>1655050318991</updated>
     </task>
-    <option name="localTasksCounter" value="324" />
+    <task id="LOCAL-00324" summary="Fixing trade route closing and establishment. Fixing action point problem">
+      <created>1655227396152</created>
+      <option name="number" value="00324" />
+      <option name="presentableId" value="LOCAL-00324" />
+      <option name="project" value="LOCAL" />
+      <updated>1655227396152</updated>
+    </task>
+    <option name="localTasksCounter" value="325" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -497,7 +500,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing trade gain bank" />
     <MESSAGE value="Fixing trade outgoing gain" />
     <MESSAGE value="Fixing bank display" />
     <MESSAGE value="Updating military upkeep unrest modifier" />
@@ -522,7 +524,8 @@
     <MESSAGE value="Fixing mass_deploy" />
     <MESSAGE value="Fixing view" />
     <MESSAGE value="Fixing port and fort limits" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing port and fort limits" />
+    <MESSAGE value="Fixing trade route closing and establishment. Fixing action point problem" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing trade route closing and establishment. Fixing action point problem" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
