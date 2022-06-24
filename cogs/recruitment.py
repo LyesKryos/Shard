@@ -535,7 +535,7 @@ class Recruitment(commands.Cog):
         # if the user wants the regular ranks
         if monthly is None:
             # fetches all user information, sorted by 'sent'
-            userinfo = await conn.fetch('''SELECT * FROM recruitment 
+            userinfo = await conn.fetch('''SELECT * FROM recruitment WHERE sent > 0
                                         ORDER BY sent DESC
                                         LIMIT 10;''')
             ranksstr = "**__Top 10 Recruiters__**\n"
@@ -551,7 +551,8 @@ class Recruitment(commands.Cog):
         # if the user wants the sent monthly list
         elif monthly in ['m', 'month', 'monthly']:
             # fetches relevant user data, sorted by 'sent_this_month`
-            userinfo = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month DESC LIMIT 10;''')
+            userinfo = await conn.fetch('''SELECT * FROM recruitment WHERE sent_this_month > 0 
+            ORDER BY sent_this_month DESC LIMIT 10;''')
             ranksstr = "**__Top 10 Recruiters (this month)__**\n"
             # adds each user, by rank, to the list
             rank = 1

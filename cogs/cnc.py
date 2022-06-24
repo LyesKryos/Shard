@@ -121,7 +121,7 @@ class CNC(commands.Cog):
                 if pixel == (0, 0, 0, 0):
                     not_colored.append((x, y))
                 else:
-                    prov.putpixel((x,y), owner)
+                    prov.putpixel((x, y), owner)
         for x in range(0, 2 * width, space):
             prov_draw.line([x, 0, x - width, height], width=3, fill=occupyer)
         for pix in not_colored:
@@ -825,7 +825,8 @@ class CNC(commands.Cog):
         provinceembed.add_field(name="Terrain", value=terrain['name'] + riverstring)
         provinceembed.add_field(name="Structures", value=structlist)
         provinceembed.add_field(name="Bordering Provinces", value=bordering)
-        provinceembed.add_field(name="Occupying Nation", value=owner)
+        provinceembed.add_field(name="Core Owner", value=owner)
+        provinceembed.add_field(name="Occupying Nation", value=province['occupier'])
         provinceembed.add_field(name="Troops Present", value=province['troops'])
         provinceembed.add_field(name="Local Unrest", value=str(province['unrest']))
         provinceembed.add_field(name="Trade Value", value=province['trade_value'])
@@ -924,7 +925,7 @@ class CNC(commands.Cog):
         # connects to the database
         conn = self.bot.pool
         # fetches all users
-        allusers = await conn.fetch('''SELECT user_id FROM cncusers''')
+        allusers = await conn.fetch('''SELECT user_id FROM cncusers;''')
         alluserids = list()
         for id in allusers:
             alluserids.append(id['user_id'])
@@ -933,7 +934,7 @@ class CNC(commands.Cog):
             await ctx.send(f"{author} not registered.")
             return
         # fetches all province ids
-        allprovinces = await conn.fetch('''SELECT id FROM provinces''')
+        allprovinces = await conn.fetch('''SELECT id FROM provinces;''')
         allids = list()
         for x in allprovinces:
             allids.append(x['id'])
@@ -1130,6 +1131,28 @@ class CNC(commands.Cog):
                     await conn.execute(
                         '''UPDATE interactions SET active = False WHERE type = 'war' AND sender = $1 AND 
                         recipient = $2;''', pending_int['sender'], pending_int['recipient'])
+                    sender_occupied = await conn.fetch(
+                        '''SELECT * FROM provinces WHERE occuiper = $1 AND owner = $2;''',
+                        pending_int['sender'], pending_int['recipient'])
+                    recip_occupied = await conn.fetch(
+                        '''SELECT * FROM provinces WHERE occuiper = $2 AND owner = $1;''',
+                        pending_int['sender'], pending_int['recipient'])
+                    if sender_occupied is True:
+                        owner_color = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
+                                                          pending_int['recipient'])
+                        owner_color = owner_color['usercolor']
+                        for p in sender_occupied:
+                            await self.bot.loop.run_in_executor(None, self.map_color, p['id'], p['cord'], owner_color)
+                            await conn.execute('''UPDATE provinces SET occupier = $1, occupier_id = $2;''',
+                                               p['owner'], p['owner_id'])
+                    if recip_occupied is True:
+                        owner_color = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
+                                                          pending_int['sender'])
+                        owner_color = owner_color['usercolor']
+                        for p in sender_occupied:
+                            await self.bot.loop.run_in_executor(None, self.map_color, p['id'], p['cord'], owner_color)
+                            await conn.execute('''UPDATE provinces SET occupier = $1, occupier_id = $2;''',
+                                               p['owner'], p['owner_id'])
                 # if trade, update user information
                 if pending_int['type'] == 'trade':
                     senderinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
@@ -1405,7 +1428,7 @@ class CNC(commands.Cog):
                            sender, recipient, recipient, sender)
         trade_interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'trade' AND 
                                 active = True AND sender = $1 AND recipient = $2 OR sender = $1 AND recipient = $2;''',
-                                                sender, recipient, recipient, sender)
+                                              sender, recipient, recipient, sender)
         for t in trade_interactions:
             trade_sender = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
                                                t['sender'])
@@ -2306,15 +2329,15 @@ class CNC(commands.Cog):
             await ctx.send(f"Location id `{stationed}` is not a valid ID.")
             return
         # fetches target and stationed information
-        targetowner = await conn.fetchrow('''SELECT owner_id FROM provinces  WHERE id = $1;''', target)
-        stationedowner = await conn.fetchrow('''SELECT owner_id FROM provinces  WHERE id = $1;''', stationed)
+        targetowner = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', target)
+        stationedowner = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', stationed)
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
         # ensures province ownership
-        if targetowner['owner_id'] != author.id:
-            await ctx.send(f"{userinfo['username']} does not own Province #{target}!")
+        if targetowner['owner_id'] != author.id and targetowner['occupier_id'] != author.id:
+            await ctx.send(f"{userinfo['username']} does not own or occupy Province #{target}!")
             return
-        elif stationedowner['owner_id'] != author.id:
-            await ctx.send(f"{userinfo['username']} does not own Province #{stationed}!")
+        elif stationedowner['owner_id'] != author.id and stationedowner['occupier_id'] != author.id:
+            await ctx.send(f"{userinfo['username']} does not own or occupy Province #{stationed}!")
             return
         # gathers specific province information
         targetinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', target)
@@ -2375,11 +2398,11 @@ class CNC(commands.Cog):
             await ctx.send(f"{userinfo['username']} does not have any movement points left!")
             return
         # checks ownership conflicts
-        if stationedownerid['owner_id'] != author.id:
+        if stationedownerid['owner_id'] != author.id and stationedownerid['occupier_id'] != author.id:
             await ctx.send(f"{userinfo['username']} does not own Province #{stationed}!")
             return
-        if targetownerid['owner_id'] == author.id:
-            await ctx.send(f"You cannot attack a province you already own!")
+        if targetownerid['owner_id'] == author.id and targetownerid['owner_id'] == author.id:
+            await ctx.send(f"You cannot attack a province you already own or occupy!")
             return
         targetinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', target)
         stationedinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''',
@@ -2440,25 +2463,31 @@ class CNC(commands.Cog):
                                (targetinfo['troops'] + force), target)
             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                (stationedinfo['troops'] - force), stationed)
-            await conn.execute('''UPDATE provinces  SET owner_id = $1, owner = $2 WHERE id = $3;''', author.id,
-                               userinfo['username'], target)
-            await conn.execute(
-                '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
-                ownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
-            owner = "the natives"
+            if targetinfo['owner_id'] == 0:
+                await conn.execute('''UPDATE provinces  SET owner_id = $1, owner = $2 WHERE id = $3;''', author.id,
+                                   userinfo['username'], target)
+                await conn.execute(
+                    '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
+                    ownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
+                owner = "the natives"
+                await ctx.send(
+                    f"Province #{target} is undefended! It has been overrun by {userinfo['username']} with {force}"
+                    f" troops, seizing the province from {owner}!")
+                await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
+                                           userinfo['usercolor'])
             # if there is an owner, all relevant information updated
             if targetinfo['owner_id'] != 0:
-                defenderownedlist = [id for id in defenderinfo['provinces_owned']]
-                defenderownedlist.remove(target)
-                await conn.execute('''UPDATE cncusers SET provinces_owned = $1 WHERE user_id = $2;''',
-                                   defenderownedlist, defenderinfo['user_id'])
+                await conn.execute('''UPDATE provinces SET occupier_id = $1, occupier = $2 WHERE id = $3;''', author.id,
+                                   userinfo['username'], target)
+                await conn.execute(
+                    '''UPDATE cncusers SET moves = $1, resources = $2 WHERE user_id = $3;''',
+                    (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
                 owner = targetinfo['owner']
-            await ctx.send(
-                f"Province #{target} is undefended! It has been overrun by {userinfo['username']} with {force}"
-                f" troops, seizing the province from {owner}!")
-            await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
-                                       userinfo['usercolor'])
-            self.map_color(target, targetinfo['cord'][0:2], userinfo['usercolor'])
+                await loop.run_in_executor(None, self.occupy_color, target, targetinfo['cord'][0:2],
+                                           userinfo['usercolor'], defenderinfo['usercolor'])
+                await ctx.send(
+                    f"Province #{target} is undefended! It has been overrun by {userinfo['username']} with {force}"
+                    f" troops, seizing the province from {owner}!")
             return
         # if there are any stationed troops
         else:
@@ -2814,25 +2843,16 @@ class CNC(commands.Cog):
                 if (len(retreatoptions) == 0) and (targetinfo['coast'] is False):
                     # if the retreat options are none and the defending land is not a coastline
                     # all troops will be destroyed and the attacker takes control of the province
-                    # gets the list of all owned provinces  for both parties
-                    defownedlist = defenderinfo['provinces_owned']
-                    if defownedlist is None:
-                        defownedlist = list()
-                    defownedlist.remove(target)
-                    victorownedlist = userinfo['provinces_owned']
-                    if victorownedlist is None:
-                        victorownedlist = list()
-                    victorownedlist.append(target)
                     # updates all troop and province information and sends the embed
                     await conn.execute(
                         '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
                         (userinfo['resources'] - crossingfee), author.id)
                     await conn.execute(
-                        '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
+                        '''UPDATE provinces  SET troops = $1, occupier_id = $2, occupier = $3 WHERE id = $4;''',
                         battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
                     await conn.execute(
-                        '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
-                        victorownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee),
+                        '''UPDATE cncusers SET moves = $1, resources = $2 WHERE user_id = $3;''',
+                        (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee),
                         author.id)
                     await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                        (stationedinfo['troops'] - force), stationed)
@@ -2845,32 +2865,24 @@ class CNC(commands.Cog):
                         await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
                                            userinfo['national_unrest'] + 50, userinfo['username'])
                     await ctx.send(embed=battleembed)
-                    await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
-                                               userinfo['usercolor'])
+                    await loop.run_in_executor(None, self.occupy_color, target, targetinfo['cord'][0:2],
+                                               userinfo['usercolor'], defenderinfo['usercolor'])
                     return
                 if (len(retreatoptions) == 0) and (targetinfo['coast'] is True):
                     # if the target is a coastline and there are no retreat options by land, the army will be
                     # returned to the defender's stockpile
                     # gets the list of all owned provinces  for both parties
-                    defownedlist = defenderinfo['provinces_owned']
-                    if defownedlist is None:
-                        defownedlist = list()
-                    defownedlist.remove(target)
-                    victorownedlist = userinfo['provinces_owned']
-                    if victorownedlist is None:
-                        victorownedlist = list()
-                    victorownedlist.append(target)
                     # updates all relevant information and sends the embed
                     await conn.execute(
-                        '''UPDATE cncusers SET provinces_owned = $1, undeployed = $2 WHERE user_id = $3;''',
-                        defownedlist, (defenderinfo['undeployed'] + battle.RemainingDefendingArmy),
+                        '''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
+                        (defenderinfo['undeployed'] + battle.RemainingDefendingArmy),
                         defenderinfo['user_id'])
                     await conn.execute(
-                        '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
+                        '''UPDATE provinces  SET troops = $1, occupier_id = $2, occupier = $3 WHERE id = $4;''',
                         battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
                     await conn.execute(
-                        '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
-                        victorownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee),
+                        '''UPDATE cncusers SET moves = $1, resources = $2 WHERE user_id = $3;''',
+                        (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee),
                         author.id)
                     await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                        (stationedinfo['troops'] - force), stationed)
@@ -2888,21 +2900,12 @@ class CNC(commands.Cog):
                         await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
                                            userinfo['national_unrest'] + 50, userinfo['username'])
                     await ctx.send(embed=battleembed)
-                    await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
-                                               userinfo['usercolor'])
+                    await loop.run_in_executor(None, self.occupy_color, target, targetinfo['cord'][0:2],
+                                               userinfo['usercolor'], defenderinfo['usercolor'])
                     return
                 else:
                     # if there are retreat options, one will be randomly selected and all remaining troops will
                     # retreat there
-                    # gets the list of all owned provinces  for both parties
-                    defownedlist = defenderinfo['provinces_owned']
-                    if defownedlist is None:
-                        defownedlist = list()
-                    defownedlist.remove(target)
-                    victorownedlist = userinfo['provinces_owned']
-                    if victorownedlist is None:
-                        victorownedlist = list()
-                    victorownedlist.append(target)
                     retreatprovince = choice(retreatoptions)
                     retreatinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''',
                                                       retreatprovince)
@@ -2913,13 +2916,11 @@ class CNC(commands.Cog):
                         '''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
                         (userinfo['resources'] - crossingfee), author.id)
                     await conn.execute(
-                        '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
+                        '''UPDATE provinces  SET troops = $1, occupier_id = $2, occupier     = $3 WHERE id = $4;''',
                         battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
                     await conn.execute(
-                        '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id 
-                        = $4;''', victorownedlist, (userinfo['moves'] - 1),
-                        (userinfo['resources'] - crossingfee),
-                        author.id)
+                        '''UPDATE cncusers SET moves = $1, resources = $2 WHERE user_id = $3;''',
+                        (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
                     await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                        (stationedinfo['troops'] - force), stationed)
                     deaths = await conn.fetchrow(
@@ -2936,8 +2937,8 @@ class CNC(commands.Cog):
                         await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
                                            userinfo['national_unrest'] + 50, userinfo['username'])
                     await ctx.send(embed=battleembed)
-                    await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
-                                               userinfo['usercolor'])
+                    await loop.run_in_executor(None, self.occupy_color, target, targetinfo['cord'][0:2],
+                                               userinfo['usercolor'], defenderinfo['usercolor'])
                     return
             # if the attacker is not victorious, no provinces change hands
             else:
@@ -3770,8 +3771,12 @@ class CNC(commands.Cog):
                     color = usersncolors[p_owner]
                 else:
                     color = "#808080"
-                await loop.run_in_executor(None, self.map_color, p_id, p_cord,
-                                           color)
+                if p_owner == p['occupier']:
+                    await loop.run_in_executor(None, self.map_color, p_id, p_cord,
+                                               color)
+                if p_owner != p['occupier']:
+                    occupier_color = usersncolors[p['occupier']]
+                    await loop.run_in_executor(None, self.occupy_color, p_id, p_cord, occupier_color, color)
         await ctx.send("All owned provinces checked and colored.")
 
     # ---------------------Updating------------------------------
@@ -3848,7 +3853,7 @@ class CNC(commands.Cog):
                 trade_route_limit += math.floor(userinfo['portlimit'][0] / 2)
                 # if the current trade route number is too high, close a random trade route
                 if trade_routes[0] > trade_route_limit:
-                    for i in range(trade_route_limit-trade_routes[0]):
+                    for i in range(trade_route_limit - trade_routes[0]):
                         closed_interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE sender = $1 OR 
                         recipient = $1 AND type = 'trade' AND active = True ORDER BY RANDOM();''', userinfo['username'])
                         await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''',
@@ -3998,6 +4003,41 @@ class CNC(commands.Cog):
                     await user.send(f"The population of province(s) {provinces_rebelled_string} "
                                     f"have risen up due to high unrest! {structures_destroyed} structures have been"
                                     f"destroyed by the rioters.")
+                # calculate unrest and occupation cost for occupied provinces
+                occupation_uprising = list()
+                provinces_occupied = await conn.fetchrow('''SELECT * FROM provinces WHERE occupier_id = $1 AND
+                owner_id != $1;''', u)
+                if provinces_occupied is True:
+                    for p in provinces_occupied:
+                        # calculate unrest
+                        unrest = 0
+                        # add base occupation unrest
+                        unrest += 25
+                        troops_unrest = p['troops'] / -100
+                        tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
+                        military_upkeep_unrest = -round(
+                            (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
+                                    military_upkeep / 10 - 1)) * 0.75))
+                        if public_services < 15:
+                            public_service_unrest = round(30 - public_services * 2)
+                        else:
+                            public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
+                        unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
+                        # if the unrest is greater than 50, roll a d100-25 to see if they rebel
+                        if unrest >= 50:
+                            unrest_roll = randint(1, 100) - 25
+                            if unrest_roll <= 75:
+                                owner_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1,''',
+                                                                 p['owner'])
+                                await self.bot.loop.run_in_executor(None, self.map_color, p['id'], p['cord'],
+                                                                    owner_info['usercolor'])
+                                occupation_uprising.append(p['id'])
+                if occupation_uprising is True:
+                    occupation_uprising_string = ', '.join(str(p) for p in occupation_uprising)
+                    await user.send(f"The population of occupied province(s) {occupation_uprising_string} "
+                                    f"have risen up due to high unrest and have returned to their "
+                                    f"core owner's control!")
+
                 # for every domestic trade route, +10%. For every foreign trade route, +5%
                 trade_gain = initial_trade_value * (userinfo['trade_routes'][0] / 10)
                 trade_gain += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
@@ -4123,20 +4163,11 @@ class CNC(commands.Cog):
                 trade_route_limit += math.floor(userinfo['portlimit'][0] / 2)
                 # if the current trade route number is too high, close a random trade route
                 if trade_routes[0] > trade_route_limit:
-                    for i in range(trade_routes[0] - trade_route_limit):
+                    for i in range(trade_route_limit - trade_routes[0]):
                         closed_interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE sender = $1 OR 
                         recipient = $1 AND type = 'trade' AND active = True ORDER BY RANDOM();''', userinfo['username'])
                         await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''',
                                            closed_interaction['id'])
-                        recip_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
-                                                         closed_interaction['recipient_id'])
-                        recip_routes = recip_info['trade_routes']
-                        recip_routes[1] -= 1
-                        await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE user_id = $2;''',
-                                           recip_routes, recip_info['user_id'])
-                    trade_routes[0] = trade_route_limit
-                    await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE user_id = $2;''',
-                                       trade_routes, u)
                 trade_routes = userinfo['trade_routes']
                 trade_routes[2] = trade_route_limit
                 tax_rate *= 100
@@ -4282,6 +4313,41 @@ class CNC(commands.Cog):
                     await user.send(f"The population of province(s) {provinces_rebelled_string} "
                                     f"have risen up due to high unrest! {structures_destroyed} structures have been"
                                     f"destroyed by the rioters.")
+                # calculate unrest and occupation cost for occupied provinces
+                occupation_uprising = list()
+                provinces_occupied = await conn.fetchrow('''SELECT * FROM provinces WHERE occupier_id = $1 AND
+                owner_id != $1;''', u)
+                if provinces_occupied is True:
+                    for p in provinces_occupied:
+                        # calculate unrest
+                        unrest = 0
+                        # add base occupation unrest
+                        unrest += 25
+                        troops_unrest = p['troops'] / -100
+                        tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
+                        military_upkeep_unrest = -round(
+                            (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
+                                    military_upkeep / 10 - 1)) * 0.75))
+                        if public_services < 15:
+                            public_service_unrest = round(30 - public_services * 2)
+                        else:
+                            public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
+                        unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
+                        # if the unrest is greater than 50, roll a d100-25 to see if they rebel
+                        if unrest >= 50:
+                            unrest_roll = randint(1, 100) - 25
+                            if unrest_roll <= 75:
+                                owner_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1,''',
+                                                                 p['owner'])
+                                await self.bot.loop.run_in_executor(None, self.map_color, p['id'], p['cord'],
+                                                                    owner_info['usercolor'])
+                                occupation_uprising.append(p['id'])
+                if occupation_uprising is True:
+                    occupation_uprising_string = ', '.join(str(p) for p in occupation_uprising)
+                    await user.send(f"The population of occupied province(s) {occupation_uprising_string} "
+                                    f"have risen up due to high unrest and have returned to their "
+                                    f"core owner's control!")
+
                 # for every domestic trade route, +10%. For every foreign trade route, +5%
                 trade_gain = initial_trade_value * (userinfo['trade_routes'][0] / 10)
                 trade_gain += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
