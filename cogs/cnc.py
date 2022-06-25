@@ -29,7 +29,9 @@ class CNC(commands.Cog):
 
     def cog_unload(self):
         # stop the running turnloop
-        self.turn_loop.stop()
+        self.turn_loop.cancel()
+        if not self.turn_loop.is_running():
+            print("\/")
         # cancel the running turn task
         self.turn_task.cancel()
 
