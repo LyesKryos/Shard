@@ -1625,6 +1625,7 @@ class CNC(commands.Cog):
 
     @commands.command(usage="<nation name>", aliases=['cncb'], brief="Displays information about a nation's income")
     async def cnc_bank(self, ctx, *args):
+        author = ctx.author
         conn = self.bot.pool
         nationname = ' '.join(args[:])
         if nationname == '':
@@ -1659,6 +1660,8 @@ class CNC(commands.Cog):
                 if p == 0:
                     continue
                 p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+                if p_info['occupier_id'] != author.id:
+                    continue
                 total_troops += p_info['troops']
                 # for every province, calculate local trade value
                 province_value = p_info['trade_value']
@@ -1791,7 +1794,7 @@ class CNC(commands.Cog):
                 await ctx.send(f"`{location}` is not a valid province ID.")
                 return
             # if the location is not owned by the user
-            if province['owner_id'] != author.id:
+            if province['owner_id'] != author.id and province['occuper_id'] != author.id:
                 await ctx.send(
                     f"{nationname} does not own province #{location}. "
                     f"Please select a location that {nationname} owns.")
@@ -2262,7 +2265,8 @@ class CNC(commands.Cog):
         if userinfo is None:
             await ctx.send(f"{author} not registered.")
             return
-        withdrawn_raw = await conn.fetchrow('''SELECT sum(troops::int) FROM provinces WHERE occupier_id = $1;''',
+        withdrawn_raw = await conn.fetchrow('''SELECT sum(troops::int) FROM provinces 
+        WHERE occupier_id = $1 AND owner_id = $1;''',
                                             author.id)
         withdrawn = withdrawn_raw['sum']
         await conn.execute('''UPDATE provinces SET troops = 0 WHERE occupier_id = $1;''',
@@ -2340,11 +2344,11 @@ class CNC(commands.Cog):
         stationedowner = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', stationed)
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1''', author.id)
         # ensures province ownership
-        if targetowner['owner_id'] != author.id and targetowner['occupier_id'] != author.id:
-            await ctx.send(f"{userinfo['username']} does not own or occupy Province #{target}!")
+        if targetowner['occupier_id'] != author.id:
+            await ctx.send(f"{userinfo['username']} does not occupy Province #{target}!")
             return
-        elif stationedowner['owner_id'] != author.id and stationedowner['occupier_id'] != author.id:
-            await ctx.send(f"{userinfo['username']} does not own or occupy Province #{stationed}!")
+        elif stationedowner['occupier_id'] != author.id:
+            await ctx.send(f"{userinfo['username']} does not occupy Province #{stationed}!")
             return
         # gathers specific province information
         targetinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', target)
@@ -2405,8 +2409,8 @@ class CNC(commands.Cog):
             await ctx.send(f"{userinfo['username']} does not have any movement points left!")
             return
         # checks ownership conflicts
-        if stationedownerid['owner_id'] != author.id and stationedownerid['occupier_id'] != author.id:
-            await ctx.send(f"{userinfo['username']} does not own Province #{stationed}!")
+        if stationedownerid['occupier_id'] != author.id:
+            await ctx.send(f"{userinfo['username']} does not occupy Province #{stationed}!")
             return
         if targetownerid['owner_id'] == author.id and targetownerid['owner_id'] == author.id:
             await ctx.send(f"You cannot attack a province you already own or occupy!")
