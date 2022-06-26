@@ -186,7 +186,7 @@ class Recruitment(commands.Cog):
                             for n in Recruitment.new_wa:
                                 wa_notif = await wa_pings.send(f"New World Assembly nation, {wa_role.mention}!"
                                                                f"\nPlease endorse: https://www.nationstates.net/nation={n}.")
-                                await wa_notif.reaction_add("\U0001f310")
+                                await wa_notif.add_reaction("\U0001f310")
                         Recruitment.all_wa = members
                         await asyncio.sleep(300)
                         continue

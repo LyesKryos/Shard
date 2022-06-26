@@ -30,8 +30,6 @@ class CNC(commands.Cog):
     def cog_unload(self):
         # stop the running turnloop
         self.turn_loop.cancel()
-        if not self.turn_loop.is_running():
-            print("\/")
         # cancel the running turn task
         self.turn_task.cancel()
 
@@ -3802,7 +3800,7 @@ class CNC(commands.Cog):
         else:
             await ctx.send("Turn loop not running.")
 
-    @tasks.loop(hours=6)
+    @tasks.loop(hours=6, reconnect=False)
     async def turn_loop(self):
         crashchannel = self.bot.get_channel(835579413625569322)
         try:
