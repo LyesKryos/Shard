@@ -4096,6 +4096,7 @@ class CNC(commands.Cog):
                 gp_points += alliances['count'] * 0.5
                 await conn.execute('''UPDATE cncusers SET great_power_score = $1 WHERE username = $2;''',
                                    gp_points, userinfo['username'])
+            await conn.execute('''UPDATE cncusers SET great_power = False;''')
             great_powers = await conn.fetch('''SELECT user_id, great_power_score FROM cncusers 
             ORDER BY great_power_score DESC LIMIT 3;''')
             for gp in great_powers:
