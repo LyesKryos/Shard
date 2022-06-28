@@ -796,8 +796,10 @@ class CNC(commands.Cog):
         # if there is no province owner
         if province['owner'] == '':
             owner = "None"
+            occupier = "None"
         else:
             owner = province['owner']
+            occupier = province['occupier']
         # sorts the bordering
         borderinglist = province['bordering']
         borderinglist.sort()
@@ -826,7 +828,7 @@ class CNC(commands.Cog):
         provinceembed.add_field(name="Structures", value=structlist)
         provinceembed.add_field(name="Bordering Provinces", value=bordering)
         provinceembed.add_field(name="Core Owner", value=owner)
-        provinceembed.add_field(name="Occupying Nation", value=province['occupier'])
+        provinceembed.add_field(name="Occupying Nation", value=occupier)
         provinceembed.add_field(name="Troops Present", value=province['troops'])
         provinceembed.add_field(name="Local Unrest", value=str(province['unrest']))
         provinceembed.add_field(name="Trade Value", value=province['trade_value'])

@@ -134,14 +134,7 @@
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
       <workItem from="1654788589345" duration="46873000" />
-      <workItem from="1656005939581" duration="18660000" />
-    </task>
-    <task id="LOCAL-00284" summary="Fixing trade outgoing gain">
-      <created>1654804056982</created>
-      <option name="number" value="00284" />
-      <option name="presentableId" value="LOCAL-00284" />
-      <option name="project" value="LOCAL" />
-      <updated>1654804056982</updated>
+      <workItem from="1656005939581" duration="19628000" />
     </task>
     <task id="LOCAL-00285" summary="Fixing bank display">
       <created>1654804180238</created>
@@ -479,7 +472,14 @@
       <option name="project" value="LOCAL" />
       <updated>1656416507064</updated>
     </task>
-    <option name="localTasksCounter" value="333" />
+    <task id="LOCAL-00333" summary="Updating cnc_release to match new occupation system">
+      <created>1656427613223</created>
+      <option name="number" value="00333" />
+      <option name="presentableId" value="LOCAL-00333" />
+      <option name="project" value="LOCAL" />
+      <updated>1656427613225</updated>
+    </task>
+    <option name="localTasksCounter" value="334" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
