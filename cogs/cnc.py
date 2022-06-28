@@ -893,8 +893,8 @@ class CNC(commands.Cog):
             troops = randrange(100, 300)
         ownedlist = userinfo['provinces_owned']
         ownedlist.remove(provinceid)
-        await conn.execute('''UPDATE provinces SET owner = '', owner_id = 0, troops = $2 WHERE id = $1;''',
-                           provinceid, troops)
+        await conn.execute('''UPDATE provinces SET owner = '', owner_id = 0, occupier = '', occupier_id = 0,
+         troops = $2 WHERE id = $1;''', provinceid, troops)
         await conn.execute('''UPDATE cncusers SET undeployed = $1, provinces_owned = $2 WHERE user_id = $3;''',
                            (userinfo['undeployed'] + provinceinfo['troops']), ownedlist, author.id)
         await ctx.send(
@@ -4407,6 +4407,7 @@ class CNC(commands.Cog):
                 gp_points += alliances['count'] * 0.5
                 await conn.execute('''UPDATE cncusers SET great_power_score = $1 WHERE username = $2;''',
                                    gp_points, userinfo['username'])
+            await conn.execute('''UPDATE cncusers SET great_power = False;''')
             great_powers = await conn.fetch('''SELECT user_id, great_power_score FROM cncusers 
             ORDER BY great_power_score DESC LIMIT 3;''')
             for gp in great_powers:
