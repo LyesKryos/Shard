@@ -870,12 +870,11 @@ class CNC(commands.Cog):
             return
         # fetches user info
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-        # ensures province ownership
-        if provinceid not in userinfo['provinces_owned']:
-            await ctx.send(f"{userinfo['username']} does not own province #{provinceid}.")
-            return
         # fetches province information
         provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
+        if provinceinfo['owner_id'] != author.id and provinceinfo['occupier_id'] != author.id:
+            await ctx.send(f"{userinfo['username']} does not own and occupy province #{provinceid}.")
+            return
         # clears province and return troops to owner, removes province from owner, places native troops
         terrain = provinceinfo['terrain']
         troops = 0
@@ -1003,12 +1002,12 @@ class CNC(commands.Cog):
             return
         # fetches user info
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
-        # ensures province ownership
-        if provinceid not in userinfo['provinces_owned']:
-            await ctx.send(f"{userinfo['username']} does not own province #{provinceid}.")
-            return
         # fetches province information
         provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
+        # ensures province ownership
+        if provinceinfo['owner_id'] != author.id and provinceinfo['occupier_id'] != author.id:
+            await ctx.send(f"{userinfo['username']} does not own and occupy province #{provinceid}.")
+            return
         # clears province and return troops to owner, removes province from owner
         ownedlist = userinfo['provinces_owned']
         ownedlist.remove(provinceid)
@@ -1023,7 +1022,8 @@ class CNC(commands.Cog):
         await conn.execute('''UPDATE cncusers SET provinces_owned = $1 WHERE lower(username) = $2;''',
                            recipientowned, recipient.lower())
         # sets province owner info
-        await conn.execute('''UPDATE provinces  SET owner = $1, owner_id = $2 WHERE id = $3;''',
+        await conn.execute('''UPDATE provinces  SET owner = $1, owner_id = $2, occupier = $1, occupier_id = $2
+         WHERE id = $3;''',
                            recipientinfo['username'], recipientinfo['user_id'], provinceid)
         await ctx.send(
             f"Province #{provinceid} transferred to the ownership of {recipientinfo['username']} "
@@ -2475,8 +2475,8 @@ class CNC(commands.Cog):
             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                (stationedinfo['troops'] - force), stationed)
             if targetinfo['owner_id'] == 0:
-                await conn.execute('''UPDATE provinces  SET owner_id = $1, owner = $2 WHERE id = $3;''', author.id,
-                                   userinfo['username'], target)
+                await conn.execute('''UPDATE provinces  SET owner_id = $1, owner = $2, occupier = $1, occupier_id = $2
+                 WHERE id = $3;''', author.id, userinfo['username'], target)
                 await conn.execute(
                     '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
                     ownedlist, (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
@@ -2830,7 +2830,8 @@ class CNC(commands.Cog):
                     victorownedlist.append(target)
                     # updates the relevant information
                     await conn.execute(
-                        '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3 WHERE id = $4;''',
+                        '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3, occupier = $3, occupier_id = $2
+                         WHERE id = $4;''',
                         battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
                     await conn.execute(
                         '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
