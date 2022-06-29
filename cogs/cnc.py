@@ -2422,6 +2422,9 @@ class CNC(commands.Cog):
                                             stationed)
         if force is None:
             force = stationedinfo['troops']
+        if force == 0:
+            await ctx.send("You cannot attack with 0 troops.")
+            return
         if targetinfo['owner_id'] != 0:
             defenderinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
                                                targetinfo['owner_id'])
@@ -2832,7 +2835,7 @@ class CNC(commands.Cog):
                     victorownedlist.append(target)
                     # updates the relevant information
                     await conn.execute(
-                        '''UPDATE provinces  SET troops = $1, owner_id = $2, owner = $3, occupier = $3, occupier_id = $2
+                        '''UPDATE provinces SET troops = $1, owner_id = $2, owner = $3, occupier_id = $2, occupier = $3
                          WHERE id = $4;''',
                         battle.RemainingAttackingArmy, author.id, userinfo['username'], target)
                     await conn.execute(

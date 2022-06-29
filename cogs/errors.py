@@ -54,9 +54,9 @@ class ShardErrorHandler(commands.Cog):
             return
         elif isinstance(error, commands.CheckFailure):
             await ctx.send("A check failed. Check the logs.")
-            self.bot.logger.warning(msg=traceback.format_exc())
-        else:
             self.bot.logger.warning(msg=error)
+        else:
+            self.bot.logger.warning(msg=f"{ctx.invoked_with}: {error}")
 
 async def setup(bot: Shard):
     errorhandler = ShardErrorHandler(bot)
