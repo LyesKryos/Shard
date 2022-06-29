@@ -2480,7 +2480,7 @@ class CNC(commands.Cog):
             await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                                (stationedinfo['troops'] - force), stationed)
             if targetinfo['owner_id'] == 0:
-                await conn.execute('''UPDATE provinces  SET owner_id = $1, owner = $2, occupier = $1, occupier_id = $2
+                await conn.execute('''UPDATE provinces  SET owner_id = $1, owner = $2, occupier = $2, occupier_id = $1
                  WHERE id = $3;''', author.id, userinfo['username'], target)
                 await conn.execute(
                     '''UPDATE cncusers SET provinces_owned = $1, moves = $2, resources = $3 WHERE user_id = $4;''',
