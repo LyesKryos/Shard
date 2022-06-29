@@ -314,9 +314,9 @@ class CNC(commands.Cog):
             cncuserembed = discord.Embed(title=userinfo["username"], color=color,
                                          description=f"Registered nation of {self.bot.get_user(userinfo['user_id']).name}.")
             cncuserembed.add_field(name=f"Territory (Total: {len(provinceslist)})", value=provinces, inline=False)
-            cncuserembed.add_field(name="Total Troops", value=total_troops)
-            cncuserembed.add_field(name="Undeployed Troops", value=userinfo['undeployed'])
-            cncuserembed.add_field(name="Resources", value=f"\u03FE{userinfo['resources']}")
+            cncuserembed.add_field(name="Total Troops", value=f"{total_troops:,}")
+            cncuserembed.add_field(name="Undeployed Troops", value=f"{userinfo['undeployed']:,}")
+            cncuserembed.add_field(name="Resources", value=f"\u03FE{userinfo['resources']:,}")
             cncuserembed.add_field(name="National Focus", value=focus)
             cncuserembed.add_field(name="Color", value=colorvalue)
             cncuserembed.add_field(name="Action Points", value=userinfo['moves'])
@@ -413,8 +413,8 @@ class CNC(commands.Cog):
             cncuserembed = discord.Embed(title=nation["username"], color=color,
                                          description=f"Registered nation of {self.bot.get_user(nation['user_id']).name}.")
             cncuserembed.add_field(name=f"Territory (Total: {len(provinceslist)})", value=provinces, inline=False)
-            cncuserembed.add_field(name="Total Troops", value=total_troops)
-            cncuserembed.add_field(name="Undeployed Troops", value=nation['undeployed'])
+            cncuserembed.add_field(name="Total Troops", value=f"{total_troops:,}")
+            cncuserembed.add_field(name="Undeployed Troops", value=f"{nation['undeployed']:,}")
             cncuserembed.add_field(name="Resources", value=f"\u03FE{nation['resources']}")
             cncuserembed.add_field(name="National Focus", value=focus)
             cncuserembed.add_field(name="Color", value=colorvalue)
@@ -524,9 +524,9 @@ class CNC(commands.Cog):
                                      description=f"Registered nation of "
                                                  f"{self.bot.get_user(userinfo['user_id']).name}.")
         cncuserembed.add_field(name=f"Territory (Total: {len(provinceslist)})", value=provinces, inline=False)
-        cncuserembed.add_field(name="Total Troops", value=total_troops)
-        cncuserembed.add_field(name="Undeployed Troops", value=userinfo['undeployed'])
-        cncuserembed.add_field(name="Resources", value=f"\u03FE{userinfo['resources']}")
+        cncuserembed.add_field(name="Total Troops", value=f"{total_troops:,}")
+        cncuserembed.add_field(name="Undeployed Troops", value=f"{userinfo['undeployed']:,}")
+        cncuserembed.add_field(name="Resources", value=f"\u03FE{userinfo['resources']:,}")
         cncuserembed.add_field(name="National Focus", value=focus)
         cncuserembed.add_field(name="Color", value=colorvalue)
         cncuserembed.add_field(name="Action Points", value=userinfo['moves'])
@@ -543,8 +543,8 @@ class CNC(commands.Cog):
                                      f"Active Routes ({route_number}): {routes}\n"
                                      f"Max Routes: {userinfo['trade_routes'][2]}")
         cncuserembed.add_field(name="Manpower/Manpower Limit",
-                               value=f"{userinfo['manpower']}/{userinfo['maxmanpower']}")
-        cncuserembed.add_field(name="Manpower Increase", value=str(added_manpower))
+                               value=f"{userinfo['manpower']:,}/{userinfo['maxmanpower']:,}")
+        cncuserembed.add_field(name="Manpower Increase", value=f"{added_manpower:,}")
         cncuserembed.add_field(name="Economic Status",
                                value=f"Taxation Rate: {userinfo['taxation']}%\n"
                                      f"Military Upkeep: {userinfo['military_upkeep']}%\n"
@@ -604,8 +604,8 @@ class CNC(commands.Cog):
             # fetches province information, adds it to the embed, and increases the count
             provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
             sv_emebed.add_field(name=f"**Province #{p}**",
-                                value=f"Troops: {provinceinfo['troops']}\nTrade Value: {provinceinfo['trade_value']}"
-                                      f"\nManpower: {provinceinfo['manpower']}\nUnrest: {provinceinfo['unrest']}")
+                                value=f"Troops: {provinceinfo['troops']:,}\nTrade Value: {provinceinfo['trade_value']}"
+                                      f"\nManpower: {provinceinfo['manpower']:,}\nUnrest: {provinceinfo['unrest']}")
             province_number += 1
             # if there are 15 provinces queued, send the embed, clear it, and start over
             # (unless this is the last set)
@@ -1682,9 +1682,9 @@ class CNC(commands.Cog):
             # sends the embed
             bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
                                       description="An overview of the resource status of a nation.")
-            bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']}")
-            bankembed.add_field(name="Total Projected Gain", value=f"\u03FE{math.ceil(base_gain)}")
-            bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(trade_gain)}")
+            bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']:,}")
+            bankembed.add_field(name="Total Projected Gain", value=f"\u03FE{math.ceil(base_gain):,}")
+            bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(trade_gain):,}")
             bankembed.add_field(name="Cities", value=cities)
             bankembed.add_field(name="Ports", value=ports)
             await ctx.send(embed=bankembed)
@@ -1737,9 +1737,9 @@ class CNC(commands.Cog):
             # sends the embed
             bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
                                       description="An overview of the resource status of a nation.")
-            bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']}")
-            bankembed.add_field(name="Current Gain", value=f"\u03FE{math.ceil(base_gain)}")
-            bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(trade_gain)}")
+            bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']:,}")
+            bankembed.add_field(name="Current Gain", value=f"\u03FE{math.ceil(base_gain):,}")
+            bankembed.add_field(name="Trade Gain", value=f"\u03FE{math.ceil(trade_gain):,}")
             bankembed.add_field(name="Cities", value=str(cities))
             bankembed.add_field(name="Ports", value=str(ports))
             await ctx.send(embed=bankembed)
@@ -1898,7 +1898,7 @@ class CNC(commands.Cog):
                            (userinfo['resources'] - amount), author.id)
         await conn.execute('''UPDATE cncusers SET resources = $1 WHERE username = $2;''',
                            (recipientinfo['resources'] + amount), recipientinfo['username'])
-        await ctx.send(f"{userinfo['username']} has sent \u03FE{amount} to {recipientinfo['username']}.")
+        await ctx.send(f"{userinfo['username']} has sent \u03FE{amount:,} to {recipientinfo['username']}.")
         return
 
     @commands.command(usage="[battalion amount] [recipient nation]",
@@ -1932,7 +1932,7 @@ class CNC(commands.Cog):
                            undeployed - amount, author.id)
         await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
                            recip_info['undeployed'] + amount, recip_info['user_id'])
-        await ctx.send(f"{userinfo['username']} has sent an expeditionary force of {amount} troops to "
+        await ctx.send(f"{userinfo['username']} has sent an expeditionary force of {amount:,} troops to "
                        f"{recip_info['username']}.")
 
     @commands.command(usage="[province id]", brief="Purchases a specified province")
@@ -2238,7 +2238,7 @@ class CNC(commands.Cog):
             await ctx.send(f"`{province}` is not a valid ID.")
         if amount is not None:
             if amount > provinceinfo['troops']:
-                await ctx.send(f"There are not {amount} troops in province #{province}.")
+                await ctx.send(f"There are not {amount:,} troops in province #{province}.")
                 return
         if provinceinfo['owner_id'] != author.id and provinceinfo['occupier_id'] != author.id:
             await ctx.send("You do not own or occupy that province.")
@@ -2252,7 +2252,7 @@ class CNC(commands.Cog):
         await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
                            (userinfo['undeployed'] + amount), author.id)
         await ctx.send(
-            f"{amount} troops removed from province #{province} and returned to the undeployed stockpile.")
+            f"{amount:,} troops removed from province #{province} and returned to the undeployed stockpile.")
         return
 
     @commands.command(brief="Removes all troops from all provinces")
@@ -2275,7 +2275,7 @@ class CNC(commands.Cog):
                            author.id)
         await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
                            (userinfo['undeployed'] + withdrawn), author.id)
-        await ctx.send(f"{withdrawn} troops removed from all owned or occupied provinces "
+        await ctx.send(f"{withdrawn:,} troops removed from all owned or occupied provinces "
                        f"and returned to the undeployed stockpile.")
         return
 
@@ -2310,7 +2310,7 @@ class CNC(commands.Cog):
             p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p['id'])
             troops = p_info['troops']
             await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', troops + amount, p)
-        await ctx.send(f"{amount} troops deployed to all {len(userinfo['provinces_owned'])} provinces.")
+        await ctx.send(f"{amount:,} troops deployed to all {len(userinfo['provinces_owned'])} provinces.")
         return
 
     @commands.command(usage="[stationed target id] [target province id] [amount]", aliases=['cncm'],
@@ -2371,7 +2371,7 @@ class CNC(commands.Cog):
         await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
                            (stationedinfo['troops'] - amount),
                            stationed)
-        await ctx.send(f"{amount} troops moved to Province #{target} successfully!")
+        await ctx.send(f"{amount:,} troops moved to Province #{target} successfully!")
 
     @commands.command(usage="[stationed province] [target province] [attack force]", aliases=['cnca'],
                       brief="Attacks from one province to another")
