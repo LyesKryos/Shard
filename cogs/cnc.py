@@ -829,10 +829,10 @@ class CNC(commands.Cog):
         provinceembed.add_field(name="Bordering Provinces", value=bordering)
         provinceembed.add_field(name="Core Owner", value=owner)
         provinceembed.add_field(name="Occupying Nation", value=occupier)
-        provinceembed.add_field(name="Troops Present", value=province['troops'])
+        provinceembed.add_field(name="Troops Present", value=f"{province['troops']:,}")
         provinceembed.add_field(name="Local Unrest", value=str(province['unrest']))
         provinceembed.add_field(name="Trade Value", value=province['trade_value'])
-        provinceembed.add_field(name="Manpower", value=province['manpower'])
+        provinceembed.add_field(name="Manpower", value=f"{province['manpower']:,}")
         provinceembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
         # sets the proper coastline
         if province['coast'] is True:
