@@ -1425,7 +1425,7 @@ class CNC(commands.Cog):
                            recipient,
                            recipient_id, terms, True)
         # updates relations and trade routes
-        await conn.execute('''UPDATE relations SET trade = False, relation = 'war' WHERE name = $1 AND nation = $2
+        await conn.execute('''UPDATE relations SET relation = 'war' WHERE name = $1 AND nation = $2
                                     OR name = $3 AND nation = $4;''',
                            sender, recipient, recipient, sender)
         trade_interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'trade' AND 
