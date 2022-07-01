@@ -2300,7 +2300,7 @@ class CNC(commands.Cog):
                            f"to all {len(userinfo['provinces_owned'])+len(occupied_provinces)} "
                            f"owned and occupied provinces.")
             return
-        await conn.execute('''UPDATE cncusers SET undeployed_troops = $1 WHERE user_id = $2;''',
+        await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
                            userinfo['undeployed'] - total_deployed, author.id)
         for p in userinfo['provinces_owned']:
             p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
