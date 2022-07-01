@@ -1430,7 +1430,7 @@ class CNC(commands.Cog):
                            sender, recipient, recipient, sender)
         trade_interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'trade' AND 
                                 active = True AND sender = $1 AND recipient = $2 OR sender = $1 AND recipient = $2;''',
-                                              sender, recipient, recipient, sender)
+                                              sender, recipient)
         for t in trade_interactions:
             trade_sender = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
                                                t['sender'])
