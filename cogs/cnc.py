@@ -2292,26 +2292,20 @@ class CNC(commands.Cog):
             await ctx.send(f"{author} not registered.")
             return
         occupied_provinces = await conn.fetch('''SELECT * FROM provinces WHERE occupier_id = $1;''', author.id)
-        total_deployed = amount * (len(userinfo['provinces_owned'])+len(occupied_provinces))
+        total_deployed = amount * len(occupied_provinces)
         if amount <= 0:
             raise commands.UserInputError
         if total_deployed < userinfo['undeployed']:
             await ctx.send(f"{userinfo['username']} does not have enough undeployed troops to deploy {amount} troops "
-                           f"to all {len(userinfo['provinces_owned'])+len(occupied_provinces)} "
+                           f"to all {len(occupied_provinces)} "
                            f"owned and occupied provinces.")
             return
         await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
                            userinfo['undeployed'] - total_deployed, author.id)
-        for p in userinfo['provinces_owned']:
-            if p == 0:
-                continue
-            p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-            troops = p_info['troops']
-            await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', troops + amount, p)
         for p in occupied_provinces:
             p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p['id'])
             troops = p_info['troops']
-            await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', troops + amount, p)
+            await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', troops + amount, p['id'])
         await ctx.send(f"{amount:,} troops deployed to all {len(userinfo['provinces_owned'])} provinces.")
         return
 
