@@ -2303,6 +2303,8 @@ class CNC(commands.Cog):
         await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
                            userinfo['undeployed'] - total_deployed, author.id)
         for p in userinfo['provinces_owned']:
+            if p == 0:
+                continue
             p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
             troops = p_info['troops']
             await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', troops + amount, p)
