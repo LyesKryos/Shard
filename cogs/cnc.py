@@ -1135,10 +1135,10 @@ class CNC(commands.Cog):
                         '''UPDATE interactions SET active = False WHERE type = 'war' AND sender = $1 AND 
                         recipient = $2;''', pending_int['sender'], pending_int['recipient'])
                     sender_occupied = await conn.fetch(
-                        '''SELECT * FROM provinces WHERE occuiper = $1 AND owner = $2;''',
+                        '''SELECT * FROM provinces WHERE occupier = $1 AND owner = $2;''',
                         pending_int['sender'], pending_int['recipient'])
                     recip_occupied = await conn.fetch(
-                        '''SELECT * FROM provinces WHERE occuiper = $2 AND owner = $1;''',
+                        '''SELECT * FROM provinces WHERE occupier = $2 AND owner = $1;''',
                         pending_int['sender'], pending_int['recipient'])
                     if sender_occupied is True:
                         owner_color = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
