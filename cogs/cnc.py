@@ -1426,10 +1426,10 @@ class CNC(commands.Cog):
                            recipient_id, terms, True)
         # updates relations and trade routes
         await conn.execute('''UPDATE relations SET relation = 'war' WHERE name = $1 AND nation = $2
-                                    OR name = $3 AND nation = $4;''',
-                           sender, recipient, recipient, sender)
+                                    OR name = $2 AND nation = $1;''',
+                           sender, recipient)
         trade_interactions = await conn.fetch('''SELECT * FROM interactions WHERE type = 'trade' AND 
-                                active = True AND sender = $1 AND recipient = $2 OR sender = $1 AND recipient = $2;''',
+                                active = True AND sender = $1 AND recipient = $2 OR sender = $2 AND recipient = $1;''',
                                               sender, recipient)
         for t in trade_interactions:
             trade_sender = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
