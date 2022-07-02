@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing declare">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing mass deploy">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -133,21 +133,7 @@
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
       <workItem from="1654788589345" duration="46873000" />
-      <workItem from="1656005939581" duration="24044000" />
-    </task>
-    <task id="LOCAL-00293" summary="fixing prefix">
-      <created>1654807871873</created>
-      <option name="number" value="00293" />
-      <option name="presentableId" value="LOCAL-00293" />
-      <option name="project" value="LOCAL" />
-      <updated>1654807871873</updated>
-    </task>
-    <task id="LOCAL-00294" summary="Adding traceback logging">
-      <created>1654818061514</created>
-      <option name="number" value="00294" />
-      <option name="presentableId" value="LOCAL-00294" />
-      <option name="project" value="LOCAL" />
-      <updated>1654818061514</updated>
+      <workItem from="1656005939581" duration="24348000" />
     </task>
     <task id="LOCAL-00295" summary="Fixing loading and reloading">
       <created>1654818183763</created>
@@ -478,7 +464,21 @@
       <option name="project" value="LOCAL" />
       <updated>1656714596053</updated>
     </task>
-    <option name="localTasksCounter" value="342" />
+    <task id="LOCAL-00342" summary="Fixing mass deploy">
+      <created>1656726297353</created>
+      <option name="number" value="00342" />
+      <option name="presentableId" value="LOCAL-00342" />
+      <option name="project" value="LOCAL" />
+      <updated>1656726297353</updated>
+    </task>
+    <task id="LOCAL-00343" summary="Fixing mass deploy">
+      <created>1656726435657</created>
+      <option name="number" value="00343" />
+      <option name="presentableId" value="LOCAL-00343" />
+      <option name="project" value="LOCAL" />
+      <updated>1656726435657</updated>
+    </task>
+    <option name="localTasksCounter" value="344" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -520,9 +520,9 @@
     <MESSAGE value="Fixing attack crash issue" />
     <MESSAGE value="Adding comma formatting" />
     <MESSAGE value="Fixing war declaration" />
-    <MESSAGE value="Fixing mass deploy" />
     <MESSAGE value="Fixing declare" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing declare" />
+    <MESSAGE value="Fixing mass deploy" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing mass deploy" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
