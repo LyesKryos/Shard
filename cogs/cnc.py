@@ -269,9 +269,9 @@ class CNC(commands.Cog):
                 provinceslist.sort()
                 provinces = ', '.join(str(i) for i in provinceslist)
                 total_troops = 0
-                for p in provinceslist:
-                    provinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-                    total_troops += provinfo['troops']
+                total_troops_raw = await conn.fetchrow('''SELECT sum(troops::int) FROM provinces 
+                WHERE occupier_id = $1;''', author.id)
+                total_troops += total_troops_raw['sum']
                 total_troops += userinfo['undeployed']
             else:
                 provinceslist = []
@@ -368,7 +368,7 @@ class CNC(commands.Cog):
                 provinceslist.sort()
                 provinces = ', '.join(str(p) for p in provinceslist)
                 p_total_troops = await conn.fetchrow(
-                    '''SELECT SUM(troops::int) FROM provinces WHERE owner_id = $1;''',
+                    '''SELECT SUM(troops::int) FROM provinces WHERE occupier_id = $1;''',
                     nation['user_id'])
                 total_troops += p_total_troops['sum']
             else:
@@ -454,9 +454,10 @@ class CNC(commands.Cog):
             provinceslist.sort()
             provinces = ', '.join(str(i) for i in provinceslist)
             total_troops = 0
-            for p in provinceslist:
-                provinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-                total_troops += provinfo['troops']
+            total_troops = 0
+            total_troops_raw = await conn.fetchrow('''SELECT sum(troops::int) FROM provinces 
+            WHERE occupier_id = $1;''', author.id)
+            total_troops += total_troops_raw['sum']
             total_troops += userinfo['undeployed']
         else:
             provinceslist = []
