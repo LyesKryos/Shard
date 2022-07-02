@@ -1140,6 +1140,8 @@ class CNC(commands.Cog):
                     recip_occupied = await conn.fetch(
                         '''SELECT * FROM provinces WHERE occupier = $2 AND owner = $1;''',
                         pending_int['sender'], pending_int['recipient'])
+                    await conn.execute('''UPDATE relations SET relation = 'peace' WHERE (nation = $1 AND name = $2) OR
+                    (nation = $2 AND name = $1);''', pending_int['sender'], pending_int['recipient'])
                     if sender_occupied is True:
                         owner_color = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
                                                           pending_int['recipient'])
