@@ -2434,11 +2434,20 @@ class CNC(commands.Cog):
                 raise Exception("Defenderinfo fetching broken")
         # ensures valid conflict
         if targetinfo['owner_id'] != 0:
-            war = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 and nation = $2;''',
-                                      userinfo['username'], defenderinfo['username'])
-            if war['relation'] != 'war':
-                await ctx.send("You cannot attack a province owned by someone you are not at war with.")
-                return
+            # if the province is occupied and the attacker is the owner, check for a valid conflict
+            if targetinfo['owner_id'] != targetinfo['occupier_id'] and targetinfo['owner_id'] == author.id:
+                war = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 and nation = $2;''',
+                                          userinfo['username'], targetinfo['occupier'])
+                if war['relation'] != 'war':
+                    await ctx.send("You cannot attack a province occupied by a nation you are not at war with or"
+                                   "owned by a nation you are not at war with.")
+                    return
+            else:
+                war = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 and nation = $2;''',
+                                          userinfo['username'], defenderinfo['username'])
+                if war['relation'] != 'war':
+                    await ctx.send("You cannot attack a province owned by a nation you are not at war with.")
+                    return
         # ensures bordering
         if (targetinfo['coast'] is False) and (stationedinfo['coast'] is False):
             if stationed not in targetinfo['bordering']:
