@@ -948,9 +948,9 @@ class CNC(commands.Cog):
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
         userprovinces = userinfo['provinces_owned']
         userundeployed = userinfo['undeployed']
-        provinceinfo = await conn.fetchrow('''SELECT troops FROM provinces WHERE id = $1;''', location)
+        provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', location)
         # ensures location ownership
-        if location not in userprovinces and provinceinfo['occupier_id'] != author.id:
+        if provinceinfo['occupier_id'] != author.id:
             await ctx.send(
                 f"{userinfo['username']} does not own Province #{location} and cannot deploy troops there.")
             return
@@ -2416,7 +2416,7 @@ class CNC(commands.Cog):
         if stationedownerid['occupier_id'] != author.id:
             await ctx.send(f"{userinfo['username']} does not occupy Province #{stationed}!")
             return
-        if targetownerid['owner_id'] == author.id and targetownerid['owner_id'] == author.id:
+        if targetownerid['occupier_id'] == author.id:
             await ctx.send(f"You cannot attack a province you already own or occupy!")
             return
         targetinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', target)
