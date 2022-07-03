@@ -3903,8 +3903,8 @@ class CNC(commands.Cog):
                                     troops_remaining = 0
                                 await conn.execute('''UPDATE cncusers SET provinces_owned = $1, undeployed = $2 WHERE 
                                 user_id = $3;''', provinces_owned, undeployed + troops_remaining, u)
-                                await conn.execute('''UPDATE provinces SET owner = '', owner_id = '0', unrest = 0, 
-                                troops = $1 WHERE id = $2;''', p_info['manpower'] * 2, pr)
+                                await conn.execute('''UPDATE provinces SET owner = '', owner_id = '0', occupier = '', 
+                                 occupier_id = 0, unrest = 0, troops = $1 WHERE id = $2;''', p_info['manpower'] * 2, pr)
                                 await self.bot.loop.run_in_executor(None, self.map_color, pr, p_info['cord'][0:2],
                                                                     "#808080", True)
                             provinces_rebelling.sort()
@@ -4214,8 +4214,8 @@ class CNC(commands.Cog):
                                     troops_remaining = 0
                                 await conn.execute('''UPDATE cncusers SET provinces_owned = $1, undeployed = $2 WHERE 
                                 user_id = $3;''', provinces_owned, undeployed + troops_remaining, u)
-                                await conn.execute('''UPDATE provinces SET owner = '', owner_id = '0', unrest = 0, 
-                                troops = $1 WHERE id = $2;''', p_info['manpower'] * 2, pr)
+                                await conn.execute('''UPDATE provinces SET owner = '', owner_id = '0', occupier = '', 
+                                 occupier_id = 0, unrest = 0, troops = $1 WHERE id = $2;''', p_info['manpower'] * 2, pr)
                                 await self.bot.loop.run_in_executor(None, self.map_color, pr, p_info['cord'][0:2],
                                                                     "#808080", True)
                             provinces_rebelling.sort()
