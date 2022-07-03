@@ -1148,16 +1148,16 @@ class CNC(commands.Cog):
                         owner_color = owner_color['usercolor']
                         for p in sender_occupied:
                             await self.bot.loop.run_in_executor(None, self.map_color, p['id'], p['cord'], owner_color)
-                            await conn.execute('''UPDATE provinces SET occupier = $1, occupier_id = $2;''',
-                                               p['owner'], p['owner_id'])
+                            await conn.execute('''UPDATE provinces SET occupier = $1, occupier_id = $2 WHERE id = $3;''',
+                                               p['owner'], p['owner_id'], p['id'])
                     if recip_occupied is True:
                         owner_color = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
                                                           pending_int['sender'])
                         owner_color = owner_color['usercolor']
                         for p in sender_occupied:
                             await self.bot.loop.run_in_executor(None, self.map_color, p['id'], p['cord'], owner_color)
-                            await conn.execute('''UPDATE provinces SET occupier = $1, occupier_id = $2;''',
-                                               p['owner'], p['owner_id'])
+                            await conn.execute('''UPDATE provinces SET occupier = $1, occupier_id = $2 WHERE id = $3;''',
+                                               p['owner'], p['owner_id'], p['id'])
                 # if trade, update user information
                 if pending_int['type'] == 'trade':
                     senderinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
@@ -2430,6 +2430,8 @@ class CNC(commands.Cog):
         if targetinfo['owner_id'] != 0:
             defenderinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
                                                targetinfo['owner_id'])
+            if defenderinfo is None:
+                raise Exception("Defenderinfo fetching broken")
         # ensures valid conflict
         if targetinfo['owner_id'] != 0:
             war = await conn.fetchrow('''SELECT relation FROM relations WHERE name = $1 and nation = $2;''',
