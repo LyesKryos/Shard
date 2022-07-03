@@ -2429,7 +2429,7 @@ class CNC(commands.Cog):
             return
         if targetinfo['owner_id'] != 0:
             defenderinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
-                                               targetinfo['owner_id'])
+                                               targetinfo['occupier_id'])
             if defenderinfo is None:
                 raise Exception("Defenderinfo fetching broken")
         # ensures valid conflict
@@ -2511,7 +2511,7 @@ class CNC(commands.Cog):
                 await conn.execute(
                     '''UPDATE cncusers SET moves = $1, resources = $2 WHERE user_id = $3;''',
                     (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
-                owner = targetinfo['owner']
+                owner = targetinfo['occupier']
                 await loop.run_in_executor(None, self.occupy_color, target, targetinfo['cord'][0:2],
                                            userinfo['usercolor'], defenderinfo['usercolor'])
                 await ctx.send(
