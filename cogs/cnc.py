@@ -113,7 +113,7 @@ class CNC(commands.Cog):
         width = prov.size[0]
         height = prov.size[1]
         cord = (province_cord[0], province_cord[1])
-        space = 10
+        space = 20
         not_colored = list()
         for x in range(0, width):
             for y in range(0, height):
@@ -123,7 +123,7 @@ class CNC(commands.Cog):
                 else:
                     prov.putpixel((x, y), owner)
         for x in range(0, 2 * width, space):
-            prov_draw.line([x, 0, x - width, height], width=3, fill=occupyer)
+            prov_draw.line([x, 0, x - width, height], width=5, fill=occupyer)
         for pix in not_colored:
             prov.putpixel(pix, (0, 0, 0, 0))
         map.paste(prov, box=cord, mask=prov)
