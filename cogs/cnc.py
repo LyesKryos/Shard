@@ -1127,7 +1127,7 @@ class CNC(commands.Cog):
                 FROM pending_interactions WHERE id = $1;''', interactionid)
                 await conn.execute('''  UPDATE interactions SET active = True WHERE id = $1;''', interactionid)
                 await conn.execute('''DELETE FROM pending_interactions WHERE id = $1;''', interactionid)
-                # if a peace treaty, cancel war
+                # if a peace treaty, cancel war, return occupied provinces, and color map
                 if pending_int['type'] == 'peace':
                     await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''',
                                        interactionid)
@@ -1142,7 +1142,7 @@ class CNC(commands.Cog):
                         pending_int['sender'], pending_int['recipient'])
                     await conn.execute('''UPDATE relations SET relation = 'peace' WHERE (nation = $1 AND name = $2) OR
                     (nation = $2 AND name = $1);''', pending_int['sender'], pending_int['recipient'])
-                    if sender_occupied is True:
+                    if sender_occupied:
                         owner_color = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
                                                           pending_int['recipient'])
                         owner_color = owner_color['usercolor']
@@ -1150,11 +1150,11 @@ class CNC(commands.Cog):
                             await self.bot.loop.run_in_executor(None, self.map_color, p['id'], p['cord'], owner_color)
                             await conn.execute('''UPDATE provinces SET occupier = $1, occupier_id = $2 WHERE id = $3;''',
                                                p['owner'], p['owner_id'], p['id'])
-                    if recip_occupied is True:
+                    if recip_occupied:
                         owner_color = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
                                                           pending_int['sender'])
                         owner_color = owner_color['usercolor']
-                        for p in sender_occupied:
+                        for p in recip_occupied:
                             await self.bot.loop.run_in_executor(None, self.map_color, p['id'], p['cord'], owner_color)
                             await conn.execute('''UPDATE provinces SET occupier = $1, occupier_id = $2 WHERE id = $3;''',
                                                p['owner'], p['owner_id'], p['id'])
