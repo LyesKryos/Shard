@@ -4217,11 +4217,15 @@ class CNC(commands.Cog):
                         unrest_roll = randint(0, 100)
                         # if the d100 is below or equal to the national unrest, trigger civil war
                         if unrest_roll <= national_unrest:
-                            provinces_owned = userinfo['provinces_owned']
+                            provinces_owned = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1 AND
+                            occupier_id = $1;''', user.id)
+                            provinces_owned = [p['id'] for p in provinces_owned]
                             half_owned = math.floor(len(provinces_owned) / 2)
                             provinces_rebelling = sample(provinces_owned, half_owned)
                             for pr in provinces_rebelling:
                                 p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', pr)
+                                if p_info is None:
+                                    continue
                                 provinces_owned.remove(pr)
                                 undeployed = userinfo['undeployed']
                                 troops_remaining = p_info['troops'] - (p_info['manpower'] * 2)
