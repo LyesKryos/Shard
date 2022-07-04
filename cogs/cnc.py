@@ -265,7 +265,8 @@ class CNC(commands.Cog):
             # grabs all provinces owned by the nation and makes them into a pretty list
             if len(userinfo["provinces_owned"]) != 1:
                 provinceslist = userinfo["provinces_owned"]
-                provinceslist.remove(0)
+                if 0 in provinceslist:
+                    provinceslist.remove(0)
                 provinceslist.sort()
                 provinces = ', '.join(str(i) for i in provinceslist)
                 total_troops = 0
@@ -364,7 +365,8 @@ class CNC(commands.Cog):
             # grabs all provinces  owned by the nation and makes them into a pretty list
             if len(nation["provinces_owned"]) != 1:
                 provinceslist = nation["provinces_owned"]
-                provinceslist.remove(0)
+                if 0 in provinceslist:
+                    provinceslist.remove(0)
                 provinceslist.sort()
                 provinces = ', '.join(str(p) for p in provinceslist)
                 p_total_troops = await conn.fetchrow(
@@ -450,7 +452,8 @@ class CNC(commands.Cog):
         # grabs all provinces owned by the nation and makes them into a pretty list
         if len(userinfo["provinces_owned"]) != 1:
             provinceslist = userinfo["provinces_owned"]
-            provinceslist.remove(0)
+            if 0 in provinceslist:
+                provinceslist.remove(0)
             provinceslist.sort()
             provinces = ', '.join(str(i) for i in provinceslist)
             total_troops = 0
@@ -590,7 +593,8 @@ class CNC(commands.Cog):
         # pulls the specified nation data
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
         provinces = list(userinfo['provinces_owned'])
-        provinces.remove(0)
+        if 0 in provinces:
+            provinces.remove(0)
         provinces.sort()
         # gets user's color in Discord format
         color = discord.Color(int(userinfo["usercolor"].lstrip('#'), 16))
@@ -1708,7 +1712,8 @@ class CNC(commands.Cog):
                                            nationname.lower())
             # creates a list of provinces  owned
             ownedprovinces = [p for p in userinfo['provinces_owned']]
-            ownedprovinces.remove(0)
+            if 0 in ownedprovinces:
+                ownedprovinces.remove(0)
             cities = userinfo['citylimit'][0]
             ports = userinfo['portlimit'][0]
             # creates the projected resource gain data
@@ -1838,7 +1843,8 @@ class CNC(commands.Cog):
         provinces = await conn.fetchrow('''SELECT provinces_owned FROM cncusers WHERE user_id = $1;''',
                                         author.id)
         provincelist = provinces['provinces_owned']
-        provincelist.remove(0)
+        if 0 in provincelist:
+            provincelist.remove(0)
         amount *= 1000
         manpower = (amount) * len(provincelist)
         cost = (amount) * len(provincelist)
