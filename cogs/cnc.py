@@ -3820,6 +3820,20 @@ class CNC(commands.Cog):
                     await loop.run_in_executor(None, self.occupy_color, p_id, p_cord, occupier_color, color)
         await ctx.send("All owned provinces checked and colored.")
 
+    @commands.command(brief="Checks all provinces and ensures proper ownership.")
+    @modcheck()
+    async def cnc_owned_check(self, ctx):
+        conn = self.bot.pool
+        users = await conn.fetch('''SELECT * FROM cncusers;''')
+        for u in users:
+            owned_provinces = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1;''', u['id'])
+            p_list = list()
+            for p in owned_provinces:
+                p_list.append(p['id'])
+            await conn.execute('''UPDATE cncusers SET provinces_owned = $1 WHERE username = $2;''',
+                               p_list, u['username'])
+        await ctx.send("Done!")
+
     # ---------------------Updating------------------------------
 
     @commands.command(brief="Displays the status of the CNC turn loop")
