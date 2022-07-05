@@ -2013,7 +2013,8 @@ class CNC(commands.Cog):
             # updates all relevant information
             await conn.execute('''UPDATE cncusers SET provinces_owned = $1 WHERE user_id = $2;''', ownedlist,
                                author.id)
-            await conn.execute('''UPDATE provinces  SET owner = $1, owner_id = $2 WHERE id = $3;''',
+            await conn.execute('''UPDATE provinces  SET owner = $1, owner_id = $2, occupier = $1, occupier_id = $2
+            WHERE id = $3;''',
                                userinfo['username'], author.id, provinceid)
             await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
                                (userinfo['resources'] - cost), author.id)
