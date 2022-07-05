@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing blank terms">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding cnc_owned_check">
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -133,14 +133,7 @@
       <workItem from="1652651101974" duration="24370000" />
       <workItem from="1653752887539" duration="48461000" />
       <workItem from="1654788589345" duration="46873000" />
-      <workItem from="1656005939581" duration="42920000" />
-    </task>
-    <task id="LOCAL-00315" summary="Adds mass_deploy, withdraw_all, and all attacking with optional force">
-      <created>1654963343292</created>
-      <option name="number" value="00315" />
-      <option name="presentableId" value="LOCAL-00315" />
-      <option name="project" value="LOCAL" />
-      <updated>1654963343292</updated>
+      <workItem from="1656005939581" duration="43227000" />
     </task>
     <task id="LOCAL-00316" summary="Temporarily revering logging method">
       <created>1654963814179</created>
@@ -478,7 +471,14 @@
       <option name="project" value="LOCAL" />
       <updated>1657038529513</updated>
     </task>
-    <option name="localTasksCounter" value="364" />
+    <task id="LOCAL-00364" summary="Adding cnc_owned_check">
+      <created>1657039052081</created>
+      <option name="number" value="00364" />
+      <option name="presentableId" value="LOCAL-00364" />
+      <option name="project" value="LOCAL" />
+      <updated>1657039052082</updated>
+    </task>
+    <option name="localTasksCounter" value="365" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -497,7 +497,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing unoccupied province display issue" />
     <MESSAGE value="Fixing attack issue" />
     <MESSAGE value="Fixing attack crash issue" />
     <MESSAGE value="Adding comma formatting" />
@@ -522,7 +521,8 @@
     <MESSAGE value="Fixing removing province 0" />
     <MESSAGE value="Fixing purchase" />
     <MESSAGE value="Fixing blank terms" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing blank terms" />
+    <MESSAGE value="Adding cnc_owned_check" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding cnc_owned_check" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

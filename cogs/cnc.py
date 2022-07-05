@@ -3826,12 +3826,12 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         users = await conn.fetch('''SELECT * FROM cncusers;''')
         for u in users:
-            owned_provinces = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1;''', u['id'])
+            owned_provinces = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1;''', u['user_id'])
             p_list = list()
             for p in owned_provinces:
                 p_list.append(p['id'])
-            await conn.execute('''UPDATE cncusers SET provinces_owned = $1 WHERE username = $2;''',
-                               p_list, u['username'])
+            await conn.execute('''UPDATE cncusers SET provinces_owned = $1 WHERE user_id = $2;''',
+                               p_list, u['user_id'])
         await ctx.send("Done!")
 
     # ---------------------Updating------------------------------
