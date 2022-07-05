@@ -221,9 +221,9 @@ class CNC(commands.Cog):
             return
         # inserts the users id into the databases
         await conn.execute(
-            '''INSERT INTO cncusers (user_id, username, usercolor, provinces_owned, resources, 
-            focus, undeployed, moves) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);''',
-            userid, nationame, color, [0], randint(9000, 10000), focus.lower(), 0, 5)
+            '''INSERT INTO cncusers (user_id, username, usercolor, resources, 
+            focus, undeployed, moves) VALUES ($1, $2, $3, $4, $5, $6, $7);''',
+            userid, nationame, color, randint(9000, 10000), focus.lower(), 0, 5)
         allnations = await conn.fetch('''SELECT username FROM cncusers;''')
         allnations = [n['username'] for n in allnations]
         for n in allnations:
@@ -1288,10 +1288,12 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         data = args.split(',,')
         if len(data) != 2:
-            raise WrongInput
+            raise commands.UserInputError
         rrecipient = data[0]
         text = data[1]
         text = text.lstrip(' ')
+        if text == "":
+            raise commands.UserInputError
         # fetches all user ids
         allusers = await conn.fetch('''SELECT user_id, username FROM cncusers;''')
         alluserids = list()
@@ -1476,6 +1478,8 @@ class CNC(commands.Cog):
         rrecipient = data[0]
         text = data[1]
         text = text.lstrip(' ')
+        if text == "":
+            raise commands.UserInputError
         # fetches all user ids
         allusers = await conn.fetch('''SELECT user_id, username FROM cncusers;''')
         alluserids = list()
@@ -2013,8 +2017,8 @@ class CNC(commands.Cog):
             # updates all relevant information
             await conn.execute('''UPDATE cncusers SET provinces_owned = $1 WHERE user_id = $2;''', ownedlist,
                                author.id)
-            await conn.execute('''UPDATE provinces  SET owner = $1, owner_id = $2, occupier = $1, occupier_id = $2
-            WHERE id = $3;''',
+            await conn.execute('''UPDATE provinces  SET owner = $1, owner_id = $2, occupier = $1, occupier_id = $2, 
+            troops = 0 WHERE id = $3;''',
                                userinfo['username'], author.id, provinceid)
             await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''',
                                (userinfo['resources'] - cost), author.id)
