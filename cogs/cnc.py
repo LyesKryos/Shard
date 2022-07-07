@@ -2284,7 +2284,7 @@ class CNC(commands.Cog):
             await ctx.send(f"{author} not registered.")
             return
         withdrawn_raw = await conn.fetchrow('''SELECT sum(troops::int) FROM provinces 
-        WHERE occupier_id = $1 AND owner_id = $1;''', author.id)
+        WHERE occupier_id = $1;''', author.id)
         withdrawn = withdrawn_raw['sum']
         if withdrawn == 0:
             await ctx.send(f"{userinfo['username']} does not have any deployed troops.")
@@ -2324,7 +2324,7 @@ class CNC(commands.Cog):
             p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p['id'])
             troops = p_info['troops']
             await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', troops + amount, p['id'])
-        await ctx.send(f"{amount:,} troops deployed to all {len(userinfo['provinces_owned'])} provinces.")
+        await ctx.send(f"{amount:,} troops deployed to all {len(occupied_provinces)} provinces.")
         return
 
     @commands.command(usage="[stationed target id] [target province id] [amount]", aliases=['cncm'],
