@@ -457,7 +457,6 @@ class CNC(commands.Cog):
             provinceslist.sort()
             provinces = ', '.join(str(i) for i in provinceslist)
             total_troops = 0
-            total_troops = 0
             total_troops_raw = await conn.fetchrow('''SELECT sum(troops::int) FROM provinces 
             WHERE occupier_id = $1;''', author.id)
             total_troops += total_troops_raw['sum']
@@ -513,7 +512,7 @@ class CNC(commands.Cog):
         for t in routes_dict:
             routes += f"{t} ({routes_dict[t]}), "
         routes = routes[:-2]
-        max_manpower = 3000
+        max_manpower = 0
         manpower_mod = userinfo['public_services'] / 100
         max_manpower_raw = await conn.fetchrow('''SELECT sum(manpower::int) FROM provinces WHERE owner_id = $1;''',
                                                author.id)
@@ -2285,9 +2284,11 @@ class CNC(commands.Cog):
             await ctx.send(f"{author} not registered.")
             return
         withdrawn_raw = await conn.fetchrow('''SELECT sum(troops::int) FROM provinces 
-        WHERE occupier_id = $1 AND owner_id = $1;''',
-                                            author.id)
+        WHERE occupier_id = $1 AND owner_id = $1;''', author.id)
         withdrawn = withdrawn_raw['sum']
+        if withdrawn == 0:
+            await ctx.send(f"{userinfo['username']} does not have any deployed troops.")
+            return
         await conn.execute('''UPDATE provinces SET troops = 0 WHERE occupier_id = $1;''',
                            author.id)
         await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
@@ -4113,7 +4114,7 @@ class CNC(commands.Cog):
                 if userinfo['capital'] != 0:
                     if userinfo['capital'] in provinces:
                         added_manpower += 2500
-                manpower = added_manpower + userinfo['manpower']
+                manpower = added_manpower + userinfo['manpower'] + 3000
                 if manpower > max_manpower:
                     manpower = max_manpower
                 # calculates action points
