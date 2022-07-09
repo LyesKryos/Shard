@@ -272,8 +272,7 @@ class CNC(commands.Cog):
                 total_troops = 0
                 total_troops_raw = await conn.fetchrow('''SELECT sum(troops::int) FROM provinces 
                 WHERE occupier_id = $1;''', author.id)
-                await ctx.send(total_troops_raw)
-                if total_troops_raw is not None:
+                if total_troops_raw['sum'] is not None:
                     total_troops += total_troops_raw['sum']
                 total_troops += userinfo['undeployed']
             else:
@@ -374,7 +373,7 @@ class CNC(commands.Cog):
                 p_total_troops = await conn.fetchrow(
                     '''SELECT SUM(troops::int) FROM provinces WHERE occupier_id = $1;''',
                     nation['user_id'])
-                if p_total_troops is not None:
+                if p_total_troops['sum'] is not None:
                     total_troops += p_total_troops['sum']
             else:
                 provinceslist = []
