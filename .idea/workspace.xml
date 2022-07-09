@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing detailed view,  withdraw all, mass_deploy">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing view with no deployed troops" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -134,14 +132,7 @@
       <workItem from="1653752887539" duration="48461000" />
       <workItem from="1654788589345" duration="46873000" />
       <workItem from="1656005939581" duration="43893000" />
-      <workItem from="1657195423978" duration="3548000" />
-    </task>
-    <task id="LOCAL-00319" summary="Fixing mass_deploy">
-      <created>1654964464661</created>
-      <option name="number" value="00319" />
-      <option name="presentableId" value="LOCAL-00319" />
-      <option name="project" value="LOCAL" />
-      <updated>1654964464662</updated>
+      <workItem from="1657195423978" duration="3858000" />
     </task>
     <task id="LOCAL-00320" summary="Fixing mass_deploy">
       <created>1654964590274</created>
@@ -479,7 +470,14 @@
       <option name="project" value="LOCAL" />
       <updated>1657210371592</updated>
     </task>
-    <option name="localTasksCounter" value="368" />
+    <task id="LOCAL-00368" summary="Fixing view with no deployed troops">
+      <created>1657378906862</created>
+      <option name="number" value="00368" />
+      <option name="presentableId" value="LOCAL-00368" />
+      <option name="project" value="LOCAL" />
+      <updated>1657378906862</updated>
+    </task>
+    <option name="localTasksCounter" value="369" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -498,7 +496,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing war declaration" />
     <MESSAGE value="Fixing declare" />
     <MESSAGE value="Fixing mass deploy" />
     <MESSAGE value="Altering cnc_declare" />
@@ -523,7 +520,8 @@
     <MESSAGE value="Fixing cnc_owned_check" />
     <MESSAGE value="Fixing detailed view and withdraw all" />
     <MESSAGE value="Fixing detailed view,  withdraw all, mass_deploy" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing detailed view,  withdraw all, mass_deploy" />
+    <MESSAGE value="Fixing view with no deployed troops" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing view with no deployed troops" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
