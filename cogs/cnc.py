@@ -2526,7 +2526,11 @@ class CNC(commands.Cog):
                     '''UPDATE cncusers SET moves = $1, resources = $2 WHERE user_id = $3;''',
                     (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
                 owner = targetinfo['occupier']
-                await loop.run_in_executor(None, self.occupy_color, target, targetinfo['cord'][0:2],
+                if targetinfo['owner_id'] == author.id:
+                    await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
+                                               userinfo['usercolor'])
+                else:
+                    await loop.run_in_executor(None, self.occupy_color, target, targetinfo['cord'][0:2],
                                            userinfo['usercolor'], defenderinfo['usercolor'])
                 await ctx.send(
                     f"Province #{target} is undefended! It has been overrun by {userinfo['username']} with {force}"
@@ -2909,8 +2913,12 @@ class CNC(commands.Cog):
                         await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
                                            userinfo['national_unrest'] + 50, userinfo['username'])
                     await ctx.send(embed=battleembed)
-                    await loop.run_in_executor(None, self.occupy_color, target, targetinfo['cord'][0:2],
-                                               userinfo['usercolor'], defenderinfo['usercolor'])
+                    if targetinfo['owner_id'] == author.id:
+                        await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
+                                                   userinfo['usercolor'])
+                    else:
+                        await loop.run_in_executor(None, self.occupy_color, target, targetinfo['cord'][0:2],
+                                                   userinfo['usercolor'], defenderinfo['usercolor'])
                     return
                 if (len(retreatoptions) == 0) and (targetinfo['coast'] is True):
                     # if the target is a coastline and there are no retreat options by land, the army will be
@@ -2944,8 +2952,12 @@ class CNC(commands.Cog):
                         await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
                                            userinfo['national_unrest'] + 50, userinfo['username'])
                     await ctx.send(embed=battleembed)
-                    await loop.run_in_executor(None, self.occupy_color, target, targetinfo['cord'][0:2],
-                                               userinfo['usercolor'], defenderinfo['usercolor'])
+                    if targetinfo['owner_id'] == author.id:
+                        await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
+                                                   userinfo['usercolor'])
+                    else:
+                        await loop.run_in_executor(None, self.occupy_color, target, targetinfo['cord'][0:2],
+                                                   userinfo['usercolor'], defenderinfo['usercolor'])
                     return
                 else:
                     # if there are retreat options, one will be randomly selected and all remaining troops will
@@ -2981,8 +2993,12 @@ class CNC(commands.Cog):
                         await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE username = $2;''',
                                            userinfo['national_unrest'] + 50, userinfo['username'])
                     await ctx.send(embed=battleembed)
-                    await loop.run_in_executor(None, self.occupy_color, target, targetinfo['cord'][0:2],
-                                               userinfo['usercolor'], defenderinfo['usercolor'])
+                    if targetinfo['owner_id'] == author.id:
+                        await loop.run_in_executor(None, self.map_color, target, targetinfo['cord'][0:2],
+                                                   userinfo['usercolor'])
+                    else:
+                        await loop.run_in_executor(None, self.occupy_color, target, targetinfo['cord'][0:2],
+                                                   userinfo['usercolor'], defenderinfo['usercolor'])
                     return
             # if the attacker is not victorious, no provinces change hands
             else:
