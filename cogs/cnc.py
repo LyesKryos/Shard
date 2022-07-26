@@ -1153,7 +1153,7 @@ class CNC(commands.Cog):
                 interactions_text += f"Type: {i['type']}\n"
                 interactions_text += f"Terms: {i['terms']}\n"
                 interactions_text += f"Active: {i['active']}\n"
-            with open(f"{self.interaction_directory}{author.id}.txt", "wb") as interactions_file:
+            with open(f"{self.interaction_directory}{author.id}.txt", "w") as interactions_file:
                 interactions_file.write(interactions_text)
                 interactions_file.close()
                 await author.send(file=discord.File(interactions_file, f"Interactions Log for {author.id}.txt"))
@@ -1182,7 +1182,7 @@ class CNC(commands.Cog):
         embed.add_field(name="Active", value=f"{interaction['active']}")
         await ctx.send(embed=embed)
         if upload is True:
-            with open(f"{self.interaction_directory}{interaction['id']}.txt", "wb") as interaction_file:
+            with open(f"{self.interaction_directory}{interaction['id']}.txt", "w") as interaction_file:
                 interaction_file.write(interaction['terms'])
                 interaction_file.close()
                 await ctx.send(file=discord.File(interaction_file, f"{interaction['id']}.txt"))
@@ -1216,7 +1216,7 @@ class CNC(commands.Cog):
         embed.add_field(name="Terms", value=f"{terms}", inline=False)
         await ctx.send(embed=embed)
         if upload is True:
-            with open(f"{self.interaction_directory}{offer['id']}.txt", "wb") as offer_file:
+            with open(f"{self.interaction_directory}{offer['id']}.txt", "w") as offer_file:
                 offer_file.write(offer['terms'])
                 offer_file.close()
                 await ctx.send(file=discord.File(offer_file, f"{offer['id']}.txt"))
