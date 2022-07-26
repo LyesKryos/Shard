@@ -325,17 +325,23 @@ class CNC(commands.Cog):
             wars = list()
             for r in relations:
                 if r['type'] == 'war':
-                    wars.append(r)
+                    if r['sender'] == userinfo['username']:
+                        wars.append(r['recipient'])
+                    else:
+                        wars.append(r['sender'])
                 if r['type'] == 'alliance':
-                    alliances.append(r)
+                    if r['sender'] == userinfo['username']:
+                        alliances.append(r['recipient'])
+                    else:
+                        alliances.append(r['sender'])
             if len(wars) != 0:
                 wars.sort()
-                wars = ', '.join(str(w['nation']) for w in wars)
+                wars = ', '.join(str(w) for w in wars)
             else:
                 wars = "None"
             if len(alliances) != 0:
                 alliances.sort()
-                alliances = ', '.join(str(a['nation']) for a in alliances)
+                alliances = ', '.join(str(a) for a in alliances)
             else:
                 alliances = "None"
             if userinfo['capital'] == 0:
@@ -425,17 +431,23 @@ class CNC(commands.Cog):
             wars = list()
             for r in relations:
                 if r['type'] == 'war':
-                    wars.append(r)
+                    if r['sender'] == nation['username']:
+                        wars.append(r['recipient'])
+                    else:
+                        wars.append(r['sender'])
                 if r['type'] == 'alliance':
-                    alliances.append(r)
+                    if r['sender'] == nation['username']:
+                        alliances.append(r['recipient'])
+                    else:
+                        alliances.append(r['sender'])
             if len(wars) != 0:
                 wars.sort()
-                wars = ', '.join(str(w['nation']) for w in wars)
+                wars = ', '.join(str(w) for w in wars)
             else:
                 wars = "None"
             if len(alliances) != 0:
                 alliances.sort()
-                alliances = ', '.join(str(a['nation']) for a in alliances)
+                alliances = ', '.join(str(a) for a in alliances)
             else:
                 alliances = "None"
             if nation['capital'] == 0:
