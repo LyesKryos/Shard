@@ -1152,7 +1152,7 @@ class CNC(commands.Cog):
                 interactions_text += f"Recipient: {i['recipient']}\n"
                 interactions_text += f"Type: {i['type']}\n"
                 interactions_text += f"Terms: {i['terms']}\n"
-                interactions_text += f"Active: {i['active']}\n"
+                interactions_text += f"Active: {i['active']}\n\n"
             with open(f"{self.interaction_directory}{author.id}.txt", "w") as interactions_file:
                 interactions_file.write(interactions_text)
             with open(f"{self.interaction_directory}{author.id}.txt", "rb") as interactions_file:
@@ -1218,7 +1218,7 @@ class CNC(commands.Cog):
         if upload is True:
             with open(f"{self.interaction_directory}{offer['id']}.txt", "w") as offer_file:
                 offer_file.write(offer['terms'])
-                offer_file.close()
+            with open(f"{self.interaction_directory}{offer['id']}.txt", "w") as offer_file:
                 await ctx.send(file=discord.File(offer_file, f"{offer['id']}.txt"))
 
     @commands.command(usage="[interaction id] [interaction (accept, reject, cancel)]", aliases=['cnci'],
