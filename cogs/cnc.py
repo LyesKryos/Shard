@@ -1155,7 +1155,7 @@ class CNC(commands.Cog):
                 interactions_text += f"Active: {i['active']}\n"
             with open(f"{self.interaction_directory}{author.id}.txt", "w") as interactions_file:
                 interactions_file.write(interactions_text)
-                interactions_file.flush()
+            with open(f"{self.interaction_directory}{author.id}.txt", "rb") as interactions_file:
                 await author.send(file=discord.File(interactions_file, f"Interactions Log for {author.id}.txt"))
                 if ctx.guild is not None:
                     await ctx.send("Sent!")
