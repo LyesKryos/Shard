@@ -659,9 +659,21 @@ class CNC(commands.Cog):
         for p in provinces:
             # fetches province information, adds it to the embed, and increases the count
             provinceinfo = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+            structures = list()
+            if provinceinfo['city']:
+                structures.append('City')
+            if provinceinfo['port']:
+                structures.append('Port')
+            if provinceinfo['fort']:
+                structures.append('Fort')
+            if len(structures) == 0:
+                structures = "None"
+            else:
+                structures = ', '.join(s for s in structures)
             sv_emebed.add_field(name=f"**Province #{p}**",
                                 value=f"Troops: {provinceinfo['troops']:,}\nTrade Value: {provinceinfo['trade_value']}"
-                                      f"\nManpower: {provinceinfo['manpower']:,}\nUnrest: {provinceinfo['unrest']}")
+                                      f"\nManpower: {provinceinfo['manpower']:,}\nUnrest: {provinceinfo['unrest']}\n"
+                                      f"Structures: {structures}")
             province_number += 1
             # if there are 15 provinces queued, send the embed, clear it, and start over
             # (unless this is the last set)
@@ -2277,6 +2289,73 @@ class CNC(commands.Cog):
                                provinceid, userinfo['resources'] - 25000, turn['data_valye'], author.id)
             await ctx.send(f"Capital successfully moved to province #{provinceid}.")
             return
+
+    @commands.command(usage="[province id] [structure (fort, port, city)]",
+                      brief="Deconstructs a building in a specified province")
+    @commands.guild_only()
+    async def cnc_deconstruct(self, ctx, provinceid: int, structure: str):
+        # defines the author and connects to the pool
+        author = ctx.author
+        conn = self.bot.pool
+        # fetches province and user information
+        p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', provinceid)
+        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+        # if that province does not exist
+        if p_info is None:
+            await ctx.send("No such province.")
+            return
+        # if the author does not own and occupy that province
+        if p_info['owner_id'] and p_info['occupier_id'] != author.id:
+            await ctx.send("You do not own and occupy that province.")
+            return
+        # if a fort is to be deconstructed
+        if structure.lower == "fort":
+            # if no fort exists, return
+            if not p_info['fort']:
+                await ctx.send("There is no fort in that province.")
+                return
+            else:
+                # set fort to false and update fortlimit
+                await conn.execute('''UPDATE provinces SET fort = False WHERE id = $1;''', provinceid)
+                userforts = userinfo['fortlimit']
+                userforts[0] -= 1
+                await conn.execute('''UPDATE cncusers SET fortlimit = $1 WHERE user_id = $2;''',
+                                   userforts, author.id)
+                await ctx.send(f"The fort in Province #{provinceid} successfully removed.")
+                return
+        # if a port is to be deconstructed
+        if structure.lower == "port":
+            # if no port exists, return
+            if not p_info['port']:
+                await ctx.send("There is no port in that province.")
+                return
+            else:
+                # set port to false and update portlimit
+                await conn.execute('''UPDATE provinces SET port = False WHERE id = $1;''', provinceid)
+                userports = userinfo['portlimit']
+                userports[0] -= 1
+                await conn.execute('''UPDATE cncusers SET portlimit = $1 WHERE user_id = $2;''',
+                                   userports, author.id)
+                await ctx.send(f"The port in Province #{provinceid} successfully removed.")
+                return
+        # if a city is to be deconstructed
+        if structure.lower == "city":
+            # if no port exists, return
+            if not p_info['city']:
+                await ctx.send("There is no city in that province.")
+                return
+            if userinfo['capital'] == provinceid:
+                await ctx.send("You cannot remove your capital city.")
+                return
+            else:
+                # set port to false and update portlimit
+                await conn.execute('''UPDATE provinces SET city = False WHERE id = $1;''', provinceid)
+                usercities = userinfo['citylimit']
+                usercities[0] -= 1
+                await conn.execute('''UPDATE cncusers SET citylimit = $1 WHERE user_id = $2;''',
+                                   usercities, author.id)
+                await ctx.send(f"The city in Province #{provinceid} successfully removed.")
+                return
 
     @commands.command(usage="[rate changing (tax, military, services; t,m,s)] [whole number rate]",
                       brief="Changes the rate of the given spending rate.")
@@ -3983,18 +4062,29 @@ class CNC(commands.Cog):
                 taxes *= 1 - (military_upkeep + public_services)
                 credits_added += taxes
                 # establish variables
-                trade_routes = userinfo['trade_routes']
                 initial_trade_value = 0
                 total_troops = 0
                 civil_war = False
                 # fort/city/port/trade route limit update
                 if len(userinfo['provinces_owned']) <= 5:
-                    await conn.execute(
-                        '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;'''
-                        , [userinfo['citylimit'][0], 1], [userinfo['portlimit'][0], 1],
-                        [userinfo['fortlimit'][0], 1],
+                    structure_cost = 0
+                    cities = await conn.fetchrow('''SELECT count(*) FROM provinces WHERE owner_id = $1 AND city = True;''',
+                                                 userinfo['user_id'])
+                    ports = await conn.fetchrow('''SELECT count(*) FROM provinces WHERE owner_id = $1 AND port = True;''',
+                                                 userinfo['user_id'])
+                    forts = await conn.fetchrow(''''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
                         userinfo['user_id'])
+                    if cities > 1:
+                        structure_cost += 1000 * (cities-1)
+                    if ports > 1:
+                        structure_cost += 500 * (ports - 1)
+                    if forts > 1:
+                        structure_cost += 700 * (forts - 1)
+                    await conn.execute(
+                        '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;''',
+                        [cities['count'], 1], [ports['count'], 1], [forts['count'], 1], userinfo['user_id'])
                 elif len(userinfo['provinces_owned']) > 5:
+                    structure_cost = 0
                     fortlimit = math.floor((len(userinfo['provinces_owned']) - 5) / 5) + 1
                     portlimit = math.floor((len(userinfo['provinces_owned']) - 5) / 3) + 1
                     citylimit = math.floor((len(userinfo['provinces_owned']) - 5) / 7) + 1
@@ -4002,10 +4092,21 @@ class CNC(commands.Cog):
                         fortlimit += 1
                     if userinfo['focus'] == 'e':
                         portlimit += 1
+                    cities = await conn.fetchrow('''SELECT count(*) FROM provinces WHERE owner_id = $1 AND city = True;''',
+                                                 userinfo['user_id'])
+                    ports = await conn.fetchrow('''SELECT count(*) FROM provinces WHERE owner_id = $1 AND port = True;''',
+                                                 userinfo['user_id'])
+                    forts = await conn.fetchrow(''''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
+                        userinfo['user_id'])
+                    if cities > citylimit:
+                        structure_cost += 1000 * (cities-citylimit)
+                    if ports > portlimit:
+                        structure_cost += 500 * (ports - portlimit)
+                    if forts > fortlimit:
+                        structure_cost += 700 * (forts - fortlimit)
                     await conn.execute(
-                        '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;'''
-                        , [userinfo['citylimit'][0], citylimit], [userinfo['portlimit'][0], portlimit],
-                        [userinfo['fortlimit'][0], fortlimit],
+                        '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;''',
+                        [cities['count'], citylimit], [ports['count'], portlimit], [forts['count'], fortlimit],
                         userinfo['user_id'])
                 trade_route_limit = 0
                 # if the user is a great power, +1 trade route
@@ -4263,6 +4364,7 @@ class CNC(commands.Cog):
                 trade_gain += initial_trade_value * ((incoming_count * 5) / 100)
                 credits_added += trade_gain * debuff
                 credits_added -= total_troops * 0.01
+                credits_added -= structure_cost
                 # calculate manpower increase and max manpower
                 max_manpower_raw = await conn.fetchrow('''SELECT sum(manpower::int) FROM provinces WHERE
                 owner_id = $1 AND uprising = False;''', u)
@@ -4300,7 +4402,8 @@ class CNC(commands.Cog):
                 gp_points += userinfo['fortlimit'][0] + userinfo['citylimit'][0]
                 gp_points += len(provinces) * 0.5
                 alliances = await conn.fetchrow(
-                    '''SELECT COUNT(name) FROM relations WHERE name = $1 AND relation = 'alliance';''',
+                    '''SELECT COUNT(*) FROM interactions WHERE (sender = $1 or recipient = $1) and relation = 'alliance'
+                    and active = True;''',
                     userinfo['username'])
                 gp_points += alliances['count'] * 0.5
                 await conn.execute('''UPDATE cncusers SET great_power_score = $1 WHERE username = $2;''',
