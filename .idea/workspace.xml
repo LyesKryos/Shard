@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing view with no deployed troops">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing issue where returning occupied provinces colored incorrectly&#10;Fixing trade routes to update properly and display the correct amount&#10;Altering occupation color method for ease of identification and uniformity&#10;Streamlining interactions and display&#10;Fixing issue with too many ports&#10;Altering trade routes to decrease trade gain by 10% for every trade route over the limit&#10;Unrest capped at 100 and floored at 0&#10;Added unrest level to rebellion and uprising messages&#10;Added name changing ability&#10;Fixing version counter in base.py&#10;Overall, 116 changes">
+      <change beforePath="$PROJECT_DIR$/cogs/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/base.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,28 +134,8 @@
       <workItem from="1653752887539" duration="48461000" />
       <workItem from="1654788589345" duration="46873000" />
       <workItem from="1656005939581" duration="43893000" />
-      <workItem from="1657195423978" duration="4882000" />
-    </task>
-    <task id="LOCAL-00322" summary="Fixing port and fort limits">
-      <created>1655041982362</created>
-      <option name="number" value="00322" />
-      <option name="presentableId" value="LOCAL-00322" />
-      <option name="project" value="LOCAL" />
-      <updated>1655041982362</updated>
-    </task>
-    <task id="LOCAL-00323" summary="Fixing port and fort limits">
-      <created>1655050318991</created>
-      <option name="number" value="00323" />
-      <option name="presentableId" value="LOCAL-00323" />
-      <option name="project" value="LOCAL" />
-      <updated>1655050318991</updated>
-    </task>
-    <task id="LOCAL-00324" summary="Fixing trade route closing and establishment. Fixing action point problem">
-      <created>1655227396152</created>
-      <option name="number" value="00324" />
-      <option name="presentableId" value="LOCAL-00324" />
-      <option name="project" value="LOCAL" />
-      <updated>1655227396152</updated>
+      <workItem from="1657195423978" duration="11036000" />
+      <workItem from="1658842936524" duration="8051000" />
     </task>
     <task id="LOCAL-00325" summary="Adding commenting and correcting a few linter issues.">
       <created>1655764824607</created>
@@ -480,7 +459,28 @@
       <option name="project" value="LOCAL" />
       <updated>1657379288597</updated>
     </task>
-    <option name="localTasksCounter" value="371" />
+    <task id="LOCAL-00371" summary="Fixing regaining occupied provinces">
+      <created>1657624273602</created>
+      <option name="number" value="00371" />
+      <option name="presentableId" value="LOCAL-00371" />
+      <option name="project" value="LOCAL" />
+      <updated>1657624273603</updated>
+    </task>
+    <task id="LOCAL-00372" summary="Fixing issue where returning occupied provinces colored incorrectly&#10;Fixing trade routes to update properly and display the correct amount&#10;Altering occupation color method for ease of identification and uniformity&#10;Streamlining interactions and display&#10;Fixing issue with too many ports&#10;Altering trade routes to decrease trade gain by 10% for every trade route over the limit&#10;Unrest capped at 100 and floored at 0&#10;Added unrest level to rebellion and uprising messages&#10;Added name changing ability&#10;Overall, 115 changes">
+      <created>1658852154013</created>
+      <option name="number" value="00372" />
+      <option name="presentableId" value="LOCAL-00372" />
+      <option name="project" value="LOCAL" />
+      <updated>1658852154015</updated>
+    </task>
+    <task id="LOCAL-00373" summary="Fixing issue where returning occupied provinces colored incorrectly&#10;Fixing trade routes to update properly and display the correct amount&#10;Altering occupation color method for ease of identification and uniformity&#10;Streamlining interactions and display&#10;Fixing issue with too many ports&#10;Altering trade routes to decrease trade gain by 10% for every trade route over the limit&#10;Unrest capped at 100 and floored at 0&#10;Added unrest level to rebellion and uprising messages&#10;Added name changing ability&#10;Fixing version counter in base.py&#10;Overall, 116 changes">
+      <created>1658852273859</created>
+      <option name="number" value="00373" />
+      <option name="presentableId" value="LOCAL-00373" />
+      <option name="project" value="LOCAL" />
+      <updated>1658852273859</updated>
+    </task>
+    <option name="localTasksCounter" value="374" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -499,10 +499,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing declare" />
-    <MESSAGE value="Fixing mass deploy" />
-    <MESSAGE value="Altering cnc_declare" />
-    <MESSAGE value="Fixing cnc_declare" />
     <MESSAGE value="Fixing cnc_declare to close open trade routes" />
     <MESSAGE value="Altering how the view commands calculate total troops" />
     <MESSAGE value="Fixing peace offer" />
@@ -524,7 +520,11 @@
     <MESSAGE value="Fixing detailed view and withdraw all" />
     <MESSAGE value="Fixing detailed view,  withdraw all, mass_deploy" />
     <MESSAGE value="Fixing view with no deployed troops" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing view with no deployed troops" />
+    <MESSAGE value="Fixing regaining occupied provinces" />
+    <MESSAGE value="Fixing issue where returning occupied provinces colored incorrectly&#10;Fixing trade routes to update properly and display the correct amount&#10;Altering occupation color method for ease of identification and uniformity&#10;Streamlining interactions and display&#10;Fixing issue with too many ports&#10;Altering trade routes to decrease trade gain by 10% for every trade route over the limit&#10;Unrest capped at 100 and floored at 0&#10;Added unrest level to rebellion and uprising messages&#10;Added name changing ability&#10;Overall, 115 changes" />
+    <MESSAGE value="Fixing version" />
+    <MESSAGE value="Fixing issue where returning occupied provinces colored incorrectly&#10;Fixing trade routes to update properly and display the correct amount&#10;Altering occupation color method for ease of identification and uniformity&#10;Streamlining interactions and display&#10;Fixing issue with too many ports&#10;Altering trade routes to decrease trade gain by 10% for every trade route over the limit&#10;Unrest capped at 100 and floored at 0&#10;Added unrest level to rebellion and uprising messages&#10;Added name changing ability&#10;Fixing version counter in base.py&#10;Overall, 116 changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing issue where returning occupied provinces colored incorrectly&#10;Fixing trade routes to update properly and display the correct amount&#10;Altering occupation color method for ease of identification and uniformity&#10;Streamlining interactions and display&#10;Fixing issue with too many ports&#10;Altering trade routes to decrease trade gain by 10% for every trade route over the limit&#10;Unrest capped at 100 and floored at 0&#10;Added unrest level to rebellion and uprising messages&#10;Added name changing ability&#10;Fixing version counter in base.py&#10;Overall, 116 changes" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

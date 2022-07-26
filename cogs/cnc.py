@@ -1,4 +1,4 @@
-# cnc v1.0
+# cnc v1.1
 
 from ShardBot import Shard
 import discord
@@ -12,7 +12,6 @@ from PIL import Image, ImageColor, ImageDraw
 from base64 import b64encode
 import requests
 from time import sleep, localtime, time, strftime, perf_counter
-import os
 from customchecks import modcheck, SilentFail, WrongInput
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -35,11 +34,14 @@ class CNC(commands.Cog):
 
     turn_task = None
     banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2"]
+    version = "version 1.1 Misnomer"
 
     async def cog_check(self, ctx):
+        # if the sender is the owner, return true
         if ctx.author.id in [293518673417732098]:
             return True
         else:
+            # if there this is in DMs, check the user id on the Thegye server to ensure proper role
             if ctx.guild is None:
                 aroles = list()
                 thegye = ctx.bot.get_guild(674259612580446230)
@@ -48,6 +50,7 @@ class CNC(commands.Cog):
                     aroles.append(ar.id)
                 if 674260547897917460 not in aroles:
                     raise SilentFail
+            # if this is a server, check to make sure the user has the right role and/or this is the right server
             elif ctx.guild is not None:
                 aroles = list()
                 if ctx.guild.id == 674259612580446230:
@@ -55,15 +58,20 @@ class CNC(commands.Cog):
                         aroles.append(ar.id)
                     if 674260547897917460 not in aroles:
                         raise SilentFail
+                else:
+                    raise SilentFail
+            # initiate connection
             conn = self.bot.pool
             blacklist = await conn.fetchrow('''SELECT * FROM blacklist WHERE user_id = $1 AND active = True;''',
                                             ctx.author.id)
+            # if the user is on the blacklist, raise fails
             if blacklist is not None:
                 if blacklist['end_time'] is None:
                     if blacklist['status'] == "mute":
                         raise SilentFail
                     if blacklist['status'] == "ban":
                         raise SilentFail
+                # if the user should be off the blacklist, remove them
                 if blacklist['end_time'] < datetime.datetime.now():
                     await conn.execute(
                         '''UPDATE blacklist SET active = False WHERE user_id = $1 AND end_time = $2;''',
@@ -72,22 +80,28 @@ class CNC(commands.Cog):
                 return True
 
     def map_color(self, province, province_cord, hexcode, release: bool = False):
+        # obtain the coordinate information
         province_cord = ((int(province_cord[0])), (int(province_cord[1])))
+        # get color
         try:
             color = ImageColor.getrgb(hexcode)
         except ValueError:
             return ValueError("Hex code issue")
+        # open the map and the province images
         map = Image.open(fr"{self.map_directory}/Maps/wargame_provinces.png").convert("RGBA")
         prov = Image.open(fr"{self.map_directory}/Province Layers/{province}.png").convert("RGBA")
+        # obtain size and coordinate information
         width = prov.size[0]
         height = prov.size[1]
         cord = (province_cord[0], province_cord[1])
+        # for every pixel, change the color to the owners
         for x in range(0, width):
             for y in range(0, height):
                 data = prov.getpixel((x, y))
                 if data != color:
                     if data != (0, 0, 0, 0):
                         prov.putpixel((x, y), color)
+        # if this is a release, change every color to neutral grey
         if release is True:
             color = ImageColor.getrgb("#808080")
             for x in range(0, prov.size[0]):
@@ -96,25 +110,31 @@ class CNC(commands.Cog):
                     if data != color:
                         if data != (0, 0, 0, 0):
                             prov.putpixel((x, y), color)
+        # convert, paste, and save the image
         prov = prov.convert("RGBA")
         map.paste(prov, box=cord, mask=prov)
         map.save(fr"{self.map_directory}/Maps/wargame_provinces.png")
 
     def occupy_color(self, province, province_cord, occupy_color, owner_color):
+        # get province information
         province_cord = ((int(province_cord[0])), (int(province_cord[1])))
+        # get colors
         try:
             occupyer = ImageColor.getrgb(occupy_color)
             owner = ImageColor.getrgb(owner_color)
         except ValueError:
             return ValueError("Hex code issue")
+        # open map, create draw object, and obtain province information
         map = Image.open(fr"{self.map_directory}/Maps/wargame_provinces.png").convert("RGBA")
         prov = Image.open(fr"{self.map_directory}/Province Layers/{province}.png").convert("RGBA")
         prov_draw = ImageDraw.Draw(prov)
         width = prov.size[0]
         height = prov.size[1]
         cord = (province_cord[0], province_cord[1])
+        # set spacing and list of blank pixels
         space = 20
         not_colored = list()
+        # for every non-colored pixel, add it to the list
         for x in range(0, width):
             for y in range(0, height):
                 pixel = prov.getpixel((x, y))
@@ -122,14 +142,17 @@ class CNC(commands.Cog):
                     not_colored.append((x, y))
                 else:
                     prov.putpixel((x, y), owner)
-        for x in range(0, 2 * width, space):
+        # draw lines every 20 pixels with the occupier color
+        for x in range(0, 1000, space):
             prov_draw.line([x, 0, x - width, height], width=5, fill=occupyer)
+        # for every pixel in the non-colored list, remove that pixel
         for pix in not_colored:
             prov.putpixel(pix, (0, 0, 0, 0))
         map.paste(prov, box=cord, mask=prov)
         map.save(fr"{self.map_directory}/Maps/wargame_provinces.png")
 
     def add_ids(self):
+        # open map, open ids image, paste, and save
         bmap = Image.open(fr"{self.map_directory}/Maps/wargame_provinces.png").convert("RGBA")
         ids = Image.open(fr"{self.map_directory}/Maps/wargame numbers.png").convert("RGBA")
         bmap.paste(ids, box=(0, 0), mask=ids)
@@ -140,8 +163,11 @@ class CNC(commands.Cog):
     @commands.command(brief="Displays information about the CNC system.")
     @commands.guild_only()
     async def cnc_info(self, ctx):
+        # open connection and fetch data
         conn = self.bot.pool
         data = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
+
+        player_count = await conn.fetchrow('''SELECT count(*) FROM cncusers;''')
         infoembed = discord.Embed(title="Command And Conquest System", color=discord.Color.dark_red(),
                                   description="This is the condensed information about the CNC system. "
                                               "For more information, including commands, see the CNC Dispatch here:"
@@ -156,11 +182,14 @@ class CNC(commands.Cog):
                                   "information about the Command and Conquer system, make sure to check "
                                   "out the dispatch and use the command "
                                   f" `{self.bot.command_prefix}help CNC`.", inline=False)
+        infoembed.add_field(name="Version", value=f"{self.version}")
         infoembed.add_field(name="Turns", value=f"It is currently turn {data['data_value']}.")
+        infoembed.add_field(name="Active Players", value=f"{player_count['count']}")
         infoembed.add_field(name="Questions?",
                             value="Contact the creator: Lies Kryos#1734\n"
                                   "Contact a moderator: Lies Kryos#1734, [Insert_Person_Here]#6003")
         infoembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
+        # send embed
         await ctx.send(embed=infoembed)
 
     @commands.command(brief="Displays the turn count.")
@@ -207,17 +236,20 @@ class CNC(commands.Cog):
                 raise Exception("That is not a valid focus. Please use only m, e, or s.")
         else:
             focus = "None"
+        # if the color is banned, dont allow
         if color in self.banned_colors:
             await ctx.send("That color is a reserved color. Please pick another color.")
             return
         colors = [u['usercolor'] for u in registered]
+        # if the color is in use, dont allow
         if color in colors:
             await ctx.send("That color is already taken by another user. Please pick another color.")
             return
+        # try and get the color from the hex code
         try:
             ImageColor.getrgb(color)
         except ValueError:
-            await ctx.send("That doesn't appear to be a valid hex color code.")
+            await ctx.send("That doesn't appear to be a valid hex color code. Include the `#` symbol.")
             return
         # inserts the users id into the databases
         await conn.execute(
@@ -231,8 +263,6 @@ class CNC(commands.Cog):
                 continue
             await conn.execute('''INSERT INTO relations(name, nation) VALUES($1, $2);''', nationame, n)
             await conn.execute('''INSERT INTO relations(name, nation) VALUES($1, $2);''', n, nationame)
-        file = open(f"{self.interaction_directory}{userid}.txt", "w")
-        file.close()
         await ctx.send(f"{ctx.author.name} has registered {nationame} in the Command and Conquer System!")
 
     @commands.command(usage="<nation name or Discord username>", aliases=['cncv'],
@@ -289,14 +319,14 @@ class CNC(commands.Cog):
             else:
                 focus = "None"
             # fetches relations information
-            relations = await conn.fetch('''SELECT nation, relation FROM relations WHERE name = $1;''',
-                                         userinfo['username'])
+            relations = await conn.fetch('''SELECT * FROM interactions WHERE (sender = $1 OR recipient = $1) 
+            AND active = True;''', userinfo['username'])
             alliances = list()
             wars = list()
             for r in relations:
-                if r['relation'] == 'war':
+                if r['type'] == 'war':
                     wars.append(r)
-                if r['relation'] == 'alliance':
+                if r['type'] == 'alliance':
                     alliances.append(r)
             if len(wars) != 0:
                 wars.sort()
@@ -389,21 +419,20 @@ class CNC(commands.Cog):
             elif nation['focus'] == "none":
                 focus = "None"
             # fetches relations information
-            relations = await conn.fetch('''SELECT nation, relation FROM relations WHERE name = $1;''',
-                                         nation['username'])
+            relations = await conn.fetch('''SELECT * FROM interactions WHERE (sender = $1 OR recipient = $1) 
+                    AND active = True;''', nation['username'])
             alliances = list()
             wars = list()
             for r in relations:
-                if r['relation'] == 'war':
+                if r['type'] == 'war':
                     wars.append(r)
-                if r['relation'] == 'alliance':
+                if r['type'] == 'alliance':
                     alliances.append(r)
             if len(wars) != 0:
                 wars.sort()
                 wars = ', '.join(str(w['nation']) for w in wars)
             else:
                 wars = "None"
-
             if len(alliances) != 0:
                 alliances.sort()
                 alliances = ', '.join(str(a['nation']) for a in alliances)
@@ -419,7 +448,7 @@ class CNC(commands.Cog):
             cncuserembed.add_field(name=f"Territory (Total: {len(provinceslist)})", value=provinces, inline=False)
             cncuserembed.add_field(name="Total Troops", value=f"{total_troops:,}")
             cncuserembed.add_field(name="Undeployed Troops", value=f"{nation['undeployed']:,}")
-            cncuserembed.add_field(name="Resources", value=f"\u03FE{nation['resources']}")
+            cncuserembed.add_field(name="Resources", value=f"\u03FE{nation['resources']:,}")
             cncuserembed.add_field(name="National Focus", value=focus)
             cncuserembed.add_field(name="Color", value=colorvalue)
             cncuserembed.add_field(name="Action Points", value=nation['moves'])
@@ -501,19 +530,28 @@ class CNC(commands.Cog):
         else:
             alliances = "None"
             wars = "None"
+        # fetches all outgoing routes
         outgoing_routes = await conn.fetch('''SELECT * FROM interactions WHERE type = 'trade' AND active = True AND 
         sender_id = $1;''', author.id)
         routes_dict = dict()
         routes = ''
-        route_number = 0
+        outgoing_count = 0
+        # counts the number of outgoing routes per recipient
         for t in outgoing_routes:
             routes_dict.update({t['recipient']: 0})
         for t in outgoing_routes:
             routes_dict[t['recipient']] += 1
-            route_number += 1
+            outgoing_count += 1
         for t in routes_dict:
             routes += f"{t} ({routes_dict[t]}), "
         routes = routes[:-2]
+        # counts the number of incoming routes
+        incoming_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND
+        active = True AND recipient_id = $1;''', author.id)
+        if incoming_count['count'] is None:
+            incoming_count = 0
+        else:
+            incoming_count = incoming_count['count']
         max_manpower = 0
         manpower_mod = userinfo['public_services'] / 100
         max_manpower_raw = await conn.fetchrow('''SELECT sum(manpower::int) FROM provinces WHERE owner_id = $1;''',
@@ -543,10 +581,10 @@ class CNC(commands.Cog):
                                      f"Port Limit: {userinfo['portlimit'][1]}\n"
                                      f"Fort Limit: {userinfo['fortlimit'][1]}")
         cncuserembed.add_field(name="Trade Route Overview",
-                               value=f"Outgoing Routes: {userinfo['trade_routes'][0]}\n"
-                                     f"Incoming Routes: {userinfo['trade_routes'][1]}\n"
-                                     f"Active Routes ({route_number}): {routes}\n"
-                                     f"Max Routes: {userinfo['trade_routes'][2]}")
+                               value=f"Outgoing Routes: {outgoing_count}\n"
+                                     f"Incoming Routes: {incoming_count}\n"
+                                     f"Active Outgoing Routes ({outgoing_count}): {routes}\n"
+                                     f"Max Routes: {userinfo['trade_routes'][0]}")
         cncuserembed.add_field(name="Manpower/Manpower Limit",
                                value=f"{userinfo['manpower']:,}/{userinfo['maxmanpower']:,}")
         cncuserembed.add_field(name="Manpower Increase", value=f"{added_manpower:,}")
@@ -701,7 +739,7 @@ class CNC(commands.Cog):
             f"Your registered Command and Conquer account, {nationamesave['username']}, "
             f"has been deleted by moderator {ctx.author} for the following reason:```{reason}```")
 
-    @commands.command(usage="[item being edited (color or focus)]", brief="Changes a nation's registered color")
+    @commands.command(usage="[item being edited (color, focus, name)]", brief="Changes a nation's information")
     @commands.guild_only()
     async def cnc_edit(self, ctx, editing: str):
         loop = asyncio.get_running_loop()
@@ -777,6 +815,48 @@ class CNC(commands.Cog):
             if focusreply.content.lower() == "s":
                 focus = "`strategy`"
             await ctx.send(f"Success! Your new focus is {focus}.")
+            return
+        # if the name is being edited
+        if editing.lower() == "name":
+            await ctx.send("What is your new nation name?")
+
+            def authorcheck(message):
+                return ctx.author == message.author and ctx.channel == message.channel
+
+            # waits for a reply
+            try:
+                namereply = await self.bot.wait_for('message', check=authorcheck, timeout=60)
+            # if 60 seconds pass, timeout
+            except asyncio.TimeoutError:
+                return await ctx.send("Timed out. Please answer me next time!")
+            # makes sure name is not banned or taken
+            registered = await conn.fetch('''SELECT * FROM cncusers;''')
+            if namereply.content.lower() in ["name", "nation", "natives", "moderator", "mod"]:
+                await ctx.send("That name is a reserved name. Please pick another name.")
+                return
+            names = [u['username'].lower() for u in registered]
+            if namereply.content.lower() in names:
+                await ctx.send("That name is already taken by another user. Please pick another name.")
+                return
+            # updates all tables
+            await conn.execute('''UPDATE cncusers SET username = $1 WHERE username = $2;''',
+                               namereply.content, usereditinfo['username'])
+            await conn.execute('''UPDATE relations SET nation = $1 WHERE nation = $2;''',
+                               namereply.content, usereditinfo['username'])
+            await conn.execute('''UPDATE relations SET name = $1 WHERE name = $2;''',
+                               namereply.content, usereditinfo['username'])
+            await conn.execute('''UPDATE interactions SET sender = $1 WHERE sender = $2;''',
+                               namereply.content, usereditinfo['username'])
+            await conn.execute('''UPDATE interactions SET recipient = $1 WHERE recipient = $2;''',
+                               namereply.content, usereditinfo['username'])
+            await conn.execute('''UPDATE pending_interactions SET sender = $1 WHERE sender = $2;''',
+                               namereply.content, usereditinfo['username'])
+            await conn.execute('''UPDATE pending_interactions SET recipient = $1 WHERE recipient = $2;''',
+                               namereply.content, usereditinfo['username'])
+            await conn.execute('''UPDATE provinces SET owner = $1 WHERE owner = $2;''',
+                               namereply.content, usereditinfo['username'])
+            await conn.execute('''UPDATE provinces SET occupier = $1 WHERE occupier = $2;''',
+                               namereply.content, usereditinfo['username'])
             return
         else:
             # if the editing argument is not the proper argument
@@ -1049,8 +1129,22 @@ class CNC(commands.Cog):
         # connects to the database
         conn = self.bot.pool
         if interactionid is None:
-            with open(f"{self.interaction_directory}{author.id}.txt", "rb") as file:
-                await author.send(file=discord.File(file, f"Interactions Log for {author.id}.txt"))
+            # fetch all interactions
+            interactions = await conn.fetch('''SELECT * FROM interactions WHERE (sender_id = $1 OR recipient_id = $1) 
+            ORDER BY id DESC;''', author.id)
+            # build interactions text
+            interactions_text = ''
+            for i in interactions:
+                interactions_text += f"Interaction ID: {i['id']}\n"
+                interactions_text += f"Sender: {i['sender']}\n"
+                interactions_text += f"Recipient: {i['recipient']}\n"
+                interactions_text += f"Type: {i['type']}\n"
+                interactions_text += f"Terms: {i['terms']}\n"
+                interactions_text += f"Active: {i['active']}\n"
+            with open(f"{self.interaction_directory}{author.id}.txt", "wb") as interactions_file:
+                interactions_file.write(interactions_text)
+                interactions_file.close()
+                await author.send(file=discord.File(interactions_file, f"Interactions Log for {author.id}.txt"))
                 if ctx.guild is not None:
                     await ctx.send("Sent!")
                 return
@@ -1076,8 +1170,10 @@ class CNC(commands.Cog):
         embed.add_field(name="Active", value=f"{interaction['active']}")
         await ctx.send(embed=embed)
         if upload is True:
-            with open(f"{self.interaction_directory}{interaction['id']}.txt", "r") as file:
-                await ctx.send(file=discord.File(file, f"{interaction['id']}.txt"))
+            with open(f"{self.interaction_directory}{interaction['id']}.txt", "wb") as interaction_file:
+                interaction_file.write(interaction['terms'])
+                interaction_file.close()
+                await ctx.send(file=discord.File(interaction_file, f"{interaction['id']}.txt"))
 
     @commands.command(usage="[offer id]", brief="Displays a specific offer with information")
     async def cnc_offer(self, ctx, offerid: int):
@@ -1085,18 +1181,22 @@ class CNC(commands.Cog):
         # connects to the database
         conn = self.bot.pool
         offer = await conn.fetchrow('''SELECT * FROM pending_interactions WHERE id = $1;''', offerid)
+        # if there is no such offer, say so
         if offer is None:
             await ctx.send("No such pending offer.")
             return
+        # if the user is not authorized to view that offer
         if offer['sender_id'] != author.id and offer['recipient_id'] != author.id:
             await ctx.send("You are not authorized to view that offer.")
             return
+        # if the terms are longer than 1024 characters, upload a file
         upload = False
         if len(offer['terms']) > 1024:
             terms = "See File Upload"
             upload = True
         else:
             terms = offer['terms']
+        # create and send the embed + file if necessary
         embed = discord.Embed(title=f"Offer #{offer['id']}",
                               description=f"An offer of {offer['type']} from {offer['sender']}.")
         embed.add_field(name="Offer Type", value=f"{offer['type'].title()}")
@@ -1104,8 +1204,10 @@ class CNC(commands.Cog):
         embed.add_field(name="Terms", value=f"{terms}", inline=False)
         await ctx.send(embed=embed)
         if upload is True:
-            with open(f"{self.interaction_directory}{offer['id']}.txt", "r") as file:
-                await ctx.send(file=discord.File(file, f"{offer['id']}.txt"))
+            with open(f"{self.interaction_directory}{offer['id']}.txt", "wb") as offer_file:
+                offer_file.write(offer['terms'])
+                offer_file.close()
+                await ctx.send(file=discord.File(offer_file, f"{offer['id']}.txt"))
 
     @commands.command(usage="[interaction id] [interaction (accept, reject, cancel)]", aliases=['cnci'],
                       brief="Allows for interacting with a proposed interaction")
@@ -1151,45 +1253,26 @@ class CNC(commands.Cog):
                         owner_color = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
                                                           pending_int['recipient'])
                         owner_color = owner_color['usercolor']
+                        troops = 0
                         for p in sender_occupied:
                             await self.bot.loop.run_in_executor(None, self.map_color, p['id'], p['cord'], owner_color)
                             await conn.execute('''UPDATE provinces SET occupier = $1, occupier_id = $2 WHERE id = $3;''',
                                                p['owner'], p['owner_id'], p['id'])
+                            troops += p['troops']
+                        await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
+                                           troops+owner_color['undeployed'], owner_color['user_id'])
                     if recip_occupied:
                         owner_color = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
                                                           pending_int['sender'])
                         owner_color = owner_color['usercolor']
+                        troops = 0
                         for p in recip_occupied:
                             await self.bot.loop.run_in_executor(None, self.map_color, p['id'], p['cord'], owner_color)
                             await conn.execute('''UPDATE provinces SET occupier = $1, occupier_id = $2 WHERE id = $3;''',
                                                p['owner'], p['owner_id'], p['id'])
-                # if trade, update user information
-                if pending_int['type'] == 'trade':
-                    senderinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
-                                                     pending_int['sender_id'])
-                    recipinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
-                                                    pending_int['recipient_id'])
-                    sender_trs = senderinfo['trade_routes']
-                    sender_trs[0] += 1
-                    recip_trs = recipinfo['trade_routes']
-                    recip_trs[1] += 1
-                    await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE user_id = $2;''',
-                                       sender_trs, senderinfo['user_id'])
-                    await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE user_id = $2;''',
-                                       recip_trs, recipinfo['user_id'])
-                # updates interaction files
-                interaction_text = f"Offer #{pending_int['id']} of {pending_int['type']}.\nSent by: " \
-                                   f"{pending_int['sender']}\nAccepted by: {pending_int['recipient']}" \
-                                   f"\n**Terms**\n{pending_int['terms']}\n" \
-                                   f"Accepted: {strftime('%D', localtime(time()))}"
-                with open(f"{self.interaction_directory}{pending_int['sender_id']}.txt", "r+") as file:
-                    oldcontent = file.read()
-                    file.seek(0, 0)
-                    file.write(interaction_text.rstrip('\r\n') + '\n' + oldcontent)
-                with open(f"{self.interaction_directory}{pending_int['recipient_id']}.txt", "r+") as file:
-                    oldcontent = file.read()
-                    file.seek(0, 0)
-                    file.write(interaction_text.rstrip('\r\n') + '\n' + oldcontent)
+                            troops += p['troops']
+                        await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
+                                           troops + owner_color['undeployed'], owner_color['user_id'])
                 # get user object and send message
                 sender = self.bot.get_user(pending_int['sender_id'])
                 await sender.send(
@@ -1197,9 +1280,6 @@ class CNC(commands.Cog):
                     f"To view this, use `$cnc_view_interaction {interactionid}`.")
                 await ctx.send("Accepted.")
             if interaction.lower() == "reject":
-                # removes terms file
-                if os.path.exists(f"{self.interaction_directory}{interactionid}.txt"):
-                    os.remove(f"{self.interaction_directory}{interactionid}.txt")
                 # remove pending interaction
                 await conn.execute('''DELETE FROM pending_interactions WHERE id = $1;''', interactionid)
                 sender = self.bot.get_user(pending_int['sender_id'])
@@ -1215,8 +1295,7 @@ class CNC(commands.Cog):
                 return
             # ensures correct type
             if interact['type'] == 'war':
-                await ctx.send("Only alliances and treaties can be cancelled. Wars must be resolved through using "
-                               "the peace command.")
+                await ctx.send("Wars must be resolved using the peace command.")
                 return
             # ensures authority
             if (interact['recipient_id'] != author.id) and (interact['sender_id'] != author.id) and (
@@ -1233,26 +1312,6 @@ class CNC(commands.Cog):
                 await conn.execute(
                     '''UPDATE relations SET relation = 'peace' WHERE name = $1 AND nation = $2;''',
                     recipient, sender)
-            # removes trade routes and information
-            elif interact['type'] == 'trade':
-                await conn.execute('''UPDATE relations SET trade = False WHERE name = $1 AND nation = $2
-                    OR name = $2 AND nation = $1;''',
-                                   sender, recipient)
-                trade_interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE type = 'trade' AND 
-                active = True AND sender = $1 AND recipient = $2 OR sender = $2 AND recipient = $1;''',
-                                                        sender, recipient)
-                trade_sender = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
-                                                   trade_interaction['sender'])
-                trade_recipient = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
-                                                      trade_interaction['recipient'])
-                trade_sender_routes = trade_sender['trade_routes']
-                trade_sender_routes[0] -= 1
-                trade_recip_routes = trade_recipient['trade_routes']
-                trade_recip_routes[1] -= 1
-                await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE username = $2;''',
-                                   trade_sender_routes, trade_sender['username'])
-                await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE username = $2;''',
-                                   trade_recip_routes, trade_recipient['username'])
             await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''', interactionid)
             await ctx.send(f"{interact['type'].title()} between {sender} and {recipient} canceled.")
             # DMs relevant parties
@@ -1342,9 +1401,6 @@ class CNC(commands.Cog):
         if sender == recipient:
             await ctx.send("You cannot ally with yourself.")
             return
-        # creates interaction text file
-        with open(f"{self.interaction_directory}{aid}.txt", "w") as afile:
-            afile.write(terms)
         # inserts information into pending interactions
         await conn.execute('''INSERT INTO pending_interactions (id, type, sender, sender_id, recipient,
                 recipient_id, terms) VALUES($1, $2, $3, $4, $5, $6, $7);''', aid, atype, sender, sender_id,
@@ -1425,9 +1481,6 @@ class CNC(commands.Cog):
         elif alliance['relation'] != 'peace':
             await ctx.send(f"It is not possible to declare war on {recipient} when you have an alliance with them!")
             return
-        # creates text file for terms
-        with open(f"{self.interaction_directory}{aid}.txt", "w") as afile:
-            afile.write(terms)
         # inserts information into interactions
         await conn.execute('''INSERT INTO interactions (id, type, sender, sender_id, recipient,
                 recipient_id, terms, active) VALUES($1, $2, $3, $4, $5, $6, $7, $8);''', aid, atype, sender,
@@ -1443,21 +1496,9 @@ class CNC(commands.Cog):
                                               sender, recipient)
         for t in trade_interactions:
             await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''', t['id'])
-            trade_sender = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
-                                               t['sender'])
-            trade_recipient = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
-                                                  t['recipient'])
-            trade_sender['trade_routes'][0] -= 1
-            trade_recipient['trade_routes'][1] -= 1
-            trade_sender_routes = trade_sender['trade_routes']
-            trade_recip_routes = trade_recipient['trade_routes']
-            await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE username = $2;''',
-                               trade_sender_routes, trade_sender['username'])
-            await conn.execute('''UPDATE cncusers SET trade_routes = $1 WHERE username = $2;''',
-                               trade_recip_routes, trade_recipient['username'])
-            # subtracts action point
-            await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''',
-                               userinfo['moves'] - 1, author.id)
+        # subtracts action point
+        await conn.execute('''UPDATE cncusers SET moves = $1 WHERE user_id = $2;''',
+                           userinfo['moves'] - 1, author.id)
         # sends DM
         rsend = self.bot.get_user(recipient_id)
         await rsend.send(
@@ -1516,9 +1557,6 @@ class CNC(commands.Cog):
         if war['relation'] != 'war':
             await ctx.send(f"You cannot negotiate peace with {sender} if you are not at war!")
             return
-        # creates text file of terms
-        with open(f"{self.interaction_directory}{aid}.txt", "w") as afile:
-            afile.write(terms)
         # inserts information into pending interactions
         await conn.execute('''INSERT INTO pending_interactions (id, type, sender, sender_id, recipient,
                 recipient_id, terms) VALUES($1, $2, $3, $4, $5, $6, $7);''', aid, atype, sender, sender_id,
@@ -1572,9 +1610,6 @@ class CNC(commands.Cog):
         if sender == recipient:
             await ctx.send("You cannot send yourself a treaty.")
             return
-        # creates interaction text file
-        with open(f"{self.interaction_directory}{aid}.txt", "w") as afile:
-            afile.write(terms)
         # inserts information into pending interactions
         await conn.execute('''INSERT INTO pending_interactions (id, type, sender, sender_id, recipient,
                 recipient_id, terms) VALUES($1, $2, $3, $4, $5, $6, $7);''', aid, atype, sender, sender_id,
@@ -1598,16 +1633,26 @@ class CNC(commands.Cog):
         if userinfo is None:
             await ctx.send("You are not registered.")
             return
+        # pulls data for the recipient
         recipient = args
         recip_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
                                          recipient.lower())
+        # if the recipient doesn't exist
         if recip_info is None:
             await ctx.send(f"`{recipient}` does not appear to be registered.")
             return
+        # if the sender does not have enough moves
         if userinfo['moves'] <= 0:
             await ctx.send("You do not have enough action points for that!")
             return
-        if userinfo['trade_routes'][2] <= userinfo['trade_routes'][0]:
+        # if the user has the maximum outgoing trade routes
+        trade_route_count = await conn.fetchrow('''SELECT count(*) FROM interactions 
+        WHERE type = 'trade' AND sender_id = $1 AND active = True;''', author.id)
+        if trade_route_count['count'] is None:
+            trade_route_count = 0
+        else:
+            trade_route_count = trade_route_count['count']
+        if userinfo['trade_routes'][0] <= trade_route_count:
             await ctx.send("You do not have enough available trade routes to establish a new one.")
             return
         pending_route = await conn.fetchrow('''SELECT * FROM pending_interactions 
@@ -1690,8 +1735,20 @@ class CNC(commands.Cog):
                     province_value *= 1.5
                 initial_trade_value += province_value
             trade_gain = 0
-            trade_gain += initial_trade_value * (userinfo['trade_routes'][0] / 10)
-            trade_gain += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
+            outgoing_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
+                           active = True AND sender_id = $1;''', userinfo['user_id'])
+            if outgoing_count['count'] is None:
+                outgoing_count = 0
+            else:
+                outgoing_count = outgoing_count['count']
+            incoming_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
+                           active = True AND recipient_id = $1;''', userinfo['user_id'])
+            if incoming_count['count'] is None:
+                incoming_count = 0
+            else:
+                incoming_count = incoming_count['count']
+            trade_gain += initial_trade_value * (outgoing_count / 10)
+            trade_gain += initial_trade_value * ((incoming_count * 5) / 100)
             base_gain += trade_gain
             base_gain -= total_troops * 0.01
             # sends the embed
@@ -1746,8 +1803,20 @@ class CNC(commands.Cog):
                     province_value *= 1.5
                 initial_trade_value += province_value
             trade_gain = 0
-            trade_gain += initial_trade_value * (userinfo['trade_routes'][0] / 10)
-            trade_gain += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
+            outgoing_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
+                           active = True AND sender_id = $1;''', userinfo['user_id'])
+            if outgoing_count['count'] is None:
+                outgoing_count = 0
+            else:
+                outgoing_count = outgoing_count['count']
+            incoming_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
+                           active = True AND recipient_id = $1;''', userinfo['user_id'])
+            if incoming_count['count'] is None:
+                incoming_count = 0
+            else:
+                incoming_count = incoming_count['count']
+            trade_gain += initial_trade_value * (outgoing_count / 10)
+            trade_gain += initial_trade_value * ((incoming_count * 5) / 100)
             base_gain += trade_gain
             base_gain -= total_troops * 0.01
             # sends the embed
@@ -1786,11 +1855,11 @@ class CNC(commands.Cog):
         # if the nation does not have enough resources
         if monies < cost:
             await ctx.send(
-                f"{nationname} does not have enough resources to purchase {ramount * 1000} troops at \u03FE{cost}.")
+                f"{nationname} does not have enough resources to purchase {ramount * 1000:,} troops at \u03FE{cost}.")
             return
         # if the nation does not have enough manpower
         elif manpower > userinfo['manpower']:
-            await ctx.send(f"{nationname} does not have enough manpower to recruit {ramount * 1000} troops, "
+            await ctx.send(f"{nationname} does not have enough manpower to recruit {ramount * 1000:,} troops, "
                            f"lacking {-(userinfo['manpower'] - manpower)} manpower. ")
             return
         # if the location is not set
@@ -1802,7 +1871,7 @@ class CNC(commands.Cog):
             await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''', (monies - cost),
                                author.id)
             await ctx.send(
-                f"{nationname} has recruited {ramount * 1000} troops to their recruitment pool. "
+                f"{nationname} has recruited {ramount * 1000:,} troops to their recruitment pool. "
                 f"\u03FE{cost} have been spent.")
             return
         else:
@@ -1826,7 +1895,7 @@ class CNC(commands.Cog):
                            (troops['troops'] + (ramount * 1000)), location)
         await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''', (monies - cost),
                            author.id)
-        await ctx.send(f"{nationname} has successfully deployed {ramount * 1000} to Province #{location}. "
+        await ctx.send(f"{nationname} has successfully deployed {ramount * 1000:,} to Province #{location}. "
                        f"\u03FE{cost} have been spent.")
 
     @commands.command(usage="[battalion amount]", brief="Recruits a number of battalions in all controlled provinces")
@@ -3908,9 +3977,9 @@ class CNC(commands.Cog):
                     portlimit = math.floor((len(userinfo['provinces_owned']) - 5) / 3) + 1
                     citylimit = math.floor((len(userinfo['provinces_owned']) - 5) / 7) + 1
                     if userinfo['focus'] == 's':
-                        fortlimit += fortlimit + 1
+                        fortlimit += 1
                     if userinfo['focus'] == 'e':
-                        portlimit += portlimit + 1
+                        portlimit += 1
                     await conn.execute(
                         '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;'''
                         , [userinfo['citylimit'][0], citylimit], [userinfo['portlimit'][0], portlimit],
@@ -3925,15 +3994,25 @@ class CNC(commands.Cog):
                 # for every city +1 and for every two ports +1
                 trade_route_limit += userinfo['citylimit'][0]
                 trade_route_limit += math.floor(userinfo['portlimit'][0] / 2)
-                # if the current trade route number is too high, close a random trade route
-                if trade_routes[0] > trade_route_limit:
-                    for i in range(trade_route_limit - trade_routes[0]):
-                        closed_interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE sender = $1 OR 
-                        recipient = $1 AND type = 'trade' AND active = True ORDER BY RANDOM();''', userinfo['username'])
-                        await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''',
-                                           closed_interaction['id'])
+                # if the current trade route number is too high, reduce effective trade gain
+                outgoing_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
+                active = True AND sender_id = $1;''', userinfo['user_id'])
+                if outgoing_count['count'] is None:
+                    outgoing_count = 0
+                else:
+                    outgoing_count = outgoing_count['count']
+                incoming_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
+                               active = True AND recipient_id = $1;''', userinfo['user_id'])
+                if incoming_count['count'] is None:
+                    incoming_count = 0
+                else:
+                    incoming_count = incoming_count['count']
+                debuff = 1
+                if outgoing_count > trade_route_limit:
+                    for i in range(trade_route_limit - outgoing_count):
+                        debuff -= .1
                 trade_routes = userinfo['trade_routes']
-                trade_routes[2] = trade_route_limit
+                trade_routes[0] = trade_route_limit
                 tax_rate *= 100
                 military_upkeep *= 100
                 public_services *= 100
@@ -3946,20 +4025,25 @@ class CNC(commands.Cog):
                         unrest_roll = randint(0, 100)
                         # if the d100 is below or equal to the national unrest, trigger civil war
                         if unrest_roll <= national_unrest:
+                            # fetch all provinces and get half
                             provinces_owned = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1 AND
                             occupier_id = $1;''', user.id)
                             provinces_owned = [p['id'] for p in provinces_owned]
                             half_owned = math.floor(len(provinces_owned) / 2)
                             provinces_rebelling = sample(provinces_owned, half_owned)
+                            # for all provinces rebelling, get their information
                             for pr in provinces_rebelling:
                                 p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', pr)
                                 if p_info is None:
                                     continue
+                                # remove the province from the owned list
                                 provinces_owned.remove(pr)
+                                # add the remaining troops to the undeployed amount
                                 undeployed = userinfo['undeployed']
                                 troops_remaining = p_info['troops'] - (p_info['manpower'] * 2)
                                 if troops_remaining <= 0:
                                     troops_remaining = 0
+                                # update all information
                                 await conn.execute('''UPDATE cncusers SET provinces_owned = $1, undeployed = $2 WHERE 
                                 user_id = $3;''', provinces_owned, undeployed + troops_remaining, u)
                                 await conn.execute('''UPDATE provinces SET owner = '', owner_id = '0', occupier = '', 
@@ -3968,10 +4052,12 @@ class CNC(commands.Cog):
                                                                     "#808080", True)
                             provinces_rebelling.sort()
                             provinces_rebelling_string = ', '.join(str(e) for e in provinces_rebelling)
-                            await user.send(f"Province(s) {provinces_rebelling_string} have rebelled in a civil war!")
+                            await user.send(f"Province(s) {provinces_rebelling_string} have rebelled in a civil war"
+                                            f"due to high national unrest ({unrest})!")
                             civil_war = True
                 # add national Unrest
                 national_unrest = 0
+                # do complicated maths to figure out the unrest rate
                 tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
                 military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
                         military_upkeep / 10 - 1)) * 0.75))
@@ -3985,7 +4071,12 @@ class CNC(commands.Cog):
                 else:
                     if len(provinces) > 75:
                         national_unrest += math.ceil(10 * (1 + 1) ** (((len(provinces) - 75) / 5) - 1))
+                # add unrest and cap or floor
                 national_unrest += tax_unrest + public_service_unrest + military_upkeep_unrest
+                if national_unrest > 100:
+                    national_unrest = 100
+                elif national_unrest < 0:
+                    national_unrest = 0
                 await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE user_id = $2;''',
                                    national_unrest, u)
                 # gather each province information
@@ -3996,14 +4087,18 @@ class CNC(commands.Cog):
                         continue
                     p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
                     if p_info['uprising']:
+                        # if the unrest is less than a random number between 1 and 100, end uprising
                         if p_info['unrest'] < randint(1, 100):
                             await conn.execute('''UPDATE provinces SET uprising = False WHERE id = $1;''', p)
-                            pass
+                        # otherwise, continue uprising
                         else:
+                            # calculate current unrest
                             unrest = 0
+                            # reduce unrest for troops present
                             troops_unrest = p_info['troops'] / -100
                             if userinfo['great_power']:
                                 troops_unrest *= 2
+                            # do complicated maths
                             tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
                             military_upkeep_unrest = -round(
                                 (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
@@ -4012,9 +4107,15 @@ class CNC(commands.Cog):
                                 public_service_unrest = round(30 - public_services * 2)
                             else:
                                 public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
+                            # add unrest and cap or floor
                             unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
+                            if unrest > 100:
+                                unrest = 100
+                            elif unrest < 0:
+                                unrest = 0
                             await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
                             continue
+                    # gather troop, trade_value, city, and port information
                     total_troops += p_info['troops']
                     province_value = p_info['trade_value']
                     if p_info['city'] and p_info['port']:
@@ -4033,7 +4134,7 @@ class CNC(commands.Cog):
                             unrest_roll = randint(0, 100)
                             # if the d100 is greater than the local Unrest, trigger an uprising
                             if unrest_roll <= local_unrest:
-                                # trigger uprising effects
+                                # if a city is present, 20% chance for destruction
                                 if p_info['city']:
                                     if randint(1, 100) >= 80:
                                         structures_destroyed += 1
@@ -4041,6 +4142,7 @@ class CNC(commands.Cog):
                                         citylimit = userinfo['citylimit'][0] - 1
                                         await conn.execute(
                                             '''UPDATE cnc_users SET citylimit = $1 WHERE user_id = $2;''', citylimit, u)
+                                # if a fort is present, 10% chance for it to be destroyed
                                 if p_info['fort']:
                                     if randint(1, 100) >= 90:
                                         structures_destroyed += 1
@@ -4048,6 +4150,7 @@ class CNC(commands.Cog):
                                         fortlimit = userinfo['fortlimit'][0] - 1
                                         await conn.execute(
                                             '''UPDATE cnc_users SET portlimit = $1 WHERE user_id = $2;''', fortlimit, u)
+                                # if a port is present 20% chance for it to be destroyed
                                 if p_info['port']:
                                     if randint(1, 100) >= 80:
                                         structures_destroyed += 1
@@ -4055,6 +4158,7 @@ class CNC(commands.Cog):
                                         portlimit = userinfo['portlimit'][0] - 1
                                         await conn.execute(
                                             '''UPDATE cnc_users SET portlimit = $1 WHERE user_id = $2;''', portlimit, u)
+                                # calculate troops damage and update
                                 troops_attacked = p_info['troops'] - \
                                                   (randint((p_info['manpower']) / 2, p_info['manpower']))
                                 if troops_attacked < 0:
@@ -4064,8 +4168,10 @@ class CNC(commands.Cog):
                                 provinces_rebelled.append(p)
                     # add Unrest
                     unrest = 0
+                    # if there is a civil war ongoing, -20 unrest
                     if civil_war:
                         unrest -= 20
+                    # do complicated maths
                     troops_unrest = p_info['troops'] / -100
                     tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
                     military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
@@ -4074,13 +4180,19 @@ class CNC(commands.Cog):
                         public_service_unrest = round(30 - public_services * 2)
                     else:
                         public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
+                    # add unrest and cap or floor
+                    if unrest > 100:
+                        unrest = 100
+                    elif unrest < 0:
+                        unrest = 0
                     unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
                     await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
+                # if there are uprising provinces
                 if len(provinces_rebelled) != 0:
                     provinces_rebelled_string = ', '.join(str(p) for p in provinces_rebelled)
                     await user.send(f"The population of province(s) {provinces_rebelled_string} "
-                                    f"have risen up due to high unrest! {structures_destroyed} structures have been"
-                                    f"destroyed by the rioters.")
+                                    f"have risen up due to high unrest ({unrest})! {structures_destroyed} "
+                                    f"structures have been destroyed by the rioters.")
                 # calculate unrest and occupation cost for occupied provinces
                 occupation_uprising = list()
                 provinces_occupied = await conn.fetchrow('''SELECT * FROM provinces WHERE occupier_id = $1 AND
@@ -4091,6 +4203,7 @@ class CNC(commands.Cog):
                         unrest = 0
                         # add base occupation unrest
                         unrest += 25
+                        # do complicated maths
                         troops_unrest = p['troops'] / -100
                         tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
                         military_upkeep_unrest = -round(
@@ -4100,7 +4213,13 @@ class CNC(commands.Cog):
                             public_service_unrest = round(30 - public_services * 2)
                         else:
                             public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
+                        # add unrest and cap or floor
                         unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
+                        if unrest > 100:
+                            unrest = 100
+                        elif unrest < 0:
+                            unrest = 0
+                        await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
                         # if the unrest is greater than 50, roll a d100-25 to see if they rebel
                         if unrest >= 50:
                             unrest_roll = randint(1, 100) - 25
@@ -4110,16 +4229,17 @@ class CNC(commands.Cog):
                                 await self.bot.loop.run_in_executor(None, self.map_color, p['id'], p['cord'],
                                                                     owner_info['usercolor'])
                                 occupation_uprising.append(p['id'])
+                # if the province rebells
                 if occupation_uprising is True:
                     occupation_uprising_string = ', '.join(str(p) for p in occupation_uprising)
                     await user.send(f"The population of occupied province(s) {occupation_uprising_string} "
-                                    f"have risen up due to high unrest and have returned to their "
+                                    f"have risen up due to high unrest ({unrest}) and have returned to their "
                                     f"core owner's control!")
 
                 # for every domestic trade route, +10%. For every foreign trade route, +5%
-                trade_gain = initial_trade_value * (userinfo['trade_routes'][0] / 10)
-                trade_gain += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
-                credits_added += trade_gain
+                trade_gain = initial_trade_value * (outgoing_count / 10)
+                trade_gain += initial_trade_value * ((incoming_count * 5) / 100)
+                credits_added += trade_gain * debuff
                 credits_added -= total_troops * 0.01
                 # calculate manpower increase and max manpower
                 max_manpower_raw = await conn.fetchrow('''SELECT sum(manpower::int) FROM provinces WHERE
@@ -4241,14 +4361,26 @@ class CNC(commands.Cog):
                 trade_route_limit += userinfo['citylimit'][0]
                 trade_route_limit += math.floor(userinfo['portlimit'][0] / 2)
                 # if the current trade route number is too high, close a random trade route
-                if trade_routes[0] > trade_route_limit:
-                    for i in range(trade_route_limit - trade_routes[0]):
+                outgoing_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
+                active = True AND sender_id = $1;''', userinfo['user_id'])
+                if outgoing_count['count'] is None:
+                    outgoing_count = 0
+                else:
+                    outgoing_count = outgoing_count['count']
+                incoming_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
+                               active = True AND recipient_id = $1;''', userinfo['user_id'])
+                if incoming_count['count'] is None:
+                    incoming_count = 0
+                else:
+                    incoming_count = incoming_count['count']
+                if outgoing_count > trade_route_limit:
+                    for i in range(trade_route_limit - outgoing_count):
                         closed_interaction = await conn.fetchrow('''SELECT * FROM interactions WHERE sender = $1 OR 
                         recipient = $1 AND type = 'trade' AND active = True ORDER BY RANDOM();''', userinfo['username'])
                         await conn.execute('''UPDATE interactions SET active = False WHERE id = $1;''',
                                            closed_interaction['id'])
                 trade_routes = userinfo['trade_routes']
-                trade_routes[2] = trade_route_limit
+                trade_routes[0] = trade_route_limit
                 tax_rate *= 100
                 military_upkeep *= 100
                 public_services *= 100
@@ -4432,8 +4564,8 @@ class CNC(commands.Cog):
                                     f"core owner's control!")
 
                 # for every domestic trade route, +10%. For every foreign trade route, +5%
-                trade_gain = initial_trade_value * (userinfo['trade_routes'][0] / 10)
-                trade_gain += initial_trade_value * ((userinfo['trade_routes'][1] * 5) / 100)
+                trade_gain = initial_trade_value * (outgoing_count / 10)
+                trade_gain += initial_trade_value * ((incoming_count * 5) / 100)
                 credits_added += trade_gain
                 credits_added -= total_troops * 0.01
                 # calculate manpower increase and max manpower
@@ -4447,7 +4579,7 @@ class CNC(commands.Cog):
                 if userinfo['capital'] != 0:
                     if userinfo['capital'] in provinces:
                         added_manpower += 2500
-                manpower = added_manpower + userinfo['manpower']
+                manpower = added_manpower + userinfo['manpower'] + 3000
                 if manpower > max_manpower:
                     manpower = max_manpower
                 # calculates action points
