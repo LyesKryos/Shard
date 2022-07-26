@@ -869,6 +869,7 @@ class CNC(commands.Cog):
                                namereply.content, usereditinfo['username'])
             await conn.execute('''UPDATE provinces SET occupier = $1 WHERE occupier = $2;''',
                                namereply.content, usereditinfo['username'])
+            await ctx.send(f"Success! Your nation name is now {namereply.content}.")
             return
         else:
             # if the editing argument is not the proper argument
