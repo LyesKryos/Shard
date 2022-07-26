@@ -1760,9 +1760,14 @@ class CNC(commands.Cog):
                 incoming_count = 0
             else:
                 incoming_count = incoming_count['count']
+            debuff = 1
+            # if the user has too many trade routes
+            if outgoing_count > userinfo['provinces_owned'][0]:
+                for i in range(userinfo['provinces_owned'][0] - outgoing_count):
+                    debuff -= .1
             trade_gain += initial_trade_value * (outgoing_count / 10)
             trade_gain += initial_trade_value * ((incoming_count * 5) / 100)
-            base_gain += trade_gain
+            base_gain += trade_gain * debuff
             base_gain -= total_troops * 0.01
             # sends the embed
             bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
@@ -1828,9 +1833,13 @@ class CNC(commands.Cog):
                 incoming_count = 0
             else:
                 incoming_count = incoming_count['count']
+            debuff = 1
+            if outgoing_count > userinfo['provinces_owned'][0]:
+                for i in range(userinfo['provinces_owned'][0] - outgoing_count):
+                    debuff -= .1
             trade_gain += initial_trade_value * (outgoing_count / 10)
             trade_gain += initial_trade_value * ((incoming_count * 5) / 100)
-            base_gain += trade_gain
+            base_gain += trade_gain * debuff
             base_gain -= total_troops * 0.01
             # sends the embed
             bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
