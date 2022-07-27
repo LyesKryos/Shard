@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing turn loop issue">
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing turn loop issue" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -135,28 +133,7 @@
       <workItem from="1654788589345" duration="46873000" />
       <workItem from="1656005939581" duration="43893000" />
       <workItem from="1657195423978" duration="11036000" />
-      <workItem from="1658842936524" duration="14947000" />
-    </task>
-    <task id="LOCAL-00338" summary="Adding comma formatting">
-      <created>1656540531035</created>
-      <option name="number" value="00338" />
-      <option name="presentableId" value="LOCAL-00338" />
-      <option name="project" value="LOCAL" />
-      <updated>1656540531035</updated>
-    </task>
-    <task id="LOCAL-00339" summary="Fixing war declaration">
-      <created>1656714321951</created>
-      <option name="number" value="00339" />
-      <option name="presentableId" value="LOCAL-00339" />
-      <option name="project" value="LOCAL" />
-      <updated>1656714321951</updated>
-    </task>
-    <task id="LOCAL-00340" summary="Fixing mass deploy">
-      <created>1656714529357</created>
-      <option name="number" value="00340" />
-      <option name="presentableId" value="LOCAL-00340" />
-      <option name="project" value="LOCAL" />
-      <updated>1656714529357</updated>
+      <workItem from="1658842936524" duration="15257000" />
     </task>
     <task id="LOCAL-00341" summary="Fixing declare">
       <created>1656714596053</created>
@@ -480,7 +457,28 @@
       <option name="project" value="LOCAL" />
       <updated>1658937945871</updated>
     </task>
-    <option name="localTasksCounter" value="387" />
+    <task id="LOCAL-00387" summary="Fixing turn loop issue">
+      <created>1658937968826</created>
+      <option name="number" value="00387" />
+      <option name="presentableId" value="LOCAL-00387" />
+      <option name="project" value="LOCAL" />
+      <updated>1658937968826</updated>
+    </task>
+    <task id="LOCAL-00388" summary="Fixing turn loop issue">
+      <created>1658938079643</created>
+      <option name="number" value="00388" />
+      <option name="presentableId" value="LOCAL-00388" />
+      <option name="project" value="LOCAL" />
+      <updated>1658938079643</updated>
+    </task>
+    <task id="LOCAL-00389" summary="Fixing turn loop issue">
+      <created>1658938250315</created>
+      <option name="number" value="00389" />
+      <option name="presentableId" value="LOCAL-00389" />
+      <option name="project" value="LOCAL" />
+      <updated>1658938250315</updated>
+    </task>
+    <option name="localTasksCounter" value="390" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
