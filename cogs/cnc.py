@@ -4484,6 +4484,7 @@ class CNC(commands.Cog):
                         '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;''',
                         [cities['count'], 1], [ports['count'], 1], [forts['count'], 1], userinfo['user_id'])
                 elif len(userinfo['provinces_owned']) > 5:
+                    # calculate limits
                     structure_cost = 0
                     fortlimit = math.floor((len(userinfo['provinces_owned']) - 5) / 5) + 1
                     portlimit = math.floor((len(userinfo['provinces_owned']) - 5) / 3) + 1
