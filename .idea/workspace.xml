@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Added editing name response&#10;Adding debuff changes to bank command">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding deconstruct command&#10;Fixing structures disparity&#10;Adding structures to cncsv">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,14 +135,7 @@
       <workItem from="1654788589345" duration="46873000" />
       <workItem from="1656005939581" duration="43893000" />
       <workItem from="1657195423978" duration="11036000" />
-      <workItem from="1658842936524" duration="12323000" />
-    </task>
-    <task id="LOCAL-00334" summary="Fixing unoccupied province display issue">
-      <created>1656427904579</created>
-      <option name="number" value="00334" />
-      <option name="presentableId" value="LOCAL-00334" />
-      <option name="project" value="LOCAL" />
-      <updated>1656427904579</updated>
+      <workItem from="1658842936524" duration="13064000" />
     </task>
     <task id="LOCAL-00335" summary="Fixing attack issue">
       <created>1656533351748</created>
@@ -481,7 +473,14 @@
       <option name="project" value="LOCAL" />
       <updated>1658854501756</updated>
     </task>
-    <option name="localTasksCounter" value="383" />
+    <task id="LOCAL-00383" summary="Adding deconstruct command&#10;Fixing structures disparity&#10;Adding structures to cncsv">
+      <created>1658857044433</created>
+      <option name="number" value="00383" />
+      <option name="presentableId" value="LOCAL-00383" />
+      <option name="project" value="LOCAL" />
+      <updated>1658857044433</updated>
+    </task>
+    <option name="localTasksCounter" value="384" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -500,7 +499,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing civil wars" />
     <MESSAGE value="Fixing peace occupation and adding traceback to error handling" />
     <MESSAGE value="Fixing attacking occupied provinces" />
     <MESSAGE value="Fixing defenderinfo" />
@@ -525,7 +523,8 @@
     <MESSAGE value="Fixing file writing" />
     <MESSAGE value="Added editing name response" />
     <MESSAGE value="Added editing name response&#10;Adding debuff changes to bank command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added editing name response&#10;Adding debuff changes to bank command" />
+    <MESSAGE value="Adding deconstruct command&#10;Fixing structures disparity&#10;Adding structures to cncsv" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding deconstruct command&#10;Fixing structures disparity&#10;Adding structures to cncsv" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

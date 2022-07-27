@@ -4096,7 +4096,7 @@ class CNC(commands.Cog):
                                                  userinfo['user_id'])
                     ports = await conn.fetchrow('''SELECT count(*) FROM provinces WHERE owner_id = $1 AND port = True;''',
                                                  userinfo['user_id'])
-                    forts = await conn.fetchrow(''''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
+                    forts = await conn.fetchrow('''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
                         userinfo['user_id'])
                     if cities > citylimit:
                         structure_cost += 1000 * (cities-citylimit)
