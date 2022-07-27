@@ -4473,7 +4473,7 @@ class CNC(commands.Cog):
                         '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND port = True;''',
                         userinfo['user_id'])
                     forts = await conn.fetchrow(
-                        ''''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
+                        '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
                         userinfo['user_id'])
                     if cities['count'] > 1:
                         structure_cost += 1000 * (cities['count'] - 1)
