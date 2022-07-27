@@ -4075,7 +4075,7 @@ class CNC(commands.Cog):
                         '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND port = True;''',
                         userinfo['user_id'])
                     forts = await conn.fetchrow(
-                        ''''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
+                        '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
                         userinfo['user_id'])
                     if cities['count'] > 1:
                         structure_cost += 1000 * (cities['count'] - 1)
@@ -4524,13 +4524,13 @@ class CNC(commands.Cog):
                 trade_route_limit += math.floor(userinfo['portlimit'][0] / 2)
                 # if the current trade route number is too high, reduce effective trade gain
                 outgoing_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
-                       active = True AND sender_id = $1;''', userinfo['user_id'])
+                              active = True AND sender_id = $1;''', userinfo['user_id'])
                 if outgoing_count['count'] is None:
                     outgoing_count = 0
                 else:
                     outgoing_count = outgoing_count['count']
                 incoming_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
-                                      active = True AND recipient_id = $1;''', userinfo['user_id'])
+                                             active = True AND recipient_id = $1;''', userinfo['user_id'])
                 if incoming_count['count'] is None:
                     incoming_count = 0
                 else:
@@ -4555,7 +4555,7 @@ class CNC(commands.Cog):
                         if unrest_roll <= national_unrest:
                             # fetch all provinces and get half
                             provinces_owned = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1 AND
-                                   occupier_id = $1;''', user.id)
+                                          occupier_id = $1;''', user.id)
                             provinces_owned = [p['id'] for p in provinces_owned]
                             half_owned = math.floor(len(provinces_owned) / 2)
                             provinces_rebelling = sample(provinces_owned, half_owned)
@@ -4573,9 +4573,9 @@ class CNC(commands.Cog):
                                     troops_remaining = 0
                                 # update all information
                                 await conn.execute('''UPDATE cncusers SET provinces_owned = $1, undeployed = $2 WHERE 
-                                       user_id = $3;''', provinces_owned, undeployed + troops_remaining, u)
+                                              user_id = $3;''', provinces_owned, undeployed + troops_remaining, u)
                                 await conn.execute('''UPDATE provinces SET owner = '', owner_id = '0', occupier = '', 
-                                        occupier_id = 0, unrest = 0, troops = $1 WHERE id = $2;''',
+                                               occupier_id = 0, unrest = 0, troops = $1 WHERE id = $2;''',
                                                    p_info['manpower'] * 2, pr)
                                 await self.bot.loop.run_in_executor(None, self.map_color, pr, p_info['cord'][0:2],
                                                                     "#808080", True)
@@ -4693,7 +4693,7 @@ class CNC(commands.Cog):
                                 if troops_attacked < 0:
                                     troops_attacked = 0
                                 await conn.execute('''UPDATE provinces SET uprising = True, troops = $2
-                                       WHERE id = $1;''', p, troops_attacked)
+                                              WHERE id = $1;''', p, troops_attacked)
                                 provinces_rebelled.append(p)
                     # add Unrest
                     unrest = 0
@@ -4725,7 +4725,7 @@ class CNC(commands.Cog):
                 # calculate unrest and occupation cost for occupied provinces
                 occupation_uprising = list()
                 provinces_occupied = await conn.fetchrow('''SELECT * FROM provinces WHERE occupier_id = $1 AND
-                       owner_id != $1;''', u)
+                              owner_id != $1;''', u)
                 if provinces_occupied is True:
                     for p in provinces_occupied:
                         # calculate unrest
@@ -4773,7 +4773,7 @@ class CNC(commands.Cog):
                 credits_added -= structure_cost
                 # calculate manpower increase and max manpower
                 max_manpower_raw = await conn.fetchrow('''SELECT sum(manpower::int) FROM provinces WHERE
-                       owner_id = $1 AND uprising = False;''', u)
+                              owner_id = $1 AND uprising = False;''', u)
                 max_manpower = max_manpower_raw['sum']
                 if max_manpower is None:
                     max_manpower = 3000
@@ -4797,7 +4797,7 @@ class CNC(commands.Cog):
                     moves += 1
                 # add all credits, manpower, moves to the user
                 await conn.execute('''UPDATE cncusers SET resources = $1, manpower = $2, maxmanpower = $3, moves = $4, 
-                       trade_routes = $5 WHERE user_id = $6;''',
+                              trade_routes = $5 WHERE user_id = $6;''',
                                    credits_added + userinfo['resources'], manpower, max_manpower, moves, trade_routes,
                                    u)
                 # great power calculations
@@ -4816,7 +4816,7 @@ class CNC(commands.Cog):
                                    gp_points, userinfo['username'])
             await conn.execute('''UPDATE cncusers SET great_power = False;''')
             great_powers = await conn.fetch('''SELECT user_id, great_power_score FROM cncusers 
-                   ORDER BY great_power_score DESC LIMIT 3;''')
+                          ORDER BY great_power_score DESC LIMIT 3;''')
             for gp in great_powers:
                 if gp['great_power_score'] > 50:
                     userid = gp['user_id']
