@@ -1,4 +1,6 @@
 # recruitment 1.1
+from datetime import datetime
+
 from pytz import timezone
 from ShardBot import Shard
 from urllib.parse import quote
@@ -21,26 +23,23 @@ class Recruitment(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
         self.monthly_recruiter_notification = False
+        self.db_error = False
 
         async def monthly_recruiter_scheduler(bot):
             await bot.wait_until_ready()
             # fetches channel object
             crashchannel = bot.get_channel(835579413625569322)
-            try:
+            while True:
                 # sets up asyncio scheduler
-                monthlyscheduler = AsyncIOScheduler()
                 eastern = timezone('US/Eastern')
-                # adds the job with cron designator
-                monthlyscheduler.add_job(monthly_recruiter,
-                                         CronTrigger(hour=0, minute=0, day=1, timezone=eastern),
-                                         args=(bot,),
-                                         id="monthly recruiter")
-                # starts the schedule, fetches the job information, and sends the confirmation that it has begun
-                monthlyscheduler.start()
-                monthlyjob = monthlyscheduler.get_job("monthly recruiter")
-                await crashchannel.send(f"Monthly recruiter next run: {monthlyjob.next_run_time}")
-            except Exception as error:
-                await crashchannel.send(error)
+                # identifies now
+                now = datetime.now(eastern)
+                next_month = now.month + 1
+                runtime = now.replace(day=1, month=next_month, hour=0, minute=0, second=0)
+                await crashchannel.send(f"Monthly recruiter next run: {runtime.strftime('%d %a %Y at %H:%M:%S %Z%z')}")
+                await discord.utils.sleep_until(runtime)
+                await monthly_recruiter(bot)
+                continue
 
         async def monthly_recruiter(bot):
             await bot.wait_until_ready()
@@ -110,8 +109,11 @@ class Recruitment(commands.Cog):
                         if re.search("Database Connection Error", crashcheck):
                             await crashchannel.send("Error: `NationStates Database Connection Error`"
                                                     "\nWaiting 15 minutes and retrying.")
+                            bot.db_error = True
                             await asyncio.sleep(900)
                             continue
+                        else:
+                            bot.db_error = False
                         Recruitment.new_nations = set(recruitssoup.nations.text.split(':')).difference(
                             Recruitment.all_nations)
                         departed_nations = Recruitment.all_nations.difference(set(recruitssoup.nations.text.split(':')))
@@ -164,6 +166,8 @@ class Recruitment(commands.Cog):
                     members = set(membersoup.members.text.split(','))
                     Recruitment.all_wa = nations.intersection(members)
                     while True:
+                        if bot.db_error is True:
+                            continue
                         headers = {"User-Agent": "Bassiliya"}
                         params = {'q': 'nations',
                                   'region': 'thegye'}

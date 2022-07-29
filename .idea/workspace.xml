@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing cnc_deconstruct">
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,21 +136,7 @@
       <workItem from="1654788589345" duration="46873000" />
       <workItem from="1656005939581" duration="43893000" />
       <workItem from="1657195423978" duration="11036000" />
-      <workItem from="1658842936524" duration="17077000" />
-    </task>
-    <task id="LOCAL-00345" summary="Altering cnc_declare">
-      <created>1656727499955</created>
-      <option name="number" value="00345" />
-      <option name="presentableId" value="LOCAL-00345" />
-      <option name="project" value="LOCAL" />
-      <updated>1656727499955</updated>
-    </task>
-    <task id="LOCAL-00346" summary="Fixing cnc_declare">
-      <created>1656727727808</created>
-      <option name="number" value="00346" />
-      <option name="presentableId" value="LOCAL-00346" />
-      <option name="project" value="LOCAL" />
-      <updated>1656727727808</updated>
+      <workItem from="1658842936524" duration="18452000" />
     </task>
     <task id="LOCAL-00347" summary="Fixing cnc_declare">
       <created>1656728096404</created>
@@ -480,7 +467,21 @@
       <option name="project" value="LOCAL" />
       <updated>1659102820597</updated>
     </task>
-    <option name="localTasksCounter" value="394" />
+    <task id="LOCAL-00394" summary="Fixing cnc_deconstruct">
+      <created>1659103022403</created>
+      <option name="number" value="00394" />
+      <option name="presentableId" value="LOCAL-00394" />
+      <option name="project" value="LOCAL" />
+      <updated>1659103022403</updated>
+    </task>
+    <task id="LOCAL-00395" summary="Fixing cnc_deconstruct">
+      <created>1659103082166</created>
+      <option name="number" value="00395" />
+      <option name="presentableId" value="LOCAL-00395" />
+      <option name="project" value="LOCAL" />
+      <updated>1659103082166</updated>
+    </task>
+    <option name="localTasksCounter" value="396" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
