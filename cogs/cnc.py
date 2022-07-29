@@ -2324,7 +2324,7 @@ class CNC(commands.Cog):
                 await ctx.send(f"The fort in Province #{provinceid} successfully removed.")
                 return
         # if a port is to be deconstructed
-        if structure.lower == "port":
+        elif structure.lower == "port":
             # if no port exists, return
             if not p_info['port']:
                 await ctx.send("There is no port in that province.")
@@ -2339,7 +2339,7 @@ class CNC(commands.Cog):
                 await ctx.send(f"The port in Province #{provinceid} successfully removed.")
                 return
         # if a city is to be deconstructed
-        if structure.lower == "city":
+        elif structure.lower == "city":
             # if no port exists, return
             if not p_info['city']:
                 await ctx.send("There is no city in that province.")
@@ -2356,6 +2356,10 @@ class CNC(commands.Cog):
                                    usercities, author.id)
                 await ctx.send(f"The city in Province #{provinceid} successfully removed.")
                 return
+        else:
+            await ctx.send_help(ctx.invoked_with)
+            return
+
 
     @commands.command(usage="[rate changing (tax, military, services; t,m,s)] [whole number rate]",
                       brief="Changes the rate of the given spending rate.")
