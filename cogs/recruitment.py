@@ -36,7 +36,7 @@ class Recruitment(commands.Cog):
                 now = datetime.now(eastern)
                 next_month = now.month + 1
                 runtime = now.replace(day=1, month=next_month, hour=0, minute=0, second=0)
-                await crashchannel.send(f"Monthly recruiter next run: {runtime.strftime('%d %a %Y at %H:%M:%S %Z%z')}")
+                await crashchannel.send(f"Monthly recruiter next run: {runtime.strftime('%a %d %b %Y at %H:%M:%S %Z%z')}")
                 await discord.utils.sleep_until(runtime)
                 await monthly_recruiter(bot)
                 continue
