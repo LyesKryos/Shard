@@ -2309,7 +2309,7 @@ class CNC(commands.Cog):
             await ctx.send("You do not own and occupy that province.")
             return
         # if a fort is to be deconstructed
-        if structure.lower == "fort":
+        if structure.lower() == "fort":
             # if no fort exists, return
             if not p_info['fort']:
                 await ctx.send("There is no fort in that province.")
@@ -2324,7 +2324,7 @@ class CNC(commands.Cog):
                 await ctx.send(f"The fort in Province #{provinceid} successfully removed.")
                 return
         # if a port is to be deconstructed
-        elif structure.lower == "port":
+        elif structure.lower() == "port":
             # if no port exists, return
             if not p_info['port']:
                 await ctx.send("There is no port in that province.")
@@ -2339,7 +2339,7 @@ class CNC(commands.Cog):
                 await ctx.send(f"The port in Province #{provinceid} successfully removed.")
                 return
         # if a city is to be deconstructed
-        elif structure.lower == "city":
+        elif structure.lower() == "city":
             # if no port exists, return
             if not p_info['city']:
                 await ctx.send("There is no city in that province.")
