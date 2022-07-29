@@ -2348,7 +2348,7 @@ class CNC(commands.Cog):
                 await ctx.send("You cannot remove your capital city.")
                 return
             else:
-                # set port to false and update portlimit
+                # set port to false and update citylimit
                 await conn.execute('''UPDATE provinces SET city = False WHERE id = $1;''', provinceid)
                 usercities = userinfo['citylimit']
                 usercities[0] -= 1
@@ -4312,11 +4312,11 @@ class CNC(commands.Cog):
                     else:
                         public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
                     # add unrest and cap or floor
+                    unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
                     if unrest > 100:
                         unrest = 100
                     elif unrest < 0:
                         unrest = 0
-                    unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
                     await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
                 # if there are uprising provinces
                 if len(provinces_rebelled) != 0:
@@ -4710,11 +4710,12 @@ class CNC(commands.Cog):
                     else:
                         public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
                     # add unrest and cap or floor
+
+                    unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
                     if unrest > 100:
                         unrest = 100
                     elif unrest < 0:
                         unrest = 0
-                    unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
                     await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
                 # if there are uprising provinces
                 if len(provinces_rebelled) != 0:
