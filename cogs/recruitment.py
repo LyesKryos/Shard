@@ -25,7 +25,6 @@ class Recruitment(commands.Cog):
         self.monthly_recruiter_notification = False
         self.db_error = False
 
-        @tasks.loop(month=1)
         async def monthly_recruiter_scheduler(bot):
             await bot.wait_until_ready()
             # fetches channel object
