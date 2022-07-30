@@ -5,7 +5,7 @@ from pytz import timezone
 from ShardBot import Shard
 from urllib.parse import quote
 from apscheduler.triggers.cron import CronTrigger
-from discord.ext import commands
+from discord.ext import commands, tasks
 import discord
 import asyncio
 from bs4 import BeautifulSoup
@@ -25,6 +25,7 @@ class Recruitment(commands.Cog):
         self.monthly_recruiter_notification = False
         self.db_error = False
 
+        @tasks.loop(month=1)
         async def monthly_recruiter_scheduler(bot):
             await bot.wait_until_ready()
             # fetches channel object
@@ -36,7 +37,7 @@ class Recruitment(commands.Cog):
                 now = datetime.now(eastern)
                 next_month = now.month + 1
                 runtime = now.replace(day=1, month=next_month, hour=0, minute=0, second=0)
-                await crashchannel.send(f"Monthly recruiter next run: {runtime.strftime('%a %d %b %Y at %H:%M:%S %Z%z')}")
+                await crashchannel.send(f"Monthly recruiter next run: {runtime.strftime('%a, %d %b %Y at %H:%M:%S %Z%z')}")
                 await discord.utils.sleep_until(runtime)
                 await monthly_recruiter(bot)
                 continue

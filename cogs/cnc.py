@@ -4849,28 +4849,28 @@ class CNC(commands.Cog):
             # if the hour is less than midnight but not somehow also a negative hour (hey, it happens)
             if now.time() < datetime.time(hour=0):
                 update = now.replace(hour=0, minute=0, second=0, microsecond=1)
-                await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await shardchannel.send(f"Turn loop waiting until {update.strftime('%a, %d %b %Y at %H:%M:%S %Z%z')}.")
                 await discord.utils.sleep_until(update)
             # if the hour is less than 0600 but greater than 0600
             elif now.time() < datetime.time(hour=6):
                 update = now.replace(hour=6, minute=0, second=0)
-                await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await shardchannel.send(f"Turn loop waiting until {update.strftime('%a, %d %b %Y at %H:%M:%S %Z%z')}.")
                 await discord.utils.sleep_until(update)
             # if the hour is greater than 0600 but less than noon
             elif now.time() < datetime.time(hour=12):
                 update = now.replace(hour=12, minute=0, second=0)
-                await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await shardchannel.send(f"Turn loop waiting until {update.strftime('%a, %d %b %Y at %H:%M:%S %Z%z')}.")
                 await discord.utils.sleep_until(update)
             # if the hour is greater than noon but less than 1800
             elif now.time() < datetime.time(hour=18, minute=0):
                 update = now.replace(hour=18, minute=0)
-                await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await shardchannel.send(f"Turn loop waiting until {update.strftime('%a, %d %b %Y at %H:%M:%S %Z%z')}.")
                 await discord.utils.sleep_until(update)
             # if the hour is greater than 1800 but less than midnight
             elif now.time() > datetime.time(hour=18, minute=0):
                 update = now.replace(hour=0, minute=0, second=0)
                 update += datetime.timedelta(days=1)
-                await shardchannel.send(f"Turn loop waiting until {update.strftime('%d %a %Y at %H:%M:%S %Z%z')}.")
+                await shardchannel.send(f"Turn loop waiting until {update.strftime('%a, %d %b %Y at %H:%M:%S %Z%z')}.")
                 await discord.utils.sleep_until(update)
             self.turn_loop.start()
         except Exception:
