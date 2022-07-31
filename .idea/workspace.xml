@@ -7,7 +7,6 @@
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Editing monthly recruiter data">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -137,21 +136,7 @@
       <workItem from="1654788589345" duration="46873000" />
       <workItem from="1656005939581" duration="43893000" />
       <workItem from="1657195423978" duration="11036000" />
-      <workItem from="1658842936524" duration="20849000" />
-    </task>
-    <task id="LOCAL-00349" summary="Altering how the view commands calculate total troops">
-      <created>1656762180665</created>
-      <option name="number" value="00349" />
-      <option name="presentableId" value="LOCAL-00349" />
-      <option name="project" value="LOCAL" />
-      <updated>1656762180665</updated>
-    </task>
-    <task id="LOCAL-00350" summary="Fixing peace offer">
-      <created>1656762329159</created>
-      <option name="number" value="00350" />
-      <option name="presentableId" value="LOCAL-00350" />
-      <option name="project" value="LOCAL" />
-      <updated>1656762329159</updated>
+      <workItem from="1658842936524" duration="25451000" />
     </task>
     <task id="LOCAL-00351" summary="Fixing peace acceptance">
       <created>1656762974167</created>
@@ -482,7 +467,21 @@
       <option name="project" value="LOCAL" />
       <updated>1659107756104</updated>
     </task>
-    <option name="localTasksCounter" value="398" />
+    <task id="LOCAL-00398" summary="Editing monthly recruiter data">
+      <created>1659183645051</created>
+      <option name="number" value="00398" />
+      <option name="presentableId" value="LOCAL-00398" />
+      <option name="project" value="LOCAL" />
+      <updated>1659183645052</updated>
+    </task>
+    <task id="LOCAL-00399" summary="Editing monthly recruiter data">
+      <created>1659183797690</created>
+      <option name="number" value="00399" />
+      <option name="presentableId" value="LOCAL-00399" />
+      <option name="project" value="LOCAL" />
+      <updated>1659183797690</updated>
+    </task>
+    <option name="localTasksCounter" value="400" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

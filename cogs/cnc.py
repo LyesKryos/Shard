@@ -4090,7 +4090,7 @@ class CNC(commands.Cog):
                     await conn.execute(
                         '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;''',
                         [cities['count'], 1], [ports['count'], 1], [forts['count'], 1], userinfo['user_id'])
-                elif len(userinfo['provinces_owned']) > 5:
+                else:
                     # calculate limits
                     structure_cost = 0
                     fortlimit = math.floor((len(userinfo['provinces_owned']) - 5) / 5) + 1
@@ -4586,16 +4586,16 @@ class CNC(commands.Cog):
                             provinces_rebelling.sort()
                             provinces_rebelling_string = ', '.join(str(e) for e in provinces_rebelling)
                             await user.send(f"Province(s) {provinces_rebelling_string} have rebelled in a civil war"
-                                            f"due to high national unrest ({unrest})!")
+                                            f"due to high national unrest ({national_unrest})!")
                             civil_war = True
                 # add national Unrest
                 national_unrest = 0
                 # do complicated maths to figure out the unrest rate
                 tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
                 military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
-                        military_upkeep / 10 - 1)) * 0.75))
+                        (military_upkeep / 10) - 1)) * 0.75))
                 if public_services < 15:
-                    public_service_unrest = round(30 - public_services * 2)
+                    public_service_unrest = round(30 - (public_services * 2))
                 else:
                     public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
                 if userinfo['great_power'] is False:
@@ -4725,7 +4725,7 @@ class CNC(commands.Cog):
                 if len(provinces_rebelled) != 0:
                     provinces_rebelled_string = ', '.join(str(p) for p in provinces_rebelled)
                     await user.send(f"The population of province(s) {provinces_rebelled_string} "
-                                    f"have risen up due to high unrest ({unrest})! {structures_destroyed} "
+                                    f"have risen up due to high unrest! {structures_destroyed} "
                                     f"structures have been destroyed by the rioters.")
                 # calculate unrest and occupation cost for occupied provinces
                 occupation_uprising = list()
@@ -4767,7 +4767,7 @@ class CNC(commands.Cog):
                 if occupation_uprising is True:
                     occupation_uprising_string = ', '.join(str(p) for p in occupation_uprising)
                     await user.send(f"The population of occupied province(s) {occupation_uprising_string} "
-                                    f"have risen up due to high unrest ({unrest}) and have returned to their "
+                                    f"have risen up due to high unrest and have returned to their "
                                     f"core owner's control!")
 
                 # for every domestic trade route, +10%. For every foreign trade route, +5%
@@ -4806,11 +4806,12 @@ class CNC(commands.Cog):
                                    credits_added + userinfo['resources'], manpower, max_manpower, moves, trade_routes,
                                    u)
                 # great power calculations
+                total_troops += userinfo['undeployed']
                 gp_points = 0
                 gp_points += credits_added * 0.001
                 gp_points += total_troops * 0.001
                 gp_points += initial_manpower * 0.001
-                gp_points += userinfo['fortlimit'][0] + userinfo['citylimit'][0]
+                gp_points += forts['count'] + cities['count'] + ports['count']
                 gp_points += len(provinces) * 0.5
                 alliances = await conn.fetchrow(
                     '''SELECT COUNT(*) FROM interactions WHERE (sender = $1 or recipient = $1) and type = 'alliance'
