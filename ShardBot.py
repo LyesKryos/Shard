@@ -4,8 +4,6 @@ from discord.ext import commands
 import os
 import logging
 from datetime import datetime as dt
-from customchecks import SilentFail
-import traceback
 
 
 class Shard(commands.Bot):

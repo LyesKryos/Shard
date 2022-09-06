@@ -1,6 +1,4 @@
-import asyncio
 import traceback
-
 import discord
 from ShardBot import Shard
 from discord.ext import commands

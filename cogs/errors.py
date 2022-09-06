@@ -1,6 +1,4 @@
-import discord
 import traceback
-import sys
 from ShardBot import Shard
 from discord.ext import commands
 from customchecks import SilentFail
