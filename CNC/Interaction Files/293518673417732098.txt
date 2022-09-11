@@ -1,85 +1,203 @@
-Offer #975400729739145266 of alliance.
-Sent by: Bassiliya
-Accepted by: Cisalpine
-**Terms**
-The Empire of Bassiliya and the Kingdom of Cisalpine and Switzerland hereby sign this pact of non-aggression. The signatories will agree to cease all aggression against the other and abstain from all aggressive action towards each other for the duration of this treaty. This pact will last until turn #112. Should either signatory wish to break this pact of non-aggression prior to turn #112, they must notify the other party 8 turns in advance and surrender 5% of their current war chest or 5% of their credit income, whichever is greater.
-Accepted: 05/15/22
-Offer #975130018122436649 of treaty.
-Sent by: Bassiliya
-Accepted by: Nokoroth
-**Terms**
-The Empire of Bassiliya proposes to buy provinces 63, 70, 72, and 73 from the Armed Republic of Nokoroth for the sum of Ͼ3000.
-Accepted: 05/14/22
-Offer #975140973124395028 of alliance.
-Sent by: Bassiliya
-Accepted by: Crea
-**Terms**
-The Duchy of Crea and the Empire of Bassiliya hereby enter into a permanent alliance with each other. The signatories agree to defend each others borders and come to the aid of the other during a conflict. This alliance will extend until the Empire of Bassiliya cancels it.
-Accepted: 05/14/22
-Offer #975137630494806016 of peace.
-Sent by: Bassiliya
-Accepted by: Crea
-**Terms**
-The state of Crea agrees to surrender with the following terms: - The state of Crea surrenders the provinces of 86, 87, 79, 76. - The state of Crea agrees to recognize the claim of the Empire of Bassiliya to these provinces and renounces any claim to these provinces. - The state of Crea agrees to surrender their full independence to the Empire of Bassiliya. The Emperor of Bassiliya will be invested with the power to establish the Duchy of Crea. The Duchy of Crea may negotiate and administer its own internal affairs, but will immediately renounce all treaties and alliances made with any nation, aside from the Empire of Bassiliya. The Duchy of Crea will act as a permanent ally of the Empire of Bassiliya and will accept any negotiations automatically from the Empire of Bassiliya. - The Empire of Bassiliya will recognize the control of the Duchy of Crea over the remainder of Crea and will not demand further territory without fair and just compensation. The Empire of Bassiliya will agree to defend the lands of the Duchy of Crea with both economic and military force.
-Accepted: 05/14/22
-Offer #975127377594163201 of treaty.
-Sent by: Bassiliya
-Accepted by: Cisalpine
-**Terms**
-This is the declaration of acknowledgement of border claims and the mutual assurance of respect. 
-The Empire of Bassiliya and the Kingdom of Cisalpine and Switzerland mutually agree to respect the borders and claims of both empires fully and completely (claims outlined in this message: https://discord.com/channels/674259612580446230/974663465115451474/975118608697032714). South and west of the indicated line (including the line itself) will be reserved for Bassiliya; north and east of the line will be reserved for Cisalpine.  Each empire will agree to take no action against the other, as long as that other empire is pursuing agreed-upon claims and not taking direct action against any signatory. This agreement will last until the 100th turn or until the claim agreements of both empires are fully realized. Any signatory that wishes to break the agreement will notify the other signatories 10 turns in advance and surrender 5% of their current resources or their current income, whichever is greater, to the other signatories.
-Accepted: 05/14/22
-Offer #975114740948942848 of treaty.
-Sent by: Bassiliya
-Accepted by: Aquastareite
-**Terms**
-The Empire of Bassiliya offers an agreement of trade between the Empire of Bassiliya and the Thalassocracy of Aquastareite. This trade agreement will last until turn #25.
-Accepted: 05/14/22
-Offer #974772850974146612 of treaty.
-Sent by: Bassiliya
-Accepted by: Japharia
-**Terms**
-this is a test treaty. feel free to reject.
-Accepted: 05/13/22
-Offer #974749442332819516 of alliance.
-Sent by: Bassiliya
-Accepted by: Cisalpine
-**Terms**
-testing
-Accepted: 05/13/22
-Offer #974390197536034927 of alliance.
-Sent by: Bassiliya
-Accepted by: Shijeun
-**Terms**
-The Empires of Almaaz, Bassiliya, and Shijeun agree to form the Southwestern Coalition. This coalition will agree to a pact of non-aggression, a pact of mutual defense, and a pact of non-interference. Each member will reject any offers of alliance until turn #150, at which time the terms of this coalition will be reassessed by all nations and any changes may be made. Any member who wishes to withdraw from the coalition will pay all signatories 5% of all their current treasury and notify the other members 4 turns in advance.
-Accepted: 05/12/22
-Offer #974390168800870430 of alliance.
-Sent by: Bassiliya
-Accepted by: Almaaz
-**Terms**
-The Empires of Almaaz, Bassiliya, and Shijeun agree to form the Southwestern Coalition. This coalition will agree to a pact of non-aggression, a pact of mutual defense, and a pact of non-interference. Each member will reject any offers of alliance until turn #150, at which time the terms of this coalition will be reassessed by all nations and any changes may be made. Any member who wishes to withdraw from the coalition will pay all signatories 5% of all their current treasury and notify the other members 4 turns in advance.
-Accepted: 05/12/22
-Offer #974368366074691655 of peace.
-Sent by: Bassiliya
-Accepted by: Almaaz
-**Terms**
-Surrender now or... idk, die?
-Accepted: 05/12/22
-Offer #974363802697080852 of alliance.
-Sent by: Bassiliya
-Accepted by: Almaaz
-**Terms**
-testing
-Accepted: 05/12/22
-Offer #974362594322284554 of alliance.
-Sent by: Almaaz
-Accepted by: Bassiliya
-**Terms**
-Open borders for trade, non aggression pact, mutual defense treaty for 25 turns
-Accepted: 05/12/22
-Offer #974357949222887454 of alliance.
-Sent by: Bassiliya
-Accepted by: Harmania
-**Terms**
-The great Empire of Bassiliya proposes an alliance with the great nation of Harmania. The Empires will respect each others boundaries, cease all current aggression, abstain from all future aggression, and defend their mutual interests in the South of the world. This alliance will last until the Turn #100.
-Accepted: 05/12/22
+Interaction ID: 1005506882795999242
+Sender: Sounor
+Recipient: Orienta
+Type: trade
+Terms: Establish a Trade Route.
+Active: True
+
+Interaction ID: 996409382483005651
+Sender: Sounor
+Recipient: Revamper
+Type: peace
+Terms: See Eyax peace treaty.
+Active: False
+
+Interaction ID: 996406495438717069
+Sender: Eyax
+Recipient: Sounor
+Type: peace
+Terms: Sounor shall cede 1 and 2 to Eyax. Sounor shall sign a non-aggression pact with Revamper and Eyax that shall last for 50 turns. Sounor shall peace out with Revamper
+Active: False
+
+Interaction ID: 996306404975587379
+Sender: Eyax
+Recipient: Sounor
+Type: war
+Terms: Sounor has invaded Eyax
+Active: False
+
+Interaction ID: 996296210879098950
+Sender: Revamper
+Recipient: Sounor
+Type: war
+Terms: In Order To Protect Revamper From Invasion Of The Grand Confederacy of Sounor.
+Active: False
+
+Interaction ID: 995558349041041468
+Sender: Crea
+Recipient: Sounor
+Type: trade
+Terms: Establish a Trade Route.
+Active: True
+
+Interaction ID: 995345632300646432
+Sender: Eyax
+Recipient: Sounor
+Type: peace
+Terms: Sounor shall give up 212 to Eyax, Sounor shall give all other mainland provinces to Revamper, Sounor shall pay 200,000 to Eyax and 250,000 to Kiyari
+Active: False
+
+Interaction ID: 994499899146113104
+Sender: Eyax
+Recipient: Sounor
+Type: war
+Terms: betrayal during the great coalition war
+Active: False
+
+Interaction ID: 994213428572999791
+Sender: Sounor
+Recipient: Orienta
+Type: treaty
+Terms: The Grand Confederacy of Sounor agrees to send the Union of Orient Olkanania a sum of Ͼ6,000. In return, Olkanania will agree to recognize the Grand Confederacy and all her claims, to remain neutral towards the Grand Confederacy, and to remain neutral toward her allies. This treaty shall remain in effect until such a time as the Grand Confederacy wishes to end it.
+Active: True
+
+Interaction ID: 992759208653103154
+Sender: Sounor
+Recipient: Nokoroth
+Type: peace
+Terms: The people of Sounor have no quarrel with the people of Nokoroth. We propose a status quo ante bellum peace to be established immediately.
+Active: False
+
+Interaction ID: 992722507893313557
+Sender: Nokoroth
+Recipient: Sounor
+Type: war
+Terms: The grand and great empire of Nokoroth has deemed that the lowly nation of Sounor is of no importance to the Empire, and so declares war on Sounor, in order to wipe out all future opposition.
+Active: False
+
+Interaction ID: 992614646626385960
+Sender: Sounor
+Recipient: Nokoroth
+Type: war
+Terms: testing the bad boi
+Active: False
+
+Interaction ID: 992555903977009152
+Sender: Nokoroth
+Recipient: Sounor
+Type: war
+Terms: The grand and great empire of Nokoroth has deemed that the lowly nation of Sounor is of no importance to the Empire, and so declares war on Sounor, in order to wipe out all future opposition.
+Active: False
+
+Interaction ID: 990434466784755762
+Sender: Sounor
+Recipient: Revamper
+Type: trade
+Terms: Establish a Trade Route.
+Active: False
+
+Interaction ID: 988645782381035530
+Sender: Crystaliz
+Recipient: Sounor
+Type: trade
+Terms: Establish a Trade Route.
+Active: True
+
+Interaction ID: 988270242495098901
+Sender: Revamper
+Recipient: Sounor
+Type: trade
+Terms: Establish a Trade Route.
+Active: False
+
+Interaction ID: 987709530861346816
+Sender: Revamper
+Recipient: Sounor
+Type: trade
+Terms: Establish a Trade Route.
+Active: False
+
+Interaction ID: 986329507789148220
+Sender: Sounor
+Recipient: Eyax
+Type: trade
+Terms: Establish a Trade Route.
+Active: False
+
+Interaction ID: 986284031895302194
+Sender: Sounor
+Recipient: Kiyari
+Type: trade
+Terms: Establish a Trade Route.
+Active: False
+
+Interaction ID: 986283999108403210
+Sender: Sounor
+Recipient: Crea
+Type: trade
+Terms: Establish a Trade Route.
+Active: True
+
+Interaction ID: 985577783298228276
+Sender: Sounor
+Recipient: Eyax
+Type: trade
+Terms: Establish a Trade Route.
+Active: False
+
+Interaction ID: 985444025479872512
+Sender: Nokoroth
+Recipient: Sounor
+Type: trade
+Terms: Establish a Trade Route.
+Active: False
+
+Interaction ID: 985008331015995422
+Sender: Sounor
+Recipient: Revamper
+Type: peace
+Terms: The Grand Confederacy of Sounor will agree to peace terms. These terms will be that Sounor maintain all currently controlled territory, that the nation of Revamper surrender all claims to the controlled territory, and that the nation of Revamper surrender and pay 15,000 credits to the Grand Confederacy of Sounor as war reparations.
+Active: False
+
+Interaction ID: 984920397860450334
+Sender: Nokoroth
+Recipient: Sounor
+Type: trade
+Terms: Establish a Trade Route.
+Active: False
+
+Interaction ID: 984777095840399400
+Sender: Sounor
+Recipient: Crystaliz
+Type: trade
+Terms: Establish a Trade Route.
+Active: True
+
+Interaction ID: 984545962913583126
+Sender: Sounor
+Recipient: Nokoroth
+Type: trade
+Terms: Establish a Trade Route.
+Active: False
+
+Interaction ID: 984527229335781427
+Sender: Sounor
+Recipient: Nokoroth
+Type: trade
+Terms: Establish a Trade Route.
+Active: False
+
+Interaction ID: 984489825103118427
+Sender: Sounor
+Recipient: Nokoroth
+Type: trade
+Terms: Establish a Trade Route.
+Active: False
+
+Interaction ID: 983791322907443281
+Sender: Sounor
+Recipient: Revamper
+Type: war
+Terms: The Grand Confederacy of Sounor declares a state of war against the dastardly empire of Revamper. The Confederacy seeks to cut the aforementioned nation down to size and gain war reparations from them. This state of war shall last until the conclusion of the conflict, as negotiated between all involved parties.
+Active: False
+
