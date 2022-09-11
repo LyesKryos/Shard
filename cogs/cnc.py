@@ -99,8 +99,8 @@ class CNC(commands.Cog):
             for y in range(0, height):
                 data = prov.getpixel((x, y))
                 if data != color:
-                    iutpixel((x, y), color)f data != (0, 0, 0, 0):
-                        prov.p
+                    if data != (0, 0, 0, 0):
+                        prov.putpixel((x, y), color)
         # if this is a release, change every color to neutral grey
         if release is True:
             color = ImageColor.getrgb("#808080")

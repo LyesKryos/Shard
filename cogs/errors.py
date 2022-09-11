@@ -48,6 +48,9 @@ class ShardErrorHandler(commands.Cog):
         # if there is a custom check error
         elif isinstance(error, commands.UserInputError):
             await ctx.send_help(ctx.invoked_with)
+        elif isinstance(error, commands.CommandOnCooldown):
+            await ctx.send(f"Slow down! Try again in {error.retry_after:.2f} seconds.")
+            await ctx.send_help(ctx.invoked_with)
         elif isinstance(error, SilentFail):
             return
         elif isinstance(error, commands.CheckFailure):

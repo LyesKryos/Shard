@@ -4,57 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing civil wars and great power calculations">
-      <change afterPath="$PROJECT_DIR$/cnc_events.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cnc_research.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="No idea">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ShardBot.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShardBot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/base.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/errors.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/errors.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/province_naming.py" beforeDir="false" afterPath="$PROJECT_DIR$/province_naming.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources_updating_cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources_updating_cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Python Script" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="GitSEFilterConfiguration">
-    <file-type-list>
-      <filtered-out-file-type name="LOCAL_BRANCH" />
-      <filtered-out-file-type name="REMOTE_BRANCH" />
-      <filtered-out-file-type name="TAG" />
-      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
-    </file-type-list>
-  </component>
-  <component name="GithubPullRequestsUISettings">
-    <option name="selectedUrlAndAccountId">
-      <UrlAndAccount>
-        <option name="accountId" value="dbe6dcc9-d7c3-4fd0-a243-d73c8dbd7ccd" />
-        <option name="url" value="https://github.com/LyesKryos/Shard.git" />
-      </UrlAndAccount>
-    </option>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
-  </component>
-  <component name="ProjectId" id="26AA8q6GNxnStJimwgQAymIAnlW" />
+  <component name="ProjectId" id="2EUytQfW9YXhP0YoLNqva7wV1Fs" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
@@ -62,491 +28,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
-    <property name="RunConfigurationTargetLRU" value="bb2d0ebf-f42f-44a6-b0c8-014a065395ac/database/&quot;botdb&quot;" />
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/" value="PostgreSQL" />
-    <property name="com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../botdb.sql" />
-    <property name="node.js.detected.package.eslint" value="true" />
-    <property name="node.js.detected.package.tslint" value="true" />
-    <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="database.main" />
-  </component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\cogs" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard" />
-      <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\cogs" />
-    </key>
-  </component>
-  <component name="RunManager" selected="Python.resources_updating_cnc">
-    <configuration name="botdb.sql" type="DatabaseScript" editBeforeRun="true" temporary="true" nameIsGenerated="true">
-      <script-file value="$PROJECT_DIR$/../../botdb.sql" />
-      <script-mode>FILE</script-mode>
-      <data-source id="bb2d0ebf-f42f-44a6-b0c8-014a065395ac" namespace="database/&quot;botdb&quot;" />
-      <method v="2" />
-    </configuration>
-    <configuration name="console.sql" type="DatabaseScript" editBeforeRun="true" temporary="true" nameIsGenerated="true">
-      <script-file value="$APPLICATION_CONFIG_DIR$/consoles/db/bb2d0ebf-f42f-44a6-b0c8-014a065395ac/console.sql" />
-      <script-mode>FILE</script-mode>
-      <method v="2" />
-    </configuration>
-    <configuration name="cnc_research" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="Shard" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cnc_research.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="resources_updating_cnc" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="Shard" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/resources_updating_cnc.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="scratch_8" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="Shard" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$APPLICATION_CONFIG_DIR$/scratches/scratch_8.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Python.resources_updating_cnc" />
-        <item itemvalue="Python.cnc_research" />
-        <item itemvalue="Database Script.console.sql" />
-        <item itemvalue="Database Script.botdb.sql" />
-        <item itemvalue="Python.scratch_8" />
-      </list>
-    </recent_temporary>
-  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)"
+  }
+}]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
+    <task id="LOCAL-00001" summary="No idea">
+      <created>1662481702602</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1662481702602</updated>
+    </task>
     <task active="true" id="Default" summary="Default task">
-      <changelist id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="" />
-      <created>1646855861623</created>
+      <changelist id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="No idea" />
+      <created>1662664672476</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1646855861623</updated>
-      <workItem from="1646855864250" duration="13268000" />
-      <workItem from="1647180785119" duration="24063000" />
-      <workItem from="1647358739449" duration="870000" />
-      <workItem from="1647360214609" duration="592000" />
-      <workItem from="1647361075302" duration="595000" />
-      <workItem from="1647399195623" duration="16536000" />
-      <workItem from="1648745229600" duration="10964000" />
-      <workItem from="1651500112401" duration="39000" />
-      <workItem from="1651670712730" duration="2595000" />
-      <workItem from="1651766364192" duration="12819000" />
-      <workItem from="1652197800527" duration="53290000" />
-      <workItem from="1652651101974" duration="24370000" />
-      <workItem from="1653752887539" duration="48461000" />
-      <workItem from="1654788589345" duration="46873000" />
-      <workItem from="1656005939581" duration="43893000" />
-      <workItem from="1657195423978" duration="11036000" />
-      <workItem from="1658842936524" duration="26340000" />
-      <workItem from="1659744052584" duration="20335000" />
-      <workItem from="1660572458550" duration="7206000" />
-      <workItem from="1661085096450" duration="9655000" />
+      <updated>1662664672476</updated>
+      <workItem from="1662664677107" duration="1169000" />
     </task>
-    <task id="LOCAL-00352" summary="Fixing deploy and attack">
-      <created>1656808196553</created>
-      <option name="number" value="00352" />
-      <option name="presentableId" value="LOCAL-00352" />
-      <option name="project" value="LOCAL" />
-      <updated>1656808196553</updated>
-    </task>
-    <task id="LOCAL-00353" summary="Fixing civil wars">
-      <created>1656819602206</created>
-      <option name="number" value="00353" />
-      <option name="presentableId" value="LOCAL-00353" />
-      <option name="project" value="LOCAL" />
-      <updated>1656819602207</updated>
-    </task>
-    <task id="LOCAL-00354" summary="Fixing peace occupation and adding traceback to error handling">
-      <created>1656852182578</created>
-      <option name="number" value="00354" />
-      <option name="presentableId" value="LOCAL-00354" />
-      <option name="project" value="LOCAL" />
-      <updated>1656852182579</updated>
-    </task>
-    <task id="LOCAL-00355" summary="Fixing attacking occupied provinces">
-      <created>1656853309259</created>
-      <option name="number" value="00355" />
-      <option name="presentableId" value="LOCAL-00355" />
-      <option name="project" value="LOCAL" />
-      <updated>1656853309259</updated>
-    </task>
-    <task id="LOCAL-00356" summary="Fixing defenderinfo">
-      <created>1656853788793</created>
-      <option name="number" value="00356" />
-      <option name="presentableId" value="LOCAL-00356" />
-      <option name="project" value="LOCAL" />
-      <updated>1656853788793</updated>
-    </task>
-    <task id="LOCAL-00357" summary="Fixing peace occupation">
-      <created>1656861121311</created>
-      <option name="number" value="00357" />
-      <option name="presentableId" value="LOCAL-00357" />
-      <option name="project" value="LOCAL" />
-      <updated>1656861121312</updated>
-    </task>
-    <task id="LOCAL-00358" summary="Changing the way occupy color works">
-      <created>1656862187062</created>
-      <option name="number" value="00358" />
-      <option name="presentableId" value="LOCAL-00358" />
-      <option name="project" value="LOCAL" />
-      <updated>1656862187062</updated>
-    </task>
-    <task id="LOCAL-00359" summary="Fixing NoneType error for civil wars">
-      <created>1656911629517</created>
-      <option name="number" value="00359" />
-      <option name="presentableId" value="LOCAL-00359" />
-      <option name="project" value="LOCAL" />
-      <updated>1656911629517</updated>
-    </task>
-    <task id="LOCAL-00360" summary="Fixing NoneType error for civil wars for force turn">
-      <created>1656911707101</created>
-      <option name="number" value="00360" />
-      <option name="presentableId" value="LOCAL-00360" />
-      <option name="project" value="LOCAL" />
-      <updated>1656911707101</updated>
-    </task>
-    <task id="LOCAL-00361" summary="Fixing removing province 0">
-      <created>1656953619972</created>
-      <option name="number" value="00361" />
-      <option name="presentableId" value="LOCAL-00361" />
-      <option name="project" value="LOCAL" />
-      <updated>1656953619972</updated>
-    </task>
-    <task id="LOCAL-00362" summary="Fixing purchase">
-      <created>1657036299139</created>
-      <option name="number" value="00362" />
-      <option name="presentableId" value="LOCAL-00362" />
-      <option name="project" value="LOCAL" />
-      <updated>1657036299139</updated>
-    </task>
-    <task id="LOCAL-00363" summary="Fixing blank terms">
-      <created>1657038529513</created>
-      <option name="number" value="00363" />
-      <option name="presentableId" value="LOCAL-00363" />
-      <option name="project" value="LOCAL" />
-      <updated>1657038529513</updated>
-    </task>
-    <task id="LOCAL-00364" summary="Adding cnc_owned_check">
-      <created>1657039052081</created>
-      <option name="number" value="00364" />
-      <option name="presentableId" value="LOCAL-00364" />
-      <option name="project" value="LOCAL" />
-      <updated>1657039052082</updated>
-    </task>
-    <task id="LOCAL-00365" summary="Fixing cnc_owned_check">
-      <created>1657039189017</created>
-      <option name="number" value="00365" />
-      <option name="presentableId" value="LOCAL-00365" />
-      <option name="project" value="LOCAL" />
-      <updated>1657039189018</updated>
-    </task>
-    <task id="LOCAL-00366" summary="Fixing detailed view and withdraw all">
-      <created>1657197667957</created>
-      <option name="number" value="00366" />
-      <option name="presentableId" value="LOCAL-00366" />
-      <option name="project" value="LOCAL" />
-      <updated>1657197667958</updated>
-    </task>
-    <task id="LOCAL-00367" summary="Fixing detailed view,  withdraw all, mass_deploy">
-      <created>1657210371592</created>
-      <option name="number" value="00367" />
-      <option name="presentableId" value="LOCAL-00367" />
-      <option name="project" value="LOCAL" />
-      <updated>1657210371592</updated>
-    </task>
-    <task id="LOCAL-00368" summary="Fixing view with no deployed troops">
-      <created>1657378906862</created>
-      <option name="number" value="00368" />
-      <option name="presentableId" value="LOCAL-00368" />
-      <option name="project" value="LOCAL" />
-      <updated>1657378906862</updated>
-    </task>
-    <task id="LOCAL-00369" summary="Fixing view with no deployed troops">
-      <created>1657379233732</created>
-      <option name="number" value="00369" />
-      <option name="presentableId" value="LOCAL-00369" />
-      <option name="project" value="LOCAL" />
-      <updated>1657379233732</updated>
-    </task>
-    <task id="LOCAL-00370" summary="Fixing view with no deployed troops">
-      <created>1657379288597</created>
-      <option name="number" value="00370" />
-      <option name="presentableId" value="LOCAL-00370" />
-      <option name="project" value="LOCAL" />
-      <updated>1657379288597</updated>
-    </task>
-    <task id="LOCAL-00371" summary="Fixing regaining occupied provinces">
-      <created>1657624273602</created>
-      <option name="number" value="00371" />
-      <option name="presentableId" value="LOCAL-00371" />
-      <option name="project" value="LOCAL" />
-      <updated>1657624273603</updated>
-    </task>
-    <task id="LOCAL-00372" summary="Fixing issue where returning occupied provinces colored incorrectly&#10;Fixing trade routes to update properly and display the correct amount&#10;Altering occupation color method for ease of identification and uniformity&#10;Streamlining interactions and display&#10;Fixing issue with too many ports&#10;Altering trade routes to decrease trade gain by 10% for every trade route over the limit&#10;Unrest capped at 100 and floored at 0&#10;Added unrest level to rebellion and uprising messages&#10;Added name changing ability&#10;Overall, 115 changes">
-      <created>1658852154013</created>
-      <option name="number" value="00372" />
-      <option name="presentableId" value="LOCAL-00372" />
-      <option name="project" value="LOCAL" />
-      <updated>1658852154015</updated>
-    </task>
-    <task id="LOCAL-00373" summary="Fixing issue where returning occupied provinces colored incorrectly&#10;Fixing trade routes to update properly and display the correct amount&#10;Altering occupation color method for ease of identification and uniformity&#10;Streamlining interactions and display&#10;Fixing issue with too many ports&#10;Altering trade routes to decrease trade gain by 10% for every trade route over the limit&#10;Unrest capped at 100 and floored at 0&#10;Added unrest level to rebellion and uprising messages&#10;Added name changing ability&#10;Fixing version counter in base.py&#10;Overall, 116 changes">
-      <created>1658852273859</created>
-      <option name="number" value="00373" />
-      <option name="presentableId" value="LOCAL-00373" />
-      <option name="project" value="LOCAL" />
-      <updated>1658852273859</updated>
-    </task>
-    <task id="LOCAL-00374" summary="Fixing issue where returning occupied provinces colored incorrectly&#10;Fixing trade routes to update properly and display the correct amount&#10;Altering occupation color method for ease of identification and uniformity&#10;Streamlining interactions and display&#10;Fixing issue with too many ports&#10;Altering trade routes to decrease trade gain by 10% for every trade route over the limit&#10;Unrest capped at 100 and floored at 0&#10;Added unrest level to rebellion and uprising messages&#10;Added name changing ability&#10;Fixing version counter in base.py&#10;Adding version to the cnc_info command&#10;Overall, 116 changes">
-      <created>1658852615761</created>
-      <option name="number" value="00374" />
-      <option name="presentableId" value="LOCAL-00374" />
-      <option name="project" value="LOCAL" />
-      <updated>1658852615761</updated>
-    </task>
-    <task id="LOCAL-00375" summary="Fixing cncv">
-      <created>1658853073560</created>
-      <option name="number" value="00375" />
-      <option name="presentableId" value="LOCAL-00375" />
-      <option name="project" value="LOCAL" />
-      <updated>1658853073560</updated>
-    </task>
-    <task id="LOCAL-00376" summary="Fixing file writing">
-      <created>1658853394789</created>
-      <option name="number" value="00376" />
-      <option name="presentableId" value="LOCAL-00376" />
-      <option name="project" value="LOCAL" />
-      <updated>1658853394789</updated>
-    </task>
-    <task id="LOCAL-00377" summary="Fixing file writing">
-      <created>1658853454402</created>
-      <option name="number" value="00377" />
-      <option name="presentableId" value="LOCAL-00377" />
-      <option name="project" value="LOCAL" />
-      <updated>1658853454402</updated>
-    </task>
-    <task id="LOCAL-00378" summary="Fixing file writing">
-      <created>1658853553470</created>
-      <option name="number" value="00378" />
-      <option name="presentableId" value="LOCAL-00378" />
-      <option name="project" value="LOCAL" />
-      <updated>1658853553470</updated>
-    </task>
-    <task id="LOCAL-00379" summary="Fixing file writing">
-      <created>1658853652988</created>
-      <option name="number" value="00379" />
-      <option name="presentableId" value="LOCAL-00379" />
-      <option name="project" value="LOCAL" />
-      <updated>1658853652988</updated>
-    </task>
-    <task id="LOCAL-00380" summary="Fixing file writing">
-      <created>1658853714728</created>
-      <option name="number" value="00380" />
-      <option name="presentableId" value="LOCAL-00380" />
-      <option name="project" value="LOCAL" />
-      <updated>1658853714728</updated>
-    </task>
-    <task id="LOCAL-00381" summary="Added editing name response">
-      <created>1658854175748</created>
-      <option name="number" value="00381" />
-      <option name="presentableId" value="LOCAL-00381" />
-      <option name="project" value="LOCAL" />
-      <updated>1658854175748</updated>
-    </task>
-    <task id="LOCAL-00382" summary="Added editing name response&#10;Adding debuff changes to bank command">
-      <created>1658854501756</created>
-      <option name="number" value="00382" />
-      <option name="presentableId" value="LOCAL-00382" />
-      <option name="project" value="LOCAL" />
-      <updated>1658854501756</updated>
-    </task>
-    <task id="LOCAL-00383" summary="Adding deconstruct command&#10;Fixing structures disparity&#10;Adding structures to cncsv">
-      <created>1658857044433</created>
-      <option name="number" value="00383" />
-      <option name="presentableId" value="LOCAL-00383" />
-      <option name="project" value="LOCAL" />
-      <updated>1658857044433</updated>
-    </task>
-    <task id="LOCAL-00384" summary="Fixing turn loop fort issue">
-      <created>1658919944641</created>
-      <option name="number" value="00384" />
-      <option name="presentableId" value="LOCAL-00384" />
-      <option name="project" value="LOCAL" />
-      <updated>1658919944641</updated>
-    </task>
-    <task id="LOCAL-00385" summary="Fixing turn loop issue">
-      <created>1658937926420</created>
-      <option name="number" value="00385" />
-      <option name="presentableId" value="LOCAL-00385" />
-      <option name="project" value="LOCAL" />
-      <updated>1658937926420</updated>
-    </task>
-    <task id="LOCAL-00386" summary="Fixing turn loop issue">
-      <created>1658937945871</created>
-      <option name="number" value="00386" />
-      <option name="presentableId" value="LOCAL-00386" />
-      <option name="project" value="LOCAL" />
-      <updated>1658937945871</updated>
-    </task>
-    <task id="LOCAL-00387" summary="Fixing turn loop issue">
-      <created>1658937968826</created>
-      <option name="number" value="00387" />
-      <option name="presentableId" value="LOCAL-00387" />
-      <option name="project" value="LOCAL" />
-      <updated>1658937968826</updated>
-    </task>
-    <task id="LOCAL-00388" summary="Fixing turn loop issue">
-      <created>1658938079643</created>
-      <option name="number" value="00388" />
-      <option name="presentableId" value="LOCAL-00388" />
-      <option name="project" value="LOCAL" />
-      <updated>1658938079643</updated>
-    </task>
-    <task id="LOCAL-00389" summary="Fixing turn loop issue">
-      <created>1658938250315</created>
-      <option name="number" value="00389" />
-      <option name="presentableId" value="LOCAL-00389" />
-      <option name="project" value="LOCAL" />
-      <updated>1658938250315</updated>
-    </task>
-    <task id="LOCAL-00390" summary="Fixing turn loop issue">
-      <created>1658938346980</created>
-      <option name="number" value="00390" />
-      <option name="presentableId" value="LOCAL-00390" />
-      <option name="project" value="LOCAL" />
-      <updated>1658938346980</updated>
-    </task>
-    <task id="LOCAL-00391" summary="Fixing turn loop issue">
-      <created>1658938399489</created>
-      <option name="number" value="00391" />
-      <option name="presentableId" value="LOCAL-00391" />
-      <option name="project" value="LOCAL" />
-      <updated>1658938399489</updated>
-    </task>
-    <task id="LOCAL-00392" summary="Fixing turn loop issue">
-      <created>1658960961786</created>
-      <option name="number" value="00392" />
-      <option name="presentableId" value="LOCAL-00392" />
-      <option name="project" value="LOCAL" />
-      <updated>1658960961786</updated>
-    </task>
-    <task id="LOCAL-00393" summary="Fixing provincial unrest cap and floor mechanic">
-      <created>1659102820597</created>
-      <option name="number" value="00393" />
-      <option name="presentableId" value="LOCAL-00393" />
-      <option name="project" value="LOCAL" />
-      <updated>1659102820597</updated>
-    </task>
-    <task id="LOCAL-00394" summary="Fixing cnc_deconstruct">
-      <created>1659103022403</created>
-      <option name="number" value="00394" />
-      <option name="presentableId" value="LOCAL-00394" />
-      <option name="project" value="LOCAL" />
-      <updated>1659103022403</updated>
-    </task>
-    <task id="LOCAL-00395" summary="Fixing cnc_deconstruct">
-      <created>1659103082166</created>
-      <option name="number" value="00395" />
-      <option name="presentableId" value="LOCAL-00395" />
-      <option name="project" value="LOCAL" />
-      <updated>1659103082166</updated>
-    </task>
-    <task id="LOCAL-00396" summary="Fixing database error handling and monthly recruiter">
-      <created>1659107577890</created>
-      <option name="number" value="00396" />
-      <option name="presentableId" value="LOCAL-00396" />
-      <option name="project" value="LOCAL" />
-      <updated>1659107577890</updated>
-    </task>
-    <task id="LOCAL-00397" summary="Editing monthly recruiter data">
-      <created>1659107756104</created>
-      <option name="number" value="00397" />
-      <option name="presentableId" value="LOCAL-00397" />
-      <option name="project" value="LOCAL" />
-      <updated>1659107756104</updated>
-    </task>
-    <task id="LOCAL-00398" summary="Editing monthly recruiter data">
-      <created>1659183645051</created>
-      <option name="number" value="00398" />
-      <option name="presentableId" value="LOCAL-00398" />
-      <option name="project" value="LOCAL" />
-      <updated>1659183645052</updated>
-    </task>
-    <task id="LOCAL-00399" summary="Editing monthly recruiter data">
-      <created>1659183797690</created>
-      <option name="number" value="00399" />
-      <option name="presentableId" value="LOCAL-00399" />
-      <option name="project" value="LOCAL" />
-      <updated>1659183797690</updated>
-    </task>
-    <task id="LOCAL-00400" summary="Fixing civil wars and great power calculations">
-      <created>1659272163335</created>
-      <option name="number" value="00400" />
-      <option name="presentableId" value="LOCAL-00400" />
-      <option name="project" value="LOCAL" />
-      <updated>1659272163335</updated>
-    </task>
-    <option name="localTasksCounter" value="401" />
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -564,48 +74,12 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Fixing purchase" />
-    <MESSAGE value="Fixing blank terms" />
-    <MESSAGE value="Adding cnc_owned_check" />
-    <MESSAGE value="Fixing cnc_owned_check" />
-    <MESSAGE value="Fixing detailed view and withdraw all" />
-    <MESSAGE value="Fixing detailed view,  withdraw all, mass_deploy" />
-    <MESSAGE value="Fixing view with no deployed troops" />
-    <MESSAGE value="Fixing regaining occupied provinces" />
-    <MESSAGE value="Fixing issue where returning occupied provinces colored incorrectly&#10;Fixing trade routes to update properly and display the correct amount&#10;Altering occupation color method for ease of identification and uniformity&#10;Streamlining interactions and display&#10;Fixing issue with too many ports&#10;Altering trade routes to decrease trade gain by 10% for every trade route over the limit&#10;Unrest capped at 100 and floored at 0&#10;Added unrest level to rebellion and uprising messages&#10;Added name changing ability&#10;Overall, 115 changes" />
-    <MESSAGE value="Fixing version" />
-    <MESSAGE value="Fixing issue where returning occupied provinces colored incorrectly&#10;Fixing trade routes to update properly and display the correct amount&#10;Altering occupation color method for ease of identification and uniformity&#10;Streamlining interactions and display&#10;Fixing issue with too many ports&#10;Altering trade routes to decrease trade gain by 10% for every trade route over the limit&#10;Unrest capped at 100 and floored at 0&#10;Added unrest level to rebellion and uprising messages&#10;Added name changing ability&#10;Fixing version counter in base.py&#10;Overall, 116 changes" />
-    <MESSAGE value="Fixing issue where returning occupied provinces colored incorrectly&#10;Fixing trade routes to update properly and display the correct amount&#10;Altering occupation color method for ease of identification and uniformity&#10;Streamlining interactions and display&#10;Fixing issue with too many ports&#10;Altering trade routes to decrease trade gain by 10% for every trade route over the limit&#10;Unrest capped at 100 and floored at 0&#10;Added unrest level to rebellion and uprising messages&#10;Added name changing ability&#10;Fixing version counter in base.py&#10;Adding version to the cnc_info command&#10;Overall, 116 changes" />
-    <MESSAGE value="Fixing cncv" />
-    <MESSAGE value="Fixing file writing" />
-    <MESSAGE value="Added editing name response" />
-    <MESSAGE value="Added editing name response&#10;Adding debuff changes to bank command" />
-    <MESSAGE value="Adding deconstruct command&#10;Fixing structures disparity&#10;Adding structures to cncsv" />
-    <MESSAGE value="Fixing" />
-    <MESSAGE value="Fixing turn loop fort issue" />
-    <MESSAGE value="Fixing turn loop issue" />
-    <MESSAGE value="Fixing provincial unrest cap and floor mechanic" />
-    <MESSAGE value="Fixing cnc_deconstruct" />
-    <MESSAGE value="Fixing database error handling and monthly recruiter" />
-    <MESSAGE value="Editing monthly recruiter data" />
-    <MESSAGE value="Fixing civil wars and great power calculations" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing civil wars and great power calculations" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/cogs/currency.py</url>
-          <line>4</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="No idea" />
+    <option name="LAST_COMMIT_MESSAGE" value="No idea" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Shard$cnc_research.coverage" NAME="cnc_research Coverage Results" MODIFIED="1659879062745" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
+    <SUITE FILE_PATH="coverage/Shard$cnc_research.coverage" NAME="cnc_research Coverage Results" MODIFIED="1659879062745" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Shard$resources_updating_cnc.coverage" NAME="resources_updating_cnc Coverage Results" MODIFIED="1661216424601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
