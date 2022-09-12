@@ -232,57 +232,59 @@ class CNC(commands.Cog):
     @commands.command(usage="[nation name] #[hexadecimal color id] [focus (m,e,s)]", brief="Registers a new nation")
     @commands.guild_only()
     async def cnc_register(self, ctx, nationame: str, color: str, focus: str):
-        userid = ctx.author.id
-        # connects to the database
-        conn = self.bot.pool
-        # checks to see if the user is registered
-        registered = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', userid)
-        if registered is not None:
-            await ctx.send(f"You are already registered as {registered['username']}.")
-            return
-        # checks the focus and ensures proper reading
-        focuses = ['m', 'e', 's']
-        if focus.lower() not in focuses:
-            await ctx.send("That is not a valid focus. Please use only `m`, `e`, or `s`.")
-            return
-        if focus.lower() == 'm':
-            research = ["Basic Metalworking"]
-        elif focus.lower() == 'e':
-            research = ["Currency"]
-        else:
-            research = ["Writing"]
-        # if the color is banned, dont allow
-        if color in self.banned_colors:
-            await ctx.send("That color is a reserved color. Please pick another color.")
-            return
-        color_check = await conn.fetchrow('''SELECT * FROM cncusers WHERE usercolor = $1;''', color)
-        # if the color is in use, dont allow
-        if color_check is not None:
-            await ctx.send("That color is already taken by another user. Please pick another color.")
-            return
-        # try and get the color from the hex code
-        try:
-            ImageColor.getrgb(color)
-        except ValueError:
-            await ctx.send("That doesn't appear to be a valid hex color code. Include the `#` symbol.")
-            return
-        # inserts the user into the databases
-        resources = randint(9000, 10000)
-        await conn.execute(
-            '''INSERT INTO cncusers (user_id, username, usercolor, resources, 
-            focus, researched, undeployed, moves) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);''',
-            userid, nationame, color, resources, focus.lower(), research, 0, 5)
-        await conn.execute('''INSERT INTO cnc_modifiers (user_id) VALUES ($1);''', userid)
-        province = await conn.fetchrow('''SELECT * FROM provinces 
-        WHERE occupier_id = 0 and owner_id = 0 ORDER BY random();''')
-        await conn.execute('''UPDATE provinces SET occupier_id = $1, occupier = $2 , owner = $2, owner_id = $1 
-        WHERE id = $3;''', userid, nationame, province['id'])
-        await self.bot.loop.run_in_executor(None, self.map_color, province['id'], province['cord'], color)
-        tech = Technology(nationame, ctx, techs=research)
-        await tech.effects()
-        await ctx.send(f"{ctx.author.name} has registered {nationame} in the Command and Conquer System\n"
-                       f"{nationame} has been given **\u03FE{resources}**, **3000 manpower**, and "
-                       f"**Province #{province['id']}**. Use these gifts wisely!")
+        working = await ctx.send("Working...")
+        async with ctx.typing():
+            userid = ctx.author.id
+            # connects to the database
+            conn = self.bot.pool
+            # checks to see if the user is registered
+            registered = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', userid)
+            if registered is not None:
+                await ctx.send(f"You are already registered as {registered['username']}.")
+                return
+            # checks the focus and ensures proper reading
+            focuses = ['m', 'e', 's']
+            if focus.lower() not in focuses:
+                await ctx.send("That is not a valid focus. Please use only `m`, `e`, or `s`.")
+                return
+            if focus.lower() == 'm':
+                research = ["Basic Metalworking"]
+            elif focus.lower() == 'e':
+                research = ["Currency"]
+            else:
+                research = ["Writing"]
+            # if the color is banned, dont allow
+            if color in self.banned_colors:
+                await ctx.send("That color is a reserved color. Please pick another color.")
+                return
+            color_check = await conn.fetchrow('''SELECT * FROM cncusers WHERE usercolor = $1;''', color)
+            # if the color is in use, dont allow
+            if color_check is not None:
+                await ctx.send("That color is already taken by another user. Please pick another color.")
+                return
+            # try and get the color from the hex code
+            try:
+                ImageColor.getrgb(color)
+            except ValueError:
+                await ctx.send("That doesn't appear to be a valid hex color code. Include the `#` symbol.")
+                return
+            # inserts the user into the databases
+            resources = randint(9000, 10000)
+            await conn.execute(
+                '''INSERT INTO cncusers (user_id, username, usercolor, resources, 
+                focus, researched, undeployed, moves) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);''',
+                userid, nationame, color, resources, focus.lower(), research, 0, 5)
+            await conn.execute('''INSERT INTO cnc_modifiers (user_id) VALUES ($1);''', userid)
+            province = await conn.fetchrow('''SELECT * FROM provinces 
+            WHERE occupier_id = 0 and owner_id = 0 ORDER BY random();''')
+            await conn.execute('''UPDATE provinces SET occupier_id = $1, occupier = $2 , owner = $2, owner_id = $1 
+            WHERE id = $3;''', userid, nationame, province['id'])
+            await self.bot.loop.run_in_executor(None, self.map_color, province['id'], province['cord'], color)
+            tech = Technology(nationame, ctx, techs=research)
+            await tech.effects()
+            await working.edit(content=f"{ctx.author.name} has registered {nationame} in the Command and Conquer System"
+                                       f"\n{nationame} has been given **\u03FE{resources}**, **3000 manpower**, and "
+                                        f"**Province #{province['id']}**. Use these gifts wisely!")
 
     @commands.command(usage="<nation name or Discord username>", aliases=['cncv'],
                       brief="Displays information about a nation")
