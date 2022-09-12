@@ -9,18 +9,25 @@ import re
 
 class Events:
 
-    def __init__(self, ctx: commands.Context = None, nation: str = None, event: str = None, current: bool = False):
+    def __init__(self, ctx: commands.Context = None, bot: commands.Bot = None, nation: str = None, event: str = None, current: bool = False):
         # define nation, context, and event
         self.nation = nation
         self.ctx = ctx
         self.event = event
         self.current = current
         self.random_good = None
+        self.bot = bot
         # creates connection pool
-        try:
-            self.pool: asyncpg.pool = ctx.bot.pool
-        except Exception:
-            ctx.bot.logger.warning(traceback.format_exc())
+        if self.ctx is not None:
+            try:
+                self.pool: asyncpg.pool = self.ctx.bot.pool
+            except Exception:
+                self.ctx.bot.logger.warning(traceback.format_exc())
+        else:
+            try:
+                self.pool: asyncpg.pool = self.bot.pool
+            except Exception:
+                self.bot.logger.warning(traceback.format_exc())
 
     def space_replace(self, userinput: str) -> str:
         """Replaces spaces with underscores and titles"""
@@ -1123,7 +1130,7 @@ class Events:
         # execute effects; if the event is weighted less than 100, roll d100
         event = self.space_replace(self.event)
         # event channel
-        event_channel = self.ctx.bot.get_channel(982685906987274260)
+        event_channel = self.bot.get_channel(835579413625569322)
         # turns
         turn = await conn.fetchrow('''SELECT * FROM cnc_data WHERE data_name = 'turn';''')
         turn = turn['data_value']
