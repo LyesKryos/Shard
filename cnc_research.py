@@ -411,11 +411,11 @@ class Technology:
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''', self.nation)
         loading = await self.ctx.send("Loading...")
         async with self.ctx.typing():
-            tree = Image.open(fr"C:\Users\jaedo\OneDrive\NationStates BBCode\Thegye Stuff\Meta RP\Tech Tree\Cnc Tech Tree Lines.png").convert("RGBA")
-            units = Image.open(fr"C:\Users\jaedo\OneDrive\NationStates BBCode\Thegye Stuff\Meta RP\Tech Tree\CnC Tech Tree Units.png").convert("RGBA")
+            tree = Image.open(fr"/root/Documents/Shard/CNC/Tech Tree/Cnc Tech Tree Lines.png").convert("RGBA")
+            units = Image.open(fr"/root/Documents/Shard/CNC/Tech Tree/CnC Tech Tree Units.png").convert("RGBA")
             for t in userinfo['researched']:
                 techinfo = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE name = $1;''', t)
-                tech_unit = Image.open(fr"C:\Users\jaedo\OneDrive\NationStates BBCode\Thegye Stuff\Meta RP\Tech Tree\{techinfo['name']}.png")
+                tech_unit = Image.open(fr"/root/Documents/Shard/CNC/Tech Tree/{techinfo['name']}.png")
                 unit_cord = techinfo['cords']
                 width = tech_unit.size[0]
                 height = tech_unit.size[1]
@@ -430,11 +430,12 @@ class Technology:
                 units.paste(tech_unit, box=cords, mask=tech_unit)
             tree = tree.convert("RGBA")
             units.paste(tree, mask=tree)
-            units.save(fr"C:\Users\jaedo\OneDrive\NationStates BBCode\Thegye Stuff\Meta RP\Tech Tree\CnC Tech Tree Colored.png")
-            with open(fr"C:\Users\jaedo\OneDrive\NationStates BBCode\Thegye Stuff\Meta RP\Tech Tree\CnC Tech Tree Colored.png", "rb") as preimg:
+            units.save(fr"/root/Documents/Shard/CNC/Tech Tree/CnC Tech Tree Colored.png")
+            with open(fr"/root/Documents/Shard/CNC/Tech Tree/CnC Tech Tree Colored.png", "rb") as preimg:
                 img = b64encode(preimg.read())
             params = {"key": "a64d9505a13854ff660980db67ee3596",
-                      "image": img}
+                      "image": img,
+                      "name": f"{userinfo['username']} Tech Tree"}
             time.sleep(1)
             upload = await self.ctx.bot.loop.run_in_executor(None, requests.post, "https://api.imgbb.com/1/upload",
                                                 params)
