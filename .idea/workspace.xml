@@ -7,6 +7,7 @@
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updated turns with modifiers, production, and trade routes&#10;Updated province command to reflect trade good change&#9;&#10;Added tech and researching commands&#9;&#9;&#10;Added modifiers to registration&#9;&#9;&#9;&#9;&#9;&#10;Added multiple new QOL commands for mods and devs&#9;&#10;Updated bank command with new calculations and view&#9;&#10;Updated recruit command with added troop costs based on level&#10;Updated mass recruit command with added troop costs based on level&#9;&#10;Updated construct command with Workshops and Temples&#10;Added visual thousands commas for the construct command&#10;Updated deconstruction command with Workshops and Temples&#10;Added visual trade good market command&#9;&#10;Updated combat with army levels, terrain modifiers, and rounds&#9;&#9;&#10;Added cnc_locate to display a specified province&#10;Refactored for optimization&#9;&#9;&#9;&#9;&#9;&#9;&#10;Updated register with new options, requiring a focus, and auto-assigning a blank province&#10;Removed cnc_purchase in favor of future colonization">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cnc_events.py" beforeDir="false" afterPath="$PROJECT_DIR$/cnc_events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cnc_research.py" beforeDir="false" afterPath="$PROJECT_DIR$/cnc_research.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -28,19 +29,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "database.data.extractors.current.export.id": "SQL Inserts",
-    "last_opened_file_path": "C:/Users/jaedo/SQLs",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;database.data.extractors.current.export.id&quot;: &quot;SQL Inserts&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/jaedo/SQLs&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;
   }
-}]]></component>
+}</component>
   <component name="SQLScriptSettings">
     <option name="matrix">
       <map>
@@ -63,7 +64,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1662664672476</updated>
-      <workItem from="1662664677107" duration="4859000" />
+      <workItem from="1662664677107" duration="5219000" />
+      <workItem from="1662984985073" duration="3189000" />
     </task>
     <task id="LOCAL-00002" summary="Updated turns with modifiers, production, and trade routes&#10;Updated province command to reflect trade good change&#9;&#10;Added tech and researching commands&#9;&#9;&#10;Added modifiers to registration&#9;&#9;&#9;&#9;&#9;&#10;Added multiple new QOL commands for mods and devs&#9;&#10;Updated bank command with new calculations and view&#9;&#10;Updated recruit command with added troop costs based on level&#10;Updated mass recruit command with added troop costs based on level&#9;&#10;Updated construct command with Workshops and Temples&#10;Added visual thousands commas for the construct command&#10;Updated deconstruction command with Workshops and Temples&#10;Added visual trade good market command&#9;&#10;Updated combat with army levels, terrain modifiers, and rounds&#9;&#9;&#10;Added cnc_locate to display a specified province&#10;Refactored for optimization&#9;&#9;&#9;&#9;&#9;&#9;&#10;Updated register with new options, requiring a focus, and auto-assigning a blank province&#10;Removed cnc_purchase in favor of future colonization">
       <created>1662930233274</created>
