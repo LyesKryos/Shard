@@ -5759,7 +5759,7 @@ class CNC(commands.Cog):
 
 
 async def setup(bot: Shard):
-    # define the cog, set the loop, set the turnloop running, and add the cog
+    # define the cog, set the loop, set the turn loop running, and add the cog
     cog = CNC(bot)
     loop = bot.loop
     CNC.turn_task = loop.create_task(cog.cncstartloop())
