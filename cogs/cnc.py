@@ -107,7 +107,7 @@ class CNC(commands.Cog):
                 data = prov.getpixel((x, y))
                 if data != color:
                     if data != (0, 0, 0, 0):
-                        if data !=(255, 255, 255, 0):
+                        if data != (255, 255, 255, 0):
                             prov.putpixel((x, y), color)
         # if this is a release, change every color to neutral grey
         if release is True:
@@ -284,7 +284,7 @@ class CNC(commands.Cog):
             await tech.effects()
             await working.edit(content=f"{ctx.author.name} has registered {nationame} in the Command and Conquer System"
                                        f"\n{nationame} has been given **\u03FE{resources}**, **3000 manpower**, and "
-                                        f"**Province #{province['id']}**. Use these gifts wisely!")
+                                       f"**Province #{province['id']}**. Use these gifts wisely!")
 
     @commands.command(usage="<nation name or Discord username>", aliases=['cncv'],
                       brief="Displays information about a nation")
@@ -394,7 +394,7 @@ class CNC(commands.Cog):
                 pass
             if snowflake:
                 userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
-                                           user.id)
+                                               user.id)
             else:
                 userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
                                                nationname.lower())
@@ -5190,261 +5190,388 @@ class CNC(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def cnc_force_turn(self):
+    async def cnc_force_turn(self, ctx):
         # channel to send to
-        cncchannel = self.bot.get_channel(835579413625569322)
-        # connects to the database
-        conn = self.bot.pool
-        # fetches all the users and makes a list
-        users = await conn.fetch('''SELECT user_id FROM cncusers;''')
-        userids = [ids['user_id'] for ids in users]
-        await conn.execute('''DELETE FROM cnc_modifiers;''')
+        cncchannel = ctx.channel
+        crashchannel = ctx.channel
+        try:
+            # connects to the database
+            conn = self.bot.pool
+            # fetches all the users and makes a list
+            users = await conn.fetch('''SELECT user_id FROM cncusers;''')
+            userids = [ids['user_id'] for ids in users]
+            await conn.execute('''DELETE FROM cnc_modifiers;''')
 
-        ################ USER UPDATING ################
+            ################ USER UPDATING ################
 
-        for u in userids:
-            user = self.bot.get_user(u)
-            credits_added = 0
-            # pull out the data and get a list of provinces and trade routes
-            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', u)
-            # establish manpower, tax rate, and tax income
-            initial_manpower = userinfo['manpower']
-            tax_rate = userinfo['taxation'] / 100
-            taxes = initial_manpower * tax_rate
-            # set military upkeep and public services rates and remove their amount from taxes
-            military_upkeep = userinfo['military_upkeep'] / 100
-            public_services = userinfo['public_services'] / 100
-            taxes *= 1 - (military_upkeep + public_services)
-            # add taxes
-            credits_added += taxes
-            # establish initial trade access
-            initial_trade_access = 0.5
-            # establish total troops, civil war, and provinces variables
-            total_troops = 0
-            civil_war = False
-            provinces = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1;''', u)
-            provinces_owned = [p['id'] for p in provinces]
-            occupied_count = await conn.fetchrow('''SELECT count(*) FROM provinces WHERE occupier_id = $1;''', u)
-            # set taxes, military upkeep, and public service rates to whole-number values
-            tax_rate *= 100
-            military_upkeep *= 100
-            public_services *= 100
+            for u in userids:
+                user = self.bot.get_user(u)
+                credits_added = 0
+                # pull out the data and get a list of provinces and trade routes
+                userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', u)
+                # establish manpower, tax rate, and tax income
+                initial_manpower = userinfo['manpower']
+                tax_rate = userinfo['taxation'] / 100
+                taxes = initial_manpower * tax_rate
+                # set military upkeep and public services rates and remove their amount from taxes
+                military_upkeep = userinfo['military_upkeep'] / 100
+                public_services = userinfo['public_services'] / 100
+                taxes *= 1 - (military_upkeep + public_services)
+                # add taxes
+                credits_added += taxes
+                # establish initial trade access
+                initial_trade_access = 0.5
+                # establish total troops, civil war, and provinces variables
+                total_troops = 0
+                civil_war = False
+                provinces = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1;''', u)
+                provinces_owned = [p['id'] for p in provinces]
+                occupied_count = await conn.fetchrow('''SELECT count(*) FROM provinces WHERE occupier_id = $1;''', u)
+                # set taxes, military upkeep, and public service rates to whole-number values
+                tax_rate *= 100
+                military_upkeep *= 100
+                public_services *= 100
 
-            ################ TECH MODIFIERS UPDATING ################
+                ################ TECH MODIFIERS UPDATING ################
 
-            # update tech modifiers
-            await conn.execute('''INSERT INTO cnc_modifiers(user_id) VALUES($1);''', u)
-            tech = Technology(userinfo['username'], techs=userinfo['researched'])
-            await tech.effects()
-            # fetch all tech modifiers
-            modifiers = await conn.fetchrow('''SELECT * FROM cnc_modifiers WHERE user_id = $1;''', u)
+                # update tech modifiers
+                await conn.execute('''INSERT INTO cnc_modifiers(user_id) VALUES($1);''', u)
+                tech = Technology(userinfo['username'], techs=userinfo['researched'])
+                await tech.effects()
+                # fetch all tech modifiers
+                modifiers = await conn.fetchrow('''SELECT * FROM cnc_modifiers WHERE user_id = $1;''', u)
 
-            ################ EVENT UPDATING ################
+                ################ EVENT UPDATING ################
 
-            # check for event
-            event_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1 and event != '';''', u)
-            # if there is no event, pick event and run
-            if event_info is None:
-                random_event = await conn.fetchrow('''SELECT * FROM cnc_events WHERE type = 'national' 
-                                    ORDER BY random();''')
-                event = Events(userinfo['username'], random_event['name'])
-                await event.event_effects()
-            # otherwise, update effects
-            else:
-                event = Events(nation=userinfo['username'], event=event_info['event'], current=True)
-                await event.event_effects()
+                # check for event
+                event_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1 and event != '';''', u)
+                # if there is no event, pick event and run
+                if event_info is None:
+                    random_event = await conn.fetchrow('''SELECT * FROM cnc_events WHERE type = 'national' 
+                            ORDER BY random();''')
+                    event = Events(userinfo['username'], random_event['name'])
+                    await event.event_effects()
+                # otherwise, update effects
+                else:
+                    event = Events(nation=userinfo['username'], event=event_info['event'], current=True)
+                    await event.event_effects()
 
-            ################ LIMIT UPDATING ################
+                ################ LIMIT UPDATING ################
 
-            # fort/city/port/trade route limit update
-            if len(provinces_owned) <= 5:
-                structure_cost = 0
-                cities = await conn.fetchrow(
-                    '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND city = True;''',
-                    userinfo['user_id'])
-                ports = await conn.fetchrow(
-                    '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND port = True;''',
-                    userinfo['user_id'])
-                forts = await conn.fetchrow(
-                    '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
-                    userinfo['user_id'])
-                if cities['count'] > 1:
-                    structure_cost += 1000 * (cities['count'] - 1)
-                if ports['count'] > 1:
-                    structure_cost += 500 * (ports['count'] - 1)
-                if forts['count'] > 1:
-                    structure_cost += 700 * (forts['count'] - 1)
-                await conn.execute(
-                    '''UPDATE cncusers SET citylimit = 1, portlimit = 1, fortlimit = 1 WHERE user_id = $1;''',
-                    userinfo['user_id'])
-            else:
-                # calculate limits
-                structure_cost = 0
-                fortlimit = math.floor((len(provinces_owned) - 5) / 5) + 1
-                portlimit = math.floor((len(provinces_owned) - 5) / 3) + 1
-                citylimit = math.floor((len(provinces_owned) - 5) / 7) + 1
-                if userinfo['focus'] == 's':
-                    fortlimit += 1
-                if userinfo['focus'] == 'e':
-                    portlimit += 1
-                cities = await conn.fetchrow(
-                    '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND city = True;''',
-                    userinfo['user_id'])
-                ports = await conn.fetchrow(
-                    '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND port = True;''',
-                    userinfo['user_id'])
-                forts = await conn.fetchrow(
-                    '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
-                    userinfo['user_id'])
-                if cities['count'] > citylimit:
-                    structure_cost += 1000 * (cities['count'] - citylimit)
-                if ports['count'] > portlimit:
-                    structure_cost += 500 * (ports['count'] - portlimit)
-                if forts['count'] > fortlimit:
-                    structure_cost += 700 * (forts['count'] - fortlimit)
-                await conn.execute(
-                    '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;''',
-                    citylimit, portlimit, fortlimit, userinfo['user_id'])
-            # sets trade route limit
-            trade_route_limit = 0
-            # if the user is a great power, +1 trade route
-            if userinfo['great_power']:
-                trade_route_limit += 1
-            if userinfo['capital'] != 0:
-                trade_route_limit += 1
-            # for every city +1 and for every two ports +1
-            trade_route_limit += cities['count']
-            trade_route_limit += math.floor(ports['count'] / 2)
-            # if Banking and Investments is researched, add 1
-            trade_route_limit += int(modifiers['trade_route'])
-            # if the current trade route number is too high, reduce effective trade gain
-            outgoing_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
-                                              active = True AND sender_id = $1;''', userinfo['user_id'])
-            outgoing_info = await conn.fetchrow('''SELECT * FROM interactions WHERE type = 'trade' AND 
-                                              active = True AND sender_id = $1;''', userinfo['user_id'])
-            if outgoing_count['count'] is None:
-                outgoing_count = 0
-            else:
-                outgoing_count = outgoing_count['count']
-            incoming_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
-                                                             active = True AND recipient_id = $1;''',
-                                                 userinfo['user_id'])
-            if incoming_count['count'] is None:
-                incoming_count = 0
-            else:
-                incoming_count = incoming_count['count']
-            trade_debuff = 1
-            if outgoing_count > trade_route_limit:
-                for i in range(trade_route_limit - outgoing_count):
-                    trade_debuff -= .02
-            # for every domestic trade route, +10% access. For every foreign trade route, +5% access
-            if outgoing_info is not None:
-                outgoing_recipients = list()
-                for o in outgoing_info:
-                    outgoing_recipients.append(o['recipient'])
-                outgoing_repeat = Counter(outgoing_recipients)
-                # for every repeat trade route, decrease by 2% down to 0%
-                for r in outgoing_repeat:
-                    if r >= 6:
-                        initial_trade_access = .3
-                    else:
-                        initial_trade_access += (10 - (r - 1) * r) / 100 * (
-                            modifiers['trade_route_efficiency_mod'])
-            # calculate initial trade access
-            initial_trade_access += (.05 * incoming_count) * trade_debuff
+                # fort/city/port/trade route limit update
+                if len(provinces_owned) <= 5:
+                    structure_cost = 0
+                    cities = await conn.fetchrow(
+                        '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND city = True;''',
+                        userinfo['user_id'])
+                    ports = await conn.fetchrow(
+                        '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND port = True;''',
+                        userinfo['user_id'])
+                    forts = await conn.fetchrow(
+                        '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
+                        userinfo['user_id'])
+                    if cities['count'] > 1:
+                        structure_cost += 1000 * (cities['count'] - 1)
+                    if ports['count'] > 1:
+                        structure_cost += 500 * (ports['count'] - 1)
+                    if forts['count'] > 1:
+                        structure_cost += 700 * (forts['count'] - 1)
+                    await conn.execute(
+                        '''UPDATE cncusers SET citylimit = 1, portlimit = 1, fortlimit = 1 WHERE user_id = $1;''',
+                        userinfo['user_id'])
+                else:
+                    # calculate limits
+                    structure_cost = 0
+                    fortlimit = math.floor((len(provinces_owned) - 5) / 5) + 1
+                    portlimit = math.floor((len(provinces_owned) - 5) / 3) + 1
+                    citylimit = math.floor((len(provinces_owned) - 5) / 7) + 1
+                    if userinfo['focus'] == 's':
+                        fortlimit += 1
+                    if userinfo['focus'] == 'e':
+                        portlimit += 1
+                    cities = await conn.fetchrow(
+                        '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND city = True;''',
+                        userinfo['user_id'])
+                    ports = await conn.fetchrow(
+                        '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND port = True;''',
+                        userinfo['user_id'])
+                    forts = await conn.fetchrow(
+                        '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
+                        userinfo['user_id'])
+                    if cities['count'] > citylimit:
+                        structure_cost += 1000 * (cities['count'] - citylimit)
+                    if ports['count'] > portlimit:
+                        structure_cost += 500 * (ports['count'] - portlimit)
+                    if forts['count'] > fortlimit:
+                        structure_cost += 700 * (forts['count'] - fortlimit)
+                    await conn.execute(
+                        '''UPDATE cncusers SET citylimit = $1, portlimit = $2, fortlimit = $3 WHERE user_id = $4;''',
+                        citylimit, portlimit, fortlimit, userinfo['user_id'])
+                # sets trade route limit
+                trade_route_limit = 0
+                # if the user is a great power, +1 trade route
+                if userinfo['great_power']:
+                    trade_route_limit += 1
+                if userinfo['capital'] != 0:
+                    trade_route_limit += 1
+                # for every city +1 and for every two ports +1
+                trade_route_limit += cities['count']
+                trade_route_limit += math.floor(ports['count'] / 2)
+                # if Banking and Investments is researched, add 1
+                trade_route_limit += int(modifiers['trade_route'])
+                # if the current trade route number is too high, reduce effective trade gain
+                outgoing_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
+                                      active = True AND sender_id = $1;''', userinfo['user_id'])
+                outgoing_info = await conn.fetchrow('''SELECT * FROM interactions WHERE type = 'trade' AND 
+                                      active = True AND sender_id = $1;''', userinfo['user_id'])
+                if outgoing_count['count'] is None:
+                    outgoing_count = 0
+                else:
+                    outgoing_count = outgoing_count['count']
+                incoming_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
+                                                     active = True AND recipient_id = $1;''', userinfo['user_id'])
+                if incoming_count['count'] is None:
+                    incoming_count = 0
+                else:
+                    incoming_count = incoming_count['count']
+                trade_debuff = 1
+                if outgoing_count > trade_route_limit:
+                    for i in range(trade_route_limit - outgoing_count):
+                        trade_debuff -= .02
+                # for every domestic trade route, +10% access. For every foreign trade route, +5% access
+                if outgoing_info is not None:
+                    outgoing_recipients = list()
+                    for o in outgoing_info:
+                        outgoing_recipients.append(o['recipient'])
+                    outgoing_repeat = Counter(outgoing_recipients)
+                    # for every repeat trade route, decrease by 2% down to 0%
+                    for r in outgoing_repeat:
+                        if r >= 6:
+                            initial_trade_access = .3
+                        else:
+                            initial_trade_access += (10 - (r - 1) * r) / 100 * (
+                                modifiers['trade_route_efficiency_mod'])
+                # calculate initial trade access
+                initial_trade_access += (.05 * incoming_count) * trade_debuff
 
-            ################ NATIONAL UNREST UPDATING ################
+                ################ NATIONAL UNREST UPDATING ################
 
-            # check national Unrest for civil war and add national Unrest
-            national_unrest = userinfo['national_unrest']
-            # if the national unrest is above 80
-            if len(provinces) > 9:
-                if national_unrest >= 80:
-                    # roll a d100
-                    unrest_roll = randint(0, 100)
-                    # if the d100 is below or equal to the national unrest, trigger civil war
-                    if unrest_roll <= national_unrest:
-                        # fetch all provinces and get half
-                        owned_provinces = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1 AND
-                                                          occupier_id = $1;''', user.id)
-                        owned_provinces = [p['id'] for p in owned_provinces]
-                        half_owned = math.floor(len(owned_provinces) / 2)
-                        provinces_rebelling = sample(owned_provinces, half_owned)
-                        # for all provinces rebelling, get their information
-                        for pr in provinces_rebelling:
-                            p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', pr)
-                            if p_info is None:
-                                continue
-                            # add the remaining troops to the undeployed amount
-                            undeployed = userinfo['undeployed']
-                            troops_remaining = p_info['troops'] - (p_info['manpower'] * 2)
-                            if troops_remaining <= 0:
-                                troops_remaining = 0
-                            # update all information
-                            await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE 
-                                                              user_id = $2;''', undeployed + troops_remaining, u)
-                            await conn.execute('''UPDATE provinces SET occupier = '', occupier_id = 0, 
-                                                unrest = 0, troops = $1 WHERE id = $2;''', p_info['manpower'] * 2, pr)
-                            await self.bot.loop.run_in_executor(None, self.occupy_color, pr, p_info['cord'][0:2],
-                                                                "#000000", userinfo['usercolor'])
-                        provinces_rebelling.sort()
-                        provinces_rebelling_string = ', '.join(str(e) for e in provinces_rebelling)
-                        await user.send(f"Province(s) {provinces_rebelling_string} have rebelled in a civil war"
-                                        f" due to high national unrest ({national_unrest})!")
-                        civil_war = True
-            # add national Unrest
-            national_unrest = 0
-            # do complicated maths to figure out the unrest rate
-            tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
-            military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
-                    military_upkeep / 10 - 1)) * 0.75))
-            if public_services < 15:
-                public_service_unrest = round(30 - public_services * 2)
-            else:
-                public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
-            if userinfo['great_power'] is False:
-                if len(provinces) > 50:
-                    national_unrest += math.ceil(10 * (1 + 1) ** (((len(provinces) - 50) / 5) - 1))
-            else:
-                if len(provinces) > 75:
-                    national_unrest += math.ceil(10 * (1 + 1) ** (((len(provinces) - 75) / 5) - 1))
-            # add national unrest suppression modifier
-            public_service_unrest *= modifiers['national_unrest_suppression_efficiency_mod']
-            # add unrest and cap or floor
-            national_unrest += tax_unrest + public_service_unrest + military_upkeep_unrest
-            if national_unrest > 100:
-                national_unrest = 100
-            elif national_unrest < 0:
+                # check national Unrest for civil war and add national Unrest
+                national_unrest = userinfo['national_unrest']
+                # if the national unrest is above 80
+                if len(provinces) > 9:
+                    if national_unrest >= 80:
+                        # roll a d100
+                        unrest_roll = randint(0, 100)
+                        # if the d100 is below or equal to the national unrest, trigger civil war
+                        if unrest_roll <= national_unrest:
+                            # fetch all provinces and get half
+                            owned_provinces = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1 AND
+                                                  occupier_id = $1;''', user.id)
+                            owned_provinces = [p['id'] for p in owned_provinces]
+                            half_owned = math.floor(len(owned_provinces) / 2)
+                            provinces_rebelling = sample(owned_provinces, half_owned)
+                            # for all provinces rebelling, get their information
+                            for pr in provinces_rebelling:
+                                p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', pr)
+                                if p_info is None:
+                                    continue
+                                # add the remaining troops to the undeployed amount
+                                undeployed = userinfo['undeployed']
+                                troops_remaining = p_info['troops'] - (p_info['manpower'] * 2)
+                                if troops_remaining <= 0:
+                                    troops_remaining = 0
+                                # update all information
+                                await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE 
+                                                      user_id = $2;''', undeployed + troops_remaining, u)
+                                await conn.execute('''UPDATE provinces SET occupier = '', occupier_id = 0, 
+                                        unrest = 0, troops = $1 WHERE id = $2;''', p_info['manpower'] * 2, pr)
+                                await self.bot.loop.run_in_executor(None, self.occupy_color, pr, p_info['cord'][0:2],
+                                                                    "#000000", userinfo['usercolor'])
+                            provinces_rebelling.sort()
+                            provinces_rebelling_string = ', '.join(str(e) for e in provinces_rebelling)
+                            await user.send(f"Province(s) {provinces_rebelling_string} have rebelled in a civil war"
+                                            f" due to high national unrest ({national_unrest})!")
+                            civil_war = True
+                # add national Unrest
                 national_unrest = 0
-            await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE user_id = $2;''',
-                               national_unrest, u)
+                # do complicated maths to figure out the unrest rate
+                tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
+                military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
+                        military_upkeep / 10 - 1)) * 0.75))
+                if public_services < 15:
+                    public_service_unrest = round(30 - public_services * 2)
+                else:
+                    public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
+                if userinfo['great_power'] is False:
+                    if len(provinces) > 50:
+                        national_unrest += math.ceil(10 * (1 + 1) ** (((len(provinces) - 50) / 5) - 1))
+                else:
+                    if len(provinces) > 75:
+                        national_unrest += math.ceil(10 * (1 + 1) ** (((len(provinces) - 75) / 5) - 1))
+                # add national unrest suppression modifier
+                public_service_unrest *= modifiers['national_unrest_suppression_efficiency_mod']
+                # add unrest and cap or floor
+                national_unrest += tax_unrest + public_service_unrest + military_upkeep_unrest
+                if national_unrest > 100:
+                    national_unrest = 100
+                elif national_unrest < 0:
+                    national_unrest = 0
+                await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE user_id = $2;''',
+                                   national_unrest, u)
 
-            ################ PROVINCE UPDATING ################
+                ################ PROVINCE UPDATING ################
 
-            provinces_rebelled = list()
-            structures_destroyed = 0
-            workshops_n_temples = 0
-            # update all provinces
-            for p in provinces_owned:
-                if p == 0:
-                    continue
-                # fetch province info
-                p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-                if p_info['uprising']:
-                    # if the unrest is less than a random number between 1 and 100, end uprising
-                    if p_info['unrest'] < randint(1, 100):
-                        await conn.execute('''UPDATE provinces SET uprising = False WHERE id = $1;''', p)
-                    # otherwise, continue uprising
+                provinces_rebelled = list()
+                structures_destroyed = 0
+                workshops_n_temples = 0
+                # update all provinces
+                for p in provinces_owned:
+                    if p == 0:
+                        continue
+                    # fetch province info
+                    p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+                    if p_info['uprising']:
+                        # if the unrest is less than a random number between 1 and 100, end uprising
+                        if p_info['unrest'] < randint(1, 100):
+                            await conn.execute('''UPDATE provinces SET uprising = False WHERE id = $1;''', p)
+                        # otherwise, continue uprising
+                        else:
+                            # calculate current unrest
+                            unrest = 0
+                            # reduce unrest for troops present
+                            troops_unrest = p_info['troops'] / -100
+                            if userinfo['great_power']:
+                                troops_unrest *= 2
+                            # add local unrest suppression efficiency mod
+                            troops_unrest *= modifiers['local_unrest_suppression_efficiency_mod']
+                            # do complicated maths
+                            tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
+                            military_upkeep_unrest = -round(
+                                (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
+                                        military_upkeep / 10 - 1)) * 0.75))
+                            if public_services < 15:
+                                public_service_unrest = round(30 - public_services * 2)
+                            else:
+                                public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
+                            # add unrest and cap or floor
+                            unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
+                            if unrest > 100:
+                                unrest = 100
+                            elif unrest < 0:
+                                unrest = 0
+                            await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
+                            continue
+                    total_troops += p_info['troops']
+
+                    ################ PRODUCTION UPDATING ################
+
+                    # define production value, producing amount, market value modifiers, and workshop production
+                    production_value = 1
+                    market_value_mod = 1
+                    workshop_production = 0
+                    # for every city, add .5 production
+                    if p_info['city']:
+                        production_value += 0.5
+                    # for every port, add 25% market value to the local good, if it is not gold or silver
+                    if p_info['port']:
+                        if p_info['value'] not in ['Gold', 'Silver']:
+                            market_value_mod += 0.25
+                    # for every workshop, add 1 * the production modifier
+                    if p_info['workshop']:
+                        workshop_production += 1 * modifiers['workshop_production_mod']
+                        workshops_n_temples += 1
+                    # add all production to the base province production
+                    producing = p_info['production'] * (production_value + modifiers['production_mod'])
+                    # calculate local trade good value and total gain
+                    trade_good = await conn.fetchrow('''SELECT * FROM trade_goods WHERE name = $1;''', p_info['value'])
+                    credits_added += (((trade_good['market_value'] +
+                                        modifiers[f'{self.space_replace(p_info["value"]).lower()}_mod']) *
+                                       market_value_mod) * producing) * initial_trade_access
+
+                    ################ LOCAL UNREST UPDATING ################
+
+                    # check local Unrest for local uprising and add local Unrest
+                    local_unrest = p_info['unrest']
+                    # if the local Unrest is greater than 50
+                    if len(provinces) > 4:
+                        if local_unrest >= 50:
+                            # roll a d100
+                            unrest_roll = randint(0, 100)
+                            # if the d100 is greater than the local Unrest, trigger an uprising
+                            if unrest_roll <= local_unrest:
+                                # if a city is present, 20% chance for destruction
+                                if p_info['city']:
+                                    if randint(1, 100) >= 80:
+                                        structures_destroyed += 1
+                                        await conn.execute('''UPDATE provinces SET city = False WHERE id = $1;''', p)
+                                # if a fort is present, 10% chance for it to be destroyed
+                                if p_info['fort']:
+                                    if randint(1, 100) >= 90:
+                                        structures_destroyed += 1
+                                        await conn.execute('''UPDATE provinces SET fort = False WHERE id = $1;''', p)
+                                # if a port is present 20% chance for it to be destroyed
+                                if p_info['port']:
+                                    if randint(1, 100) >= 80:
+                                        structures_destroyed += 1
+                                        await conn.execute('''UPDATE provinces SET port = False WHERE id = $1;''', p)
+                                # calculate troops damage and update
+                                troops_attacked = p_info['troops'] - \
+                                                  (randint((p_info['manpower']) / 2, p_info['manpower']))
+                                if troops_attacked < 0:
+                                    troops_attacked = 0
+                                await conn.execute('''UPDATE provinces SET uprising = True, troops = $2
+                                                      WHERE id = $1;''', p, troops_attacked)
+                                provinces_rebelled.append(p)
+                    # add Unrest
+                    unrest = 0
+                    # if there is a civil war ongoing, -20 unrest
+                    if civil_war:
+                        unrest -= 20
+                    # do complicated maths
+                    troops_unrest = p_info['troops'] / -100
+                    tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
+                    military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
+                            military_upkeep / 10 - 1)) * 0.75))
+                    if public_services < 15:
+                        public_service_unrest = round(30 - public_services * 2)
                     else:
-                        # calculate current unrest
+                        public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
+                    # add unrest and cap or floor
+                    unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
+                    # if there is a temple, reduce to 85%
+                    if p_info['temple']:
+                        unrest *= 0.85
+                        workshops_n_temples += 1
+                    if unrest > 100:
+                        unrest = 100
+                    elif unrest < 0:
                         unrest = 0
-                        # reduce unrest for troops present
-                        troops_unrest = p_info['troops'] / -100
-                        if userinfo['great_power']:
-                            troops_unrest *= 2
-                        # add local unrest suppression efficiency mod
-                        troops_unrest *= modifiers['local_unrest_suppression_efficiency_mod']
+                    # update unrest in province
+                    await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
+                    ################ EXIT PROVINCE UPDATING ################
+
+                # if there are uprising provinces
+                if len(provinces_rebelled) != 0:
+                    provinces_rebelled_string = ', '.join(str(p) for p in provinces_rebelled)
+                    await user.send(f"The population of province(s) {provinces_rebelled_string} "
+                                    f"have risen up due to high unrest ({unrest})! {structures_destroyed} "
+                                    f"structures have been destroyed by the rioters.")
+
+                ################ OCCUPATION UPDATING ################
+
+                # calculate unrest and occupation cost for occupied provinces
+                occupation_uprising = list()
+                provinces_occupied = await conn.fetchrow('''SELECT * FROM provinces WHERE occupier_id = $1 AND
+                                      owner_id != $1;''', u)
+                if provinces_occupied is True:
+                    for p in provinces_occupied:
+                        # calculate unrest
+                        unrest = 0
+                        # add base occupation unrest
+                        unrest += 25
                         # do complicated maths
+                        troops_unrest = p['troops'] / -100
                         tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
                         military_upkeep_unrest = -round(
                             (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
@@ -5460,261 +5587,142 @@ class CNC(commands.Cog):
                         elif unrest < 0:
                             unrest = 0
                         await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
-                        continue
-                total_troops += p_info['troops']
+                        # if the unrest is greater than 50, roll a d100-25 to see if they rebel
+                        if unrest >= 50:
+                            unrest_roll = randint(1, 100) - 25
+                            if unrest_roll <= 75:
+                                owner_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1,''',
+                                                                 p['owner'])
+                                await self.bot.loop.run_in_executor(None, self.map_color, p['id'], p['cord'],
+                                                                    owner_info['usercolor'])
+                                occupation_uprising.append(p['id'])
+                # if the province rebels
+                if occupation_uprising is True:
+                    occupation_uprising_string = ', '.join(str(p) for p in occupation_uprising)
+                    await user.send(f"The population of occupied province(s) {occupation_uprising_string} "
+                                    f"have risen up due to high unrest ({unrest}) and have returned to their "
+                                    f"core owner's control!")
 
-                ################ PRODUCTION UPDATING ################
+                ################ RESOURCE AND MANPOWER UPDATING ################
 
-                # define production value, producing amount, market value modifiers, and workshop production
-                production_value = 1
-                market_value_mod = 1
-                workshop_production = 0
-                # for every city, add .5 production
-                if p_info['city']:
-                    production_value += 0.5
-                # for every port, add 25% market value to the local good, if it is not gold or silver
-                if p_info['port']:
-                    if p_info['value'] not in ['Gold', 'Silver']:
-                        market_value_mod += 0.25
-                # for every workshop, add 1 * the production modifier
-                if p_info['workshop']:
-                    workshop_production += 1 * modifiers['workshop_production_mod']
-                    workshops_n_temples += 1
-                # add all production to the base province production
-                producing = p_info['production'] * (production_value + modifiers['production_mod'])
-                # calculate local trade good value and total gain
-                trade_good = await conn.fetchrow('''SELECT * FROM trade_goods WHERE name = $1;''', p_info['value'])
-                credits_added += (((trade_good['market_value'] +
-                                    modifiers[f'{self.space_replace(p_info["value"]).lower()}_mod']) *
-                                   market_value_mod) * producing) * initial_trade_access
+                # subtract troop and structure maintenance costs
+                credits_added -= total_troops * (0.01 * (modifiers['attack_level'] + modifiers['defense_level'])) * \
+                                 modifiers['troop_upkeep_mod']
+                credits_added -= structure_cost
+                # calculate manpower increase and max manpower
+                max_manpower_raw = await conn.fetchrow('''SELECT sum(manpower::int) FROM provinces WHERE
+                                      owner_id = $1 AND uprising = False;''', u)
+                max_manpower = max_manpower_raw['sum']
+                # if no provinces are owned, set to 3000
+                if max_manpower is None:
+                    max_manpower = 3000
+                # calculate manpower gain (+1000 per city, +2500 for capital)
+                added_manpower = (public_services / 100) * max_manpower * modifiers['manpower_mod']
+                added_manpower += userinfo['citylimit'] * 1000
+                if userinfo['capital'] != 0:
+                    if userinfo['capital'] in provinces:
+                        added_manpower += 2500
+                # calculate all manpower and set ceiling
+                manpower = added_manpower + userinfo['manpower'] + 3000
+                if manpower > max_manpower:
+                    manpower = max_manpower
+                # calculates action points
+                moves = 4
+                # if less than 10 provinces, add no moves
+                if len(provinces) <= 10:
+                    moves += 0
+                # if more than 10 provinces, add 1 move for every 10 provinces and add 10% for strategic focus
+                elif len(provinces) > 10:
+                    moves += math.floor((len(provinces) - 10) / 10)
+                    if userinfo['focus'] == "s":
+                        moves += math.floor(moves * .1)
+                if userinfo['great_power']:
+                    moves += 1
+                # add all credits, manpower, moves to the user
+                await conn.execute('''UPDATE cncusers SET resources = $1, manpower = $2, maxmanpower = $3, moves = $4,
+                                           trade_route_limit = $5 WHERE user_id = $6;''',
+                                   credits_added + userinfo['resources'], manpower, max_manpower, moves,
+                                   trade_route_limit, u)
 
-                ################ LOCAL UNREST UPDATING ################
+                ################ GREAT POWER UPDATING ################
 
-                # check local Unrest for local uprising and add local Unrest
-                local_unrest = p_info['unrest']
-                # if the local Unrest is greater than 50
-                if len(provinces) > 4:
-                    if local_unrest >= 50:
-                        # roll a d100
-                        unrest_roll = randint(0, 100)
-                        # if the d100 is greater than the local Unrest, trigger an uprising
-                        if unrest_roll <= local_unrest:
-                            # if a city is present, 20% chance for destruction
-                            if p_info['city']:
-                                if randint(1, 100) >= 80:
-                                    structures_destroyed += 1
-                                    await conn.execute('''UPDATE provinces SET city = False WHERE id = $1;''', p)
-                            # if a fort is present, 10% chance for it to be destroyed
-                            if p_info['fort']:
-                                if randint(1, 100) >= 90:
-                                    structures_destroyed += 1
-                                    await conn.execute('''UPDATE provinces SET fort = False WHERE id = $1;''', p)
-                            # if a port is present 20% chance for it to be destroyed
-                            if p_info['port']:
-                                if randint(1, 100) >= 80:
-                                    structures_destroyed += 1
-                                    await conn.execute('''UPDATE provinces SET port = False WHERE id = $1;''', p)
-                            # calculate troops damage and update
-                            troops_attacked = p_info['troops'] - \
-                                              (randint((p_info['manpower']) / 2, p_info['manpower']))
-                            if troops_attacked < 0:
-                                troops_attacked = 0
-                            await conn.execute('''UPDATE provinces SET uprising = True, troops = $2
-                                                              WHERE id = $1;''', p, troops_attacked)
-                            provinces_rebelled.append(p)
-                # add Unrest
-                unrest = 0
-                # if there is a civil war ongoing, -20 unrest
-                if civil_war:
-                    unrest -= 20
-                # do complicated maths
-                troops_unrest = p_info['troops'] / -100
-                tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
-                military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
-                        military_upkeep / 10 - 1)) * 0.75))
-                if public_services < 15:
-                    public_service_unrest = round(30 - public_services * 2)
-                else:
-                    public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
-                # add unrest and cap or floor
-                unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
-                # if there is a temple, reduce to 85%
-                if p_info['temple']:
-                    unrest *= 0.85
-                    workshops_n_temples += 1
-                if unrest > 100:
-                    unrest = 100
-                elif unrest < 0:
-                    unrest = 0
-                # update unrest in province
-                await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
-                ################ EXIT PROVINCE UPDATING ################
+                gp_points = 0
+                # for every 100 credits earned, +1
+                gp_points += credits_added * 0.01
+                # for every army level, +1
+                gp_points += modifiers['attack_level'] + modifiers['defense_level']
+                # for every researched tech, +1
+                gp_points += len(userinfo['researched'])
+                # for every 1000 manpower, +1
+                gp_points += manpower * 0.001
+                # for every fort, city, port, workshop, and temple, +1
+                gp_points += forts['count'] + cities['count'] + \
+                             ports['count'] + workshops_n_temples
+                # for every occupied 2 provinces, +1
+                gp_points += occupied_count['count'] * 0.5
+                alliances = await conn.fetchrow(
+                    '''SELECT COUNT(*) FROM interactions WHERE (sender = $1 or recipient = $1) and type = 'alliance'
+                    and active = True;''',
+                    userinfo['username'])
+                # for every 2 alliances, +1
+                gp_points += alliances['count'] * 0.5
+                # round to floor
+                gp_points = math.floor(gp_points)
+                # update great power score
+                await conn.execute('''UPDATE cncusers SET great_power_score = $1 WHERE username = $2;''',
+                                   gp_points, userinfo['username'])
 
-            # if there are uprising provinces
-            if len(provinces_rebelled) != 0:
-                provinces_rebelled_string = ', '.join(str(p) for p in provinces_rebelled)
-                await user.send(f"The population of province(s) {provinces_rebelled_string} "
-                                f"have risen up due to high unrest ({unrest})! {structures_destroyed} "
-                                f"structures have been destroyed by the rioters.")
+                ################ EXIT USER UPDATING ################
 
-            ################ OCCUPATION UPDATING ################
+            ################ GLOBAL UPDATING ################
 
-            # calculate unrest and occupation cost for occupied provinces
-            occupation_uprising = list()
-            provinces_occupied = await conn.fetchrow('''SELECT * FROM provinces WHERE occupier_id = $1 AND
-                                              owner_id != $1;''', u)
-            if provinces_occupied is True:
-                for p in provinces_occupied:
-                    # calculate unrest
-                    unrest = 0
-                    # add base occupation unrest
-                    unrest += 25
-                    # do complicated maths
-                    troops_unrest = p['troops'] / -100
-                    tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
-                    military_upkeep_unrest = -round(
-                        (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
-                                military_upkeep / 10 - 1)) * 0.75))
-                    if public_services < 15:
-                        public_service_unrest = round(30 - public_services * 2)
-                    else:
-                        public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
-                    # add unrest and cap or floor
-                    unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
-                    if unrest > 100:
-                        unrest = 100
-                    elif unrest < 0:
-                        unrest = 0
-                    await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
-                    # if the unrest is greater than 50, roll a d100-25 to see if they rebel
-                    if unrest >= 50:
-                        unrest_roll = randint(1, 100) - 25
-                        if unrest_roll <= 75:
-                            owner_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1,''',
-                                                             p['owner'])
-                            await self.bot.loop.run_in_executor(None, self.map_color, p['id'], p['cord'],
-                                                                owner_info['usercolor'])
-                            occupation_uprising.append(p['id'])
-            # if the province rebels
-            if occupation_uprising is True:
-                occupation_uprising_string = ', '.join(str(p) for p in occupation_uprising)
-                await user.send(f"The population of occupied province(s) {occupation_uprising_string} "
-                                f"have risen up due to high unrest ({unrest}) and have returned to their "
-                                f"core owner's control!")
+            # set great powers
+            await conn.execute('''UPDATE cncusers SET great_power = False;''')
+            great_powers = await conn.fetch('''SELECT user_id, great_power_score FROM cncusers 
+                                  ORDER BY great_power_score DESC LIMIT 3;''')
+            for gp in great_powers:
+                if gp['great_power_score'] > 50:
+                    userid = gp['user_id']
+                    await conn.execute('''UPDATE cncusers SET great_power = True WHERE user_id = $1;''', userid)
+            # update research turns and researched techs
+            await conn.execute('''UPDATE cnc_researching SET turns = turns - 1;''')
+            researched = await conn.fetch('''SELECT * FROM cnc_researching WHERE turns <= 0;''')
+            for r in researched:
+                await conn.execute('''UPDATE cncusers SET researched = researched || $1 WHERE user_id = $2;''',
+                                   [str(r['tech'])], r['user_id'])
+                user = self.bot.get_user(r['user_id'])
+                userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', r['user_id'])
+                await user.send(f"{userinfo['username']} has finished researching {r['tech']}.")
+                await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', r['user_id'])
+                # updates modifiers
+                tech = Technology(nation=userinfo['username'], techs=r['tech'])
+                await tech.effects()
+            # update turns
+            turn = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'turn';''')
+            await conn.execute('''UPDATE cnc_data SET data_value = data_value + 1 WHERE data_name = 'turn';''')
+            # update user events
+            await conn.execute('''UPDATE cncusers SET event_duration = event_duration - 1 WHERE event != '';''')
+            await conn.execute('''UPDATE cncusers SET event = '', event_duration = 0 WHERE event_duration <= 0;''')
+            # update global events and select if none is in effect
+            await conn.execute('''UPDATE cnc_events SET turns = turns - 1 WHERE turns != 0;''')
+            current_event = await conn.fetchrow('''SELECT * FROM cnc_events WHERE turns != 0;''')
+            if current_event is None:
+                random_global_event = await conn.fetchrow('''SELECT * FROM cnc_events 
+                        WHERE type = 'global' ORDER BY random();''')
+                event = Events(event=random_global_event['name'])
+                await event.global_effects()
+                await conn.execute('''UPDATE cnc_events SET turns = $1 WHERE name = $2;''',
+                                   random_global_event['duration'], random_global_event['name'])
+            else:
+                event = Events(event=current_event['name'], current=True)
+                await event.global_effects()
+            # send turn notification
+            await cncchannel.send(f"New turn! It is now turn #{turn['data_value'] + 1}.")
+            ################ EXIT GLOBAL UPDATING ################
+        except Exception:
+            self.bot.logger.warning(msg=traceback.format_exc())
+            await crashchannel.send(content=f"```py\n{traceback.format_exc()}```")
 
-            ################ RESOURCE AND MANPOWER UPDATING ################
-
-            # subtract troop and structure maintenance costs
-            credits_added -= total_troops * (0.01 * (modifiers['attack_level'] + modifiers['defense_level'])) * \
-                             modifiers['troop_upkeep_mod']
-            credits_added -= structure_cost
-            # calculate manpower increase and max manpower
-            max_manpower_raw = await conn.fetchrow('''SELECT sum(manpower::int) FROM provinces WHERE
-                                              owner_id = $1 AND uprising = False;''', u)
-            max_manpower = max_manpower_raw['sum']
-            # if no provinces are owned, set to 3000
-            if max_manpower is None:
-                max_manpower = 3000
-            # calculate manpower gain (+1000 per city, +2500 for capital)
-            added_manpower = (public_services / 100) * max_manpower * modifiers['manpower_mod']
-            added_manpower += userinfo['citylimit'] * 1000
-            if userinfo['capital'] != 0:
-                if userinfo['capital'] in provinces:
-                    added_manpower += 2500
-            # calculate all manpower and set ceiling
-            manpower = added_manpower + userinfo['manpower'] + 3000
-            if manpower > max_manpower:
-                manpower = max_manpower
-            # calculates action points
-            moves = 4
-            # if less than 10 provinces, add no moves
-            if len(provinces) <= 10:
-                moves += 0
-            # if more than 10 provinces, add 1 move for every 10 provinces and add 10% for strategic focus
-            elif len(provinces) > 10:
-                moves += math.floor((len(provinces) - 10) / 10)
-                if userinfo['focus'] == "s":
-                    moves += math.floor(moves * .1)
-            if userinfo['great_power']:
-                moves += 1
-            # add all credits, manpower, moves to the user
-            await conn.execute('''UPDATE cncusers SET resources = $1, manpower = $2, maxmanpower = $3, moves = $4,
-                                                   trade_route_limit = $5 WHERE user_id = $6;''',
-                               credits_added + userinfo['resources'], manpower, max_manpower, moves,
-                               trade_route_limit, u)
-
-            ################ GREAT POWER UPDATING ################
-
-            gp_points = 0
-            # for every 100 credits earned, +1
-            gp_points += credits_added * 0.01
-            # for every army level, +1
-            gp_points += modifiers['attack_level'] + modifiers['defense_level']
-            # for every researched tech, +1
-            gp_points += len(userinfo['researched'])
-            # for every 1000 manpower, +1
-            gp_points += manpower * 0.001
-            # for every fort, city, port, workshop, and temple, +1
-            gp_points += forts['count'] + cities['count'] + \
-                         ports['count'] + workshops_n_temples
-            # for every occupied 2 provinces, +1
-            gp_points += occupied_count['count'] * 0.5
-            alliances = await conn.fetchrow(
-                '''SELECT COUNT(*) FROM interactions WHERE (sender = $1 or recipient = $1) and type = 'alliance'
-                and active = True;''',
-                userinfo['username'])
-            # for every 2 alliances, +1
-            gp_points += alliances['count'] * 0.5
-            # round to floor
-            gp_points = math.floor(gp_points)
-            # update great power score
-            await conn.execute('''UPDATE cncusers SET great_power_score = $1 WHERE username = $2;''',
-                               gp_points, userinfo['username'])
-
-            ################ EXIT USER UPDATING ################
-
-        ################ GLOBAL UPDATING ################
-
-        # set great powers
-        await conn.execute('''UPDATE cncusers SET great_power = False;''')
-        great_powers = await conn.fetch('''SELECT user_id, great_power_score FROM cncusers 
-                                          ORDER BY great_power_score DESC LIMIT 3;''')
-        for gp in great_powers:
-            if gp['great_power_score'] > 50:
-                userid = gp['user_id']
-                await conn.execute('''UPDATE cncusers SET great_power = True WHERE user_id = $1;''', userid)
-        # update research turns and researched techs
-        await conn.execute('''UPDATE cnc_researching SET turns = turns - 1;''')
-        researched = await conn.fetch('''SELECT * FROM cnc_researching WHERE turns <= 0;''')
-        for r in researched:
-            await conn.execute('''UPDATE cncusers SET researched = researched || $1 WHERE user_id = $2;''',
-                               [str(r['tech'])], r['user_id'])
-            user = self.bot.get_user(r['user_id'])
-            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', r['user_id'])
-            await user.send(f"{userinfo['username']} has finished researching {r['tech']}.")
-            await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', r['user_id'])
-            # updates modifiers
-            tech = Technology(nation=userinfo['username'], techs=r['tech'])
-            await tech.effects()
-        # update turns
-        turn = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'turn';''')
-        await conn.execute('''UPDATE cnc_data SET data_value = data_value + 1 WHERE data_name = 'turn';''')
-        # update user events
-        await conn.execute('''UPDATE cncusers SET event_duration = event_duration - 1 WHERE event != '';''')
-        await conn.execute('''UPDATE cncusers SET event = '', event_duration = 0 WHERE event_duration <= 0;''')
-        # update global events and select if none is in effect
-        await conn.execute('''UPDATE cnc_events SET turns = turns - 1 WHERE turns != 0;''')
-        current_event = await conn.fetchrow('''SELECT * FROM cnc_events WHERE turns != 0;''')
-        if current_event is None:
-            random_global_event = await conn.fetchrow('''SELECT * FROM cnc_events 
-                                WHERE type = 'global' ORDER BY random();''')
-            event = Events(event=random_global_event['name'])
-            await event.global_effects()
-            await conn.execute('''UPDATE cnc_events SET turns = $1 WHERE name = $2;''',
-                               random_global_event['duration'], random_global_event['name'])
-        else:
-            event = Events(event=current_event['name'], current=True)
-            await event.global_effects()
     async def cncstartloop(self):
         try:
             await self.bot.wait_until_ready()
