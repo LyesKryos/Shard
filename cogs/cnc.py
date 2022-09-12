@@ -278,7 +278,7 @@ class CNC(commands.Cog):
         await conn.execute('''UPDATE provinces SET occupier_id = $1, occupier = $2 , owner = $2, owner_id = $1 
         WHERE id = $3;''', userid, nationame, province['id'])
         await self.bot.loop.run_in_executor(None, self.map_color, province['id'], province['cord'], color)
-        tech = Technology(nationame, ctx, techs=research)
+        tech = Technology(nationame, ctx=ctx, techs=research)
         await tech.effects()
         await ctx.send(f"{ctx.author.name} has registered {nationame} in the Command and Conquer System\n"
                        f"{nationame} has been given **\u03FE{resources}**, **3000 manpower**, and "
@@ -921,7 +921,7 @@ class CNC(commands.Cog):
         if user is None:
             await ctx.send("You are not registered.")
             return
-        tech = Technology(user['username'], ctx, args)
+        tech = Technology(nation=user['username'], ctx=ctx, tech=args)
         await tech.research()
 
     @commands.command(brief="Displays information about current research.")
@@ -954,7 +954,7 @@ class CNC(commands.Cog):
         if userinfo is None:
             await ctx.send("You are not registered.")
             return
-        tech = Technology(userinfo['username'], ctx)
+        tech = Technology(nation=userinfo['username'], ctx=ctx)
         await tech.tree()
 
     @commands.command(brief="Sends a list of all current modifiers.", aliases=['cncmods'])
@@ -1025,7 +1025,7 @@ class CNC(commands.Cog):
 
     @commands.command(brief="Sends information about an event.", usage="<event name>")
     async def cnc_event(self, ctx, event: str = None):
-        event = Events(ctx, event=event)
+        event = Events(ctx=ctx, event=event)
         await event.event_info()
 
     # ---------------------Province Commands------------------------------
@@ -4712,7 +4712,7 @@ class CNC(commands.Cog):
                 if event_info is None:
                     random_event = await conn.fetchrow('''SELECT * FROM cnc_events WHERE type = 'national' 
                     ORDER BY random();''')
-                    event = Events(ctx, userinfo['username'], random_event['name'])
+                    event = Events(bot=self.bot, nation=userinfo['username'], event=random_event['name'])
                     await event.event_effects()
                 # otherwise, update effects
                 else:
@@ -5245,7 +5245,7 @@ class CNC(commands.Cog):
             if event_info is None:
                 random_event = await conn.fetchrow('''SELECT * FROM cnc_events WHERE type = 'national' 
                 ORDER BY random();''')
-                event = Events(ctx, userinfo['username'], random_event['name'])
+                event = Events(bot=self.bot, nation=userinfo['username'], event=random_event['name'])
                 await event.event_effects()
             # otherwise, update effects
             else:
