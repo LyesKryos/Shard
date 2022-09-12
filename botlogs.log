@@ -3020,3 +3020,90 @@ TypeError: 'NoneType' object is not subscriptable
 
 2022-09-11 16:42:48 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cnc_research" is not found
 
+2022-09-11 21:00:39 ERROR: Task exception was never retrieved
+future: <Task finished name='discord.py: on_message' coro=<Client._run_event() done, defined at /usr/local/lib/python3.8/dist-packages/discord/client.py:385> exception=SystemExit(100)>
+Traceback (most recent call last):
+  File "/usr/lib/python3.8/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/usr/lib/python3.8/asyncio/base_events.py", line 603, in run_until_complete
+    self.run_forever()
+  File "/usr/lib/python3.8/asyncio/base_events.py", line 570, in run_forever
+    self._run_once()
+  File "/usr/lib/python3.8/asyncio/base_events.py", line 1859, in _run_once
+    handle._run()
+  File "/usr/lib/python3.8/asyncio/events.py", line 81, in _run
+    self._context.run(self._callback, *self._args)
+  File "/usr/local/lib/python3.8/dist-packages/discord/client.py", line 393, in _run_event
+    await coro(*args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/bot.py", line 1374, in on_message
+    await self.process_commands(message)
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/bot.py", line 1371, in process_commands
+    await self.invoke(ctx)  # type: ignore
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/bot.py", line 1329, in invoke
+    await ctx.command.invoke(ctx)
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 995, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/base.py", line 46, in shut_down
+  File "/usr/lib/python3.8/_sitebuiltins.py", line 26, in __call__
+    raise SystemExit(code)
+SystemExit: 100
+2022-09-11 21:01:40 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 301, in cnc_view
+    if userinfo["usercolor"] == "":
+TypeError: 'NoneType' object is not subscriptable
+
+2022-09-11 21:01:51 WARNING: We are being rate limited. Retrying in 0.08 seconds. Handled under the bucket "835579413625569322:None:/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me"
+2022-09-11 21:02:36 WARNING: We are being rate limited. Retrying in 0.04 seconds. Handled under the bucket "835579413625569322:None:/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me"
+2022-09-11 21:04:11 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 282, in cnc_register
+    await tech.effects()
+  File "/root/Documents/Shard/cnc_research.py", line 361, in effects
+    await conn.execute('''UPDATE cnc_modifiers SET research_mod = research_mod - 0.05
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/pool.py", line 564, in execute
+    return await con.execute(query, *args, timeout=timeout)
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 320, in execute
+    _, status, _ = await self._execute(
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 1659, in _execute
+    result, _ = await self.__execute(
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 1684, in __execute
+    return await self._do_execute(
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 1711, in _do_execute
+    stmt = await self._get_statement(
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 398, in _get_statement
+    statement = await self._protocol.prepare(
+  File "asyncpg/protocol/protocol.pyx", line 168, in prepare
+asyncpg.exceptions.UndefinedColumnError: column "research_mod" does not exist
+
+2022-09-11 21:09:44 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 3613, in cnc_wipe_all_data_reset
+    names[iterations], choice(production), p['id'])
+IndexError: list index out of range
+
+2022-09-11 21:31:37 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 301, in cnc_view
+    await ctx.send("You are not registered.")
+TypeError: 'NoneType' object is not subscriptable
+
+2022-09-11 21:54:20 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cnc_tech_tree" is not found
+
+2022-09-11 21:54:31 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 960, in cnc_tech_tree
+    await tech.tree()
+  File "/root/Documents/Shard/cnc_research.py", line 407, in tree
+    tree = Image.open(fr"C:\Users\jaedo\OneDrive\NationStates BBCode\Thegye Stuff\Meta RP\Tech Tree\Cnc Tech Tree Lines.png").convert("RGBA")
+  File "/usr/local/lib/python3.8/dist-packages/PIL/Image.py", line 3068, in open
+    fp = builtins.open(filename, "rb")
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jaedo\\OneDrive\\NationStates BBCode\\Thegye Stuff\\Meta RP\\Tech Tree\\Cnc Tech Tree Lines.png'
+
