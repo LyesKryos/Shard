@@ -4659,7 +4659,7 @@ class CNC(commands.Cog):
         crashchannel = self.bot.get_channel(835579413625569322)
         try:
             # channel to send to
-            cncchannel = self.bot.get_channel(927288304301387816)
+            cncchannel = self.bot.get_channel(835579413625569322)
             # connects to the database
             conn = self.bot.pool
             # fetches all the users and makes a list
@@ -4705,6 +4705,21 @@ class CNC(commands.Cog):
                 await tech.effects()
                 # fetch all tech modifiers
                 modifiers = await conn.fetchrow('''SELECT * FROM cnc_modifiers WHERE user_id = $1;''', u)
+
+                ################ EVENT UPDATING ################
+
+                # check for event
+                event_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1 and event != '';''', u)
+                # if there is no event, pick event and run
+                if event_info is None:
+                    random_event = await conn.fetchrow('''SELECT * FROM cnc_events WHERE type = 'national' 
+                            ORDER BY random();''')
+                    event = Events(ctx, userinfo['username'], random_event['name'])
+                    await event.event_effects()
+                # otherwise, update effects
+                else:
+                    event = Events(ctx, nation=userinfo['username'], event=event_info['event'], current=True)
+                    await event.event_effects()
 
                 ################ LIMIT UPDATING ################
 
@@ -4771,15 +4786,15 @@ class CNC(commands.Cog):
                 trade_route_limit += int(modifiers['trade_route'])
                 # if the current trade route number is too high, reduce effective trade gain
                 outgoing_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
-                                     active = True AND sender_id = $1;''', userinfo['user_id'])
+                                      active = True AND sender_id = $1;''', userinfo['user_id'])
                 outgoing_info = await conn.fetchrow('''SELECT * FROM interactions WHERE type = 'trade' AND 
-                                     active = True AND sender_id = $1;''', userinfo['user_id'])
+                                      active = True AND sender_id = $1;''', userinfo['user_id'])
                 if outgoing_count['count'] is None:
                     outgoing_count = 0
                 else:
                     outgoing_count = outgoing_count['count']
                 incoming_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
-                                                    active = True AND recipient_id = $1;''', userinfo['user_id'])
+                                                     active = True AND recipient_id = $1;''', userinfo['user_id'])
                 if incoming_count['count'] is None:
                     incoming_count = 0
                 else:
@@ -4817,7 +4832,7 @@ class CNC(commands.Cog):
                         if unrest_roll <= national_unrest:
                             # fetch all provinces and get half
                             owned_provinces = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1 AND
-                                                 occupier_id = $1;''', user.id)
+                                                  occupier_id = $1;''', user.id)
                             owned_provinces = [p['id'] for p in owned_provinces]
                             half_owned = math.floor(len(owned_provinces) / 2)
                             provinces_rebelling = sample(owned_provinces, half_owned)
@@ -4833,15 +4848,15 @@ class CNC(commands.Cog):
                                     troops_remaining = 0
                                 # update all information
                                 await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE 
-                                                     user_id = $3;''', undeployed + troops_remaining, u)
+                                                      user_id = $2;''', undeployed + troops_remaining, u)
                                 await conn.execute('''UPDATE provinces SET occupier = '', occupier_id = 0, 
-                                unrest = 0, troops = $1 WHERE id = $2;''', p_info['manpower'] * 2, pr)
+                                        unrest = 0, troops = $1 WHERE id = $2;''', p_info['manpower'] * 2, pr)
                                 await self.bot.loop.run_in_executor(None, self.occupy_color, pr, p_info['cord'][0:2],
-                                                                    "#000000", True)
+                                                                    "#000000", userinfo['usercolor'])
                             provinces_rebelling.sort()
                             provinces_rebelling_string = ', '.join(str(e) for e in provinces_rebelling)
                             await user.send(f"Province(s) {provinces_rebelling_string} have rebelled in a civil war"
-                                            f"due to high national unrest ({national_unrest})!")
+                                            f" due to high national unrest ({national_unrest})!")
                             civil_war = True
                 # add national Unrest
                 national_unrest = 0
@@ -4876,7 +4891,7 @@ class CNC(commands.Cog):
                 structures_destroyed = 0
                 workshops_n_temples = 0
                 # update all provinces
-                for p in provinces:
+                for p in provinces_owned:
                     if p == 0:
                         continue
                     # fetch province info
@@ -4971,7 +4986,7 @@ class CNC(commands.Cog):
                                 if troops_attacked < 0:
                                     troops_attacked = 0
                                 await conn.execute('''UPDATE provinces SET uprising = True, troops = $2
-                                                     WHERE id = $1;''', p, troops_attacked)
+                                                      WHERE id = $1;''', p, troops_attacked)
                                 provinces_rebelled.append(p)
                     # add Unrest
                     unrest = 0
@@ -5013,7 +5028,7 @@ class CNC(commands.Cog):
                 # calculate unrest and occupation cost for occupied provinces
                 occupation_uprising = list()
                 provinces_occupied = await conn.fetchrow('''SELECT * FROM provinces WHERE occupier_id = $1 AND
-                                     owner_id != $1;''', u)
+                                      owner_id != $1;''', u)
                 if provinces_occupied is True:
                     for p in provinces_occupied:
                         # calculate unrest
@@ -5061,14 +5076,14 @@ class CNC(commands.Cog):
                 credits_added -= structure_cost
                 # calculate manpower increase and max manpower
                 max_manpower_raw = await conn.fetchrow('''SELECT sum(manpower::int) FROM provinces WHERE
-                                     owner_id = $1 AND uprising = False;''', u)
+                                      owner_id = $1 AND uprising = False;''', u)
                 max_manpower = max_manpower_raw['sum']
                 # if no provinces are owned, set to 3000
                 if max_manpower is None:
                     max_manpower = 3000
                 # calculate manpower gain (+1000 per city, +2500 for capital)
                 added_manpower = (public_services / 100) * max_manpower * modifiers['manpower_mod']
-                added_manpower += userinfo['citylimit'][0] * 1000
+                added_manpower += userinfo['citylimit'] * 1000
                 if userinfo['capital'] != 0:
                     if userinfo['capital'] in provinces:
                         added_manpower += 2500
@@ -5090,7 +5105,7 @@ class CNC(commands.Cog):
                     moves += 1
                 # add all credits, manpower, moves to the user
                 await conn.execute('''UPDATE cncusers SET resources = $1, manpower = $2, maxmanpower = $3, moves = $4,
-                                          trade_route_limit = $5 WHERE user_id = $6;''',
+                                           trade_route_limit = $5 WHERE user_id = $6;''',
                                    credits_added + userinfo['resources'], manpower, max_manpower, moves,
                                    trade_route_limit, u)
 
@@ -5129,7 +5144,7 @@ class CNC(commands.Cog):
             # set great powers
             await conn.execute('''UPDATE cncusers SET great_power = False;''')
             great_powers = await conn.fetch('''SELECT user_id, great_power_score FROM cncusers 
-                                 ORDER BY great_power_score DESC LIMIT 3;''')
+                                  ORDER BY great_power_score DESC LIMIT 3;''')
             for gp in great_powers:
                 if gp['great_power_score'] > 50:
                     userid = gp['user_id']
@@ -5145,11 +5160,28 @@ class CNC(commands.Cog):
                 await user.send(f"{userinfo['username']} has finished researching {r['tech']}.")
                 await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', r['user_id'])
                 # updates modifiers
-                tech = Technology(nation=userinfo['username'], tech=r['tech'], ctx=ctx)
+                tech = Technology(nation=userinfo['username'], techs=r['tech'], ctx=ctx)
                 await tech.effects()
             # update turns
             turn = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'turn';''')
             await conn.execute('''UPDATE cnc_data SET data_value = data_value + 1 WHERE data_name = 'turn';''')
+            # update user events
+            await conn.execute('''UPDATE cncusers SET event_duration = event_duration - 1 WHERE event != '';''')
+            await conn.execute('''UPDATE cncusers SET event = '', event_duration = 0 WHERE event_duration <= 0;''')
+            # update global events and select if none is in effect
+            await conn.execute('''UPDATE cnc_events SET turns = turns - 1 WHERE turns != 0;''')
+            current_event = await conn.fetchrow('''SELECT * FROM cnc_events WHERE turns != 0;''')
+            if current_event is None:
+                random_global_event = await conn.fetchrow('''SELECT * FROM cnc_events 
+                        WHERE type = 'global' ORDER BY random();''')
+                event = Events(ctx, event=random_global_event['name'])
+                await event.global_effects()
+                await conn.execute('''UPDATE cnc_events SET turns = $1 WHERE name = $2;''',
+                                   random_global_event['duration'], random_global_event['name'])
+            else:
+                event = Events(ctx, event=current_event['name'], current=True)
+                await event.global_effects()
+            # send turn notification
             await cncchannel.send(f"New turn! It is now turn #{turn['data_value'] + 1}.")
             ################ EXIT GLOBAL UPDATING ################
         except Exception:

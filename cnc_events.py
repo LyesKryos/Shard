@@ -1123,7 +1123,7 @@ class Events:
         # execute effects; if the event is weighted less than 100, roll d100
         event = self.space_replace(self.event)
         # event channel
-        event_channel = self.ctx.bot.get_channel(835579413625569322)
+        event_channel = self.ctx.bot.get_channel(982685906987274260)
         # turns
         turn = await conn.fetchrow('''SELECT * FROM cnc_data WHERE data_name = 'turn';''')
         turn = turn['data_value']
