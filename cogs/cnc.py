@@ -2321,7 +2321,7 @@ class CNC(commands.Cog):
         return
 
     @commands.command(usage="[battalion amount] [recipient nation]",
-                      brief="Sends a numer of undeployed battalions to a specified nation.")
+                      brief="Sends a number of undeployed battalions to a specified nation.")
     async def cnc_expedition(self, ctx, amount: int, recipient: str):
         # create connection
         author = ctx.author
@@ -4655,7 +4655,7 @@ class CNC(commands.Cog):
             await ctx.send("Turn loop not running.")
 
     @tasks.loop(hours=6, reconnect=False)
-    async def turn_loop(self, ctx):
+    async def turn_loop(self):
         crashchannel = self.bot.get_channel(835579413625569322)
         try:
             # channel to send to
@@ -4701,7 +4701,7 @@ class CNC(commands.Cog):
 
                 # update tech modifiers
                 await conn.execute('''INSERT INTO cnc_modifiers(user_id) VALUES($1);''', u)
-                tech = Technology(userinfo['username'], techs=userinfo['researched'], ctx=ctx)
+                tech = Technology(userinfo['username'], techs=userinfo['researched'])
                 await tech.effects()
                 # fetch all tech modifiers
                 modifiers = await conn.fetchrow('''SELECT * FROM cnc_modifiers WHERE user_id = $1;''', u)
@@ -4714,11 +4714,11 @@ class CNC(commands.Cog):
                 if event_info is None:
                     random_event = await conn.fetchrow('''SELECT * FROM cnc_events WHERE type = 'national' 
                             ORDER BY random();''')
-                    event = Events(ctx, userinfo['username'], random_event['name'])
+                    event = Events(userinfo['username'], random_event['name'])
                     await event.event_effects()
                 # otherwise, update effects
                 else:
-                    event = Events(ctx, nation=userinfo['username'], event=event_info['event'], current=True)
+                    event = Events(nation=userinfo['username'], event=event_info['event'], current=True)
                     await event.event_effects()
 
                 ################ LIMIT UPDATING ################
@@ -5160,7 +5160,7 @@ class CNC(commands.Cog):
                 await user.send(f"{userinfo['username']} has finished researching {r['tech']}.")
                 await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', r['user_id'])
                 # updates modifiers
-                tech = Technology(nation=userinfo['username'], techs=r['tech'], ctx=ctx)
+                tech = Technology(nation=userinfo['username'], techs=r['tech'])
                 await tech.effects()
             # update turns
             turn = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = 'turn';''')
@@ -5174,12 +5174,12 @@ class CNC(commands.Cog):
             if current_event is None:
                 random_global_event = await conn.fetchrow('''SELECT * FROM cnc_events 
                         WHERE type = 'global' ORDER BY random();''')
-                event = Events(ctx, event=random_global_event['name'])
+                event = Events(event=random_global_event['name'])
                 await event.global_effects()
                 await conn.execute('''UPDATE cnc_events SET turns = $1 WHERE name = $2;''',
                                    random_global_event['duration'], random_global_event['name'])
             else:
-                event = Events(ctx, event=current_event['name'], current=True)
+                event = Events(event=current_event['name'], current=True)
                 await event.global_effects()
             # send turn notification
             await cncchannel.send(f"New turn! It is now turn #{turn['data_value'] + 1}.")
@@ -5718,7 +5718,7 @@ class CNC(commands.Cog):
         await cncchannel.send(f"New turn! It is now turn #{turn['data_value'] + 1}.")
         ################ EXIT GLOBAL UPDATING ################
 
-    async def cncstartloop(self):
+    async def cncstartloop(self, ctx):
         try:
             await self.bot.wait_until_ready()
             # fetch the Shard testing channel
@@ -5756,7 +5756,7 @@ class CNC(commands.Cog):
                 update += datetime.timedelta(days=1)
                 await shardchannel.send(f"Turn loop waiting until {update.strftime('%a, %d %b %Y at %H:%M:%S %Z%z')}.")
                 await discord.utils.sleep_until(update)
-            self.turn_loop.start()
+            self.turn_loop.start(ctx)
         except Exception:
             self.bot.logger.warning(msg=traceback.format_exc())
 

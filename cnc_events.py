@@ -9,7 +9,7 @@ import re
 
 class Events:
 
-    def __init__(self, ctx: commands.Context, nation: str = None, event: str = None, current: bool = False):
+    def __init__(self, ctx: commands.Context = None, nation: str = None, event: str = None, current: bool = False):
         # define nation, context, and event
         self.nation = nation
         self.ctx = ctx
