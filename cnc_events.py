@@ -76,10 +76,10 @@ class Events:
             # construct embed and send
             event_embed = discord.Embed(title=event_info['name'],
                                         description=f"The current event affecting {userinfo['username']}.")
-            event_embed.add_field(name="Effect", value=f"{event_info['effects']}")
-            event_embed.add_field(name="\u200b", value="\u200b")
+            event_embed.add_field(name="Effect", value=f"{event_info['effects']}", inline=False)
+            event_embed.add_field(name="Type", value=f"{event_info['type'].title()}")
+            event_embed.add_field(name="Duration", value=f"{event_info['duration']} turns")
             event_embed.add_field(name="Weight", value=f"{event_info['weight']}")
-            event_embed.add_field(name="Description", value=f"{event_info['description']}")
             await self.ctx.send(embed=event_embed)
             return
 
