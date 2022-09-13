@@ -1024,7 +1024,7 @@ class CNC(commands.Cog):
             await ctx.send("Sent!")
 
     @commands.command(brief="Sends information about an event.", usage="<event name>")
-    async def cnc_event(self, ctx, *, args):
+    async def cnc_event(self, ctx, *, args = None):
         event = Events(ctx=ctx, event=args)
         await event.event_info()
 
@@ -4653,7 +4653,7 @@ class CNC(commands.Cog):
             await ctx.send("Turn loop not running.")
 
     @tasks.loop(hours=6, reconnect=False)
-    async def turn_loop(self, ctx):
+    async def turn_loop(self):
         crashchannel = self.bot.get_channel(835579413625569322)
         try:
             # channel to send to
@@ -5740,7 +5740,7 @@ class CNC(commands.Cog):
                 await discord.utils.sleep_until(update)
             # if the hour is greater than 0600 but less than noon
             elif now.time() < datetime.time(hour=12):
-                update = now.replace(hour=12, minute=0, second=0)
+                update = now.replace(hour=6, minute=18, second=30)
                 await shardchannel.send(f"Turn loop waiting until {update.strftime('%a, %d %b %Y at %H:%M:%S %Z%z')}.")
                 await discord.utils.sleep_until(update)
             # if the hour is greater than noon but less than 1800
