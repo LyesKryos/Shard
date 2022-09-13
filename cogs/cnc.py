@@ -1024,8 +1024,8 @@ class CNC(commands.Cog):
             await ctx.send("Sent!")
 
     @commands.command(brief="Sends information about an event.", usage="<event name>")
-    async def cnc_event(self, ctx, event: str = None):
-        event = Events(ctx=ctx, event=event)
+    async def cnc_event(self, ctx, *, args):
+        event = Events(ctx=ctx, event=args)
         await event.event_info()
 
     # ---------------------Province Commands------------------------------
