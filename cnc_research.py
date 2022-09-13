@@ -392,7 +392,7 @@ class Technology:
 
     async def lookup(self):
         conn = self.pool
-        techinfo = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE name = $1;''', self.tech.title())
+        techinfo = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE lower(name) = $1;''', self.tech.lower())
         if techinfo is None:
             await self.ctx.send("No such technology exists.")
             return
