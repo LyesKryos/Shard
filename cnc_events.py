@@ -1142,12 +1142,12 @@ class Events:
             # weighted 75
             roll = random.randint(1, 100)
             if self.current:
-                await conn.execute('''UPDATE cnc_modifiers SET manpower_mod = mandpower_mod - .25;''')
+                await conn.execute('''UPDATE cnc_modifiers SET manpower_mod = manpower_mod - .25;''')
                 return
             if roll >= 25:
                 # if the turn is 56 or later, reduce manpower gain by 25%
                 if turn >= 56:
-                    await conn.execute('''UPDATE cnc_modifiers SET manpower_mod = mandpower_mod - .25;''')
+                    await conn.execute('''UPDATE cnc_modifiers SET manpower_mod = manpower_mod - .25;''')
                     await event_channel.send("A great **Famine** has struck the world! Global manpower increase is "
                                              "reduced by 25%.")
                 return
@@ -1156,12 +1156,12 @@ class Events:
             # weighted 25
             roll = random.randint(1, 100)
             if self.current:
-                await conn.execute('''UPDATE cnc_modifiers SET manpower_mod = mandpower_mod - .25;''')
+                await conn.execute('''UPDATE cnc_modifiers SET manpower_mod = manpower_mod - .25;''')
                 return
             if roll >= 75:
                 # if the turn is 112 or later, reduce manpower gain by 25%
                 if turn >= 112:
-                    await conn.execute('''UPDATE cnc_modifiers SET manpower_mod = mandpower_mod - .25;''')
+                    await conn.execute('''UPDATE cnc_modifiers SET manpower_mod = manpower_mod - .25;''')
                     await event_channel.send("A great **Plague** has struck the world! Global manpower increase is "
                                              "reduced by 75%.")
                 return
