@@ -30,12 +30,12 @@ class Events:
                 self.bot.logger.warning(traceback.format_exc())
 
     def space_replace(self, userinput: str) -> str:
-        """Replaces spaces with underscores and titles"""
+        """Replaces spaces with underscores and lowers"""
         to_regex = userinput.replace(" ", "_").lower()
         return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
 
     def underscore_replace(self, userinput: str) -> str:
-        """Replaces underscores with spaces and lowers the text"""
+        """Replaces underscores with spaces and titles the text"""
         to_regex = userinput.replace("_", " ").title()
         return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
 
@@ -68,8 +68,10 @@ class Events:
             return
         else:
             # fetch event info
-            event_info = await conn.fetchrow('''SELECT * FROM cnc_events WHERE name = $1;''',
-                                             self.space_replace(self.event))
+            event_info = await conn.fetchrow('''SELECT * FROM cnc_events WHERE lower(name) = $1;''',
+                                             self.event.lower())
+            if event_info is None:
+                await self.ctx.send("No such event exists.")
             # construct embed and send
             event_embed = discord.Embed(title=event_info['name'],
                                         description=f"The current event affecting {userinfo['username']}.")
