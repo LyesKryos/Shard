@@ -96,7 +96,10 @@ class Events:
         event_info = await conn.fetchrow('''SELECT * FROM cnc_events WHERE name = $1;''', self.event)
         # execute effects; if the event is weighted less than 100, roll d100
         event = self.space_replace(self.event)
-        user = self.ctx.bot.get_user(user_id)
+        if self.ctx is not None:
+            user = self.ctx.bot.get_user(user_id)
+        else:
+            user = self.bot.get_user(user_id)
         # if the event is bountiful_harvest
         if event == "bountiful_harvest":
             if self.current:
