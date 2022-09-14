@@ -2277,6 +2277,29 @@ class CNC(commands.Cog):
         await ctx.send(
             f"{userinfo['username']} has succssfully deployed {amount} troops to all {len(provinces_owned)} provinces.")
 
+    @commands.command(usage="[troop amount]", brief="Disbands a specified number of undeployed troops.")
+    @commands.guild_only()
+    async def cnc_disband(self, ctx, amount: int):
+        # connects to database
+        conn = self.bot.pool
+        # defines author
+        author = ctx.author
+        # fetches userinfo
+        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+        if userinfo is None:
+            await ctx.send("You are not registered.")
+            return
+        # define undeployed and check for enough undeployed troops
+        undeployed = userinfo['undeployed']
+        if amount > undeployed:
+            await ctx.send(f"{userinfo['username']} does not have {amount:,} undeployed troops.")
+            return
+        else:
+            await conn.execute('''UPDATE cncusers SET undeployed = undeployed - $1 WHERE user_id = $2;''',
+                               amount, author.id)
+            await ctx.send(f"{userinfo['username']} as disbanded {amount:,} troops.")
+            return
+
     @commands.command(usage="[amount] [recipient nation]", brief="Sends money to a specified nation")
     @commands.guild_only()
     async def cnc_tribute(self, ctx, amount: int, recipient: str):
@@ -2468,7 +2491,7 @@ class CNC(commands.Cog):
             if "Dockyards" not in userinfo['researched']:
                 await ctx.send("Constructing a port requires the Dockyards technology.")
                 return
-            pcost = 10000
+            pcost = 15000
             if p_info['coast'] is False:
                 await ctx.send(f"Province #{provinceid} is not a coastal province.")
                 return
@@ -2476,7 +2499,7 @@ class CNC(commands.Cog):
                 await ctx.send(f"{userinfo['username']} has reached its port building limit.")
                 return
             if userinfo['focus'] == "e":
-                pcost = math.ceil(10000 * uniform(.89, .99))
+                pcost = math.ceil(15000 * uniform(.89, .99))
             if userinfo['resources'] < pcost:
                 difference = pcost - userinfo['resources']
                 await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a port."
@@ -2498,7 +2521,7 @@ class CNC(commands.Cog):
         if structure.lower() == 'city':
             if "Cities" not in userinfo['researched']:
                 await ctx.send("Constructing a city requires the Cities technology.")
-            ccost = 25000
+            ccost = 30000
             if userinfo['resources'] < ccost:
                 difference = ccost - userinfo['resources']
                 await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a city."
@@ -2524,9 +2547,9 @@ class CNC(commands.Cog):
         if structure.lower() == 'fort':
             if "Fortifications" not in userinfo['researched']:
                 await ctx.send("Constructing a fort requires the Fortifications technology.")
-            fcost = 15000
+            fcost = 12500
             if userinfo['focus'] == "s":
-                fcost = math.ceil(15000 * uniform(.89, .99))
+                fcost = math.ceil(12500 * uniform(.89, .99))
             if userinfo['resources'] < fcost:
                 difference = fcost - userinfo['resources']
                 await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a fort."
@@ -5279,8 +5302,8 @@ class CNC(commands.Cog):
                 # calculate limits
                 structure_cost = 0
                 fortlimit = math.floor((len(provinces_owned) - 5) / 5) + 1
-                portlimit = math.floor((len(provinces_owned) - 5) / 3) + 1
-                citylimit = math.floor((len(provinces_owned) - 5) / 7) + 1
+                portlimit = math.floor((len(provinces_owned) - 5) / 7) + 1
+                citylimit = math.floor((len(provinces_owned) - 5) / 10) + 1
                 if userinfo['focus'] == 's':
                     fortlimit += 1
                 if userinfo['focus'] == 'e':
@@ -5614,7 +5637,7 @@ class CNC(commands.Cog):
                 max_manpower = 3000
             # calculate manpower gain (+1000 per city, +2500 for capital)
             added_manpower = (public_services / 100) * max_manpower * modifiers['manpower_mod']
-            added_manpower += userinfo['citylimit'] * 1000
+            added_manpower += cities['count'] * 1000
             if userinfo['capital'] != 0:
                 if userinfo['capital'] in provinces:
                     added_manpower += 2500
