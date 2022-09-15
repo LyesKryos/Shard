@@ -825,9 +825,8 @@ class CNC(commands.Cog):
             for p in provinces_owned:
                 if p['id'] == 0:
                     break
-                cord = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p['id'])
-                cord = (cord['cord'][0], cord['cord'][1])
-                await loop.run_in_executor(None, self.map_color, p, cord, colorreply.content)
+                cord = (p['cord'][0], p['cord'][1])
+                await loop.run_in_executor(None, self.map_color, p['id'], cord, colorreply.content)
             await conn.execute('''UPDATE cncusers SET usercolor = $1 WHERE user_id = $2;''', colorreply.content,
                                author.id)
             await ctx.send(f"Success! Your new color is {colorreply.content}.")
