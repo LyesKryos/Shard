@@ -23,8 +23,8 @@ class calculations:
         self.ctx = ctx
         # if the debug mode is initiated
         self.debug = debug
-        self.map_directory = r"C:\Users\jaedo\OneDrive\NationStates BBCode\Thegye Stuff\Meta RP\Maps\\"
-        self.province_directory = r"C:\Users\jaedo\OneDrive\NationStates BBCode\Thegye Stuff\Meta RP\Maps\Province Layers\\"
+        self.map_directory = r"/root/Documents/Shard/CNC/Map Files/Maps/"
+        self.province_directory = r"/root/Documents/Shard/CNC/Map Files/Province Layers/"
         # creates connection pool
         try:
             self.pool: asyncpg.pool = ctx.bot.pool
