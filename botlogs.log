@@ -3551,3 +3551,9 @@ TypeError: 'NoneType' object is not subscriptable
     color = ImageColor.getrgb(good_color['color'])
 TypeError: 'NoneType' object is not subscriptable
 
+2022-09-15 11:45:10 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cncl" is not found
+
+2022-09-15 11:48:41 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cnc_rename" is not found
+
+2022-09-15 11:49:02 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cnc_name" is not found
+
