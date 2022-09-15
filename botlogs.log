@@ -3107,3 +3107,447 @@ TypeError: 'NoneType' object is not subscriptable
     fp = builtins.open(filename, "rb")
 FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jaedo\\OneDrive\\NationStates BBCode\\Thegye Stuff\\Meta RP\\Tech Tree\\Cnc Tech Tree Lines.png'
 
+2022-09-12 19:19:36 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/bot.py", line 928, in _load_from_module_spec
+    await setup(self)
+  File "/root/Documents/Shard/cogs/cnc.py", line 5768, in setup
+    CNC.turn_task = loop.create_task(cog.cncstartloop())
+TypeError: cncstartloop() missing 1 required positional argument: 'ctx'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/base.py", line 83, in reload
+    await self.bot.load_extension(f"cogs.{extension}")
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/bot.py", line 994, in load_extension
+    await self._load_from_module_spec(spec, name)
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/bot.py", line 933, in _load_from_module_spec
+    raise errors.ExtensionFailed(key, e) from e
+discord.ext.commands.errors.ExtensionFailed: Extension 'cogs.cnc' raised an error: TypeError: cncstartloop() missing 1 required positional argument: 'ctx'
+
+2022-09-12 19:25:40 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/bot.py", line 916, in _load_from_module_spec
+    spec.loader.exec_module(lib)  # type: ignore
+  File "<frozen importlib._bootstrap_external>", line 848, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/root/Documents/Shard/cogs/cnc.py", line 26, in <module>
+    class CNC(commands.Cog):
+  File "/root/Documents/Shard/cogs/cnc.py", line 5193, in CNC
+    async def cnc_force_turn(self):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 1757, in decorator
+    return cls(func, name=name, **attrs)
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 371, in __init__
+    self.callback = func
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 480, in callback
+    self.params: Dict[str, Parameter] = get_signature_parameters(function, globalns)
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 130, in get_signature_parameters
+    raise TypeError(f'Command signature requires at least {required_params - 1} parameter(s)')
+TypeError: Command signature requires at least 1 parameter(s)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/base.py", line 68, in load
+    await self.bot.load_extension(f"cogs.{extension}")
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/bot.py", line 994, in load_extension
+    await self._load_from_module_spec(spec, name)
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/bot.py", line 919, in _load_from_module_spec
+    raise errors.ExtensionFailed(key, e) from e
+discord.ext.commands.errors.ExtensionFailed: Extension 'cogs.cnc' raised an error: TypeError: Command signature requires at least 1 parameter(s)
+
+2022-09-12 19:29:54 WARNING: Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/cnc.py", line 5239, in cnc_force_turn
+    tech = Technology(userinfo['username'], techs=userinfo['researched'])
+TypeError: __init__() missing 1 required positional argument: 'ctx'
+
+2022-09-12 19:30:57 WARNING: Traceback (most recent call last):
+  File "/root/Documents/Shard/cnc_research.py", line 23, in __init__
+    self.pool: asyncpg.pool = self.ctx.bot.pool
+AttributeError: 'NoneType' object has no attribute 'bot'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/cnc.py", line 5239, in cnc_force_turn
+    tech = Technology(userinfo['username'], techs=userinfo['researched'])
+  File "/root/Documents/Shard/cnc_research.py", line 25, in __init__
+    self.ctx.bot.logger.warning(traceback.format_exc())
+AttributeError: 'NoneType' object has no attribute 'bot'
+
+2022-09-12 19:44:18 WARNING: Traceback (most recent call last):
+  File "/root/Documents/Shard/cnc_research.py", line 30, in __init__
+    self.pool: asyncpg.pool = self.bot.pool
+AttributeError: 'Context' object has no attribute 'pool'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 957, in cnc_tech_tree
+    tech = Technology(userinfo['username'], ctx)
+  File "/root/Documents/Shard/cnc_research.py", line 32, in __init__
+    self.bot.logger.warning(traceback.format_exc())
+AttributeError: 'Context' object has no attribute 'logger'
+
+2022-09-12 19:49:22 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 958, in cnc_tech_tree
+    await tech.tree()
+  File "/root/Documents/Shard/cnc_research.py", line 414, in tree
+    tree = Image.open(fr"C:\Users\jaedo\OneDrive\NationStates BBCode\Thegye Stuff\Meta RP\Tech Tree\Cnc Tech Tree Lines.png").convert("RGBA")
+  File "/usr/local/lib/python3.8/dist-packages/PIL/Image.py", line 3068, in open
+    fp = builtins.open(filename, "rb")
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jaedo\\OneDrive\\NationStates BBCode\\Thegye Stuff\\Meta RP\\Tech Tree\\Cnc Tech Tree Lines.png'
+
+2022-09-12 21:13:17 WARNING: Traceback (most recent call last):
+  File "/root/Documents/Shard/cnc_events.py", line 100, in event_effects
+    user = self.ctx.bot.get_user(user_id)
+AttributeError: 'NoneType' object has no attribute 'bot'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 5249, in cnc_force_turn
+    await event.event_effects()
+  File "/root/Documents/Shard/cnc_events.py", line 1125, in event_effects
+    self.ctx.bot.logger.warning(traceback.format_exc())
+AttributeError: 'NoneType' object has no attribute 'bot'
+
+2022-09-12 21:15:36 WARNING: Traceback (most recent call last):
+  File "/root/Documents/Shard/cnc_events.py", line 100, in event_effects
+    user = self.ctx.bot.get_user(user_id)
+AttributeError: 'NoneType' object has no attribute 'bot'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 5249, in cnc_force_turn
+    await event.event_effects()
+  File "/root/Documents/Shard/cnc_events.py", line 1125, in event_effects
+    self.ctx.bot.logger.warning(traceback.format_exc())
+AttributeError: 'NoneType' object has no attribute 'bot'
+
+2022-09-12 21:25:29 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 5249, in cnc_force_turn
+    await event.event_effects()
+  File "/root/Documents/Shard/cnc_events.py", line 99, in event_effects
+    user = self.ctx.bot.get_user(user_id)
+AttributeError: 'NoneType' object has no attribute 'bot'
+
+2022-09-12 21:29:17 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 1029, in cnc_event
+    await event.event_info()
+  File "/root/Documents/Shard/cnc_events.py", line 74, in event_info
+    event_embed = discord.Embed(title=event_info['name'],
+TypeError: 'NoneType' object is not subscriptable
+
+2022-09-12 21:35:35 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 1029, in cnc_event
+    await event.event_info()
+  File "/root/Documents/Shard/cnc_events.py", line 76, in event_info
+    event_embed = discord.Embed(title=event_info['name'],
+TypeError: 'NoneType' object is not subscriptable
+
+2022-09-12 21:35:53 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 1029, in cnc_event
+    await event.event_info()
+  File "/root/Documents/Shard/cnc_events.py", line 76, in event_info
+    event_embed = discord.Embed(title=event_info['name'],
+TypeError: 'NoneType' object is not subscriptable
+
+2022-09-12 21:40:03 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 1029, in cnc_event
+    await event.event_info()
+  File "/root/Documents/Shard/cnc_events.py", line 81, in event_info
+    event_embed.add_field(name="Weight", value=f"{event_info['weight']}")
+KeyError: 'description'
+
+2022-09-12 21:43:40 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 1029, in cnc_event
+    await event.event_info()
+  File "/root/Documents/Shard/cnc_events.py", line 82, in event_info
+    event_embed.add_field(name="Description", value=f"{event_info['description']}")
+KeyError: 'description'
+
+2022-09-13 14:52:01 ERROR: Task exception was never retrieved
+future: <Task finished name='Task-395' coro=<Loop._loop() done, defined at /usr/local/lib/python3.8/dist-packages/discord/ext/tasks/__init__.py:202> exception=OSError(5, 'Input/output error')>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/tasks/__init__.py", line 241, in _loop
+    await self.coro(*args, **kwargs)
+TypeError: turn_loop() missing 1 required positional argument: 'ctx'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/tasks/__init__.py", line 265, in _loop
+    await self._call_loop_function('error', exc)
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/tasks/__init__.py", line 188, in _call_loop_function
+    await coro(self._injected, *args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/tasks/__init__.py", line 539, in _error
+    print(f'Unhandled exception in internal background task {self.coro.__name__!r}.', file=sys.stderr)
+OSError: [Errno 5] Input/output error
+2022-09-13 15:20:57 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 301, in cnc_view
+    if userinfo["usercolor"] == "":
+TypeError: 'NoneType' object is not subscriptable
+
+2022-09-13 18:00:00 WARNING: Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/cnc.py", line 5181, in turn_loop
+    await event.global_effects()
+  File "/root/Documents/Shard/cnc_events.py", line 1159, in global_effects
+    await conn.execute('''UPDATE cnc_modifiers SET manpower_mod = mandpower_mod - .25;''')
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/pool.py", line 564, in execute
+    return await con.execute(query, *args, timeout=timeout)
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 318, in execute
+    return await self._protocol.query(query, timeout)
+  File "asyncpg/protocol/protocol.pyx", line 338, in query
+asyncpg.exceptions.UndefinedColumnError: column "mandpower_mod" does not exist
+HINT:  Perhaps you meant to reference the column "cnc_modifiers.manpower_mod".
+
+2022-09-14 00:00:00 WARNING: Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/cnc.py", line 5181, in turn_loop
+    await event.global_effects()
+  File "/root/Documents/Shard/cnc_events.py", line 1159, in global_effects
+    await conn.execute('''UPDATE cnc_modifiers SET manpower_mod = mandpower_mod - .25;''')
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/pool.py", line 564, in execute
+    return await con.execute(query, *args, timeout=timeout)
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 318, in execute
+    return await self._protocol.query(query, timeout)
+  File "asyncpg/protocol/protocol.pyx", line 338, in query
+asyncpg.exceptions.UndefinedColumnError: column "mandpower_mod" does not exist
+HINT:  Perhaps you meant to reference the column "cnc_modifiers.manpower_mod".
+
+2022-09-14 06:00:00 WARNING: Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/cnc.py", line 5181, in turn_loop
+    await event.global_effects()
+  File "/root/Documents/Shard/cnc_events.py", line 1159, in global_effects
+    await conn.execute('''UPDATE cnc_modifiers SET manpower_mod = mandpower_mod - .25;''')
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/pool.py", line 564, in execute
+    return await con.execute(query, *args, timeout=timeout)
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 318, in execute
+    return await self._protocol.query(query, timeout)
+  File "asyncpg/protocol/protocol.pyx", line 338, in query
+asyncpg.exceptions.UndefinedColumnError: column "mandpower_mod" does not exist
+HINT:  Perhaps you meant to reference the column "cnc_modifiers.manpower_mod".
+
+2022-09-14 12:00:00 WARNING: Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/cnc.py", line 5181, in turn_loop
+    await event.global_effects()
+  File "/root/Documents/Shard/cnc_events.py", line 1159, in global_effects
+    await conn.execute('''UPDATE cnc_modifiers SET manpower_mod = mandpower_mod - .25;''')
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/pool.py", line 564, in execute
+    return await con.execute(query, *args, timeout=timeout)
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 318, in execute
+    return await self._protocol.query(query, timeout)
+  File "asyncpg/protocol/protocol.pyx", line 338, in query
+asyncpg.exceptions.UndefinedColumnError: column "mandpower_mod" does not exist
+HINT:  Perhaps you meant to reference the column "cnc_modifiers.manpower_mod".
+
+2022-09-14 18:00:00 WARNING: Traceback (most recent call last):
+  File "/root/Documents/Shard/cogs/cnc.py", line 5181, in turn_loop
+    await event.global_effects()
+  File "/root/Documents/Shard/cnc_events.py", line 1159, in global_effects
+    await conn.execute('''UPDATE cnc_modifiers SET manpower_mod = mandpower_mod - .25;''')
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/pool.py", line 564, in execute
+    return await con.execute(query, *args, timeout=timeout)
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 318, in execute
+    return await self._protocol.query(query, timeout)
+  File "asyncpg/protocol/protocol.pyx", line 338, in query
+asyncpg.exceptions.UndefinedColumnError: column "mandpower_mod" does not exist
+HINT:  Perhaps you meant to reference the column "cnc_modifiers.manpower_mod".
+
+2022-09-14 21:17:15 WARNING: discord.ext.commands.errors.CommandNotFound: Command "map" is not found
+
+2022-09-14 21:26:28 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cnc_manpower" is not found
+
+2022-09-14 21:29:09 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 3218, in cnc_attack
+    await attack.combat()
+  File "/root/Documents/Shard/battlesim.py", line 296, in combat
+    terrain_mod = terrain_info['roll']
+KeyError: 'roll'
+
+2022-09-14 21:36:53 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 3218, in cnc_attack
+    await attack.combat()
+  File "/root/Documents/Shard/battlesim.py", line 413, in combat
+    await loop.run_in_executor(None, self.map_color, self.target, target_info['cord'][0:2],
+  File "/usr/lib/python3.8/concurrent/futures/thread.py", line 57, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/root/Documents/Shard/battlesim.py", line 43, in map_color
+    map = Image.open(fr"{self.map_directory}wargame_provinces.png").convert("RGBA")
+  File "/usr/local/lib/python3.8/dist-packages/PIL/Image.py", line 3068, in open
+    fp = builtins.open(filename, "rb")
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jaedo\\OneDrive\\NationStates BBCode\\Thegye Stuff\\Meta RP\\Maps\\\\wargame_provinces.png'
+
+2022-09-14 22:01:06 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cnc_purchase" is not found
+
+2022-09-14 22:14:56 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cnc_purchase" is not found
+
+2022-09-14 22:15:17 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cnc_buy" is not found
+
+2022-09-15 02:34:35 WARNING: We are being rate limited. Retrying in 0.06 seconds. Handled under the bucket "927288304301387816:None:/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me"
+2022-09-15 02:51:58 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cnc_claim" is not found
+
+2022-09-15 03:08:49 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cnc_" is not found
+
+2022-09-15 03:09:15 WARNING: Traceback (most recent call last):
+  File "asyncpg/protocol/prepared_stmt.pyx", line 168, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+  File "asyncpg/protocol/codecs/base.pyx", line 206, in asyncpg.protocol.protocol.Codec.encode
+  File "asyncpg/protocol/codecs/base.pyx", line 111, in asyncpg.protocol.protocol.Codec.encode_scalar
+  File "asyncpg/pgproto/./codecs/int.pyx", line 54, in asyncpg.pgproto.pgproto.int4_encode
+TypeError: an integer is required (got type asyncpg.Record)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 828, in cnc_edit
+    cord = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/pool.py", line 615, in fetchrow
+    return await con.fetchrow(query, *args, timeout=timeout)
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 679, in fetchrow
+    data = await self._execute(
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 1659, in _execute
+    result, _ = await self.__execute(
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 1684, in __execute
+    return await self._do_execute(
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 1731, in _do_execute
+    result = await executor(stmt, None)
+  File "asyncpg/protocol/protocol.pyx", line 183, in bind_execute
+  File "asyncpg/protocol/prepared_stmt.pyx", line 197, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+asyncpg.exceptions.DataError: invalid input for query argument $1: <Record id=557 terrain=7 bordering=[555,... (an integer is required (got type asyncpg.Record))
+
+2022-09-15 03:13:24 WARNING: We are being rate limited. Retrying in 0.09 seconds. Handled under the bucket "927288304301387816:None:/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me"
+2022-09-15 03:14:43 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cncw_all" is not found
+
+2022-09-15 03:22:18 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 927, in cnc_research
+    await tech.research()
+  File "/root/Documents/Shard/cnc_research.py", line 55, in research
+    if province_count['count'] is None:
+KeyError: 'count'
+
+2022-09-15 03:23:23 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 927, in cnc_research
+    await tech.research()
+  File "/root/Documents/Shard/cnc_research.py", line 55, in research
+    if province_count['count'] is None:
+KeyError: 'count'
+
+2022-09-15 06:35:23 WARNING: Traceback (most recent call last):
+  File "asyncpg/protocol/prepared_stmt.pyx", line 168, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+  File "asyncpg/protocol/codecs/base.pyx", line 206, in asyncpg.protocol.protocol.Codec.encode
+  File "asyncpg/protocol/codecs/base.pyx", line 111, in asyncpg.protocol.protocol.Codec.encode_scalar
+  File "asyncpg/pgproto/./codecs/int.pyx", line 54, in asyncpg.pgproto.pgproto.int4_encode
+TypeError: an integer is required (got type asyncpg.Record)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 828, in cnc_edit
+    cord = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/pool.py", line 615, in fetchrow
+    return await con.fetchrow(query, *args, timeout=timeout)
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 679, in fetchrow
+    data = await self._execute(
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 1659, in _execute
+    result, _ = await self.__execute(
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 1684, in __execute
+    return await self._do_execute(
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 1731, in _do_execute
+    result = await executor(stmt, None)
+  File "asyncpg/protocol/protocol.pyx", line 183, in bind_execute
+  File "asyncpg/protocol/prepared_stmt.pyx", line 197, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+asyncpg.exceptions.DataError: invalid input for query argument $1: <Record id=554 terrain=0 bordering=[550,... (an integer is required (got type asyncpg.Record))
+
+2022-09-15 06:37:12 WARNING: Traceback (most recent call last):
+  File "asyncpg/protocol/prepared_stmt.pyx", line 168, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+  File "asyncpg/protocol/codecs/base.pyx", line 206, in asyncpg.protocol.protocol.Codec.encode
+  File "asyncpg/protocol/codecs/base.pyx", line 111, in asyncpg.protocol.protocol.Codec.encode_scalar
+  File "asyncpg/pgproto/./codecs/int.pyx", line 54, in asyncpg.pgproto.pgproto.int4_encode
+TypeError: an integer is required (got type asyncpg.Record)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 828, in cnc_edit
+    cord = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/pool.py", line 615, in fetchrow
+    return await con.fetchrow(query, *args, timeout=timeout)
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 679, in fetchrow
+    data = await self._execute(
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 1659, in _execute
+    result, _ = await self.__execute(
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 1684, in __execute
+    return await self._do_execute(
+  File "/usr/local/lib/python3.8/dist-packages/asyncpg/connection.py", line 1731, in _do_execute
+    result = await executor(stmt, None)
+  File "asyncpg/protocol/protocol.pyx", line 183, in bind_execute
+  File "asyncpg/protocol/prepared_stmt.pyx", line 197, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+asyncpg.exceptions.DataError: invalid input for query argument $1: <Record id=554 terrain=0 bordering=[550,... (an integer is required (got type asyncpg.Record))
+
+2022-09-15 08:54:46 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cnc_rename" is not found
+
+2022-09-15 09:05:06 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cnc_tech-tree" is not found
+
+2022-09-15 09:14:54 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 4363, in cnc_trade_goods_check
+    color = ImageColor.getrgb(good_color['color'])
+TypeError: 'NoneType' object is not subscriptable
+
+2022-09-15 09:33:12 WARNING: discord.ext.commands.errors.CommandNotFound: Command "cnc_p" is not found
+
+2022-09-15 09:44:33 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 4363, in cnc_trade_goods_check
+    color = ImageColor.getrgb(good_color['color'])
+TypeError: 'NoneType' object is not subscriptable
+
+2022-09-15 11:08:31 WARNING: Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/discord/ext/commands/core.py", line 200, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "/root/Documents/Shard/cogs/cnc.py", line 4363, in cnc_trade_goods_check
+    color = ImageColor.getrgb(good_color['color'])
+TypeError: 'NoneType' object is not subscriptable
+
