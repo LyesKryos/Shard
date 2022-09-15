@@ -107,7 +107,7 @@ class CNC(commands.Cog):
                 data = prov.getpixel((x, y))
                 if data != color:
                     if data != (0, 0, 0, 0):
-                        if data !=(255, 255, 255, 0):
+                        if data != (255, 255, 255, 0):
                             prov.putpixel((x, y), color)
         # if this is a release, change every color to neutral grey
         if release is True:
@@ -728,6 +728,188 @@ class CNC(commands.Cog):
         gpembed = discord.Embed(title="Great Power List",
                                 description=power_string)
         await ctx.send(embed=gpembed)
+
+    @commands.command(aliases=['cncgps'], brief="Displays great power calculations of a nation.")
+    @commands.guild_only()
+    async def cnc_great_power_score(self, ctx, nation: str = None):
+        # establish connection
+        conn = self.bot.pool
+        # userinfo
+        if nation is None:
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', ctx.author.id)
+            if userinfo is None:
+                await ctx.send("You are not registered.")
+                return
+        else:
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', nation.lower())
+            if userinfo is None:
+                await ctx.send(f"{nation} is not registered.")
+                return
+        # define city, port, and trade route limit information
+        trade_route_limit = userinfo['trade_route_limit']
+        # fetch modifiers
+        modifiers = await conn.fetchrow('''SELECT * FROM cnc_modifiers WHERE user_id = $1;''', userinfo['user_id'])
+        # fetch outgoing trade route information
+        outgoing_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
+                                      active = True AND sender_id = $1;''', userinfo['user_id'])
+        outgoing_info = await conn.fetchrow('''SELECT * FROM interactions WHERE type = 'trade' AND 
+                                      active = True AND sender_id = $1;''', userinfo['user_id'])
+        if outgoing_count['count'] is None:
+            outgoing_count = 0
+        else:
+            outgoing_count = outgoing_count['count']
+        # fetch incoming trade route information
+        incoming_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
+                                                     active = True AND recipient_id = $1;''', userinfo['user_id'])
+        if incoming_count['count'] is None:
+            incoming_count = 0
+        else:
+            incoming_count = incoming_count['count']
+        # if the outgoing count is over the trade route limit, add a debuff
+        trade_debuff = 1
+        if outgoing_count > trade_route_limit:
+            for i in range(trade_route_limit - outgoing_count):
+                trade_debuff -= .02
+        # define initial trade access
+        initial_trade_access = 0.5
+        # for every domestic trade route, +10% access. For every foreign trade route, +5% access
+        if outgoing_count != 0:
+            outgoing_recipients = list()
+            for o in outgoing_info:
+                outgoing_recipients.append(o['recipient'])
+            outgoing_repeat = Counter(outgoing_recipients)
+            # for every repeat trade route, decrease by 2% down to 0%
+            for r in outgoing_repeat:
+                if r >= 6:
+                    initial_trade_access = .3
+                else:
+                    initial_trade_access += (10 - (r - 1) * r) / 100 * (
+                        modifiers['trade_route_efficiency_mod'])
+        # calculate initial trade access
+        initial_trade_access += (.05 * incoming_count) * trade_debuff
+        # creates the projected resource gain data
+        manpower = userinfo['manpower']
+        taxation = userinfo['taxation']
+        military_upkeep = userinfo['military_upkeep']
+        public_services = userinfo['public_services']
+        base_gain = 0
+        tax_gain = manpower * (taxation / 100)
+        tax_gain -= tax_gain * (military_upkeep / 100)
+        tax_gain -= tax_gain * (public_services / 100)
+        tax_gain = math.floor(tax_gain)
+        # adds trade gain and subtracts troop upkeep
+        total_troops = 0
+        production_gain = 0
+        workshops = 0
+        products = list()
+        provinces_owned = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1 and occupier_id = $1;''',
+                                           userinfo['user_id'])
+        if provinces_owned is None:
+            provinces_owned = 0
+        for p in provinces_owned:
+            if p == 0:
+                break
+            p_info = p
+            if p_info['occupier_id'] != userinfo['user_id']:
+                continue
+            total_troops += p_info['troops']
+            # for every province, calculate local trade value
+            # define production value, producing amount, market value modifiers, and workshop production
+            production_value = 1
+            market_value_mod = 1
+            workshop_production = 0
+            # for every city, add .5 production
+            if p_info['city']:
+                production_value += 0.5
+            # for every port, add 25% market value to the local good, if it is not gold or silver
+            if p_info['port']:
+                if p_info['value'] not in ['Gold', 'Silver']:
+                    market_value_mod += 0.25
+            # for every workshop, add 1 * the production modifier
+            if p_info['workshop']:
+                workshops += 1
+                workshop_production += 1 * modifiers['workshop_production_mod']
+            if p_info['temple']:
+                workshops += 1
+            # add all production to the base province production
+            producing = p_info['production'] * (production_value + modifiers['production_mod'])
+            # calculate local trade good value and total gain
+            trade_good = await conn.fetchrow('''SELECT * FROM trade_goods WHERE name = $1;''', p_info['value'])
+            products.append(p_info['value'])
+            production_gain += (((trade_good['market_value'] +
+                                  modifiers[f'{self.space_replace(p_info["value"]).lower()}_mod']) *
+                                 market_value_mod) * producing) * initial_trade_access
+            production_gain = math.floor(production_gain)
+        # troop upkeep cost
+        troop_maintenance = total_troops * (0.01 * (modifiers['attack_level'] + modifiers['defense_level']))
+        troop_maintenance = math.floor(troop_maintenance)
+        # structure upkeep cost
+        structure_cost = 0
+        fortlimit = userinfo['fortlimit']
+        portlimit = userinfo['portlimit']
+        citylimit = userinfo['citylimit']
+        cities = await conn.fetchrow(
+            '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND city = True;''',
+            userinfo['user_id'])
+        ports = await conn.fetchrow(
+            '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND port = True;''',
+            userinfo['user_id'])
+        forts = await conn.fetchrow(
+            '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
+            userinfo['user_id'])
+        if cities['count'] > citylimit:
+            structure_cost += 1000 * (cities['count'] - citylimit)
+        if ports['count'] > portlimit:
+            structure_cost += 500 * (ports['count'] - portlimit)
+        if forts['count'] > fortlimit:
+            structure_cost += 700 * (forts['count'] - fortlimit)
+        # add gain
+        base_gain += production_gain + tax_gain - troop_maintenance - structure_cost
+        occupied_count = await conn.fetchrow('''SELECT count(*) FROM provinces 
+        WHERE owner_id != $1 and occupier_id = $1;''', userinfo['user_id'])
+        provinces_count = await conn.fetchrow('''SELECT count(*) FROM provinces 
+        WHERE owner_id = $1 and occupier_id = $1;''', userinfo['user_id'])
+        gp_points = 0
+        # for every 100 credits earned, +1
+        income_points = base_gain * 0.01
+        gp_points += base_gain * 0.01
+        # for every army level, +1
+        army_level_points = modifiers['attack_level'] + modifiers['defense_level']
+        gp_points += modifiers['attack_level'] + modifiers['defense_level']
+        # for every researched tech, +1
+        technology_points = len(userinfo['researched'])
+        gp_points += len(userinfo['researched'])
+        # for every 1000 manpower, +1
+        manpower_points = manpower * 0.001
+        gp_points += manpower * 0.001
+        # for every fort, city, port, workshop, and temple, +1
+        structure_points = forts['count'] + cities['count'] + ports['count'] + workshops
+        gp_points += forts['count'] + cities['count'] + ports['count'] + workshops
+        # for every occupied 2 provinces, +1
+        province_points = (occupied_count['count'] * 0.5) + provinces_count['count']
+        gp_points += occupied_count['count'] * 0.5
+        gp_points += provinces_count['count']
+        alliances = await conn.fetchrow(
+            '''SELECT COUNT(*) FROM interactions WHERE (sender = $1 or recipient = $1) and type = 'alliance'
+            and active = True;''',
+            userinfo['username'])
+        # for every 2 alliances, +1
+        alliance_points = alliances['count'] * 0.5
+        gp_points += alliances['count'] * 0.5
+        # round to floor
+        gp_points = math.floor(gp_points)
+        # update great power score
+        gpscore_embed = discord.Embed(title=f"Great Power Score of {userinfo['username']}",
+                                      description="A breakdown of a nation's Great Power points.")
+        gpscore_embed.add_field(name="Total Score", value=str(gp_points), inline=False)
+        gpscore_embed.add_field(name="Income Points", value=str(income_points))
+        gpscore_embed.add_field(name="Army Level Points", value=str(army_level_points))
+        gpscore_embed.add_field(name="Technology Points", value=str(technology_points))
+        gpscore_embed.add_field(name="Manpower Points", value=str(manpower_points))
+        gpscore_embed.add_field(name="Structure Points", value=str(structure_points))
+        gpscore_embed.add_field(name="Alliance Points", value=str(alliance_points))
+        gpscore_embed.add_field(name="Province Points", value=str(province_points))
+        await ctx.send(embed=gpscore_embed)
 
     @commands.command(usage="[nation name] <reason>", brief="Completely removes a user from the CNC system. Owner only")
     @commands.is_owner()
@@ -3282,7 +3464,7 @@ class CNC(commands.Cog):
                 # name map
                 if str(reaction.emoji) == "\U0001f4cc":
                     await map.clear_reactions()
-                    await map.edit(content="https://i.ibb.co/TBTMRxK/CNC-name-map.png")
+                    await map.edit(content="https://i.ibb.co/zfjtnYZ/CNC-name-map.png")
                     for react in reactions:
                         await map.add_reaction(react)
                     continue
@@ -5148,6 +5330,8 @@ class CNC(commands.Cog):
                              ports['count'] + workshops_n_temples
                 # for every occupied 2 provinces, +1
                 gp_points += occupied_count['count'] * 0.5
+                # for every province, +1
+                gp_points += len(provinces_owned)
                 alliances = await conn.fetchrow(
                     '''SELECT COUNT(*) FROM interactions WHERE (sender = $1 or recipient = $1) and type = 'alliance'
                     and active = True;''',

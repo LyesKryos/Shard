@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing the trade goods map">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding cnc_great_power_score and adding provinces to great power score">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot_db_dump.sql" beforeDir="false" afterPath="$PROJECT_DIR$/bot_db_dump.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -58,7 +57,7 @@
       <updated>1662664672476</updated>
       <workItem from="1662664677107" duration="5219000" />
       <workItem from="1662984985073" duration="12615000" />
-      <workItem from="1663117760476" duration="15356000" />
+      <workItem from="1663117760476" duration="22119000" />
     </task>
     <task id="LOCAL-00002" summary="Updated turns with modifiers, production, and trade routes&#10;Updated province command to reflect trade good change&#9;&#10;Added tech and researching commands&#9;&#9;&#10;Added modifiers to registration&#9;&#9;&#9;&#9;&#9;&#10;Added multiple new QOL commands for mods and devs&#9;&#10;Updated bank command with new calculations and view&#9;&#10;Updated recruit command with added troop costs based on level&#10;Updated mass recruit command with added troop costs based on level&#9;&#10;Updated construct command with Workshops and Temples&#10;Added visual thousands commas for the construct command&#10;Updated deconstruction command with Workshops and Temples&#10;Added visual trade good market command&#9;&#10;Updated combat with army levels, terrain modifiers, and rounds&#9;&#9;&#10;Added cnc_locate to display a specified province&#10;Refactored for optimization&#9;&#9;&#9;&#9;&#9;&#9;&#10;Updated register with new options, requiring a focus, and auto-assigning a blank province&#10;Removed cnc_purchase in favor of future colonization">
       <created>1662930233274</created>
@@ -263,7 +262,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663238333363</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="Fixing the trade goods map">
+      <created>1663259811838</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1663259811838</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -304,7 +310,8 @@
     <MESSAGE value="Fixing cnc_research.py" />
     <MESSAGE value="Fixing cnc_edit color" />
     <MESSAGE value="Fixing the trade goods map" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing the trade goods map" />
+    <MESSAGE value="Adding cnc_great_power_score and adding provinces to great power score" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding cnc_great_power_score and adding provinces to great power score" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
