@@ -50,7 +50,7 @@ class Technology:
         # fetch userinfo
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', self.ctx.author.id)
         # fetch province count
-        province_count = await conn.fetchrow('''SELECT * FROM provinces WHERE owner_id = $1 and occupier_id = $1;''',
+        province_count = await conn.fetchrow('''SELECT count(*) FROM provinces WHERE owner_id = $1 and occupier_id = $1;''',
                                              userinfo['user_id'])
         if province_count['count'] is None:
             provinces = 0
