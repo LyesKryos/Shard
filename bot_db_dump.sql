@@ -1855,22 +1855,22 @@ COPY public.terrains (id, name, modifier, color, roll) FROM stdin;
 --
 
 COPY public.trade_goods (name, market_value, color) FROM stdin;
-Precious Stones	60	#305496
+('Precious Stones',	60,	#305496),
 Coal	40	#404040
 Wine	40	#7030A0
 Fish	10	#8497B0
-Tea and Coffee	40	#B45A00
+('Tea and Coffee',	40,	'#B45A00'),
 Tobacco	40	#375623
 Sugar	40	#E2EFDA
 Fruits	50	#CC99FF
 Dyes	50	#CC00FF
 Wood	20	#744D26
-"Rare Wood"	50	#AA7138
-"Precious Goods"	70	#993366
+('Rare Wood',	50,	'#AA7138')
+('Precious Goods',	70,	'#993366'),
 Spices	50	#FFCC66
 Livestock	20	#C6E0B4
 Grain	20	#FFD966
-"Raw Stone"	20	#757171
+('Raw Stone',	20,	'#757171')
 Tin	50	#B4C6E7
 Ivory	60	#DBDBDB
 Glass	30	#DDEBF7
