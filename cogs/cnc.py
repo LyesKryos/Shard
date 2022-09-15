@@ -183,7 +183,7 @@ class CNC(commands.Cog):
     async def cnc_info(self, ctx):
         # open connection and fetch data
         conn = self.bot.pool
-        data = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turns")
+        data = await conn.fetchrow('''SELECT data_value FROM cnc_data WHERE data_name = $1;''', "turn")
 
         player_count = await conn.fetchrow('''SELECT count(*) FROM cncusers;''')
         infoembed = discord.Embed(title="Command And Conquest System", color=discord.Color.dark_red(),
