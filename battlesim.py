@@ -159,7 +159,7 @@ class calculations:
         self.defending_army = target_info['troops']
         # if the self.attacking_army argument is 0 troops
         if self.attacking_army == 0:
-            await self.ctx.send("Stop wasting my time, will ya?")
+            await self.ctx.send("Stop wasting my time, will ya? You can't attack with no army.")
             return
         # fetch the target owner's info
         if target_info['owner_id'] != 0 and target_info['occupier_id'] != 0:
@@ -275,6 +275,18 @@ class calculations:
             if target_info['fort']:
                 round_roll += 3
                 terrain_objects_mod += .3
+            # fetch upkeep modifiers
+            defender_upkeep_mod = 1
+            if target_info['owner_id'] != 0:
+                if defender_info['military_upkeep'] < 10:
+                    defender_upkeep_mod -= (10 - defender_info['military_upkeep']) * .1
+                elif defender_info['military_upkeep'] > 15:
+                    defender_upkeep_mod += (defender_info['military_upkeep']-15) * .1
+            attacker_upkeep_mod = 1
+            if userinfo['military_upkeep'] < 10:
+                attacker_upkeep_mod -= (10 - userinfo['military_upkeep']) * .1
+            elif userinfo['military_upkeep'] < 15:
+                attacker_upkeep_mod += (userinfo['military_upkeep']-15) * .1
             # define round wins
             attacker_wins = 0
             defender_wins = 0
@@ -301,9 +313,9 @@ class calculations:
                     size_modifier = -math.floor((self.defending_army * 0.25) / self.attacking_army)
                 # calculates the d6 + level + modifier for both attacker and defender
                 attack_roll = random.randint(1, 6)
-                modded_attack_roll = attack_roll + attacker_mods['attack_level'] + size_modifier
+                modded_attack_roll = (attack_roll + attacker_mods['attack_level'] + size_modifier) * attacker_upkeep_mod
                 defense_roll = random.randint(1, 6)
-                modded_defense_roll = defense_roll + defence_level + terrain_mod
+                modded_defense_roll = (defense_roll + defence_level + terrain_mod) * defender_upkeep_mod
                 # calculate casualties
                 attack_cas = self.casualties_roll(terrain_info['modifier'], defense_roll)
                 defense_cas = self.casualties_roll(terrain_info['modifier'], attack_roll)

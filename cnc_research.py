@@ -1,3 +1,4 @@
+import math
 import time
 from base64 import b64encode
 import asyncpg
@@ -48,6 +49,13 @@ class Technology:
             return
         # fetch userinfo
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', self.ctx.author.id)
+        # fetch province count
+        province_count = await conn.fetchrow('''SELECT * FROM provinces WHERE owner_id = $1 and occupier_id = $1;''',
+                                             userinfo['user_id'])
+        if province_count['count'] is None:
+            provinces = 0
+        else:
+            provinces = province_count['count']
         # if tech is already researched
         if self.tech.title() in userinfo['researched']:
             await self.ctx.send(f"{self.tech.title()} has already been researched by {userinfo['username']}.")
@@ -87,6 +95,17 @@ class Technology:
                 return
         # if the user has any research boosters, apply
         research_time *= modifiers['research_mod']
+        research_time += math.floor(provinces/5)
+        # check the user focus and the technology's field
+        if tech['field'] == "Economy":
+            if userinfo['focus'] == "e":
+                research_time -= 1
+        elif tech['field'] == "Strategy":
+            if userinfo['focus'] == "s":
+                research_time -= 1
+        elif tech['field'] == "Military":
+            if userinfo['focus'] == "m":
+                research_time -= 1
         # insert into researching and send message
         await conn.execute('''INSERT INTO cnc_researching VALUES ($1, $2, $3);''',
                            self.ctx.author.id, self.tech.title(), int(research_time))
