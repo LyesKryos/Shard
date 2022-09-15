@@ -274,7 +274,9 @@ class CNC(commands.Cog):
             userid, nationame, color, resources, focus.lower(), research, 0, 5)
         await conn.execute('''INSERT INTO cnc_modifiers (user_id) VALUES ($1);''', userid)
         province = await conn.fetchrow('''SELECT * FROM provinces 
-        WHERE occupier_id = 0 and owner_id = 0 ORDER BY random();''')
+        WHERE occupier_id = 0 and owner_id = 0 and id NOT IN (130, 441, 442, 621, 622, 623, 65, 486, 215, 923, 926, 924,
+         925, 771, 772,770, 769, 768, 909, 761, 762, 763, 764, 765, 766, 767, 1207, 
+         1208, 1209, 1210, 1211, 1212, 1213, 1214, 744) ORDER BY random();''')
         await conn.execute('''UPDATE provinces SET occupier_id = $1, occupier = $2 , owner = $2, owner_id = $1 
         WHERE id = $3;''', userid, nationame, province['id'])
         await self.bot.loop.run_in_executor(None, self.map_color, province['id'], province['cord'], color)
