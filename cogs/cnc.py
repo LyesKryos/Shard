@@ -3332,7 +3332,8 @@ class CNC(commands.Cog):
                         data = prov.getpixel((x, y))
                         if data != color:
                             if data != (0, 0, 0, 0):
-                                prov.putpixel((x, y), color)
+                                if data != (255, 255, 255, 0):
+                                    prov.putpixel((x, y), color)
                 # convert, paste, and save the image
                 prov = prov.convert("RGBA")
                 map.paste(prov, box=cord, mask=prov)
