@@ -788,7 +788,7 @@ class CNC(commands.Cog):
         # calculate initial trade access
         initial_trade_access += (.05 * incoming_count) * trade_debuff
         # creates the projected resource gain data
-        manpower = userinfo['manpower']
+        manpower = userinfo['max_manpower']
         taxation = userinfo['taxation']
         military_upkeep = userinfo['military_upkeep']
         public_services = userinfo['public_services']
@@ -900,7 +900,8 @@ class CNC(commands.Cog):
         gp_points = math.floor(gp_points)
         # update great power score
         gpscore_embed = discord.Embed(title=f"Great Power Score of {userinfo['username']}",
-                                      description="A breakdown of a nation's Great Power points.")
+                                      description="A breakdown of a nation's Great Power points. "
+                                                  "Note that any decimal score is rounded down.")
         gpscore_embed.add_field(name="Total Score", value=str(gp_points), inline=False)
         gpscore_embed.add_field(name="Income Points", value=str(income_points))
         gpscore_embed.add_field(name="Army Level Points", value=str(army_level_points))
@@ -4913,17 +4914,15 @@ class CNC(commands.Cog):
 
                 ################ EVENT UPDATING ################
 
-                # check for event
-                event_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1 and event != '';''', u)
                 # if there is no event, pick event and run
-                if event_info is None:
+                if userinfo['event'] == '':
                     random_event = await conn.fetchrow('''SELECT * FROM cnc_events WHERE type = 'national' 
                     ORDER BY random();''')
                     event = Events(bot=self.bot, nation=userinfo['username'], event=random_event['name'])
                     await event.event_effects()
                 # otherwise, update effects
                 else:
-                    event = Events(bot=self.bot, nation=userinfo['username'], event=event_info['event'], current=True)
+                    event = Events(bot=self.bot, nation=userinfo['username'], event=userinfo['event'], current=True)
                     await event.event_effects()
 
                 ################ LIMIT UPDATING ################
@@ -5324,7 +5323,7 @@ class CNC(commands.Cog):
                 # for every researched tech, +1
                 gp_points += len(userinfo['researched'])
                 # for every 1000 manpower, +1
-                gp_points += manpower * 0.001
+                gp_points += userinfo['max_manpower'] * 0.001
                 # for every fort, city, port, workshop, and temple, +1
                 gp_points += forts['count'] + cities['count'] + \
                              ports['count'] + workshops_n_temples
