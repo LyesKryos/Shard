@@ -44,6 +44,7 @@ class CNC(commands.Cog):
     version = "version 2.0 Teaching and Trading"
 
     async def cog_check(self, ctx):
+        approved_roles = [674260547897917460, 771456227674685440]
         # if the sender is the owner, return true
         if ctx.author.id in [293518673417732098]:
             return True
@@ -55,7 +56,7 @@ class CNC(commands.Cog):
                 member = thegye.get_member(ctx.author.id)
                 for ar in member.roles:
                     aroles.append(ar.id)
-                if aroles not in [674260547897917460, 771456227674685440]:
+                if not any(i in approved_roles for i in aroles):
                     raise SilentFail
             # if this is a server, check to make sure the user has the right role and/or this is the right server
             elif ctx.guild is not None:
@@ -63,7 +64,7 @@ class CNC(commands.Cog):
                 if ctx.guild.id == 674259612580446230:
                     for ar in ctx.author.roles:
                         aroles.append(ar.id)
-                    if aroles not in [674260547897917460, 771456227674685440]:
+                    if not any(i in approved_roles for i in aroles):
                         raise SilentFail
                 else:
                     raise SilentFail
