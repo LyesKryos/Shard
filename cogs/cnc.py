@@ -731,9 +731,10 @@ class CNC(commands.Cog):
 
     @commands.command(aliases=['cncgps'], brief="Displays great power calculations of a nation.")
     @commands.guild_only()
-    async def cnc_great_power_score(self, ctx, nation: str = None):
+    async def cnc_great_power_score(self, ctx, *, args: str):
         # establish connection
         conn = self.bot.pool
+        nation = args
         # userinfo
         if nation is None:
             userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', ctx.author.id)
