@@ -788,7 +788,7 @@ class CNC(commands.Cog):
         # calculate initial trade access
         initial_trade_access += (.05 * incoming_count) * trade_debuff
         # creates the projected resource gain data
-        manpower = userinfo['max_manpower']
+        manpower = userinfo['maxmanpower']
         taxation = userinfo['taxation']
         military_upkeep = userinfo['military_upkeep']
         public_services = userinfo['public_services']
@@ -5323,7 +5323,7 @@ class CNC(commands.Cog):
                 # for every researched tech, +1
                 gp_points += len(userinfo['researched'])
                 # for every 1000 manpower, +1
-                gp_points += userinfo['max_manpower'] * 0.001
+                gp_points += userinfo['maxmanpower'] * 0.001
                 # for every fort, city, port, workshop, and temple, +1
                 gp_points += forts['count'] + cities['count'] + \
                              ports['count'] + workshops_n_temples
