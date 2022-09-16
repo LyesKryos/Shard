@@ -55,7 +55,7 @@ class CNC(commands.Cog):
                 member = thegye.get_member(ctx.author.id)
                 for ar in member.roles:
                     aroles.append(ar.id)
-                if 674260547897917460 not in aroles:
+                if aroles not in [674260547897917460, 771456227674685440]:
                     raise SilentFail
             # if this is a server, check to make sure the user has the right role and/or this is the right server
             elif ctx.guild is not None:
@@ -63,7 +63,7 @@ class CNC(commands.Cog):
                 if ctx.guild.id == 674259612580446230:
                     for ar in ctx.author.roles:
                         aroles.append(ar.id)
-                    if 674260547897917460 not in aroles:
+                    if aroles not in [674260547897917460, 771456227674685440]:
                         raise SilentFail
                 else:
                     raise SilentFail
