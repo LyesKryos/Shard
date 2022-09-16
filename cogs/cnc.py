@@ -731,7 +731,7 @@ class CNC(commands.Cog):
 
     @commands.command(aliases=['cncgps'], brief="Displays great power calculations of a nation.")
     @commands.guild_only()
-    async def cnc_great_power_score(self, ctx, *, args: str):
+    async def cnc_great_power_score(self, ctx, *, args: str = None):
         # establish connection
         conn = self.bot.pool
         nation = args
