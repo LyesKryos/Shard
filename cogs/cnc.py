@@ -118,7 +118,8 @@ class CNC(commands.Cog):
                     data = prov.getpixel((x, y))
                     if data != color:
                         if data != (0, 0, 0, 0):
-                            prov.putpixel((x, y), color)
+                            if data != (255, 255, 255, 0):
+                                prov.putpixel((x, y), color)
         # convert, paste, and save the image
         prov = prov.convert("RGBA")
         map.paste(prov, box=cord, mask=prov)
@@ -147,7 +148,7 @@ class CNC(commands.Cog):
         for x in range(0, width):
             for y in range(0, height):
                 pixel = prov.getpixel((x, y))
-                if pixel == (0, 0, 0, 0):
+                if pixel == (0, 0, 0, 0) or pixel == (255,255,255,0):
                     not_colored.append((x, y))
                 else:
                     prov.putpixel((x, y), owner)
@@ -1450,7 +1451,7 @@ class CNC(commands.Cog):
             return
         # clears province and return troops to owner, removes province from owner
         await conn.execute('''UPDATE provinces  SET troops = 0 WHERE id = $1;''', provinceid)
-        await conn.execute('''UPDATE cncusers SET undeployed = undeployed + $1 WHERE user_id = $3;''',
+        await conn.execute('''UPDATE cncusers SET undeployed = undeployed + $1 WHERE user_id = $2;''',
                            provinceinfo['troops'], author.id)
         # adds province to recipient
         recipientinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
