@@ -373,8 +373,9 @@ class CNC(commands.Cog):
             else:
                 capital = f"Province #{userinfo['capital']}"
             # creates the embed item
-            cncuserembed = discord.Embed(title=userinfo["username"], color=color,
-                                         description=f"Registered nation of {self.bot.get_user(userinfo['user_id']).name}.")
+            cncuserembed = discord.Embed(title=f"The {userinfo['pretitle']} of {userinfo['username']}", color=color,
+                                         description=f"Registered nation of "
+                                                     f"{self.bot.get_user(userinfo['user_id']).name}.")
             cncuserembed.add_field(name=f"Territory (Total: {len(provinces_owned)})", value=provinces, inline=False)
             cncuserembed.add_field(name="Total Troops", value=f"{total_troops:,}")
             cncuserembed.add_field(name="Undeployed Troops", value=f"{userinfo['undeployed']:,}")
@@ -962,7 +963,8 @@ class CNC(commands.Cog):
             f"Your registered Command and Conquer account, {nationamesave['username']}, "
             f"has been deleted by moderator {ctx.author} for the following reason:```{reason}```")
 
-    @commands.command(usage="[item being edited (color, focus, name)]", brief="Changes a nation's information")
+    @commands.command(usage="[item being edited (color, focus, name, pretitle)]",
+                      brief="Changes a nation's information")
     @commands.guild_only()
     async def cnc_edit(self, ctx, editing: str):
         loop = asyncio.get_running_loop()
@@ -1082,6 +1084,27 @@ class CNC(commands.Cog):
             await conn.execute('''UPDATE provinces SET occupier = $1 WHERE occupier = $2;''',
                                namereply.content, usereditinfo['username'])
             await ctx.send(f"Success! Your nation name is now {namereply.content}.")
+            return
+        # if the focus is being edited
+        if editing.lower() == "pretitle":
+            await ctx.send("What would you like your new national pretitle to be?")
+
+            def authorcheck(message):
+                return ctx.author == message.author and ctx.channel == message.channel
+
+            # wait for a reply
+            try:
+                pretitle_reply = await self.bot.wait_for('message', check=authorcheck, timeout=60)
+            # if 60 seconds pass, timeout
+            except asyncio.TimeoutError:
+                return await ctx.send("Timed out. Please answer me next time!")
+            # if the content is not in the proper format
+            if type(pretitle_reply.content) is not str:
+                raise commands.UserInputError
+            # execute the information
+            await conn.execute('''UPDATE cncusers SET prettile = $1 WHERE user_id = $2;''', pretitle_reply.content,
+                               author.id)
+            await ctx.send(f"Success! Your new pretitle is {pretitle_reply.content}.")
             return
         else:
             # if the editing argument is not the proper argument

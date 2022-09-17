@@ -366,7 +366,7 @@ class calculations:
             if self.winner == "defenders":
                 victor = "The defenders are victorious!"
             # if the attackers win the battle roll, retreat
-            else:
+            if self.winner == "attackers":
                 victor = "The attackers are victorious!"
             # create battleembed object
             battleembed = discord.Embed(title=f"Battle of {target_info['name']} (Province #{self.target})",
