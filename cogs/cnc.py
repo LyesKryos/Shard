@@ -1102,7 +1102,7 @@ class CNC(commands.Cog):
             if type(pretitle_reply.content) is not str:
                 raise commands.UserInputError
             # execute the information
-            await conn.execute('''UPDATE cncusers SET prettile = $1 WHERE user_id = $2;''', pretitle_reply.content,
+            await conn.execute('''UPDATE cncusers SET pretitle = $1 WHERE user_id = $2;''', pretitle_reply.content,
                                author.id)
             await ctx.send(f"Success! Your new pretitle is {pretitle_reply.content}.")
             return
