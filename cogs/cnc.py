@@ -472,7 +472,7 @@ class CNC(commands.Cog):
             else:
                 capital = f"Province #{userinfo['capital']}"
             # creates the embed item
-            cncuserembed = discord.Embed(title=userinfo["username"], color=color,
+            cncuserembed = discord.Embed(title=f"The {userinfo['pretitle']} of {userinfo['username']}", color=color,
                                          description=f"Registered nation of {self.bot.get_user(userinfo['user_id']).name}.")
             cncuserembed.add_field(name=f"Territory (Total: {len(provinces_owned)})", value=provinces, inline=False)
             cncuserembed.add_field(name="Total Troops", value=f"{total_troops:,}")
@@ -584,7 +584,7 @@ class CNC(commands.Cog):
         max_manpower += max_manpower_raw
         added_manpower = math.ceil((max_manpower * manpower_mod) * modifiers['manpower_mod'])
         # creates the embed item
-        cncuserembed = discord.Embed(title=userinfo["username"], color=color,
+        cncuserembed = discord.Embed(title=f"The {userinfo['pretitle']} of {userinfo['username']}", color=color,
                                      description=f"Registered nation of "
                                                  f"{self.bot.get_user(userinfo['user_id']).name}.")
         cncuserembed.add_field(name=f"Territory (Total: {len(provinces_owned)})", value=provinces, inline=False)
@@ -2191,7 +2191,7 @@ class CNC(commands.Cog):
             # add gain
             base_gain += production_gain + tax_gain - troop_maintenance - structure_cost
             # sends the embed
-            bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
+            bankembed = discord.Embed(title=f"The {userinfo['pretitle']} of {userinfo['username']} - War Chest",
                                       description="An overview of the resource status of a nation.")
             bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']:,}", inline=False)
             bankembed.add_field(name="Total Projected Gain", value=f"\u03FE{int(math.ceil(base_gain)):,}")
@@ -2343,7 +2343,7 @@ class CNC(commands.Cog):
             # add gain
             base_gain += production_gain + tax_gain - troop_maintenance - structure_cost
             # sends the embed
-            bankembed = discord.Embed(title=f"{userinfo['username']} - War Chest",
+            bankembed = discord.Embed(title=f"The {userinfo['pretitle']} of {userinfo['username']} - War Chest",
                                       description="An overview of the resource status of a nation.")
             bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']:,}", inline=False)
             bankembed.add_field(name="Total Projected Gain", value=f"\u03FE{int(math.ceil(base_gain)):,}")
