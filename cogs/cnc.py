@@ -3475,7 +3475,7 @@ class CNC(commands.Cog):
                 # trade goods map
                 if str(reaction.emoji) == "\U0001fa99":
                     await map.clear_reactions()
-                    await map.edit(content="https://i.ibb.co/Zg6557y/Trade-Goods-Map.png")
+                    await map.edit(content="https://i.ibb.co/TWH96nH/Trade-Goods-Map.png")
                     for react in reactions:
                         await map.add_reaction(react)
                     continue
