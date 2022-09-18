@@ -277,7 +277,7 @@ class calculations:
                 terrain_objects_mod += .3
             # fetch upkeep modifiers
             defender_upkeep_mod = 1
-            if target_info['owner_id'] != 0:
+            if target_info['occupier_id'] != 0:
                 if defender_info['military_upkeep'] < 10:
                     defender_upkeep_mod -= (10 - defender_info['military_upkeep']) * .1
                 elif defender_info['military_upkeep'] > 15:
