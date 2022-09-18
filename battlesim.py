@@ -410,7 +410,7 @@ class calculations:
                             text=f"The natives have lost control of province #{self.target}!"
                                  f" All {target_info['troops']} troops have "
                                  f"been killed or captured!")
-                    if target_info['occupier_id'] == 0:
+                    elif target_info['occupier_id'] == 0:
                         battleembed.set_footer(
                             text=f"The rebels have lost control of province #{self.target}!"
                                  f" All {target_info['troops']} troops have "
@@ -548,7 +548,7 @@ class calculations:
                     if target_info['owner_id'] == 0:
                         battleembed.set_footer(
                             text=f"The natives have successfully defended province #{self.target}!")
-                    if target_info['occupier_id'] == 0:
+                    elif target_info['occupier_id'] == 0:
                         battleembed.set_footer(
                             text=f"The rebels have successfully defended province #{self.target}!")
                     await self.ctx.send(embed=battleembed)
