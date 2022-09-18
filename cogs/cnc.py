@@ -2954,7 +2954,7 @@ class CNC(commands.Cog):
             await ctx.send_help(ctx.invoked_with)
             return
 
-    @commands.command(usage="[rate changing (tax, military, services; t,m,s)] [whole number rate]",
+    @commands.command(usage="[rate changing (tax, military, services, research; t,m,s,r)] [whole number rate]",
                       brief="Changes the rate of the given spending rate.")
     async def cnc_change_rate(self, ctx, changed: str, rate: int):
         # defines author and connection pool
