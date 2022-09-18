@@ -148,12 +148,12 @@ class CNC(commands.Cog):
         for x in range(0, width):
             for y in range(0, height):
                 pixel = prov.getpixel((x, y))
-                if pixel == (0, 0, 0, 0) or pixel == (255,255,255,0):
+                if pixel == (0, 0, 0, 0) or pixel == (255, 255, 255, 0):
                     not_colored.append((x, y))
                 else:
                     prov.putpixel((x, y), owner)
         # draw lines every 20 pixels with the occupier color
-        for x in range(0, 1000*2, space):
+        for x in range(0, 1000 * 2, space):
             prov_draw.line([x, 0, x - 1000, 1000], width=5, fill=occupyer)
         # for every pixel in the non-colored list, remove that pixel
         for pix in not_colored:
@@ -397,7 +397,7 @@ class CNC(commands.Cog):
                 pass
             if snowflake:
                 userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
-                                           user.id)
+                                               user.id)
             else:
                 userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
                                                nationname.lower())
@@ -1234,7 +1234,7 @@ class CNC(commands.Cog):
             await ctx.send("Sent!")
 
     @commands.command(brief="Sends information about an event.", usage="<event name>")
-    async def cnc_event(self, ctx, *, args = None):
+    async def cnc_event(self, ctx, *, args=None):
         event = Events(ctx=ctx, event=args)
         await event.event_info()
 
@@ -5211,8 +5211,8 @@ class CNC(commands.Cog):
                                         structures_destroyed += 1
                                         await conn.execute('''UPDATE provinces SET port = False WHERE id = $1;''', p)
                                 # calculate troops damage and update
-                                troops_attacked = p_info['troops'] - \
-                                                  (randint((p_info['manpower']) / 2, p_info['manpower']))
+                                troops_attacked = p_info['troops'] - (
+                                    randint(int(p_info['manpower'] / 2), p_info['manpower']))
                                 if troops_attacked < 0:
                                     troops_attacked = 0
                                 await conn.execute('''UPDATE provinces SET uprising = True, troops = $2
@@ -5474,17 +5474,15 @@ class CNC(commands.Cog):
 
                 ################ EVENT UPDATING ################
 
-                # check for event
-                event_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1 and event != '';''', u)
                 # if there is no event, pick event and run
-                if event_info is None:
+                if userinfo['event'] == '':
                     random_event = await conn.fetchrow('''SELECT * FROM cnc_events WHERE type = 'national' 
                     ORDER BY random();''')
                     event = Events(bot=self.bot, nation=userinfo['username'], event=random_event['name'])
                     await event.event_effects()
                 # otherwise, update effects
                 else:
-                    event = Events(bot=self.bot, nation=userinfo['username'], event=event_info['event'], current=True)
+                    event = Events(bot=self.bot, nation=userinfo['username'], event=userinfo['event'], current=True)
                     await event.event_effects()
 
                 ################ LIMIT UPDATING ################
@@ -5747,8 +5745,8 @@ class CNC(commands.Cog):
                                         structures_destroyed += 1
                                         await conn.execute('''UPDATE provinces SET port = False WHERE id = $1;''', p)
                                 # calculate troops damage and update
-                                troops_attacked = p_info['troops'] - \
-                                                  (randint((p_info['manpower']) / 2, p_info['manpower']))
+                                troops_attacked = p_info['troops'] - (
+                                    randint(int(p_info['manpower'] / 2), p_info['manpower']))
                                 if troops_attacked < 0:
                                     troops_attacked = 0
                                 await conn.execute('''UPDATE provinces SET uprising = True, troops = $2
@@ -5885,12 +5883,14 @@ class CNC(commands.Cog):
                 # for every researched tech, +1
                 gp_points += len(userinfo['researched'])
                 # for every 1000 manpower, +1
-                gp_points += manpower * 0.001
+                gp_points += userinfo['maxmanpower'] * 0.001
                 # for every fort, city, port, workshop, and temple, +1
                 gp_points += forts['count'] + cities['count'] + \
                              ports['count'] + workshops_n_temples
                 # for every occupied 2 provinces, +1
                 gp_points += occupied_count['count'] * 0.5
+                # for every province, +1
+                gp_points += len(provinces_owned)
                 alliances = await conn.fetchrow(
                     '''SELECT COUNT(*) FROM interactions WHERE (sender = $1 or recipient = $1) and type = 'alliance'
                     and active = True;''',

@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing pretitle">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battlesim.py" beforeDir="false" afterPath="$PROJECT_DIR$/battlesim.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding pretitle to view and bank. &#10;Fixing problem with victor display in battlesim.py" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -60,7 +56,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="338000" />
+      <workItem from="1663445529962" duration="1028000" />
     </task>
     <task id="LOCAL-00002" summary="Updated turns with modifiers, production, and trade routes&#10;Updated province command to reflect trade good change&#9;&#10;Added tech and researching commands&#9;&#9;&#10;Added modifiers to registration&#9;&#9;&#9;&#9;&#9;&#10;Added multiple new QOL commands for mods and devs&#9;&#10;Updated bank command with new calculations and view&#9;&#10;Updated recruit command with added troop costs based on level&#10;Updated mass recruit command with added troop costs based on level&#9;&#10;Updated construct command with Workshops and Temples&#10;Added visual thousands commas for the construct command&#10;Updated deconstruction command with Workshops and Temples&#10;Added visual trade good market command&#9;&#10;Updated combat with army levels, terrain modifiers, and rounds&#9;&#9;&#10;Added cnc_locate to display a specified province&#10;Refactored for optimization&#9;&#9;&#9;&#9;&#9;&#9;&#10;Updated register with new options, requiring a focus, and auto-assigning a blank province&#10;Removed cnc_purchase in favor of future colonization">
       <created>1662930233274</created>
@@ -349,7 +345,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663424044213</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="Adding pretitle to view and bank. &#10;Fixing problem with victor display in battlesim.py">
+      <created>1663445943621</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1663445943621</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -367,7 +370,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing general problems for cnc_researching" />
     <MESSAGE value="Fixing cnc_event issues" />
     <MESSAGE value="Fixing turn_loop" />
     <MESSAGE value="Cleaning up turn_loop" />
@@ -392,7 +394,8 @@
     <MESSAGE value="Fixing trade map" />
     <MESSAGE value="Adding pretitle and fixing battle issue" />
     <MESSAGE value="Fixing pretitle" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing pretitle" />
+    <MESSAGE value="Adding pretitle to view and bank. &#10;Fixing problem with victor display in battlesim.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding pretitle to view and bank. &#10;Fixing problem with victor display in battlesim.py" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
