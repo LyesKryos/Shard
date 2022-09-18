@@ -612,7 +612,8 @@ class CNC(commands.Cog):
         cncuserembed.add_field(name="Economic Status",
                                value=f"Taxation Rate: {userinfo['taxation']}%\n"
                                      f"Military Upkeep: {userinfo['military_upkeep']}%\n"
-                                     f"Public Services: {userinfo['public_services']}%")
+                                     f"Public Services: {userinfo['public_services']}%\n"
+                                     f"Research Budget: {userinfo['research_budget']}%")
         if ctx.guild is not None:
             await ctx.send("Sent!")
         await author.send(embed=cncuserembed)
