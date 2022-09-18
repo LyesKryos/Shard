@@ -95,7 +95,7 @@ class Technology:
                 return
         # if the user has any research boosters, apply
         research_time *= modifiers['research_mod']
-        research_time += math.floor(provinces/5)
+        research_time += math.floor(provinces/15)
         # check the user focus and the technology's field
         if tech['field'] == "Economy":
             if userinfo['focus'] == "e":
@@ -106,6 +106,8 @@ class Technology:
         elif tech['field'] == "Military":
             if userinfo['focus'] == "m":
                 research_time -= 1
+        # apply research budget
+        research_time += (-userinfo['research_budget']/5) + 2
         # insert into researching and send message
         await conn.execute('''INSERT INTO cnc_researching VALUES ($1, $2, $3);''',
                            self.ctx.author.id, self.tech.title(), int(research_time))

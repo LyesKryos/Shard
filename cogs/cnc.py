@@ -2113,10 +2113,10 @@ class CNC(commands.Cog):
             taxation = userinfo['taxation']
             military_upkeep = userinfo['military_upkeep']
             public_services = userinfo['public_services']
+            research_budget = userinfo['research_budget']
             base_gain = 0
             tax_gain = manpower * (taxation / 100)
-            tax_gain -= tax_gain * (military_upkeep / 100)
-            tax_gain -= tax_gain * (public_services / 100)
+            tax_gain -= tax_gain * ((military_upkeep + public_services + research_budget)/ 100)
             tax_gain = math.floor(tax_gain)
             # adds trade gain and subtracts troop upkeep
             total_troops = 0
@@ -2264,10 +2264,10 @@ class CNC(commands.Cog):
             taxation = userinfo['taxation']
             military_upkeep = userinfo['military_upkeep']
             public_services = userinfo['public_services']
+            research_budget = userinfo['research_budget']
             base_gain = 0
             tax_gain = manpower * (taxation / 100)
-            tax_gain -= tax_gain * (military_upkeep / 100)
-            tax_gain -= tax_gain * (public_services / 100)
+            tax_gain -= tax_gain * ((military_upkeep + public_services + research_budget)/ 100)
             tax_gain = math.floor(tax_gain)
             # adds trade gain and subtracts troop upkeep
             total_troops = 0
@@ -2964,7 +2964,7 @@ class CNC(commands.Cog):
         if userinfo is None:
             await ctx.send(f"{author} does not appear to be registered.")
             return
-        if changed not in ['tax', 'military', 'services', 't', 'm', 's']:
+        if changed not in ['tax', 'military', 'services', 'research' 't', 'm', 's', 'r']:
             raise commands.UserInputError
         if rate < 0:
             raise commands.UserInputError
@@ -2998,6 +2998,16 @@ class CNC(commands.Cog):
                 await ctx.send(f"Your rate is already {rate}%!")
                 return
             await conn.execute('''UPDATE cncusers SET public_services = $1 WHERE user_id = $2;''', rate, author.id)
+        if changed == 'research' or changed == 'r':
+            changed = 'research_budget'
+            if rate > 35:
+                await ctx.send("The maximum research budget is 35%.")
+                return
+            current_rate = userinfo[changed]
+            if current_rate == rate:
+                await ctx.send(f"Your rate is already {rate}%!")
+                return
+            await conn.execute('''UPDATE cncusers SET research_budget = $1 WHERE user_id = $2;''', rate, author.id)
         changed = changed.replace("_", " ")
         await ctx.send(f"{changed.title()} rate changed from {current_rate}% to {rate}% successfully!")
 
@@ -4907,15 +4917,14 @@ class CNC(commands.Cog):
                 # pull out the data and get a list of provinces and trade routes
                 userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', u)
                 # establish manpower, tax rate, and tax income
-                initial_manpower = userinfo['manpower']
-                tax_rate = userinfo['taxation'] / 100
-                taxes = initial_manpower * tax_rate
-                # set military upkeep and public services rates and remove their amount from taxes
-                military_upkeep = userinfo['military_upkeep'] / 100
-                public_services = userinfo['public_services'] / 100
-                taxes *= 1 - (military_upkeep + public_services)
-                # add taxes
-                credits_added += taxes
+                manpower = userinfo['manpower']
+                taxation = userinfo['taxation']
+                military_upkeep = userinfo['military_upkeep']
+                public_services = userinfo['public_services']
+                research_budget = userinfo['research_budget']
+                tax_gain = manpower * (taxation / 100)
+                tax_gain -= tax_gain * ((military_upkeep + public_services + research_budget) / 100)
+                credits_added += tax_gain
                 # establish initial trade access
                 initial_trade_access = 0.5
                 # establish total troops, civil war, and provinces variables
@@ -4925,7 +4934,7 @@ class CNC(commands.Cog):
                 provinces_owned = [p['id'] for p in provinces]
                 occupied_count = await conn.fetchrow('''SELECT count(*) FROM provinces WHERE occupier_id = $1;''', u)
                 # set taxes, military upkeep, and public service rates to whole-number values
-                tax_rate *= 100
+                taxation *= 100
                 military_upkeep *= 100
                 public_services *= 100
 
@@ -5091,7 +5100,7 @@ class CNC(commands.Cog):
                 # add national Unrest
                 national_unrest = 0
                 # do complicated maths to figure out the unrest rate
-                tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
+                tax_unrest = math.ceil(10 * (1 + 1) ** ((taxation / 5) - 1))
                 military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
                         military_upkeep / 10 - 1)) * 0.75))
                 if public_services < 15:
@@ -5141,7 +5150,7 @@ class CNC(commands.Cog):
                             # add local unrest suppression efficiency mod
                             troops_unrest *= modifiers['local_unrest_suppression_efficiency_mod']
                             # do complicated maths
-                            tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
+                            tax_unrest = math.ceil(10 * (1 + 1) ** ((taxation / 5) - 1))
                             military_upkeep_unrest = -round(
                                 (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
                                         military_upkeep / 10 - 1)) * 0.75))
@@ -5225,7 +5234,7 @@ class CNC(commands.Cog):
                         unrest -= 20
                     # do complicated maths
                     troops_unrest = p_info['troops'] / -100
-                    tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
+                    tax_unrest = math.ceil(10 * (1 + 1) ** ((taxation / 5) - 1))
                     military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
                             military_upkeep / 10 - 1)) * 0.75))
                     if public_services < 15:
@@ -5267,7 +5276,7 @@ class CNC(commands.Cog):
                         unrest += 25
                         # do complicated maths
                         troops_unrest = p['troops'] / -100
-                        tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
+                        tax_unrest = math.ceil(10 * (1 + 1) ** ((taxation / 5) - 1))
                         military_upkeep_unrest = -round(
                             (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
                                     military_upkeep / 10 - 1)) * 0.75))
@@ -5441,15 +5450,14 @@ class CNC(commands.Cog):
                 # pull out the data and get a list of provinces and trade routes
                 userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', u)
                 # establish manpower, tax rate, and tax income
-                initial_manpower = userinfo['manpower']
-                tax_rate = userinfo['taxation'] / 100
-                taxes = initial_manpower * tax_rate
-                # set military upkeep and public services rates and remove their amount from taxes
-                military_upkeep = userinfo['military_upkeep'] / 100
-                public_services = userinfo['public_services'] / 100
-                taxes *= 1 - (military_upkeep + public_services)
-                # add taxes
-                credits_added += taxes
+                manpower = userinfo['manpower']
+                taxation = userinfo['taxation']
+                military_upkeep = userinfo['military_upkeep']
+                public_services = userinfo['public_services']
+                research_budget = userinfo['research_budget']
+                tax_gain = manpower * (taxation / 100)
+                tax_gain -= tax_gain * ((military_upkeep + public_services + research_budget) / 100)
+                credits_added += tax_gain
                 # establish initial trade access
                 initial_trade_access = 0.5
                 # establish total troops, civil war, and provinces variables
@@ -5459,7 +5467,7 @@ class CNC(commands.Cog):
                 provinces_owned = [p['id'] for p in provinces]
                 occupied_count = await conn.fetchrow('''SELECT count(*) FROM provinces WHERE occupier_id = $1;''', u)
                 # set taxes, military upkeep, and public service rates to whole-number values
-                tax_rate *= 100
+                taxation *= 100
                 military_upkeep *= 100
                 public_services *= 100
 
@@ -5625,7 +5633,7 @@ class CNC(commands.Cog):
                 # add national Unrest
                 national_unrest = 0
                 # do complicated maths to figure out the unrest rate
-                tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
+                tax_unrest = math.ceil(10 * (1 + 1) ** ((taxation / 5) - 1))
                 military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
                         military_upkeep / 10 - 1)) * 0.75))
                 if public_services < 15:
@@ -5675,7 +5683,7 @@ class CNC(commands.Cog):
                             # add local unrest suppression efficiency mod
                             troops_unrest *= modifiers['local_unrest_suppression_efficiency_mod']
                             # do complicated maths
-                            tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
+                            tax_unrest = math.ceil(10 * (1 + 1) ** ((taxation / 5) - 1))
                             military_upkeep_unrest = -round(
                                 (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
                                         military_upkeep / 10 - 1)) * 0.75))
@@ -5759,7 +5767,7 @@ class CNC(commands.Cog):
                         unrest -= 20
                     # do complicated maths
                     troops_unrest = p_info['troops'] / -100
-                    tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
+                    tax_unrest = math.ceil(10 * (1 + 1) ** ((taxation / 5) - 1))
                     military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
                             military_upkeep / 10 - 1)) * 0.75))
                     if public_services < 15:
@@ -5801,7 +5809,7 @@ class CNC(commands.Cog):
                         unrest += 25
                         # do complicated maths
                         troops_unrest = p['troops'] / -100
-                        tax_unrest = math.ceil(10 * (1 + 1) ** ((tax_rate / 5) - 1))
+                        tax_unrest = math.ceil(10 * (1 + 1) ** ((taxation / 5) - 1))
                         military_upkeep_unrest = -round(
                             (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
                                     military_upkeep / 10 - 1)) * 0.75))
