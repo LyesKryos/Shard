@@ -60,7 +60,7 @@ class Events:
                                              userinfo['event'])
             # construct embed and send
             event_embed = discord.Embed(title=userinfo['event'],
-                                        description=f"The current event affecting {userinfo['username']}.")
+                                        description=f"Information about an event.")
             event_embed.add_field(name="Effect", value=f"{event_info['effects']}", inline=False)
             event_embed.add_field(name="Type", value=f"{event_info['type'].title()}")
             event_embed.add_field(name="Duration", value=f"{event_info['duration']} turns")

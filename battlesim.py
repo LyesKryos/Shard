@@ -370,7 +370,7 @@ class calculations:
                 victor = "The attackers are victorious!"
             # create battleembed object
             battleembed = discord.Embed(title=f"Battle of {target_info['name']} (Province #{self.target})",
-                                        description=f"Attack from Province #{self.target} by {userinfo['username']} "
+                                        description=f"Attack from Province #{self.stationed} by {userinfo['username']} "
                                                     f"on Province #{self.target} with {attacking_troops} troops.",
                                         color=discord.Color.red())
             battleembed.add_field(name="Attacking Force", value=str(attacking_troops))
@@ -405,10 +405,16 @@ class calculations:
                     await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''',
                                        (stationed_info['troops'] - self.attacking_army), self.stationed)
                     # sets the footer and sends the embed object
-                    battleembed.set_footer(
-                        text=f"The natives have lost control of province #{self.target}!"
-                             f" All {target_info['troops']} troops have "
-                             f"been killed or captured!")
+                    if target_info['owner_id'] == 0:
+                        battleembed.set_footer(
+                            text=f"The natives have lost control of province #{self.target}!"
+                                 f" All {target_info['troops']} troops have "
+                                 f"been killed or captured!")
+                    if target_info['occupier_id'] == 0:
+                        battleembed.set_footer(
+                            text=f"The rebels have lost control of province #{self.target}!"
+                                 f" All {target_info['troops']} troops have "
+                                 f"been killed or captured!")
                     await self.ctx.send(embed=battleembed)
                     await loop.run_in_executor(None, self.map_color, self.target, target_info['cord'][0:2],
                                                userinfo['usercolor'])
@@ -539,8 +545,12 @@ class calculations:
                     await conn.execute(
                         '''UPDATE cnc_data SET data_value = data_value + $1 WHERE data_name = 'deaths';''',
                         self.attacking_casualties + self.defending_casualties)
-                    battleembed.set_footer(
-                        text=f"The natives have successfully defended province #{self.target}!")
+                    if target_info['owner_id'] == 0:
+                        battleembed.set_footer(
+                            text=f"The natives have successfully defended province #{self.target}!")
+                    if target_info['occupier_id'] == 0:
+                        battleembed.set_footer(
+                            text=f"The rebels have successfully defended province #{self.target}!")
                     await self.ctx.send(embed=battleembed)
                     return
                 # updates the relevant information and sends the embed
