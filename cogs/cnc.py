@@ -3008,7 +3008,12 @@ class CNC(commands.Cog):
             if current_rate == rate:
                 await ctx.send(f"Your rate is already {rate}%!")
                 return
+            reduction = (-rate/5) + 2
+            previous_reduction = (-current_rate/5) - 2
+            turns_added = reduction - previous_reduction
             await conn.execute('''UPDATE cncusers SET research_budget = $1 WHERE user_id = $2;''', rate, author.id)
+            await conn.execute('''UPDATE cnc_researching SET turns = turns + $1 where user_id = $2;''',
+                               turns_added, userinfo['user_id'])
         changed = changed.replace("_", " ")
         await ctx.send(f"{changed.title()} rate changed from {current_rate}% to {rate}% successfully!")
 
