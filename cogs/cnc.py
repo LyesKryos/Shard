@@ -2397,7 +2397,7 @@ class CNC(commands.Cog):
             await ctx.send(f"{nationname} does not have enough manpower to recruit {ramount * 1000:,} troops, "
                            f"lacking {-(userinfo['manpower'] - manpower)} manpower. ")
             return
-        elif ramount * 1000 + troop_count['sum'] > modifiers['army_limit']:
+        elif (ramount * 1000 + troop_count['sum'] + userinfo['undeployed']) > modifiers['army_limit']:
             await ctx.send(f"{userinfo['username']} cannot recruit that many troops. "
                            f"The troop cap is {modifiers['army_limit']}.")
             return
@@ -2429,9 +2429,8 @@ class CNC(commands.Cog):
         await conn.execute('''UPDATE cncusers SET manpower= $1 WHERE user_id = $2;''',
                            userinfo['manpower'] - manpower,
                            author.id)
-        troops = await conn.fetchrow('''SELECT troops FROM provinces  WHERE id = $1;''', location)
-        await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                           (troops['troops'] + (ramount * 1000)), location)
+        await conn.execute('''UPDATE provinces  SET troops = troops + $1 WHERE id = $2;''',
+                           ramount * 1000, location)
         await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''', (monies - cost),
                            author.id)
         await ctx.send(f"{nationname} has successfully deployed {ramount * 1000:,} to Province #{location}. "
