@@ -2507,7 +2507,7 @@ class CNC(commands.Cog):
         else:
             await conn.execute('''UPDATE cncusers SET undeployed = undeployed - $1 WHERE user_id = $2;''',
                                amount, author.id)
-            await ctx.send(f"{userinfo['username']} as disbanded {amount:,} troops.")
+            await ctx.send(f"{userinfo['username']} has disbanded {amount:,} troops.")
             return
 
     @commands.command(usage="[amount] [recipient nation]", brief="Sends money to a specified nation")

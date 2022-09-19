@@ -402,8 +402,8 @@ class calculations:
                         (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee),
                         author.id)
                     # updates the stationed province info
-                    await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''',
-                                       (stationed_info['troops'] - self.attacking_army), self.stationed)
+                    await conn.execute('''UPDATE provinces SET troops = troops - $1 WHERE id = $2;''',
+                                       attacking_troops, self.stationed)
                     # sets the footer and sends the embed object
                     if target_info['owner_id'] == 0:
                         battleembed.set_footer(
@@ -439,8 +439,8 @@ class calculations:
                         '''UPDATE cncusers SET moves = $1, resources = $2 WHERE user_id = $3;''',
                         (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee),
                         author.id)
-                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                       (stationed_info['troops'] - self.attacking_army), self.stationed)
+                    await conn.execute('''UPDATE provinces SET troops = troops - $1 WHERE id = $2;''',
+                                       attacking_troops, self.stationed)
                     battleembed.set_footer(
                         text=f"{defender_info['username']} has lost control of province #{self.target}!"
                              f" With nowhere to retreat, all {target_info['troops']} troops have "
@@ -473,8 +473,8 @@ class calculations:
                         '''UPDATE cncusers SET moves = $1, resources = $2 WHERE user_id = $3;''',
                         (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee),
                         author.id)
-                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                       (stationed_info['troops'] - self.attacking_army), self.stationed)
+                    await conn.execute('''UPDATE provinces  SET troops = troops - $1 WHERE id = $2;''',
+                                       attacking_troops, self.stationed)
                     await conn.execute(
                         '''UPDATE cnc_data SET data_value = data_value + $1 WHERE data_name = 'deaths';''',
                         self.attacking_casualties + self.defending_casualties)
@@ -510,8 +510,8 @@ class calculations:
                     await conn.execute(
                         '''UPDATE cncusers SET moves = $1, resources = $2 WHERE user_id = $3;''',
                         (userinfo['moves'] - 1), (userinfo['resources'] - crossingfee), author.id)
-                    await conn.execute('''UPDATE provinces  SET troops = $1 WHERE id = $2;''',
-                                       (stationed_info['troops'] - self.attacking_army), self.stationed)
+                    await conn.execute('''UPDATE provinces  SET troops = troops - $1 WHERE id = $2;''',
+                                       attacking_troops, self.stationed)
                     await conn.execute(
                         '''UPDATE cnc_data SET data_value = data_value + $1 WHERE data_name = 'deaths';''',
                         self.attacking_casualties + self.defending_casualties)
