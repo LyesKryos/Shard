@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing cnc_events.py">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Altering the cncdv display">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,21 +51,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="16859000" />
-    </task>
-    <task id="LOCAL-00010" summary="Fixing path issues for cnc_researching">
-      <created>1663026855129</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1663026855129</updated>
-    </task>
-    <task id="LOCAL-00011" summary="Fixing general problems for cnc_researching">
-      <created>1663031448117</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1663031448118</updated>
+      <workItem from="1663445529962" duration="17676000" />
     </task>
     <task id="LOCAL-00012" summary="Fixing cnc_event issues">
       <created>1663031764862</created>
@@ -397,7 +382,21 @@
       <option name="project" value="LOCAL" />
       <updated>1663695096363</updated>
     </task>
-    <option name="localTasksCounter" value="59" />
+    <task id="LOCAL-00059" summary="Altering the cncdv display">
+      <created>1663698905589</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1663698905589</updated>
+    </task>
+    <task id="LOCAL-00060" summary="Altering the cncdv display">
+      <created>1663699117920</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1663699117920</updated>
+    </task>
+    <option name="localTasksCounter" value="61" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -415,7 +414,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing the trade goods map" />
     <MESSAGE value="Adding cnc_great_power_score and adding provinces to great power score" />
     <MESSAGE value="Altering great power score calculations" />
     <MESSAGE value="Fixing gps command" />
@@ -440,19 +438,20 @@
     <MESSAGE value="Fixing userinputerror for cnc_treaty&#10;Adding national unrest calculation" />
     <MESSAGE value="Fixing" />
     <MESSAGE value="Fixing cnc_events.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing cnc_events.py" />
+    <MESSAGE value="Altering the cncdv display" />
+    <option name="LAST_COMMIT_MESSAGE" value="Altering the cncdv display" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/cogs/cnc.py</url>
-          <line>918</line>
+          <line>919</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/cogs/cnc.py</url>
-          <line>738</line>
+          <line>739</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>

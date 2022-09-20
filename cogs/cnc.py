@@ -5178,8 +5178,6 @@ class CNC(commands.Cog):
                     national_unrest = 100
                 elif national_unrest < 0:
                     national_unrest = 0
-                await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE user_id = $2;''',
-                                   national_unrest, u)
 
                 ################ PROVINCE UPDATING ################
 
@@ -5401,9 +5399,9 @@ class CNC(commands.Cog):
                     moves += 1
                 # add all credits, manpower, moves to the user
                 await conn.execute('''UPDATE cncusers SET resources = $1, manpower = $2, maxmanpower = $3, moves = $4,
-                                   trade_route_limit = $5 WHERE user_id = $6;''',
+                                   trade_route_limit = $5, national_unrest = $6 WHERE user_id = $7;''',
                                    credits_added + userinfo['resources'], manpower, max_manpower, moves,
-                                   trade_route_limit, u)
+                                   trade_route_limit, national_unrest, u)
 
                 ################ GREAT POWER UPDATING ################
 
@@ -5711,8 +5709,6 @@ class CNC(commands.Cog):
                     national_unrest = 100
                 elif national_unrest < 0:
                     national_unrest = 0
-                await conn.execute('''UPDATE cncusers SET national_unrest = $1 WHERE user_id = $2;''',
-                                   national_unrest, u)
 
                 ################ PROVINCE UPDATING ################
 
@@ -5934,9 +5930,9 @@ class CNC(commands.Cog):
                     moves += 1
                 # add all credits, manpower, moves to the user
                 await conn.execute('''UPDATE cncusers SET resources = $1, manpower = $2, maxmanpower = $3, moves = $4,
-                                   trade_route_limit = $5 WHERE user_id = $6;''',
+                                   trade_route_limit = $5, national_unrest = $6 WHERE user_id = $7;''',
                                    credits_added + userinfo['resources'], manpower, max_manpower, moves,
-                                   trade_route_limit, u)
+                                   trade_route_limit, national_unrest, u)
 
                 ################ GREAT POWER UPDATING ################
 
