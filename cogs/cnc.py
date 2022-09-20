@@ -960,7 +960,7 @@ class CNC(commands.Cog):
             national_unrest = 0
         nus_embed = discord.Embed(title="National Unrest Score", description=f"The national unrest score breakdown for "
                                                                              f"{userinfo['username']}.")
-        nus_embed.add_field(name="Total Score", value=str(national_unrest), inline=False)
+        nus_embed.add_field(name="Total Score", value=str(int(national_unrest)), inline=False)
         nus_embed.add_field(name="Taxation Unrest", value=str(tax_unrest), inline=False)
         nus_embed.add_field(name="Public Service Order", value=str(public_service_unrest))
         nus_embed.add_field(name="Military Upkeep Order", value=str(military_upkeep_unrest))
