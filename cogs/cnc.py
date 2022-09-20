@@ -1542,7 +1542,7 @@ class CNC(commands.Cog):
         if upload is True:
             with open(f"{self.interaction_directory}{interaction['id']}.txt", "w") as interaction_file:
                 interaction_file.write(interaction['terms'])
-                interaction_file.close()
+            with open(f"{self.interaction_directory}{interaction['id']}.txt", "rb") as interaction_file:
                 await ctx.send(file=discord.File(interaction_file, f"{interaction['id']}.txt"))
 
     @commands.command(usage="[offer id]", brief="Displays a specific offer with information")
@@ -1576,7 +1576,7 @@ class CNC(commands.Cog):
         if upload is True:
             with open(f"{self.interaction_directory}{offer['id']}.txt", "w") as offer_file:
                 offer_file.write(offer['terms'])
-            with open(f"{self.interaction_directory}{offer['id']}.txt", "w") as offer_file:
+            with open(f"{self.interaction_directory}{offer['id']}.txt", "rb") as offer_file:
                 await ctx.send(file=discord.File(offer_file, f"{offer['id']}.txt"))
 
     @commands.command(usage="[interaction id] [interaction (accept, reject, cancel)]", aliases=['cnci'],
