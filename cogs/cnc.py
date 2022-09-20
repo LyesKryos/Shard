@@ -588,24 +588,25 @@ class CNC(commands.Cog):
                                      description=f"Registered nation of "
                                                  f"{self.bot.get_user(userinfo['user_id']).name}.")
         cncuserembed.add_field(name=f"Territory (Total: {len(provinces_owned)})", value=provinces, inline=False)
-        cncuserembed.add_field(name="Total Troops", value=f"{total_troops:,}")
+        cncuserembed.add_field(name="Total Troops", value=f"{total_troops:,} / {modifiers['army_limit']}")
         cncuserembed.add_field(name="Undeployed Troops", value=f"{userinfo['undeployed']:,}")
-        cncuserembed.add_field(name="Resources", value=f"\u03FE{userinfo['resources']:,}")
         cncuserembed.add_field(name="National Focus", value=focus)
         cncuserembed.add_field(name="Color", value=colorvalue)
         cncuserembed.add_field(name="Action Points", value=userinfo['moves'])
+        cncuserembed.add_field(name="\u200b", value="\u200b")
         cncuserembed.add_field(name="Alliances", value=alliances)
         cncuserembed.add_field(name="Wars", value=wars)
-        cncuserembed.add_field(name="National Unrest", value=str(userinfo['national_unrest']))
-        cncuserembed.add_field(name="City/Port/Fort Limit",
-                               value=f"City Limit: {userinfo['citylimit']}\n"
-                                     f"Port Limit: {userinfo['portlimit']}\n"
-                                     f"Fort Limit: {userinfo['fortlimit']}")
         cncuserembed.add_field(name="Trade Route Overview",
                                value=f"Outgoing Routes: {outgoing_count}\n"
                                      f"Incoming Routes: {incoming_count}\n"
                                      f"Active Outgoing Routes ({outgoing_count}): {routes}\n"
                                      f"Max Routes: {userinfo['trade_route_limit']}")
+        cncuserembed.add_field(name="Resources", value=f"\u03FE{userinfo['resources']:,}")
+        cncuserembed.add_field(name="City/Port/Fort Limit",
+                               value=f"City Limit: {userinfo['citylimit']}\n"
+                                     f"Port Limit: {userinfo['portlimit']}\n"
+                                     f"Fort Limit: {userinfo['fortlimit']}")
+        cncuserembed.add_field(name="\u200b", value="\u200b")
         cncuserembed.add_field(name="Manpower/Manpower Limit",
                                value=f"{userinfo['manpower']:,}/{userinfo['maxmanpower']:,}")
         cncuserembed.add_field(name="Manpower Increase", value=f"{added_manpower:,}")
@@ -614,6 +615,7 @@ class CNC(commands.Cog):
                                      f"Military Upkeep: {userinfo['military_upkeep']}%\n"
                                      f"Public Services: {userinfo['public_services']}%\n"
                                      f"Research Budget: {userinfo['research_budget']}%")
+        cncuserembed.add_field(name="National Unrest", value=str(userinfo['national_unrest']))
         if ctx.guild is not None:
             await ctx.send("Sent!")
         await author.send(embed=cncuserembed)
