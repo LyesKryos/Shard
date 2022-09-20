@@ -917,6 +917,56 @@ class CNC(commands.Cog):
         gpscore_embed.add_field(name="Province Points", value=str(province_points))
         await ctx.send(embed=gpscore_embed)
 
+    @commands.command(aliases=['cncus'], brief="Displays national unrest calculation.")
+    async def cnc_unrest_score(self, ctx):
+        # established connection
+        conn = self.bot.pool
+        # fetches userinfo
+        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', ctx.author.id)
+        if userinfo is None:
+            await ctx.send("You are not registered.")
+            return
+        taxation = userinfo['taxation']
+        military_upkeep = userinfo['military_upkeep']
+        public_services = userinfo['public_services']
+        province_count = await conn.fetchrow('''SELECT count(*) FROM provinces 
+        WHERE occupier_id = $1 and owner_id = $1;''', ctx.author.id)
+        province_count = province_count['count']
+        modifiers = await conn.fetchrow('''SELECT * FROM cnc_modifiers WHERE user_id = $1;''', ctx.author.id)
+        # add national Unrest
+        national_unrest = 0
+        # do complicated maths to figure out the unrest rate
+        tax_unrest = math.ceil(10 * (1 + 1) ** ((taxation / 5) - 1))
+        military_upkeep_unrest = -round((1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
+                military_upkeep / 10 - 1)) * 0.75))
+        if public_services < 15:
+            public_service_unrest = round(30 - public_services * 2)
+        else:
+            public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
+        overextension_unrest = 0
+        if userinfo['great_power'] is False:
+            if province_count > 50:
+                overextension_unrest = math.ceil(10 * (1 + 1) ** (((province_count - 50) / 5) - 1))
+        else:
+            if province_count > 75:
+                overextension_unrest = math.ceil(10 * (1 + 1) ** (((province_count - 75) / 5) - 1))
+        # add national unrest suppression modifier
+        public_service_unrest *= modifiers['national_unrest_suppression_efficiency_mod']
+        # add unrest and cap or floor
+        national_unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + overextension_unrest
+        if national_unrest > 100:
+            national_unrest = 100
+        elif national_unrest < 0:
+            national_unrest = 0
+        nus_embed = discord.Embed(title="National Unrest Score", description=f"The national unrest score breakdown for "
+                                                                             f"{userinfo['username']}.")
+        nus_embed.add_field(name="Total Score", value=str(national_unrest), inline=False)
+        nus_embed.add_field(name="Taxation Unrest", value=str(tax_unrest), inline=False)
+        nus_embed.add_field(name="Public Service Order", value=str(public_service_unrest))
+        nus_embed.add_field(name="Military Upkeep Order", value=str(military_upkeep_unrest))
+        nus_embed.add_field(name="Overextension Unrest", value=str(overextension_unrest))
+        await ctx.send(embed=nus_embed)
+
     @commands.command(usage="[nation name] <reason>", brief="Completely removes a user from the CNC system. Owner only")
     @commands.is_owner()
     async def cnc_remove(self, ctx, nationname: str, reason: str = None):
@@ -1940,7 +1990,7 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         data = args.split(',,')
         if len(data) != 2:
-            raise WrongInput
+            raise commands.UserInputError
         rrecipient = data[0]
         text = data[1]
         text = text.lstrip(' ')
