@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing userinputerror for cnc_treaty&#10;Adding national unrest calculation">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -52,14 +52,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="14594000" />
-    </task>
-    <task id="LOCAL-00008" summary="Fixing ctx issues">
-      <created>1663026165074</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1663026165074</updated>
+      <workItem from="1663445529962" duration="15422000" />
     </task>
     <task id="LOCAL-00009" summary="Fixing ctx issues">
       <created>1663026520154</created>
@@ -397,7 +390,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663686748464</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="Fixing">
+      <created>1663694995635</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1663694995635</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -415,7 +415,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing cnc_research.py" />
     <MESSAGE value="Fixing cnc_edit color" />
     <MESSAGE value="Fixing the trade goods map" />
     <MESSAGE value="Adding cnc_great_power_score and adding provinces to great power score" />
@@ -440,7 +439,8 @@
     <MESSAGE value="Fixing typo&#10;Fixing battlesim.py" />
     <MESSAGE value="Fixing interactions file uploading" />
     <MESSAGE value="Fixing userinputerror for cnc_treaty&#10;Adding national unrest calculation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing userinputerror for cnc_treaty&#10;Adding national unrest calculation" />
+    <MESSAGE value="Fixing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
