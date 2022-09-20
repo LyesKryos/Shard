@@ -588,7 +588,7 @@ class CNC(commands.Cog):
                                      description=f"Registered nation of "
                                                  f"{self.bot.get_user(userinfo['user_id']).name}.")
         cncuserembed.add_field(name=f"Territory (Total: {len(provinces_owned)})", value=provinces, inline=False)
-        cncuserembed.add_field(name="Total Troops", value=f"{total_troops:,} / {modifiers['army_limit']}")
+        cncuserembed.add_field(name="Total Troops", value=f"{total_troops:,}/{modifiers['army_limit']:,}")
         cncuserembed.add_field(name="Undeployed Troops", value=f"{userinfo['undeployed']:,}")
         cncuserembed.add_field(name="National Focus", value=focus)
         cncuserembed.add_field(name="Color", value=colorvalue)
