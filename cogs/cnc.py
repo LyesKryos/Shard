@@ -1887,17 +1887,21 @@ class CNC(commands.Cog):
             await ctx.send("You cannot declare war on yourself.")
             return
         # ensures no alliance and no existing war
-        relations = await conn.fetch('''SELECT * FROM interactions 
-        WHERE (sender = $1 and recipient = $2) or (sender = $2 and recipient = $1) AND active = True;''',
+        war = await conn.fetchrow('''SELECT * FROM interactions 
+        WHERE ((sender = $1 and recipient = $2) OR (sender = $2 and recipient = $1)) 
+        AND type = 'war' AND active = True;''',
                                      sender, recipient)
-        for r in relations:
-            if r['type'] == 'war':
-                await ctx.send(
-                    f"It is not possible to declare war on {recipient} when you are already at war with them!")
-                return
-            elif r['type'] == 'alliance':
-                await ctx.send(f"It is not possible to declare war on {recipient} when you have an alliance with them!")
-                return
+        if war is not None:
+            await ctx.send(
+                f"It is not possible to declare war on {recipient} when you are already at war with them!")
+            return
+        alliance = await conn.fetchrow('''SELECT * FROM interactions 
+        WHERE ((sender = $1 and recipient = $2) OR (sender = $2 and recipient = $1)) 
+        AND type = 'alliance' AND active = True;''',
+                                  sender, recipient)
+        if alliance is not None:
+            await ctx.send(f"It is not possible to declare war on {recipient} when you have an alliance with them!")
+            return
         # inserts information into interactions
         await conn.execute('''INSERT INTO interactions (id, type, sender, sender_id, recipient,
                 recipient_id, terms, active) VALUES($1, $2, $3, $4, $5, $6, $7, $8);''', aid, atype, sender,
