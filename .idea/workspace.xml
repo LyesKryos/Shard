@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing cnc_release">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding mass_deploy_coastal">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -51,28 +51,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="21892000" />
-    </task>
-    <task id="LOCAL-00014" summary="Fixing cnc_event issues">
-      <created>1663032815854</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1663032815854</updated>
-    </task>
-    <task id="LOCAL-00015" summary="Fixing cnc_event issues">
-      <created>1663033043321</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1663033043321</updated>
-    </task>
-    <task id="LOCAL-00016" summary="Fixing cnc_event issues">
-      <created>1663033288267</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1663033288267</updated>
+      <workItem from="1663445529962" duration="23170000" />
     </task>
     <task id="LOCAL-00017" summary="Fixing turn_loop">
       <created>1663064282560</created>
@@ -396,7 +375,28 @@
       <option name="project" value="LOCAL" />
       <updated>1663774582553</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="Fixing cnc_bank viewing other players">
+      <created>1663775665485</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1663775665485</updated>
+    </task>
+    <task id="LOCAL-00064" summary="Fixing cnc_bank viewing other players">
+      <created>1663775834964</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1663775834964</updated>
+    </task>
+    <task id="LOCAL-00065" summary="Adding mass_deploy_coastal">
+      <created>1663778408239</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1663778408239</updated>
+    </task>
+    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -414,8 +414,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing gps command" />
-    <MESSAGE value="Adding Karma to system" />
     <MESSAGE value="Fixing cncgps" />
     <MESSAGE value="Fixing roles checking" />
     <MESSAGE value="Fixing cnc_transfer and map issue" />
@@ -439,7 +437,9 @@
     <MESSAGE value="Altering the cncdv display" />
     <MESSAGE value="Updating force_turn" />
     <MESSAGE value="Fixing cnc_release" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing cnc_release" />
+    <MESSAGE value="Fixing cnc_bank viewing other players" />
+    <MESSAGE value="Adding mass_deploy_coastal" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding mass_deploy_coastal" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
