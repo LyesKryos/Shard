@@ -2330,7 +2330,7 @@ class CNC(commands.Cog):
             products = list()
             provinces_owned = await conn.fetch(
                 '''SELECT * FROM provinces WHERE owner_id = $1 and occupier_id = $1;''',
-                author.id)
+                userinfo['user_id'])
             if provinces_owned is None:
                 provinces_owned = 0
             for p in provinces_owned:
