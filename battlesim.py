@@ -101,7 +101,7 @@ class calculations:
         for pix in not_colored:
             prov.putpixel(pix, (0, 0, 0, 0))
         map.paste(prov, box=cord, mask=prov)
-        map.save(fr"{self.map_directory}/Maps/wargame_provinces.png")
+        map.save(fr"{self.map_directory}wargame_provinces.png")
 
     def casualties_roll(self, mod: int, roll: int) -> int:
         max_cas = 0

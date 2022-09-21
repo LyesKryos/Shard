@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing battlesim.py" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing battlesim.py">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -49,14 +51,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="23769000" />
-    </task>
-    <task id="LOCAL-00019" summary="Cleaning up turn_loop">
-      <created>1663064502968</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1663064502968</updated>
+      <workItem from="1663445529962" duration="24878000" />
     </task>
     <task id="LOCAL-00020" summary="Fixing typo in cnc_events.py">
       <created>1663086226186</created>
@@ -394,7 +389,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663778889679</updated>
     </task>
-    <option name="localTasksCounter" value="68" />
+    <task id="LOCAL-00068" summary="Fixing battlesim.py">
+      <created>1663779413087</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1663779413087</updated>
+    </task>
+    <option name="localTasksCounter" value="69" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
