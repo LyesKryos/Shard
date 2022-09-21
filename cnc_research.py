@@ -94,7 +94,7 @@ class Technology:
                                     f"because it is mutually exclusive with {tech['exclusive']}.")
                 return
         # if the user has any research boosters, apply
-        research_time *= modifiers['research_mod']
+        research_time *= modifiers['research_mod'] * .5
         research_time += math.floor(provinces/15)
         # check the user focus and the technology's field
         if tech['field'] == "Economy":
@@ -108,6 +108,7 @@ class Technology:
                 research_time -= 1
         # apply research budget
         research_time += (-userinfo['research_budget']/5) + 2
+        research_time = round(research_time)
         # insert into researching and send message
         await conn.execute('''INSERT INTO cnc_researching VALUES ($1, $2, $3);''',
                            self.ctx.author.id, self.tech.title(), int(research_time))

@@ -1412,7 +1412,7 @@ class CNC(commands.Cog):
             troops = randrange(100, 300)
         await conn.execute('''UPDATE provinces SET owner = '', owner_id = 0, occupier = '', occupier_id = 0,
          troops = $2 WHERE id = $1;''', provinceid, troops)
-        await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $3;''',
+        await conn.execute('''UPDATE cncusers SET undeployed = undeployed + $1 WHERE user_id = $2;''',
                            provinceinfo['troops'], author.id)
         await ctx.send(
             f"Province #{provinceid} has been released. Natives have retaken control of the province.")
@@ -2169,7 +2169,8 @@ class CNC(commands.Cog):
             research_budget = userinfo['research_budget']
             base_gain = 0
             tax_gain = manpower * (taxation / 100)
-            tax_gain -= tax_gain * ((military_upkeep + public_services + research_budget)/ 100)
+            tax_gain *= modifiers['tax_mod']
+            tax_gain -= tax_gain * ((military_upkeep + public_services + research_budget) / 100)
             tax_gain = math.floor(tax_gain)
             # adds trade gain and subtracts troop upkeep
             total_troops = 0
@@ -3016,7 +3017,7 @@ class CNC(commands.Cog):
         if userinfo is None:
             await ctx.send(f"{author} does not appear to be registered.")
             return
-        if changed not in ['tax', 'military', 'services', 'research' 't', 'm', 's', 'r']:
+        if changed not in ['tax', 'military', 'services', 'research', 't', 'm', 's', 'r']:
             raise commands.UserInputError
         if rate < 0:
             raise commands.UserInputError

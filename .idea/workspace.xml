@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Altering the cncdv display">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating force_turn">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cnc_research.py" beforeDir="false" afterPath="$PROJECT_DIR$/cnc_research.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,14 +53,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="17676000" />
-    </task>
-    <task id="LOCAL-00012" summary="Fixing cnc_event issues">
-      <created>1663031764862</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1663031764862</updated>
+      <workItem from="1663445529962" duration="20404000" />
     </task>
     <task id="LOCAL-00013" summary="Fixing cnc_event issues">
       <created>1663032424002</created>
@@ -396,7 +391,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663699117920</updated>
     </task>
-    <option name="localTasksCounter" value="61" />
+    <task id="LOCAL-00061" summary="Updating force_turn">
+      <created>1663712494743</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1663712494743</updated>
+    </task>
+    <option name="localTasksCounter" value="62" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -414,7 +416,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding cnc_great_power_score and adding provinces to great power score" />
     <MESSAGE value="Altering great power score calculations" />
     <MESSAGE value="Fixing gps command" />
     <MESSAGE value="Adding Karma to system" />
@@ -439,7 +440,8 @@
     <MESSAGE value="Fixing" />
     <MESSAGE value="Fixing cnc_events.py" />
     <MESSAGE value="Altering the cncdv display" />
-    <option name="LAST_COMMIT_MESSAGE" value="Altering the cncdv display" />
+    <MESSAGE value="Updating force_turn" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updating force_turn" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
