@@ -1682,7 +1682,6 @@ class CNC(commands.Cog):
                             troops += p['troops']
                         await conn.execute('''UPDATE cncusers SET undeployed = undeployed + $1 WHERE username = $2;''',
                                            troops, pending_int['sender'])
-                        await ctx.send(f"{troops:,} returned to {owner_info['username']}'s undeployed stockpile.")
                     if recip_occupied:
                         owner_color = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
                                                           pending_int['sender'])
@@ -5227,37 +5226,6 @@ class CNC(commands.Cog):
                         continue
                     # fetch province info
                     p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-                    if p_info['uprising']:
-                        # if the unrest is less than a random number between 1 and 100, end uprising
-                        if p_info['unrest'] < randint(1, 100):
-                            await conn.execute('''UPDATE provinces SET uprising = False WHERE id = $1;''', p)
-                        # otherwise, continue uprising
-                        else:
-                            # calculate current unrest
-                            unrest = 0
-                            # reduce unrest for troops present
-                            troops_unrest = p_info['troops'] / -100
-                            if userinfo['great_power']:
-                                troops_unrest *= 2
-                            # add local unrest suppression efficiency mod
-                            troops_unrest *= modifiers['local_unrest_suppression_efficiency_mod']
-                            # do complicated maths
-                            tax_unrest = math.ceil(10 * (1 + 1) ** ((taxation / 5) - 1))
-                            military_upkeep_unrest = -round(
-                                (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
-                                        military_upkeep / 10 - 1)) * 0.75))
-                            if public_services < 15:
-                                public_service_unrest = round(30 - public_services * 2)
-                            else:
-                                public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
-                            # add unrest and cap or floor
-                            unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
-                            if unrest > 100:
-                                unrest = 100
-                            elif unrest < 0:
-                                unrest = 0
-                            await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
-                            continue
                     total_troops += p_info['troops']
 
                     ################ PRODUCTION UPDATING ################
@@ -5439,6 +5407,7 @@ class CNC(commands.Cog):
                                    trade_route_limit = $5, national_unrest = $6 WHERE user_id = $7;''',
                                    credits_added + userinfo['resources'], manpower, max_manpower, moves,
                                    trade_route_limit, national_unrest, u)
+                await crashchannel.send(f"{userinfo['username']}: {national_unrest}")
 
                 ################ GREAT POWER UPDATING ################
 

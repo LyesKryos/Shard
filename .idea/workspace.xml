@@ -52,14 +52,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="30818000" />
-    </task>
-    <task id="LOCAL-00025" summary="Fixing cnc_info and cnc_locate">
-      <created>1663205077062</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1663205077062</updated>
+      <workItem from="1663445529962" duration="32288000" />
     </task>
     <task id="LOCAL-00026" summary="Fixing battlesim.py">
       <created>1663206100764</created>
@@ -397,7 +390,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663793472867</updated>
     </task>
-    <option name="localTasksCounter" value="74" />
+    <task id="LOCAL-00074" summary="Fixing cnc_peace">
+      <created>1663794043564</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1663794043564</updated>
+    </task>
+    <option name="localTasksCounter" value="75" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
