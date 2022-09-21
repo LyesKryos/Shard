@@ -77,8 +77,8 @@ class calculations:
         except ValueError:
             return ValueError("Hex code issue")
         # open map, create draw object, and obtain province information
-        map = Image.open(fr"{self.map_directory}Maps/wargame_provinces.png").convert("RGBA")
-        prov = Image.open(fr"{self.map_directory}Province Layers/{province}.png").convert("RGBA")
+        map = Image.open(fr"{self.map_directory}wargame_provinces.png").convert("RGBA")
+        prov = Image.open(fr"{self.province_directory}{province}.png").convert("RGBA")
         prov_draw = ImageDraw.Draw(prov)
         width = prov.size[0]
         height = prov.size[1]
