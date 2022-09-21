@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding mass_deploy_coastal">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing battlesim.py" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -51,21 +49,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="23170000" />
-    </task>
-    <task id="LOCAL-00017" summary="Fixing turn_loop">
-      <created>1663064282560</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1663064282560</updated>
-    </task>
-    <task id="LOCAL-00018" summary="Fixing turn_loop">
-      <created>1663064353872</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1663064353872</updated>
+      <workItem from="1663445529962" duration="23769000" />
     </task>
     <task id="LOCAL-00019" summary="Cleaning up turn_loop">
       <created>1663064502968</created>
@@ -396,7 +380,21 @@
       <option name="project" value="LOCAL" />
       <updated>1663778408239</updated>
     </task>
-    <option name="localTasksCounter" value="66" />
+    <task id="LOCAL-00066" summary="Fixing battlesim.py">
+      <created>1663778773767</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1663778773767</updated>
+    </task>
+    <task id="LOCAL-00067" summary="Fixing battlesim.py">
+      <created>1663778889678</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1663778889679</updated>
+    </task>
+    <option name="localTasksCounter" value="68" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -423,7 +421,6 @@
     <MESSAGE value="Adding pretitle to view and bank. &#10;Fixing problem with victor display in battlesim.py" />
     <MESSAGE value="Fixing turn loop" />
     <MESSAGE value="Fixing battlesim.py and cnc_events.py" />
-    <MESSAGE value="Fixing battlesim.py" />
     <MESSAGE value="Altering research time&#10;Adding research budget&#10;Fixing cnc_bank and turn_loop to properly reflect the tax reduction from spending" />
     <MESSAGE value="Updating cncdv with new research budget" />
     <MESSAGE value="Fixing cnc_change_rate" />
@@ -439,7 +436,8 @@
     <MESSAGE value="Fixing cnc_release" />
     <MESSAGE value="Fixing cnc_bank viewing other players" />
     <MESSAGE value="Adding mass_deploy_coastal" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding mass_deploy_coastal" />
+    <MESSAGE value="Fixing battlesim.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing battlesim.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

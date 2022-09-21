@@ -302,7 +302,7 @@ class calculations:
             if defender_mods is None:
                 defence_level = 0
             else:
-                defence_level = defender_mods['defence_level']
+                defence_level = defender_mods['defense_level']
             # while there are rounds to be fought
             while round_count <= round_roll:
                 # calculates army difference if the attacking army is bigger
