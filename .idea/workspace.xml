@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing cnc_declare">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing cnc_peace">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -52,14 +52,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="29042000" />
-    </task>
-    <task id="LOCAL-00023" summary="Resetting the channel ids to the proper ones.">
-      <created>1663203793536</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1663203793536</updated>
+      <workItem from="1663445529962" duration="29916000" />
     </task>
     <task id="LOCAL-00024" summary="Fixing cnc_info">
       <created>1663204030061</created>
@@ -397,7 +390,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663791549253</updated>
     </task>
-    <option name="localTasksCounter" value="72" />
+    <task id="LOCAL-00072" summary="Fixing cnc_peace">
+      <created>1663792430556</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1663792430556</updated>
+    </task>
+    <option name="localTasksCounter" value="73" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -415,7 +415,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing cnc_transfer and map issue" />
     <MESSAGE value="Fixing trade map" />
     <MESSAGE value="Adding pretitle and fixing battle issue" />
     <MESSAGE value="Fixing pretitle" />
@@ -440,7 +439,8 @@
     <MESSAGE value="Fixing battlesim.py" />
     <MESSAGE value="Fixing peace interactions" />
     <MESSAGE value="Fixing cnc_declare" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing cnc_declare" />
+    <MESSAGE value="Fixing cnc_peace" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing cnc_peace" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

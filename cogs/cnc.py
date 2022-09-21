@@ -1682,7 +1682,7 @@ class CNC(commands.Cog):
                             troops += p['troops']
                         await conn.execute('''UPDATE cncusers SET undeployed = undeployed + $1 WHERE user_id = $2;''',
                                            troops, owner_info['user_id'])
-                        await ctx.send(f"{troops:,} returned to {user_info['username']}'s undeployed stockpile.")
+                        await ctx.send(f"{troops:,} returned to {owner_info['username']}'s undeployed stockpile.")
                     if recip_occupied:
                         owner_color = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
                                                           pending_int['sender'])
