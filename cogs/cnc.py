@@ -2337,7 +2337,7 @@ class CNC(commands.Cog):
                 if p == 0:
                     break
                 p_info = p
-                if p_info['occupier_id'] != author.id:
+                if p_info['occupier_id'] != userinfo['user_id']:
                     continue
                 total_troops += p_info['troops']
                 # for every province, calculate local trade value
