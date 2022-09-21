@@ -1680,8 +1680,8 @@ class CNC(commands.Cog):
                                 '''UPDATE provinces SET occupier = $1, occupier_id = $2 WHERE id = $3;''',
                                 p['owner'], p['owner_id'], p['id'])
                             troops += p['troops']
-                        await conn.execute('''UPDATE cncusers SET undeployed = undeployed + $1 WHERE user_id = $2;''',
-                                           troops, owner_info['user_id'])
+                        await conn.execute('''UPDATE cncusers SET undeployed = undeployed + $1 WHERE username = $2;''',
+                                           troops, pending_int['sender'])
                         await ctx.send(f"{troops:,} returned to {owner_info['username']}'s undeployed stockpile.")
                     if recip_occupied:
                         owner_color = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
@@ -1694,8 +1694,8 @@ class CNC(commands.Cog):
                                 '''UPDATE provinces SET occupier = $1, occupier_id = $2 WHERE id = $3;''',
                                 p['owner'], p['owner_id'], p['id'])
                             troops += p['troops']
-                        await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
-                                           troops + owner_color['undeployed'], owner_color['user_id'])
+                        await conn.execute('''UPDATE cncusers SET undeployed = undeployed + $1 WHERE user_id = $2;''',
+                                           troops, pending_int['recipient'])
                 # get user object and send message
                 sender = self.bot.get_user(pending_int['sender_id'])
                 await sender.send(
