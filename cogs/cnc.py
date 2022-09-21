@@ -3426,6 +3426,37 @@ class CNC(commands.Cog):
         await ctx.send(f"{amount:,} troops deployed to all {len(occupied_provinces)} provinces.")
         return
 
+    @commands.command(usage="[amount]", brief="Deploys a given number of troops to all coastal provinces")
+    @commands.guild_only()
+    async def cnc_mass_deploy_coastal(self, ctx, amount: int):
+        author = ctx.author
+        # connects to the database
+        conn = self.bot.pool
+        # fetches all user ids
+        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
+        # ensures author registration
+        if userinfo is None:
+            await ctx.send(f"{author} not registered.")
+            return
+        occupied_provinces = await conn.fetch('''SELECT * FROM provinces WHERE occupier_id = $1 and coast = True;''',
+                                              author.id)
+        total_deployed = amount * len(occupied_provinces)
+        if amount <= 0:
+            raise commands.UserInputError
+        if total_deployed > userinfo['undeployed']:
+            await ctx.send(f"{userinfo['username']} does not have enough undeployed troops to deploy {amount} troops "
+                           f"to all {len(occupied_provinces)} "
+                           f"owned and occupied provinces.")
+            return
+        await conn.execute('''UPDATE cncusers SET undeployed = undeployed - $1 WHERE user_id = $2;''',
+                           total_deployed, author.id)
+        for p in occupied_provinces:
+            p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p['id'])
+            troops = p_info['troops']
+            await conn.execute('''UPDATE provinces SET troops = $1 WHERE id = $2;''', troops + amount, p['id'])
+        await ctx.send(f"{amount:,} troops deployed to all {len(occupied_provinces)} coastal provinces.")
+        return
+
     @commands.command(usage="[stationed target id] [target province id] [amount]", aliases=['cncm'],
                       brief="Moves troops from one province to another")
     @commands.guild_only()
