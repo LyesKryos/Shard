@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing battlesim.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,14 +52,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="24878000" />
-    </task>
-    <task id="LOCAL-00020" summary="Fixing typo in cnc_events.py">
-      <created>1663086226186</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1663086226186</updated>
+      <workItem from="1663445529962" duration="27079000" />
     </task>
     <task id="LOCAL-00021" summary="Adding cnc_disband">
       <created>1663159163949</created>
@@ -396,7 +390,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663779413087</updated>
     </task>
-    <option name="localTasksCounter" value="69" />
+    <task id="LOCAL-00069" summary="Fixing battlesim.py">
+      <created>1663780829265</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1663780829265</updated>
+    </task>
+    <option name="localTasksCounter" value="70" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

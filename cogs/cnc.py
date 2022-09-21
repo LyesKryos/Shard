@@ -1392,7 +1392,7 @@ class CNC(commands.Cog):
         userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
         # fetches province information
         provinceinfo = await conn.fetchrow('''SELECT * FROM provinces  WHERE id = $1;''', provinceid)
-        if provinceinfo['owner_id'] != author.id and provinceinfo['occupier_id'] != author.id:
+        if provinceinfo['owner_id'] != provinceinfo['occupier_id']:
             await ctx.send(f"{userinfo['username']} does not own and occupy province #{provinceid}.")
             return
         # clears province and return troops to owner, removes province from owner, places native troops
@@ -1670,9 +1670,9 @@ class CNC(commands.Cog):
                         '''SELECT * FROM provinces WHERE occupier = $2 AND owner = $1;''',
                         pending_int['sender'], pending_int['recipient'])
                     if sender_occupied:
-                        owner_color = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
+                        owner_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
                                                           pending_int['recipient'])
-                        owner_color = owner_color['usercolor']
+                        owner_color = owner_info['usercolor']
                         troops = 0
                         for p in sender_occupied:
                             await self.bot.loop.run_in_executor(None, self.map_color, p['id'], p['cord'], owner_color)
@@ -1681,7 +1681,7 @@ class CNC(commands.Cog):
                                 p['owner'], p['owner_id'], p['id'])
                             troops += p['troops']
                         await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
-                                           troops + owner_color['undeployed'], owner_color['user_id'])
+                                           troops + owner_info['undeployed'], owner_info['user_id'])
                     if recip_occupied:
                         owner_color = await conn.fetchrow('''SELECT * FROM cncusers WHERE username = $1;''',
                                                           pending_int['sender'])
