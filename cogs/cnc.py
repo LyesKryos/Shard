@@ -2118,335 +2118,172 @@ class CNC(commands.Cog):
     # ---------------------Resource and Recruit Commands------------------------------
 
     @commands.command(usage="<nation name>", aliases=['cncb'], brief="Displays information about a nation's income")
-    async def cnc_bank(self, ctx, *args):
+    async def cnc_bank(self, ctx, *, args):
         author = ctx.author
         conn = self.bot.pool
-        nationname = ' '.join(args[:])
-        if nationname == '':
+        if args == '':
             # if the nationame is left blank, the author id is used to find the nation information
             authorid = ctx.author.id
-            registeredusers = await conn.fetch('''SELECT user_id FROM cncusers;''')
-            registeredlist = list()
-            # makes a list of the registered users
-            for users in registeredusers:
-                registeredlist.append(users["user_id"])
-            # checks the author id against the list of registered users
-            if authorid not in registeredlist:
-                await ctx.send(f"{ctx.author} is not registered.")
-                return
-            # grabs the nation information
-            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', authorid)
-            # define city, port, and trade route limit information
-            trade_route_limit = userinfo['trade_route_limit']
-            # fetch modifiers
-            modifiers = await conn.fetchrow('''SELECT * FROM cnc_modifiers WHERE user_id = $1;''', userinfo['user_id'])
-            # fetch outgoing trade route information
-            outgoing_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
-                                          active = True AND sender_id = $1;''', userinfo['user_id'])
-            outgoing_info = await conn.fetchrow('''SELECT * FROM interactions WHERE type = 'trade' AND 
-                                          active = True AND sender_id = $1;''', userinfo['user_id'])
-            if outgoing_count['count'] is None:
-                outgoing_count = 0
-            else:
-                outgoing_count = outgoing_count['count']
-            # fetch incoming trade route information
-            incoming_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
-                                                         active = True AND recipient_id = $1;''', userinfo['user_id'])
-            if incoming_count['count'] is None:
-                incoming_count = 0
-            else:
-                incoming_count = incoming_count['count']
-            # if the outgoing count is over the trade route limit, add a debuff
-            trade_debuff = 1
-            if outgoing_count > trade_route_limit:
-                for i in range(trade_route_limit - outgoing_count):
-                    trade_debuff -= .02
-            # define initial trade access
-            initial_trade_access = 0.5
-            # for every domestic trade route, +10% access. For every foreign trade route, +5% access
-            if outgoing_count != 0:
-                outgoing_recipients = list()
-                for o in outgoing_info:
-                    outgoing_recipients.append(o['recipient'])
-                outgoing_repeat = Counter(outgoing_recipients)
-                # for every repeat trade route, decrease by 2% down to 0%
-                for r in outgoing_repeat:
-                    if r >= 6:
-                        initial_trade_access = .3
-                    else:
-                        initial_trade_access += (10 - (r - 1) * r) / 100 * (
-                            modifiers['trade_route_efficiency_mod'])
-            # calculate initial trade access
-            initial_trade_access += (.05 * incoming_count) * trade_debuff
-            # creates the projected resource gain data
-            manpower = userinfo['manpower']
-            taxation = userinfo['taxation']
-            military_upkeep = userinfo['military_upkeep']
-            public_services = userinfo['public_services']
-            research_budget = userinfo['research_budget']
-            base_gain = 0
-            tax_gain = manpower * (taxation / 100)
-            tax_gain *= modifiers['tax_mod']
-            tax_gain -= tax_gain * (research_budget / 100)
-            tax_gain = math.floor(tax_gain)
-            # adds trade gain and subtracts troop upkeep
-            total_troops = 0
-            production_gain = 0
-            workshops = 0
-            products = list()
-            provinces_owned = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1 and occupier_id = $1;''',
-                                               author.id)
-            if provinces_owned is None:
-                provinces_owned = 0
-            for p in provinces_owned:
-                if p == 0:
-                    break
-                p_info = p
-                if p_info['occupier_id'] != author.id:
-                    continue
-                total_troops += p_info['troops']
-                # for every province, calculate local trade value
-                # define production value, producing amount, market value modifiers, and workshop production
-                production_value = 1
-                market_value_mod = 1
-                workshop_production = 0
-                # for every city, add .5 production
-                if p_info['city']:
-                    production_value += 0.5
-                # for every port, add 25% market value to the local good, if it is not gold or silver
-                if p_info['port']:
-                    if p_info['value'] not in ['Gold', 'Silver']:
-                        market_value_mod += 0.25
-                # for every workshop, add 1 * the production modifier
-                if p_info['workshop']:
-                    workshops += 1
-                    workshop_production += 1 * modifiers['workshop_production_mod']
-                # add all production to the base province production
-                producing = p_info['production'] * (production_value + modifiers['production_mod'])
-                # calculate local trade good value and total gain
-                trade_good = await conn.fetchrow('''SELECT * FROM trade_goods WHERE name = $1;''', p_info['value'])
-                products.append(p_info['value'])
-                production_gain += (((trade_good['market_value'] +
-                                      modifiers[f'{self.space_replace(p_info["value"]).lower()}_mod']) *
-                                     market_value_mod) * producing) * initial_trade_access
-                production_gain = math.floor(production_gain)
-            # remove duplicate trade goods and create string
-            products = list(dict.fromkeys(products))
-            if len(products) == 0:
-                products_string = "None"
-            else:
-                products_string = ", ".join(products)
-            # troop upkeep cost
-            total_troops += userinfo['undeployed']
-            troop_maintenance = total_troops * (0.01 * (modifiers['attack_level'] + modifiers['defense_level']))
-            troop_maintenance = math.floor(troop_maintenance)
-            # structure upkeep cost
-            structure_cost = 0
-            fortlimit = userinfo['fortlimit']
-            portlimit = userinfo['portlimit']
-            citylimit = userinfo['citylimit']
-            cities = await conn.fetchrow(
-                '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND city = True;''',
-                userinfo['user_id'])
-            ports = await conn.fetchrow(
-                '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND port = True;''',
-                userinfo['user_id'])
-            forts = await conn.fetchrow(
-                '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
-                userinfo['user_id'])
-            if cities['count'] > citylimit:
-                structure_cost += 1000 * (cities['count'] - citylimit)
-            if ports['count'] > portlimit:
-                structure_cost += 500 * (ports['count'] - portlimit)
-            if forts['count'] > fortlimit:
-                structure_cost += 700 * (forts['count'] - fortlimit)
-            # calculate military upkeep and public services
-            military_upkeep_cost = total_troops * (military_upkeep / 100)
-            public_services_cost = (userinfo['manpower'] * .1) * (public_services / 100)
-            # add gain
-            base_gain += production_gain + tax_gain
-            base_gain -= troop_maintenance + structure_cost + military_upkeep_cost + public_services_cost
-            # sends the embed
-            bankembed = discord.Embed(title=f"The {userinfo['pretitle']} of {userinfo['username']} - War Chest",
-                                      description="An overview of the resource status of a nation.")
-            bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']:,}", inline=False)
-            bankembed.add_field(name="Total Projected Gain", value=f"\u03FE{int(math.ceil(base_gain)):,}")
-            bankembed.add_field(name="Production Gain", value=f"\u03FE{int(production_gain):,}")
-            bankembed.add_field(name="Tax Gain", value=f"\u03FE{int(tax_gain):,}")
-            bankembed.add_field(name="Military Upkeep Cost", value=f"\u03FE{int(military_upkeep_cost):,}")
-            bankembed.add_field(name="Public Services Cost", value=f"\u03FE{int(public_services_cost):,}")
-            bankembed.add_field(name="\u200b", value="\u200b")
-            bankembed.add_field(name="Troop Maintenance Cost", value=f"\u03FE{int(troop_maintenance):,}")
-            bankembed.add_field(name="Structure Maintenance Cost", value=f"\u03FE{int(structure_cost):,}")
-            bankembed.add_field(name="\u200b", value="\u200b")
-            bankembed.add_field(name="Trade Routes", value=f"{outgoing_count + incoming_count}")
-            bankembed.add_field(name="Trade Access", value=f"{initial_trade_access * 100}%")
-            bankembed.add_field(name="\u200b", value="\u200b")
-            bankembed.add_field(name="Cities", value=cities['count'])
-            bankembed.add_field(name="Ports", value=ports['count'])
-            bankembed.add_field(name="Workshops", value=str(workshops))
-            bankembed.add_field(name="National Products", value=products_string)
-            await ctx.send(embed=bankembed)
-        else:
-            # if a nation is specified, fetch that information
-            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
-            # verifies user existance
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
             if userinfo is None:
-                await ctx.send(f"No such nation as {nationname}.")
+                await ctx.send("You are not registered.")
                 return
-            # define city, port, and trade route limit information
-            trade_route_limit = userinfo['trade_route_limit']
-            # fetch modifiers
-            modifiers = await conn.fetchrow('''SELECT * FROM cnc_modifiers WHERE user_id = $1;''',
-                                            userinfo['user_id'])
-            # fetch outgoing trade route information
-            outgoing_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
-                                                 active = True AND sender_id = $1;''', userinfo['user_id'])
-            outgoing_info = await conn.fetchrow('''SELECT * FROM interactions WHERE type = 'trade' AND 
-                                                 active = True AND sender_id = $1;''', userinfo['user_id'])
-            if outgoing_count['count'] is None:
-                outgoing_count = 0
-            else:
-                outgoing_count = outgoing_count['count']
-            # fetch incoming trade route information
-            incoming_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
-                                                                active = True AND recipient_id = $1;''',
-                                                 userinfo['user_id'])
-            if incoming_count['count'] is None:
-                incoming_count = 0
-            else:
-                incoming_count = incoming_count['count']
-            # if the outgoing count is over the trade route limit, add a debuff
-            trade_debuff = 1
-            if outgoing_count > trade_route_limit:
-                for i in range(trade_route_limit - outgoing_count):
-                    trade_debuff -= .02
-            # define initial trade access
-            initial_trade_access = 0.5
-            # for every domestic trade route, +10% access. For every foreign trade route, +5% access
-            if outgoing_count != 0:
-                outgoing_recipients = list()
-                for o in outgoing_info:
-                    outgoing_recipients.append(o['recipient'])
-                outgoing_repeat = Counter(outgoing_recipients)
-                # for every repeat trade route, decrease by 2% down to 0%
-                for r in outgoing_repeat:
-                    if r >= 6:
-                        initial_trade_access = .3
-                    else:
-                        initial_trade_access += (10 - (r - 1) * r) / 100 * (
-                            modifiers['trade_route_efficiency_mod'])
-            # calculate initial trade access
-            initial_trade_access += (.05 * incoming_count) * trade_debuff
-            # creates the projected resource gain data
-            manpower = userinfo['manpower']
-            taxation = userinfo['taxation']
-            military_upkeep = userinfo['military_upkeep']
-            public_services = userinfo['public_services']
-            research_budget = userinfo['research_budget']
-            base_gain = 0
-            tax_gain = manpower * (taxation / 100)
-            tax_gain -= tax_gain * (research_budget / 100)
-            tax_gain = math.floor(tax_gain)
-            # adds trade gain and subtracts troop upkeep
-            total_troops = 0
-            production_gain = 0
-            workshops = 0
-            products = list()
-            provinces_owned = await conn.fetch(
-                '''SELECT * FROM provinces WHERE owner_id = $1 and occupier_id = $1;''',
-                userinfo['user_id'])
-            if provinces_owned is None:
-                provinces_owned = 0
-            for p in provinces_owned:
-                if p == 0:
-                    break
-                p_info = p
-                if p_info['occupier_id'] != userinfo['user_id']:
-                    continue
-                total_troops += p_info['troops']
-                # for every province, calculate local trade value
-                # define production value, producing amount, market value modifiers, and workshop production
-                production_value = 1
-                market_value_mod = 1
-                workshop_production = 0
-                # for every city, add .5 production
-                if p_info['city']:
-                    production_value += 0.5
-                # for every port, add 25% market value to the local good, if it is not gold or silver
-                if p_info['port']:
-                    if p_info['value'] not in ['Gold', 'Silver']:
-                        market_value_mod += 0.25
-                # for every workshop, add 1 * the production modifier
-                if p_info['workshop']:
-                    workshops += 1
-                    workshop_production += 1 * modifiers['workshop_production_mod']
-                # add all production to the base province production
-                producing = p_info['production'] * (production_value + modifiers['production_mod'])
-                # calculate local trade good value and total gain
-                trade_good = await conn.fetchrow('''SELECT * FROM trade_goods WHERE name = $1;''', p_info['value'])
-                products.append(p_info['value'])
-                production_gain += (((trade_good['market_value'] +
-                                      modifiers[f'{self.space_replace(p_info["value"]).lower()}_mod']) *
-                                     market_value_mod) * producing) * initial_trade_access
-                production_gain = math.floor(production_gain)
-            # remove duplicate trade goods and create string
-            products = list(dict.fromkeys(products))
-            if len(products) == 0:
-                products_string = "None"
-            else:
-                products_string = ", ".join(products)
-            # troop upkeep cost
-            total_troops += userinfo['undeployed']
-            troop_maintenance = total_troops * (0.01 * (modifiers['attack_level'] + modifiers['defense_level']))
-            troop_maintenance = math.floor(troop_maintenance)
-            # structure upkeep cost
-            structure_cost = 0
-            fortlimit = userinfo['fortlimit']
-            portlimit = userinfo['portlimit']
-            citylimit = userinfo['citylimit']
-            cities = await conn.fetchrow(
-                '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND city = True;''',
-                userinfo['user_id'])
-            ports = await conn.fetchrow(
-                '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND port = True;''',
-                userinfo['user_id'])
-            forts = await conn.fetchrow(
-                '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
-                userinfo['user_id'])
-            if cities['count'] > citylimit:
-                structure_cost += 1000 * (cities['count'] - citylimit)
-            if ports['count'] > portlimit:
-                structure_cost += 500 * (ports['count'] - portlimit)
-            if forts['count'] > fortlimit:
-                structure_cost += 700 * (forts['count'] - fortlimit)
-            # calculate military upkeep and public services
-            military_upkeep_cost = total_troops * (military_upkeep / 100)
-            public_services_cost = (userinfo['manpower'] * .1) * (public_services / 100)
-            # add gain
-            base_gain += production_gain + tax_gain
-            base_gain -= troop_maintenance + structure_cost + military_upkeep_cost + public_services_cost
-            # sends the embed
-            bankembed = discord.Embed(title=f"The {userinfo['pretitle']} of {userinfo['username']} - War Chest",
-                                      description="An overview of the resource status of a nation.")
-            bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']:,}", inline=False)
-            bankembed.add_field(name="Total Projected Gain", value=f"\u03FE{int(math.ceil(base_gain)):,}")
-            bankembed.add_field(name="Production Gain", value=f"\u03FE{int(production_gain):,}")
-            bankembed.add_field(name="Tax Gain", value=f"\u03FE{int(tax_gain):,}")
-            bankembed.add_field(name="Military Upkeep Cost", value=f"\u03FE{int(military_upkeep_cost):,}")
-            bankembed.add_field(name="Public Services Cost", value=f"\u03FE{int(public_services_cost):,}")
-            bankembed.add_field(name="\u200b", value="\u200b")
-            bankembed.add_field(name="Troop Maintenance Cost", value=f"\u03FE{int(troop_maintenance):,}")
-            bankembed.add_field(name="Structure Maintenance Cost", value=f"\u03FE{int(structure_cost):,}")
-            bankembed.add_field(name="\u200b", value="\u200b")
-            bankembed.add_field(name="Trade Routes", value=f"{outgoing_count + incoming_count}")
-            bankembed.add_field(name="Trade Access", value=f"{initial_trade_access * 100}%")
-            bankembed.add_field(name="\u200b", value="\u200b")
-            bankembed.add_field(name="Cities", value=cities['count'])
-            bankembed.add_field(name="Ports", value=ports['count'])
-            bankembed.add_field(name="Workshops", value=str(workshops))
-            bankembed.add_field(name="National Products", value=products_string)
-            await ctx.send(embed=bankembed)
+        else:
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', args)
+            if userinfo is None:
+                await ctx.send(f"`{args}` is not registered.")
+                return
+        # define city, port, and trade route limit information
+        trade_route_limit = userinfo['trade_route_limit']
+        # fetch modifiers
+        modifiers = await conn.fetchrow('''SELECT * FROM cnc_modifiers WHERE user_id = $1;''', userinfo['user_id'])
+        # fetch outgoing trade route information
+        outgoing_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
+                                      active = True AND sender_id = $1;''', userinfo['user_id'])
+        outgoing_info = await conn.fetchrow('''SELECT * FROM interactions WHERE type = 'trade' AND 
+                                      active = True AND sender_id = $1;''', userinfo['user_id'])
+        if outgoing_count['count'] is None:
+            outgoing_count = 0
+        else:
+            outgoing_count = outgoing_count['count']
+        # fetch incoming trade route information
+        incoming_count = await conn.fetchrow('''SELECT count(*) FROM interactions WHERE type = 'trade' AND 
+                                                     active = True AND recipient_id = $1;''', userinfo['user_id'])
+        if incoming_count['count'] is None:
+            incoming_count = 0
+        else:
+            incoming_count = incoming_count['count']
+        # if the outgoing count is over the trade route limit, add a debuff
+        trade_debuff = 1
+        if outgoing_count > trade_route_limit:
+            for i in range(trade_route_limit - outgoing_count):
+                trade_debuff -= .02
+        # define initial trade access
+        initial_trade_access = 0.5
+        # for every domestic trade route, +10% access. For every foreign trade route, +5% access
+        if outgoing_count != 0:
+            outgoing_recipients = list()
+            for o in outgoing_info:
+                outgoing_recipients.append(o['recipient'])
+            outgoing_repeat = Counter(outgoing_recipients)
+            # for every repeat trade route, decrease by 2% down to 0%
+            for r in outgoing_repeat:
+                if r >= 6:
+                    initial_trade_access = .3
+                else:
+                    initial_trade_access += (10 - (r - 1) * r) / 100 * (
+                        modifiers['trade_route_efficiency_mod'])
+        # calculate initial trade access
+        initial_trade_access += (.05 * incoming_count) * trade_debuff
+        # creates the projected resource gain data
+        manpower = userinfo['manpower']
+        taxation = userinfo['taxation']
+        military_upkeep = userinfo['military_upkeep']
+        public_services = userinfo['public_services']
+        research_budget = userinfo['research_budget']
+        base_gain = 0
+        tax_gain = manpower * (taxation / 100)
+        tax_gain *= modifiers['tax_mod']
+        tax_gain -= tax_gain * (research_budget / 100)
+        tax_gain = math.floor(tax_gain)
+        # adds trade gain and subtracts troop upkeep
+        total_troops = 0
+        production_gain = 0
+        workshops = 0
+        products = list()
+        provinces_owned = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1 and occupier_id = $1;''',
+                                           userinfo['user_id'])
+        if provinces_owned is None:
+            provinces_owned = 0
+        for p in provinces_owned:
+            if p == 0:
+                break
+            p_info = p
+            if p_info['occupier_id'] != userinfo['user_id']:
+                continue
+            total_troops += p_info['troops']
+            # for every province, calculate local trade value
+            # define production value, producing amount, market value modifiers, and workshop production
+            production_value = 1
+            market_value_mod = 1
+            workshop_production = 0
+            # for every city, add .5 production
+            if p_info['city']:
+                production_value += 0.5
+            # for every port, add 25% market value to the local good, if it is not gold or silver
+            if p_info['port']:
+                if p_info['value'] not in ['Gold', 'Silver']:
+                    market_value_mod += 0.25
+            # for every workshop, add 1 * the production modifier
+            if p_info['workshop']:
+                workshops += 1
+                workshop_production += 1 * modifiers['workshop_production_mod']
+            # add all production to the base province production
+            producing = p_info['production'] * (production_value + modifiers['production_mod'])
+            # calculate local trade good value and total gain
+            trade_good = await conn.fetchrow('''SELECT * FROM trade_goods WHERE name = $1;''', p_info['value'])
+            products.append(p_info['value'])
+            production_gain += (((trade_good['market_value'] +
+                                  modifiers[f'{self.space_replace(p_info["value"]).lower()}_mod']) *
+                                 market_value_mod) * producing) * initial_trade_access
+            production_gain = math.floor(production_gain)
+        # remove duplicate trade goods and create string
+        products = list(dict.fromkeys(products))
+        if len(products) == 0:
+            products_string = "None"
+        else:
+            products_string = ", ".join(products)
+        # troop upkeep cost
+        total_troops += userinfo['undeployed']
+        troop_maintenance = total_troops * (0.01 * (modifiers['attack_level'] + modifiers['defense_level']))
+        troop_maintenance = math.floor(troop_maintenance)
+        # structure upkeep cost
+        structure_cost = 0
+        fortlimit = userinfo['fortlimit']
+        portlimit = userinfo['portlimit']
+        citylimit = userinfo['citylimit']
+        cities = await conn.fetchrow(
+            '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND city = True;''',
+            userinfo['user_id'])
+        ports = await conn.fetchrow(
+            '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND port = True;''',
+            userinfo['user_id'])
+        forts = await conn.fetchrow(
+            '''SELECT count(*) FROM provinces WHERE owner_id = $1 AND fort = True;''',
+            userinfo['user_id'])
+        if cities['count'] > citylimit:
+            structure_cost += 1000 * (cities['count'] - citylimit)
+        if ports['count'] > portlimit:
+            structure_cost += 500 * (ports['count'] - portlimit)
+        if forts['count'] > fortlimit:
+            structure_cost += 700 * (forts['count'] - fortlimit)
+        # calculate military upkeep and public services
+        military_upkeep_cost = total_troops * (military_upkeep / 100)
+        public_services_cost = (userinfo['manpower'] * .1) * (public_services / 100)
+        # add gain
+        base_gain += production_gain + tax_gain
+        base_gain -= troop_maintenance + structure_cost + military_upkeep_cost + public_services_cost
+        # sends the embed
+        bankembed = discord.Embed(title=f"The {userinfo['pretitle']} of {userinfo['username']} - War Chest",
+                                  description="An overview of the resource status of a nation.")
+        bankembed.add_field(name="Current Resources", value=f"\u03FE{userinfo['resources']:,}", inline=False)
+        bankembed.add_field(name="Total Projected Gain", value=f"\u03FE{int(math.ceil(base_gain)):,}")
+        bankembed.add_field(name="Production Gain", value=f"\u03FE{int(production_gain):,}")
+        bankembed.add_field(name="Tax Gain", value=f"\u03FE{int(tax_gain):,}")
+        bankembed.add_field(name="Military Upkeep Cost", value=f"\u03FE{int(military_upkeep_cost):,}")
+        bankembed.add_field(name="Public Services Cost", value=f"\u03FE{int(public_services_cost):,}")
+        bankembed.add_field(name="\u200b", value="\u200b")
+        bankembed.add_field(name="Troop Maintenance Cost", value=f"\u03FE{int(troop_maintenance):,}")
+        bankembed.add_field(name="Structure Maintenance Cost", value=f"\u03FE{int(structure_cost):,}")
+        bankembed.add_field(name="\u200b", value="\u200b")
+        bankembed.add_field(name="Trade Routes", value=f"{outgoing_count + incoming_count}")
+        bankembed.add_field(name="Trade Access", value=f"{initial_trade_access * 100}%")
+        bankembed.add_field(name="\u200b", value="\u200b")
+        bankembed.add_field(name="Cities", value=cities['count'])
+        bankembed.add_field(name="Ports", value=ports['count'])
+        bankembed.add_field(name="Workshops", value=str(workshops))
+        bankembed.add_field(name="National Products", value=products_string)
+        await ctx.send(embed=bankembed)
 
     @commands.command(usage="[battalion amount] <province id>", aliases=['cncr'],
                       brief="Recruits a number of battalions")
