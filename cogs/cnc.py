@@ -3113,11 +3113,11 @@ class CNC(commands.Cog):
             await inquiry.add_reaction(e)
 
         # the check for the emojis
-        def emojicheck(reaction, user, message):
-            return user == ctx.message.author and reaction == str(reaction.emoji) and message == inquiry
+        def emojicheck(reaction, user):
+            return user == ctx.message.author and reaction == str(reaction.emoji)
 
         try:
-            reaction, user, message = await self.bot.wait_for('reaction_add', timeout=180, check=emojicheck)
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=emojicheck)
         except asyncio.TimeoutError:
             await inquiry.delete()
             return
@@ -3328,11 +3328,11 @@ class CNC(commands.Cog):
                 await goods_sent.add_reaction(r)
 
             # the check for the emojis
-            def emojicheck(reaction, user, message):
-                return user == ctx.message.author and reaction == str(reaction.emoji) and message == goods_sent
+            def emojicheck(reaction, user):
+                return user == ctx.message.author and reaction == str(reaction.emoji)
 
             try:
-                reaction, user, message = await self.bot.wait_for('reaction_add', timeout=180, check=emojicheck)
+                reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=emojicheck)
             except asyncio.TimeoutError:
                 await goods_sent.clear_reactions()
                 break
