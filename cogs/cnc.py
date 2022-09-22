@@ -3101,6 +3101,7 @@ class CNC(commands.Cog):
 
     @commands.command(brief="Displays current value of all trade goods.")
     @commands.guild_only()
+    @commands.max_concurrency(1, commands.BucketType.user)
     async def cnc_market(self, ctx):
         # establish connection
         conn = self.bot.pool
@@ -3112,11 +3113,11 @@ class CNC(commands.Cog):
             await inquiry.add_reaction(e)
 
         # the check for the emojis
-        def emojicheck(reaction, user):
-            return user == ctx.message.author and str(reaction.emoji)
+        def emojicheck(reaction, user, message):
+            return user == ctx.message.author and reaction == str(reaction.emoji) and message == inquiry
 
         try:
-            reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=emojicheck)
+            reaction, user, message = await self.bot.wait_for('reaction_add', timeout=180, check=emojicheck)
         except asyncio.TimeoutError:
             await inquiry.delete()
             return
@@ -3272,6 +3273,7 @@ class CNC(commands.Cog):
 
     @commands.command(brief="Displays current production of the nation's trade goods.")
     @commands.guild_only()
+    @commands.max_concurrency(1, commands.BucketType.user)
     async def cnc_production(self, ctx):
         # establish connection
         conn = self.bot.pool
@@ -3326,11 +3328,11 @@ class CNC(commands.Cog):
                 await goods_sent.add_reaction(r)
 
             # the check for the emojis
-            def reasoncheck(reaction, user):
-                return user == ctx.message.author and str(reaction.emoji)
+            def emojicheck(reaction, user, message):
+                return user == ctx.message.author and reaction == str(reaction.emoji) and message == goods_sent
 
             try:
-                reaction, user = await self.bot.wait_for('reaction_add', timeout=180, check=reasoncheck)
+                reaction, user, message = await self.bot.wait_for('reaction_add', timeout=180, check=emojicheck)
             except asyncio.TimeoutError:
                 await goods_sent.clear_reactions()
                 break
@@ -5404,6 +5406,8 @@ class CNC(commands.Cog):
                 max_manpower = max_manpower_raw['sum']
                 # if no provinces are owned, set to 3000
                 if max_manpower is None:
+                    max_manpower = 3000
+                if max_manpower < 3000:
                     max_manpower = 3000
                 # calculate manpower gain (+1000 per city, +2500 for capital)
                 added_manpower = (public_services / 100) * max_manpower * modifiers['manpower_mod']
