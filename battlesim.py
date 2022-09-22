@@ -95,8 +95,8 @@ class calculations:
                 else:
                     prov.putpixel((x, y), owner)
         # draw lines every 20 pixels with the occupier color
-        for x in range(0, 1000, space):
-            prov_draw.line([x, 0, x - width, height], width=5, fill=occupyer)
+        for x in range(0, 1000 * 2, space):
+            prov_draw.line([x, 0, x - 1000, 1000], width=5, fill=occupyer)
         # for every pixel in the non-colored list, remove that pixel
         for pix in not_colored:
             prov.putpixel(pix, (0, 0, 0, 0))
