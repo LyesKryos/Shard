@@ -5011,25 +5011,25 @@ class CNC(commands.Cog):
                 userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', u)
                 # establish manpower, tax rate, and tax income
                 manpower = userinfo['manpower']
+                total_troops = await conn.fetchrow('''SELECT sum(troops) FROM provinces WHERE occupier_id = $1;''', u)
+                if total_troops['sum'] is not None:
+                    total_troops = total_troops['sum'] + userinfo['undeployed']
+                else:
+                    total_troops = userinfo['undeployed']
                 taxation = userinfo['taxation']
                 military_upkeep = userinfo['military_upkeep']
                 public_services = userinfo['public_services']
                 research_budget = userinfo['research_budget']
                 tax_gain = manpower * (taxation / 100)
-                tax_gain -= tax_gain * ((military_upkeep + public_services + research_budget) / 100)
+                tax_gain -= (military_upkeep * total_troops) + (public_services * (manpower * 0.01))
                 credits_added += tax_gain
                 # establish initial trade access
                 initial_trade_access = 0.5
                 # establish total troops, civil war, and provinces variables
-                total_troops = 0
                 civil_war = False
                 provinces = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1;''', u)
                 provinces_owned = [p['id'] for p in provinces]
                 occupied_count = await conn.fetchrow('''SELECT count(*) FROM provinces WHERE occupier_id = $1;''', u)
-                # set taxes, military upkeep, and public service rates to whole-number values
-                taxation *= 100
-                military_upkeep *= 100
-                public_services *= 100
 
                 ################ TECH MODIFIERS UPDATING ################
 
@@ -5226,7 +5226,6 @@ class CNC(commands.Cog):
                         continue
                     # fetch province info
                     p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-                    total_troops += p_info['troops']
 
                     ################ PRODUCTION UPDATING ################
 
@@ -5407,7 +5406,6 @@ class CNC(commands.Cog):
                                    trade_route_limit = $5, national_unrest = $6 WHERE user_id = $7;''',
                                    credits_added + userinfo['resources'], manpower, max_manpower, moves,
                                    trade_route_limit, national_unrest, u)
-                await crashchannel.send(f"{userinfo['username']}: {national_unrest}")
 
                 ################ GREAT POWER UPDATING ################
 
@@ -5512,25 +5510,25 @@ class CNC(commands.Cog):
                 userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', u)
                 # establish manpower, tax rate, and tax income
                 manpower = userinfo['manpower']
+                total_troops = await conn.fetchrow('''SELECT sum(troops) FROM provinces WHERE occupier_id = $1;''', u)
+                if total_troops['sum'] is not None:
+                    total_troops = total_troops['sum'] + userinfo['undeployed']
+                else:
+                    total_troops = userinfo['undeployed']
                 taxation = userinfo['taxation']
                 military_upkeep = userinfo['military_upkeep']
                 public_services = userinfo['public_services']
                 research_budget = userinfo['research_budget']
                 tax_gain = manpower * (taxation / 100)
-                tax_gain -= tax_gain * ((military_upkeep + public_services + research_budget) / 100)
+                tax_gain -= (military_upkeep * total_troops) + (public_services * (manpower * 0.01))
                 credits_added += tax_gain
                 # establish initial trade access
                 initial_trade_access = 0.5
                 # establish total troops, civil war, and provinces variables
-                total_troops = 0
                 civil_war = False
                 provinces = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1;''', u)
                 provinces_owned = [p['id'] for p in provinces]
                 occupied_count = await conn.fetchrow('''SELECT count(*) FROM provinces WHERE occupier_id = $1;''', u)
-                # set taxes, military upkeep, and public service rates to whole-number values
-                taxation *= 100
-                military_upkeep *= 100
-                public_services *= 100
 
                 ################ TECH MODIFIERS UPDATING ################
 
@@ -5727,38 +5725,6 @@ class CNC(commands.Cog):
                         continue
                     # fetch province info
                     p_info = await conn.fetchrow('''SELECT * FROM provinces WHERE id = $1;''', p)
-                    if p_info['uprising']:
-                        # if the unrest is less than a random number between 1 and 100, end uprising
-                        if p_info['unrest'] < randint(1, 100):
-                            await conn.execute('''UPDATE provinces SET uprising = False WHERE id = $1;''', p)
-                        # otherwise, continue uprising
-                        else:
-                            # calculate current unrest
-                            unrest = 0
-                            # reduce unrest for troops present
-                            troops_unrest = p_info['troops'] / -100
-                            if userinfo['great_power']:
-                                troops_unrest *= 2
-                            # add local unrest suppression efficiency mod
-                            troops_unrest *= modifiers['local_unrest_suppression_efficiency_mod']
-                            # do complicated maths
-                            tax_unrest = math.ceil(10 * (1 + 1) ** ((taxation / 5) - 1))
-                            military_upkeep_unrest = -round(
-                                (1 * (1 + 1) ** (military_upkeep / 5.75 - 1)) + ((1 * (1 + 1) ** (
-                                        military_upkeep / 10 - 1)) * 0.75))
-                            if public_services < 15:
-                                public_service_unrest = round(30 - public_services * 2)
-                            else:
-                                public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
-                            # add unrest and cap or floor
-                            unrest += tax_unrest + public_service_unrest + military_upkeep_unrest + troops_unrest
-                            if unrest > 100:
-                                unrest = 100
-                            elif unrest < 0:
-                                unrest = 0
-                            await conn.execute('''UPDATE provinces SET unrest = $1 WHERE id = $2;''', unrest, p)
-                            continue
-                    total_troops += p_info['troops']
 
                     ################ PRODUCTION UPDATING ################
 

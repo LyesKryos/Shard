@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing cnc_peace">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Debugging national unrest">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -52,14 +52,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="32288000" />
-    </task>
-    <task id="LOCAL-00026" summary="Fixing battlesim.py">
-      <created>1663206100764</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1663206100764</updated>
+      <workItem from="1663445529962" duration="34487000" />
     </task>
     <task id="LOCAL-00027" summary="Removing single and double provinces from cnc_register">
       <created>1663206482370</created>
@@ -397,7 +390,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663794043564</updated>
     </task>
-    <option name="localTasksCounter" value="75" />
+    <task id="LOCAL-00075" summary="Debugging national unrest">
+      <created>1663795770836</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1663795770836</updated>
+    </task>
+    <option name="localTasksCounter" value="76" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -415,7 +415,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing trade map" />
     <MESSAGE value="Adding pretitle and fixing battle issue" />
     <MESSAGE value="Fixing pretitle" />
     <MESSAGE value="Adding pretitle to view and bank. &#10;Fixing problem with victor display in battlesim.py" />
@@ -440,7 +439,8 @@
     <MESSAGE value="Fixing peace interactions" />
     <MESSAGE value="Fixing cnc_declare" />
     <MESSAGE value="Fixing cnc_peace" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing cnc_peace" />
+    <MESSAGE value="Debugging national unrest" />
+    <option name="LAST_COMMIT_MESSAGE" value="Debugging national unrest" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
