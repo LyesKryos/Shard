@@ -5049,7 +5049,8 @@ class CNC(commands.Cog):
                 public_services = userinfo['public_services']
                 research_budget = userinfo['research_budget']
                 tax_gain = manpower * (taxation / 100)
-                tax_gain -= (military_upkeep * total_troops) + (public_services * (manpower * 0.1)) + (research_budget / 100)
+                tax_gain -= ((military_upkeep / 100) * total_troops) +\
+                            ((public_services / 100) * (manpower * 0.1)) + (research_budget / 100)
                 credits_added += tax_gain
                 # establish initial trade access
                 initial_trade_access = 0.5
@@ -5552,7 +5553,8 @@ class CNC(commands.Cog):
                 public_services = userinfo['public_services']
                 research_budget = userinfo['research_budget']
                 tax_gain = manpower * (taxation / 100)
-                tax_gain -= (military_upkeep * total_troops) + (public_services * (manpower * 0.01))
+                tax_gain -= ((military_upkeep / 100) * total_troops) + \
+                            ((public_services / 100) * (manpower * 0.1)) + (research_budget / 100)
                 credits_added += tax_gain
                 # establish initial trade access
                 initial_trade_access = 0.5
@@ -5909,6 +5911,8 @@ class CNC(commands.Cog):
                 max_manpower = max_manpower_raw['sum']
                 # if no provinces are owned, set to 3000
                 if max_manpower is None:
+                    max_manpower = 3000
+                if max_manpower < 3000:
                     max_manpower = 3000
                 # calculate manpower gain (+1000 per city, +2500 for capital)
                 added_manpower = (public_services / 100) * max_manpower * modifiers['manpower_mod']
