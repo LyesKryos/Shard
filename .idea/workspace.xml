@@ -5,8 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Flooring research at 1 turn">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cnc_research.py" beforeDir="false" afterPath="$PROJECT_DIR$/cnc_research.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -53,14 +51,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="42339000" />
-    </task>
-    <task id="LOCAL-00036" summary="Adding Karma to system">
-      <created>1663332770400</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1663332770400</updated>
+      <workItem from="1663445529962" duration="43005000" />
     </task>
     <task id="LOCAL-00037" summary="Fixing cncgps">
       <created>1663356939404</created>
@@ -398,7 +389,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663864142063</updated>
     </task>
-    <option name="localTasksCounter" value="85" />
+    <task id="LOCAL-00085" summary="Flooring research at 1 turn">
+      <created>1663873765364</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1663873765364</updated>
+    </task>
+    <option name="localTasksCounter" value="86" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

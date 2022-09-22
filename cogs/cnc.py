@@ -848,6 +848,7 @@ class CNC(commands.Cog):
                                  market_value_mod) * producing) * initial_trade_access
             production_gain = math.floor(production_gain)
         # troop upkeep cost
+        total_troops += userinfo['undeployed']
         troop_maintenance = total_troops * (0.01 * (modifiers['attack_level'] + modifiers['defense_level']))
         troop_maintenance = math.floor(troop_maintenance)
         # structure upkeep cost
@@ -2236,6 +2237,7 @@ class CNC(commands.Cog):
             else:
                 products_string = ", ".join(products)
             # troop upkeep cost
+            total_troops += userinfo['undeployed']
             troop_maintenance = total_troops * (0.01 * (modifiers['attack_level'] + modifiers['defense_level']))
             troop_maintenance = math.floor(troop_maintenance)
             # structure upkeep cost
@@ -2395,6 +2397,7 @@ class CNC(commands.Cog):
             else:
                 products_string = ", ".join(products)
             # troop upkeep cost
+            total_troops += userinfo['undeployed']
             troop_maintenance = total_troops * (0.01 * (modifiers['attack_level'] + modifiers['defense_level']))
             troop_maintenance = math.floor(troop_maintenance)
             # structure upkeep cost
