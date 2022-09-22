@@ -872,7 +872,7 @@ class CNC(commands.Cog):
             structure_cost += 700 * (forts['count'] - fortlimit)
         # calculate military upkeep and public services
         military_upkeep_cost = total_troops * (military_upkeep / 100)
-        public_services_cost = (userinfo['manpower'] * .01) * (public_services / 100)
+        public_services_cost = (userinfo['manpower'] * .1) * (public_services / 100)
         # add gain
         base_gain += production_gain + tax_gain
         base_gain -= troop_maintenance + structure_cost + military_upkeep_cost + public_services_cost
@@ -2256,7 +2256,7 @@ class CNC(commands.Cog):
                 structure_cost += 700 * (forts['count'] - fortlimit)
             # calculate military upkeep and public services
             military_upkeep_cost = total_troops * (military_upkeep / 100)
-            public_services_cost = (userinfo['manpower'] * .01) * (public_services / 100)
+            public_services_cost = (userinfo['manpower'] * .1) * (public_services / 100)
             # add gain
             base_gain += production_gain + tax_gain
             base_gain -= troop_maintenance + structure_cost + military_upkeep_cost + public_services_cost
@@ -2415,7 +2415,7 @@ class CNC(commands.Cog):
                 structure_cost += 700 * (forts['count'] - fortlimit)
             # calculate military upkeep and public services
             military_upkeep_cost = total_troops * (military_upkeep / 100)
-            public_services_cost = (userinfo['manpower'] * .01) * (public_services / 100)
+            public_services_cost = (userinfo['manpower'] * .1) * (public_services / 100)
             # add gain
             base_gain += production_gain + tax_gain
             base_gain -= troop_maintenance + structure_cost + military_upkeep_cost + public_services_cost
@@ -5043,7 +5043,7 @@ class CNC(commands.Cog):
                 public_services = userinfo['public_services']
                 research_budget = userinfo['research_budget']
                 tax_gain = manpower * (taxation / 100)
-                tax_gain -= (military_upkeep * total_troops) + (public_services * (manpower * 0.01))
+                tax_gain -= (military_upkeep * total_troops) + (public_services * (manpower * 0.1)) + (research_budget / 100)
                 credits_added += tax_gain
                 # establish initial trade access
                 initial_trade_access = 0.5
