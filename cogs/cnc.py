@@ -1066,7 +1066,6 @@ class CNC(commands.Cog):
                 await ctx.send("That doesn't appear to be a valid hex color code.")
                 return
             # updates map with colors
-            user = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
             provinces_owned = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1 and occupier_id = $1;''',
                                                author.id)
             if provinces_owned is None:
@@ -1076,6 +1075,11 @@ class CNC(commands.Cog):
                     break
                 cord = (p['cord'][0], p['cord'][1])
                 await loop.run_in_executor(None, self.map_color, p['id'], cord, colorreply.content)
+                if p['occupier_id'] != p['owner_id']:
+                    occupier_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''',
+                                                        p['occupier_id'])
+                    occupier_color = occupier_info['usercolor']
+                    await loop.run_in_executor(None, self.occupy_color, p['id'], cord, occupier_color)
             await conn.execute('''UPDATE cncusers SET usercolor = $1 WHERE user_id = $2;''', colorreply.content,
                                author.id)
             await ctx.send(f"Success! Your new color is {colorreply.content}.")
