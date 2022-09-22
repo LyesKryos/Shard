@@ -109,6 +109,8 @@ class Technology:
         # apply research budget
         research_time += (-userinfo['research_budget']/5) + 2
         research_time = round(research_time)
+        if research_time < 0:
+            research_time = 1
         # insert into researching and send message
         await conn.execute('''INSERT INTO cnc_researching VALUES ($1, $2, $3);''',
                            self.ctx.author.id, self.tech.title(), int(research_time))
