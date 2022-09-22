@@ -799,10 +799,10 @@ class CNC(commands.Cog):
         taxation = userinfo['taxation']
         military_upkeep = userinfo['military_upkeep']
         public_services = userinfo['public_services']
+        research_budget = userinfo['research_budget']
         base_gain = 0
         tax_gain = manpower * (taxation / 100)
-        tax_gain -= tax_gain * (military_upkeep / 100)
-        tax_gain -= tax_gain * (public_services / 100)
+        tax_gain -= tax_gain * (research_budget / 100)
         tax_gain = math.floor(tax_gain)
         # adds trade gain and subtracts troop upkeep
         total_troops = 0
@@ -870,8 +870,12 @@ class CNC(commands.Cog):
             structure_cost += 500 * (ports['count'] - portlimit)
         if forts['count'] > fortlimit:
             structure_cost += 700 * (forts['count'] - fortlimit)
+        # calculate military upkeep and public services
+        military_upkeep_cost = total_troops * (military_upkeep / 100)
+        public_services_cost = (userinfo['manpower'] * .01) * (public_services / 100)
         # add gain
-        base_gain += production_gain + tax_gain - troop_maintenance - structure_cost
+        base_gain += production_gain + tax_gain
+        base_gain -= troop_maintenance + structure_cost + military_upkeep_cost + public_services_cost
         occupied_count = await conn.fetchrow('''SELECT count(*) FROM provinces 
         WHERE owner_id != $1 and occupier_id = $1;''', userinfo['user_id'])
         provinces_count = await conn.fetchrow('''SELECT count(*) FROM provinces 
@@ -903,6 +907,9 @@ class CNC(commands.Cog):
         # for every 2 alliances, +1
         alliance_points = alliances['count'] * 0.5
         gp_points += alliances['count'] * 0.5
+        # subtract national unrest
+        national_unrest = userinfo['national_unrest']
+        gp_points -= national_unrest
         # round to floor
         gp_points = math.floor(gp_points)
         # update great power score
@@ -914,6 +921,7 @@ class CNC(commands.Cog):
         gpscore_embed.add_field(name="Army Level Points", value=str(army_level_points))
         gpscore_embed.add_field(name="Technology Points", value=str(technology_points))
         gpscore_embed.add_field(name="Manpower Points", value=str(manpower_points))
+        gpscore_embed.add_field(name="Unrest Points", value=f"-{national_unrest}")
         gpscore_embed.add_field(name="Structure Points", value=str(structure_points))
         gpscore_embed.add_field(name="Alliance Points", value=str(alliance_points))
         gpscore_embed.add_field(name="Province Points", value=str(province_points))
@@ -2174,7 +2182,7 @@ class CNC(commands.Cog):
             base_gain = 0
             tax_gain = manpower * (taxation / 100)
             tax_gain *= modifiers['tax_mod']
-            tax_gain -= tax_gain * ((military_upkeep + public_services + research_budget) / 100)
+            tax_gain -= tax_gain * (research_budget / 100)
             tax_gain = math.floor(tax_gain)
             # adds trade gain and subtracts troop upkeep
             total_troops = 0
@@ -2246,8 +2254,12 @@ class CNC(commands.Cog):
                 structure_cost += 500 * (ports['count'] - portlimit)
             if forts['count'] > fortlimit:
                 structure_cost += 700 * (forts['count'] - fortlimit)
+            # calculate military upkeep and public services
+            military_upkeep_cost = total_troops * (military_upkeep / 100)
+            public_services_cost = (userinfo['manpower'] * .01) * (public_services / 100)
             # add gain
-            base_gain += production_gain + tax_gain - troop_maintenance - structure_cost
+            base_gain += production_gain + tax_gain
+            base_gain -= troop_maintenance + structure_cost + military_upkeep_cost + public_services_cost
             # sends the embed
             bankembed = discord.Embed(title=f"The {userinfo['pretitle']} of {userinfo['username']} - War Chest",
                                       description="An overview of the resource status of a nation.")
@@ -2255,6 +2267,9 @@ class CNC(commands.Cog):
             bankembed.add_field(name="Total Projected Gain", value=f"\u03FE{int(math.ceil(base_gain)):,}")
             bankembed.add_field(name="Production Gain", value=f"\u03FE{int(production_gain):,}")
             bankembed.add_field(name="Tax Gain", value=f"\u03FE{int(tax_gain):,}")
+            bankembed.add_field(name="Military Upkeep Cost", value=f"\u03FE{int(military_upkeep_cost)}")
+            bankembed.add_field(name="Public Services Cost", value=f"\u03FE{int(public_services_cost)}")
+            bankembed.add_field(name="\u200b", value="\u200b")
             bankembed.add_field(name="Troop Maintenance Cost", value=f"\u03FE{int(troop_maintenance):,}")
             bankembed.add_field(name="Structure Maintenance Cost", value=f"\u03FE{int(structure_cost):,}")
             bankembed.add_field(name="\u200b", value="\u200b")
@@ -2325,7 +2340,7 @@ class CNC(commands.Cog):
             research_budget = userinfo['research_budget']
             base_gain = 0
             tax_gain = manpower * (taxation / 100)
-            tax_gain -= tax_gain * ((military_upkeep + public_services + research_budget)/ 100)
+            tax_gain -= tax_gain * (research_budget / 100)
             tax_gain = math.floor(tax_gain)
             # adds trade gain and subtracts troop upkeep
             total_troops = 0
@@ -2398,8 +2413,12 @@ class CNC(commands.Cog):
                 structure_cost += 500 * (ports['count'] - portlimit)
             if forts['count'] > fortlimit:
                 structure_cost += 700 * (forts['count'] - fortlimit)
+            # calculate military upkeep and public services
+            military_upkeep_cost = total_troops * (military_upkeep / 100)
+            public_services_cost = (userinfo['manpower'] * .01) * (public_services / 100)
             # add gain
-            base_gain += production_gain + tax_gain - troop_maintenance - structure_cost
+            base_gain += production_gain + tax_gain
+            base_gain -= troop_maintenance + structure_cost + military_upkeep_cost + public_services_cost
             # sends the embed
             bankembed = discord.Embed(title=f"The {userinfo['pretitle']} of {userinfo['username']} - War Chest",
                                       description="An overview of the resource status of a nation.")
@@ -2407,6 +2426,9 @@ class CNC(commands.Cog):
             bankembed.add_field(name="Total Projected Gain", value=f"\u03FE{int(math.ceil(base_gain)):,}")
             bankembed.add_field(name="Production Gain", value=f"\u03FE{int(production_gain):,}")
             bankembed.add_field(name="Tax Gain", value=f"\u03FE{int(tax_gain):,}")
+            bankembed.add_field(name="Military Upkeep Cost", value=f"\u03FE{int(military_upkeep_cost)}")
+            bankembed.add_field(name="Public Services Cost", value=f"\u03FE{int(public_services_cost)}")
+            bankembed.add_field(name="\u200b", value="\u200b")
             bankembed.add_field(name="Troop Maintenance Cost", value=f"\u03FE{int(troop_maintenance):,}")
             bankembed.add_field(name="Structure Maintenance Cost", value=f"\u03FE{int(structure_cost):,}")
             bankembed.add_field(name="\u200b", value="\u200b")
@@ -4992,9 +5014,9 @@ class CNC(commands.Cog):
     @tasks.loop(hours=6, reconnect=False)
     async def turn_loop(self):
         crashchannel = self.bot.get_channel(835579413625569322)
+        # channel to send to
+        cncchannel = self.bot.get_channel(927288304301387816)
         try:
-            # channel to send to
-            cncchannel = self.bot.get_channel(927288304301387816)
             # connects to the database
             conn = self.bot.pool
             # fetches all the users and makes a list
@@ -5374,7 +5396,7 @@ class CNC(commands.Cog):
                 credits_added -= structure_cost
                 # calculate manpower increase and max manpower
                 max_manpower_raw = await conn.fetchrow('''SELECT sum(manpower::int) FROM provinces WHERE
-                              owner_id = $1 AND uprising = False;''', u)
+                              owner_id = $1 AND occupier_id = $1;''', u)
                 max_manpower = max_manpower_raw['sum']
                 # if no provinces are owned, set to 3000
                 if max_manpower is None:
@@ -5431,6 +5453,8 @@ class CNC(commands.Cog):
                     userinfo['username'])
                 # for every 2 alliances, +1
                 gp_points += alliances['count'] * 0.5
+                # subtract national unrest
+                gp_points -= national_unrest
                 # round to floor
                 gp_points = math.floor(gp_points)
                 # update great power score
@@ -5491,9 +5515,9 @@ class CNC(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def cnc_force_turn(self, ctx):
+        # channel to send to
+        cncchannel = ctx.channel
         try:
-            # channel to send to
-            cncchannel = ctx.channel
             # connects to the database
             conn = self.bot.pool
             # fetches all the users and makes a list
@@ -5873,7 +5897,7 @@ class CNC(commands.Cog):
                 credits_added -= structure_cost
                 # calculate manpower increase and max manpower
                 max_manpower_raw = await conn.fetchrow('''SELECT sum(manpower::int) FROM provinces WHERE
-                              owner_id = $1 AND uprising = False;''', u)
+                              owner_id = $1 AND occupier_id = $1;''', u)
                 max_manpower = max_manpower_raw['sum']
                 # if no provinces are owned, set to 3000
                 if max_manpower is None:
@@ -5930,6 +5954,8 @@ class CNC(commands.Cog):
                     userinfo['username'])
                 # for every 2 alliances, +1
                 gp_points += alliances['count'] * 0.5
+                # subtract national unrest
+                gp_points -= national_unrest
                 # round to floor
                 gp_points = math.floor(gp_points)
                 # update great power score
