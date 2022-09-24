@@ -941,7 +941,7 @@ class CNC(commands.Cog):
         military_upkeep = userinfo['military_upkeep']
         public_services = userinfo['public_services']
         province_count = await conn.fetchrow('''SELECT count(*) FROM provinces 
-        WHERE owner_id = $1;''', ctx.author.id)
+        WHERE owner_id = $1 and occupier_id = $1;''', ctx.author.id)
         province_count = province_count['count']
         modifiers = await conn.fetchrow('''SELECT * FROM cnc_modifiers WHERE user_id = $1;''', ctx.author.id)
         # add national Unrest
@@ -5075,12 +5075,15 @@ class CNC(commands.Cog):
                     public_service_unrest = round(30 - public_services * 2)
                 else:
                     public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
+                provinces_owned_and_occupied = await conn.fetchrow('''SELECT count(*) FROM provinces 
+                WHERE owner_id = $1 ADN occupier_id = $1;''')
+                province_oo_count = provinces_owned_and_occupied['count']
                 if userinfo['great_power'] is False:
-                    if len(provinces) > 50:
-                        national_unrest += math.ceil(10 * (1 + 1) ** (((len(provinces) - 50) / 5) - 1))
+                    if len(province_oo_count) > 50:
+                        national_unrest += math.ceil(10 * (1 + 1) ** (((len(province_oo_count) - 50) / 5) - 1))
                 else:
-                    if len(provinces) > 75:
-                        national_unrest += math.ceil(10 * (1 + 1) ** (((len(provinces) - 75) / 5) - 1))
+                    if len(province_oo_count) > 75:
+                        national_unrest += math.ceil(10 * (1 + 1) ** (((len(province_oo_count) - 75) / 5) - 1))
                 # add national unrest suppression modifier
                 public_service_unrest *= modifiers['national_unrest_suppression_efficiency_mod']
                 # add unrest and cap or floor
