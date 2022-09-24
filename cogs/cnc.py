@@ -941,7 +941,7 @@ class CNC(commands.Cog):
         military_upkeep = userinfo['military_upkeep']
         public_services = userinfo['public_services']
         province_count = await conn.fetchrow('''SELECT count(*) FROM provinces 
-        WHERE occupier_id = $1 and owner_id = $1;''', ctx.author.id)
+        WHERE owner_id = $1;''', ctx.author.id)
         province_count = province_count['count']
         modifiers = await conn.fetchrow('''SELECT * FROM cnc_modifiers WHERE user_id = $1;''', ctx.author.id)
         # add national Unrest
