@@ -65,7 +65,7 @@ class Technology:
         # set prerequisites
         required_tech = tech['prerequisites']
         # split the all and some requirement
-        all_required = required_tech.split(',')
+        all_required = required_tech.split(', ')
         some_required = required_tech.split('/')
         # if there are some required and not all
         if len(some_required) >= 2:
