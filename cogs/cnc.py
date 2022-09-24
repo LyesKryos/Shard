@@ -2632,6 +2632,8 @@ class CNC(commands.Cog):
                 return
             if userinfo['focus'] == "e":
                 pcost = math.ceil(15000 * uniform(.89, .99))
+            if "Construction" in userinfo['researched']:
+                pcost *= .95
             if userinfo['resources'] < pcost:
                 difference = pcost - userinfo['resources']
                 await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a port."
@@ -2654,6 +2656,8 @@ class CNC(commands.Cog):
             if "Cities" not in userinfo['researched']:
                 await ctx.send("Constructing a city requires the Cities technology.")
             ccost = 30000
+            if "Construction" in userinfo['researched']:
+                ccost *= .95
             if userinfo['resources'] < ccost:
                 difference = ccost - userinfo['resources']
                 await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a city."
@@ -2682,6 +2686,8 @@ class CNC(commands.Cog):
             fcost = 12500
             if userinfo['focus'] == "s":
                 fcost = math.ceil(12500 * uniform(.89, .99))
+            if "Construction" in userinfo['researched']:
+                fcost *= .95
             if userinfo['resources'] < fcost:
                 difference = fcost - userinfo['resources']
                 await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a fort."
@@ -2710,6 +2716,8 @@ class CNC(commands.Cog):
             cost = 20000
             if userinfo['focus'] == "e":
                 cost = math.ceil(20000 * uniform(.89, .99))
+            if "Construction" in userinfo['researched']:
+                cost *= .95
             if userinfo['resources'] < cost:
                 difference = cost - userinfo['resources']
                 await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a workshop."
@@ -2735,6 +2743,8 @@ class CNC(commands.Cog):
             cost = 10000
             if userinfo['focus'] == "s":
                 cost = math.ceil(10000 * uniform(.89, .99))
+            if "Construction" in userinfo['researched']:
+                cost *= .95
             if userinfo['resources'] < cost:
                 difference = cost - userinfo['resources']
                 await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a temple."
@@ -2757,8 +2767,11 @@ class CNC(commands.Cog):
             if userinfo['capital'] != 0:
                 await ctx.send(f"{userinfo['username']} already has a capital in Province #{userinfo['capital']}.")
                 return
-            if userinfo['resources'] < 50000:
-                difference = 50000 - userinfo['resources']
+            cost = 50000
+            if "Construction" in userinfo['researched']:
+                cost *= .95
+            if userinfo['resources'] < cost:
+                difference = cost - userinfo['resources']
                 await ctx.send(f"{userinfo['username']} does not have enough credit resources to build a capital."
                                f"\n**Resource Deficit:** \u03FE{math.ceil(difference)}")
                 return
@@ -2766,7 +2779,7 @@ class CNC(commands.Cog):
                 await ctx.send("A capital can only be built in a province with an existing city.")
                 return
             await conn.execute('''UPDATE cncusers SET capital = $1, resources = resources - $2 WHERE user_id = $3;''',
-                               provinceid, 50000, author.id)
+                               provinceid, cost, author.id)
             await ctx.send(f"{userinfo['username']} successfully constructed a capital in province # {provinceid}.")
             return
         if structure.lower() == 'move_capital':

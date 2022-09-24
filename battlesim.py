@@ -206,6 +206,8 @@ class calculations:
             crossingfee = math.ceil(self.attacking_army * .50)
             if userinfo['focus'] == 'm':
                 crossingfee = math.ceil(self.attacking_army * .40)
+            if 'Navigation' in userinfo['researched']:
+                crossingfee *= .75
             if crossingfee > userinfo['resources']:
                 await self.ctx.send(
                     f"{userinfo['username']} does not have enough resources to cross with "

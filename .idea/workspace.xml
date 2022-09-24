@@ -49,21 +49,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="49955000" />
-    </task>
-    <task id="LOCAL-00044" summary="Fixing turn loop">
-      <created>1663500929550</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1663500929550</updated>
-    </task>
-    <task id="LOCAL-00045" summary="Fixing battlesim.py">
-      <created>1663501691821</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1663501691821</updated>
+      <workItem from="1663445529962" duration="50732000" />
     </task>
     <task id="LOCAL-00046" summary="Fixing battlesim.py and cnc_events.py">
       <created>1663539325202</created>
@@ -394,7 +380,21 @@
       <option name="project" value="LOCAL" />
       <updated>1664036753084</updated>
     </task>
-    <option name="localTasksCounter" value="93" />
+    <task id="LOCAL-00093" summary="Fixing turnloop">
+      <created>1664037566523</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1664037566523</updated>
+    </task>
+    <task id="LOCAL-00094" summary="Fixing turnloop">
+      <created>1664037688816</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1664037688816</updated>
+    </task>
+    <option name="localTasksCounter" value="95" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
