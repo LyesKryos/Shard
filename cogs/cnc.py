@@ -4895,7 +4895,7 @@ class CNC(commands.Cog):
                 public_services = userinfo['public_services']
                 research_budget = userinfo['research_budget']
                 tax_gain = manpower * (taxation / 100)
-                tax_gain -= ((military_upkeep / 100) * total_troops) +\
+                tax_gain -= ((military_upkeep / 100) * total_troops) + \
                             ((public_services / 100) * (manpower * 0.1)) + (research_budget / 100)
                 credits_added += tax_gain
                 # establish initial trade access
@@ -5076,7 +5076,7 @@ class CNC(commands.Cog):
                 else:
                     public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
                 provinces_owned_and_occupied = await conn.fetchrow('''SELECT count(*) FROM provinces 
-                WHERE owner_id = $1 AND occupier_id = $1;''')
+                WHERE owner_id = $1 AND occupier_id = $1;''', u)
                 province_oo_count = provinces_owned_and_occupied['count']
                 if userinfo['great_power'] is False:
                     if len(province_oo_count) > 50:
@@ -5583,7 +5583,7 @@ class CNC(commands.Cog):
                 else:
                     public_service_unrest = -round((3 * (1 + 0.75) ** ((public_services - 23) / 5) - 1))
                 provinces_owned_and_occupied = await conn.fetchrow('''SELECT count(*) FROM provinces 
-                WHERE owner_id = $1 AND occupier_id = $1;''')
+                WHERE owner_id = $1 AND occupier_id = $1;''', u)
                 province_oo_count = provinces_owned_and_occupied['count']
                 if userinfo['great_power'] is False:
                     if len(province_oo_count) > 50:
