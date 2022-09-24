@@ -2118,12 +2118,11 @@ class CNC(commands.Cog):
     # ---------------------Resource and Recruit Commands------------------------------
 
     @commands.command(usage="<nation name>", aliases=['cncb'], brief="Displays information about a nation's income")
-    async def cnc_bank(self, ctx, *, args):
+    async def cnc_bank(self, ctx, *, args = None):
         author = ctx.author
         conn = self.bot.pool
-        if args == '':
+        if args is None:
             # if the nationame is left blank, the author id is used to find the nation information
-            authorid = ctx.author.id
             userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
             if userinfo is None:
                 await ctx.send("You are not registered.")

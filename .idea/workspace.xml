@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing cnc_bank">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing cnc_research.py with prerequisites">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,14 +52,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="45877000" />
-    </task>
-    <task id="LOCAL-00039" summary="Fixing cnc_transfer and map issue">
-      <created>1663419510357</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1663419510357</updated>
+      <workItem from="1663445529962" duration="46888000" />
     </task>
     <task id="LOCAL-00040" summary="Fixing trade map">
       <created>1663420621213</created>
@@ -396,7 +390,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663887797288</updated>
     </task>
-    <option name="localTasksCounter" value="88" />
+    <task id="LOCAL-00088" summary="Fixing cnc_research.py with prerequisites">
+      <created>1663989509389</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1663989509389</updated>
+    </task>
+    <option name="localTasksCounter" value="89" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -414,7 +415,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing userinputerror for cnc_treaty&#10;Adding national unrest calculation" />
     <MESSAGE value="Fixing" />
     <MESSAGE value="Fixing cnc_events.py" />
     <MESSAGE value="Altering the cncdv display" />
@@ -439,7 +439,8 @@
     <MESSAGE value="Flooring research at 1 turn" />
     <MESSAGE value="Fixing total troops calculation" />
     <MESSAGE value="Fixing cnc_bank" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing cnc_bank" />
+    <MESSAGE value="Fixing cnc_research.py with prerequisites" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing cnc_research.py with prerequisites" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
