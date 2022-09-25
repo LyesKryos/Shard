@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing turnloop" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating some commands with tech modifiers">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -49,14 +52,7 @@
       <workItem from="1662984985073" duration="12615000" />
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
-      <workItem from="1663445529962" duration="50732000" />
-    </task>
-    <task id="LOCAL-00046" summary="Fixing battlesim.py and cnc_events.py">
-      <created>1663539325202</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1663539325202</updated>
+      <workItem from="1663445529962" duration="52024000" />
     </task>
     <task id="LOCAL-00047" summary="Fixing battlesim.py">
       <created>1663541278592</created>
@@ -394,7 +390,14 @@
       <option name="project" value="LOCAL" />
       <updated>1664037688816</updated>
     </task>
-    <option name="localTasksCounter" value="95" />
+    <task id="LOCAL-00095" summary="Updating some commands with tech modifiers">
+      <created>1664041883869</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1664041883869</updated>
+    </task>
+    <option name="localTasksCounter" value="96" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -412,7 +415,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updating force_turn" />
     <MESSAGE value="Fixing cnc_release" />
     <MESSAGE value="Fixing cnc_bank viewing other players" />
     <MESSAGE value="Adding mass_deploy_coastal" />
@@ -437,7 +439,8 @@
     <MESSAGE value="Fixing cncus" />
     <MESSAGE value="Fixing unrest to calculate overextension only on owned and occupied provinces" />
     <MESSAGE value="Fixing turnloop" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing turnloop" />
+    <MESSAGE value="Updating some commands with tech modifiers" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updating some commands with tech modifiers" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

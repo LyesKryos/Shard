@@ -985,26 +985,22 @@ class CNC(commands.Cog):
         loop = asyncio.get_running_loop()
         # connects to the database
         conn = self.bot.pool
-        # grabs user information
-        users = await conn.fetch('''SELECT username FROM cncusers;''')
-        # makes a list of users
-        userlist = list()
-        for user in users:
-            userlist.append(user["username"].lower())
-        # checks to see if the nation is registered
-        if nationname.lower() not in userlist:
-            await ctx.send(f"The user `{nationname}` does not appear to be registered.")
-            return
-        # grabs all nation information
-        nationamesave = await conn.fetchrow('''SELECT username FROM cncusers WHERE lower(username) = $1;''',
-                                            nationname.lower())
         # grabs the user id
         user_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
                                         nationname.lower())
+        if user_info is None:
+            await ctx.send(f"`{nationname}` not registered.")
+            return
         # deletes the user and sends them a DM with the notification
         await conn.execute('''DELETE FROM cncusers WHERE lower(username) = $1;''', nationname.lower())
+        await conn.execute('''DELETE FROM interactions WHERE recipient_id = $1 or sender_id = $1;''',
+                           user_info['user_id'])
+        await conn.execute('''DELETE FROM pending_interactions WHERE recipient_id = $1 or sender_id = $1;''',
+                           user_info['user_id'])
+        await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user_info['user_id'])
+
         # updates province and map information
-        provinces_owned = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1 and occupier_id = $1;''',
+        provinces_owned = await conn.fetch('''SELECT * FROM provinces WHERE owner_id = $1;''',
                                            user_info['user_id'])
         if provinces_owned is None:
             provinces_owned = 0
@@ -2128,7 +2124,7 @@ class CNC(commands.Cog):
                 await ctx.send("You are not registered.")
                 return
         else:
-            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', args)
+            userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''', args.lower())
             if userinfo is None:
                 await ctx.send(f"`{args}` is not registered.")
                 return
