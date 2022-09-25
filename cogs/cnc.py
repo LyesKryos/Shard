@@ -5358,7 +5358,7 @@ class CNC(commands.Cog):
                     await conn.execute('''UPDATE cncusers SET great_power = True WHERE user_id = $1;''', userid)
             # update research turns and researched techs
             await conn.execute('''UPDATE cnc_researching SET turns = turns - 1;''')
-            researched = await conn.fetch('''SELECT * FROM cnc_researching WHERE turns <= 0;''')
+            researched = await conn.fetch('''SELECT * FROM cnc_researching WHERE turns < 1;''')
             for r in researched:
                 await conn.execute('''UPDATE cncusers SET researched = researched || $1 WHERE user_id = $2;''',
                                    [str(r['tech'])], r['user_id'])
