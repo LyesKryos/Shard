@@ -212,7 +212,7 @@ class calculations:
                 await self.ctx.send(
                     f"{userinfo['username']} does not have enough resources to cross with "
                     f"{self.attacking_army} troops!\n"
-                    f"**Resources Required:** \u03FE{math.ceil(self.attacking_army * .05)}")
+                    f"**Resources Required:** \u03FE{crossingfee}")
                 return
             if stationed_info['port'] is True:
                 crossingfee *= .5
