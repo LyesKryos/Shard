@@ -2114,7 +2114,7 @@ class CNC(commands.Cog):
     # ---------------------Resource and Recruit Commands------------------------------
 
     @commands.command(usage="<nation name>", aliases=['cncb'], brief="Displays information about a nation's income")
-    async def cnc_bank(self, ctx, *, args = None):
+    async def cnc_bank(self, ctx, *, args=None):
         author = ctx.author
         conn = self.bot.pool
         if args is None:
@@ -2329,7 +2329,7 @@ class CNC(commands.Cog):
                                author.id)
             await ctx.send(
                 f"{nationname} has recruited {ramount * 1000:,} troops to their recruitment pool. "
-                f"\u03FE{cost} have been spent.")
+                f"\u03FE{int(cost):,} have been spent.")
             return
         else:
             # fetches all province ids and makes them into a list
@@ -2352,7 +2352,7 @@ class CNC(commands.Cog):
         await conn.execute('''UPDATE cncusers SET resources = $1 WHERE user_id = $2;''', (monies - cost),
                            author.id)
         await ctx.send(f"{nationname} has successfully deployed {ramount * 1000:,} to Province #{location}. "
-                       f"\u03FE{cost} have been spent.")
+                       f"\u03FE{int(cost):,} have been spent.")
 
     @commands.command(usage="[battalion amount]", brief="Recruits a number of battalions in all controlled provinces")
     @commands.guild_only()
@@ -2384,6 +2384,13 @@ class CNC(commands.Cog):
         # checks if the focus is military
         if userinfo['focus'] == "m":
             cost = round(cost * uniform(.89, .99))
+        # apply military upkeep buffs
+        if userinfo['military_upkeep'] >= 10:
+            cost_reduction = (userinfo['military_upkeep'] - 10) / 100
+            cost *= 1 - cost_reduction
+        else:
+            cost_increase = (userinfo['military_upkeep'] - 10) / 100
+            cost *= 1 + cost_increase
         # checks for enough resources
         if userinfo['resources'] < cost:
             await ctx.send(
@@ -2403,7 +2410,8 @@ class CNC(commands.Cog):
                                (troops['troops'] + amount),
                                p)
         await ctx.send(
-            f"{userinfo['username']} has succssfully deployed {amount} troops to all {len(provinces_owned)} provinces.")
+            f"{userinfo['username']} has succssfully deployed {amount} troops to all {len(provinces_owned)} provinces."
+            f"\u03FE{int(cost):,} have been spent.")
 
     @commands.command(usage="[troop amount]", brief="Disbands a specified number of undeployed troops.")
     @commands.guild_only()
@@ -2487,13 +2495,21 @@ class CNC(commands.Cog):
         # fetch recipient info and check existence
         recip_info = await conn.fetchrow('''SELECT * FROM cncusers WHERE lower(username) = $1;''',
                                          recipient.lower())
+        recip_modifiers = await conn.fetchrow('''SELECT * FROM cnc_modifiers WHERE user_id = $1;''',
+                                              recip_info['user_id'])
         if recip_info is None:
-            await ctx.send(f"{recipient} does not appear to be registered.")
+            await ctx.send(f"`{recipient}` is not registered.")
             return
         # check if the user has enough troops to send the expedition
         undeployed = userinfo['undeployed']
+        recip_deployed = await conn.fetchrow('''SELECT sum(troops) FROM provinces WHERE occupier_id = $1;''',
+                                             recip_info['user_id'])
         if amount > undeployed:
             await ctx.send(f"{userinfo['username']} does not have {amount} undeployed troops!")
+            return
+        if recip_modifiers['army_limit'] < (recip_info['undeployed'] + recip_deployed['sum'] + amount):
+            await ctx.send(f"{recip_info['username']} has a army limit of {recip_modifiers['army_limit']}. You cannot "
+                           f"send them more forces.")
             return
         # execute changes
         await conn.execute('''UPDATE cncusers SET undeployed = $1 WHERE user_id = $2;''',
