@@ -2089,7 +2089,7 @@ class CNC(commands.Cog):
             await ctx.send(f"You have a trade route offer already pending for {recip_info['username']}.")
             return
         war = await conn.fetch('''SELECT * FROM interactions 
-        WHERE (sender = $1 and recipient = $2) or (sender = $2 and recipient = $1) 
+        WHERE ((sender = $1 and recipient = $2) or (sender = $2 and recipient = $1)) 
         AND active = True AND type = 'war';''', userinfo['username'], recipient)
         if war is not None:
             await ctx.send("You cannot send a trade route to someone you are at war with!")
