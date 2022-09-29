@@ -2600,7 +2600,7 @@ class CNC(commands.Cog):
         # connects to the database
         conn = self.bot.pool
         # fetches user info
-        userinfo = await conn.fetchrow('''SELECT user_id FROM cncusers WHERE user_id = $1;''', author.id)
+        userinfo = await conn.fetchrow('''SELECT * FROM cncusers WHERE user_id = $1;''', author.id)
         if userinfo is None:
             await ctx.send(f"{author} not registered.")
             return
