@@ -1018,7 +1018,7 @@ class CNC(commands.Cog):
             reason = "Your registered Command and Conquest account has been terminated for an unlisted reason. " \
                      "If you have further questions, contact a moderator."
         await user.send(
-            f"Your registered Command and Conquer account, {nationamesave['username']}, "
+            f"Your registered Command and Conquer account, {user_info['username']}, "
             f"has been deleted by moderator {ctx.author} for the following reason:```{reason}```")
 
     @commands.command(usage="[item being edited (color, focus, name, pretitle)]",
@@ -2742,7 +2742,7 @@ class CNC(commands.Cog):
                 await ctx.send("Mountainous terrains are impossible to build on!")
                 return
             else:
-                await conn.execute('''UPDATE cncusers SET resources = resrouces - $1 WHERE user_id = $2;''',
+                await conn.execute('''UPDATE cncusers SET resources = resources - $1 WHERE user_id = $2;''',
                                    cost, userinfo['user_id'])
                 await conn.execute('''UPDATE provinces SET workshop = TRUE WHERE id = $1;''', provinceid)
                 await ctx.send(
@@ -2769,7 +2769,7 @@ class CNC(commands.Cog):
                 await ctx.send("Mountainous terrains are impossible to build on!")
                 return
             else:
-                await conn.execute('''UPDATE cncusers SET resources = resrouces - $1 WHERE user_id = $2;''',
+                await conn.execute('''UPDATE cncusers SET resources = resources - $1 WHERE user_id = $2;''',
                                    cost, userinfo['user_id'])
                 await conn.execute('''UPDATE provinces SET workshop = TRUE WHERE id = $1;''', provinceid)
                 await ctx.send(
