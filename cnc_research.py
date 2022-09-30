@@ -245,11 +245,11 @@ class Technology:
                 WHERE user_id = $1;''', userinfo['user_id'])
             if t == 'Philosophy':
                 await conn.execute('''UPDATE cnc_modifiers 
-                SET national_unrest_suppression_efficiency_mod = national_unrest_suppression_efficiency_mod + 0.25 
+                SET national_unrest_suppression_efficiency_mod = national_unrest_suppression_efficiency_mod + 0.05 
                 WHERE user_id = $1;''', userinfo['user_id'])
             if t == 'Religion':
                 await conn.execute('''UPDATE cnc_modifiers 
-                SET national_unrest_suppression_efficiency_mod = national_unrest_suppression_efficiency_mod + 0.25 
+                SET national_unrest_suppression_efficiency_mod = national_unrest_suppression_efficiency_mod + 0.05 
                 WHERE user_id = $1;''', userinfo['user_id'])
             if t == 'City Administration':
                 await conn.execute('''UPDATE cnc_modifiers SET tax_mod = tax_mod + 0.01 WHERE user_id = $1;''',
