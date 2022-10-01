@@ -1350,7 +1350,7 @@ class CNC(commands.Cog):
             structures.append('City')
         if province['workshop'] is True:
             structures.append('Workshop')
-            workshop_production += 1 * modifiers['workshop_efficiency_mod']
+            workshop_production += 1 * modifiers['workshop_production_mod']
         if province['temple'] is True:
             structures.append('Temple')
         structlist = ', '.join(s for s in structures)
