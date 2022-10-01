@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing cnc_research.py with proper unrest buffs">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing province production" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -52,21 +50,7 @@
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
-      <workItem from="1664469072638" duration="3842000" />
-    </task>
-    <task id="LOCAL-00054" summary="Fixing typo&#10;Fixing battlesim.py">
-      <created>1663614335068</created>
-      <option name="number" value="00054" />
-      <option name="presentableId" value="LOCAL-00054" />
-      <option name="project" value="LOCAL" />
-      <updated>1663614335071</updated>
-    </task>
-    <task id="LOCAL-00055" summary="Fixing interactions file uploading">
-      <created>1663636691976</created>
-      <option name="number" value="00055" />
-      <option name="presentableId" value="LOCAL-00055" />
-      <option name="project" value="LOCAL" />
-      <updated>1663636691976</updated>
+      <workItem from="1664469072638" duration="4234000" />
     </task>
     <task id="LOCAL-00056" summary="Fixing userinputerror for cnc_treaty&#10;Adding national unrest calculation">
       <created>1663686748463</created>
@@ -397,7 +381,21 @@
       <option name="project" value="LOCAL" />
       <updated>1664573284767</updated>
     </task>
-    <option name="localTasksCounter" value="103" />
+    <task id="LOCAL-00103" summary="Fixing province production and structure output">
+      <created>1664646822129</created>
+      <option name="number" value="00103" />
+      <option name="presentableId" value="LOCAL-00103" />
+      <option name="project" value="LOCAL" />
+      <updated>1664646822129</updated>
+    </task>
+    <task id="LOCAL-00104" summary="Fixing province production">
+      <created>1664646928838</created>
+      <option name="number" value="00104" />
+      <option name="presentableId" value="LOCAL-00104" />
+      <option name="project" value="LOCAL" />
+      <updated>1664646928838</updated>
+    </task>
+    <option name="localTasksCounter" value="105" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -415,8 +413,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing cnc_peace" />
-    <MESSAGE value="Debugging national unrest" />
     <MESSAGE value="Fixing national unrest&#10;Altering public services and military upkeep to reflect &quot;need&quot; value" />
     <MESSAGE value="Altering public services and military upkeep to reflect &quot;need&quot; value&#10;Fixing max_manpower to calculate based off unoccupied provinces" />
     <MESSAGE value="Adding magnitude commas" />
@@ -440,7 +436,9 @@
     <MESSAGE value="Fixing construct" />
     <MESSAGE value="Fixing trade route" />
     <MESSAGE value="Fixing cnc_research.py with proper unrest buffs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing cnc_research.py with proper unrest buffs" />
+    <MESSAGE value="Fixing province production and structure output" />
+    <MESSAGE value="Fixing province production" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing province production" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
