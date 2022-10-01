@@ -1358,7 +1358,7 @@ class CNC(commands.Cog):
             structlist = "None"
         production = str(province['production'])
         if workshop_production > 0:
-            production += f"+ {workshop_production}"
+            production += f" + {int(workshop_production)}"
         # creates the embed object
         provinceembed = discord.Embed(title=f"{province['name']} (Province #{province['id']})", color=color)
         provinceembed.add_field(name="Terrain", value=terrain['name'] + riverstring)
