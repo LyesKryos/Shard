@@ -2225,7 +2225,7 @@ class CNC(commands.Cog):
                 workshops += 1
                 workshop_production += 1 * modifiers['workshop_production_mod']
             # add all production to the base province production
-            producing = p_info['production'] * (production_value + modifiers['production_mod'])
+            producing = p_info['production'] * (production_value + modifiers['production_mod'] + workshop_production)
             # calculate local trade good value and total gain
             trade_good = await conn.fetchrow('''SELECT * FROM trade_goods WHERE name = $1;''', p_info['value'])
             products.append(p_info['value'])
@@ -5159,7 +5159,7 @@ class CNC(commands.Cog):
                         workshop_production += 1 * modifiers['workshop_production_mod']
                         workshops_n_temples += 1
                     # add all production to the base province production
-                    producing = p_info['production'] * (production_value + modifiers['production_mod'])
+                    producing = p_info['production'] * (production_value + modifiers['production_mod'] + workshop_production)
                     # calculate local trade good value and total gain
                     trade_good = await conn.fetchrow('''SELECT * FROM trade_goods WHERE name = $1;''', p_info['value'])
                     credits_added += (((trade_good['market_value'] +
