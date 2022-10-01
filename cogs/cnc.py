@@ -1332,6 +1332,8 @@ class CNC(commands.Cog):
         bordering = ', '.join(str(b) for b in borderinglist)
         # gets the color set
         color = discord.Color(int(terrain["color"].lstrip('#'), 16))
+        # gets modifiers
+        modifiers = await conn.fetchrow('''SELECT * FROM cnc_modifiers WHERE user_id = $1;''', province['owner_id'])
         # checks for river presence
         if province['river'] is not False:
             riverstring = ", River"
@@ -1339,15 +1341,24 @@ class CNC(commands.Cog):
             riverstring = ''
         # sets up the structures
         structures = []
+        workshop_production = 0
         if province['port'] is True:
             structures.append('Port')
         if province['fort'] is True:
             structures.append('Fort')
         if province['city'] is True:
             structures.append('City')
+        if province['workshop'] is True:
+            structures.append('Workshop')
+            workshop_production += 1 * modifiers['workshop_efficiency_mod']
+        if province['temple'] is True:
+            structures.append('Temple')
         structlist = ', '.join(s for s in structures)
         if len(structures) == 0:
             structlist = "None"
+        production = str(province['production'])
+        if workshop_production < 0:
+            production += f"+ {workshop_production}"
         # creates the embed object
         provinceembed = discord.Embed(title=f"{province['name']} (Province #{province['id']})", color=color)
         provinceembed.add_field(name="Terrain", value=terrain['name'] + riverstring)
@@ -1358,7 +1369,7 @@ class CNC(commands.Cog):
         provinceembed.add_field(name="Troops Present", value=f"{province['troops']:,}")
         provinceembed.add_field(name="Local Unrest", value=str(province['unrest']))
         provinceembed.add_field(name="Trade Good", value=province['value'])
-        provinceembed.add_field(name="Production", value=province['production'])
+        provinceembed.add_field(name="Production", value=production)
         provinceembed.add_field(name="Manpower", value=f"{province['manpower']:,}")
         provinceembed.set_thumbnail(url="https://i.ibb.co/gTpHmgq/Command-Conquest-symbol.png")
         # sets the proper coastline
