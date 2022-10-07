@@ -764,5 +764,5 @@ class Recruitment(commands.Cog):
 
 async def setup(bot):
     await bot.wait_until_ready()
-    await Recruitment.api_recruitment.start()
+    await Recruitment.api_recruitment.start(bot)
     await bot.add_cog(Recruitment(bot))
