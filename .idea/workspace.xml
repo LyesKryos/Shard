@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Trying fixing API startup">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -59,28 +60,7 @@
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
       <workItem from="1664469072638" duration="5067000" />
-      <workItem from="1665141589598" duration="5908000" />
-    </task>
-    <task id="LOCAL-00077" summary="Altering public services and military upkeep to reflect &quot;need&quot; value&#10;Fixing max_manpower to calculate based off unoccupied provinces">
-      <created>1663848819729</created>
-      <option name="number" value="00077" />
-      <option name="presentableId" value="LOCAL-00077" />
-      <option name="project" value="LOCAL" />
-      <updated>1663848819729</updated>
-    </task>
-    <task id="LOCAL-00078" summary="Adding magnitude commas">
-      <created>1663849208554</created>
-      <option name="number" value="00078" />
-      <option name="presentableId" value="LOCAL-00078" />
-      <option name="project" value="LOCAL" />
-      <updated>1663849208554</updated>
-    </task>
-    <task id="LOCAL-00079" summary="Fixing occupy_color">
-      <created>1663850078738</created>
-      <option name="number" value="00079" />
-      <option name="presentableId" value="LOCAL-00079" />
-      <option name="project" value="LOCAL" />
-      <updated>1663850078738</updated>
+      <workItem from="1665141589598" duration="6552000" />
     </task>
     <task id="LOCAL-00080" summary="Altering public services cost">
       <created>1663850474896</created>
@@ -404,7 +384,28 @@
       <option name="project" value="LOCAL" />
       <updated>1665154125932</updated>
     </task>
-    <option name="localTasksCounter" value="126" />
+    <task id="LOCAL-00126" summary="Trying fixing API startup">
+      <created>1665154548320</created>
+      <option name="number" value="00126" />
+      <option name="presentableId" value="LOCAL-00126" />
+      <option name="project" value="LOCAL" />
+      <updated>1665154548320</updated>
+    </task>
+    <task id="LOCAL-00127" summary="Trying fixing API startup">
+      <created>1665154599609</created>
+      <option name="number" value="00127" />
+      <option name="presentableId" value="LOCAL-00127" />
+      <option name="project" value="LOCAL" />
+      <updated>1665154599609</updated>
+    </task>
+    <task id="LOCAL-00128" summary="Trying fixing API startup">
+      <created>1665154648428</created>
+      <option name="number" value="00128" />
+      <option name="presentableId" value="LOCAL-00128" />
+      <option name="project" value="LOCAL" />
+      <updated>1665154648428</updated>
+    </task>
+    <option name="localTasksCounter" value="129" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
