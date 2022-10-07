@@ -208,7 +208,7 @@ class Recruitment(commands.Cog):
             except Exception as error:
                 error_log(error)
 
-        @tasks.loop(seconds=180)
+        @tasks.loop(seconds=10)
         async def api_recruitment():
             try:
                 headers = {'User-Agent': 'Bassiliya'}
@@ -252,6 +252,7 @@ class Recruitment(commands.Cog):
                                 self.api_recruitment.cancel()
                                 raise Exception(f"API received faulty response code: "
                                                 f"{api_send.status}\n{api_send.text}")
+                        await asyncio.sleep(180)
                         api_send.close()
             except Exception as error:
                 error_log(error)
