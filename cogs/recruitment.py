@@ -258,7 +258,7 @@ class Recruitment(commands.Cog):
         self.monthly_loop = loop.create_task(monthly_recruiter_scheduler(bot))
         self.retention_loop = loop.create_task(retention(bot))
         self.world_assembly_notification_loop = loop.create_task(world_assembly_notification(bot))
-        self.api_recruitment = loop.create_task(api_recruitment())
+        # self.api_recruitment = loop.create_task(api_recruitment())
 
 
     def sanitize_links_percent(self, url: str) -> str:
@@ -275,7 +275,7 @@ class Recruitment(commands.Cog):
         self.retention_loop.cancel()
         self.monthly_loop.cancel()
         self.world_assembly_notification_loop.cancel()
-        self.api_recruitment.cancel()
+        # self.api_recruitment.cancel()
 
     # cog variables
     do_not_recruit = list()
