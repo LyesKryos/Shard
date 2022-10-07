@@ -207,8 +207,6 @@ class Recruitment(commands.Cog):
                         continue
             except Exception as error:
                 error_log(error)
-
-        @tasks.loop(seconds=10)
         async def api_recruitment():
             try:
                 headers = {'User-Agent': 'Bassiliya'}
@@ -239,7 +237,6 @@ class Recruitment(commands.Cog):
                     params.update({'to': sending_to})
                     async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?a=sendTG',
                                            headers=headers, params=params) as api_send:
-                        await asyncio.sleep(.6)
                         if api_send.status != 200:
                             crash_channel = self.bot.get_channel(835579413625569322)
                             if api_send.status == 429:
@@ -249,7 +246,6 @@ class Recruitment(commands.Cog):
                                                          f" seconds. Attempted to send to `{sending_to}`.")
                             else:
                                 await crash_channel.send("API telegram sending error.")
-                                self.api_recruitment.cancel()
                                 raise Exception(f"API received faulty response code: "
                                                 f"{api_send.status}\n{api_send.text}")
                         await asyncio.sleep(180)
@@ -262,8 +258,7 @@ class Recruitment(commands.Cog):
         self.monthly_loop = loop.create_task(monthly_recruiter_scheduler(bot))
         self.retention_loop = loop.create_task(retention(bot))
         self.world_assembly_notification_loop = loop.create_task(world_assembly_notification(bot))
-        self.api_recruitment = api_recruitment
-        self.api_recruitment.start()
+        self.api_recruitment = loop.create_task(api_recruitment())
 
 
     def sanitize_links_percent(self, url: str) -> str:
@@ -509,21 +504,11 @@ class Recruitment(commands.Cog):
             await ctx.send("WA notification running.")
         elif not self.world_assembly_notification_loop:
             await ctx.send("WA notification not running.")
-        if self.api_recruitment.is_running():
+        if self.api_recruitment:
             await ctx.send("API running.")
-        elif not self.api_recruitment.is_running():
+        elif not self.api_recruitment:
             await ctx.send("API not running.")
 
-    @commands.command(brief="Starts the API recruitment loop.")
-    @commands.is_owner()
-    async def api_start(self, ctx):
-        # starts API loop
-        await self.api_recruitment.start()
-        await asyncio.sleep(3)
-        if self.api_recruitment.is_running():
-            await ctx.send("API loop running!")
-        else:
-            await ctx.send("API loop failed to start.")
 
     @commands.command(brief="Stops the API recruitment loop.")
     @commands.is_owner()
@@ -531,7 +516,7 @@ class Recruitment(commands.Cog):
         # stops API loop
         self.api_recruitment.cancel()
         await asyncio.sleep(3)
-        if self.api_recruitment.is_running():
+        if self.api_recruitment:
             await ctx.send("API loop is still running!")
         else:
             await ctx.send("API loop cancelled.")
@@ -795,5 +780,4 @@ class Recruitment(commands.Cog):
 
 async def setup(bot):
     await bot.wait_until_ready()
-
     await bot.add_cog(Recruitment(bot))
