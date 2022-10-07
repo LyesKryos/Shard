@@ -245,6 +245,7 @@ class Recruitment(commands.Cog):
                             await crash_channel.send("API telegram sending error.")
                             raise Exception(f"API received faulty response code: {api_send.status}\n{api_send.text}")
                         api_send.close()
+                        return
             except Exception as error:
                 error_log(error)
 
