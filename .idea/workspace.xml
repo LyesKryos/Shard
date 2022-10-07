@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Trying fixing API loop time" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Trying fixing API startup">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -57,21 +60,7 @@
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
       <workItem from="1664469072638" duration="5067000" />
-      <workItem from="1665141589598" duration="4942000" />
-    </task>
-    <task id="LOCAL-00073" summary="Fixing cnc_peace">
-      <created>1663793472867</created>
-      <option name="number" value="00073" />
-      <option name="presentableId" value="LOCAL-00073" />
-      <option name="project" value="LOCAL" />
-      <updated>1663793472867</updated>
-    </task>
-    <task id="LOCAL-00074" summary="Fixing cnc_peace">
-      <created>1663794043564</created>
-      <option name="number" value="00074" />
-      <option name="presentableId" value="LOCAL-00074" />
-      <option name="project" value="LOCAL" />
-      <updated>1663794043564</updated>
+      <workItem from="1665141589598" duration="5601000" />
     </task>
     <task id="LOCAL-00075" summary="Debugging national unrest">
       <created>1663795770836</created>
@@ -402,7 +391,21 @@
       <option name="project" value="LOCAL" />
       <updated>1665153408441</updated>
     </task>
-    <option name="localTasksCounter" value="122" />
+    <task id="LOCAL-00122" summary="Trying fixing API startup">
+      <created>1665153551378</created>
+      <option name="number" value="00122" />
+      <option name="presentableId" value="LOCAL-00122" />
+      <option name="project" value="LOCAL" />
+      <updated>1665153551378</updated>
+    </task>
+    <task id="LOCAL-00123" summary="Trying fixing API startup">
+      <created>1665153769546</created>
+      <option name="number" value="00123" />
+      <option name="presentableId" value="LOCAL-00123" />
+      <option name="project" value="LOCAL" />
+      <updated>1665153769546</updated>
+    </task>
+    <option name="localTasksCounter" value="124" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -420,7 +423,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding max_concurrency &#10;Balancing max_manpower" />
     <MESSAGE value="Fixing turn resources" />
     <MESSAGE value="Fixing turn resources&#10;Fixing cnc_market and cnc_production" />
     <MESSAGE value="Flooring research at 1 turn" />
@@ -445,7 +447,8 @@
     <MESSAGE value="Trying to fix recruitment cron issues" />
     <MESSAGE value="Trying to fix api recruitment" />
     <MESSAGE value="Trying fixing API loop time" />
-    <option name="LAST_COMMIT_MESSAGE" value="Trying fixing API loop time" />
+    <MESSAGE value="Trying fixing API startup" />
+    <option name="LAST_COMMIT_MESSAGE" value="Trying fixing API startup" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
