@@ -245,7 +245,7 @@ class Recruitment(commands.Cog):
                             await crash_channel.send("API telegram sending error.")
                             if api_send.status == 429:
                                 retry_after = api_send.headers
-                                await crash_channel.send(retry_after['X-Retry-After'])
+                                await crash_channel.send(retry_after['Retry-After'])
                             raise Exception(f"API received faulty response code: {api_send.status}\n{api_send.text}")
                         api_send.close()
                         return
