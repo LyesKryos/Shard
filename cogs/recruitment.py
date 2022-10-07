@@ -241,7 +241,7 @@ class Recruitment(commands.Cog):
         self.api_recruitment = api_recruitment
         self.api_recruitment.start()
         shard_channel = self.bot.get_channel(835579413625569322)
-        asyncio.run(shard_channel.send("API starting up."))
+        bot.loop.run_until_complete(shard_channel.send("API starting up."))
 
 
     def sanitize_links_percent(self, url: str) -> str:
