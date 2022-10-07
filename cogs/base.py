@@ -107,8 +107,8 @@ class BaseCommands(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def input_error(self, ctx, *, args):
-        raise commands.UserInputError
+    async def error(self, ctx):
+        raise Exception("Custom error.")
 
     @commands.command()
     @commands.is_owner()
