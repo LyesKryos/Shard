@@ -243,6 +243,9 @@ class Recruitment(commands.Cog):
                         if api_send.status != 200:
                             crash_channel = self.bot.get_channel(835579413625569322)
                             await crash_channel.send("API telegram sending error.")
+                            if api_send.status == 429:
+                                retry_after = api_send.json()
+                                await crash_channel.send(retry_after)
                             raise Exception(f"API received faulty response code: {api_send.status}\n{api_send.text}")
                         api_send.close()
                         return
@@ -507,6 +510,7 @@ class Recruitment(commands.Cog):
     async def api_start(self, ctx):
         # starts API loop
         await self.api_recruitment.start()
+        await asyncio.sleep(3)
         if self.api_recruitment.is_running():
             await ctx.send("API loop running!")
         else:
@@ -517,6 +521,7 @@ class Recruitment(commands.Cog):
     async def api_stop(self, ctx):
         # stops API loop
         self.api_recruitment.cancel()
+        await asyncio.sleep(3)
         if self.api_recruitment.is_running():
             await ctx.send("API loop is still running!")
         else:
