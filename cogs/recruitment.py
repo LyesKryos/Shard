@@ -208,6 +208,7 @@ class Recruitment(commands.Cog):
         self.retention_loop.cancel()
         self.monthly_loop.cancel()
         self.world_assembly_notification_loop.cancel()
+        self.api_recruitment.cancel()
         # self.api_loop.cancel()
 
     # cog variables
