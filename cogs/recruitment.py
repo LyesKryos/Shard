@@ -246,7 +246,7 @@ class Recruitment(commands.Cog):
                                 retry_after = api_send.headers
                                 await asyncio.sleep(int(retry_after['Retry-After']))
                                 await crash_channel.send(f"API too fast! Retrying after {retry_after['Retry-After']}"
-                                                         f"seconds.")
+                                                         f" seconds.")
                             else:
                                 await crash_channel.send("API telegram sending error.")
                                 self.api_recruitment.cancel()
@@ -507,6 +507,10 @@ class Recruitment(commands.Cog):
         if self.world_assembly_notification_loop:
             await ctx.send("WA notification running.")
         elif not self.world_assembly_notification_loop:
+            await ctx.send("WA notification not running.")
+        if self.api_recruitment.is_running():
+            await ctx.send("WA notification running.")
+        elif not self.api_recruitment.is_running():
             await ctx.send("WA notification not running.")
 
     @commands.command(brief="Starts the API recruitment loop.")
