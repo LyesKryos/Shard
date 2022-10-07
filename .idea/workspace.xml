@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Trying to fix recruitment cron issues" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Trying to fix api recruitment">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,6 +40,12 @@
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\cogs" />
+      <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard" />
+    </key>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -51,14 +60,7 @@
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
       <workItem from="1664469072638" duration="5067000" />
-      <workItem from="1665141589598" duration="4290000" />
-    </task>
-    <task id="LOCAL-00069" summary="Fixing battlesim.py">
-      <created>1663780829265</created>
-      <option name="number" value="00069" />
-      <option name="presentableId" value="LOCAL-00069" />
-      <option name="project" value="LOCAL" />
-      <updated>1663780829265</updated>
+      <workItem from="1665141589598" duration="4601000" />
     </task>
     <task id="LOCAL-00070" summary="Fixing peace interactions">
       <created>1663783352975</created>
@@ -396,7 +398,14 @@
       <option name="project" value="LOCAL" />
       <updated>1665152746567</updated>
     </task>
-    <option name="localTasksCounter" value="118" />
+    <task id="LOCAL-00118" summary="Trying to fix api recruitment">
+      <created>1665152993914</created>
+      <option name="number" value="00118" />
+      <option name="presentableId" value="LOCAL-00118" />
+      <option name="project" value="LOCAL" />
+      <updated>1665152993914</updated>
+    </task>
+    <option name="localTasksCounter" value="119" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -414,7 +423,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Altering public services cost" />
     <MESSAGE value="Updating cnc_edit color with occupation" />
     <MESSAGE value="Adding max_concurrency &#10;Balancing max_manpower" />
     <MESSAGE value="Fixing turn resources" />
@@ -439,7 +447,8 @@
     <MESSAGE value="Sprucing up the recruitment code&#10;Adding API telegramming" />
     <MESSAGE value="Adding API telegramming on reload/start" />
     <MESSAGE value="Trying to fix recruitment cron issues" />
-    <option name="LAST_COMMIT_MESSAGE" value="Trying to fix recruitment cron issues" />
+    <MESSAGE value="Trying to fix api recruitment" />
+    <option name="LAST_COMMIT_MESSAGE" value="Trying to fix api recruitment" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

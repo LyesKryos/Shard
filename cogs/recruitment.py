@@ -197,14 +197,12 @@ class Recruitment(commands.Cog):
                     await asyncio.sleep(300)
                     continue
 
-        @tasks.loop(seconds=10)
+        @tasks.loop(seconds=180)
         async def api_recruitment():
             headers = {'User-Agent': 'Bassiliya'}
             params = {'client': '85eb458e',
                       'tgid': '25352330',
                       'key': 'b777d3383626'}
-            shard_channel = self.bot.get_channel(835579413625569322)
-            await shard_channel.send("API starting up.")
             async with aiohttp.ClientSession() as session:
                 newnationsparams = {'q': 'newnations'}
                 async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
@@ -242,6 +240,9 @@ class Recruitment(commands.Cog):
         self.world_assembly_notification_loop = loop.create_task(world_assembly_notification(bot))
         self.api_recruitment = api_recruitment
         self.api_recruitment.start()
+        shard_channel = self.bot.get_channel(835579413625569322)
+        await shard_channel.send("API starting up.")
+
 
     def sanitize_links_percent(self, url: str) -> str:
         # sanitizes links with %s
