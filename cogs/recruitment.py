@@ -197,10 +197,51 @@ class Recruitment(commands.Cog):
                     await asyncio.sleep(300)
                     continue
 
+        @tasks.loop(seconds=10)
+        async def api_recruitment():
+            headers = {'User-Agent': 'Bassiliya'}
+            params = {'client': '85eb458e',
+                      'tgid': '25352330',
+                      'key': 'b777d3383626'}
+            shard_channel = self.bot.get_channel(835579413625569322)
+            await shard_channel.send("API starting up.")
+            async with aiohttp.ClientSession() as session:
+                newnationsparams = {'q': 'newnations'}
+                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                       headers=headers, params=newnationsparams) as nnresp:
+                    await asyncio.sleep(.6)
+                    newnationsraw = await nnresp.text()
+                    nnresp.close()
+                # after the list is called, the xml is parsed and the list is made
+                nnsoup = BeautifulSoup(newnationsraw, "lxml")
+                newnations_prefilter = set(nnsoup.newnations.string.split(","))
+                for nation in newnations_prefilter:
+                    # searches for numbers in names
+                    number_puppet = re.search("\d+", nation)
+                    # if there is a number, remove that nation and add it to the do not send list
+                    if number_puppet:
+                        self.do_not_recruit.append(nation)
+                # filters out any do not send to nations
+                newnations_post_filter = list(newnations_prefilter.difference(set(self.do_not_recruit)))
+                # grabs only the first nation to send a telegram to
+                newnation = newnations_post_filter[0]
+                sending_to = newnation
+                params.update({'to': sending_to})
+                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?a=sendTG',
+                                       headers=headers, params=params) as api_send:
+                    await asyncio.sleep(.6)
+                    if api_send.status != 200:
+                        crash_channel = self.bot.get_channel(835579413625569322)
+                        await crash_channel.send("API telegram sending error.")
+                        raise Exception(f"API received faulty response code: {api_send.status}")
+                    api_send.close()
+
         loop = bot.loop
         self.monthly_loop = loop.create_task(monthly_recruiter_scheduler(bot))
         self.retention_loop = loop.create_task(retention(bot))
         self.world_assembly_notification_loop = loop.create_task(world_assembly_notification(bot))
+        self.api_recruitment = api_recruitment
+        self.api_recruitment.start()
 
     def sanitize_links_percent(self, url: str) -> str:
         # sanitizes links with %s
@@ -445,45 +486,6 @@ class Recruitment(commands.Cog):
             await ctx.send("WA notification running.")
         elif not self.world_assembly_notification_loop:
             await ctx.send("WA notification not running.")
-
-    @tasks.loop(seconds=10)
-    async def api_recruitment(self):
-        headers = {'User-Agent': 'Bassiliya'}
-        params = {'client': '85eb458e',
-                  'tgid': '25352330',
-                  'key': 'b777d3383626'}
-        shard_channel = self.bot.get_channel(835579413625569322)
-        await shard_channel.send("API starting up.")
-        async with aiohttp.ClientSession() as session:
-            newnationsparams = {'q': 'newnations'}
-            async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                   headers=headers, params=newnationsparams) as nnresp:
-                await asyncio.sleep(.6)
-                newnationsraw = await nnresp.text()
-                nnresp.close()
-            # after the list is called, the xml is parsed and the list is made
-            nnsoup = BeautifulSoup(newnationsraw, "lxml")
-            newnations_prefilter = set(nnsoup.newnations.string.split(","))
-            for nation in newnations_prefilter:
-                # searches for numbers in names
-                number_puppet = re.search("\d+", nation)
-                # if there is a number, remove that nation and add it to the do not send list
-                if number_puppet:
-                    self.do_not_recruit.append(nation)
-            # filters out any do not send to nations
-            newnations_post_filter = list(newnations_prefilter.difference(set(self.do_not_recruit)))
-            # grabs only the first nation to send a telegram to
-            newnation = newnations_post_filter[0]
-            sending_to = newnation
-            params.update({'to': sending_to})
-            async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?a=sendTG',
-                                   headers=headers, params=params) as api_send:
-                await asyncio.sleep(.6)
-                if api_send.status != 200:
-                    crash_channel = self.bot.get_channel(835579413625569322)
-                    await crash_channel.send("API telegram sending error.")
-                    raise Exception(f"API received faulty response code: {api_send.status}")
-                api_send.close()
 
     @commands.command(brief="Starts the API recruitment loop.")
     @commands.is_owner()
@@ -764,5 +766,5 @@ class Recruitment(commands.Cog):
 
 async def setup(bot):
     await bot.wait_until_ready()
-    await Recruitment.api_recruitment.start(Shard)
+
     await bot.add_cog(Recruitment(bot))
