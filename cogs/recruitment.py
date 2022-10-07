@@ -32,7 +32,8 @@ class Recruitment(commands.Cog):
                 now = datetime.now(eastern)
                 next_month = now.month + 1
                 runtime = now.replace(day=1, month=next_month, hour=0, minute=0, second=0)
-                await crashchannel.send(f"Monthly recruiter next run: {runtime.strftime('%a, %d %b %Y at %H:%M:%S %Z%z')}")
+                await crashchannel.send(
+                    f"Monthly recruiter next run: {runtime.strftime('%a, %d %b %Y at %H:%M:%S %Z%z')}")
                 await discord.utils.sleep_until(runtime)
                 await monthly_recruiter(bot)
                 continue
@@ -41,41 +42,39 @@ class Recruitment(commands.Cog):
             await bot.wait_until_ready()
             # connects to database
             conn = bot.pool
-            try:
-                # fetches all user data
-                top_recruiter = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month DESC;''')
-                # finds the first entry and gathers user id, sent number, and sends the announcement message
-                top_recruiter_user = top_recruiter[0]['user_id']
-                top_recruiter_numbers = top_recruiter[0]['sent_this_month']
-                announcements = bot.get_channel(674602527333023747)
-                thegye = bot.get_guild(674259612580446230)
-                recruiter_of_the_month_role = thegye.get_role(813953181234626582)
-                for members in thegye.members:
-                    await members.remove_roles(recruiter_of_the_month_role)
-                user = thegye.get_member(top_recruiter_user)
-                await user.add_roles(recruiter_of_the_month_role)
-                monthly_total = 0
-                for s in top_recruiter:
-                    monthly_total += s['sent_this_month']
-                await recruiter_of_the_month_role.edit(color=discord.Color.light_grey(),
-                                                       name="Recruiter of the Month")
-                announce = await announcements.send(
-                    f"**Congratulations to {user.mention}!**\n{user.display_name} has earned the "
-                    f"distinction of being this month's top recruiter! This month, they have sent "
-                    f"{top_recruiter_numbers} telegrams to new players. Wow! {user.display_name} has "
-                    f"been awarded the {recruiter_of_the_month_role.mention} role, customizable by "
-                    f"request. Everyone give them a round of applause!\nIn total, {monthly_total:,} telegrams have been "
-                    f"sent by our wonderful recruiters this month!")
-                await announce.add_reaction("\U0001f44f")
-                # clears all sent_this_month
-                await conn.execute('''UPDATE recruitment SET sent_this_month = 0;''')
-                self.monthly_recruiter_notification = True
-                return
-            except Exception as error:
-                crashchannel = bot.get_channel(835579413625569322)
-                await crashchannel.send(error)
-                self.bot.logger.warning(error)
-                return
+            # fetches all user data
+            top_recruiter = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month DESC;''')
+            # finds the first entry and gathers user id, sent number, and sends the announcement message
+            top_recruiter_user = top_recruiter[0]['user_id']
+            top_recruiter_numbers = top_recruiter[0]['sent_this_month']
+            announcements = bot.get_channel(674602527333023747)
+            thegye = bot.get_guild(674259612580446230)
+            # adds the role to the user and removes it from any other user that previously had it
+            recruiter_of_the_month_role = thegye.get_role(813953181234626582)
+            for members in thegye.members:
+                await members.remove_roles(recruiter_of_the_month_role)
+            user = thegye.get_member(top_recruiter_user)
+            await user.add_roles(recruiter_of_the_month_role)
+            # calculates the monthly total for all recruitment telegrams
+            monthly_total = 0
+            for s in top_recruiter:
+                monthly_total += s['sent_this_month']
+            # resets the role
+            await recruiter_of_the_month_role.edit(color=discord.Color.light_grey(),
+                                                   name="Recruiter of the Month")
+            # send the announcement
+            announce = await announcements.send(
+                f"**Congratulations to {user.mention}!**\n{user.display_name} has earned the "
+                f"distinction of being this month's top recruiter! This month, they have sent "
+                f"{top_recruiter_numbers} telegrams to new players. Wow! {user.display_name} has "
+                f"been awarded the {recruiter_of_the_month_role.mention} role, customizable by "
+                f"request. Everyone give them a round of applause!\nIn total, {monthly_total:,} telegrams have been "
+                f"sent by our wonderful recruiters this month!")
+            await announce.add_reaction("\U0001f44f")
+            # clears all sent_this_month
+            await conn.execute('''UPDATE recruitment SET sent_this_month = 0;''')
+            self.monthly_recruiter_notification = True
+            return
 
         async def retention(bot):
             await bot.wait_until_ready()
@@ -136,12 +135,30 @@ class Recruitment(commands.Cog):
                 await crashchannel.send(f"`{error}` in retention module.")
 
         async def world_assembly_notification(bot):
-            try:
-                await bot.wait_until_ready()
-                wa_pings = bot.get_channel(676437972819640357)
-                thegye_server = bot.get_guild(674259612580446230)
-                wa_role = discord.utils.get(thegye_server.roles, id=674283915870994442)
-                async with aiohttp.ClientSession() as session:
+            await bot.wait_until_ready()
+            wa_pings = bot.get_channel(676437972819640357)
+            thegye_server = bot.get_guild(674259612580446230)
+            wa_role = discord.utils.get(thegye_server.roles, id=674283915870994442)
+            async with aiohttp.ClientSession() as session:
+                headers = {"User-Agent": "Bassiliya"}
+                params = {'q': 'nations',
+                          'region': 'thegye'}
+                waparams = {'wa': '1',
+                            'q': 'members'}
+                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                       headers=headers, params=params) as nationsresp:
+                    nations = await nationsresp.text()
+                    await asyncio.sleep(.6)
+                nationsoup = BeautifulSoup(nations, 'lxml')
+                nations = set(nationsoup.nations.text.split(':'))
+                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                       headers=headers, params=waparams) as membersresp:
+                    members = await membersresp.text()
+                    await asyncio.sleep(.6)
+                membersoup = BeautifulSoup(members, 'lxml')
+                members = set(membersoup.members.text.split(','))
+                Recruitment.all_wa = nations.intersection(members)
+                while True:
                     headers = {"User-Agent": "Bassiliya"}
                     params = {'q': 'nations',
                               'region': 'thegye'}
@@ -158,88 +175,24 @@ class Recruitment(commands.Cog):
                         members = await membersresp.text()
                         await asyncio.sleep(.6)
                     membersoup = BeautifulSoup(members, 'lxml')
-                    members = set(membersoup.members.text.split(','))
-                    Recruitment.all_wa = nations.intersection(members)
-                    while True:
-                        if bot.db_error is True:
-                            continue
-                        headers = {"User-Agent": "Bassiliya"}
-                        params = {'q': 'nations',
-                                  'region': 'thegye'}
-                        waparams = {'wa': '1',
-                                    'q': 'members'}
-                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                               headers=headers, params=params) as nationsresp:
-                            nations = await nationsresp.text()
-                            await asyncio.sleep(.6)
-                        nationsoup = BeautifulSoup(nations, 'lxml')
-                        nations = set(nationsoup.nations.text.split(':'))
-                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                               headers=headers, params=waparams) as membersresp:
-                            members = await membersresp.text()
-                            await asyncio.sleep(.6)
-                        membersoup = BeautifulSoup(members, 'lxml')
-                        members = nations.intersection(set(membersoup.members.text.split(',')))
-                        Recruitment.new_wa = members.difference(Recruitment.all_wa)
-                        if Recruitment.new_wa:
-                            for n in Recruitment.new_wa:
-                                wa_notif = await wa_pings.send(f"New World Assembly nation, {wa_role.mention}!"
-                                                               f"\nPlease endorse: https://www.nationstates.net/nation={n}.")
-                                await wa_notif.add_reaction("\U0001f310")
-                        Recruitment.all_wa = members
-                        await asyncio.sleep(300)
+                    members = nations.intersection(set(membersoup.members.text.split(',')))
+                    Recruitment.new_wa = members.difference(Recruitment.all_wa)
+                    if len(members) == len(Recruitment.new_wa):
+                        await asyncio.sleep(30)
                         continue
-            except Exception as error:
-                self.bot.logger.warning(msg=error)
-
-        async def api_recruitment(bot):
-            try:
-                await bot.wait_until_ready()
-                headers = {'User-Agent': 'Bassiliya'}
-                params = {'client': '85eb458e',
-                          'tgid': '25352330',
-                          'key': 'b777d3383626'}
-                while True:
-                    async with aiohttp.ClientSession() as session:
-                        newnationsparams = {'q': 'newnations'}
-                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                               headers=headers, params=newnationsparams) as nnresp:
-                            await asyncio.sleep(.6)
-                            newnationsraw = await nnresp.text()
-                            nnresp.close()
-                        # after the list is called, the xml is parsed and the list is made
-                        nnsoup = BeautifulSoup(newnationsraw, "lxml")
-                        newnations_prefilter = set(nnsoup.newnations.string.split(","))
-                        # filters out any do not send to nations
-                        newnations_post_filter = list(newnations_prefilter.difference(set(self.do_not_recruit)))
-                        # grabs only the first eight
-                        newnations = newnations_post_filter[0]
-                        non_puppets = list()
-                        # puppet filter
-                        for nation in newnations:
-                            # searches for numbers in names
-                            number_puppet = re.search("\d+", nation)
-                            # if there is a number, remove that nation and add it to the do not send list
-                            if not number_puppet:
-                                non_puppets.append(nation)
-                                self.do_not_recruit.append(nation)
-                        sending_to = [n for n in non_puppets]
-                        params.update({'to': sending_to})
-                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?a=sendTG',
-                                               headers=headers, params=params) as api_send:
-                            await asyncio.sleep(.6)
-                            if api_send.status != 200:
-                                raise Exception(f"API received faulty response code: {api_send.status}")
-                            await asyncio.sleep(180)
-                            api_send.close()
-            except Exception as error:
-                await self.bot.logger.warning(msg=error)
+                    if Recruitment.new_wa:
+                        for n in Recruitment.new_wa:
+                            wa_notif = await wa_pings.send(f"New World Assembly nation, {wa_role.mention}!"
+                                                           f"\nPlease endorse: https://www.nationstates.net/nation={n}.")
+                            await wa_notif.add_reaction("\U0001f310")
+                    Recruitment.all_wa = members
+                    await asyncio.sleep(300)
+                    continue
 
         loop = bot.loop
         self.monthly_loop = loop.create_task(monthly_recruiter_scheduler(bot))
         self.retention_loop = loop.create_task(retention(bot))
         self.world_assembly_notification_loop = loop.create_task(world_assembly_notification(bot))
-        # self.api_loop = loop.create_task(api_recruitment(bot))
 
     def sanitize_links_percent(self, url: str) -> str:
         # sanitizes links with %s
@@ -484,24 +437,83 @@ class Recruitment(commands.Cog):
         elif not self.world_assembly_notification_loop:
             await ctx.send("WA notification not running.")
 
+    @tasks.loop(seconds=10)
+    async def api_recruitment(self):
+        headers = {'User-Agent': 'Bassiliya'}
+        params = {'client': '85eb458e',
+                  'tgid': '25352330',
+                  'key': 'b777d3383626'}
+        async with aiohttp.ClientSession() as session:
+            newnationsparams = {'q': 'newnations'}
+            async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                   headers=headers, params=newnationsparams) as nnresp:
+                await asyncio.sleep(.6)
+                newnationsraw = await nnresp.text()
+                nnresp.close()
+            # after the list is called, the xml is parsed and the list is made
+            nnsoup = BeautifulSoup(newnationsraw, "lxml")
+            newnations_prefilter = set(nnsoup.newnations.string.split(","))
+            for nation in newnations_prefilter:
+                # searches for numbers in names
+                number_puppet = re.search("\d+", nation)
+                # if there is a number, remove that nation and add it to the do not send list
+                if number_puppet:
+                    self.do_not_recruit.append(nation)
+            # filters out any do not send to nations
+            newnations_post_filter = list(newnations_prefilter.difference(set(self.do_not_recruit)))
+            # grabs only the first nation to send a telegram to
+            newnation = newnations_post_filter[0]
+            sending_to = newnation
+            params.update({'to': sending_to})
+            async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?a=sendTG',
+                                   headers=headers, params=params) as api_send:
+                await asyncio.sleep(.6)
+                if api_send.status != 200:
+                    crash_channel = self.bot.get_channel(835579413625569322)
+                    await crash_channel.send("API telegram sending error.")
+                    raise Exception(f"API received faulty response code: {api_send.status}")
+                api_send.close()
+
+    @commands.command(brief="Starts the API recruitment loop.")
+    @commands.is_owner()
+    async def api_start(self, ctx):
+        # starts API loop
+        await self.api_recruitment.start()
+        if self.api_recruitment.is_running():
+            await ctx.send("API loop running!")
+        else:
+            await ctx.send("API loop failed to start.")
+
+    @commands.command(brief="Stops the API recruitment loop.")
+    @commands.is_owner()
+    async def api_stop(self, ctx):
+        # stops API loop
+        self.api_recruitment.cancel()
+        if self.api_recruitment.is_running():
+            await ctx.send("API loop is still running!")
+        else:
+            await ctx.send("API loop cancelled.")
+
     @commands.command(usage="<(user, global)>",
                       brief="Displays sent information for a specified user, the requesting user, or all sent telegrams")
     @commands.guild_only()
     @RecruitmentCheck()
-    async def sent(self, ctx, *args):
+    async def sent(self, ctx, *, args=None):
         # fetches the sent amount of the specified user
         author = ctx.author
         # connects to database
         conn = self.bot.pool
         # if the call is for the author
-        if args == ():
+        if args is None:
             # fetches relevant user data
             userinfo = await conn.fetchrow('''SELECT sent FROM recruitment WHERE user_id = $1;''', author.id)
             sent = userinfo['sent']
+            if sent is None:
+                await ctx.send("You are not registered.")
             # sends amount
             await ctx.send(f"{author} has sent {sent} telegrams.")
             return
-        elif ' '.join(args).lower() == "global":
+        elif args == "global":
             # fetches relevant user data
             allsent = await conn.fetch('''SELECT sent, sent_this_month FROM recruitment;''')
             totalsent = 0
@@ -514,16 +526,18 @@ class Recruitment(commands.Cog):
                 f"A total of {totalsent:,} telegrams have been sent.\nA total of {monthlytotal:,} telegrams "
                 f"have been sent this month.")
             return
-        elif args != ():
+        elif args is not None:
             # fetches the user object via the converter
-            user = ' '.join(args[:])
+            user = args
             user = await commands.converter.MemberConverter().convert(ctx, user)
             # connects to the database
             conn = self.bot.pool  # fetches relevant user data and sends it
             userinfo = await conn.fetchrow('''SELECT sent FROM recruitment WHERE user_id = $1;''', user.id)
             sent = userinfo['sent']
+            if sent is None:
+                await ctx.send(f"{user.display_name} is not registered.")
+                return
             await ctx.send(f"{user} has sent {sent} telegrams.")
-
 
     @commands.command(usage="<m>", brief="Displays the all time or monthly ranks")
     @commands.guild_only()
@@ -563,7 +577,6 @@ class Recruitment(commands.Cog):
             return
         else:
             raise commands.UserInputError()
-
 
     @commands.command(usage='[template id]', brief="Registers a user and a template")
     @commands.guild_only()
@@ -691,7 +704,7 @@ class Recruitment(commands.Cog):
                    f"{htmlstring}\n" \
                    "</body>\n" \
                    "</html>\n" \
-        # writes the html to a file
+            # writes the html to a file
         with open(fr"{self.directory}{regions['region'].lower()}_endo_campaign.html", "w+") as writefile:
             writefile.write(htmlfile)
         with open(fr"{self.directory}{regions['region'].lower()}_endo_campaign.html", "r") as campaign:
@@ -715,9 +728,8 @@ class Recruitment(commands.Cog):
                 await recruiter_of_the_month_role.edit(color=rolecolor, name=f"{name} (Recruiter of the Month)")
                 await ctx.send(f"Color changed to `{rolecolor}` and name changed to `{name}` successfully!")
             except ValueError:
-                    await ctx.send("That doesn't appear to be a valid hex color code.")
-                    return
-
+                await ctx.send("That doesn't appear to be a valid hex color code.")
+                return
 
     @commands.command(brief="Adds or removes the retention role")
     @RecruitmentCheck()
