@@ -13,6 +13,7 @@ from time import perf_counter, strftime
 from PIL import ImageColor
 from customchecks import RecruitmentCheck
 import traceback
+import os
 
 
 class Recruitment(commands.Cog):
@@ -20,6 +21,13 @@ class Recruitment(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
         self.db_error = False
+
+        fd = os.open(os.devnull, os.O_RDWR)
+        # NB: even if stdin is closed, fd >= 0
+        os.dup2(fd, 1)
+        os.dup2(fd, 2)
+        if fd > 2:
+            os.close(fd)
 
         async def monthly_recruiter_scheduler(bot):
             await bot.wait_until_ready()
