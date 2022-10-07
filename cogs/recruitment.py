@@ -443,6 +443,8 @@ class Recruitment(commands.Cog):
         params = {'client': '85eb458e',
                   'tgid': '25352330',
                   'key': 'b777d3383626'}
+        shard_channel = self.bot.get_channel(835579413625569322)
+        await shard_channel.send("API starting up.")
         async with aiohttp.ClientSession() as session:
             newnationsparams = {'q': 'newnations'}
             async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
@@ -752,4 +754,6 @@ class Recruitment(commands.Cog):
 
 
 async def setup(bot):
+    await bot.wait_until_ready()
+    await Recruitment.api_recruitment.start()
     await bot.add_cog(Recruitment(bot))
