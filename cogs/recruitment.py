@@ -246,7 +246,7 @@ class Recruitment(commands.Cog):
                                 retry_after = api_send.headers
                                 await asyncio.sleep(int(retry_after['Retry-After']))
                                 await crash_channel.send(f"API too fast! Retrying after {retry_after['Retry-After']}"
-                                                         f" seconds.")
+                                                         f" seconds. Attempted to send to `{sending_to}`.")
                             else:
                                 await crash_channel.send("API telegram sending error.")
                                 self.api_recruitment.cancel()
