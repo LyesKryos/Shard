@@ -509,9 +509,9 @@ class Recruitment(commands.Cog):
         elif not self.world_assembly_notification_loop:
             await ctx.send("WA notification not running.")
         if self.api_recruitment.is_running():
-            await ctx.send("WA notification running.")
+            await ctx.send("API running.")
         elif not self.api_recruitment.is_running():
-            await ctx.send("WA notification not running.")
+            await ctx.send("API not running.")
 
     @commands.command(brief="Starts the API recruitment loop.")
     @commands.is_owner()
