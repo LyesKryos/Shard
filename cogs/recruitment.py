@@ -29,6 +29,13 @@ class Recruitment(commands.Cog):
         if fd > 2:
             os.close(fd)
 
+        def error_log(error):
+            etype = type(error)
+            trace = error.__traceback__
+            lines = traceback.format_exception(etype, error, trace)
+            traceback_text = ''.join(lines)
+            self.bot.logger.warning(msg=f"{traceback_text}")
+
         async def monthly_recruiter_scheduler(bot):
             await bot.wait_until_ready()
             # fetches channel object
@@ -141,32 +148,15 @@ class Recruitment(commands.Cog):
                         continue
             except Exception as error:
                 await crashchannel.send(f"`{error}` in retention module.")
+                error_log(error)
 
         async def world_assembly_notification(bot):
-            await bot.wait_until_ready()
-            wa_pings = bot.get_channel(676437972819640357)
-            thegye_server = bot.get_guild(674259612580446230)
-            wa_role = discord.utils.get(thegye_server.roles, id=674283915870994442)
-            async with aiohttp.ClientSession() as session:
-                headers = {"User-Agent": "Bassiliya"}
-                params = {'q': 'nations',
-                          'region': 'thegye'}
-                waparams = {'wa': '1',
-                            'q': 'members'}
-                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                       headers=headers, params=params) as nationsresp:
-                    nations = await nationsresp.text()
-                    await asyncio.sleep(.6)
-                nationsoup = BeautifulSoup(nations, 'lxml')
-                nations = set(nationsoup.nations.text.split(':'))
-                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                       headers=headers, params=waparams) as membersresp:
-                    members = await membersresp.text()
-                    await asyncio.sleep(.6)
-                membersoup = BeautifulSoup(members, 'lxml')
-                members = set(membersoup.members.text.split(','))
-                Recruitment.all_wa = nations.intersection(members)
-                while True:
+            try:
+                await bot.wait_until_ready()
+                wa_pings = bot.get_channel(676437972819640357)
+                thegye_server = bot.get_guild(674259612580446230)
+                wa_role = discord.utils.get(thegye_server.roles, id=674283915870994442)
+                async with aiohttp.ClientSession() as session:
                     headers = {"User-Agent": "Bassiliya"}
                     params = {'q': 'nations',
                               'region': 'thegye'}
@@ -183,56 +173,81 @@ class Recruitment(commands.Cog):
                         members = await membersresp.text()
                         await asyncio.sleep(.6)
                     membersoup = BeautifulSoup(members, 'lxml')
-                    members = nations.intersection(set(membersoup.members.text.split(',')))
-                    Recruitment.new_wa = members.difference(Recruitment.all_wa)
-                    if len(members) == len(Recruitment.new_wa):
-                        await asyncio.sleep(30)
+                    members = set(membersoup.members.text.split(','))
+                    Recruitment.all_wa = nations.intersection(members)
+                    while True:
+                        headers = {"User-Agent": "Bassiliya"}
+                        params = {'q': 'nations',
+                                  'region': 'thegye'}
+                        waparams = {'wa': '1',
+                                    'q': 'members'}
+                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                               headers=headers, params=params) as nationsresp:
+                            nations = await nationsresp.text()
+                            await asyncio.sleep(.6)
+                        nationsoup = BeautifulSoup(nations, 'lxml')
+                        nations = set(nationsoup.nations.text.split(':'))
+                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                               headers=headers, params=waparams) as membersresp:
+                            members = await membersresp.text()
+                            await asyncio.sleep(.6)
+                        membersoup = BeautifulSoup(members, 'lxml')
+                        members = nations.intersection(set(membersoup.members.text.split(',')))
+                        Recruitment.new_wa = members.difference(Recruitment.all_wa)
+                        if len(members) == len(Recruitment.new_wa):
+                            await asyncio.sleep(30)
+                            continue
+                        if Recruitment.new_wa:
+                            for n in Recruitment.new_wa:
+                                wa_notif = await wa_pings.send(f"New World Assembly nation, {wa_role.mention}!"
+                                                               f"\nPlease endorse: https://www.nationstates.net/nation={n}.")
+                                await wa_notif.add_reaction("\U0001f310")
+                        Recruitment.all_wa = members
+                        await asyncio.sleep(300)
                         continue
-                    if Recruitment.new_wa:
-                        for n in Recruitment.new_wa:
-                            wa_notif = await wa_pings.send(f"New World Assembly nation, {wa_role.mention}!"
-                                                           f"\nPlease endorse: https://www.nationstates.net/nation={n}.")
-                            await wa_notif.add_reaction("\U0001f310")
-                    Recruitment.all_wa = members
-                    await asyncio.sleep(300)
-                    continue
+            except Exception as error:
+                error_log(error)
 
         @tasks.loop(seconds=180)
         async def api_recruitment():
-            headers = {'User-Agent': 'Bassiliya'}
-            params = {'client': '85eb458e',
-                      'tgid': '25352330',
-                      'key': 'b777d3383626'}
-            async with aiohttp.ClientSession() as session:
-                newnationsparams = {'q': 'newnations'}
-                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                       headers=headers, params=newnationsparams) as nnresp:
-                    await asyncio.sleep(.6)
-                    newnationsraw = await nnresp.text()
-                    nnresp.close()
-                # after the list is called, the xml is parsed and the list is made
-                nnsoup = BeautifulSoup(newnationsraw, "lxml")
-                newnations_prefilter = set(nnsoup.newnations.string.split(","))
-                for nation in newnations_prefilter:
-                    # searches for numbers in names
-                    number_puppet = re.search("\d+", nation)
-                    # if there is a number, remove that nation and add it to the do not send list
-                    if number_puppet:
-                        self.do_not_recruit.append(nation)
-                # filters out any do not send to nations
-                newnations_post_filter = list(newnations_prefilter.difference(set(self.do_not_recruit)))
-                # grabs only the first nation to send a telegram to
-                newnation = newnations_post_filter[0]
-                sending_to = newnation
-                params.update({'to': sending_to})
-                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?a=sendTG',
-                                       headers=headers, params=params) as api_send:
-                    await asyncio.sleep(.6)
-                    if api_send.status != 200:
-                        crash_channel = self.bot.get_channel(835579413625569322)
-                        await crash_channel.send("API telegram sending error.")
-                        raise Exception(f"API received faulty response code: {api_send.status}")
-                    api_send.close()
+            try:
+                headers = {'User-Agent': 'Bassiliya'}
+                params = {'client': '85eb458e',
+                          'tgid': '25352330',
+                          'key': 'b777d3383626'}
+                async with aiohttp.ClientSession() as session:
+                    newnationsparams = {'q': 'newnations'}
+                    async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                           headers=headers, params=newnationsparams) as nnresp:
+                        await asyncio.sleep(.6)
+                        newnationsraw = await nnresp.text()
+                        nnresp.close()
+                    # after the list is called, the xml is parsed and the list is made
+                    nnsoup = BeautifulSoup(newnationsraw, "lxml")
+                    newnations_prefilter = set(nnsoup.newnations.string.split(","))
+                    for nation in newnations_prefilter:
+                        # searches for numbers in names
+                        number_puppet = re.search("\d+", nation)
+                        # if there is a number, remove that nation and add it to the do not send list
+                        if number_puppet:
+                            self.do_not_recruit.append(nation)
+                    # filters out any do not send to nations
+                    newnations_post_filter = list(newnations_prefilter.difference(set(self.do_not_recruit)))
+                    # grabs only the first nation to send a telegram to
+                    newnation = newnations_post_filter[0]
+                    sending_to = newnation
+                    params.update({'to': sending_to})
+                    async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?a=sendTG',
+                                           headers=headers, params=params) as api_send:
+                        await asyncio.sleep(.6)
+                        if api_send.status != 200:
+                            crash_channel = self.bot.get_channel(835579413625569322)
+                            await crash_channel.send("API telegram sending error.")
+                            raise Exception(f"API received faulty response code: {api_send.status}\n{api_send.text()}")
+                        api_send.close()
+            except Exception as error:
+                error_log(error)
+
 
         loop = bot.loop
         self.monthly_loop = loop.create_task(monthly_recruiter_scheduler(bot))
