@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing province production" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing province production">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/dispatch.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/dispatch.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -50,35 +53,8 @@
       <workItem from="1663117760476" duration="25806000" />
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
-      <workItem from="1664469072638" duration="4234000" />
-    </task>
-    <task id="LOCAL-00056" summary="Fixing userinputerror for cnc_treaty&#10;Adding national unrest calculation">
-      <created>1663686748463</created>
-      <option name="number" value="00056" />
-      <option name="presentableId" value="LOCAL-00056" />
-      <option name="project" value="LOCAL" />
-      <updated>1663686748464</updated>
-    </task>
-    <task id="LOCAL-00057" summary="Fixing">
-      <created>1663694995635</created>
-      <option name="number" value="00057" />
-      <option name="presentableId" value="LOCAL-00057" />
-      <option name="project" value="LOCAL" />
-      <updated>1663694995635</updated>
-    </task>
-    <task id="LOCAL-00058" summary="Fixing cnc_events.py">
-      <created>1663695096362</created>
-      <option name="number" value="00058" />
-      <option name="presentableId" value="LOCAL-00058" />
-      <option name="project" value="LOCAL" />
-      <updated>1663695096363</updated>
-    </task>
-    <task id="LOCAL-00059" summary="Altering the cncdv display">
-      <created>1663698905589</created>
-      <option name="number" value="00059" />
-      <option name="presentableId" value="LOCAL-00059" />
-      <option name="project" value="LOCAL" />
-      <updated>1663698905589</updated>
+      <workItem from="1664469072638" duration="5067000" />
+      <workItem from="1665141589598" duration="392000" />
     </task>
     <task id="LOCAL-00060" summary="Altering the cncdv display">
       <created>1663699117920</created>
@@ -395,7 +371,35 @@
       <option name="project" value="LOCAL" />
       <updated>1664646928838</updated>
     </task>
-    <option name="localTasksCounter" value="105" />
+    <task id="LOCAL-00105" summary="Fixing province production">
+      <created>1664646979564</created>
+      <option name="number" value="00105" />
+      <option name="presentableId" value="LOCAL-00105" />
+      <option name="project" value="LOCAL" />
+      <updated>1664646979564</updated>
+    </task>
+    <task id="LOCAL-00106" summary="Fixing province production">
+      <created>1664647015676</created>
+      <option name="number" value="00106" />
+      <option name="presentableId" value="LOCAL-00106" />
+      <option name="project" value="LOCAL" />
+      <updated>1664647015676</updated>
+    </task>
+    <task id="LOCAL-00107" summary="Fixing province production">
+      <created>1664647024424</created>
+      <option name="number" value="00107" />
+      <option name="presentableId" value="LOCAL-00107" />
+      <option name="project" value="LOCAL" />
+      <updated>1664647024424</updated>
+    </task>
+    <task id="LOCAL-00108" summary="Fixing province production">
+      <created>1664647915828</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1664647915828</updated>
+    </task>
+    <option name="localTasksCounter" value="109" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
