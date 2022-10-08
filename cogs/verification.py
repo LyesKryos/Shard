@@ -27,8 +27,8 @@ class Verification(commands.Cog):
         # creates DM
         author_message = await author.create_dm()
 
-        def authorcheck():
-            return ctx.channel.id == author_message.id
+        def authorcheck(message):
+            return ctx.author.id == message.author.id and message.guild is None
 
         # sends DM to initiate verification
         await author_message.send(f"**Welcome to the Thegye server, {author}!** \n\n"
