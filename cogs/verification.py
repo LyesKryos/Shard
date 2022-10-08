@@ -333,7 +333,7 @@ class Verification(commands.Cog):
                                                              "Please try again.")
 
     @commands.command(brief="Displays a list of all verified nations.")
-    async def view_verified(self, ctx, *, user: discord.User = None):
+    async def view_verified(self, ctx, *, user: discord.Member = None):
         # establish connection
         conn = self.bot.pool
         if user is None:
@@ -355,6 +355,8 @@ class Verification(commands.Cog):
                     verified_nations = ", ".join(verified['nations'])
                 return await ctx.send(f"Verified nations of {author.name}: {verified_nations}")
         if user is not None:
+            if ctx.guild is None:
+                raise commands.NoPrivateMessage
             # get author
             author = user
             # fetches all verified nations
