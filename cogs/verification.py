@@ -11,7 +11,7 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 import aiohttp
-from typing import Union
+from typing import Union, Optional
 
 
 # f"**Welcome to the Thegye server, {author}!** \n\n"
@@ -339,7 +339,7 @@ class Verification(commands.Cog):
                                                              "Please try again.")
 
     @commands.command(brief="Displays a list of all verified nations.")
-    async def view_verified(self, ctx, *, user: Union[discord.Member, discord.User] = None):
+    async def view_verified(self, ctx, *, user: Optional[discord.Member] = None):
         # establish connection
         conn = self.bot.pool
         if user is None:
