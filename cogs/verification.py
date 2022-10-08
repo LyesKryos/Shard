@@ -148,7 +148,8 @@ class Verification(commands.Cog):
                                 region = nation_info_soup.region.text
                                 # if the nation's region is Thegye, add the Thegye role
                                 if region == "Thegye":
-                                    await user.add_roles(thegye_role)
+                                    await user.remove_roles(traveler_role, karma_role)
+                                    return await user.add_roles(thegye_role)
                                 # if the nation's region is Karma, add the Karma role
                                 elif region == "Karma":
                                     await user.add_roles(karma_role)
