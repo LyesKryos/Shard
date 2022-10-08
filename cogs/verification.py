@@ -41,6 +41,8 @@ class Verification(commands.Cog):
         # define thegye server and unverified role
         thegye_sever = self.bot.get_guild(674259612580446230)
         unverified_role = thegye_sever.get_role(1028144304507592704)
+        if ctx.guild is not None:
+            await ctx.send("Sent you a DM!")
 
         def authorcheck(message):
             return ctx.author.id == message.author.id and message.guild is None
@@ -91,8 +93,8 @@ class Verification(commands.Cog):
         # send verification instructions via DM
         await author_message.send(f"Please login to {nation_name}. Once complete, head to this link and send me the "
                                   f"verification code displayed: https://www.nationstates.net/page=verify_login. "
-                                  f"You may give the code below to an external website, which can use it to verify "
-                                  f"that you are indeed currently logged in as this nation. "
+                                  f"You may give the code displayed to an external website or tool, like me, "
+                                  f"which can use it to verify that you are indeed currently logged in as this nation. "
                                   f"This is *all* I can do with it: It does not allow me to access your nation.")
         # wait for response
         try:
@@ -213,6 +215,9 @@ class Verification(commands.Cog):
                             nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
                             region = nation_info_soup.region.text
                             nation_name = nation_info_soup.nation.text
+                            # insert new user into database
+                            await conn.execute('''INSERT INTO verified_nations(user_id, nations) VALUES($1, $2);''',
+                                               user.id, [nation_name])
                             # if the nation's region is Thegye, add the Thegye role
                             if region == "Thegye":
                                 await user.remove_roles(traveler_role, karma_role)

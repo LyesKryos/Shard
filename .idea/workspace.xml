@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Altering view_verified command&#10;Adding commands.UserNotFound to errors.py">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding message verification for the verify command.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
@@ -67,14 +67,7 @@
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
       <workItem from="1664469072638" duration="5067000" />
-      <workItem from="1665141589598" duration="37323000" />
-    </task>
-    <task id="LOCAL-00123" summary="Trying fixing API startup">
-      <created>1665153769546</created>
-      <option name="number" value="00123" />
-      <option name="presentableId" value="LOCAL-00123" />
-      <option name="project" value="LOCAL" />
-      <updated>1665153769546</updated>
+      <workItem from="1665141589598" duration="39078000" />
     </task>
     <task id="LOCAL-00124" summary="Trying fixing API startup">
       <created>1665154103684</created>
@@ -412,7 +405,14 @@
       <option name="project" value="LOCAL" />
       <updated>1665267762414</updated>
     </task>
-    <option name="localTasksCounter" value="172" />
+    <task id="LOCAL-00172" summary="Altering view_verified command&#10;Adding commands.UserNotFound to errors.py">
+      <created>1665269694196</created>
+      <option name="number" value="00172" />
+      <option name="presentableId" value="LOCAL-00172" />
+      <option name="project" value="LOCAL" />
+      <updated>1665269694196</updated>
+    </task>
+    <option name="localTasksCounter" value="173" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -430,7 +430,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing cnc_research.py so that it never displays 0 turns on a tech" />
     <MESSAGE value="Fixing construct" />
     <MESSAGE value="Fixing trade route" />
     <MESSAGE value="Fixing cnc_research.py with proper unrest buffs" />
@@ -455,7 +454,8 @@
     <MESSAGE value="Altering view_verified commands" />
     <MESSAGE value="Altering view_verified command" />
     <MESSAGE value="Altering view_verified command&#10;Adding commands.UserNotFound to errors.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Altering view_verified command&#10;Adding commands.UserNotFound to errors.py" />
+    <MESSAGE value="Adding message verification for the verify command." />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding message verification for the verify command." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
