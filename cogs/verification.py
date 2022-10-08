@@ -369,7 +369,7 @@ class Verification(commands.Cog):
             return await ctx.send("You do not have any verified nations. Use the `$verify` command to "
                                   "verify a nation first.")
         # if the nation is not previously verified
-        if nation not in [n.lower() for n in nation_info['nations']]:
+        if nation.lower() not in [n.lower() for n in nation_info['nations']]:
             return await ctx.send(f"`{nation}` is not a verified nation associated with your account.")
         # if the nation is already the main nation
         if nation.lower() == nation_info['main_nation'].lower():
