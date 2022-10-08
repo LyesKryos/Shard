@@ -105,12 +105,12 @@ class Verification(commands.Cog):
                 verification_soup = BeautifulSoup(verification_raw, 'lxml')
                 # fetch verification
                 verification = verification_soup.verify.string
-                # if the verification code is goood
+                # if the verification code is good
                 if int(verification) == 1:
                     # if the user has no verified nation, add a new row
                     if verified_check is None:
-                        await conn.execute('''INSERT INTO verified_nations(user_id, nations) VALUES ($1, $2);''',
-                                           author.id, list(nation_name))
+                        await conn.execute('''INSERT INTO verified_nations(user_id, nations) VALUES ($1, {$2});''',
+                                           author.id, nation_name)
                         # if the nation's region is Thegye, add the Thegye role
                         if verification_soup.region.text == "Thegye":
                             thegye_sever = self.bot.get_guild(674259612580446230)
@@ -131,8 +131,8 @@ class Verification(commands.Cog):
                             await user.add_roles(traveler_role)
                     else:
                         # append the verified nation to the list
-                        await conn.execute('''UPDATE verified_nations SET nations = nations || $1 
-                        WHERE user_id = $2;''', list(nation_name), author.id)
+                        await conn.execute('''UPDATE verified_nations SET nations = nations || {$1} 
+                        WHERE user_id = $2;''', nation_name, author.id)
                         all_nations = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
                                                           author.id)
                         thegye_sever = self.bot.get_guild(674259612580446230)
