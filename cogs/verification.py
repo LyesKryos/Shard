@@ -333,26 +333,46 @@ class Verification(commands.Cog):
                                                              "Please try again.")
 
     @commands.command(brief="Displays a list of all verified nations.")
-    async def view_verified(self, ctx):
+    async def view_verified(self, ctx, user: discord.User = None):
         # establish connection
         conn = self.bot.pool
-        # get author
-        author = ctx.author
-        # fetches all verified nations
-        verified = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
-                                       author.id)
-        if verified is None:
-            return await ctx.send("You do not have any verified nations. Use `$verify` to verify a nation.")
-        else:
-            if verified['main_nation'] is not None:
-                verified_nations = f"**{verified['main_nation']}**"
-                for n in verified['nations']:
-                    if n == verified['main_nation']:
-                        continue
-                    verified_nations += f", {n}"
+        if user is None:
+            # get author
+            author = ctx.author
+            # fetches all verified nations
+            verified = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
+                                           author.id)
+            if verified is None:
+                return await ctx.send("You do not have any verified nations. Use `$verify` to verify a nation.")
             else:
-                verified_nations = ", ".join(verified['nations'])
-            return await ctx.send(f"Verified nations of {author.name}: {verified_nations}")
+                if verified['main_nation'] is not None:
+                    verified_nations = f"**{verified['main_nation']}**"
+                    for n in verified['nations']:
+                        if n == verified['main_nation']:
+                            continue
+                        verified_nations += f", {n}"
+                else:
+                    verified_nations = ", ".join(verified['nations'])
+                return await ctx.send(f"Verified nations of {author.name}: {verified_nations}")
+        if user is not None:
+            # get author
+            author = user
+            # fetches all verified nations
+            verified = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
+                                           author.id)
+            if verified is None:
+                return await ctx.send("You do not have any verified nations. Use `$verify` to verify a nation.")
+            else:
+                if verified['main_nation'] is not None:
+                    verified_nations = f"**{verified['main_nation']}**"
+                    for n in verified['nations']:
+                        if n == verified['main_nation']:
+                            continue
+                        verified_nations += f", {n}"
+                else:
+                    verified_nations = ", ".join(verified['nations'])
+                return await ctx.send(f"Verified nations of {author.name}: {verified_nations}")
+
 
     @commands.command(brief="Sets a previously verified nation as the main nation.")
     @commands.guild_only()
