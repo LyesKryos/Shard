@@ -344,11 +344,14 @@ class Verification(commands.Cog):
         if verified is None:
             return await ctx.send("You do not have any verified nations. Use `$verify` to verify a nation.")
         else:
-            verified_nations = f"**{verified['main_nation']}** "
-            for n in verified['nations']:
-                if n == verified['main_nation']:
-                    continue
-                verified_nations += f", {n}"
+            if verified['main_nation'] is not None:
+                verified_nations = f"**{verified['main_nation']}**"
+                for n in verified['nations']:
+                    if n == verified['main_nation']:
+                        continue
+                    verified_nations += f", {n}"
+            else:
+                verified_nations = ", ".join(verified['nations'])
             return await ctx.send(f"Verified nations of {author.name}: {verified_nations}")
 
     @commands.command(brief="Sets a previously verified nation as the main nation.")
