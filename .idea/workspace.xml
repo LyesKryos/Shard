@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Altering view_verified commands">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Altering view_verified command">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
@@ -67,14 +67,7 @@
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
       <workItem from="1664469072638" duration="5067000" />
-      <workItem from="1665141589598" duration="34639000" />
-    </task>
-    <task id="LOCAL-00121" summary="Trying fixing API loop time">
-      <created>1665153408441</created>
-      <option name="number" value="00121" />
-      <option name="presentableId" value="LOCAL-00121" />
-      <option name="project" value="LOCAL" />
-      <updated>1665153408441</updated>
+      <workItem from="1665141589598" duration="35375000" />
     </task>
     <task id="LOCAL-00122" summary="Trying fixing API startup">
       <created>1665153551378</created>
@@ -412,7 +405,14 @@
       <option name="project" value="LOCAL" />
       <updated>1665263966354</updated>
     </task>
-    <option name="localTasksCounter" value="170" />
+    <task id="LOCAL-00170" summary="Altering view_verified command">
+      <created>1665267036519</created>
+      <option name="number" value="00170" />
+      <option name="presentableId" value="LOCAL-00170" />
+      <option name="project" value="LOCAL" />
+      <updated>1665267036519</updated>
+    </task>
+    <option name="localTasksCounter" value="171" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -430,7 +430,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing cnc_remove to include all tables&#10;Fixing cncb with lower" />
     <MESSAGE value="Fixing cnc_remove to include all tables&#10;Fixing cncb with lower&#10;Fixing cnc_expedition to follow army limits" />
     <MESSAGE value="Fixing cnc_research.py so that it never displays 0 turns on a tech" />
     <MESSAGE value="Fixing construct" />
@@ -455,7 +454,8 @@
     <MESSAGE value="Adding view_verified and set_main commands" />
     <MESSAGE value="Fixing set_main commands" />
     <MESSAGE value="Altering view_verified commands" />
-    <option name="LAST_COMMIT_MESSAGE" value="Altering view_verified commands" />
+    <MESSAGE value="Altering view_verified command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Altering view_verified command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

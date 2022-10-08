@@ -53,6 +53,8 @@ class ShardErrorHandler(commands.Cog):
             await ctx.send_help(ctx.invoked_with)
         elif isinstance(error, SilentFail):
             return
+        elif isinstance(error, commands.UserNotFound):
+            await ctx.send("I have no record of a user by that name, discriminator, or ID.")
         elif isinstance(error, commands.CheckFailure):
             await ctx.send("A check failed. Check the logs.")
             self.bot.logger.warning(msg=error)

@@ -11,6 +11,7 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 import aiohttp
+from typing import Union
 
 
 # f"**Welcome to the Thegye server, {author}!** \n\n"
@@ -37,6 +38,9 @@ class Verification(commands.Cog):
         author = ctx.author
         # creates DM
         author_message = await author.create_dm()
+        # define thegye server and unverified role
+        thegye_sever = self.bot.get_guild(674259612580446230)
+        unverified_role = thegye_sever.get_role(1028144304507592704)
 
         def authorcheck(message):
             return ctx.author.id == message.author.id and message.guild is None
@@ -85,7 +89,7 @@ class Verification(commands.Cog):
                     f"You have already verified `{nation_name}`. To view your verified nations, "
                     f"use `$view_verified`.")
         # send verification instructions via DM
-        await author_message.send(f"Please login to {nation_name}. Once complete, head to this link and send the "
+        await author_message.send(f"Please login to {nation_name}. Once complete, head to this link and send me the "
                                   f"verification code displayed: https://www.nationstates.net/page=verify_login. "
                                   f"You may give the code below to an external website, which can use it to verify "
                                   f"that you are indeed currently logged in as this nation. "
@@ -119,22 +123,24 @@ class Verification(commands.Cog):
                                            author.id, [nation_name])
                         # if the nation's region is Thegye, add the Thegye role
                         if verification_soup.region.text == "Thegye":
-                            thegye_sever = self.bot.get_guild(674259612580446230)
                             thegye_role = thegye_sever.get_role(674260547897917460)
                             user = thegye_sever.get_member(author.id)
                             await user.add_roles(thegye_role)
+                            await user.remove_roles(unverified_role)
                         # if the nation's region is Karma, add the Karma role
                         elif verification_soup.region.text == "Karma":
                             thegye_sever = self.bot.get_guild(674259612580446230)
                             karma_role = thegye_sever.get_role(771456227674685440)
                             user = thegye_sever.get_member(author.id)
                             await user.add_roles(karma_role)
+                            await user.remove_roles(unverified_role)
                         # otherwise, add the traveler role
                         else:
                             thegye_sever = self.bot.get_guild(674259612580446230)
                             traveler_role = thegye_sever.get_role(674280677268652047)
                             user = thegye_sever.get_member(author.id)
                             await user.add_roles(traveler_role)
+                            await user.remove_roles(unverified_role)
                     else:
                         # append the verified nation to the list
                         await conn.execute('''UPDATE verified_nations SET nations = nations || $1
@@ -333,7 +339,7 @@ class Verification(commands.Cog):
                                                              "Please try again.")
 
     @commands.command(brief="Displays a list of all verified nations.")
-    async def view_verified(self, ctx, *, user: discord.Member = None):
+    async def view_verified(self, ctx, *, user: Union[discord.Member, discord.User] = None):
         # establish connection
         conn = self.bot.pool
         if user is None:
@@ -355,8 +361,6 @@ class Verification(commands.Cog):
                     verified_nations = ", ".join(verified['nations'])
                 return await ctx.send(f"Verified nations of {author.name}: {verified_nations}")
         if user is not None:
-            if ctx.guild is None:
-                raise commands.NoPrivateMessage
             # get author
             author = user
             # fetches all verified nations
