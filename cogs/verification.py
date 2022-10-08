@@ -101,7 +101,8 @@ class Verification(commands.Cog):
                         await conn.execute('''UPDATE verified_nations SET nations = nations || $1 
                         WHERE user_id = $2;''', nation_name, author.id)
                     await author.send(f"Success! You have now verified `{nation_name}`. "
-                                      f"Your roles will update momentarily.")
+                                      f"Your roles will update momentarily. If you would like to set your main nation, "
+                                      f"use the `$set_main` command to do so.")
                     verify.close()
                     # if the nation's region is Thegye, add the Thegye role
                     if verification_soup.region.text == "Thegye":
