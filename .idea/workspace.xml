@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing verification">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -66,21 +67,7 @@
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
       <workItem from="1664469072638" duration="5067000" />
-      <workItem from="1665141589598" duration="18963000" />
-    </task>
-    <task id="LOCAL-00101" summary="Fixing trade route">
-      <created>1664491799072</created>
-      <option name="number" value="00101" />
-      <option name="presentableId" value="LOCAL-00101" />
-      <option name="project" value="LOCAL" />
-      <updated>1664491799072</updated>
-    </task>
-    <task id="LOCAL-00102" summary="Fixing cnc_research.py with proper unrest buffs">
-      <created>1664573284767</created>
-      <option name="number" value="00102" />
-      <option name="presentableId" value="LOCAL-00102" />
-      <option name="project" value="LOCAL" />
-      <updated>1664573284767</updated>
+      <workItem from="1665141589598" duration="19770000" />
     </task>
     <task id="LOCAL-00103" summary="Fixing province production and structure output">
       <created>1664646822129</created>
@@ -411,7 +398,21 @@
       <option name="project" value="LOCAL" />
       <updated>1665231327160</updated>
     </task>
-    <option name="localTasksCounter" value="150" />
+    <task id="LOCAL-00150" summary="Fixing verification">
+      <created>1665231631289</created>
+      <option name="number" value="00150" />
+      <option name="presentableId" value="LOCAL-00150" />
+      <option name="project" value="LOCAL" />
+      <updated>1665231631289</updated>
+    </task>
+    <task id="LOCAL-00151" summary="Fixing verification">
+      <created>1665231726998</created>
+      <option name="number" value="00151" />
+      <option name="presentableId" value="LOCAL-00151" />
+      <option name="project" value="LOCAL" />
+      <updated>1665231726998</updated>
+    </task>
+    <option name="localTasksCounter" value="152" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

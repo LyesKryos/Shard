@@ -113,17 +113,20 @@ class Verification(commands.Cog):
                     if verification_soup.region.text == "Thegye":
                         thegye_sever = self.bot.get_guild(674259612580446230)
                         thegye_role = thegye_sever.get_role(674260547897917460)
-                        await author.add_roles(thegye_role)
+                        user = thegye_sever.get_member(author.id)
+                        await user.add_roles(thegye_role)
                     # if the nation's region is Karma, add the Karma role
                     if verification_soup.region.text == "Karma":
                         thegye_sever = self.bot.get_guild(674259612580446230)
                         karma_role = thegye_sever.get_role(771456227674685440)
-                        await author.add_roles(karma_role)
+                        user = thegye_sever.get_member(author.id)
+                        await user.add_roles(karma_role)
                     # otherwise, add the traveler role
                     else:
                         thegye_sever = self.bot.get_guild(674259612580446230)
                         traveler_role = thegye_sever.get_role(674280677268652047)
-                        await author.add_roles(traveler_role)
+                        user = thegye_sever.get_member(author.id)
+                        await user.add_roles(traveler_role)
                     return
 
 
