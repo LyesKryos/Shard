@@ -72,11 +72,16 @@ class Verification(commands.Cog):
                 f"No such nation as `{nation_name}`. Please check that you are using only the nation's"
                 f" name, without the pretitle.")
             return
+        # get official nation name
+        nation_name_raw = nation_exist.text
+        nation_name_soup = BeautifulSoup(nation_name_raw, 'lxml')
+        nation_name = nation_name_soup.find('name').string
         # if the user has already verified that nation
         if verified_check is not None:
             if nation_name.lower() in [n.lower() for n in verified_check['nations']]:
-                return await author_message.send(f"You have already verified `{nation_name}`. To view your verified nations, "
-                                    f"use `$view_verified`.")
+                return await author_message.send(
+                    f"You have already verified `{nation_name}`. To view your verified nations, "
+                    f"use `$view_verified`.")
         # send verification instructions via DM
         await author_message.send(f"Please login to {nation_name}. Once complete, head to this link and send the "
                                   f"verification code displayed: https://www.nationstates.net/page=verify_login. "
@@ -91,7 +96,7 @@ class Verification(commands.Cog):
         # define headers and parameters
         headers = {"User-Agent": "Bassiliya"}
         params = {'a': 'verify',
-                  'nation': nation_name.lower(),
+                  'nation': nation_name,
                   'checksum': code_reply.content,
                   'q': 'region'}
         # start session
@@ -158,11 +163,11 @@ class Verification(commands.Cog):
                                 # otherwise, add the traveler role
                                 else:
                                     await user.add_roles(traveler_role)
-                    await author_message.send(f"Success! You have now verified `{nation_name}`. "
-                                              f"Your roles will update momentarily. If you would like to set your "
-                                              f"main nation, use the `$set_main` command to do so.")
                     verifying.close()
-                    return
+                    return await author_message.send(f"Success! You have now verified `{nation_name}`. "
+                                                     f"Your roles will update momentarily. "
+                                                     f"If you would like to set your main nation, "
+                                                     f"use the `$set_main` command to do so.")
                 else:
                     return await author_message.send("That is not a valid or correct verification code. "
                                                      "Please try again.")
