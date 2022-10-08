@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing verification">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Altering verification">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
@@ -67,14 +67,7 @@
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
       <workItem from="1664469072638" duration="5067000" />
-      <workItem from="1665141589598" duration="21357000" />
-    </task>
-    <task id="LOCAL-00104" summary="Fixing province production">
-      <created>1664646928838</created>
-      <option name="number" value="00104" />
-      <option name="presentableId" value="LOCAL-00104" />
-      <option name="project" value="LOCAL" />
-      <updated>1664646928838</updated>
+      <workItem from="1665141589598" duration="21736000" />
     </task>
     <task id="LOCAL-00105" summary="Fixing province production">
       <created>1664646979564</created>
@@ -412,7 +405,14 @@
       <option name="project" value="LOCAL" />
       <updated>1665232708259</updated>
     </task>
-    <option name="localTasksCounter" value="153" />
+    <task id="LOCAL-00153" summary="Altering verification">
+      <created>1665234218420</created>
+      <option name="number" value="00153" />
+      <option name="presentableId" value="LOCAL-00153" />
+      <option name="project" value="LOCAL" />
+      <updated>1665234218420</updated>
+    </task>
+    <option name="localTasksCounter" value="154" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -430,7 +430,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing cncus" />
     <MESSAGE value="Fixing unrest to calculate overextension only on owned and occupied provinces" />
     <MESSAGE value="Fixing turnloop" />
     <MESSAGE value="Updating some commands with tech modifiers" />
@@ -455,7 +454,8 @@
     <MESSAGE value="Adding verify command" />
     <MESSAGE value="Fixing DM check" />
     <MESSAGE value="Fixing verification" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing verification" />
+    <MESSAGE value="Altering verification" />
+    <option name="LAST_COMMIT_MESSAGE" value="Altering verification" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

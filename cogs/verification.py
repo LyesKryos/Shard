@@ -146,7 +146,7 @@ class Verification(commands.Cog):
                                                           headers=headers) as nation_info:
                                 nation_info_raw = await nation_info.text()
                                 nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
-                                region = nation_info_soup.region.string
+                                region = nation_info_soup.region.text
                                 # if the nation's region is Thegye, add the Thegye role
                                 if region == "Thegye":
                                     await user.add_roles(thegye_role)
