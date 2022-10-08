@@ -64,28 +64,7 @@
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
       <workItem from="1664469072638" duration="5067000" />
-      <workItem from="1665141589598" duration="23431000" />
-    </task>
-    <task id="LOCAL-00108" summary="Fixing province production">
-      <created>1664647915828</created>
-      <option name="number" value="00108" />
-      <option name="presentableId" value="LOCAL-00108" />
-      <option name="project" value="LOCAL" />
-      <updated>1664647915828</updated>
-    </task>
-    <task id="LOCAL-00109" summary="Removing Gaia from dispatch updating">
-      <created>1665142122750</created>
-      <option name="number" value="00109" />
-      <option name="presentableId" value="LOCAL-00109" />
-      <option name="project" value="LOCAL" />
-      <updated>1665142122750</updated>
-    </task>
-    <task id="LOCAL-00110" summary="Sprucing up the recruitment code&#10;Adding API telegramming">
-      <created>1665151775685</created>
-      <option name="number" value="00110" />
-      <option name="presentableId" value="LOCAL-00110" />
-      <option name="project" value="LOCAL" />
-      <updated>1665151775685</updated>
+      <workItem from="1665141589598" duration="23767000" />
     </task>
     <task id="LOCAL-00111" summary="Adding API telegramming on reload/start">
       <created>1665152006443</created>
@@ -409,7 +388,28 @@
       <option name="project" value="LOCAL" />
       <updated>1665235691328</updated>
     </task>
-    <option name="localTasksCounter" value="157" />
+    <task id="LOCAL-00157" summary="Fixing verification">
+      <created>1665235981908</created>
+      <option name="number" value="00157" />
+      <option name="presentableId" value="LOCAL-00157" />
+      <option name="project" value="LOCAL" />
+      <updated>1665235981908</updated>
+    </task>
+    <task id="LOCAL-00158" summary="Fixing verification">
+      <created>1665236095959</created>
+      <option name="number" value="00158" />
+      <option name="presentableId" value="LOCAL-00158" />
+      <option name="project" value="LOCAL" />
+      <updated>1665236095959</updated>
+    </task>
+    <task id="LOCAL-00159" summary="Fixing verification">
+      <created>1665236195723</created>
+      <option name="number" value="00159" />
+      <option name="presentableId" value="LOCAL-00159" />
+      <option name="project" value="LOCAL" />
+      <updated>1665236195723</updated>
+    </task>
+    <option name="localTasksCounter" value="160" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -99,6 +99,7 @@ class Verification(commands.Cog):
             # call for necessary data
             async with verify_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                           headers=headers, params=params) as verifying:
+                await asyncio.sleep(.6)
                 # parse the verification response
                 verification_raw = await verifying.text()
                 verification_soup = BeautifulSoup(verification_raw, 'lxml')
@@ -143,6 +144,7 @@ class Verification(commands.Cog):
                         for n in all_nations['nations']:
                             async with verify_session.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={n}",
                                                           headers=headers) as nation_info:
+                                await asyncio.sleep(.6)
                                 nation_info_raw = await nation_info.text()
                                 nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
                                 region = nation_info_soup.region.text
