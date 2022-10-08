@@ -79,9 +79,9 @@ class Verification(commands.Cog):
         async with aiohttp.ClientSession() as verify_session:
             # call for necessary data
             async with verify_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                          headers=headers, params=params) as verify:
+                                          headers=headers, params=params) as verifying:
                 # parse the verification response
-                verification_raw = await verify.text()
+                verification_raw = await verifying.text()
                 verification_soup = BeautifulSoup(verification_raw, 'lxml')
                 # fetch verification
                 verification = verification_soup.verify.string
@@ -108,7 +108,7 @@ class Verification(commands.Cog):
                     await author_message.send(f"Success! You have now verified `{nation_name}`. "
                                               f"Your roles will update momentarily. If you would like to set your "
                                               f"main nation, use the `$set_main` command to do so.")
-                    verify.close()
+                    verifying.close()
                     # if the nation's region is Thegye, add the Thegye role
                     if verification_soup.region.text == "Thegye":
                         thegye_sever = self.bot.get_guild(674259612580446230)
