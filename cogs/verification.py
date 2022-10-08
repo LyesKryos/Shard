@@ -97,7 +97,7 @@ class Verification(commands.Cog):
                         # if the user already has the nation verified, return
                         nation_check = await conn.fetchrow('''SELECT nations FROM verified_nations 
                         WHERE user_id = $1;''', author.id)
-                        nation_check = [n.lower() for n in nation_check]
+                        nation_check = [n.lower() for n in nation_check['nations']]
                         if nation_name in nation_check:
                             await author_message.send("You have already verified that nation. "
                                                       "To view a list of your verified nations, use `$view_verified`.")

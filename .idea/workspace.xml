@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing DM check">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing verification">
       <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -66,28 +66,7 @@
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
       <workItem from="1664469072638" duration="5067000" />
-      <workItem from="1665141589598" duration="18503000" />
-    </task>
-    <task id="LOCAL-00098" summary="Fixing cnc_research.py so that it never displays 0 turns on a tech">
-      <created>1664143457681</created>
-      <option name="number" value="00098" />
-      <option name="presentableId" value="LOCAL-00098" />
-      <option name="project" value="LOCAL" />
-      <updated>1664143457681</updated>
-    </task>
-    <task id="LOCAL-00099" summary="Fixing construct">
-      <created>1664469284960</created>
-      <option name="number" value="00099" />
-      <option name="presentableId" value="LOCAL-00099" />
-      <option name="project" value="LOCAL" />
-      <updated>1664469284961</updated>
-    </task>
-    <task id="LOCAL-00100" summary="Fixing construct">
-      <created>1664491569776</created>
-      <option name="number" value="00100" />
-      <option name="presentableId" value="LOCAL-00100" />
-      <option name="project" value="LOCAL" />
-      <updated>1664491569776</updated>
+      <workItem from="1665141589598" duration="18963000" />
     </task>
     <task id="LOCAL-00101" summary="Fixing trade route">
       <created>1664491799072</created>
@@ -411,7 +390,28 @@
       <option name="project" value="LOCAL" />
       <updated>1665230700496</updated>
     </task>
-    <option name="localTasksCounter" value="147" />
+    <task id="LOCAL-00147" summary="Fixing DM check">
+      <created>1665231150807</created>
+      <option name="number" value="00147" />
+      <option name="presentableId" value="LOCAL-00147" />
+      <option name="project" value="LOCAL" />
+      <updated>1665231150807</updated>
+    </task>
+    <task id="LOCAL-00148" summary="Fixing DM check">
+      <created>1665231259871</created>
+      <option name="number" value="00148" />
+      <option name="presentableId" value="LOCAL-00148" />
+      <option name="project" value="LOCAL" />
+      <updated>1665231259872</updated>
+    </task>
+    <task id="LOCAL-00149" summary="Fixing verification">
+      <created>1665231327160</created>
+      <option name="number" value="00149" />
+      <option name="presentableId" value="LOCAL-00149" />
+      <option name="project" value="LOCAL" />
+      <updated>1665231327160</updated>
+    </task>
+    <option name="localTasksCounter" value="150" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -429,7 +429,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing cnc_bank" />
     <MESSAGE value="Fixing cncus" />
     <MESSAGE value="Fixing unrest to calculate overextension only on owned and occupied provinces" />
     <MESSAGE value="Fixing turnloop" />
@@ -454,7 +453,8 @@
     <MESSAGE value="API code alteration" />
     <MESSAGE value="Adding verify command" />
     <MESSAGE value="Fixing DM check" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing DM check" />
+    <MESSAGE value="Fixing verification" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing verification" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
