@@ -372,8 +372,9 @@ class Verification(commands.Cog):
         if nation.lower() not in [n.lower() for n in nation_info['nations']]:
             return await ctx.send(f"`{nation}` is not a verified nation associated with your account.")
         # if the nation is already the main nation
-        if nation.lower() == nation_info['main_nation'].lower():
-            return await ctx.send(f"{nation_info['main_nation']} is already your main nation.")
+        if nation_info['main_nation'] is not None:
+            if nation.lower() == nation_info['main_nation'].lower():
+                return await ctx.send(f"{nation_info['main_nation']} is already your main nation.")
         # set the nation as the main nation
         headers = {'User-Agent': 'Bassiliya'}
         nation_exist = requests.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={nation}",
