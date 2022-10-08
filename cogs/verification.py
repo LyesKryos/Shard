@@ -75,7 +75,7 @@ class Verification(commands.Cog):
         # if the user has already verified that nation
         if verified_check is not None:
             if nation_name.lower() in [n.lower() for n in verified_check['nations']]:
-                return await author_message.send(f"You have already verified '{nation_name}`. To view your verified nations, "
+                return await author_message.send(f"You have already verified `{nation_name}`. To view your verified nations, "
                                     f"use `$view_verified`.")
         # send verification instructions via DM
         await author_message.send(f"Please login to {nation_name}. Once complete, head to this link and send the "
@@ -160,6 +160,9 @@ class Verification(commands.Cog):
                                               f"main nation, use the `$set_main` command to do so.")
                     verifying.close()
                     return
+                else:
+                    return await author_message.send("That is not a valid or correct verification code. "
+                                                     "Please try again.")
 
 
 async def setup(bot: Shard):
