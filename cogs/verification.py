@@ -1,4 +1,6 @@
 # Shard Verification 0.1b
+import discord.channel
+
 from ShardBot import Shard
 import asyncio
 from discord.ext import commands
@@ -24,7 +26,7 @@ class Verification(commands.Cog):
         author = ctx.author
 
         def authorcheck(message):
-            return ctx.author == message.author and ctx.channel == message.channel
+            return ctx.author == message.author and ctx.channel == discord.channel.DMChannel
 
         # sends DM to initiate verification
         await author.send(f"**Welcome to the Thegye server, {author}!** \n\n"
@@ -32,7 +34,7 @@ class Verification(commands.Cog):
                           f"currently residing in Thegye, you will be assigned the Thegye role. If your nation is"
                           f" not currently residing in Thegye, you will be assigned the Traveler role. "
                           f"If you do not verify any nation, you will be assigned the Unverified role and be unable"
-                          f"to access the majority of the server.\n\n"
+                          f" to access the majority of the server.\n\n"
                           f"To begin the verification process, please enter your nation's **name**, "
                           f"without the pretitle. For example, if your nation appears as `The Holy Empire of Bassiliya`,"
                           f" please only enter `Bassiliya`. If you would like to skip verification, enter \"SKIP\" "
@@ -41,7 +43,7 @@ class Verification(commands.Cog):
         try:
             nation_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
         except asyncio.TimeoutError:
-            return await ctx.send("Verification timed out. Please answer me next time!")
+            return await author.send("Verification timed out. Please answer me next time!")
         # assigns nation name
         nation_name = nation_reply.content
         if nation_name.lower() == 'skip':
