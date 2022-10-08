@@ -92,7 +92,7 @@ class Verification(commands.Cog):
                     # if the user has no verified nation, add a new row
                     if nation is None:
                         await conn.execute('''INSERT INTO verified_nations(user_id, nations) VALUES ($1, $2);''',
-                                           author.id, nation_name)
+                                           author.id, list(nation_name))
                     else:
                         # if the user already has the nation verified, return
                         nation_check = await conn.fetchrow('''SELECT nations FROM verified_nations 
