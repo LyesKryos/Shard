@@ -73,7 +73,7 @@ class Verification(commands.Cog):
         headers = {"User-Agent": "Bassiliya"}
         params = {'a': 'verify',
                   'nation': nation_name.lower(),
-                  'checksum': code_reply,
+                  'checksum': code_reply.content,
                   'q': 'region'}
         # start session
         async with aiohttp.ClientSession() as verify_session:
