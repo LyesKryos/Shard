@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding verify command">
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing DM check">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -67,14 +67,7 @@
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
       <workItem from="1664469072638" duration="5067000" />
-      <workItem from="1665141589598" duration="16974000" />
-    </task>
-    <task id="LOCAL-00095" summary="Updating some commands with tech modifiers">
-      <created>1664041883869</created>
-      <option name="number" value="00095" />
-      <option name="presentableId" value="LOCAL-00095" />
-      <option name="project" value="LOCAL" />
-      <updated>1664041883869</updated>
+      <workItem from="1665141589598" duration="17629000" />
     </task>
     <task id="LOCAL-00096" summary="Fixing cnc_remove to include all tables&#10;Fixing cncb with lower">
       <created>1664071758282</created>
@@ -412,7 +405,14 @@
       <option name="project" value="LOCAL" />
       <updated>1665229194139</updated>
     </task>
-    <option name="localTasksCounter" value="144" />
+    <task id="LOCAL-00144" summary="Fixing DM check">
+      <created>1665229733173</created>
+      <option name="number" value="00144" />
+      <option name="presentableId" value="LOCAL-00144" />
+      <option name="project" value="LOCAL" />
+      <updated>1665229733173</updated>
+    </task>
+    <option name="localTasksCounter" value="145" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -430,7 +430,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing cnc_research.py with prerequisites" />
     <MESSAGE value="Fixing cnc_bank" />
     <MESSAGE value="Fixing cncus" />
     <MESSAGE value="Fixing unrest to calculate overextension only on owned and occupied provinces" />
@@ -455,7 +454,8 @@
     <MESSAGE value="Small fixes" />
     <MESSAGE value="API code alteration" />
     <MESSAGE value="Adding verify command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding verify command" />
+    <MESSAGE value="Fixing DM check" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing DM check" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
