@@ -333,7 +333,7 @@ class Verification(commands.Cog):
                                                              "Please try again.")
 
     @commands.command(brief="Displays a list of all verified nations.")
-    async def view_verified(self, ctx, user: discord.User = None):
+    async def view_verified(self, ctx, *, user: discord.User = None):
         # establish connection
         conn = self.bot.pool
         if user is None:
