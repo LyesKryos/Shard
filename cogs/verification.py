@@ -13,6 +13,17 @@ from pytz import timezone
 import aiohttp
 
 
+# f"**Welcome to the Thegye server, {author}!** \n\n"
+# f"This is your quick invitation to verify your NationStates nation. If your nation is "
+# f"currently residing in Thegye, you will be assigned the Thegye role. If your nation is"
+# f" not currently residing in Thegye, you will be assigned the Traveler role. "
+# f"If you do not verify any nation, you will be assigned the Unverified role and be unable"
+# f" to access the majority of the server.\n\n"
+# f"To begin the verification process, please enter your nation's **name**, "
+# f"without the pretitle. For example, if your nation appears as `The Holy Empire of Bassiliya`,"
+# f" please only enter `Bassiliya`. If you would like to skip verification, enter \"SKIP\" "
+# f"instead of your nation name."
+
 class Verification(commands.Cog):
 
     def __init__(self, bot: Shard):
@@ -30,17 +41,20 @@ class Verification(commands.Cog):
         def authorcheck(message):
             return ctx.author.id == message.author.id and message.guild is None
 
-        # sends DM to initiate verification
-        await author_message.send(f"**Welcome to the Thegye server, {author}!** \n\n"
-                                  f"This is your quick invitation to verify your NationStates nation. If your nation is "
-                                  f"currently residing in Thegye, you will be assigned the Thegye role. If your nation is"
-                                  f" not currently residing in Thegye, you will be assigned the Traveler role. "
-                                  f"If you do not verify any nation, you will be assigned the Unverified role and be unable"
-                                  f" to access the majority of the server.\n\n"
-                                  f"To begin the verification process, please enter your nation's **name**, "
-                                  f"without the pretitle. For example, if your nation appears as `The Holy Empire of Bassiliya`,"
-                                  f" please only enter `Bassiliya`. If you would like to skip verification, enter \"SKIP\" "
-                                  f"instead of your nation name.")
+        verified_check = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''', author.id)
+        if verified_check is None:
+            # sends DM to initiate verification
+            await author_message.send(f"**Welcome to the Shard Verification, {author}!** \n\n"
+                                      f"To begin the verification process, please enter your nation's **name**, "
+                                      f"without the pretitle. For example, if your nation appears as `The Holy Empire "
+                                      f"of Bassiliya`, please only enter `Bassiliya`.")
+        else:
+            # sends DM to initiate verification
+            await author_message.send(f"**Welcome back to the Shard Verification, {author}!** \n\n"
+                                      f"To begin the verification process, please enter your nation's **name**, "
+                                      f"without the pretitle. Please verify a nation that you have not "
+                                      f"previously verified. For example, if your nation appears as `The Holy Empire "
+                                      f"of Bassiliya`, please only enter `Bassiliya`.")
         # waits for the user to reply with their nation
         try:
             nation_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
@@ -49,7 +63,7 @@ class Verification(commands.Cog):
         # assigns nation name
         nation_name = nation_reply.content
         if nation_name.lower() == 'skip':
-            return
+            return await author_message.send("Verification cancelled.")
         # checks for the nation's existence
         nation_exist = requests.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={nation_name.lower()}")
         # if the nation does not exist, let the user know
@@ -58,12 +72,18 @@ class Verification(commands.Cog):
                 f"No such nation as `{nation_name}`. Please check that you are using only the nation's"
                 f" name, without the pretitle.")
             return
+        # if the user has already verified that nation
+        if verified_check is not None:
+            if nation_name.lower() in [n.lower() for n in verified_check['nations']]:
+                author_message.send(f"You have already verified '{nation_name}`. To view your verified nations, "
+                                    f"use `$view_verified`.")
+                return
         # send verification instructions via DM
         await author_message.send(f"Please login to {nation_name}. Once complete, head to this link and send the "
                                   f"verification code displayed: https://www.nationstates.net/page=verify_login. "
-                                  f"You may give the code below to an external website, which can use it to verify that you are"
-                                  f" indeed currently logged in as this nation. This is *all* I can do with it: "
-                                  f"It does not allow me to access your nation.")
+                                  f"You may give the code below to an external website, which can use it to verify "
+                                  f"that you are indeed currently logged in as this nation. "
+                                  f"This is *all* I can do with it: It does not allow me to access your nation.")
         # wait for response
         try:
             code_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
@@ -87,46 +107,59 @@ class Verification(commands.Cog):
                 verification = verification_soup.verify.string
                 # if the verification code is goood
                 if int(verification) == 1:
-                    # pull the nation info if the user has already verified a nation
-                    nation = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''', author.id)
                     # if the user has no verified nation, add a new row
-                    if nation is None:
+                    if verified_check is None:
                         await conn.execute('''INSERT INTO verified_nations(user_id, nations) VALUES ($1, $2);''',
                                            author.id, list(nation_name))
+                        # if the nation's region is Thegye, add the Thegye role
+                        if verification_soup.region.text == "Thegye":
+                            thegye_sever = self.bot.get_guild(674259612580446230)
+                            thegye_role = thegye_sever.get_role(674260547897917460)
+                            user = thegye_sever.get_member(author.id)
+                            await user.add_roles(thegye_role)
+                        # if the nation's region is Karma, add the Karma role
+                        elif verification_soup.region.text == "Karma":
+                            thegye_sever = self.bot.get_guild(674259612580446230)
+                            karma_role = thegye_sever.get_role(771456227674685440)
+                            user = thegye_sever.get_member(author.id)
+                            await user.add_roles(karma_role)
+                        # otherwise, add the traveler role
+                        else:
+                            thegye_sever = self.bot.get_guild(674259612580446230)
+                            traveler_role = thegye_sever.get_role(674280677268652047)
+                            user = thegye_sever.get_member(author.id)
+                            await user.add_roles(traveler_role)
                     else:
-                        # if the user already has the nation verified, return
-                        nation_check = await conn.fetchrow('''SELECT nations FROM verified_nations 
-                        WHERE user_id = $1;''', author.id)
-                        nation_check = [n.lower() for n in nation_check['nations']]
-                        if nation_name in nation_check:
-                            await author_message.send("You have already verified that nation. "
-                                                      "To view a list of your verified nations, use `$view_verified`.")
-                            return
                         # append the verified nation to the list
                         await conn.execute('''UPDATE verified_nations SET nations = nations || $1 
                         WHERE user_id = $2;''', list(nation_name), author.id)
+                        all_nations = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
+                                                          author.id)
+                        thegye_sever = self.bot.get_guild(674259612580446230)
+                        thegye_role = thegye_sever.get_role(674260547897917460)
+                        traveler_role = thegye_sever.get_role(674280677268652047)
+                        karma_role = thegye_sever.get_role(771456227674685440)
+                        user = thegye_sever.get_member(author.id)
+                        await user.remove_roles(thegye_role, traveler_role, karma_role)
+                        for n in all_nations['nations']:
+                            async with verify_session.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={n}",
+                                                          headers=headers) as nation_info:
+                                nation_info_raw = await nation_info.text()
+                                nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
+                                region = nation_info_soup.region.string
+                                # if the nation's region is Thegye, add the Thegye role
+                                if region == "Thegye":
+                                    await user.add_roles(thegye_role)
+                                # if the nation's region is Karma, add the Karma role
+                                elif region == "Karma":
+                                    await user.add_roles(karma_role)
+                                # otherwise, add the traveler role
+                                else:
+                                    await user.add_roles(traveler_role)
                     await author_message.send(f"Success! You have now verified `{nation_name}`. "
                                               f"Your roles will update momentarily. If you would like to set your "
                                               f"main nation, use the `$set_main` command to do so.")
                     verifying.close()
-                    # if the nation's region is Thegye, add the Thegye role
-                    if verification_soup.region.text == "Thegye":
-                        thegye_sever = self.bot.get_guild(674259612580446230)
-                        thegye_role = thegye_sever.get_role(674260547897917460)
-                        user = thegye_sever.get_member(author.id)
-                        await user.add_roles(thegye_role)
-                    # if the nation's region is Karma, add the Karma role
-                    if verification_soup.region.text == "Karma":
-                        thegye_sever = self.bot.get_guild(674259612580446230)
-                        karma_role = thegye_sever.get_role(771456227674685440)
-                        user = thegye_sever.get_member(author.id)
-                        await user.add_roles(karma_role)
-                    # otherwise, add the traveler role
-                    else:
-                        thegye_sever = self.bot.get_guild(674259612580446230)
-                        traveler_role = thegye_sever.get_role(674280677268652047)
-                        user = thegye_sever.get_member(author.id)
-                        await user.add_roles(traveler_role)
                     return
 
 
