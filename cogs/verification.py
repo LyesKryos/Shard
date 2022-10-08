@@ -104,7 +104,7 @@ class Verification(commands.Cog):
                             return
                         # append the verified nation to the list
                         await conn.execute('''UPDATE verified_nations SET nations = nations || $1 
-                        WHERE user_id = $2;''', nation_name, author.id)
+                        WHERE user_id = $2;''', list(nation_name), author.id)
                     await author_message.send(f"Success! You have now verified `{nation_name}`. "
                                               f"Your roles will update momentarily. If you would like to set your "
                                               f"main nation, use the `$set_main` command to do so.")
