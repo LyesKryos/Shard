@@ -65,7 +65,9 @@ class Verification(commands.Cog):
         if nation_name.lower() == 'skip':
             return await author_message.send("Verification cancelled.")
         # checks for the nation's existence
-        nation_exist = requests.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={nation_name}")
+        headers = {"User-Agent": "Bassiliya"}
+        nation_exist = requests.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={nation_name}",
+                                    headers=headers)
         # if the nation does not exist, let the user know
         if nation_exist.status_code == 404:
             await author_message.send(
@@ -73,9 +75,9 @@ class Verification(commands.Cog):
                 f" name, without the pretitle.")
             return
         # get official nation name
-        nation_name_raw = nation_exist.text
-        nation_name_soup = BeautifulSoup(nation_name_raw, 'lxml')
-        nation_name = nation_name_soup.find('name').text
+        nation_raw = nation_exist.text
+        nation_soup = BeautifulSoup(nation_raw, 'lxml')
+        nation_name = nation_soup.find('name').text
         # if the user has already verified that nation
         if verified_check is not None:
             if nation_name.lower() in [n.lower() for n in verified_check['nations']]:
@@ -94,7 +96,6 @@ class Verification(commands.Cog):
         except asyncio.TimeoutError:
             return await author_message.send("Verification timed out. Please answer me next time!")
         # define headers and parameters
-        headers = {"User-Agent": "Bassiliya"}
         params = {'a': 'verify',
                   'nation': nation_name,
                   'checksum': code_reply.content,
