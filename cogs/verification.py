@@ -406,6 +406,8 @@ class Verification(commands.Cog):
                                 if nation_info_soup.unstatus.text == "Member":
                                     await user.add_roles(wa_role)
                                 await user.remove_roles(traveler_role, karma_role)
+                                await ctx.send(f"You have successfully removed {nation_name} from your verified list. "
+                                               f"Your roles have updated appropriately.")
                                 return await user.add_roles(thegye_role)
                             # if the nation's region is Karma, add the Karma role
                             elif region == "Karma":
