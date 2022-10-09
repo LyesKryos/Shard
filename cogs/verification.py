@@ -210,7 +210,7 @@ class Verification(commands.Cog):
                 thegye_role = thegye_sever.get_role(674260547897917460)
                 traveler_role = thegye_sever.get_role(674280677268652047)
                 karma_role = thegye_sever.get_role(771456227674685440)
-                cte_role = thegye_server.get_role(572456164399251490)
+                cte_role = thegye_sever.get_role(572456164399251490)
                 await user.remove_roles(thegye_role, traveler_role, karma_role, unverified_role)
                 # start session and define headers
                 headers = {"User-Agent": "Bassiliya"}
