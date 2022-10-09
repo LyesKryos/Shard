@@ -169,7 +169,7 @@ class Verification(commands.Cog):
                                                               f"If you would like to set your main nation, "
                                                               f"use the `$set_main` command to do so.")
                                     # if the nation is in the WA, add the WA role
-                                    if verification_soup.unstatus.text != "Non-member":
+                                    if nation_info_soup.unstatus.text != "Non-member":
                                         wa_role = thegye_sever.get_role(674283915870994442)
                                         await user.add_roles(wa_role)
                                     return await user.add_roles(thegye_role)
