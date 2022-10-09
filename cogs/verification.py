@@ -99,7 +99,7 @@ class Verification(commands.Cog):
         params = {'a': 'verify',
                   'nation': nation_name,
                   'checksum': code_reply.content,
-                  'q': 'region'}
+                  'q': 'region+wa'}
         # start session
         async with aiohttp.ClientSession() as verify_session:
             # call for necessary data
