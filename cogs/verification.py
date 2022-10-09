@@ -196,7 +196,11 @@ class Verification(commands.Cog):
             user = thegye_sever.get_member(member.id)
             unverified_role = thegye_sever.get_role(1028144304507592704)
             await user.add_roles(unverified_role)
+            # define channels
             open_square = thegye_sever.get_channel(674335095628365855)
+            gatehouse = thegye_sever.get_channel(674284159128043530)
+            await gatehouse.send(f"{user.mention}, please check your DMs to start the verification process!\n"
+                                 f"If you have any issues, be sure to let a Gatekeeper know.")
             # establish connection
             conn = self.bot.pool
             # search for existing nations
@@ -206,6 +210,7 @@ class Verification(commands.Cog):
                 thegye_role = thegye_sever.get_role(674260547897917460)
                 traveler_role = thegye_sever.get_role(674280677268652047)
                 karma_role = thegye_sever.get_role(771456227674685440)
+                cte_role = thegye_server.get_role(572456164399251490)
                 await user.remove_roles(thegye_role, traveler_role, karma_role, unverified_role)
                 # start session and define headers
                 headers = {"User-Agent": "Bassiliya"}
@@ -214,6 +219,10 @@ class Verification(commands.Cog):
                         async with verify_session.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={n}",
                                                       headers=headers) as nation_info:
                             await asyncio.sleep(.6)
+                            if nation_info.status == 404:
+                                await user.add_roles(cte_role)
+                                return await open_square.send(f"The gods have sent us {member.mention}! "
+                                                              f"Welcome, traveler, and introduce yourself!")
                             nation_info_raw = await nation_info.text()
                             nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
                             region = nation_info_soup.region.text
@@ -279,10 +288,9 @@ class Verification(commands.Cog):
                 if nation_exist.status_code == 404:
                     await open_square.send(f"The gods have sent us {member.mention}! Welcome, traveler, "
                                            f"and introduce yourself!")
-                    await member_message.send(
+                    return await member_message.send(
                         f"No such nation as `{nation_name}`. Please check that you are using only the nation's"
                         f" name, without the pretitle.")
-                    return
                 # get official nation name
                 nation_raw = nation_exist.text
                 nation_soup = BeautifulSoup(nation_raw, 'lxml')
@@ -345,6 +353,8 @@ class Verification(commands.Cog):
                                 user = thegye_sever.get_member(member.id)
                                 await user.add_roles(traveler_role)
                                 await user.remove_roles(unverified_role)
+                            await open_square.send(f"The gods have sent us {member.mention}! Welcome, traveler, "
+                                                   f"and introduce yourself!")
                         else:
                             await open_square.send(f"The gods have sent us {member.mention}! Welcome, traveler, "
                                                    f"and introduce yourself!")
@@ -463,11 +473,13 @@ class Verification(commands.Cog):
 
     @commands.command(brief="Sets a previously verified nation as the main nation.")
     @commands.guild_only()
-    async def set_main(self, ctx, nation: str):
+    async def set_main(self, ctx, *, args: str):
         # establish connection
         conn = self.bot.pool
         # get author
         author = ctx.author
+        # set nation variable
+        nation = args
         # checks if nation is already verified and returns if not
         nation_info = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
                                           author.id)
