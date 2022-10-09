@@ -122,7 +122,7 @@ class Verification(commands.Cog):
                             thegye_role = thegye_sever.get_role(674260547897917460)
                             user = thegye_sever.get_member(author.id)
                             # if the nation is in the WA, add the WA role
-                            if verification_soup.unstatus.text == "Member":
+                            if verification_soup.unstatus.text != "Non-member":
                                 wa_role = thegye_sever.get_role(674283915870994442)
                                 await user.add_roles(wa_role)
                             await user.add_roles(thegye_role)
@@ -169,7 +169,7 @@ class Verification(commands.Cog):
                                                               f"If you would like to set your main nation, "
                                                               f"use the `$set_main` command to do so.")
                                     # if the nation is in the WA, add the WA role
-                                    if verification_soup.unstatus.text == "Member":
+                                    if verification_soup.unstatus.text != "Non-member":
                                         wa_role = thegye_sever.get_role(674283915870994442)
                                         await user.add_roles(wa_role)
                                     return await user.add_roles(thegye_role)
@@ -227,7 +227,7 @@ class Verification(commands.Cog):
                                 await open_square.send(f"The gods have sent us {member.mention}! Welcome, traveler, "
                                                        f"and introduce yourself!")
                                 # if the nation is in the WA, add the WA role
-                                if nation_info_soup.unstatus.text == "Member":
+                                if nation_info_soup.unstatus.text != "Non-member":
                                     wa_role = thegye_sever.get_role(674283915870994442)
                                     await user.add_roles(wa_role)
                                 return await user.add_roles(thegye_role)
@@ -328,7 +328,7 @@ class Verification(commands.Cog):
                                 thegye_role = thegye_sever.get_role(674260547897917460)
                                 user = thegye_sever.get_member(member.id)
                                 # if the nation is in the WA, add the WA role
-                                if verification_soup.unstatus.text == "Member":
+                                if verification_soup.unstatus.text != "Non-member":
                                     wa_role = thegye_sever.get_role(674283915870994442)
                                     await user.add_roles(wa_role)
                                 await user.add_roles(thegye_role)
@@ -403,7 +403,7 @@ class Verification(commands.Cog):
                             # if the nation's region is Thegye, add the Thegye role
                             if region == "Thegye":
                                 # if the nation is in the WA, add the WA role
-                                if nation_info_soup.unstatus.text == "Member":
+                                if nation_info_soup.unstatus.text != "Non-member":
                                     await user.add_roles(wa_role)
                                 await user.remove_roles(traveler_role, karma_role)
                                 await ctx.send(f"You have successfully removed {nation_name} from your verified list. "
