@@ -67,14 +67,7 @@
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
       <workItem from="1664469072638" duration="5067000" />
-      <workItem from="1665141589598" duration="39078000" />
-    </task>
-    <task id="LOCAL-00124" summary="Trying fixing API startup">
-      <created>1665154103684</created>
-      <option name="number" value="00124" />
-      <option name="presentableId" value="LOCAL-00124" />
-      <option name="project" value="LOCAL" />
-      <updated>1665154103684</updated>
+      <workItem from="1665141589598" duration="42031000" />
     </task>
     <task id="LOCAL-00125" summary="Trying fixing API startup">
       <created>1665154125932</created>
@@ -412,7 +405,14 @@
       <option name="project" value="LOCAL" />
       <updated>1665269694196</updated>
     </task>
-    <option name="localTasksCounter" value="173" />
+    <task id="LOCAL-00173" summary="Adding message verification for the verify command.">
+      <created>1665271858489</created>
+      <option name="number" value="00173" />
+      <option name="presentableId" value="LOCAL-00173" />
+      <option name="project" value="LOCAL" />
+      <updated>1665271858489</updated>
+    </task>
+    <option name="localTasksCounter" value="174" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

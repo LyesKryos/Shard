@@ -14,17 +14,6 @@ import aiohttp
 from typing import Union, Optional
 
 
-# f"**Welcome to the Thegye server, {author}!** \n\n"
-# f"This is your quick invitation to verify your NationStates nation. If your nation is "
-# f"currently residing in Thegye, you will be assigned the Thegye role. If your nation is"
-# f" not currently residing in Thegye, you will be assigned the Traveler role. "
-# f"If you do not verify any nation, you will be assigned the Unverified role and be unable"
-# f" to access the majority of the server.\n\n"
-# f"To begin the verification process, please enter your nation's **name**, "
-# f"without the pretitle. For example, if your nation appears as `The Holy Empire of Bassiliya`,"
-# f" please only enter `Bassiliya`. If you would like to skip verification, enter \"SKIP\" "
-# f"instead of your nation name."
-
 class Verification(commands.Cog):
 
     def __init__(self, bot: Shard):
@@ -44,16 +33,20 @@ class Verification(commands.Cog):
         if ctx.guild is not None:
             await ctx.send("Sent you a DM!")
 
+        # checks to make sure the author is the author and the guild is a DM
         def authorcheck(message):
             return ctx.author.id == message.author.id and message.guild is None
 
+        # checks to see if the user has already verified yet or not
         verified_check = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''', author.id)
+        # if the user has no verified nations
         if verified_check is None:
             # sends DM to initiate verification
             await author_message.send(f"**Welcome to the Shard Verification, {author}!** \n\n"
                                       f"To begin the verification process, please enter your nation's **name**, "
                                       f"without the pretitle. For example, if your nation appears as `The Holy Empire "
                                       f"of Bassiliya`, please only enter `Bassiliya`.")
+        # if the user does have some verified nation(s)
         else:
             # sends DM to initiate verification
             await author_message.send(f"**Welcome back to the Shard Verification, {author}!** \n\n"
@@ -68,7 +61,8 @@ class Verification(commands.Cog):
             return await author_message.send("Verification timed out. Please answer me next time!")
         # assigns nation name
         nation_name = nation_reply.content
-        if nation_name.lower() == 'skip':
+        # if the user decides to cancel the process
+        if nation_name.lower() == 'stop' or nation_name.lower() == 'cancel' or nation_name.lower() == 'skip':
             return await author_message.send("Verification cancelled.")
         # checks for the nation's existence
         headers = {"User-Agent": "Bassiliya"}
@@ -127,6 +121,10 @@ class Verification(commands.Cog):
                         if verification_soup.region.text == "Thegye":
                             thegye_role = thegye_sever.get_role(674260547897917460)
                             user = thegye_sever.get_member(author.id)
+                            # if the nation is in the WA, add the WA role
+                            if verification_soup.unstatus.text == "Member":
+                                wa_role = thegye_sever.get_role(674283915870994442)
+                                await user.add_roles(wa_role)
                             await user.add_roles(thegye_role)
                             await user.remove_roles(unverified_role)
                         # if the nation's region is Karma, add the Karma role
@@ -143,6 +141,7 @@ class Verification(commands.Cog):
                             user = thegye_sever.get_member(author.id)
                             await user.add_roles(traveler_role)
                             await user.remove_roles(unverified_role)
+                    # if the user has previously verified a nation
                     else:
                         # append the verified nation to the list
                         await conn.execute('''UPDATE verified_nations SET nations = nations || $1
@@ -169,6 +168,10 @@ class Verification(commands.Cog):
                                                               f"Your roles will update momentarily. "
                                                               f"If you would like to set your main nation, "
                                                               f"use the `$set_main` command to do so.")
+                                    # if the nation is in the WA, add the WA role
+                                    if verification_soup.unstatus.text == "Member":
+                                        wa_role = thegye_sever.get_role(674283915870994442)
+                                        await user.add_roles(wa_role)
                                     return await user.add_roles(thegye_role)
                                 # if the nation's region is Karma, add the Karma role
                                 elif region == "Karma":
@@ -223,6 +226,10 @@ class Verification(commands.Cog):
                                 await user.remove_roles(traveler_role, karma_role)
                                 await open_square.send(f"The gods have sent us {member.mention}! Welcome, traveler, "
                                                        f"and introduce yourself!")
+                                # if the nation is in the WA, add the WA role
+                                if nation_info_soup.unstatus.text == "Member":
+                                    wa_role = thegye_sever.get_role(674283915870994442)
+                                    await user.add_roles(wa_role)
                                 return await user.add_roles(thegye_role)
                             # if the nation's region is Karma, add the Karma role
                             elif region == "Karma":
@@ -247,6 +254,7 @@ class Verification(commands.Cog):
                                           f"`The Holy Empire of Bassiliya`, please only enter `Bassiliya`. "
                                           f"If you would like to skip verification, "
                                           f"enter \"SKIP\" instead of your nation name.")
+
                 def authorcheck(message):
                     return member.id == message.author.id and message.guild is None
 
@@ -315,14 +323,14 @@ class Verification(commands.Cog):
                             await conn.execute(
                                 '''INSERT INTO verified_nations(user_id, nations) VALUES ($1, $2);''',
                                 member.id, [nation_name])
-                            # if the nation is in the WA, add the WA role
-                            if verification_soup.unstatus.text == "Member":
-                                wa_role = thegye_sever.get_role(674283915870994442)
-                                await user.add_roles(wa_role)
                             # if the nation's region is Thegye, add the Thegye role
                             if verification_soup.region.text == "Thegye":
                                 thegye_role = thegye_sever.get_role(674260547897917460)
                                 user = thegye_sever.get_member(member.id)
+                                # if the nation is in the WA, add the WA role
+                                if verification_soup.unstatus.text == "Member":
+                                    wa_role = thegye_sever.get_role(674283915870994442)
+                                    await user.add_roles(wa_role)
                                 await user.add_roles(thegye_role)
                                 await user.remove_roles(unverified_role)
                             # if the nation's region is Karma, add the Karma role
@@ -342,6 +350,73 @@ class Verification(commands.Cog):
                                                    f"and introduce yourself!")
                             return await member_message.send("That is not a valid or correct verification code. "
                                                              "Please try again.")
+
+    @commands.command(brief="Remove a nation from your verified list.")
+    async def unverify(self, ctx, *, args):
+        # establish connection
+        conn = self.bot.pool
+        # sets author
+        author = ctx.author
+        # fetches nation information
+        nation_check = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
+                                           author.id)
+        # if the user has no verified nations, return
+        if nation_check is None:
+            return await ctx.send("You have no nations registered.")
+        # if the nation specified is not in the list
+        if args.lower() not in [n.lower() for n in nation_check['nations']]:
+            return await ctx.send("That nation is not registered.")
+        # get the real nation name
+        async with aiohttp.ClientSession() as verify_session:
+            # headers and params
+            headers = {'User-Agent': 'Bassiliya'}
+            params = {'nation': args}
+            # get data
+            async with verify_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                          headers=headers, params=params) as nation_info:
+                await asyncio.sleep(.6)
+                # parse name
+                nation_info_response = await nation_info.text()
+                nation_info_soup = BeautifulSoup(nation_info_response, 'lxml')
+                nation_name = nation_info_soup.find('name').text
+                # remove name
+                await conn.execute('''UPDATE verified_nations SET nations = array_remove(nations, $1) 
+                WHERE user_id = $2;''', nation_name, author.id)
+                all_nations = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
+                                                  author.id)
+                thegye_sever = self.bot.get_guild(674259612580446230)
+                thegye_role = thegye_sever.get_role(674260547897917460)
+                traveler_role = thegye_sever.get_role(674280677268652047)
+                karma_role = thegye_sever.get_role(771456227674685440)
+                unverified_role = thegye_sever.get_role(1028144304507592704)
+                wa_role = thegye_sever.get_role(674283915870994442)
+                user = thegye_sever.get_member(author.id)
+                await user.remove_roles(thegye_role, traveler_role, karma_role, wa_role)
+                if all_nations['nations'] is not None:
+                    for n in all_nations['nations']:
+                        async with verify_session.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={n}",
+                                                      headers=headers) as nation_info:
+                            await asyncio.sleep(.6)
+                            nation_info_raw = await nation_info.text()
+                            nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
+                            region = nation_info_soup.region.text
+                            # if the nation's region is Thegye, add the Thegye role
+                            if region == "Thegye":
+                                # if the nation is in the WA, add the WA role
+                                if nation_info_soup.unstatus.text == "Member":
+                                    await user.add_roles(wa_role)
+                                await user.remove_roles(traveler_role, karma_role)
+                                return await user.add_roles(thegye_role)
+                            # if the nation's region is Karma, add the Karma role
+                            elif region == "Karma":
+                                await user.add_roles(karma_role)
+                            # otherwise, add the traveler role
+                            else:
+                                await user.add_roles(traveler_role)
+                else:
+                    await user.add_roles(unverified_role)
+        return await ctx.send(f"You have successfully removed {nation_name} from your verified list. "
+                              f"Your roles have updated appropriately.")
 
     @commands.command(brief="Displays a list of all verified nations.")
     async def view_verified(self, ctx, *, user: Optional[discord.Member] = None):
@@ -383,7 +458,6 @@ class Verification(commands.Cog):
                 else:
                     verified_nations = ", ".join(verified['nations'])
                 return await ctx.send(f"Verified nations of {author.name}: {verified_nations}")
-
 
     @commands.command(brief="Sets a previously verified nation as the main nation.")
     @commands.guild_only()
