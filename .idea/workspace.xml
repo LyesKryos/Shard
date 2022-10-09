@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Improving set main&#10;Fixing welcome message.&#10;Adding CTE role for on-join nations that have already verified">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing cte role">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
@@ -67,21 +67,7 @@
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
       <workItem from="1664469072638" duration="5067000" />
-      <workItem from="1665141589598" duration="45559000" />
-    </task>
-    <task id="LOCAL-00131" summary="Trying fixing API startup and error catching">
-      <created>1665155585312</created>
-      <option name="number" value="00131" />
-      <option name="presentableId" value="LOCAL-00131" />
-      <option name="project" value="LOCAL" />
-      <updated>1665155585312</updated>
-    </task>
-    <task id="LOCAL-00132" summary="Trying fixing API startup and error catching">
-      <created>1665158616513</created>
-      <option name="number" value="00132" />
-      <option name="presentableId" value="LOCAL-00132" />
-      <option name="project" value="LOCAL" />
-      <updated>1665158616514</updated>
+      <workItem from="1665141589598" duration="46678000" />
     </task>
     <task id="LOCAL-00133" summary="Small fixes">
       <created>1665158730683</created>
@@ -412,7 +398,21 @@
       <option name="project" value="LOCAL" />
       <updated>1665315778398</updated>
     </task>
-    <option name="localTasksCounter" value="180" />
+    <task id="LOCAL-00180" summary="Improving set main&#10;Fixing welcome message.&#10;Adding CTE role for on-join nations that have already verified">
+      <created>1665315849629</created>
+      <option name="number" value="00180" />
+      <option name="presentableId" value="LOCAL-00180" />
+      <option name="project" value="LOCAL" />
+      <updated>1665315849630</updated>
+    </task>
+    <task id="LOCAL-00181" summary="Fixing cte role">
+      <created>1665315995838</created>
+      <option name="number" value="00181" />
+      <option name="presentableId" value="LOCAL-00181" />
+      <option name="project" value="LOCAL" />
+      <updated>1665315995838</updated>
+    </task>
+    <option name="localTasksCounter" value="182" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -430,7 +430,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing province production" />
     <MESSAGE value="Removing Gaia from dispatch updating" />
     <MESSAGE value="Sprucing up the recruitment code&#10;Adding API telegramming" />
     <MESSAGE value="Adding API telegramming on reload/start" />
@@ -455,7 +454,8 @@
     <MESSAGE value="Fixing unverify command" />
     <MESSAGE value="Fixing verify command" />
     <MESSAGE value="Improving set main&#10;Fixing welcome message.&#10;Adding CTE role for on-join nations that have already verified" />
-    <option name="LAST_COMMIT_MESSAGE" value="Improving set main&#10;Fixing welcome message.&#10;Adding CTE role for on-join nations that have already verified" />
+    <MESSAGE value="Fixing cte role" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing cte role" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

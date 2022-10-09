@@ -313,7 +313,7 @@ class Verification(commands.Cog):
                 params = {'a': 'verify',
                           'nation': nation_name,
                           'checksum': code_reply.content,
-                          'q': 'region'}
+                          'q': 'region+wa'}
                 # start session
                 async with aiohttp.ClientSession() as verify_session:
                     # call for necessary data
@@ -325,34 +325,37 @@ class Verification(commands.Cog):
                         verification_soup = BeautifulSoup(verification_raw, 'lxml')
                         # fetch verification
                         verification = verification_soup.verify.string
+                        region = verification_soup.region.string
                         # if the verification code is good
                         if int(verification) == 1:
+                            # define roles
+                            thegye_role = thegye_sever.get_role(674260547897917460)
+                            traveler_role = thegye_sever.get_role(674280677268652047)
+                            karma_role = thegye_sever.get_role(771456227674685440)
                             # since the user has no verified nation, add a new row
                             await conn.execute(
                                 '''INSERT INTO verified_nations(user_id, nations) VALUES ($1, $2);''',
                                 member.id, [nation_name])
                             # if the nation's region is Thegye, add the Thegye role
-                            if verification_soup.region.text == "Thegye":
-                                thegye_role = thegye_sever.get_role(674260547897917460)
-                                user = thegye_sever.get_member(member.id)
+                            if region == "Thegye":
+                                await user.remove_roles(traveler_role, karma_role)
+                                await member_message.send(f"Success! You have now verified `{nation_name}`. "
+                                                          f"Your roles will update momentarily. "
+                                                          f"If you would like to set your main nation, "
+                                                          f"use the `$set_main` command to do so.")
+                                await user.add_roles(thegye_role)
                                 # if the nation is in the WA, add the WA role
                                 if verification_soup.unstatus.text != "Non-member":
                                     wa_role = thegye_sever.get_role(674283915870994442)
                                     await user.add_roles(wa_role)
-                                await user.add_roles(thegye_role)
-                                await user.remove_roles(unverified_role)
+                                return await open_square.send(f"The gods have sent us {member.mention}! "
+                                                              f"Welcome, traveler, and introduce yourself!")
                             # if the nation's region is Karma, add the Karma role
-                            elif verification_soup.region.text == "Karma":
-                                karma_role = thegye_sever.get_role(771456227674685440)
-                                user = thegye_sever.get_member(member.id)
+                            elif region == "Karma":
                                 await user.add_roles(karma_role)
-                                await user.remove_roles(unverified_role)
                             # otherwise, add the traveler role
                             else:
-                                traveler_role = thegye_sever.get_role(674280677268652047)
-                                user = thegye_sever.get_member(member.id)
                                 await user.add_roles(traveler_role)
-                                await user.remove_roles(unverified_role)
                             await open_square.send(f"The gods have sent us {member.mention}! Welcome, traveler, "
                                                    f"and introduce yourself!")
                         else:
