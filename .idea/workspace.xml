@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding roleplay intro command" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing roleplay intro command">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/roleplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/roleplay.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -64,21 +67,7 @@
       <workItem from="1663417484418" duration="5405000" />
       <workItem from="1663445529962" duration="55526000" />
       <workItem from="1664469072638" duration="5067000" />
-      <workItem from="1665141589598" duration="49045000" />
-    </task>
-    <task id="LOCAL-00136" summary="API code alteration">
-      <created>1665160622445</created>
-      <option name="number" value="00136" />
-      <option name="presentableId" value="LOCAL-00136" />
-      <option name="project" value="LOCAL" />
-      <updated>1665160622445</updated>
-    </task>
-    <task id="LOCAL-00137" summary="API code alteration">
-      <created>1665167723381</created>
-      <option name="number" value="00137" />
-      <option name="presentableId" value="LOCAL-00137" />
-      <option name="project" value="LOCAL" />
-      <updated>1665167723381</updated>
+      <workItem from="1665141589598" duration="49950000" />
     </task>
     <task id="LOCAL-00138" summary="API code alteration">
       <created>1665167860565</created>
@@ -409,7 +398,21 @@
       <option name="project" value="LOCAL" />
       <updated>1665405665666</updated>
     </task>
-    <option name="localTasksCounter" value="185" />
+    <task id="LOCAL-00185" summary="Fixing roleplay intro command">
+      <created>1665405801014</created>
+      <option name="number" value="00185" />
+      <option name="presentableId" value="LOCAL-00185" />
+      <option name="project" value="LOCAL" />
+      <updated>1665405801014</updated>
+    </task>
+    <task id="LOCAL-00186" summary="Fixing roleplay intro command">
+      <created>1665405953026</created>
+      <option name="number" value="00186" />
+      <option name="presentableId" value="LOCAL-00186" />
+      <option name="project" value="LOCAL" />
+      <updated>1665405953026</updated>
+    </task>
+    <option name="localTasksCounter" value="187" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -427,7 +430,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Trying to fix recruitment cron issues" />
     <MESSAGE value="Trying to fix api recruitment" />
     <MESSAGE value="Trying fixing API loop time" />
     <MESSAGE value="Trying fixing API startup" />
@@ -452,7 +454,8 @@
     <MESSAGE value="Fixing on_member_join verification" />
     <MESSAGE value="Adding response for denied DM" />
     <MESSAGE value="Adding roleplay intro command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding roleplay intro command" />
+    <MESSAGE value="Fixing roleplay intro command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing roleplay intro command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
