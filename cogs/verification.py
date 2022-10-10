@@ -251,18 +251,30 @@ class Verification(commands.Cog):
             else:
                 # creates DM
                 member_message = await member.create_dm()
-                await member_message.send(f"**Welcome to the Thegye server, {member}!** \n\n"
-                                          f"This is your quick invitation to verify your NationStates nation. If your "
-                                          f"nation is currently residing in Thegye, "
-                                          f"you will be assigned the Thegye role. If your nation is not currently "
-                                          f"residing in Thegye, you will be assigned the Traveler role. "
-                                          f"If you do not verify any nation, you will be assigned "
-                                          f"the Unverified role and be unable to access the majority of the server.\n\n"
-                                          f"To begin the verification process, please enter your nation's **name**, "
-                                          f"without the pretitle. For example, if your nation appears as "
-                                          f"`The Holy Empire of Bassiliya`, please only enter `Bassiliya`. "
-                                          f"If you would like to skip verification, "
-                                          f"enter \"SKIP\" instead of your nation name.")
+                try:
+                    await member_message.send(f"**Welcome to the Thegye server, {member}!** \n\n"
+                                              f"This is your quick invitation to verify your NationStates nation. If your "
+                                              f"nation is currently residing in Thegye, "
+                                              f"you will be assigned the Thegye role. If your nation is not currently "
+                                              f"residing in Thegye, you will be assigned the Traveler role. "
+                                              f"If you do not verify any nation, you will be assigned "
+                                              f"the Unverified role and be unable to access the majority of the server.\n\n"
+                                              f"To begin the verification process, please enter your nation's **name**, "
+                                              f"without the pretitle. For example, if your nation appears as "
+                                              f"`The Holy Empire of Bassiliya`, please only enter `Bassiliya`. "
+                                              f"If you would like to skip verification, "
+                                              f"enter \"SKIP\" instead of your nation name.")
+                except discord.Forbidden:
+                    return await gatehouse.send(f"{user.mention}, I can't DM you! This could be for a few reasons: \n\n"
+                                                f"1. You have me blocked. Sad. \U0001f614 \n"
+                                                f"2. You are no longer in this server or any server we share. "
+                                                f"*Come back!*\n"
+                                                f"3. You accept DMs only from users you have in your Friends list. "
+                                                f"In order to allow me to DM you, go to `Settings > Privacy & Safety > "
+                                                f"Server Privacy Defaults` and toggle **ON** the "
+                                                f"`Allow direct messages from server members.\n\n"
+                                                f"Once you have completed that step, please use the `$verify` "
+                                                f"command again to complete the verification process. ")
 
                 def authorcheck(message):
                     return member.id == message.author.id and message.guild is None
@@ -348,6 +360,7 @@ class Verification(commands.Cog):
                                 if verification_soup.unstatus.text != "Non-member":
                                     wa_role = thegye_sever.get_role(674283915870994442)
                                     await user.add_roles(wa_role)
+                                await user.remove_roles(unverified_role)
                                 return await open_square.send(f"The gods have sent us {member.mention}! "
                                                               f"Welcome, traveler, and introduce yourself!")
                             # if the nation's region is Karma, add the Karma role
@@ -356,6 +369,7 @@ class Verification(commands.Cog):
                             # otherwise, add the traveler role
                             else:
                                 await user.add_roles(traveler_role)
+                            await user.remove_roles(unverified_role)
                             await open_square.send(f"The gods have sent us {member.mention}! Welcome, traveler, "
                                                    f"and introduce yourself!")
                         else:
