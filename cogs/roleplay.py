@@ -47,7 +47,7 @@ class Roleplay(commands.Cog):
     async def roleplay_intro(self, ctx, user: discord.Member):
         # get channel
         thegye_server = self.bot.get_guild(674259612580446230)
-        ooc_channel = thegye_server.get_channel(674259612580446230)
+        ooc_channel = thegye_server.get_channel(674337504933052469)
         await ooc_channel.send("Welcome to Thegye RP! \n\n"
                                "First, you should check out our roleplay dispatch located here: "
                                "https://www.nationstates.net/page=dispatch/id=1370630 It has all the information to get"
