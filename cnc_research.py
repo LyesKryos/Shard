@@ -263,7 +263,7 @@ class Technology:
                 SET national_unrest_suppression_efficiency_mod = national_unrest_suppression_efficiency_mod + 0.05
                 WHERE user_id = $1;''', userinfo['user_id'])
             if t == 'Machines':
-                await conn.execute('''UPDATE cnc_modifiders SET workshop_production_mod = workshop_production_mod + 0.5
+                await conn.execute('''UPDATE cnc_modifiers SET workshop_production_mod = workshop_production_mod + 0.5
                 WHERE user_id = $1;''', userinfo['user_id'])
             if t == 'Printing Press':
                 await conn.execute('''UPDATE cnc_modifiers 
