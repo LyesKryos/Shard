@@ -208,11 +208,13 @@ class Recruitment(commands.Cog):
             except Exception as error:
                 error_log(error)
 
-
-        loop = bot.loop
-        self.monthly_loop = loop.create_task(monthly_recruiter_scheduler(bot))
-        self.retention_loop = loop.create_task(retention(bot))
-        self.world_assembly_notification_loop = loop.create_task(world_assembly_notification(bot))
+        try:
+            loop = bot.loop
+            self.monthly_loop = loop.create_task(monthly_recruiter_scheduler(bot))
+            self.retention_loop = loop.create_task(retention(bot))
+            self.world_assembly_notification_loop = loop.create_task(world_assembly_notification(bot))
+        except Exception as error:
+            error_log(error)
 
 
     def sanitize_links_percent(self, url: str) -> str:
