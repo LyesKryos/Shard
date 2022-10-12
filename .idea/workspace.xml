@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding map and edit_map commands">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cnc_research.py" beforeDir="false" afterPath="$PROJECT_DIR$/cnc_research.py" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing cnc_research.py">
+      <change beforePath="$PROJECT_DIR$/ShardBot.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShardBot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,14 +68,7 @@
       <workItem from="1663445529962" duration="55526000" />
       <workItem from="1664469072638" duration="5067000" />
       <workItem from="1665141589598" duration="50358000" />
-      <workItem from="1665506818611" duration="739000" />
-    </task>
-    <task id="LOCAL-00139" summary="API code alteration">
-      <created>1665168074062</created>
-      <option name="number" value="00139" />
-      <option name="presentableId" value="LOCAL-00139" />
-      <option name="project" value="LOCAL" />
-      <updated>1665168074062</updated>
+      <workItem from="1665506818611" duration="1096000" />
     </task>
     <task id="LOCAL-00140" summary="API code alteration">
       <created>1665168126967</created>
@@ -413,7 +406,14 @@
       <option name="project" value="LOCAL" />
       <updated>1665406845828</updated>
     </task>
-    <option name="localTasksCounter" value="188" />
+    <task id="LOCAL-00188" summary="Fixing cnc_research.py">
+      <created>1665578627394</created>
+      <option name="number" value="00188" />
+      <option name="presentableId" value="LOCAL-00188" />
+      <option name="project" value="LOCAL" />
+      <updated>1665578627395</updated>
+    </task>
+    <option name="localTasksCounter" value="189" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -431,7 +431,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Trying fixing API loop time" />
     <MESSAGE value="Trying fixing API startup" />
     <MESSAGE value="Trying fixing API startup and error catching" />
     <MESSAGE value="Small fixes" />
@@ -456,7 +455,8 @@
     <MESSAGE value="Adding roleplay intro command" />
     <MESSAGE value="Fixing roleplay intro command" />
     <MESSAGE value="Adding map and edit_map commands" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding map and edit_map commands" />
+    <MESSAGE value="Fixing cnc_research.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing cnc_research.py" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

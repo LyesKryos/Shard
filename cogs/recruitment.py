@@ -207,58 +207,12 @@ class Recruitment(commands.Cog):
                         continue
             except Exception as error:
                 error_log(error)
-        async def api_recruitment():
-            try:
-                headers = {'User-Agent': 'Bassiliya'}
-                params = {'client': '85eb458e',
-                          'tgid': '25352330',
-                          'key': 'b777d3383626'}
-                async with aiohttp.ClientSession() as session:
-                    newnationsparams = {'q': 'newnations'}
-                    async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                           headers=headers, params=newnationsparams) as nnresp:
-                        await asyncio.sleep(.6)
-                        newnationsraw = await nnresp.text()
-                        nnresp.close()
-                    # after the list is called, the xml is parsed and the list is made
-                    nnsoup = BeautifulSoup(newnationsraw, "lxml")
-                    newnations_prefilter = set(nnsoup.newnations.string.split(","))
-                    for nation in newnations_prefilter:
-                        # searches for numbers in names
-                        number_puppet = re.search("\d+", nation)
-                        # if there is a number, remove that nation and add it to the do not send list
-                        if number_puppet:
-                            self.do_not_recruit.append(nation)
-                    # filters out any do not send to nations
-                    newnations_post_filter = list(newnations_prefilter.difference(set(self.do_not_recruit)))
-                    # grabs only the first nation to send a telegram to
-                    newnation = newnations_post_filter[0]
-                    sending_to = newnation
-                    params.update({'to': sending_to})
-                    async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?a=sendTG',
-                                           headers=headers, params=params) as api_send:
-                        if api_send.status != 200:
-                            crash_channel = self.bot.get_channel(835579413625569322)
-                            if api_send.status == 429:
-                                retry_after = api_send.headers
-                                await asyncio.sleep(int(retry_after['Retry-After']))
-                                await crash_channel.send(f"API too fast! Retrying after {retry_after['Retry-After']}"
-                                                         f" seconds. Attempted to send to `{sending_to}`.")
-                            else:
-                                await crash_channel.send("API telegram sending error.")
-                                raise Exception(f"API received faulty response code: "
-                                                f"{api_send.status}\n{api_send.text}")
-                        await asyncio.sleep(180)
-                        api_send.close()
-            except Exception as error:
-                error_log(error)
 
 
         loop = bot.loop
         self.monthly_loop = loop.create_task(monthly_recruiter_scheduler(bot))
         self.retention_loop = loop.create_task(retention(bot))
         self.world_assembly_notification_loop = loop.create_task(world_assembly_notification(bot))
-        # self.api_recruitment = loop.create_task(api_recruitment())
 
 
     def sanitize_links_percent(self, url: str) -> str:
@@ -275,7 +229,6 @@ class Recruitment(commands.Cog):
         self.retention_loop.cancel()
         self.monthly_loop.cancel()
         self.world_assembly_notification_loop.cancel()
-        # self.api_recruitment.cancel()
 
     # cog variables
     do_not_recruit = list()
