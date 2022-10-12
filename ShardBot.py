@@ -41,6 +41,7 @@ class Shard(commands.Bot):
                                                                 database="botdb")
         except Exception as error:
             self.logger.warning(error)
+
     async def close(self):
         await super().close()
 
@@ -48,5 +49,3 @@ class Shard(commands.Bot):
         if member.guild.id == 674259612580446230:
             role = member.guild.get_role(751113326481768479)
             await member.add_roles(role)
-
-
