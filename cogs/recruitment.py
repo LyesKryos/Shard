@@ -198,14 +198,9 @@ class Recruitment(commands.Cog):
             except Exception as error:
                 error_log(error)
 
-        try:
-            loop = bot.loop
-            loop.run_in_executor(None, monthly_recruiter, bot)
-            loop.run_in_executor(None, retention, bot)
-            loop.run_in_executor(None, world_assembly_notification, bot)
-        except Exception as error:
-            error_log(error)
-
+        self.monthly_recruiter = monthly_recruiter(bot)
+        self.retention = retention(bot)
+        self.world_assembly_notification = world_assembly_notification(bot)
 
     def sanitize_links_percent(self, url: str) -> str:
         # sanitizes links with %s
@@ -690,4 +685,8 @@ class Recruitment(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(Recruitment(bot))
+    cog = Recruitment(bot)
+    await cog.world_assembly_notification
+    await cog.retention
+    await cog.monthly_recruiter
+    await bot.add_cog(cog)
