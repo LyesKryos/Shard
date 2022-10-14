@@ -202,9 +202,10 @@ class Recruitment(commands.Cog):
                 error_log(error)
 
         try:
-            asyncio.run(monthly_recruiter(bot))
-            asyncio.run(retention(bot))
-            asyncio.run(world_assembly_notification(bot))
+            loop = bot.loop
+            loop.run_until_complete(monthly_recruiter(bot))
+            loop.run_until_complete(retention(bot))
+            loop.run_until_complete(world_assembly_notification(bot))
         except Exception as error:
             error_log(error)
 
