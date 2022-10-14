@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing looping for retention, WA, and monthly recruiter">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,28 +68,7 @@
       <workItem from="1664469072638" duration="5067000" />
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
-      <workItem from="1665685087568" duration="6950000" />
-    </task>
-    <task id="LOCAL-00150" summary="Fixing verification">
-      <created>1665231631289</created>
-      <option name="number" value="00150" />
-      <option name="presentableId" value="LOCAL-00150" />
-      <option name="project" value="LOCAL" />
-      <updated>1665231631289</updated>
-    </task>
-    <task id="LOCAL-00151" summary="Fixing verification">
-      <created>1665231726998</created>
-      <option name="number" value="00151" />
-      <option name="presentableId" value="LOCAL-00151" />
-      <option name="project" value="LOCAL" />
-      <updated>1665231726998</updated>
-    </task>
-    <task id="LOCAL-00152" summary="Fixing verification">
-      <created>1665232708259</created>
-      <option name="number" value="00152" />
-      <option name="presentableId" value="LOCAL-00152" />
-      <option name="project" value="LOCAL" />
-      <updated>1665232708259</updated>
+      <workItem from="1665685087568" duration="8032000" />
     </task>
     <task id="LOCAL-00153" summary="Altering verification">
       <created>1665234218420</created>
@@ -414,7 +392,28 @@
       <option name="project" value="LOCAL" />
       <updated>1665759411408</updated>
     </task>
-    <option name="localTasksCounter" value="199" />
+    <task id="LOCAL-00199" summary="Fixing looping for retention, WA, and monthly recruiter">
+      <created>1665776962376</created>
+      <option name="number" value="00199" />
+      <option name="presentableId" value="LOCAL-00199" />
+      <option name="project" value="LOCAL" />
+      <updated>1665776962376</updated>
+    </task>
+    <task id="LOCAL-00200" summary="Fixing looping for retention, WA, and monthly recruiter">
+      <created>1665777078894</created>
+      <option name="number" value="00200" />
+      <option name="presentableId" value="LOCAL-00200" />
+      <option name="project" value="LOCAL" />
+      <updated>1665777078894</updated>
+    </task>
+    <task id="LOCAL-00201" summary="Fixing looping for retention, WA, and monthly recruiter">
+      <created>1665777268988</created>
+      <option name="number" value="00201" />
+      <option name="presentableId" value="LOCAL-00201" />
+      <option name="project" value="LOCAL" />
+      <updated>1665777268988</updated>
+    </task>
+    <option name="localTasksCounter" value="202" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
