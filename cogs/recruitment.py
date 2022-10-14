@@ -203,9 +203,9 @@ class Recruitment(commands.Cog):
 
         try:
             loop = bot.loop
-            loop.run_until_complete(monthly_recruiter(bot))
-            loop.run_until_complete(retention(bot))
-            loop.run_until_complete(world_assembly_notification(bot))
+            await monthly_recruiter(bot)
+            await retention(bot)
+            await world_assembly_notification(bot)
         except Exception as error:
             error_log(error)
 
