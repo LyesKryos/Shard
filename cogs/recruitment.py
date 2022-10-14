@@ -38,7 +38,6 @@ class Recruitment(commands.Cog):
         crashchannel = bot.get_channel(835579413625569322)
 
         async def monthly_recruiter(bot):
-            await bot.wait_until_ready()
             while True:
                 # define now
                 now = datetime.now()
@@ -89,7 +88,6 @@ class Recruitment(commands.Cog):
                 return
 
         async def retention(bot):
-            await bot.wait_until_ready()
             recruitment_channel = bot.get_channel(674342850296807454)
             thegye_server = bot.get_guild(674259612580446230)
             notifrole = discord.utils.get(thegye_server.roles, id=950950836006187018)
@@ -149,7 +147,6 @@ class Recruitment(commands.Cog):
 
         async def world_assembly_notification(bot):
             try:
-                await bot.wait_until_ready()
                 wa_pings = bot.get_channel(676437972819640357)
                 thegye_server = bot.get_guild(674259612580446230)
                 wa_role = discord.utils.get(thegye_server.roles, id=674283915870994442)
