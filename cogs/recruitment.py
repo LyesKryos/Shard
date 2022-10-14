@@ -38,7 +38,6 @@ class Recruitment(commands.Cog):
         crashchannel = bot.get_channel(835579413625569322)
 
         async def monthly_recruiter(bot):
-            await asyncio.sleep(10)
             while True:
                 # define now
                 now = datetime.now()
@@ -89,10 +88,9 @@ class Recruitment(commands.Cog):
                 return
 
         async def retention(bot):
-            await asyncio.sleep(10)
             recruitment_channel = bot.get_channel(674342850296807454)
             thegye_server = bot.get_guild(674259612580446230)
-            notifrole = discord.utils.get(thegye_server.roles, id=950950836006187018)
+            notifrole = thegye_server.get_role(950950836006187018)
             await crashchannel.send("Starting retention loop.")
             try:
                 async with aiohttp.ClientSession() as session:
@@ -149,10 +147,9 @@ class Recruitment(commands.Cog):
 
         async def world_assembly_notification(bot):
             try:
-                await asyncio.sleep(10)
                 wa_pings = bot.get_channel(676437972819640357)
                 thegye_server = bot.get_guild(674259612580446230)
-                wa_role = discord.utils.get(thegye_server.roles, id=674283915870994442)
+                wa_role = thegye_server.get_role(674283915870994442)
                 await crashchannel.send("Starting WA notification loop.")
                 async with aiohttp.ClientSession() as session:
                     headers = {"User-Agent": "Bassiliya"}
