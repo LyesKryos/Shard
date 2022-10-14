@@ -1,6 +1,5 @@
 # recruitment 1.1
-from datetime import datetime
-from pytz import timezone
+from datetime import datetime, timedelta
 from ShardBot import Shard
 from urllib.parse import quote
 from discord.ext import commands, tasks
@@ -35,68 +34,66 @@ class Recruitment(commands.Cog):
             lines = traceback.format_exception(etype, error, trace)
             traceback_text = ''.join(lines)
             self.bot.logger.warning(msg=f"{traceback_text}")
-
-        async def monthly_recruiter_scheduler(bot):
-            await bot.wait_until_ready()
-            # fetches channel object
-            crashchannel = bot.get_channel(835579413625569322)
-            while True:
-                # sets up asyncio scheduler
-                eastern = timezone('US/Eastern')
-                # identifies now
-                now = datetime.now(eastern)
-                next_month = now.month + 1
-                runtime = now.replace(day=1, month=next_month, hour=0, minute=0, second=0)
-                await crashchannel.send(
-                    f"Monthly recruiter next run: {runtime.strftime('%a, %d %b %Y at %H:%M:%S %Z%z')}")
-                await discord.utils.sleep_until(runtime)
-                await monthly_recruiter(bot)
-                continue
+        # define testing channel
+        crashchannel = bot.get_channel(835579413625569322)
 
         async def monthly_recruiter(bot):
             await bot.wait_until_ready()
-            # connects to database
-            conn = bot.pool
-            # fetches all user data
-            top_recruiter = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month DESC;''')
-            # finds the first entry and gathers user id, sent number, and sends the announcement message
-            top_recruiter_user = top_recruiter[0]['user_id']
-            top_recruiter_numbers = top_recruiter[0]['sent_this_month']
-            announcements = bot.get_channel(674602527333023747)
-            thegye = bot.get_guild(674259612580446230)
-            # adds the role to the user and removes it from any other user that previously had it
-            recruiter_of_the_month_role = thegye.get_role(813953181234626582)
-            for members in thegye.members:
-                await members.remove_roles(recruiter_of_the_month_role)
-            user = thegye.get_member(top_recruiter_user)
-            await user.add_roles(recruiter_of_the_month_role)
-            # calculates the monthly total for all recruitment telegrams
-            monthly_total = 0
-            for s in top_recruiter:
-                monthly_total += s['sent_this_month']
-            # resets the role
-            await recruiter_of_the_month_role.edit(color=discord.Color.light_grey(),
-                                                   name="Recruiter of the Month")
-            # send the announcement
-            announce = await announcements.send(
-                f"**Congratulations to {user.mention}!**\n{user.display_name} has earned the "
-                f"distinction of being this month's top recruiter! This month, they have sent "
-                f"{top_recruiter_numbers} telegrams to new players. Wow! {user.display_name} has "
-                f"been awarded the {recruiter_of_the_month_role.mention} role, customizable by "
-                f"request. Everyone give them a round of applause!\nIn total, {monthly_total:,} telegrams have been "
-                f"sent by our wonderful recruiters this month!")
-            await announce.add_reaction("\U0001f44f")
-            # clears all sent_this_month
-            await conn.execute('''UPDATE recruitment SET sent_this_month = 0;''')
-            self.monthly_recruiter_notification = True
-            return
+            while True:
+                # define now
+                now = datetime.now()
+                # sets time to be midnight on the next month's first day
+                next_first = datetime(now.year, now.month+1, day=1, hour=0, minute=0, second=0)
+                # gets the time to wait
+                delta: timedelta = next_first - now
+                # converts time to seconds
+                seconds = delta.total_seconds()
+                # sends the next runtime
+                await crashchannel.send(f"Monthly recruiter waiting until "
+                                        f"{next_first.strftime('%a, %d %b %Y at %H:%M%z')}")
+                # waits until the next runtime
+                await asyncio.sleep(seconds)
+                # connects to database
+                conn = bot.pool
+                # fetches all user data
+                top_recruiter = await conn.fetch('''SELECT * FROM recruitment ORDER BY sent_this_month DESC;''')
+                # finds the first entry and gathers user id, sent number, and sends the announcement message
+                top_recruiter_user = top_recruiter[0]['user_id']
+                top_recruiter_numbers = top_recruiter[0]['sent_this_month']
+                announcements = bot.get_channel(674602527333023747)
+                thegye = bot.get_guild(674259612580446230)
+                # adds the role to the user and removes it from any other user that previously had it
+                recruiter_of_the_month_role = thegye.get_role(813953181234626582)
+                for members in thegye.members:
+                    await members.remove_roles(recruiter_of_the_month_role)
+                user = thegye.get_member(top_recruiter_user)
+                await user.add_roles(recruiter_of_the_month_role)
+                # calculates the monthly total for all recruitment telegrams
+                monthly_total = 0
+                for s in top_recruiter:
+                    monthly_total += s['sent_this_month']
+                # resets the role
+                await recruiter_of_the_month_role.edit(color=discord.Color.light_grey(),
+                                                       name="Recruiter of the Month")
+                # send the announcement
+                announce = await announcements.send(
+                    f"**Congratulations to {user.mention}!**\n{user.display_name} has earned the "
+                    f"distinction of being this month's top recruiter! This month, they have sent "
+                    f"{top_recruiter_numbers} telegrams to new players. Wow! {user.display_name} has "
+                    f"been awarded the {recruiter_of_the_month_role.mention} role, customizable by "
+                    f"request. Everyone give them a round of applause!\nIn total, {monthly_total:,} telegrams have been "
+                    f"sent by our wonderful recruiters this month!")
+                await announce.add_reaction("\U0001f44f")
+                # clears all sent_this_month
+                await conn.execute('''UPDATE recruitment SET sent_this_month = 0;''')
+                return
 
         async def retention(bot):
             await bot.wait_until_ready()
-            crashchannel = bot.get_channel(835579413625569322)
             recruitment_channel = bot.get_channel(674342850296807454)
             thegye_server = bot.get_guild(674259612580446230)
             notifrole = discord.utils.get(thegye_server.roles, id=950950836006187018)
+            await crashchannel.send("Starting retention loop.")
             try:
                 async with aiohttp.ClientSession() as session:
                     headers = {"User-Agent": "Bassiliya"}
@@ -156,6 +153,7 @@ class Recruitment(commands.Cog):
                 wa_pings = bot.get_channel(676437972819640357)
                 thegye_server = bot.get_guild(674259612580446230)
                 wa_role = discord.utils.get(thegye_server.roles, id=674283915870994442)
+                await crashchannel.send("Starting WA notification loop.")
                 async with aiohttp.ClientSession() as session:
                     headers = {"User-Agent": "Bassiliya"}
                     params = {'q': 'nations',
@@ -176,11 +174,6 @@ class Recruitment(commands.Cog):
                     members = set(membersoup.members.text.split(','))
                     Recruitment.all_wa = nations.intersection(members)
                     while True:
-                        headers = {"User-Agent": "Bassiliya"}
-                        params = {'q': 'nations',
-                                  'region': 'thegye'}
-                        waparams = {'wa': '1',
-                                    'q': 'members'}
                         async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                                headers=headers, params=params) as nationsresp:
                             nations = await nationsresp.text()
@@ -209,10 +202,9 @@ class Recruitment(commands.Cog):
                 error_log(error)
 
         try:
-            loop = bot.loop
-            self.monthly_loop = loop.create_task(monthly_recruiter_scheduler(bot))
-            self.retention_loop = loop.create_task(retention(bot))
-            self.world_assembly_notification_loop = loop.create_task(world_assembly_notification(bot))
+            asyncio.run(monthly_recruiter(bot))
+            asyncio.run(retention(bot))
+            asyncio.run(world_assembly_notification(bot))
         except Exception as error:
             error_log(error)
 
@@ -226,11 +218,6 @@ class Recruitment(commands.Cog):
         # replaces user input with proper, url-friendly code
         to_regex = userinput.replace(" ", "_")
         return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
-
-    def cog_unload(self):
-        self.retention_loop.cancel()
-        self.monthly_loop.cancel()
-        self.world_assembly_notification_loop.cancel()
 
     # cog variables
     do_not_recruit = list()

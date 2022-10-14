@@ -46,7 +46,3 @@ class Shard(commands.Bot):
     async def close(self):
         await super().close()
 
-    async def on_member_join(self, member):
-        if member.guild.id == 674259612580446230:
-            role = member.guild.get_role(751113326481768479)
-            await member.add_roles(role)
