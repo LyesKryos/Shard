@@ -146,6 +146,7 @@ class Recruitment(commands.Cog):
                 error_log(error)
 
         async def world_assembly_notification(bot):
+            await bot.wait_until_ready()
             try:
                 wa_pings = bot.get_channel(676437972819640357)
                 thegye_server = bot.get_guild(674259612580446230)
