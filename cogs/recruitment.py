@@ -203,9 +203,9 @@ class Recruitment(commands.Cog):
 
         try:
             loop = bot.loop
-            await monthly_recruiter(bot)
-            await retention(bot)
-            await world_assembly_notification(bot)
+            loop.run_in_executor(None, monthly_recruiter, bot)
+            loop.run_in_executor(None, retention, bot)
+            loop.run_in_executor(None, world_assembly_notification, bot)
         except Exception as error:
             error_log(error)
 
@@ -434,34 +434,6 @@ class Recruitment(commands.Cog):
             await ctx.send("Recruitment is running.")
         elif self.running is False:
             await ctx.send("Recruitment is not running.")
-        if self.monthly_loop:
-            await ctx.send("Recruiter of the Month running.")
-        elif not self.monthly_loop:
-            await ctx.send("Recruiter of the Month not running.")
-        if self.retention_loop:
-            await ctx.send("Retention running.")
-        elif not self.retention_loop:
-            await ctx.send("Retention not running.")
-        if self.world_assembly_notification_loop:
-            await ctx.send("WA notification running.")
-        elif not self.world_assembly_notification_loop:
-            await ctx.send("WA notification not running.")
-        if self.api_recruitment:
-            await ctx.send("API running.")
-        elif not self.api_recruitment:
-            await ctx.send("API not running.")
-
-
-    @commands.command(brief="Stops the API recruitment loop.")
-    @commands.is_owner()
-    async def api_stop(self, ctx):
-        # stops API loop
-        self.api_recruitment.cancel()
-        await asyncio.sleep(3)
-        if self.api_recruitment:
-            await ctx.send("API loop is still running!")
-        else:
-            await ctx.send("API loop cancelled.")
 
     @commands.command(usage="<(user, global)>",
                       brief="Displays sent information for a specified user, the requesting user, or all sent telegrams")
