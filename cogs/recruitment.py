@@ -35,10 +35,10 @@ class Recruitment(commands.Cog):
             traceback_text = ''.join(lines)
             self.bot.logger.warning(msg=f"{traceback_text}")
         # define testing channel
-        crashchannel = bot.get_channel(835579413625569322)
 
         async def monthly_recruiter(bot):
             await bot.wait_until_ready()
+            crashchannel = bot.get_channel(835579413625569322)
             while True:
                 # define now
                 now = datetime.now()
@@ -91,6 +91,7 @@ class Recruitment(commands.Cog):
         async def retention(bot):
             await bot.wait_until_ready()
             recruitment_channel = bot.get_channel(674342850296807454)
+            crashchannel = bot.get_channel(835579413625569322)
             thegye_server = bot.get_guild(674259612580446230)
             notifrole = thegye_server.get_role(950950836006187018)
             await crashchannel.send("Starting retention loop.")
@@ -151,6 +152,7 @@ class Recruitment(commands.Cog):
             try:
                 await bot.wait_until_ready()
                 wa_pings = bot.get_channel(676437972819640357)
+                crashchannel = bot.get_channel(835579413625569322)
                 thegye_server = bot.get_guild(674259612580446230)
                 wa_role = thegye_server.get_role(674283915870994442)
                 await crashchannel.send("Starting WA notification loop.")
