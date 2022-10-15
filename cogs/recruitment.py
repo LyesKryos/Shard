@@ -38,6 +38,7 @@ class Recruitment(commands.Cog):
         crashchannel = bot.get_channel(835579413625569322)
 
         async def monthly_recruiter(bot):
+            await bot.wait_until_ready()
             while True:
                 # define now
                 now = datetime.now()
@@ -88,6 +89,7 @@ class Recruitment(commands.Cog):
                 return
 
         async def retention(bot):
+            await bot.wait_until_ready()
             recruitment_channel = bot.get_channel(674342850296807454)
             thegye_server = bot.get_guild(674259612580446230)
             notifrole = thegye_server.get_role(950950836006187018)
@@ -147,6 +149,7 @@ class Recruitment(commands.Cog):
 
         async def world_assembly_notification(bot):
             try:
+                await bot.wait_until_ready()
                 wa_pings = bot.get_channel(676437972819640357)
                 thegye_server = bot.get_guild(674259612580446230)
                 wa_role = thegye_server.get_role(674283915870994442)
@@ -198,9 +201,9 @@ class Recruitment(commands.Cog):
             except Exception as error:
                 error_log(error)
 
-        self.monthly_recruiter = monthly_recruiter(bot)
-        self.retention = retention(bot)
-        self.world_assembly_notification = world_assembly_notification(bot)
+        self.monthly_recruiter = asyncio.create_task(monthly_recruiter(bot))
+        self.retention = asyncio.create_task(retention(bot))
+        self.world_assembly_notification = asyncio.create_task(world_assembly_notification(bot))
 
     def sanitize_links_percent(self, url: str) -> str:
         # sanitizes links with %s
@@ -212,6 +215,12 @@ class Recruitment(commands.Cog):
         to_regex = userinput.replace(" ", "_")
         return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
 
+    def cog_unload(self):
+        # stop the running tasks
+        self.monthly_recruiter.cancel()
+        self.retention.cancel()
+        self.world_assembly_notification.cancel()
+
     # cog variables
     do_not_recruit = list()
     sending_to = list()
@@ -222,6 +231,7 @@ class Recruitment(commands.Cog):
     user_sent = 0
     running = False
     recruitment_gather_object = None
+    loops_gather_object = None
 
     async def recruitment(self, ctx, template):
         try:
@@ -686,7 +696,4 @@ class Recruitment(commands.Cog):
 
 async def setup(bot):
     cog = Recruitment(bot)
-    await cog.world_assembly_notification
-    await cog.retention
-    await cog.monthly_recruiter
     await bot.add_cog(cog)
