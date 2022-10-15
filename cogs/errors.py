@@ -25,12 +25,12 @@ class ShardErrorHandler(commands.Cog):
         elif isinstance(error, commands.ExtensionError):
             await ctx.send(f"Extension error: ``{error}``.")
         # if the command used does not exist
-        if isinstance(error, commands.CommandNotFound):
+        elif isinstance(error, commands.CommandNotFound):
             await ctx.send(f"Command `{self.bot.prefix}{ctx.invoked_with}` not found.")
-        if isinstance(error, RuntimeError):
+        elif isinstance(error, RuntimeError):
             await ctx.send("Command already running.")
         # if the user is not authorized
-        if isinstance(error, commands.MissingPermissions):
+        elif isinstance(error, commands.MissingPermissions):
             await ctx.send(f"I do not have the proper permissions for `{ctx.invoked_with}`.")
         # if the user is really not authorized
         elif isinstance(error, commands.NotOwner):
