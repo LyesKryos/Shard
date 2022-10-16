@@ -28,7 +28,7 @@ class Verification(commands.Cog):
                 eastern = timezone('US/Eastern')
                 now = datetime.now(eastern)
                 # sets time to be midnight on the next month's first day
-                next_run = datetime(now.year, now.month, day=now.day + 1, hour=3, minute=30, second=0)
+                next_run = datetime(now.year, now.month, day=now.day + 1, hour=3, minute=30, second=0, tzinfo=eastern)
                 # sends the next runtime
                 await crashchannel.send(f"Verification daily update waiting until "
                                         f"{next_run.strftime('%H:%M%z')}")
@@ -47,7 +47,7 @@ class Verification(commands.Cog):
                     eastern = timezone('US/Eastern')
                     now = datetime.now(eastern)
                     # sets time to be 330 the next day
-                    next_run = datetime(now.year, now.month, day=now.day+1, hour=3, minute=30, second=0)
+                    next_run = datetime(now.year, now.month, day=now.day+1, hour=3, minute=30, second=0, tzinfo=eastern)
                     # gets the time to wait
                     delta: timedelta = next_run - now
                     # converts time to seconds

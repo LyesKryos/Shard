@@ -46,7 +46,7 @@ class Recruitment(commands.Cog):
             eastern = timezone('US/Eastern')
             now = datetime.now(eastern)
             # sets time to be midnight on the next month's first day
-            next_first = datetime(now.year, now.month + 1, day=1, hour=0, minute=0, second=0)
+            next_first = datetime(now.year, now.month + 1, day=1, hour=0, minute=0, second=0, tzinfo=eastern)
             await crashchannel.send(f"Monthly recruiter waiting until "
                                     f"{next_first.strftime('%a, %d %b %Y at %H:%M%z')}")
             while True:
@@ -54,7 +54,7 @@ class Recruitment(commands.Cog):
                 eastern = timezone('US/Eastern')
                 now = datetime.now(eastern)
                 # sets time to be midnight on the next month's first day
-                next_first = datetime(now.year, now.month + 1, day=1, hour=0, minute=0, second=0)
+                next_first = datetime(now.year, now.month + 1, day=1, hour=0, minute=0, second=0, tzinfo=eastern)
                 # gets the time to wait
                 delta: timedelta = next_first - now
                 # converts time to seconds
