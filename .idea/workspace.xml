@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding server_check command" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Exempting bots from verification" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -66,14 +66,7 @@
       <workItem from="1664469072638" duration="5067000" />
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
-      <workItem from="1665685087568" duration="21873000" />
-    </task>
-    <task id="LOCAL-00179" summary="Improving set main&#10;Fixing welcome message.&#10;Adding CTE role for on-join nations that have already verified">
-      <created>1665315778398</created>
-      <option name="number" value="00179" />
-      <option name="presentableId" value="LOCAL-00179" />
-      <option name="project" value="LOCAL" />
-      <updated>1665315778398</updated>
+      <workItem from="1665685087568" duration="22209000" />
     </task>
     <task id="LOCAL-00180" summary="Improving set main&#10;Fixing welcome message.&#10;Adding CTE role for on-join nations that have already verified">
       <created>1665315849629</created>
@@ -411,7 +404,14 @@
       <option name="project" value="LOCAL" />
       <updated>1665920709343</updated>
     </task>
-    <option name="localTasksCounter" value="228" />
+    <task id="LOCAL-00228" summary="Exempting bots from verification">
+      <created>1665920850179</created>
+      <option name="number" value="00228" />
+      <option name="presentableId" value="LOCAL-00228" />
+      <option name="project" value="LOCAL" />
+      <updated>1665920850179</updated>
+    </task>
+    <option name="localTasksCounter" value="229" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -429,7 +429,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing on_member_join verification" />
     <MESSAGE value="Adding response for denied DM" />
     <MESSAGE value="Adding roleplay intro command" />
     <MESSAGE value="Fixing roleplay intro command" />
@@ -454,7 +453,8 @@
     <MESSAGE value="Fixing profile" />
     <MESSAGE value="Fixing daily verification" />
     <MESSAGE value="Adding server_check command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding server_check command" />
+    <MESSAGE value="Exempting bots from verification" />
+    <option name="LAST_COMMIT_MESSAGE" value="Exempting bots from verification" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
