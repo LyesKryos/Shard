@@ -136,7 +136,7 @@ class BaseCommands(commands.Cog):
         role_names = [r.name for r in all_roles]
         user_roles = ', '.join(role_names[::-1])
         # creates embed
-        user_embed = discord.Embed(title=f"{user.nick}", description=f"Information about server member "
+        user_embed = discord.Embed(title=f"{user.display_name}", description=f"Information about server member "
                                                                      f"{user.name}#{user.discriminator}\n"
                                                                      f"User ID: {user.id}.",
 
