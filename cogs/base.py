@@ -119,7 +119,7 @@ class BaseCommands(commands.Cog):
         else:
             if verified['main_nation'] == '':
                 nation_list = []
-                for n in verified['main_nation']:
+                for n in verified['nations']:
                     nation_list.append(f"[{n}]"
                                        f"(https://www.nationstates.net/nation={self.sanitize_links_underscore(n)})")
                 user_nations = ', '.join(nation_list)
