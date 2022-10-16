@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Standardizing errors.py">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding daily verification checking">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
@@ -69,14 +69,7 @@
       <workItem from="1664469072638" duration="5067000" />
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
-      <workItem from="1665685087568" duration="14307000" />
-    </task>
-    <task id="LOCAL-00158" summary="Fixing verification">
-      <created>1665236095959</created>
-      <option name="number" value="00158" />
-      <option name="presentableId" value="LOCAL-00158" />
-      <option name="project" value="LOCAL" />
-      <updated>1665236095959</updated>
+      <workItem from="1665685087568" duration="14727000" />
     </task>
     <task id="LOCAL-00159" summary="Fixing verification">
       <created>1665236195723</created>
@@ -414,7 +407,14 @@
       <option name="project" value="LOCAL" />
       <updated>1665848318730</updated>
     </task>
-    <option name="localTasksCounter" value="207" />
+    <task id="LOCAL-00207" summary="Adding daily verification checking">
+      <created>1665881026067</created>
+      <option name="number" value="00207" />
+      <option name="presentableId" value="LOCAL-00207" />
+      <option name="project" value="LOCAL" />
+      <updated>1665881026067</updated>
+    </task>
+    <option name="localTasksCounter" value="208" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -432,7 +432,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing set_main commands" />
     <MESSAGE value="Altering view_verified commands" />
     <MESSAGE value="Altering view_verified command" />
     <MESSAGE value="Altering view_verified command&#10;Adding commands.UserNotFound to errors.py" />
@@ -457,7 +456,8 @@
     <MESSAGE value="Fixing looping for retention, WA, and monthly recruiter&#10;Making rotating handler bigger" />
     <MESSAGE value="Fixing looping for retention, WA, and monthly recruiter" />
     <MESSAGE value="Standardizing errors.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Standardizing errors.py" />
+    <MESSAGE value="Adding daily verification checking" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding daily verification checking" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
