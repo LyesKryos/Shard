@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing profile" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing profile">
+      <change beforePath="$PROJECT_DIR$/cogs/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/base.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -66,21 +68,7 @@
       <workItem from="1664469072638" duration="5067000" />
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
-      <workItem from="1665685087568" duration="19929000" />
-    </task>
-    <task id="LOCAL-00174" summary="Adding unverify command">
-      <created>1665277927395</created>
-      <option name="number" value="00174" />
-      <option name="presentableId" value="LOCAL-00174" />
-      <option name="project" value="LOCAL" />
-      <updated>1665277927395</updated>
-    </task>
-    <task id="LOCAL-00175" summary="Adding unverify command">
-      <created>1665278002180</created>
-      <option name="number" value="00175" />
-      <option name="presentableId" value="LOCAL-00175" />
-      <option name="project" value="LOCAL" />
-      <updated>1665278002180</updated>
+      <workItem from="1665685087568" duration="20403000" />
     </task>
     <task id="LOCAL-00176" summary="Fixing unverify command">
       <created>1665278154157</created>
@@ -411,7 +399,21 @@
       <option name="project" value="LOCAL" />
       <updated>1665886269965</updated>
     </task>
-    <option name="localTasksCounter" value="223" />
+    <task id="LOCAL-00223" summary="Adding alias to profile">
+      <created>1665886392162</created>
+      <option name="number" value="00223" />
+      <option name="presentableId" value="LOCAL-00223" />
+      <option name="project" value="LOCAL" />
+      <updated>1665886392162</updated>
+    </task>
+    <task id="LOCAL-00224" summary="Fixing profile">
+      <created>1665886751635</created>
+      <option name="number" value="00224" />
+      <option name="presentableId" value="LOCAL-00224" />
+      <option name="project" value="LOCAL" />
+      <updated>1665886751635</updated>
+    </task>
+    <option name="localTasksCounter" value="225" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -429,7 +431,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing verify command" />
     <MESSAGE value="Improving set main&#10;Fixing welcome message.&#10;Adding CTE role for on-join nations that have already verified" />
     <MESSAGE value="Fixing cte role" />
     <MESSAGE value="Fixing on_member_join verification" />
@@ -453,6 +454,7 @@
     <MESSAGE value="Testing" />
     <MESSAGE value="Fixing wording on the verification command" />
     <MESSAGE value="Adding profile command.&#10;Adding MemberNotFound error handling.&#10;Fixing something in recruitment.py" />
+    <MESSAGE value="Adding alias to profile" />
     <MESSAGE value="Fixing profile" />
     <option name="LAST_COMMIT_MESSAGE" value="Fixing profile" />
   </component>

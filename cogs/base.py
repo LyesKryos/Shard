@@ -117,7 +117,7 @@ class BaseCommands(commands.Cog):
         if verified is None:
             user_nations = "*None*"
         else:
-            if verified['main_nation'] == '':
+            if verified['main_nation'] is None:
                 nation_list = []
                 for n in verified['nations']:
                     nation_list.append(f"[{n}]"
