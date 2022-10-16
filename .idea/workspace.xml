@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding profile command.&#10;Adding MemberNotFound error handling.&#10;Fixing something in recruitment.py">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/base.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing profile" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -69,21 +66,7 @@
       <workItem from="1664469072638" duration="5067000" />
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
-      <workItem from="1665685087568" duration="19606000" />
-    </task>
-    <task id="LOCAL-00172" summary="Altering view_verified command&#10;Adding commands.UserNotFound to errors.py">
-      <created>1665269694196</created>
-      <option name="number" value="00172" />
-      <option name="presentableId" value="LOCAL-00172" />
-      <option name="project" value="LOCAL" />
-      <updated>1665269694196</updated>
-    </task>
-    <task id="LOCAL-00173" summary="Adding message verification for the verify command.">
-      <created>1665271858489</created>
-      <option name="number" value="00173" />
-      <option name="presentableId" value="LOCAL-00173" />
-      <option name="project" value="LOCAL" />
-      <updated>1665271858489</updated>
+      <workItem from="1665685087568" duration="19929000" />
     </task>
     <task id="LOCAL-00174" summary="Adding unverify command">
       <created>1665277927395</created>
@@ -414,7 +397,21 @@
       <option name="project" value="LOCAL" />
       <updated>1665885635519</updated>
     </task>
-    <option name="localTasksCounter" value="221" />
+    <task id="LOCAL-00221" summary="Fixing profile">
+      <created>1665886171421</created>
+      <option name="number" value="00221" />
+      <option name="presentableId" value="LOCAL-00221" />
+      <option name="project" value="LOCAL" />
+      <updated>1665886171421</updated>
+    </task>
+    <task id="LOCAL-00222" summary="Fixing profile">
+      <created>1665886269965</created>
+      <option name="number" value="00222" />
+      <option name="presentableId" value="LOCAL-00222" />
+      <option name="project" value="LOCAL" />
+      <updated>1665886269965</updated>
+    </task>
+    <option name="localTasksCounter" value="223" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -432,7 +429,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing unverify command" />
     <MESSAGE value="Fixing verify command" />
     <MESSAGE value="Improving set main&#10;Fixing welcome message.&#10;Adding CTE role for on-join nations that have already verified" />
     <MESSAGE value="Fixing cte role" />
@@ -457,7 +453,8 @@
     <MESSAGE value="Testing" />
     <MESSAGE value="Fixing wording on the verification command" />
     <MESSAGE value="Adding profile command.&#10;Adding MemberNotFound error handling.&#10;Fixing something in recruitment.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding profile command.&#10;Adding MemberNotFound error handling.&#10;Fixing something in recruitment.py" />
+    <MESSAGE value="Fixing profile" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing profile" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

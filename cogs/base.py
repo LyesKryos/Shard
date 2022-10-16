@@ -102,7 +102,7 @@ class BaseCommands(commands.Cog):
         msg = await ctx.send(f"Round trip {round(self.bot.latency * 1000, 2)}ms!")
         await msg.add_reaction("↔")
 
-    @commands.command(brief="Displays information about a user in the server.")
+    @commands.command(brief="Displays information about a user in the server.", aliases=['p'])
     @commands.guild_only()
     async def profile(self, ctx, *, args=None):
         # establishes connection
