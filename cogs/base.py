@@ -1,4 +1,6 @@
 import traceback
+from typing import Optional
+
 import discord
 from ShardBot import Shard
 from discord.ext import commands
@@ -98,6 +100,11 @@ class BaseCommands(commands.Cog):
     async def ping(self, ctx):
         msg = await ctx.send(f"Round trip {round(self.bot.latency * 1000, 2)}ms!")
         await msg.add_reaction("↔")
+
+    @commands.command(brief="Displays information about a user in the server.")
+    @commands.guild_only()
+    async def profile(self, ctx, *, user: Optional[discord.Member] = None):
+        pass
 
     async def on_ready(self):
         print("Ready.")

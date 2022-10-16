@@ -533,8 +533,8 @@ class Verification(commands.Cog):
         return await ctx.send(f"You have successfully removed {nation_name} from your verified list. "
                               f"Your roles have updated appropriately.")
 
-    @commands.command(brief="Displays a list of all verified nations.")
-    async def view_verified(self, ctx, *, user: Optional[discord.Member] = None):
+    @commands.command(brief="Displays a list of all verified nations.", aliases=['vv'])
+    async def view_verified(self, ctx, user: Optional[discord.Member] = None):
         # establish connection
         conn = self.bot.pool
         if user is None:
