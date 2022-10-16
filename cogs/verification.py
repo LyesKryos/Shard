@@ -77,7 +77,6 @@ class Verification(commands.Cog):
                                         await asyncio.sleep(.6)
                                         if nation_info.status == 404:
                                             await member.add_roles(cte_role)
-                                            continue
                                         nation_info_raw = await nation_info.text()
                                         nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
                                         region = nation_info_soup.region.text
@@ -88,13 +87,16 @@ class Verification(commands.Cog):
                                             if nation_info_soup.unstatus.text != "Non-member":
                                                 await member.add_roles(wa_role)
                                             await member.add_roles(thegye_role)
+                                            await member.remove_roles(cte_role)
                                             continue
                                         # if the nation's region is Karma, add the Karma role
                                         elif region == "Karma":
                                             await member.add_roles(karma_role)
+                                            await member.remove_roles(cte_role)
                                         # otherwise, add the traveler role
                                         else:
                                             await member.add_roles(traveler_role)
+                                            await member.remove_roles(cte_role)
                     await admin_channel.send(f"{thegye_server.member_count} users checked and roles updated.")
                     continue
             except Exception as error:
