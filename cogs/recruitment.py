@@ -34,23 +34,26 @@ class Recruitment(commands.Cog):
             lines = traceback.format_exception(etype, error, trace)
             traceback_text = ''.join(lines)
             self.bot.logger.warning(msg=f"{traceback_text}")
+
         # define testing channel
 
         async def monthly_recruiter(bot):
             await bot.wait_until_ready()
             crashchannel = bot.get_channel(835579413625569322)
+            now = datetime.now()
+            # sets time to be midnight on the next month's first day
+            next_first = datetime(now.year, now.month + 1, day=1, hour=0, minute=0, second=0)
+            await crashchannel.send(f"Monthly recruiter waiting until "
+                                    f"{next_first.strftime('%a, %d %b %Y at %H:%M%z')}")
             while True:
                 # define now
                 now = datetime.now()
                 # sets time to be midnight on the next month's first day
-                next_first = datetime(now.year, now.month+1, day=1, hour=0, minute=0, second=0)
+                next_first = datetime(now.year, now.month + 1, day=1, hour=0, minute=0, second=0)
                 # gets the time to wait
                 delta: timedelta = next_first - now
                 # converts time to seconds
                 seconds = delta.total_seconds()
-                # sends the next runtime
-                await crashchannel.send(f"Monthly recruiter waiting until "
-                                        f"{next_first.strftime('%a, %d %b %Y at %H:%M%z')}")
                 # waits until the next runtime
                 await asyncio.sleep(seconds)
                 # connects to database

@@ -25,6 +25,12 @@ class Verification(commands.Cog):
                 conn = bot.pool
                 await bot.wait_until_ready()
                 crashchannel = bot.get_channel(835579413625569322)
+                now = datetime.now()
+                # sets time to be midnight on the next month's first day
+                next_run = datetime(now.year, now.month, day=now.day + 1, hour=3, minute=30, second=0)
+                # sends the next runtime
+                await crashchannel.send(f"Verification daily update waiting until "
+                                        f"{next_run.strftime('%H:%M%z')}")
                 # establishes loop
                 while True:
                     # gets server, channels, and roles
@@ -38,15 +44,12 @@ class Verification(commands.Cog):
                     wa_role = thegye_server.get_role(674283915870994442)
                     # sets time
                     now = datetime.now()
-                    # sets time to be midnight on the next month's first day
+                    # sets time to be 330 the next day
                     next_run = datetime(now.year, now.month, day=now.day+1, hour=3, minute=30, second=0)
                     # gets the time to wait
                     delta: timedelta = next_run - now
                     # converts time to seconds
                     seconds = delta.total_seconds()
-                    # sends the next runtime
-                    await crashchannel.send(f"Verification daily update waiting until "
-                                            f"{next_run.strftime('%H:%M%z')}")
                     # sleeps until runtime
                     await asyncio.sleep(seconds)
                     # cycles through all members
