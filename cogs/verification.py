@@ -100,7 +100,7 @@ class Verification(commands.Cog):
 
         self.daily_verification = asyncio.create_task(daily_check(bot))
 
-    def cog_load(self):
+    def cog_unload(self):
         self.daily_verification.cancel()
 
     @commands.command(brief="Verifies a nation.")

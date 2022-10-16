@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing daily verification checking starting">
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -68,21 +69,7 @@
       <workItem from="1664469072638" duration="5067000" />
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
-      <workItem from="1665685087568" duration="15369000" />
-    </task>
-    <task id="LOCAL-00164" summary="Adding view_verified and set_main commands">
-      <created>1665260948681</created>
-      <option name="number" value="00164" />
-      <option name="presentableId" value="LOCAL-00164" />
-      <option name="project" value="LOCAL" />
-      <updated>1665260948681</updated>
-    </task>
-    <task id="LOCAL-00165" summary="Adding view_verified and set_main commands">
-      <created>1665261197743</created>
-      <option name="number" value="00165" />
-      <option name="presentableId" value="LOCAL-00165" />
-      <option name="project" value="LOCAL" />
-      <updated>1665261197743</updated>
+      <workItem from="1665685087568" duration="15786000" />
     </task>
     <task id="LOCAL-00166" summary="Fixing set_main commands">
       <created>1665263066442</created>
@@ -413,7 +400,21 @@
       <option name="project" value="LOCAL" />
       <updated>1665881671285</updated>
     </task>
-    <option name="localTasksCounter" value="213" />
+    <task id="LOCAL-00213" summary="Fixing daily verification checking starting">
+      <created>1665881921563</created>
+      <option name="number" value="00213" />
+      <option name="presentableId" value="LOCAL-00213" />
+      <option name="project" value="LOCAL" />
+      <updated>1665881921563</updated>
+    </task>
+    <task id="LOCAL-00214" summary="Fixing daily verification checking starting">
+      <created>1665882093672</created>
+      <option name="number" value="00214" />
+      <option name="presentableId" value="LOCAL-00214" />
+      <option name="project" value="LOCAL" />
+      <updated>1665882093672</updated>
+    </task>
+    <option name="localTasksCounter" value="215" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
