@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing profile">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing daily verification">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,14 +69,7 @@
       <workItem from="1664469072638" duration="5067000" />
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
-      <workItem from="1665685087568" duration="20859000" />
-    </task>
-    <task id="LOCAL-00177" summary="Fixing unverify command">
-      <created>1665278638423</created>
-      <option name="number" value="00177" />
-      <option name="presentableId" value="LOCAL-00177" />
-      <option name="project" value="LOCAL" />
-      <updated>1665278638423</updated>
+      <workItem from="1665685087568" duration="21531000" />
     </task>
     <task id="LOCAL-00178" summary="Fixing verify command">
       <created>1665280844834</created>
@@ -414,7 +407,14 @@
       <option name="project" value="LOCAL" />
       <updated>1665887211045</updated>
     </task>
-    <option name="localTasksCounter" value="226" />
+    <task id="LOCAL-00226" summary="Fixing daily verification">
+      <created>1665889132828</created>
+      <option name="number" value="00226" />
+      <option name="presentableId" value="LOCAL-00226" />
+      <option name="project" value="LOCAL" />
+      <updated>1665889132828</updated>
+    </task>
+    <option name="localTasksCounter" value="227" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -432,7 +432,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Improving set main&#10;Fixing welcome message.&#10;Adding CTE role for on-join nations that have already verified" />
     <MESSAGE value="Fixing cte role" />
     <MESSAGE value="Fixing on_member_join verification" />
     <MESSAGE value="Adding response for denied DM" />
@@ -457,7 +456,8 @@
     <MESSAGE value="Adding profile command.&#10;Adding MemberNotFound error handling.&#10;Fixing something in recruitment.py" />
     <MESSAGE value="Adding alias to profile" />
     <MESSAGE value="Fixing profile" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing profile" />
+    <MESSAGE value="Fixing daily verification" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing daily verification" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
