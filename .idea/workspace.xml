@@ -68,21 +68,7 @@
       <workItem from="1664469072638" duration="5067000" />
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
-      <workItem from="1665685087568" duration="15028000" />
-    </task>
-    <task id="LOCAL-00162" summary="Altering verification">
-      <created>1665237048670</created>
-      <option name="number" value="00162" />
-      <option name="presentableId" value="LOCAL-00162" />
-      <option name="project" value="LOCAL" />
-      <updated>1665237048670</updated>
-    </task>
-    <task id="LOCAL-00163" summary="Fixing verification">
-      <created>1665237397990</created>
-      <option name="number" value="00163" />
-      <option name="presentableId" value="LOCAL-00163" />
-      <option name="project" value="LOCAL" />
-      <updated>1665237397991</updated>
+      <workItem from="1665685087568" duration="15369000" />
     </task>
     <task id="LOCAL-00164" summary="Adding view_verified and set_main commands">
       <created>1665260948681</created>
@@ -413,7 +399,21 @@
       <option name="project" value="LOCAL" />
       <updated>1665881289132</updated>
     </task>
-    <option name="localTasksCounter" value="211" />
+    <task id="LOCAL-00211" summary="Fixing daily verification checking starting">
+      <created>1665881517973</created>
+      <option name="number" value="00211" />
+      <option name="presentableId" value="LOCAL-00211" />
+      <option name="project" value="LOCAL" />
+      <updated>1665881517973</updated>
+    </task>
+    <task id="LOCAL-00212" summary="Fixing daily verification checking starting">
+      <created>1665881671285</created>
+      <option name="number" value="00212" />
+      <option name="presentableId" value="LOCAL-00212" />
+      <option name="project" value="LOCAL" />
+      <updated>1665881671285</updated>
+    </task>
+    <option name="localTasksCounter" value="213" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

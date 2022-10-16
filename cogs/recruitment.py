@@ -86,7 +86,7 @@ class Recruitment(commands.Cog):
                 await announce.add_reaction("\U0001f44f")
                 # clears all sent_this_month
                 await conn.execute('''UPDATE recruitment SET sent_this_month = 0;''')
-                return
+                continue
 
         async def retention(bot):
             await bot.wait_until_ready()
