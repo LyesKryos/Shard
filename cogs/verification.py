@@ -598,6 +598,8 @@ class Verification(commands.Cog):
                                     # otherwise, add the traveler role
                                     else:
                                         await member.add_roles(traveler_role)
+                await admin_channel.send(f"{thegye_server.member_count} users checked and roles updated.")
+                continue
         except Exception as error:
             self.bot.logger.warning(error)
 
