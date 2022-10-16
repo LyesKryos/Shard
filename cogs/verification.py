@@ -562,7 +562,7 @@ class Verification(commands.Cog):
             verified = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
                                            author.id)
             if verified is None:
-                return await ctx.send("You do not have any verified nations. Use `$verify` to verify a nation.")
+                return await ctx.send(f"{user.nick} does not have any verified nations.")
             else:
                 if verified['main_nation'] is not None:
                     verified_nations = f"**{verified['main_nation']}**"
