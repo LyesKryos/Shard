@@ -38,6 +38,8 @@ class ShardErrorHandler(commands.Cog):
         # if the user is missing a role necessary for the command
         elif isinstance(error, commands.MissingRole):
             await ctx.send("You do not have the proper role for that, amigo.")
+        elif isinstance(error, commands.MemberNotFound):
+            await ctx.send("I cannot find any such user.")
         # if the user attempts to use a command in DMs that is not authorized to use in DMs
         elif isinstance(error, commands.NoPrivateMessage):
             await ctx.send(f"I cannot run `${ctx.invoked_with}` in DMs! Return to the safety of a server.")

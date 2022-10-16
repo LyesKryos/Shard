@@ -7,6 +7,7 @@ from discord.ext import commands
 import os
 from customchecks import SilentFail
 
+
 class BaseCommands(commands.Cog):
 
     def __init__(self, bot: Shard):
@@ -32,8 +33,6 @@ class BaseCommands(commands.Cog):
         infoembed.add_field(name="Hosting Software", value="Oracle Virtual Cloud Network Virtual Machine")
         await ctx.send(embed=infoembed)
 
-
-
     @commands.command(brief="Shuts down the bot with a global message")
     @commands.is_owner()
     async def shut_down(self, ctx, *args):
@@ -44,7 +43,6 @@ class BaseCommands(commands.Cog):
                                f"```{' '.join(args[:])}```")
         await ctx.send("Shutting down!")
         exit(100)
-
 
     @commands.command(brief="Shuts down the bot without a global message.")
     @commands.is_owner()
@@ -70,13 +68,11 @@ class BaseCommands(commands.Cog):
         await self.bot.load_extension(f"cogs.{extension}")
         await ctx.send(f"Loaded extension: `{extension}`")
 
-
     @commands.command(brief="Unloads cog")
     @commands.is_owner()
     async def unload(self, ctx, extension):
         await self.bot.unload_extension(f"cogs.{extension}")
         await ctx.send(f"Unloaded extension: `{extension}`")
-
 
     @commands.command(brief="Reloads cog")
     @commands.is_owner()
@@ -84,7 +80,6 @@ class BaseCommands(commands.Cog):
         await self.bot.unload_extension(f"cogs.{extension}")
         await self.bot.load_extension(f"cogs.{extension}")
         await ctx.send(f"Reloaded extension: `{extension}`")
-
 
     @commands.command(brief="Reloads all cogs")
     @commands.is_owner()
@@ -103,8 +98,44 @@ class BaseCommands(commands.Cog):
 
     @commands.command(brief="Displays information about a user in the server.")
     @commands.guild_only()
-    async def profile(self, ctx, *, user: Optional[discord.Member] = None):
-        pass
+    async def profile(self, ctx, *, args=None):
+        # establishes connection
+        conn = self.bot.pool
+        # gets user
+        if args is None:
+            user = ctx.author
+        else:
+            user = await commands.converter.MemberConverter().convert(ctx, args)
+        # fetches nation information
+        verified = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''', user.id)
+        if verified is None:
+            user_nations = "*None*"
+        else:
+            if verified['main_nation'] == '':
+                nation_list = []
+                for n in verified['main_nation']:
+                    nation_list.append(f"[{n}](https://www.nationstates.net/nation={n})")
+                user_nations = ', '.join(nation_list)
+            else:
+                user_nations = f"[**{verified['main_nation']}**]" \
+                               f"(https://www.nationstates.net/nation={verified['main_nation']})"
+                for n in verified['nations']:
+                    if n == verified['main_nation']:
+                        continue
+                    user_nations += f"[{n}](https://www.nationstates.net/nation={n})"
+        # creates embed
+        user_embed = discord.Embed(title=f"{user.nick}", description=f"Information about server member "
+                                                                     f"{user.name}{user.discriminator}\n"
+                                                                     f"User ID: {user.id}.",
+
+                                   color=user.color)
+        user_embed.set_thumbnail(url=user.display_avatar.url)
+        user_embed.add_field(name="Joined Discord", value=f"{user.created_at.strftime('%d %B %Y')}")
+        user_embed.add_field(name="Joined Server", value=f"{user.joined_at.strftime('%d %B %Y')}")
+        user_embed.add_field(name="\u200b", value="\u200b")
+        user_embed.add_field(name="Roles", value=f"{user.roles[1:]}", inline=False)
+        user_embed.add_field(name="Nations", value=user_nations)
+        await ctx.send(embed=user_embed)
 
     async def on_ready(self):
         print("Ready.")
@@ -127,6 +158,7 @@ class BaseCommands(commands.Cog):
             role = member.guild.get_role(751113326481768479)
             await member.add_roles(role)
 
+
 async def setup(bot: Shard):
     async def alive(bot):
         await bot.wait_until_ready()
@@ -136,7 +168,7 @@ async def setup(bot: Shard):
             await channel.send("We are online.")
         except Exception:
             bot.logger.warning(msg=traceback.format_exc())
+
     loop = bot.loop
     loop.create_task(alive(bot))
     await bot.add_cog(BaseCommands(bot))
-

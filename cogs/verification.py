@@ -31,7 +31,7 @@ class Verification(commands.Cog):
                 next_run = datetime(now.year, now.month, day=now.day + 1, hour=3, minute=30, second=0, tzinfo=eastern)
                 # sends the next runtime
                 await crashchannel.send(f"Verification daily update waiting until "
-                                        f"{next_run.strftime('%H:%M%z')}")
+                                        f"{next_run.strftime('%H:%M %Z%z')}")
                 # establishes loop
                 while True:
                     # gets server, channels, and roles
@@ -534,7 +534,7 @@ class Verification(commands.Cog):
                               f"Your roles have updated appropriately.")
 
     @commands.command(brief="Displays a list of all verified nations.", aliases=['vv'])
-    async def view_verified(self, ctx, user: Optional[discord.Member] = None):
+    async def view_verified(self, ctx, *, user: Optional[discord.Member] = None):
         # establish connection
         conn = self.bot.pool
         if user is None:
