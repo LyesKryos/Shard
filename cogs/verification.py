@@ -19,17 +19,17 @@ class Verification(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
 
-        async def daily_check():
+        async def daily_check(bot):
             try:
                 # establishes connection
-                conn = self.bot.pool
-                await self.bot.wait_until_ready()
+                conn = bot.pool
+                await bot.wait_until_ready()
                 # establishes loop
                 while True:
                     # gets server, channels, and roles
-                    thegye_server = self.bot.get_guild(674259612580446230)
+                    thegye_server = bot.get_guild(674259612580446230)
                     admin_channel = thegye_server.get_channel(674285035905613825)
-                    crashchannel = self.bot.get_channel(835579413625569322)
+                    crashchannel = bot.get_channel(835579413625569322)
                     thegye_role = thegye_server.get_role(674260547897917460)
                     traveler_role = thegye_server.get_role(674280677268652047)
                     karma_role = thegye_server.get_role(771456227674685440)
@@ -93,11 +93,9 @@ class Verification(commands.Cog):
                     await admin_channel.send(f"{thegye_server.member_count} users checked and roles updated.")
                     continue
             except Exception as error:
-                self.bot.logger.warning(error)
+                bot.logger.warning(error)
 
-        self.daily_verification = asyncio.create_task(daily_check())
-
-
+        self.daily_verification = asyncio.create_task(daily_check(bot))
 
     def cog_load(self):
         self.daily_verification.cancel()
