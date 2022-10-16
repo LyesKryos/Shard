@@ -1,3 +1,4 @@
+import re
 import traceback
 from typing import Optional
 
@@ -12,6 +13,11 @@ class BaseCommands(commands.Cog):
 
     def __init__(self, bot: Shard):
         self.bot = bot
+
+    def sanitize_links_underscore(self, userinput: str) -> str:
+        # replaces user input with proper, url-friendly code
+        to_regex = userinput.replace(" ", "_")
+        return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
 
     @commands.command(aliases=["1080"])
     async def teneighty(self, ctx):
@@ -114,18 +120,24 @@ class BaseCommands(commands.Cog):
             if verified['main_nation'] == '':
                 nation_list = []
                 for n in verified['main_nation']:
-                    nation_list.append(f"[{n}](https://www.nationstates.net/nation={n})")
+                    nation_list.append(f"[{n}]"
+                                       f"(https://www.nationstates.net/nation={self.sanitize_links_underscore(n)})")
                 user_nations = ', '.join(nation_list)
             else:
                 user_nations = f"[**{verified['main_nation']}**]" \
-                               f"(https://www.nationstates.net/nation={verified['main_nation']})"
+                               f"(https://www.nationstates.net/nation=" \
+                               f"{self.sanitize_links_underscore(verified['main_nation'])})"
                 for n in verified['nations']:
                     if n == verified['main_nation']:
                         continue
-                    user_nations += f"[{n}](https://www.nationstates.net/nation={n})"
+                    user_nations += f", [{n}](https://www.nationstates.net/nation={self.sanitize_links_underscore(n)})"
+        # defines roles
+        all_roles = user.roles[1:]
+        role_names = [r.name for r in all_roles]
+        user_roles = ', '.join(role_names[::-1])
         # creates embed
         user_embed = discord.Embed(title=f"{user.nick}", description=f"Information about server member "
-                                                                     f"{user.name}{user.discriminator}\n"
+                                                                     f"{user.name}#{user.discriminator}\n"
                                                                      f"User ID: {user.id}.",
 
                                    color=user.color)
@@ -133,7 +145,7 @@ class BaseCommands(commands.Cog):
         user_embed.add_field(name="Joined Discord", value=f"{user.created_at.strftime('%d %B %Y')}")
         user_embed.add_field(name="Joined Server", value=f"{user.joined_at.strftime('%d %B %Y')}")
         user_embed.add_field(name="\u200b", value="\u200b")
-        user_embed.add_field(name="Roles", value=f"{user.roles[1:]}", inline=False)
+        user_embed.add_field(name="Roles", value=f"{user_roles}", inline=False)
         user_embed.add_field(name="Nations", value=user_nations)
         await ctx.send(embed=user_embed)
 
