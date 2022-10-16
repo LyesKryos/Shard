@@ -57,6 +57,9 @@ class Verification(commands.Cog):
                     await asyncio.sleep(seconds)
                     # cycles through all members
                     for member in thegye_server.members:
+                        # if member is a bot
+                        if member.bot:
+                            continue
                         # calls member information from the database
                         member_info = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
                                                           member.id)
@@ -630,6 +633,9 @@ class Verification(commands.Cog):
         wa_role = thegye_server.get_role(674283915870994442)
         # cycles through all members
         for member in thegye_server.members:
+            # if member is a bot
+            if member.bot:
+                continue
             # calls member information from the database
             member_info = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
                                               member.id)
