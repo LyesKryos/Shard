@@ -41,10 +41,86 @@ class NationStates(commands.Cog):
         to_regex = userinput.replace(" ", "_")
         return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
 
+    async def get_nation(self, ctx, nation):
+        async with aiohttp.ClientSession() as nation_session:
+            headers = {'User-Agent': 'Bassiliya'}
+            params = {'nation': nation}
+            # get data
+            async with nation_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                          headers=headers, params=params) as nation_info:
+                await asyncio.sleep(.6)
+                # if the nation does not exist
+                if nation_info.status == 404:
+                    return await ctx.send(f"That nation does not seem to exist. "
+                                          f"You can check for CTEd nations in the Boneyard: "
+                                          f"https://www.nationstates.net/page=boneyard")
+                # parse data
+                nation_info_raw = await nation_info.text()
+                nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
+                fullname = nation_info_soup.fullname.text
+                motto = nation_info_soup.motto.text
+                category = nation_info_soup.category.text
+                wa = nation_info_soup.unstatus.text
+                endos = nation_info_soup.endorsements.text
+                region = nation_info_soup.region.text
+                founded = nation_info_soup.founded.text
+                founded_epoch = nation_info_soup.firstlogin.text
+                population = nation_info_soup.population.text
+                influence = nation_info_soup.influence.text
+                demonym = nation_info_soup.demonym2plural.text
+                flag = nation_info_soup.flag.text
+            # parameters for census scores
+            number_params = {'nation': nation,
+                             'q': 'census',
+                             'mode': 'score',
+                             'scale': '80+65'}
+            # get data
+            async with nation_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                          headers=headers, params=number_params) as number_info:
+                # parse data
+                await asyncio.sleep(.6)
+                nation_soup = await number_info.text()
+                nation_soup = BeautifulSoup(nation_soup, 'lxml')
+                # get scores
+                influence_score, residency = [round(float(score.text))
+                                              for score in nation_soup.census.find_all("score")]
+            # get data
+            async with nation_session.get(f"{flag}",
+                                          headers=headers) as flag:
+                # parse data
+                await asyncio.sleep(.6)
+                get_flag = await flag.read()
+            img = Image.open(BytesIO(get_flag))
+            rgb_color = self.get_dominant_color(img)
+            flag_color = discord.Colour.from_rgb(rgb_color[0], rgb_color[1], rgb_color[2])
+            creation_time = datetime.datetime.fromtimestamp(int(founded_epoch), tz=self.eastern)
+            # create embed
+            nation_embed = discord.Embed(title=f"{fullname}", colour=flag_color)
+            nation_embed.set_thumbnail(url=flag)
+            nation_embed.add_field(name="Motto", value=f"{motto}")
+            nation_embed.add_field(name="Classification", value=f"{category}")
+            nation_embed.add_field(name="\u200b", value="\u200b")
+            nation_embed.add_field(name="World Assembly", value=f"{wa} ({len(endos)} endorsements)")
+            nation_embed.add_field(name="Influence", value=f"{influence} ({influence_score:,} points)")
+            nation_embed.add_field(name="\u200b", value="\u200b")
+            nation_embed.add_field(name="Region", value=f"[{region}]"
+                                                        f"(https://www.nationstates.net/region="
+                                                        f"{self.sanitize_links_underscore(region)})")
+            nation_embed.add_field(name="Founded",
+                                   value=f"{creation_time.strftime('%d %b %Y')} "
+                                         f"({founded})")
+            if int(population) >= 1000:
+                population = f"{float(population) / 1000} billion {demonym}"
+            else:
+                population = f"{float(population)} million {demonym}"
+            nation_embed.add_field(name="Population", value=population)
+            await ctx.send(embed=nation_embed)
+
     @commands.command(brief="Displays information about a nation", aliases=['n'])
     async def nation(self, ctx, *, args=None):
         # establishes connection
         conn = self.bot.pool
+        bot = self.bot
         # defines nation
         if args is None:
             # fetches nation info
@@ -54,77 +130,7 @@ class NationStates(commands.Cog):
                 raise commands.UserInputError
             # otherwise
             else:
-                async with aiohttp.ClientSession() as nation_session:
-                    headers = {'User-Agent': 'Bassiliya'}
-                    params = {'nation': main_nation['main_nation']}
-                    # get data
-                    async with nation_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                                  headers=headers, params=params) as nation_info:
-                        await asyncio.sleep(.6)
-                        # if the nation does not exist
-                        if nation_info.status == 404:
-                            return await ctx.send(f"That nation does not seem to exist. "
-                                                  f"You can check for CTEd nations in the Boneyard: "
-                                                  f"https://www.nationstates.net/page=boneyard")
-                        # parse data
-                        nation_info_raw = await nation_info.text()
-                        nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
-                        fullname = nation_info_soup.fullname.text
-                        motto = nation_info_soup.motto.text
-                        category = nation_info_soup.category.text
-                        wa = nation_info_soup.unstatus.text
-                        endos = nation_info_soup.endorsements.text
-                        region = nation_info_soup.region.text
-                        founded = nation_info_soup.founded.text
-                        founded_epoch = nation_info_soup.firstlogin.text
-                        population = nation_info_soup.population.text
-                        influence = nation_info_soup.influence.text
-                        demonym = nation_info_soup.demonym2plural.text
-                        flag = nation_info_soup.flag.text
-                    # parameters for census scores
-                    number_params = {'nation': main_nation['main_nation'],
-                                     'q': 'census',
-                                     'mode': 'score',
-                                     'scale': '80+65'}
-                    # get data
-                    async with nation_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                                  headers=headers, params=number_params) as number_info:
-                        # parse data
-                        await asyncio.sleep(.6)
-                        nation_soup = await number_info.text()
-                        nation_soup = BeautifulSoup(nation_soup, 'lxml')
-                        # get scores
-                        influence_score, residency = [round(float(score.text))
-                                                      for score in nation_soup.census.find_all("score")]
-                    # get data
-                    flag_get = requests.get(
-                        "https://www.nationstates.net/images/flags/uploads/rflags/thegye__860796.png", headers=headers)
-                    img = Image.open(BytesIO(flag_get.content))
-                    rgb_color = self.get_dominant_color(img)
-                    flag_color = discord.Colour.from_rgb(rgb_color[0], rgb_color[1], rgb_color[2])
-                    creation_time = datetime.datetime.fromtimestamp(int(founded_epoch), tz=self.eastern)
-                    # create embed
-                    nation_embed = discord.Embed(title=f"{fullname}", colour=flag_color)
-                    nation_embed.set_thumbnail(url=flag)
-                    nation_embed.add_field(name="Motto", value=f"{motto}")
-                    nation_embed.add_field(name="Classification", value=f"{category}")
-                    nation_embed.add_field(name="\u200b", value="\u200b")
-                    nation_embed.add_field(name="World Assembly", value=f"{wa} ({len(endos)} endorsements)")
-                    nation_embed.add_field(name="Influence", value=f"{influence} ({influence_score:,} points)")
-                    nation_embed.add_field(name="\u200b", value="\u200b")
-                    nation_embed.add_field(name="Region", value=f"[{region}]"
-                                                                f"(https://www.nationstates.net/region="
-                                                                f"{self.sanitize_links_underscore(region)})")
-                    nation_embed.add_field(name="Founded",
-                                           value=f"{creation_time.strftime('%d %b %Y')} "
-                                                 f"({founded})")
-                    if int(population) >= 1000:
-                        population = f"{float(population) / 1000} billion {demonym}"
-                    else:
-                        population = f"{float(population)} million {demonym}"
-                    nation_embed.add_field(name="Population", value=population)
-                    await ctx.send(embed=nation_embed)
-
+                await self.bot.loop.run_in_executor(None, self.get_nation, ctx, main_nation['main_nation'])
 
 async def setup(bot):
     cog = NationStates(bot)
