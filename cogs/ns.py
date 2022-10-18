@@ -102,7 +102,7 @@ class NationStates(commands.Cog):
                     img = Image.open(BytesIO(flag_get.content))
                     rgb_color = self.get_dominant_color(img)
                     flag_color = discord.Colour.from_rgb(rgb_color[0], rgb_color[1], rgb_color[2])
-                    creation_time = datetime.datetime.fromtimestamp(founded_epoch, tz=self.eastern)
+                    creation_time = datetime.datetime.fromtimestamp(int(founded_epoch), tz=self.eastern)
                     # create embed
                     nation_embed = discord.Embed(title=f"{fullname}", colour=flag_color)
                     nation_embed.set_thumbnail(url=flag)
