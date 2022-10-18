@@ -120,7 +120,6 @@ class NationStates(commands.Cog):
     async def nation(self, ctx, *, args=None):
         # establishes connection
         conn = self.bot.pool
-        bot = self.bot
         # defines nation
         if args is None:
             # fetches nation info
@@ -131,6 +130,9 @@ class NationStates(commands.Cog):
             # otherwise
             else:
                 await self.get_nation(ctx, main_nation['main_nation'])
+        else:
+            await self.get_nation(ctx, args)
+
 
 async def setup(bot):
     cog = NationStates(bot)
