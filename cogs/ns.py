@@ -119,9 +119,9 @@ class NationStates(commands.Cog):
                                            value=f"{creation_time.strftime('%d %b %Y')} "
                                                  f"({founded})")
                     if int(population) >= 1000:
-                        population = f"{int(population) / 1000} billion {demonym}"
+                        population = f"{float(population) / 1000} billion {demonym}"
                     else:
-                        population = f"{int(population)} million {demonym}"
+                        population = f"{float(population)} million {demonym}"
                     nation_embed.add_field(name="Population", value=population)
                     await ctx.send(embed=nation_embed)
 
