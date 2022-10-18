@@ -68,7 +68,7 @@ class NationStates(commands.Cog):
                 population = nation_info_soup.population.text
                 influence = nation_info_soup.influence.text
                 demonym = nation_info_soup.demonym2plural.text
-                flag = nation_info_soup.flag.text
+                flag_link = nation_info_soup.flag.text
             # parameters for census scores
             number_params = {'nation': nation,
                              'q': 'census',
@@ -85,7 +85,7 @@ class NationStates(commands.Cog):
                 influence_score, residency = [round(float(score.text))
                                               for score in nation_soup.census.find_all("score")]
             # get data
-            async with nation_session.get(f"{flag}",
+            async with nation_session.get(f"{flag_link}",
                                           headers=headers) as flag:
                 # parse data
                 await asyncio.sleep(.6)
@@ -96,7 +96,7 @@ class NationStates(commands.Cog):
             creation_time = datetime.datetime.fromtimestamp(int(founded_epoch), tz=self.eastern)
             # create embed
             nation_embed = discord.Embed(title=f"{fullname}", colour=flag_color)
-            nation_embed.set_thumbnail(url=flag)
+            nation_embed.set_thumbnail(url=flag_link)
             nation_embed.add_field(name="Motto", value=f"{motto}")
             nation_embed.add_field(name="Classification", value=f"{category}")
             nation_embed.add_field(name="\u200b", value="\u200b")
