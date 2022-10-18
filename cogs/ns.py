@@ -48,7 +48,6 @@ class NationStates(commands.Cog):
             # get data
             async with nation_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                           headers=headers, params=params) as nation_info:
-                await asyncio.sleep(.6)
                 # if the nation does not exist
                 if nation_info.status == 404:
                     return await ctx.send(f"That nation does not seem to exist. "
@@ -78,7 +77,6 @@ class NationStates(commands.Cog):
             async with nation_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                           headers=headers, params=number_params) as number_info:
                 # parse data
-                await asyncio.sleep(.6)
                 nation_soup = await number_info.text()
                 nation_soup = BeautifulSoup(nation_soup, 'lxml')
                 # get scores
@@ -88,7 +86,6 @@ class NationStates(commands.Cog):
             async with nation_session.get(f"{flag_link}",
                                           headers=headers) as flag:
                 # parse data
-                await asyncio.sleep(.6)
                 get_flag = await flag.read()
             img = Image.open(BytesIO(get_flag))
             rgb_color = self.get_dominant_color(img)
@@ -115,6 +112,7 @@ class NationStates(commands.Cog):
                 population = f"{float(population)} million {demonym}"
             nation_embed.add_field(name="Population", value=population)
             await ctx.send(embed=nation_embed)
+            return asyncio.sleep(1.8)
 
     @commands.command(brief="Displays information about a nation", aliases=['n'])
     async def nation(self, ctx, *, args=None):
