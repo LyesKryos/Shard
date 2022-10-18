@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing nation command">
-      <change beforePath="$PROJECT_DIR$/cogs/ns.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/ns.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing nation command" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -68,28 +66,7 @@
       <workItem from="1664469072638" duration="5067000" />
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
-      <workItem from="1665685087568" duration="32612000" />
-    </task>
-    <task id="LOCAL-00186" summary="Fixing roleplay intro command">
-      <created>1665405953026</created>
-      <option name="number" value="00186" />
-      <option name="presentableId" value="LOCAL-00186" />
-      <option name="project" value="LOCAL" />
-      <updated>1665405953026</updated>
-    </task>
-    <task id="LOCAL-00187" summary="Adding map and edit_map commands">
-      <created>1665406845828</created>
-      <option name="number" value="00187" />
-      <option name="presentableId" value="LOCAL-00187" />
-      <option name="project" value="LOCAL" />
-      <updated>1665406845828</updated>
-    </task>
-    <task id="LOCAL-00188" summary="Fixing cnc_research.py">
-      <created>1665578627394</created>
-      <option name="number" value="00188" />
-      <option name="presentableId" value="LOCAL-00188" />
-      <option name="project" value="LOCAL" />
-      <updated>1665578627395</updated>
+      <workItem from="1665685087568" duration="33131000" />
     </task>
     <task id="LOCAL-00189" summary="Adding error catching for loading cogs">
       <created>1665579076216</created>
@@ -413,7 +390,28 @@
       <option name="project" value="LOCAL" />
       <updated>1666119816581</updated>
     </task>
-    <option name="localTasksCounter" value="235" />
+    <task id="LOCAL-00235" summary="Fixing nation command">
+      <created>1666119893097</created>
+      <option name="number" value="00235" />
+      <option name="presentableId" value="LOCAL-00235" />
+      <option name="project" value="LOCAL" />
+      <updated>1666119893097</updated>
+    </task>
+    <task id="LOCAL-00236" summary="Fixing nation command">
+      <created>1666119903461</created>
+      <option name="number" value="00236" />
+      <option name="presentableId" value="LOCAL-00236" />
+      <option name="project" value="LOCAL" />
+      <updated>1666119903461</updated>
+    </task>
+    <task id="LOCAL-00237" summary="Fixing nation command">
+      <created>1666120264972</created>
+      <option name="number" value="00237" />
+      <option name="presentableId" value="LOCAL-00237" />
+      <option name="project" value="LOCAL" />
+      <updated>1666120264972</updated>
+    </task>
+    <option name="localTasksCounter" value="238" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

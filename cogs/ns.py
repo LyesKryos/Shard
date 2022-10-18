@@ -130,7 +130,7 @@ class NationStates(commands.Cog):
                 raise commands.UserInputError
             # otherwise
             else:
-                await self.bot.loop.run_in_executor(None, self.get_nation, ctx, main_nation['main_nation'])
+                await self.get_nation(ctx, main_nation['main_nation'])
 
 async def setup(bot):
     cog = NationStates(bot)
