@@ -1,21 +1,17 @@
 # dispatch cog v 1.4
 import datetime
 from io import BytesIO
-
 import aiohttp
 import discord
-
 from ShardBot import Shard
 import asyncio
 from discord.ext import commands
-import requests
 from bs4 import BeautifulSoup
 import re
-from apscheduler.triggers.cron import CronTrigger
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 from PIL import Image
 from ratelimiter import Ratelimiter
+from customchecks import TooManyRequests
 
 
 class NationStates(commands.Cog):
@@ -48,10 +44,19 @@ class NationStates(commands.Cog):
         async with aiohttp.ClientSession() as nation_session:
             headers = {'User-Agent': 'Bassiliya'}
             params = {'nation': nation}
+            # ratelimiter
+            while True:
+                # see if there are enough available calls. if so, break the loop
+                try:
+                    await self.rate_limit.call()
+                    break
+                # if there are not enough available calls, continue the loop
+                except TooManyRequests as error:
+                    await asyncio.sleep(int(str(error)))
+                    continue
             # get data
             async with nation_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                           headers=headers, params=params) as nation_info:
-                await self.rate_limit.call()
                 # if the nation does not exist
                 if nation_info.status == 404:
                     return await ctx.send(f"That nation does not seem to exist. "
@@ -77,20 +82,38 @@ class NationStates(commands.Cog):
                              'q': 'census',
                              'mode': 'score',
                              'scale': '80+65'}
+            # ratelimiter
+            while True:
+                # see if there are enough available calls. if so, break the loop
+                try:
+                    await self.rate_limit.call()
+                    break
+                # if there are not enough available calls, continue the loop
+                except TooManyRequests as error:
+                    await asyncio.sleep(int(str(error)))
+                    continue
             # get data
             async with nation_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                           headers=headers, params=number_params) as number_info:
-                await self.rate_limit.call()
                 # parse data
                 nation_soup = await number_info.text()
                 nation_soup = BeautifulSoup(nation_soup, 'lxml')
                 # get scores
                 influence_score, residency = [round(float(score.text))
                                               for score in nation_soup.census.find_all("score")]
+            # ratelimiter
+            while True:
+                # see if there are enough available calls. if so, break the loop
+                try:
+                    await self.rate_limit.call()
+                    break
+                # if there are not enough available calls, continue the loop
+                except TooManyRequests as error:
+                    await asyncio.sleep(int(str(error)))
+                    continue
             # get data
             async with nation_session.get(f"{flag_link}",
                                           headers=headers) as flag:
-                await self.rate_limit.call()
                 # parse data
                 get_flag = await flag.read()
             img = Image.open(BytesIO(get_flag))

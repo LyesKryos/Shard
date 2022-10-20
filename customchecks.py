@@ -11,6 +11,10 @@ class CNCFail(commands.CheckFailure):
 
 
 class TooManyRequests(Exception):
+
+    """If there are too many requests made to the API via the rate limiter, return the number of seconds to wait prior
+    to trying again."""
+
     pass
 
 

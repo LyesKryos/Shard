@@ -23,4 +23,4 @@ class Ratelimiter:
         self._ratelimit -= 1
         # if there are 0 or fewer requests left, raise the exception
         if self._ratelimit <= 0:
-            raise TooManyRequests(self._period)
+            raise TooManyRequests(f"{self._period}")
