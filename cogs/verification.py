@@ -26,8 +26,8 @@ class Verification(commands.Cog):
         try:
             # establishes connection
             bot = self.bot
-            conn = bot.pool
             await bot.wait_until_ready()
+            conn = bot.pool
             crashchannel = bot.get_channel(835579413625569322)
             eastern = timezone('US/Eastern')
             now = datetime.now(eastern)
