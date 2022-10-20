@@ -256,7 +256,7 @@ class Technology:
                                    userinfo['user_id'])
             if t == 'Regional Governance':
                 await conn.execute('''UPDATE cnc_modifiers 
-                SET local_unrest_suppresssion_efficiency_mod = local_unrest_suppression_efficiency_mod + 0.01
+                SET local_unrest_suppression_efficiency_mod = local_unrest_suppression_efficiency_mod + 0.01
                 WHERE user_id = $1;''', userinfo['user_id'])
             if t == 'National Government':
                 await conn.execute('''UPDATE cnc_modifiers 
