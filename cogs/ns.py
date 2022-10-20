@@ -66,6 +66,7 @@ class NationStates(commands.Cog):
                 nation_info_raw = await nation_info.text()
                 nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
                 fullname = nation_info_soup.fullname.text
+                name = nation_info_soup.name.text
                 motto = nation_info_soup.motto.text
                 category = nation_info_soup.category.text
                 wa = nation_info_soup.unstatus.text
@@ -121,7 +122,8 @@ class NationStates(commands.Cog):
             flag_color = discord.Colour.from_rgb(rgb_color[0], rgb_color[1], rgb_color[2])
             creation_time = datetime.datetime.fromtimestamp(int(founded_epoch), tz=self.eastern)
             # create embed
-            nation_embed = discord.Embed(title=f"{fullname}", colour=flag_color)
+            nation_embed = discord.Embed(title=f"{fullname}", colour=flag_color,
+                                         url=f"https://www.nationstates.net/nation={name}")
             nation_embed.set_thumbnail(url=flag_link)
             nation_embed.add_field(name="Motto", value=f"{motto}")
             nation_embed.add_field(name="Classification", value=f"{category}")
