@@ -10,6 +10,10 @@ class CNCFail(commands.CheckFailure):
     pass
 
 
+class TooManyRequests(Exception):
+    pass
+
+
 def modcheck():
     # custom check
     def predicate(ctx):
@@ -75,6 +79,7 @@ def CurrencyCheck():
             raise CurrencyFail("This server is not registered for that command.")
 
     return commands.check(currency)
+
 
 class WrongInput(commands.CommandInvokeError):
     pass

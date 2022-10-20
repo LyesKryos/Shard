@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing nation command" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing research">
+      <change afterPath="$PROJECT_DIR$/ratelimiter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/ns.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/ns.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/customchecks.py" beforeDir="false" afterPath="$PROJECT_DIR$/customchecks.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -66,21 +71,7 @@
       <workItem from="1664469072638" duration="5067000" />
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
-      <workItem from="1665685087568" duration="34181000" />
-    </task>
-    <task id="LOCAL-00193" summary="Attempting a fix for recruitment.py">
-      <created>1665598210991</created>
-      <option name="number" value="00193" />
-      <option name="presentableId" value="LOCAL-00193" />
-      <option name="project" value="LOCAL" />
-      <updated>1665598210992</updated>
-    </task>
-    <task id="LOCAL-00194" summary="Changing looping for retention, WA, and monthly recruiter&#10;Moving role assignment">
-      <created>1665752387710</created>
-      <option name="number" value="00194" />
-      <option name="presentableId" value="LOCAL-00194" />
-      <option name="project" value="LOCAL" />
-      <updated>1665752387712</updated>
+      <workItem from="1665685087568" duration="36796000" />
     </task>
     <task id="LOCAL-00195" summary="Fixing looping for retention, WA, and monthly recruiter">
       <created>1665758449474</created>
@@ -411,7 +402,21 @@
       <option name="project" value="LOCAL" />
       <updated>1666120805893</updated>
     </task>
-    <option name="localTasksCounter" value="242" />
+    <task id="LOCAL-00242" summary="Fixing research">
+      <created>1666279433657</created>
+      <option name="number" value="00242" />
+      <option name="presentableId" value="LOCAL-00242" />
+      <option name="project" value="LOCAL" />
+      <updated>1666279433657</updated>
+    </task>
+    <task id="LOCAL-00243" summary="Fixing research">
+      <created>1666279584746</created>
+      <option name="number" value="00243" />
+      <option name="presentableId" value="LOCAL-00243" />
+      <option name="project" value="LOCAL" />
+      <updated>1666279584746</updated>
+    </task>
+    <option name="localTasksCounter" value="244" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -429,7 +434,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding map and edit_map commands" />
     <MESSAGE value="Fixing cnc_research.py" />
     <MESSAGE value="Adding error catching for loading cogs" />
     <MESSAGE value="Fixing things" />
@@ -454,7 +458,8 @@
     <MESSAGE value="Fixing timing for monthly_recruiter and verification loops" />
     <MESSAGE value="Adding NationStates suite" />
     <MESSAGE value="Fixing nation command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing nation command" />
+    <MESSAGE value="Fixing research" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing research" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

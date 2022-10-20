@@ -15,6 +15,7 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 from PIL import Image
+from ratelimiter import Ratelimiter
 
 
 class NationStates(commands.Cog):
@@ -22,6 +23,7 @@ class NationStates(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
         self.eastern = timezone('US/Eastern')
+        self.rate_limit = Ratelimiter()
 
     def get_dominant_color(self, pil_img, palette_size=16):
         # Resize image to speed up processing
@@ -41,6 +43,7 @@ class NationStates(commands.Cog):
         to_regex = userinput.replace(" ", "_")
         return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
 
+
     async def get_nation(self, ctx, nation):
         async with aiohttp.ClientSession() as nation_session:
             headers = {'User-Agent': 'Bassiliya'}
@@ -48,6 +51,7 @@ class NationStates(commands.Cog):
             # get data
             async with nation_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                           headers=headers, params=params) as nation_info:
+                await self.rate_limit.call()
                 # if the nation does not exist
                 if nation_info.status == 404:
                     return await ctx.send(f"That nation does not seem to exist. "
@@ -76,6 +80,7 @@ class NationStates(commands.Cog):
             # get data
             async with nation_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                           headers=headers, params=number_params) as number_info:
+                await self.rate_limit.call()
                 # parse data
                 nation_soup = await number_info.text()
                 nation_soup = BeautifulSoup(nation_soup, 'lxml')
@@ -85,6 +90,7 @@ class NationStates(commands.Cog):
             # get data
             async with nation_session.get(f"{flag_link}",
                                           headers=headers) as flag:
+                await self.rate_limit.call()
                 # parse data
                 get_flag = await flag.read()
             img = Image.open(BytesIO(get_flag))
