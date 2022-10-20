@@ -105,7 +105,7 @@ class Verification(commands.Cog):
             except Exception as error:
                 bot.logger.warning(error)
 
-        self.daily_verification = asyncio.create_task(daily_check(bot))
+        self.daily_verification = asyncio.create_task(daily_check(self.bot))
 
     def cog_unload(self):
         self.daily_verification.cancel()
