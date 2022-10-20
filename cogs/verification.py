@@ -20,98 +20,98 @@ class Verification(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
 
-        async def daily_check():
-            try:
-                # establishes connection
-                bot = self.bot
-                conn = bot.pool
-                await bot.wait_until_ready()
-                crashchannel = bot.get_channel(835579413625569322)
+        self.daily_verification = asyncio.create_task(self.daily_check())
+
+    async def daily_check(self):
+        try:
+            # establishes connection
+            bot = self.bot
+            conn = bot.pool
+            await bot.wait_until_ready()
+            crashchannel = bot.get_channel(835579413625569322)
+            eastern = timezone('US/Eastern')
+            now = datetime.now(eastern)
+            # sets time to be midnight on the next month's first day
+            next_run = now.replace(day=now.day + 1, hour=3, minute=30, second=0)
+            # sends the next runtime
+            await crashchannel.send(f"Verification daily update waiting until "
+                                    f"{next_run.strftime('%H:%M %Z%z')}")
+            # establishes loop
+            while True:
+                # gets server, channels, and roles
+                thegye_server = bot.get_guild(674259612580446230)
+                admin_channel = thegye_server.get_channel(674285035905613825)
+                thegye_role = thegye_server.get_role(674260547897917460)
+                traveler_role = thegye_server.get_role(674280677268652047)
+                karma_role = thegye_server.get_role(771456227674685440)
+                unverified_role = thegye_server.get_role(1028144304507592704)
+                cte_role = thegye_server.get_role(674284482890694657)
+                wa_role = thegye_server.get_role(674283915870994442)
+                # sets time
                 eastern = timezone('US/Eastern')
                 now = datetime.now(eastern)
-                # sets time to be midnight on the next month's first day
+                # sets time to be 330 the next day
                 next_run = now.replace(day=now.day + 1, hour=3, minute=30, second=0)
-                # sends the next runtime
-                await crashchannel.send(f"Verification daily update waiting until "
-                                        f"{next_run.strftime('%H:%M %Z%z')}")
-                # establishes loop
-                while True:
-                    # gets server, channels, and roles
-                    thegye_server = bot.get_guild(674259612580446230)
-                    admin_channel = thegye_server.get_channel(674285035905613825)
-                    thegye_role = thegye_server.get_role(674260547897917460)
-                    traveler_role = thegye_server.get_role(674280677268652047)
-                    karma_role = thegye_server.get_role(771456227674685440)
-                    unverified_role = thegye_server.get_role(1028144304507592704)
-                    cte_role = thegye_server.get_role(674284482890694657)
-                    wa_role = thegye_server.get_role(674283915870994442)
-                    # sets time
-                    eastern = timezone('US/Eastern')
-                    now = datetime.now(eastern)
-                    # sets time to be 330 the next day
-                    next_run = now.replace(day=now.day + 1, hour=3, minute=30, second=0)
-                    # gets the time to wait
-                    delta: timedelta = next_run - now
-                    # converts time to seconds
-                    seconds = delta.total_seconds()
-                    # sleeps until runtime
-                    await asyncio.sleep(seconds)
-                    # cycles through all members
-                    for member in thegye_server.members:
-                        # if member is a bot
-                        if member.bot:
-                            continue
-                        # calls member information from the database
-                        member_info = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
-                                                          member.id)
-                        await member.remove_roles(wa_role, thegye_role, karma_role, traveler_role, cte_role)
-                        # if the member is not verified at all, remove all relevant roles and move to the next member
-                        if member_info is None:
-                            await member.add_roles(unverified_role)
-                            continue
-                        # otherwise, update roles
-                        else:
-                            member_nations = member_info['nations']
-                            async with aiohttp.ClientSession() as verify_session:
-                                for n in member_nations:
-                                    headers = {'User-Agent': 'Bassiliya'}
-                                    params = {'nation': n}
-                                    # get data
-                                    async with verify_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                                                  headers=headers, params=params) as nation_info:
-                                        await asyncio.sleep(.6)
-                                        if nation_info.status == 404:
-                                            await member.add_roles(cte_role)
-                                        nation_info_raw = await nation_info.text()
-                                        nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
-                                        region = nation_info_soup.region.text
-                                        # if the nation's region is Thegye, add the Thegye role
-                                        if region == "Thegye":
-                                            await member.remove_roles(traveler_role, karma_role)
-                                            # if the nation is in the WA, add the WA role
-                                            if nation_info_soup.unstatus.text != "Non-member":
-                                                await member.add_roles(wa_role)
-                                            await member.add_roles(thegye_role)
-                                            await member.remove_roles(cte_role)
-                                            continue
-                                        # if the nation's region is Karma, add the Karma role
-                                        elif region == "Karma":
-                                            await member.add_roles(karma_role)
-                                            await member.remove_roles(cte_role)
-                                        # otherwise, add the traveler role
-                                        else:
-                                            await member.add_roles(traveler_role)
-                                            await member.remove_roles(cte_role)
-                    await admin_channel.send(f"{thegye_server.member_count} users checked and roles updated.")
-                    continue
-            except Exception as error:
-                etype = type(error)
-                trace = error.__traceback__
-                lines = traceback.format_exception(etype, error, trace)
-                traceback_text = ''.join(lines)
-                self.bot.logger.warning(msg=f"{traceback_text}")
-
-        self.daily_verification = asyncio.create_task(daily_check())
+                # gets the time to wait
+                delta: timedelta = next_run - now
+                # converts time to seconds
+                seconds = delta.total_seconds()
+                # sleeps until runtime
+                await asyncio.sleep(seconds)
+                # cycles through all members
+                for member in thegye_server.members:
+                    # if member is a bot
+                    if member.bot:
+                        continue
+                    # calls member information from the database
+                    member_info = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
+                                                      member.id)
+                    await member.remove_roles(wa_role, thegye_role, karma_role, traveler_role, cte_role)
+                    # if the member is not verified at all, remove all relevant roles and move to the next member
+                    if member_info is None:
+                        await member.add_roles(unverified_role)
+                        continue
+                    # otherwise, update roles
+                    else:
+                        member_nations = member_info['nations']
+                        async with aiohttp.ClientSession() as verify_session:
+                            for n in member_nations:
+                                headers = {'User-Agent': 'Bassiliya'}
+                                params = {'nation': n}
+                                # get data
+                                async with verify_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                                              headers=headers, params=params) as nation_info:
+                                    await asyncio.sleep(.6)
+                                    if nation_info.status == 404:
+                                        await member.add_roles(cte_role)
+                                    nation_info_raw = await nation_info.text()
+                                    nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
+                                    region = nation_info_soup.region.text
+                                    # if the nation's region is Thegye, add the Thegye role
+                                    if region == "Thegye":
+                                        await member.remove_roles(traveler_role, karma_role)
+                                        # if the nation is in the WA, add the WA role
+                                        if nation_info_soup.unstatus.text != "Non-member":
+                                            await member.add_roles(wa_role)
+                                        await member.add_roles(thegye_role)
+                                        await member.remove_roles(cte_role)
+                                        continue
+                                    # if the nation's region is Karma, add the Karma role
+                                    elif region == "Karma":
+                                        await member.add_roles(karma_role)
+                                        await member.remove_roles(cte_role)
+                                    # otherwise, add the traveler role
+                                    else:
+                                        await member.add_roles(traveler_role)
+                                        await member.remove_roles(cte_role)
+                await admin_channel.send(f"{thegye_server.member_count} users checked and roles updated.")
+                continue
+        except Exception as error:
+            etype = type(error)
+            trace = error.__traceback__
+            lines = traceback.format_exception(etype, error, trace)
+            traceback_text = ''.join(lines)
+            self.bot.logger.warning(msg=f"{traceback_text}")
 
     def cog_unload(self):
         self.daily_verification.cancel()
