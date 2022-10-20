@@ -1,4 +1,5 @@
 # Shard Verification 0.1b
+import traceback
 from datetime import datetime, timedelta
 import discord.channel
 from ShardBot import Shard
@@ -19,9 +20,10 @@ class Verification(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
 
-        async def daily_check(bot):
+        async def daily_check():
             try:
                 # establishes connection
+                bot = self.bot
                 conn = bot.pool
                 await bot.wait_until_ready()
                 crashchannel = bot.get_channel(835579413625569322)
@@ -103,9 +105,13 @@ class Verification(commands.Cog):
                     await admin_channel.send(f"{thegye_server.member_count} users checked and roles updated.")
                     continue
             except Exception as error:
-                bot.logger.warning(error)
+                etype = type(error)
+                trace = error.__traceback__
+                lines = traceback.format_exception(etype, error, trace)
+                traceback_text = ''.join(lines)
+                self.bot.logger.warning(msg=f"{traceback_text}")
 
-        self.daily_verification = asyncio.create_task(daily_check(self.bot))
+        self.daily_verification = asyncio.create_task(daily_check())
 
     def cog_unload(self):
         self.daily_verification.cancel()
