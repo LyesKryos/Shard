@@ -123,7 +123,7 @@ class NationStates(commands.Cog):
             creation_time = datetime.datetime.fromtimestamp(int(founded_epoch), tz=self.eastern)
             # create embed
             nation_embed = discord.Embed(title=f"{fullname}", colour=flag_color,
-                                         url=f"https://www.nationstates.net/nation={name}")
+                                         url=f"https://www.nationstates.net/nation={name}", type="link")
             nation_embed.set_thumbnail(url=flag_link)
             nation_embed.add_field(name="Motto", value=f"{motto}")
             nation_embed.add_field(name="Classification", value=f"{category}")
