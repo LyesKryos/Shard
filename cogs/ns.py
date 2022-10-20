@@ -66,7 +66,7 @@ class NationStates(commands.Cog):
                 nation_info_raw = await nation_info.text()
                 nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
                 fullname = nation_info_soup.fullname.text
-                name = nation_info_soup.name.text
+                name = nation_info_soup.find('name').text
                 motto = nation_info_soup.motto.text
                 category = nation_info_soup.category.text
                 wa = nation_info_soup.unstatus.text
