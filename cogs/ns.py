@@ -125,7 +125,7 @@ class NationStates(commands.Cog):
             nation_embed = discord.Embed(title="\u200b", colour=flag_color)
             nation_embed.set_thumbnail(url=flag_link)
             nation_embed.add_field(name=f"[{fullname}]"
-                                        f"(https://www.nationstates.net/nation={self.sanitize_links_underscore(name)}",
+                                        f"(https://www.nationstates.net/nation={self.sanitize_links_underscore(name)})",
                                    value="\u200b", inline=False)
             nation_embed.add_field(name="Motto", value=f"{motto}")
             nation_embed.add_field(name="Classification", value=f"{category}")
