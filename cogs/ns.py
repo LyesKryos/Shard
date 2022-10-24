@@ -136,6 +136,7 @@ class NationStates(commands.Cog):
             nation_embed.add_field(name="Founded",
                                    value=f"{creation_time.strftime('%d %b %Y')}\n "
                                          f"({founded})")
+            nation_embed.add_field(name="\u200b", value="\u200b")
             if int(population) >= 1000:
                 population = f"{float(population) / 1000} billion {demonym}"
             else:
