@@ -149,7 +149,7 @@ class NationStates(commands.Cog):
         async with aiohttp.ClientSession() as nation_session:
             headers = {'User-Agent': 'Bassiliya'}
             params = {'region': region,
-                      'q': 'name+numnations+founder+foundedtime+power+flag+delegate+delegatevotes'}
+                      'q': 'name+numnations+founder+foundedtime+power+flag+delegate+delegatevotes+lastupdate'}
             # ratelimiter
             while True:
                 # see if there are enough available calls. if so, break the loop
