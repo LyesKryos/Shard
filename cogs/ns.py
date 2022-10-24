@@ -165,9 +165,7 @@ class NationStates(commands.Cog):
                                           headers=headers, params=params) as region_data:
                 # if the nation does not exist
                 if region_data.status == 404:
-                    return await ctx.send(f"That nation does not seem to exist. "
-                                          f"You can check for CTEd nations in the Boneyard: "
-                                          f"https://www.nationstates.net/page=boneyard")
+                    return await ctx.send("That region does not seem to exist.")
                 # parse data
                 region_data_raw = await region_data.text()
                 region_info = BeautifulSoup(region_data_raw, 'lxml')
