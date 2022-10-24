@@ -128,13 +128,13 @@ class NationStates(commands.Cog):
             nation_embed.add_field(name="Classification", value=f"{category}")
             nation_embed.add_field(name="\u200b", value="\u200b")
             nation_embed.add_field(name="World Assembly", value=f"{wa} ({len(endos)} endorsements)")
-            nation_embed.add_field(name="Influence", value=f"{influence} ({influence_score:,} points)")
+            nation_embed.add_field(name="Influence", value=f"{influence}\n ({influence_score:,} points)")
             nation_embed.add_field(name="\u200b", value="\u200b")
             nation_embed.add_field(name="Region", value=f"[{region}]"
                                                         f"(https://www.nationstates.net/region="
                                                         f"{self.sanitize_links_underscore(region)})")
             nation_embed.add_field(name="Founded",
-                                   value=f"{creation_time.strftime('%d %b %Y')} "
+                                   value=f"{creation_time.strftime('%d %b %Y')}\n "
                                          f"({founded})")
             if int(population) >= 1000:
                 population = f"{float(population) / 1000} billion {demonym}"
