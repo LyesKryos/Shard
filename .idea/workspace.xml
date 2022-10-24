@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Messing with url" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding residency">
+      <change beforePath="$PROJECT_DIR$/cogs/ns.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/ns.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -67,28 +69,7 @@
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
       <workItem from="1665685087568" duration="40245000" />
-      <workItem from="1666613506288" duration="1088000" />
-    </task>
-    <task id="LOCAL-00212" summary="Fixing daily verification checking starting">
-      <created>1665881671285</created>
-      <option name="number" value="00212" />
-      <option name="presentableId" value="LOCAL-00212" />
-      <option name="project" value="LOCAL" />
-      <updated>1665881671285</updated>
-    </task>
-    <task id="LOCAL-00213" summary="Fixing daily verification checking starting">
-      <created>1665881921563</created>
-      <option name="number" value="00213" />
-      <option name="presentableId" value="LOCAL-00213" />
-      <option name="project" value="LOCAL" />
-      <updated>1665881921563</updated>
-    </task>
-    <task id="LOCAL-00214" summary="Fixing daily verification checking starting">
-      <created>1665882093672</created>
-      <option name="number" value="00214" />
-      <option name="presentableId" value="LOCAL-00214" />
-      <option name="project" value="LOCAL" />
-      <updated>1665882093672</updated>
+      <workItem from="1666613506288" duration="1437000" />
     </task>
     <task id="LOCAL-00215" summary="Fixing daily verification checking starting">
       <created>1665882134282</created>
@@ -412,7 +393,28 @@
       <option name="project" value="LOCAL" />
       <updated>1666614522360</updated>
     </task>
-    <option name="localTasksCounter" value="261" />
+    <task id="LOCAL-00261" summary="Messing with url">
+      <created>1666614633232</created>
+      <option name="number" value="00261" />
+      <option name="presentableId" value="LOCAL-00261" />
+      <option name="project" value="LOCAL" />
+      <updated>1666614633232</updated>
+    </task>
+    <task id="LOCAL-00262" summary="Adding residency">
+      <created>1666614725542</created>
+      <option name="number" value="00262" />
+      <option name="presentableId" value="LOCAL-00262" />
+      <option name="project" value="LOCAL" />
+      <updated>1666614725542</updated>
+    </task>
+    <task id="LOCAL-00263" summary="Adding residency">
+      <created>1666614768793</created>
+      <option name="number" value="00263" />
+      <option name="presentableId" value="LOCAL-00263" />
+      <option name="project" value="LOCAL" />
+      <updated>1666614768793</updated>
+    </task>
+    <option name="localTasksCounter" value="264" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -430,7 +432,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Attempting a fix for recruitment.py" />
     <MESSAGE value="Changing looping for retention, WA, and monthly recruiter&#10;Moving role assignment" />
     <MESSAGE value="Fixing looping for retention, WA, and monthly recruiter&#10;Making rotating handler bigger" />
     <MESSAGE value="Fixing looping for retention, WA, and monthly recruiter" />
@@ -455,7 +456,8 @@
     <MESSAGE value="Fixing ratelimiter.py" />
     <MESSAGE value="Adding url to nation command" />
     <MESSAGE value="Messing with url" />
-    <option name="LAST_COMMIT_MESSAGE" value="Messing with url" />
+    <MESSAGE value="Adding residency" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding residency" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

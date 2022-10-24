@@ -127,15 +127,15 @@ class NationStates(commands.Cog):
                                                             f"{self.sanitize_links_underscore(nation)}")
             nation_embed.add_field(name="Classification", value=f"{category}")
             nation_embed.add_field(name="\u200b", value="\u200b")
-            nation_embed.add_field(name="World Assembly", value=f"{wa} ({len(endos)} endorsements)")
-            nation_embed.add_field(name="Influence", value=f"{influence}\n ({influence_score:,} points)")
+            nation_embed.add_field(name="World Assembly", value=f"{wa}\n({len(endos)} endorsements)")
+            nation_embed.add_field(name="Influence", value=f"{influence}\n({influence_score:,} points)")
             nation_embed.add_field(name="\u200b", value="\u200b")
             nation_embed.add_field(name="Region", value=f"[{region}]"
                                                         f"(https://www.nationstates.net/region="
                                                         f"{self.sanitize_links_underscore(region)})\n"
                                                         f"({residency} days ago)")
             nation_embed.add_field(name="Founded",
-                                   value=f"{creation_time.strftime('%d %b %Y')}\n "
+                                   value=f"{creation_time.strftime('%d %b %Y')}\n"
                                          f"({founded})")
             nation_embed.add_field(name="\u200b", value="\u200b")
             if int(population) >= 1000:
