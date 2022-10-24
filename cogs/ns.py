@@ -39,7 +39,6 @@ class NationStates(commands.Cog):
         to_regex = userinput.replace(" ", "_")
         return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
 
-
     async def get_nation(self, ctx, nation):
         async with aiohttp.ClientSession() as nation_session:
             headers = {'User-Agent': 'Bassiliya'}
@@ -122,9 +121,10 @@ class NationStates(commands.Cog):
             flag_color = discord.Colour.from_rgb(rgb_color[0], rgb_color[1], rgb_color[2])
             creation_time = datetime.datetime.fromtimestamp(int(founded_epoch), tz=self.eastern)
             # create embed
-            nation_embed = discord.Embed(title=f"[{fullname}](https://www.nationstates.net/nation="
-                                               f"{self.sanitize_links_underscore(name)})", colour=flag_color)
+            nation_embed = discord.Embed(title=f"\u200b)", colour=flag_color)
             nation_embed.set_thumbnail(url=flag_link)
+            nation_embed.set_author(name=f"{fullname}", url=f"https://www.nationstates.net/region="
+                                                            f"{self.sanitize_links_underscore(nation)}")
             nation_embed.add_field(name="Motto", value=f"{motto}")
             nation_embed.add_field(name="Classification", value=f"{category}")
             nation_embed.add_field(name="\u200b", value="\u200b")
