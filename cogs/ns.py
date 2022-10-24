@@ -121,7 +121,7 @@ class NationStates(commands.Cog):
             flag_color = discord.Colour.from_rgb(rgb_color[0], rgb_color[1], rgb_color[2])
             creation_time = datetime.datetime.fromtimestamp(int(founded_epoch), tz=self.eastern)
             # create embed
-            nation_embed = discord.Embed(title=f"\u200b", description=f"{motto}", color=flag_color)
+            nation_embed = discord.Embed(description=f"{motto}", color=flag_color)
             nation_embed.set_thumbnail(url=flag_link)
             nation_embed.set_author(name=f"{fullname}", url=f"https://www.nationstates.net/region="
                                                             f"{self.sanitize_links_underscore(nation)}")
