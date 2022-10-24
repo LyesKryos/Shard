@@ -210,7 +210,6 @@ class NationStates(commands.Cog):
             region_embed.add_field(name="Founded",
                                    value=f"{creation_time.strftime('%d %b %Y')}\n"
                                          f"({founded})")
-            region_embed.add_field(name="\u200b", value="\u200b")
             region_embed.add_field(name="Nations", value=f"{residents} nations", inline=False)
             region_embed.add_field(name="WA Delegate", value=f"[{delegate.title()}]"
                                                              f"(https://www.nationstates.net/nation="
