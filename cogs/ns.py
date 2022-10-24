@@ -132,7 +132,8 @@ class NationStates(commands.Cog):
             nation_embed.add_field(name="\u200b", value="\u200b")
             nation_embed.add_field(name="Region", value=f"[{region}]"
                                                         f"(https://www.nationstates.net/region="
-                                                        f"{self.sanitize_links_underscore(region)})")
+                                                        f"{self.sanitize_links_underscore(region)})\n"
+                                                        f"(Joined {residency} days ago)")
             nation_embed.add_field(name="Founded",
                                    value=f"{creation_time.strftime('%d %b %Y')}\n "
                                          f"({founded})")
