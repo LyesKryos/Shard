@@ -210,13 +210,13 @@ class NationStates(commands.Cog):
                                    value=f"{creation_time.strftime('%d %b %Y')}\n"
                                          f"({founded})")
             region_embed.add_field(name="\u200b", value="\u200b")
-            region_embed.add_field(name='Nations', value=f"{residents} nations")
+            region_embed.add_field(name="Nations", value=f"{residents} nations", inline=False)
             region_embed.add_field(name="World Assembly Delegate", value=f"[{delegate.title()}]"
                                                                          f"(https://www.nationstates.net/nation="
                                                                          f"{self.sanitize_links_underscore(delegate)})"
                                                                          f"\n({len(del_endos)} votes)")
             region_embed.add_field(name="Influence", value=f"{influence_level}")
-            region_embed.add_field(name="Last Update", value=f"<t:{update}:T>")
+            region_embed.add_field(name="Last Update", value=f"<t:{update}:T>", inline=False)
             await ctx.send(embed=region_embed)
 
     @commands.command(brief="Displays information about a nation", aliases=['n'])
