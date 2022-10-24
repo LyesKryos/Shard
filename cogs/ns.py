@@ -204,14 +204,14 @@ class NationStates(commands.Cog):
             region_embed.set_thumbnail(url=flag_link)
             region_embed.set_author(name=f"{region_name}", url=f"https://www.nationstates.net/region="
                                                                f"{self.sanitize_links_underscore(region_name)}")
-            region_embed.add_field(name="Founder", value=f"[{founder.title()}] (https://www.nationstates.net/nation="
+            region_embed.add_field(name="Founder", value=f"[{founder.title()}](https://www.nationstates.net/nation="
                                                          f"{self.sanitize_links_underscore(founder)})")
             region_embed.add_field(name="Founded",
                                    value=f"{creation_time.strftime('%d %b %Y')}\n"
                                          f"({founded})")
             region_embed.add_field(name="\u200b", value="\u200b")
             region_embed.add_field(name='Nations', value=f"{residents} nations")
-            region_embed.add_field(name="World Assembly Delegate", value=f"[{delegate.title()}] "
+            region_embed.add_field(name="World Assembly Delegate", value=f"[{delegate.title()}]"
                                                                          f"(https://www.nationstates.net/nation="
                                                                          f"{self.sanitize_links_underscore(delegate)})"
                                                                          f"\n({len(del_endos)} votes)")

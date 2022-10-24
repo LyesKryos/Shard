@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding region command" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing region command" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -67,21 +67,7 @@
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
       <workItem from="1665685087568" duration="40245000" />
-      <workItem from="1666613506288" duration="4234000" />
-    </task>
-    <task id="LOCAL-00217" summary="Testing">
-      <created>1665882949921</created>
-      <option name="number" value="00217" />
-      <option name="presentableId" value="LOCAL-00217" />
-      <option name="project" value="LOCAL" />
-      <updated>1665882949921</updated>
-    </task>
-    <task id="LOCAL-00218" summary="Fixing wording on the verification command">
-      <created>1665883064554</created>
-      <option name="number" value="00218" />
-      <option name="presentableId" value="LOCAL-00218" />
-      <option name="project" value="LOCAL" />
-      <updated>1665883064554</updated>
+      <workItem from="1666613506288" duration="4545000" />
     </task>
     <task id="LOCAL-00219" summary="Fixing wording on the verification command">
       <created>1665883255665</created>
@@ -412,7 +398,21 @@
       <option name="project" value="LOCAL" />
       <updated>1666623873832</updated>
     </task>
-    <option name="localTasksCounter" value="266" />
+    <task id="LOCAL-00266" summary="Fixing region command">
+      <created>1666623954010</created>
+      <option name="number" value="00266" />
+      <option name="presentableId" value="LOCAL-00266" />
+      <option name="project" value="LOCAL" />
+      <updated>1666623954010</updated>
+    </task>
+    <task id="LOCAL-00267" summary="Fixing region command">
+      <created>1666624188166</created>
+      <option name="number" value="00267" />
+      <option name="presentableId" value="LOCAL-00267" />
+      <option name="project" value="LOCAL" />
+      <updated>1666624188166</updated>
+    </task>
+    <option name="localTasksCounter" value="268" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -430,7 +430,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing looping for retention, WA, and monthly recruiter&#10;Making rotating handler bigger" />
     <MESSAGE value="Fixing looping for retention, WA, and monthly recruiter" />
     <MESSAGE value="Standardizing errors.py" />
     <MESSAGE value="Adding daily verification checking" />
@@ -455,7 +454,8 @@
     <MESSAGE value="Messing with url" />
     <MESSAGE value="Adding residency" />
     <MESSAGE value="Adding region command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding region command" />
+    <MESSAGE value="Fixing region command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing region command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
