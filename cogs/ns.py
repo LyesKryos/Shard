@@ -120,6 +120,9 @@ class NationStates(commands.Cog):
             rgb_color = self.get_dominant_color(img)
             flag_color = discord.Colour.from_rgb(rgb_color[0], rgb_color[1], rgb_color[2])
             creation_time = datetime.datetime.fromtimestamp(int(founded_epoch), tz=self.eastern)
+            endos = len(endos.split(','))
+            if wa == "Non-member":
+                endos = 0
             # create embed
             nation_embed = discord.Embed(description=f"*{motto}*", color=flag_color)
             nation_embed.set_thumbnail(url=flag_link)
@@ -127,7 +130,7 @@ class NationStates(commands.Cog):
                                                             f"{self.sanitize_links_underscore(name)}")
             nation_embed.add_field(name="Classification", value=f"{category}")
             nation_embed.add_field(name="\u200b", value="\u200b")
-            nation_embed.add_field(name="World Assembly", value=f"{wa}\n({len(endos.split(','))} endorsements)")
+            nation_embed.add_field(name="World Assembly", value=f"{wa}\n({endos} endorsements)")
             nation_embed.add_field(name="Influence", value=f"{influence}\n({influence_score:,} points)")
             nation_embed.add_field(name="\u200b", value="\u200b")
             nation_embed.add_field(name="Region", value=f"[{region}]"

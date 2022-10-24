@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing no-region response" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing endorsement count for nation command">
+      <change beforePath="$PROJECT_DIR$/cogs/ns.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/ns.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -67,21 +69,7 @@
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
       <workItem from="1665685087568" duration="40245000" />
-      <workItem from="1666613506288" duration="5195000" />
-    </task>
-    <task id="LOCAL-00226" summary="Fixing daily verification">
-      <created>1665889132828</created>
-      <option name="number" value="00226" />
-      <option name="presentableId" value="LOCAL-00226" />
-      <option name="project" value="LOCAL" />
-      <updated>1665889132828</updated>
-    </task>
-    <task id="LOCAL-00227" summary="Adding server_check command">
-      <created>1665920709343</created>
-      <option name="number" value="00227" />
-      <option name="presentableId" value="LOCAL-00227" />
-      <option name="project" value="LOCAL" />
-      <updated>1665920709343</updated>
+      <workItem from="1666613506288" duration="5511000" />
     </task>
     <task id="LOCAL-00228" summary="Exempting bots from verification">
       <created>1665920850179</created>
@@ -412,7 +400,21 @@
       <option name="project" value="LOCAL" />
       <updated>1666624890726</updated>
     </task>
-    <option name="localTasksCounter" value="275" />
+    <task id="LOCAL-00275" summary="Fixing endorsement count for nation command">
+      <created>1666625065107</created>
+      <option name="number" value="00275" />
+      <option name="presentableId" value="LOCAL-00275" />
+      <option name="project" value="LOCAL" />
+      <updated>1666625065107</updated>
+    </task>
+    <task id="LOCAL-00276" summary="Fixing endorsement count for nation command">
+      <created>1666625113473</created>
+      <option name="number" value="00276" />
+      <option name="presentableId" value="LOCAL-00276" />
+      <option name="project" value="LOCAL" />
+      <updated>1666625113473</updated>
+    </task>
+    <option name="localTasksCounter" value="277" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -430,7 +432,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Standardizing errors.py" />
     <MESSAGE value="Adding daily verification checking" />
     <MESSAGE value="Fixing daily verification checking starting" />
     <MESSAGE value="Updating timezones" />
@@ -455,7 +456,8 @@
     <MESSAGE value="Adding region command" />
     <MESSAGE value="Fixing region command" />
     <MESSAGE value="Fixing no-region response" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing no-region response" />
+    <MESSAGE value="Fixing endorsement count for nation command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing endorsement count for nation command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
