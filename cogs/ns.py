@@ -123,8 +123,8 @@ class NationStates(commands.Cog):
             # create embed
             nation_embed = discord.Embed(description=f"*{motto}*", color=flag_color)
             nation_embed.set_thumbnail(url=flag_link)
-            nation_embed.set_author(name=f"{fullname}", url=f"https://www.nationstates.net/region="
-                                                            f"{self.sanitize_links_underscore(nation)}")
+            nation_embed.set_author(name=f"{fullname}", url=f"https://www.nationstates.net/nation="
+                                                            f"{self.sanitize_links_underscore(name)}")
             nation_embed.add_field(name="Classification", value=f"{category}")
             nation_embed.add_field(name="\u200b", value="\u200b")
             nation_embed.add_field(name="World Assembly", value=f"{wa}\n({len(endos)} endorsements)")
@@ -144,7 +144,77 @@ class NationStates(commands.Cog):
                 population = f"{float(population)} million {demonym}"
             nation_embed.add_field(name="Population", value=population)
             await ctx.send(embed=nation_embed)
-            return asyncio.sleep(1.8)
+
+    async def get_region(self, ctx, region):
+        async with aiohttp.ClientSession() as nation_session:
+            headers = {'User-Agent': 'Bassiliya'}
+            params = {'region': region,
+                      'q': 'name+numnations+founder+foundedtime+power+flag+delegate+delegatevotes'}
+            # ratelimiter
+            while True:
+                # see if there are enough available calls. if so, break the loop
+                try:
+                    await self.rate_limit.call()
+                    break
+                # if there are not enough available calls, continue the loop
+                except TooManyRequests as error:
+                    await asyncio.sleep(int(str(error)))
+                    continue
+            # get data
+            async with nation_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                          headers=headers, params=params) as region_data:
+                # if the nation does not exist
+                if region_data.status == 404:
+                    return await ctx.send(f"That nation does not seem to exist. "
+                                          f"You can check for CTEd nations in the Boneyard: "
+                                          f"https://www.nationstates.net/page=boneyard")
+                # parse data
+                region_data_raw = await region_data.text()
+                region_info = BeautifulSoup(region_data_raw, 'lxml')
+                region_name = region_info.find('name').text
+                residents = region_info.numnations.text
+                delegate = region_info.delegate.text
+                del_endos = region_info.delegatevotes.text
+                founder = region_info.founder.text
+                founded = region_info.foundedtime.text
+                influence_level = region_info.power.text
+                flag_link = region_info.flag.text
+                update = region_info.lastupdate.text
+            # ratelimiter
+            while True:
+                # see if there are enough available calls. if so, break the loop
+                try:
+                    await self.rate_limit.call()
+                    break
+                # if there are not enough available calls, continue the loop
+                except TooManyRequests as error:
+                    await asyncio.sleep(int(str(error)))
+                    continue
+            # get data
+            async with nation_session.get(f"{flag_link}",
+                                          headers=headers) as flag:
+                # parse data
+                get_flag = await flag.read()
+            img = Image.open(BytesIO(get_flag))
+            rgb_color = self.get_dominant_color(img)
+            flag_color = discord.Colour.from_rgb(rgb_color[0], rgb_color[1], rgb_color[2])
+            creation_time = datetime.datetime.fromtimestamp(int(founded), tz=self.eastern)
+            # create embed
+            region_embed = discord.Embed(color=flag_color)
+            region_embed.set_thumbnail(url=flag_link)
+            region_embed.set_author(name=f"{region_name}", url=f"https://www.nationstates.net/region="
+                                                            f"{self.sanitize_links_underscore(region_name)}")
+            region_embed.add_field(name="Founder", value=f"[{founder}] (https://www.nationstates.net/nation="
+                                                         f"{self.sanitize_links_underscore(founder)}")
+            region_embed.add_field(name="Founded",
+                                   value=f"{creation_time.strftime('%d %b %Y')}\n"
+                                         f"({founded})")
+            region_embed.add_field(name="\u200b", value="\u200b")
+            region_embed.add_field(name='Nations', value=f"{residents} nations")
+            region_embed.add_field(name="World Assembly Delegate", value=f"{delegate}\n({len(del_endos)} votes)")
+            region_embed.add_field(name="Influence", value=f"{influence_level}")
+            region_embed.add_field(name="Last Update", value=f"<t:{update}:T>")
+            await ctx.send(embed=region_embed)
 
     @commands.command(brief="Displays information about a nation", aliases=['n'])
     async def nation(self, ctx, *, args=None):
@@ -162,6 +232,10 @@ class NationStates(commands.Cog):
                 await self.get_nation(ctx, main_nation['main_nation'])
         else:
             await self.get_nation(ctx, args)
+
+    @commands.command(brief="Displays information about a region", aliases=['r'])
+    async def region(self, ctx, *, args):
+        await self.get_region(ctx, args)
 
 
 async def setup(bot):

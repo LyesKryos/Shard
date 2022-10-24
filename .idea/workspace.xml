@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding residency">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/ns.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/ns.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -69,14 +70,7 @@
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
       <workItem from="1665685087568" duration="40245000" />
-      <workItem from="1666613506288" duration="1437000" />
-    </task>
-    <task id="LOCAL-00215" summary="Fixing daily verification checking starting">
-      <created>1665882134282</created>
-      <option name="number" value="00215" />
-      <option name="presentableId" value="LOCAL-00215" />
-      <option name="project" value="LOCAL" />
-      <updated>1665882134282</updated>
+      <workItem from="1666613506288" duration="3916000" />
     </task>
     <task id="LOCAL-00216" summary="Updating timezones">
       <created>1665882267514</created>
@@ -414,7 +408,14 @@
       <option name="project" value="LOCAL" />
       <updated>1666614768793</updated>
     </task>
-    <option name="localTasksCounter" value="264" />
+    <task id="LOCAL-00264" summary="Adding residency">
+      <created>1666614978975</created>
+      <option name="number" value="00264" />
+      <option name="presentableId" value="LOCAL-00264" />
+      <option name="project" value="LOCAL" />
+      <updated>1666614978975</updated>
+    </task>
+    <option name="localTasksCounter" value="265" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
