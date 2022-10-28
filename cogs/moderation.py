@@ -49,7 +49,7 @@ class Moderation(commands.Cog):
                 raise commands.UserInputError
             else:
                 raise commands.UserInputError
-        await user.timeout(mute_datetime)
+        await user.timeout(mute_datetime, reason=None)
         await ctx.send(f"{user.name}{user.discriminator} muted until "
                        f"{mute_datetime.strftime('%d %b %Y at %H:%M:%S %Z%z')}. "
                        f"Relative time: <t:{mute_datetime.timestamp()}:f>")

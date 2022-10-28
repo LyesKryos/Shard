@@ -1,4 +1,7 @@
 import traceback
+
+import discord.errors
+
 from ShardBot import Shard
 from discord.ext import commands
 from customchecks import SilentFail
@@ -60,6 +63,8 @@ class ShardErrorHandler(commands.Cog):
         elif isinstance(error, commands.CheckFailure):
             await ctx.send("A check failed. Check the logs.")
             self.bot.logger.warning(msg=error)
+        elif isinstance(error, discord.errors.Forbidden):
+            await ctx.send("I cannot complete that action.")
         else:
             etype = type(error)
             trace = error.__traceback__
