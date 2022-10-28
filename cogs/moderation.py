@@ -38,13 +38,13 @@ class Moderation(commands.Cog):
         mute_datetime = now
         for t in mutetime:
             if t.endswith('s'):
-                basetime += mute_datetime + timedelta(seconds=int(t[:-1]))
+                mute_datetime += mute_datetime + timedelta(seconds=int(t[:-1]))
             elif t.endswith('m'):
-                basetime += mute_datetime + timedelta(minutes=int(t[:-1]))
+                mute_datetime += mute_datetime + timedelta(minutes=int(t[:-1]))
             elif t.endswith('h'):
-                basetime += mute_datetime + timedelta(hours=int(t[:-1]))
+                mute_datetime += mute_datetime + timedelta(hours=int(t[:-1]))
             elif t.endswith('d'):
-                basetime += mute_datetime + timedelta(days=int(t[:-1]))
+                mute_datetime += mute_datetime + timedelta(days=int(t[:-1]))
             elif len(mutetime) > 4:
                 raise commands.UserInputError
             else:
