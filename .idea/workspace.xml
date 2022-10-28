@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing endorsement count for nation command">
-      <change beforePath="$PROJECT_DIR$/cogs/ns.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/ns.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cogs/moderation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,14 +70,7 @@
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
       <workItem from="1665685087568" duration="40245000" />
-      <workItem from="1666613506288" duration="5511000" />
-    </task>
-    <task id="LOCAL-00228" summary="Exempting bots from verification">
-      <created>1665920850179</created>
-      <option name="number" value="00228" />
-      <option name="presentableId" value="LOCAL-00228" />
-      <option name="project" value="LOCAL" />
-      <updated>1665920850179</updated>
+      <workItem from="1666613506288" duration="10052000" />
     </task>
     <task id="LOCAL-00229" summary="Fixing timing for monthly_recruiter and verification loops">
       <created>1665921351203</created>
@@ -414,7 +408,14 @@
       <option name="project" value="LOCAL" />
       <updated>1666625113473</updated>
     </task>
-    <option name="localTasksCounter" value="277" />
+    <task id="LOCAL-00277" summary="Fixing endorsement count for nation command">
+      <created>1666631602031</created>
+      <option name="number" value="00277" />
+      <option name="presentableId" value="LOCAL-00277" />
+      <option name="project" value="LOCAL" />
+      <updated>1666631602031</updated>
+    </task>
+    <option name="localTasksCounter" value="278" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
