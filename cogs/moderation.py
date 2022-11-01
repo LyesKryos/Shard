@@ -72,6 +72,8 @@ class Moderation(commands.Cog):
     async def kick(self, ctx, user: discord.Member):
         # fetch the guild
         thegye_server = await self.bot.fetch_guild(674259612580446230)
+        # check if the user is in the server
+        user = thegye_server.get_member(user.id)
         # kick user
         await thegye_server.kick(user)
         return await ctx.send(f"{user.mention} kicked.")
