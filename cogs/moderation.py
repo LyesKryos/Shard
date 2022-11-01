@@ -67,6 +67,26 @@ class Moderation(commands.Cog):
         else:
             return await ctx.send(f"Unmute not successful.")
 
+    @commands.command(brief="Kicks a specified user.")
+    @commands.guild_only()
+    async def kick(self, ctx, user: discord.Member):
+        # fetch the guild
+        thegye_server = await self.bot.fetch_guild(674259612580446230)
+        # kick user
+        await thegye_server.kick(user)
+        return await ctx.send(f"{user.mention} kicked.")
+
+    @commands.command(brief="Bans a specified user.")
+    @commands.guild_only()
+    async def ban(self, ctx, user: discord.Member):
+        # fetch the guild
+        thegye_server = await self.bot.fetch_guild(674259612580446230)
+        # kick user
+        await thegye_server.ban(user)
+        return await ctx.send(f"{user.mention} banned.")
+
+
+
 
 
 async def setup(bot: Shard):
