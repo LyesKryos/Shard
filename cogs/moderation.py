@@ -78,15 +78,28 @@ class Moderation(commands.Cog):
 
     @commands.command(brief="Bans a specified user.")
     @commands.guild_only()
-    async def ban(self, ctx, user: discord.Member):
+    async def ban(self, ctx, *, args):
         # fetch the guild
         thegye_server = await self.bot.fetch_guild(674259612580446230)
-        # kick user
-        await thegye_server.ban(user)
-        return await ctx.send(f"{user.mention} banned.")
+        # ban user
+        try:
+            user = await commands.MemberConverter().convert(ctx, args)
+            await thegye_server.ban(user)
+            return await ctx.send(f"{user.mention} banned.")
+        except commands.MemberNotFound:
+            user = await commands.UserConverter().convert(ctx, args)
+            await thegye_server.ban(user)
+            return await ctx.send(f"Non-server member {user.id} banned.")
 
-
-
+    @commands.command(brief="Bans a specified user.")
+    @commands.guild_only()
+    async def unban(self, ctx, *, args):
+        # fetch the guild
+        thegye_server = await self.bot.fetch_guild(674259612580446230)
+        # unban user
+        user = await commands.UserConverter().convert(ctx, args)
+        await thegye_server.unban(user)
+        return await ctx.send(f"Non-server member {user.id} unbanned.")
 
 
 async def setup(bot: Shard):
