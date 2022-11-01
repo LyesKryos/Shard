@@ -74,6 +74,8 @@ class Moderation(commands.Cog):
         thegye_server = await self.bot.fetch_guild(674259612580446230)
         # check if the user is in the server
         user = thegye_server.get_member(user.id)
+        if user is None:
+            raise commands.MemberNotFound
         # kick user
         await thegye_server.kick(user)
         return await ctx.send(f"{user.mention} kicked.")
