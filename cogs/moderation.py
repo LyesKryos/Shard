@@ -30,7 +30,6 @@ class Moderation(commands.Cog):
                             "minute, second format. Example: 1h,2m,3s")
     @commands.guild_only()
     async def mute(self, ctx, user: discord.Member, mutetime: str):
-        # converts time
         # sets mute time
         basetime = 0
         mutetime = mutetime.split(',')
@@ -52,7 +51,22 @@ class Moderation(commands.Cog):
         await user.timeout(mute_datetime, reason=None)
         await ctx.send(f"{user.name}{user.discriminator} muted until "
                        f"{mute_datetime.strftime('%d %b %Y at %H:%M:%S %Z%z')}. "
-                       f"Relative time: <t:{mute_datetime.timestamp()}:f>")
+                       f"Relative time: <t:{round(mute_datetime.timestamp())}:f>")
+
+    @commands.command(brief="Unmutes a previously muted user.")
+    @commands.guild_only()
+    async def unmute(self, ctx, user: discord.Member):
+        # if the member hasn't been muted, cannot unmute
+        if user.timed_out_until is None:
+            return await ctx.send(f"{user.name}{user.discriminator} cannot be unmuted, as they are not muted.")
+        # otherwise, unmute!
+        await user.edit(timed_out_until=None)
+        # double check
+        if user.timed_out_until is None:
+            return await ctx.send(f"{user.name}{user.discriminator} unmuted.")
+        else:
+            return await ctx.send(f"Unmute not successful.")
+
 
 
 async def setup(bot: Shard):
