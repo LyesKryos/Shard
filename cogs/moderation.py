@@ -90,7 +90,7 @@ class Moderation(commands.Cog):
         except commands.MemberNotFound:
             user = await commands.UserConverter().convert(ctx, args)
             await thegye_server.ban(user)
-            return await ctx.send(f"Non-server member {user.id} banned.")
+            return await ctx.send(f"Non-server member {user.mention} ({user.id}) banned.")
 
     @commands.command(brief="Bans a specified user.")
     @commands.guild_only()
@@ -100,7 +100,7 @@ class Moderation(commands.Cog):
         # unban user
         user = await commands.UserConverter().convert(ctx, args)
         await thegye_server.unban(user)
-        return await ctx.send(f"{user.mention} unbanned.")
+        return await ctx.send(f"{user.mention} ({user.id}) unbanned.")
 
 
 async def setup(bot: Shard):
