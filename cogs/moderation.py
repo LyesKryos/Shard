@@ -14,6 +14,7 @@ class Moderation(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
         self.eastern = timezone('US/Eastern')
+        self.thegye = 674259612580446230
 
     async def cog_check(self, ctx) -> bool:
         if ctx.author.id == ctx.bot.owner_id:
@@ -70,7 +71,7 @@ class Moderation(commands.Cog):
     @commands.guild_only()
     async def kick(self, ctx, *, args):
         # fetch the guild
-        thegye_server = await self.bot.fetch_guild(728444080908140575)
+        thegye_server = await self.bot.fetch_guild(self.thegye)
         # check if the user is in the server
         member = await commands.MemberConverter().convert(ctx, args)
         # kick user
@@ -81,7 +82,7 @@ class Moderation(commands.Cog):
     @commands.guild_only()
     async def ban(self, ctx, *, args):
         # fetch the guild
-        thegye_server = await self.bot.fetch_guild(728444080908140575)
+        thegye_server = await self.bot.fetch_guild(self.thegye)
         # ban user
         try:
             user = await commands.MemberConverter().convert(ctx, args)
@@ -96,7 +97,7 @@ class Moderation(commands.Cog):
     @commands.guild_only()
     async def unban(self, ctx, *, args):
         # fetch the guild
-        thegye_server = await self.bot.fetch_guild(728444080908140575)
+        thegye_server = await self.bot.fetch_guild(self.thegye)
         # unban user
         user = await commands.UserConverter().convert(ctx, args)
         await thegye_server.unban(user)
