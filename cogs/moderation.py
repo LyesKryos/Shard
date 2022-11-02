@@ -100,7 +100,7 @@ class Moderation(commands.Cog):
         # unban user
         user = await commands.UserConverter().convert(ctx, args)
         await thegye_server.unban(user)
-        return await ctx.send(f"Non-server member {user.id} unbanned.")
+        return await ctx.send(f"{user.mention} unbanned.")
 
 
 async def setup(bot: Shard):
