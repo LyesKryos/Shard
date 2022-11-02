@@ -74,8 +74,8 @@ class Moderation(commands.Cog):
         # check if the user is in the server
         member = await commands.MemberConverter().convert(user, ctx)
         # kick user
-        await thegye_server.kick(user)
-        return await ctx.send(f"{user.mention} kicked.")
+        await thegye_server.kick(member)
+        return await ctx.send(f"{member.mention} kicked.")
 
     @commands.command(brief="Bans a specified user.")
     @commands.guild_only()
