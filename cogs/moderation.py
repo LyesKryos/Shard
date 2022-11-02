@@ -14,7 +14,6 @@ class Moderation(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
         self.eastern = timezone('US/Eastern')
-        self.pool = bot.pool
 
     async def cog_check(self, ctx) -> bool:
         if ctx.author.id == ctx.bot.owner_id:
