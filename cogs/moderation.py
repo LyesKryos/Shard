@@ -81,7 +81,7 @@ class Moderation(commands.Cog):
     @commands.guild_only()
     async def ban(self, ctx, *, args):
         # fetch the guild
-        thegye_server = await self.bot.fetch_guild(674259612580446230)
+        thegye_server = await self.bot.fetch_guild(728444080908140575)
         # ban user
         try:
             user = await commands.MemberConverter().convert(ctx, args)
@@ -96,7 +96,7 @@ class Moderation(commands.Cog):
     @commands.guild_only()
     async def unban(self, ctx, *, args):
         # fetch the guild
-        thegye_server = await self.bot.fetch_guild(674259612580446230)
+        thegye_server = await self.bot.fetch_guild(728444080908140575)
         # unban user
         user = await commands.UserConverter().convert(ctx, args)
         await thegye_server.unban(user)

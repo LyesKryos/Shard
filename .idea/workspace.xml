@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing kick" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating ban commands" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -67,14 +67,7 @@
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
       <workItem from="1665685087568" duration="40245000" />
-      <workItem from="1666613506288" duration="19810000" />
-    </task>
-    <task id="LOCAL-00250" summary="Adding url to nation command">
-      <created>1666299481244</created>
-      <option name="number" value="00250" />
-      <option name="presentableId" value="LOCAL-00250" />
-      <option name="project" value="LOCAL" />
-      <updated>1666299481244</updated>
+      <workItem from="1666613506288" duration="20271000" />
     </task>
     <task id="LOCAL-00251" summary="Adding url to nation command">
       <created>1666299528983</created>
@@ -412,7 +405,14 @@
       <option name="project" value="LOCAL" />
       <updated>1667393421915</updated>
     </task>
-    <option name="localTasksCounter" value="299" />
+    <task id="LOCAL-00299" summary="Updating ban commands">
+      <created>1667393722012</created>
+      <option name="number" value="00299" />
+      <option name="presentableId" value="LOCAL-00299" />
+      <option name="project" value="LOCAL" />
+      <updated>1667393722012</updated>
+    </task>
+    <option name="localTasksCounter" value="300" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -430,7 +430,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Exempting bots from verification" />
     <MESSAGE value="Fixing timing for monthly_recruiter and verification loops" />
     <MESSAGE value="Adding NationStates suite" />
     <MESSAGE value="Fixing nation command" />
@@ -455,7 +454,8 @@
     <MESSAGE value="Standardizing errors.py" />
     <MESSAGE value="Fixing moderation.py" />
     <MESSAGE value="Fixing kick" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing kick" />
+    <MESSAGE value="Updating ban commands" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updating ban commands" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
