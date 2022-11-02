@@ -68,11 +68,12 @@ class Moderation(commands.Cog):
 
     @commands.command(brief="Kicks a specified user.")
     @commands.guild_only()
-    async def kick(self, ctx, user: discord.Member):
+    async def kick(self, ctx, user):
         # fetch the guild
         thegye_server = await self.bot.fetch_guild(728444080908140575)
         # check if the user is in the server
-        user = thegye_server.get_member(user.id)
+        member = await commands.MemberConverter().convert(user, ctx)
+        user = thegye_server.get_member(member.id)
         if user is None:
             raise commands.MemberNotFound(str(user))
         # kick user
