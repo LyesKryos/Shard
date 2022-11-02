@@ -60,6 +60,8 @@ class ShardErrorHandler(commands.Cog):
             return
         elif isinstance(error, commands.UserNotFound):
             await ctx.send("I have no record of a user by that name, discriminator, or ID.")
+        elif isinstance(error, commands.MemberNotFound):
+            await ctx.send("I have no record of a server member by that name, discriminator, or ID.")
         elif isinstance(error, commands.CheckFailure):
             await ctx.send("A check failed. Check the logs.")
             self.bot.logger.warning(msg=error)
