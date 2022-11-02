@@ -72,7 +72,7 @@ class Moderation(commands.Cog):
         # fetch the guild
         thegye_server = await self.bot.fetch_guild(728444080908140575)
         # check if the user is in the server
-        member = await commands.MemberConverter().convert(args, ctx)
+        member = await commands.MemberConverter().convert(ctx, args)
         # kick user
         await thegye_server.kick(member)
         return await ctx.send(f"{member.mention} kicked.")
