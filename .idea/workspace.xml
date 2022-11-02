@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Upping bytes for logs">
-      <change beforePath="$PROJECT_DIR$/ShardBot.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShardBot.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Standardizing errors.py" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -69,28 +67,7 @@
       <workItem from="1665141589598" duration="50358000" />
       <workItem from="1665506818611" duration="3901000" />
       <workItem from="1665685087568" duration="40245000" />
-      <workItem from="1666613506288" duration="17845000" />
-    </task>
-    <task id="LOCAL-00239" summary="Fixing nation command">
-      <created>1666120510623</created>
-      <option name="number" value="00239" />
-      <option name="presentableId" value="LOCAL-00239" />
-      <option name="project" value="LOCAL" />
-      <updated>1666120510623</updated>
-    </task>
-    <task id="LOCAL-00240" summary="Fixing nation command">
-      <created>1666120765130</created>
-      <option name="number" value="00240" />
-      <option name="presentableId" value="LOCAL-00240" />
-      <option name="project" value="LOCAL" />
-      <updated>1666120765130</updated>
-    </task>
-    <task id="LOCAL-00241" summary="Fixing nation command">
-      <created>1666120805893</created>
-      <option name="number" value="00241" />
-      <option name="presentableId" value="LOCAL-00241" />
-      <option name="project" value="LOCAL" />
-      <updated>1666120805893</updated>
+      <workItem from="1666613506288" duration="18338000" />
     </task>
     <task id="LOCAL-00242" summary="Fixing research">
       <created>1666279433657</created>
@@ -414,7 +391,28 @@
       <option name="project" value="LOCAL" />
       <updated>1667391471686</updated>
     </task>
-    <option name="localTasksCounter" value="288" />
+    <task id="LOCAL-00288" summary="Fixing moderation.py">
+      <created>1667391602920</created>
+      <option name="number" value="00288" />
+      <option name="presentableId" value="LOCAL-00288" />
+      <option name="project" value="LOCAL" />
+      <updated>1667391602920</updated>
+    </task>
+    <task id="LOCAL-00289" summary="Fixing moderation.py">
+      <created>1667391738322</created>
+      <option name="number" value="00289" />
+      <option name="presentableId" value="LOCAL-00289" />
+      <option name="project" value="LOCAL" />
+      <updated>1667391738322</updated>
+    </task>
+    <task id="LOCAL-00290" summary="Standardizing errors.py">
+      <created>1667392006620</created>
+      <option name="number" value="00290" />
+      <option name="presentableId" value="LOCAL-00290" />
+      <option name="project" value="LOCAL" />
+      <updated>1667392006620</updated>
+    </task>
+    <option name="localTasksCounter" value="291" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -432,8 +430,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing daily verification" />
-    <MESSAGE value="Adding server_check command" />
     <MESSAGE value="Exempting bots from verification" />
     <MESSAGE value="Fixing timing for monthly_recruiter and verification loops" />
     <MESSAGE value="Adding NationStates suite" />
@@ -457,7 +453,9 @@
     <MESSAGE value="Adding unban" />
     <MESSAGE value="Fixing kick" />
     <MESSAGE value="Upping bytes for logs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Upping bytes for logs" />
+    <MESSAGE value="Fixing moderation.py" />
+    <MESSAGE value="Standardizing errors.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Standardizing errors.py" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
