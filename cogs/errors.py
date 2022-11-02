@@ -42,7 +42,7 @@ class ShardErrorHandler(commands.Cog):
         elif isinstance(error, commands.MissingRole):
             await ctx.send("You do not have the proper role for that, amigo.")
         elif isinstance(error, commands.MemberNotFound):
-            await ctx.send("I cannot find any such user.")
+            await ctx.send("I cannot find that server member.")
         # if the user attempts to use a command in DMs that is not authorized to use in DMs
         elif isinstance(error, commands.NoPrivateMessage):
             await ctx.send(f"I cannot run `${ctx.invoked_with}` in DMs! Return to the safety of a server.")
@@ -59,9 +59,7 @@ class ShardErrorHandler(commands.Cog):
         elif isinstance(error, SilentFail):
             return
         elif isinstance(error, commands.UserNotFound):
-            await ctx.send("I have no record of a user by that name, discriminator, or ID.")
-        elif isinstance(error, commands.MemberNotFound):
-            await ctx.send("I have no record of a server member by that name, discriminator, or ID.")
+            await ctx.send("I cannot find that user.")
         elif isinstance(error, commands.CheckFailure):
             await ctx.send("A check failed. Check the logs.")
             self.bot.logger.warning(msg=error)
