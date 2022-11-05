@@ -292,7 +292,8 @@ class Verification(commands.Cog):
             thegye_sever = self.bot.get_guild(674259612580446230)
             user = thegye_sever.get_member(member.id)
             unverified_role = thegye_sever.get_role(1028144304507592704)
-            await user.add_roles(unverified_role)
+            dispatch_role = member.guild.get_role(751113326481768479)
+            await user.add_roles(unverified_role, dispatch_role)
             # define channels
             open_square = thegye_sever.get_channel(674335095628365855)
             gatehouse = thegye_sever.get_channel(674284159128043530)
