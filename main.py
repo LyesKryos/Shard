@@ -4,7 +4,7 @@ import asyncio
 
 async def main(bot: Shard):
     async with bot:
-        await bot.start("ODM0ODkyMDM3MjE1NjE3MDk0.YIHfzQ.-UBhOq3ukC7kz3VTvUmpUBtjqaM")
+        bot.run("ODM0ODkyMDM3MjE1NjE3MDk0.YIHfzQ.-UBhOq3ukC7kz3VTvUmpUBtjqaM", log_handler=bot.logger)
 
 
 asyncio.run(main(Shard()))
