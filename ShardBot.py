@@ -19,9 +19,9 @@ class Shard(commands.Bot):
                             format='%(asctime)s %(levelname)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.WARNING)
-        handler = handlers.RotatingFileHandler("botlogs.log", encoding="utf-8", mode='a', maxBytes=5000, backupCount=3)
-        handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
-        self.logger.addHandler(handler)
+        self.handler = handlers.RotatingFileHandler("botlogs.log", encoding="utf-8", mode='a', maxBytes=5000, backupCount=3)
+        self.handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
+        self.logger.addHandler(self.handler)
         self.time = dt.now().strftime("%Y-%m-%d %H:%M:%S")
         self.version = "Shard Version 1.4"
         self.last_update = "Shard Update: Repairman"
