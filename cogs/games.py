@@ -80,7 +80,7 @@ class Games(commands.Cog):
                 return await author_dm.send("Process cancelled.")
             # add the user to the database
             await conn.execute('''INSERT INTO games(user_id, steam_id, game, game_username)
-             VALUES($1,$2,$3,$4);''', ctx.author.id, int(steam_id), 'Valheim', username)
+             VALUES($1,$2,$3,$4);''', ctx.author.id, steam_id, 'Valheim', username)
             return await author_dm.send(f"Congratulations! You may now log into the Valheim server!\n"
                                         f"Server Name: {valheim_info['server_name']}\n"
                                         f"Server Port: {valheim_info['server_port']}\n"
