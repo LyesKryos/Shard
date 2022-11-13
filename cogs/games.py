@@ -54,7 +54,7 @@ class Games(commands.Cog):
                                      "Steam ID to me in this DM. "
                                      "This will help me and the server admin identify your account.\n"
                                      "In order to get your Steam ID, log into Steam on your web browser at "
-                                     "https://steamcommunity.com/. Your Steam ID will be the long string of numbers "
+                                     "<https://steamcommunity.com/>. Your Steam ID will be the long string of numbers "
                                      "following `/profiles/`.")
                 try:
                     steam_id_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
@@ -83,7 +83,7 @@ class Games(commands.Cog):
                 # add the user to the database
                 await conn.execute('''INSERT INTO games(user_id, steam_id, game, game_username)
                  VALUES($1,$2,$3,$4);''', ctx.author.id, int(steam_id), 'Valheim', username)
-                return author_dm.send(f"Congratulations! You may now log into the Valheim server!\n"
+                return await author_dm.send(f"Congratulations! You may now log into the Valheim server!\n"
                                       f"Server Name: {valheim_info['server_name']}\n"
                                       f"Server Port: {valheim_info['server_port']}\n"
                                       f"Server Password: ||{valheim_info['server_password']}||\n\n"
