@@ -32,7 +32,7 @@ class Games(commands.Cog):
                                              f"Server Port: {valheim_info['server_port']}\n"
                                              f"Server Password: ||{valheim_info['server_password']}||\n\n"
                                              f"**Remember that sharing server access information with others is against "
-                                             f"the rules and can lead to a permanent ban.")
+                                             f"the rules and can lead to a permanent ban.**")
             elif user_info['banned'] is True:
                 return await ctx.send("You are banned from playing Valheim in the Thegye server.")
             # get the citizen role
@@ -86,7 +86,7 @@ class Games(commands.Cog):
                                         f"Server Port: {valheim_info['server_port']}\n"
                                         f"Server Password: ||{valheim_info['server_password']}||\n\n"
                                         f"**Remember that sharing server access information with others is against "
-                                        f"the rules and can lead to a permanent ban.")
+                                        f"the rules and can lead to a permanent ban.**")
 
 
 async def setup(bot: Shard):
