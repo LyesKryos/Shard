@@ -23,7 +23,7 @@ class Games(commands.Cog):
                                         ctx.author.id)
         # fetch game information
         valheim_info = await conn.fetchrow('''SELECT * FROM games_info WHERE game_name = 'Valheim';''')
-        if valheim_info is not None:
+        if user_info is not None:
             # if the user already exists and is not banned, send them the port and password
             if user_info['banned'] is False:
                 return await ctx.author.send(f"Server Name: {valheim_info['server_name']}\n"
