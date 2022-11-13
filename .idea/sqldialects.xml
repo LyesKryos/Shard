@@ -7,6 +7,7 @@
     <file url="file://$PROJECT_DIR$/cogs/base.py" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/cogs/cnc.py" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/cogs/currency.py" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/cogs/games.py" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/cogs/ns.py" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/cogs/recruitment.py" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/cogs/roleplay.py" dialect="GenericSQL" />
