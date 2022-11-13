@@ -23,15 +23,16 @@ class Games(commands.Cog):
                                         ctx.author.id)
         # fetch game information
         valheim_info = await conn.fetchrow('''SELECT * FROM games_info WHERE game_name = 'Valheim';''')
-        # if the user already exists and is not banned, send them the port and password
-        if user_info['banned'] is False:
-            return await ctx.author.send(f"Server Name: {valheim_info['server_name']}\n"
-                                         f"Server Port: {valheim_info['server_port']}\n"
-                                         f"Server Password: ||{valheim_info['server_password']}||\n\n"
-                                         f"**Remember that sharing server access information with others is against "
-                                         f"the rules and can lead to a permanent ban.")
-        elif user_info['banned'] is True:
-            return await ctx.send("You are banned from playing Valheim in the Thegye server.")
+        if valheim_info is not None:
+            # if the user already exists and is not banned, send them the port and password
+            if user_info['banned'] is False:
+                return await ctx.author.send(f"Server Name: {valheim_info['server_name']}\n"
+                                             f"Server Port: {valheim_info['server_port']}\n"
+                                             f"Server Password: ||{valheim_info['server_password']}||\n\n"
+                                             f"**Remember that sharing server access information with others is against "
+                                             f"the rules and can lead to a permanent ban.")
+            elif user_info['banned'] is True:
+                return await ctx.send("You are banned from playing Valheim in the Thegye server.")
         else:
             # get list of all Steam IDs
             steam_ids_raw = await conn.fetch('''SELECT steam_id FROM games;''')
