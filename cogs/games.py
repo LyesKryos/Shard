@@ -43,7 +43,6 @@ class Games(commands.Cog):
             else:
                 # create the DM with the user
                 author_dm = await ctx.author.create_dm()
-                await ctx.send("Sent you a DM!")
 
                 # check the message
                 def authorcheck(message):
