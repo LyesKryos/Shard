@@ -12,6 +12,8 @@ class Games(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
 
+    @commands.command()
+    @commands.guild_only()
     async def valheim(self, ctx):
         # establish pool
         conn = self.bot.pool
@@ -49,7 +51,10 @@ class Games(commands.Cog):
                 # send the opening dialogue
                 await author_dm.send("To join the Valheim server, please send your "
                                      "Steam ID to me in this DM. "
-                                     "This will help me and the server admin identify your account.")
+                                     "This will help me and the server admin identify your account.\n"
+                                     "In order to get your Steam ID, log into Steam on your web browser at "
+                                     "https://steamcommunity.com/. Your Steam ID will be the long string of numbers "
+                                     "following `/profiles/`.")
                 try:
                     steam_id_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
                 except asyncio.TimeoutError:
