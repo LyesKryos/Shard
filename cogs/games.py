@@ -33,7 +33,6 @@ class Games(commands.Cog):
                                              f"the rules and can lead to a permanent ban.")
             elif user_info['banned'] is True:
                 return await ctx.send("You are banned from playing Valheim in the Thegye server.")
-        else:
             # get list of all Steam IDs
             steam_ids_raw = await conn.fetch('''SELECT steam_id FROM games;''')
             steam_ids = [sid['steam_id'] for sid in steam_ids_raw]
@@ -84,20 +83,14 @@ class Games(commands.Cog):
                 await conn.execute('''INSERT INTO games(user_id, steam_id, game, game_username)
                  VALUES($1,$2,$3,$4);''', ctx.author.id, int(steam_id), 'Valheim', username)
                 return await author_dm.send(f"Congratulations! You may now log into the Valheim server!\n"
-                                      f"Server Name: {valheim_info['server_name']}\n"
-                                      f"Server Port: {valheim_info['server_port']}\n"
-                                      f"Server Password: ||{valheim_info['server_password']}||\n\n"
-                                      f"**Remember that sharing server access information with others is against "
-                                      f"the rules and can lead to a permanent ban.")
+                                            f"Server Name: {valheim_info['server_name']}\n"
+                                            f"Server Port: {valheim_info['server_port']}\n"
+                                            f"Server Password: ||{valheim_info['server_password']}||\n\n"
+                                            f"**Remember that sharing server access information with others is against "
+                                            f"the rules and can lead to a permanent ban.")
+
 
 async def setup(bot: Shard):
     # define the cog and add the cog
     cog = Games(bot)
     await bot.add_cog(cog)
-
-
-
-
-
-
-
