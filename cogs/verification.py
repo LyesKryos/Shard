@@ -14,12 +14,15 @@ from pytz import timezone
 import aiohttp
 from typing import Union, Optional
 
+from customchecks import TooManyRequests
+from ratelimiter import Ratelimiter
+
 
 class Verification(commands.Cog):
 
     def __init__(self, bot: Shard):
         self.bot = bot
-
+        self.rate_limit = Ratelimiter()
         self.daily_verification = asyncio.create_task(self.daily_check())
 
     async def daily_check(self):
@@ -657,10 +660,18 @@ class Verification(commands.Cog):
                     for n in member_nations:
                         headers = {'User-Agent': 'Bassiliya'}
                         params = {'nation': n}
+                        while True:
+                            # see if there are enough available calls. if so, break the loop
+                            try:
+                                await self.rate_limit.call()
+                                break
+                            # if there are not enough available calls, continue the loop
+                            except TooManyRequests as error:
+                                await asyncio.sleep(int(str(error)))
+                                continue
                         # get data
                         async with verify_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                                       headers=headers, params=params) as nation_info:
-                            await asyncio.sleep(.6)
                             if nation_info.status == 404:
                                 await member.add_roles(cte_role)
                             nation_info_raw = await nation_info.text()
@@ -685,6 +696,10 @@ class Verification(commands.Cog):
                                 await member.remove_roles(cte_role)
         await ctx.send(f"{thegye_server.member_count} users checked and roles updated.")
 
+    @commands.command()
+    @commands.is_owner()
+    async def force_check(self, ctx):
+        await self.server_check(ctx)
 
 async def setup(bot: Shard):
     # define the cog and add the cog
