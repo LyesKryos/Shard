@@ -31,7 +31,6 @@ class Moderation(commands.Cog):
     @commands.guild_only()
     async def mute(self, ctx, user: discord.Member, mutetime: str):
         # sets mute time
-        basetime = 0
         mutetime = mutetime.split(',')
         now = datetime.now(tz=self.eastern)
         mute_datetime = now
@@ -86,7 +85,7 @@ class Moderation(commands.Cog):
         # ban user
         try:
             user = await commands.MemberConverter().convert(ctx, args)
-            await thegye_server.ban(user)
+            await thegye_server.ban(user, delete_message_days=0)
             return await ctx.send(f"{user.mention} banned.")
         except commands.MemberNotFound:
             user = await commands.UserConverter().convert(ctx, args)

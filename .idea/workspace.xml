@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing the valheim command">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/games.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/games.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/moderation.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/moderation.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,28 +72,8 @@
       <workItem from="1665506818611" duration="3901000" />
       <workItem from="1665685087568" duration="40245000" />
       <workItem from="1666613506288" duration="25503000" />
-      <workItem from="1668290570429" duration="5398000" />
-    </task>
-    <task id="LOCAL-00265" summary="Adding region command">
-      <created>1666623873832</created>
-      <option name="number" value="00265" />
-      <option name="presentableId" value="LOCAL-00265" />
-      <option name="project" value="LOCAL" />
-      <updated>1666623873832</updated>
-    </task>
-    <task id="LOCAL-00266" summary="Fixing region command">
-      <created>1666623954010</created>
-      <option name="number" value="00266" />
-      <option name="presentableId" value="LOCAL-00266" />
-      <option name="project" value="LOCAL" />
-      <updated>1666623954010</updated>
-    </task>
-    <task id="LOCAL-00267" summary="Fixing region command">
-      <created>1666624188166</created>
-      <option name="number" value="00267" />
-      <option name="presentableId" value="LOCAL-00267" />
-      <option name="project" value="LOCAL" />
-      <updated>1666624188166</updated>
+      <workItem from="1668290570429" duration="7730000" />
+      <workItem from="1669641797845" duration="1187000" />
     </task>
     <task id="LOCAL-00268" summary="Fixing region command">
       <created>1666624361828</created>
@@ -415,7 +397,28 @@
       <option name="project" value="LOCAL" />
       <updated>1668299281676</updated>
     </task>
-    <option name="localTasksCounter" value="314" />
+    <task id="LOCAL-00314" summary="Fixing the valheim command">
+      <created>1668299530715</created>
+      <option name="number" value="00314" />
+      <option name="presentableId" value="LOCAL-00314" />
+      <option name="project" value="LOCAL" />
+      <updated>1668299530715</updated>
+    </task>
+    <task id="LOCAL-00315" summary="Fixing the valheim command">
+      <created>1668299571567</created>
+      <option name="number" value="00315" />
+      <option name="presentableId" value="LOCAL-00315" />
+      <option name="project" value="LOCAL" />
+      <updated>1668299571567</updated>
+    </task>
+    <task id="LOCAL-00316" summary="Fixing the valheim command">
+      <created>1668299828626</created>
+      <option name="number" value="00316" />
+      <option name="presentableId" value="LOCAL-00316" />
+      <option name="project" value="LOCAL" />
+      <updated>1668299828626</updated>
+    </task>
+    <option name="localTasksCounter" value="317" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

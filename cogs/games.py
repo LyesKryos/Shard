@@ -23,14 +23,15 @@ class Games(commands.Cog):
         # fetch game information
         valheim_info = await conn.fetchrow('''SELECT * FROM games_info WHERE game_name = 'Valheim';''')
         # get list of all Steam IDs
-        steam_ids_raw = await conn.fetch('''SELECT steam_id FROM games;''')
+        steam_ids_raw = await conn.fetch('''SELECT steam_id FROM games WHERE game = 'Valheim';''')
         steam_ids = [sid['steam_id'] for sid in steam_ids_raw]
-        if user_info is not None:
+        if user_info is not None: 
             # if the user already exists and is not banned, send them the port and password
             if user_info['banned'] is False:
                 return await ctx.author.send(f"Server Name: {valheim_info['server_name']}\n"
                                              f"Server Port: {valheim_info['server_port']}\n"
-                                             f"Server Password: ||{valheim_info['server_password']}||\n\n"
+                                             f"Server Password: ||{valheim_info['server_password']}||\n"
+                                             f"Server Rules: https://www.nationstates.net/page=dispatch/id=1794380\n\n"
                                              f"**Remember that sharing server access information with others is against "
                                              f"the rules and can lead to a permanent ban.**")
             elif user_info['banned'] is True:
@@ -53,7 +54,7 @@ class Games(commands.Cog):
                                  "This will help me and the server admin identify your account.\n"
                                  "In order to get your Steam ID, log into Steam on your web browser at "
                                  "<https://steamcommunity.com/>. Your Steam ID will be the long string of numbers "
-                                 "following `/profiles/`.")
+                                 "following `/profiles/` in the URL..")
             try:
                 steam_id_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
             except asyncio.TimeoutError:
@@ -83,10 +84,11 @@ class Games(commands.Cog):
              VALUES($1,$2,$3,$4);''', ctx.author.id, steam_id, 'Valheim', username)
             return await author_dm.send(f"Congratulations! You may now log into the Valheim server!\n"
                                         f"Server Name: {valheim_info['server_name']}\n"
-                                        f"Server Port: {valheim_info['server_port']}\n"
-                                        f"Server Password: ||{valheim_info['server_password']}||\n\n"
-                                        f"**Remember that sharing server access information with others is against "
-                                        f"the rules and can lead to a permanent ban.**")
+                                             f"Server Port: {valheim_info['server_port']}\n"
+                                             f"Server Password: ||{valheim_info['server_password']}||\n"
+                                             f"Server Rules: https://www.nationstates.net/page=dispatch/id=1794380\n\n"
+                                             f"**Remember that sharing server access information with others is against"
+                                             f" the rules and can lead to a permanent ban.**")
 
 
 async def setup(bot: Shard):
