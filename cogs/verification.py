@@ -699,7 +699,8 @@ class Verification(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def force_check(self, ctx):
-        await self.server_check(ctx)
+        async with ctx.typing():
+            await self.server_check(ctx)
 
 async def setup(bot: Shard):
     # define the cog and add the cog
