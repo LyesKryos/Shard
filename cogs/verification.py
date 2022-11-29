@@ -674,6 +674,7 @@ class Verification(commands.Cog):
                                                       headers=headers, params=params) as nation_info:
                             if nation_info.status == 404:
                                 await member.add_roles(cte_role)
+                                continue
                             nation_info_raw = await nation_info.text()
                             nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
                             region = nation_info_soup.region.text

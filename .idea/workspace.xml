@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding force server check to verification.py">
-      <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,21 +71,7 @@
       <workItem from="1665685087568" duration="40245000" />
       <workItem from="1666613506288" duration="25503000" />
       <workItem from="1668290570429" duration="7730000" />
-      <workItem from="1669641797845" duration="2297000" />
-    </task>
-    <task id="LOCAL-00269" summary="Fixing region command">
-      <created>1666624421767</created>
-      <option name="number" value="00269" />
-      <option name="presentableId" value="LOCAL-00269" />
-      <option name="project" value="LOCAL" />
-      <updated>1666624421770</updated>
-    </task>
-    <task id="LOCAL-00270" summary="Fixing region command">
-      <created>1666624636329</created>
-      <option name="number" value="00270" />
-      <option name="presentableId" value="LOCAL-00270" />
-      <option name="project" value="LOCAL" />
-      <updated>1666624636329</updated>
+      <workItem from="1669641797845" duration="2665000" />
     </task>
     <task id="LOCAL-00271" summary="Fixing region command">
       <created>1666624705801</created>
@@ -416,7 +402,21 @@
       <option name="project" value="LOCAL" />
       <updated>1669643271023</updated>
     </task>
-    <option name="localTasksCounter" value="318" />
+    <task id="LOCAL-00318" summary="Adding force server check to verification.py">
+      <created>1669644171052</created>
+      <option name="number" value="00318" />
+      <option name="presentableId" value="LOCAL-00318" />
+      <option name="project" value="LOCAL" />
+      <updated>1669644171052</updated>
+    </task>
+    <task id="LOCAL-00319" summary="Adding force server check to verification.py">
+      <created>1669644299393</created>
+      <option name="number" value="00319" />
+      <option name="presentableId" value="LOCAL-00319" />
+      <option name="project" value="LOCAL" />
+      <updated>1669644299393</updated>
+    </task>
+    <option name="localTasksCounter" value="320" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
