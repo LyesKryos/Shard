@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding force server check to verification.py">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing verification.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,14 +72,7 @@
       <workItem from="1665685087568" duration="40245000" />
       <workItem from="1666613506288" duration="25503000" />
       <workItem from="1668290570429" duration="7730000" />
-      <workItem from="1669641797845" duration="2665000" />
-    </task>
-    <task id="LOCAL-00271" summary="Fixing region command">
-      <created>1666624705801</created>
-      <option name="number" value="00271" />
-      <option name="presentableId" value="LOCAL-00271" />
-      <option name="project" value="LOCAL" />
-      <updated>1666624705801</updated>
+      <workItem from="1669641797845" duration="3290000" />
     </task>
     <task id="LOCAL-00272" summary="Fixing region command">
       <created>1666624797002</created>
@@ -416,7 +410,14 @@
       <option name="project" value="LOCAL" />
       <updated>1669644299393</updated>
     </task>
-    <option name="localTasksCounter" value="320" />
+    <task id="LOCAL-00320" summary="Fixing verification.py">
+      <created>1669751705272</created>
+      <option name="number" value="00320" />
+      <option name="presentableId" value="LOCAL-00320" />
+      <option name="project" value="LOCAL" />
+      <updated>1669751705272</updated>
+    </task>
+    <option name="localTasksCounter" value="321" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -434,7 +435,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding residency" />
     <MESSAGE value="Adding region command" />
     <MESSAGE value="Fixing region command" />
     <MESSAGE value="Fixing no-region response" />
@@ -459,7 +459,8 @@
     <MESSAGE value="Fixing the valheim command" />
     <MESSAGE value="Updating Valheim message&#10;Fixing message deleting" />
     <MESSAGE value="Adding force server check to verification.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding force server check to verification.py" />
+    <MESSAGE value="Fixing verification.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing verification.py" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
