@@ -63,13 +63,13 @@ class Verification(commands.Cog):
                 await asyncio.sleep(seconds)
                 # cycles through all members
                 for member in thegye_server.members:
-                    # if member is a bot
-                    if member.bot:
-                        continue
                     # calls member information from the database
                     member_info = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
                                                       member.id)
                     await member.remove_roles(wa_role, thegye_role, karma_role, traveler_role, cte_role)
+                    bot = thegye_server.get_role(783751789299105812)
+                    if bot in member.roles:
+                        continue
                     # if the member is not verified at all, remove all relevant roles and move to the next member
                     if member_info is None:
                         await member.add_roles(unverified_role)
@@ -87,6 +87,7 @@ class Verification(commands.Cog):
                                     await asyncio.sleep(.6)
                                     if nation_info.status == 404:
                                         await member.add_roles(cte_role)
+                                        continue
                                     nation_info_raw = await nation_info.text()
                                     nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
                                     region = nation_info_soup.region.text
@@ -642,9 +643,6 @@ class Verification(commands.Cog):
         wa_role = thegye_server.get_role(674283915870994442)
         # cycles through all members
         for member in thegye_server.members:
-            # if member is a bot
-            if member.bot:
-                continue
             # calls member information from the database
             member_info = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
                                               member.id)
