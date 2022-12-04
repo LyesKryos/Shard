@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing daily verification.py" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing daily verification.py">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -69,14 +72,7 @@
       <workItem from="1665685087568" duration="40245000" />
       <workItem from="1666613506288" duration="25503000" />
       <workItem from="1668290570429" duration="7730000" />
-      <workItem from="1669641797845" duration="4499000" />
-    </task>
-    <task id="LOCAL-00275" summary="Fixing endorsement count for nation command">
-      <created>1666625065107</created>
-      <option name="number" value="00275" />
-      <option name="presentableId" value="LOCAL-00275" />
-      <option name="project" value="LOCAL" />
-      <updated>1666625065107</updated>
+      <workItem from="1669641797845" duration="6651000" />
     </task>
     <task id="LOCAL-00276" summary="Fixing endorsement count for nation command">
       <created>1666625113473</created>
@@ -414,7 +410,14 @@
       <option name="project" value="LOCAL" />
       <updated>1669808599136</updated>
     </task>
-    <option name="localTasksCounter" value="324" />
+    <task id="LOCAL-00324" summary="Fixing daily verification.py">
+      <created>1669808818022</created>
+      <option name="number" value="00324" />
+      <option name="presentableId" value="LOCAL-00324" />
+      <option name="project" value="LOCAL" />
+      <updated>1669808818022</updated>
+    </task>
+    <option name="localTasksCounter" value="325" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
