@@ -112,6 +112,7 @@ class Verification(commands.Cog):
                 #                     else:
                 #                         await member.add_roles(traveler_role)
                 #                         await member.remove_roles(cte_role)
+                await asyncio.sleep(59)
                 await admin_channel.send(f"{thegye_server.member_count} users checked and roles updated.")
         except Exception as error:
             etype = type(error)
