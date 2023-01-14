@@ -52,7 +52,7 @@ class Verification(commands.Cog):
                 else:
                     # sets time to be 3:30 on the next day
                     try:
-                        next_run = now.replace(day=now.day, hour=14, minute=16, second=0)
+                        next_run = now.replace(day=now.day, hour=14, minute=17, second=0)
                     # if there is a value error, the month is probably whacked up
                     except ValueError:
                         next_run = now.replace(day=1, month=now.month + 1, hour=3, minute=30, second=0)

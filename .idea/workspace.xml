@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Testing verification.py fix">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -77,14 +78,7 @@
       <workItem from="1666613506288" duration="25503000" />
       <workItem from="1668290570429" duration="7730000" />
       <workItem from="1669641797845" duration="11403000" />
-      <workItem from="1673719527207" duration="1875000" />
-    </task>
-    <task id="LOCAL-00284" summary="Adding unban">
-      <created>1667330627710</created>
-      <option name="number" value="00284" />
-      <option name="presentableId" value="LOCAL-00284" />
-      <option name="project" value="LOCAL" />
-      <updated>1667330627710</updated>
+      <workItem from="1673719527207" duration="2257000" />
     </task>
     <task id="LOCAL-00285" summary="Fixing kick">
       <created>1667330788410</created>
@@ -422,7 +416,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673723369410</updated>
     </task>
-    <option name="localTasksCounter" value="333" />
+    <task id="LOCAL-00333" summary="Testing verification.py fix">
+      <created>1673723754717</created>
+      <option name="number" value="00333" />
+      <option name="presentableId" value="LOCAL-00333" />
+      <option name="project" value="LOCAL" />
+      <updated>1673723754717</updated>
+    </task>
+    <option name="localTasksCounter" value="334" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
