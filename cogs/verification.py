@@ -52,66 +52,66 @@ class Verification(commands.Cog):
                 else:
                     # sets time to be 3:30 on the next day
                     try:
-                        next_run = now.replace(day=now.day, hour=14, minute=10, second=0)
+                        next_run = now.replace(day=now.day, hour=14, minute=16, second=0)
                     # if there is a value error, the month is probably whacked up
                     except ValueError:
                         next_run = now.replace(day=1, month=now.month + 1, hour=3, minute=30, second=0)
                 # sends the next runtime
                 await crashchannel.send(f"Verification daily update waiting until "
                                         f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
-                # gets the time to wait
-                delta: timedelta = next_run - now
-                # converts time to seconds
-                seconds = delta.total_seconds()
-                # sleeps until runtime
-                await asyncio.sleep(seconds)
-                # cycles through all members
-                for member in thegye_server.members:
-                    # calls member information from the database
-                    member_info = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
-                                                      member.id)
-                    await member.remove_roles(wa_role, thegye_role, karma_role, traveler_role, cte_role)
-                    bot = thegye_server.get_role(783751789299105812)
-                    if bot in member.roles:
-                        continue
-                    # if the member is not verified at all, remove all relevant roles and move to the next member
-                    if member_info is None:
-                        await member.add_roles(unverified_role)
-                        continue
-                    # otherwise, update roles
-                    else:
-                        member_nations = member_info['nations']
-                        async with aiohttp.ClientSession() as verify_session:
-                            for n in member_nations:
-                                headers = {'User-Agent': 'Bassiliya'}
-                                params = {'nation': n}
-                                # get data
-                                async with verify_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                                              headers=headers, params=params) as nation_info:
-                                    await asyncio.sleep(.6)
-                                    if nation_info.status == 404:
-                                        await member.add_roles(cte_role)
-                                        continue
-                                    nation_info_raw = await nation_info.text()
-                                    nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
-                                    region = nation_info_soup.region.text
-                                    # if the nation's region is Thegye, add the Thegye role
-                                    if region == "Thegye":
-                                        await member.remove_roles(traveler_role, karma_role)
-                                        # if the nation is in the WA, add the WA role
-                                        if nation_info_soup.unstatus.text != "Non-member":
-                                            await member.add_roles(wa_role)
-                                        await member.add_roles(thegye_role)
-                                        await member.remove_roles(cte_role)
-                                        continue
-                                    # if the nation's region is Karma, add the Karma role
-                                    elif region == "Karma":
-                                        await member.add_roles(karma_role)
-                                        await member.remove_roles(cte_role)
-                                    # otherwise, add the traveler role
-                                    else:
-                                        await member.add_roles(traveler_role)
-                                        await member.remove_roles(cte_role)
+                # # gets the time to wait
+                # delta: timedelta = next_run - now
+                # # converts time to seconds
+                # seconds = delta.total_seconds()
+                # # sleeps until runtime
+                # await asyncio.sleep(seconds)
+                # # cycles through all members
+                # for member in thegye_server.members:
+                #     # calls member information from the database
+                #     member_info = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
+                #                                       member.id)
+                #     await member.remove_roles(wa_role, thegye_role, karma_role, traveler_role, cte_role)
+                #     bot = thegye_server.get_role(783751789299105812)
+                #     if bot in member.roles:
+                #         continue
+                #     # if the member is not verified at all, remove all relevant roles and move to the next member
+                #     if member_info is None:
+                #         await member.add_roles(unverified_role)
+                #         continue
+                #     # otherwise, update roles
+                #     else:
+                #         member_nations = member_info['nations']
+                #         async with aiohttp.ClientSession() as verify_session:
+                #             for n in member_nations:
+                #                 headers = {'User-Agent': 'Bassiliya'}
+                #                 params = {'nation': n}
+                #                 # get data
+                #                 async with verify_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                #                                               headers=headers, params=params) as nation_info:
+                #                     await asyncio.sleep(.6)
+                #                     if nation_info.status == 404:
+                #                         await member.add_roles(cte_role)
+                #                         continue
+                #                     nation_info_raw = await nation_info.text()
+                #                     nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
+                #                     region = nation_info_soup.region.text
+                #                     # if the nation's region is Thegye, add the Thegye role
+                #                     if region == "Thegye":
+                #                         await member.remove_roles(traveler_role, karma_role)
+                #                         # if the nation is in the WA, add the WA role
+                #                         if nation_info_soup.unstatus.text != "Non-member":
+                #                             await member.add_roles(wa_role)
+                #                         await member.add_roles(thegye_role)
+                #                         await member.remove_roles(cte_role)
+                #                         continue
+                #                     # if the nation's region is Karma, add the Karma role
+                #                     elif region == "Karma":
+                #                         await member.add_roles(karma_role)
+                #                         await member.remove_roles(cte_role)
+                #                     # otherwise, add the traveler role
+                #                     else:
+                #                         await member.add_roles(traveler_role)
+                #                         await member.remove_roles(cte_role)
                 await admin_channel.send(f"{thegye_server.member_count} users checked and roles updated.")
         except Exception as error:
             etype = type(error)
