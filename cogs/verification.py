@@ -61,7 +61,18 @@ class Verification(commands.Cog):
                 eastern = timezone('US/Eastern')
                 now = datetime.now(eastern)
                 # sets time to be 330 the next day
-                next_run = now.replace(day=now.day + 1, hour=3, minute=30, second=0)
+                if now.month == 12 and now.day == 31:
+                    next_run = now.replace(year=now.year + 1, month=1, day=1, hour=3, minute=30, second=0)
+                else:
+                    # sets time to be 3:30 on the next day
+                    try:
+                        next_run = now.replace(day=now.day + 1, hour=3, minute=30, second=0)
+                    # if there is a value error, the month is probably whacked up
+                    except ValueError:
+                        next_run = now.replace(day=1, month=now.month + 1, hour=3, minute=30, second=0)
+                # sends the next runtime
+                await crashchannel.send(f"Verification daily update waiting until "
+                                        f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
                 # gets the time to wait
                 delta: timedelta = next_run - now
                 # converts time to seconds
