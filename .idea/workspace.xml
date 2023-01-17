@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Testing verification.py fix">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing verification.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
@@ -78,14 +78,7 @@
       <workItem from="1666613506288" duration="25503000" />
       <workItem from="1668290570429" duration="7730000" />
       <workItem from="1669641797845" duration="11403000" />
-      <workItem from="1673719527207" duration="3935000" />
-    </task>
-    <task id="LOCAL-00288" summary="Fixing moderation.py">
-      <created>1667391602920</created>
-      <option name="number" value="00288" />
-      <option name="presentableId" value="LOCAL-00288" />
-      <option name="project" value="LOCAL" />
-      <updated>1667391602920</updated>
+      <workItem from="1673719527207" duration="4210000" />
     </task>
     <task id="LOCAL-00289" summary="Fixing moderation.py">
       <created>1667391738322</created>
@@ -423,7 +416,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673724244934</updated>
     </task>
-    <option name="localTasksCounter" value="337" />
+    <task id="LOCAL-00337" summary="Fixing verification.py">
+      <created>1673728031724</created>
+      <option name="number" value="00337" />
+      <option name="presentableId" value="LOCAL-00337" />
+      <option name="project" value="LOCAL" />
+      <updated>1673728031725</updated>
+    </task>
+    <option name="localTasksCounter" value="338" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -459,14 +459,14 @@
     <MESSAGE value="Fixing the valheim command" />
     <MESSAGE value="Updating Valheim message&#10;Fixing message deleting" />
     <MESSAGE value="Adding force server check to verification.py" />
-    <MESSAGE value="Fixing verification.py" />
     <MESSAGE value="Skipping bot verification.py" />
     <MESSAGE value="Fixing daily verification.py" />
     <MESSAGE value="Updating time for verification.py" />
     <MESSAGE value="Trying to fix verification.py" />
     <MESSAGE value="Adding" />
     <MESSAGE value="Testing verification.py fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="Testing verification.py fix" />
+    <MESSAGE value="Fixing verification.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing verification.py" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$1.coverage" NAME="1 Coverage Results" MODIFIED="1673727138457" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

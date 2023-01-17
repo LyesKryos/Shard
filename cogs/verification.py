@@ -114,6 +114,7 @@ class Verification(commands.Cog):
                                         await member.remove_roles(cte_role)
                 await asyncio.sleep(59)
                 await admin_channel.send(f"{thegye_server.member_count} users checked and roles updated.")
+                continue
         except Exception as error:
             etype = type(error)
             trace = error.__traceback__
