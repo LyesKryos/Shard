@@ -28,8 +28,8 @@ class Verification(commands.Cog):
     async def daily_check(self):
         try:
             # establishes connection
+            await self.bot.wait_until_ready()
             bot = self.bot
-            await bot.wait_until_ready()
             conn = bot.pool
             crashchannel = bot.get_channel(835579413625569322)
             # establishes loop
@@ -71,8 +71,8 @@ class Verification(commands.Cog):
                     member_info = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
                                                       member.id)
                     await member.remove_roles(wa_role, thegye_role, karma_role, traveler_role, cte_role)
-                    bot = thegye_server.get_role(783751789299105812)
-                    if bot in member.roles:
+                    bot_role = thegye_server.get_role(783751789299105812)
+                    if bot_role in member.roles:
                         continue
                     # if the member is not verified at all, remove all relevant roles and move to the next member
                     if member_info is None:
@@ -112,7 +112,6 @@ class Verification(commands.Cog):
                                     else:
                                         await member.add_roles(traveler_role)
                                         await member.remove_roles(cte_role)
-                await asyncio.sleep(59)
                 await admin_channel.send(f"{thegye_server.member_count} users checked and roles updated.")
                 continue
         except Exception as error:
