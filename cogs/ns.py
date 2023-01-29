@@ -247,6 +247,16 @@ class NationStates(commands.Cog):
         async with aiohttp.ClientSession() as tgq_session:
             headers = {'User-Agent': 'Bassiliya'}
             params = {'q': 'tgqueue'}
+            # ratelimiter
+            while True:
+                # see if there are enough available calls. if so, break the loop
+                try:
+                    await self.rate_limit.call()
+                    break
+                # if there are not enough available calls, continue the loop
+                except TooManyRequests as error:
+                    await asyncio.sleep(int(str(error)))
+                    continue
             async with tgq_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                        headers=headers, params=params) as tgq:
                 if tgq.status != 200:
@@ -259,9 +269,9 @@ class NationStates(commands.Cog):
                     stamps = tgq.mass.text
                     api = tgq.api.text
                     return await ctx.send("__Telegram Queue__\n"
-                                          f"Manual: {manual:,}\n"
-                                          f"Stamps: {stamps:,}\n"
-                                          f"API: {api:,}")
+                                          f"Manual: {int(manual):,}\n"
+                                          f"Stamps: {int(stamps):,}\n"
+                                          f"API: {int(api):,}")
 
 
 async def setup(bot):
