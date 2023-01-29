@@ -242,6 +242,27 @@ class NationStates(commands.Cog):
     async def region(self, ctx, *, args):
         await self.get_region(ctx, args)
 
+    @commands.command(brief="Displays the NS telegram queue", aliases=['tgq'])
+    async def telegram_queue(self, ctx):
+        async with aiohttp.ClientSession() as tgq_session:
+            headers = {'User-Agent': 'Bassiliya'}
+            params = {'q': 'tgqueue'}
+            async with tgq_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                       headers=headers, params=params) as tgq:
+                if tgq.status != 200:
+                    await ctx.send("NationStates error. Please wait and try again later.")
+                    return
+                else:
+                    tgq_raw = await tgq.text()
+                    tgq = BeautifulSoup(tgq_raw, 'lxml')
+                    manual = tgq.manual.text
+                    stamps = tgq.mass.text
+                    api = tgq.api.text
+                    return await ctx.send("__Telegram Queue__\n"
+                                          f"Manual: {manual}\n"
+                                          f"Stamps: {stamps}\n"
+                                          f"API: {api}")
+
 
 async def setup(bot):
     cog = NationStates(bot)

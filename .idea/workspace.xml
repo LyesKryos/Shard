@@ -5,10 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing verification daily update">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_14_2023_14_05_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_14_2023_14_05__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/ns.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/ns.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,14 +78,7 @@
       <workItem from="1666613506288" duration="25503000" />
       <workItem from="1668290570429" duration="7730000" />
       <workItem from="1669641797845" duration="11403000" />
-      <workItem from="1673719527207" duration="6677000" />
-    </task>
-    <task id="LOCAL-00291" summary="Fixing moderation.py">
-      <created>1667392118047</created>
-      <option name="number" value="00291" />
-      <option name="presentableId" value="LOCAL-00291" />
-      <option name="project" value="LOCAL" />
-      <updated>1667392118047</updated>
+      <workItem from="1673719527207" duration="8049000" />
     </task>
     <task id="LOCAL-00292" summary="Fixing moderation.py">
       <created>1667392245167</created>
@@ -425,7 +416,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674091235789</updated>
     </task>
-    <option name="localTasksCounter" value="340" />
+    <task id="LOCAL-00340" summary="Fixing verification daily update">
+      <created>1674857352953</created>
+      <option name="number" value="00340" />
+      <option name="presentableId" value="LOCAL-00340" />
+      <option name="project" value="LOCAL" />
+      <updated>1674857352953</updated>
+    </task>
+    <option name="localTasksCounter" value="341" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
