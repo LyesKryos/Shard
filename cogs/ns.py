@@ -259,9 +259,9 @@ class NationStates(commands.Cog):
                     stamps = tgq.mass.text
                     api = tgq.api.text
                     return await ctx.send("__Telegram Queue__\n"
-                                          f"Manual: {manual}\n"
-                                          f"Stamps: {stamps}\n"
-                                          f"API: {api}")
+                                          f"Manual: {manual:,}\n"
+                                          f"Stamps: {stamps:,}\n"
+                                          f"API: {api:,}")
 
 
 async def setup(bot):
