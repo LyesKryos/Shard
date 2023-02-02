@@ -132,7 +132,7 @@ class BaseCommands(commands.Cog):
                     user_nations += f", [{n}](https://www.nationstates.net/nation={self.sanitize_links_underscore(n)})"
         # defines roles
         all_roles = user.roles[1:]
-        role_names = [f"<@&{r.name}>" for r in all_roles]
+        role_names = [f"<@&{r.id}>" for r in all_roles]
         user_roles = ', '.join(role_names[::-1])
         # creates embed
         user_embed = discord.Embed(title=f"{user.display_name}", description=f"Information about server member "
