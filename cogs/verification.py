@@ -25,6 +25,12 @@ class Verification(commands.Cog):
         self.rate_limit = Ratelimiter()
         self.daily_verification = asyncio.create_task(self.daily_check())
 
+    def sanitize_links_underscore(self, userinput: str) -> str:
+        # replaces user input with proper, url-friendly code
+        to_regex = userinput.replace(" ", "_")
+        return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
+
+
     async def daily_check(self):
         try:
             # establishes connection
@@ -702,6 +708,45 @@ class Verification(commands.Cog):
                                     await member.add_roles(traveler_role)
                                     await member.remove_roles(cte_role)
         await ctx.send(f"{thegye_server.member_count} users checked and roles updated.")
+
+
+    @commands.Cog.listener()
+    async def on_member_remove(self, member):
+        if member.guild.id != 674259612580446230:
+            return
+        else:
+            # establishes connection
+            conn = self.bot.pool
+            # fetches nation information
+            verified = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''', member.id)
+            if verified is None:
+                user_nations = "*None*"
+            else:
+                if verified['main_nation'] is None:
+                    nation_list = []
+                    for n in verified['nations']:
+                        nation_list.append(f"[{n}]"
+                                           f"(https://www.nationstates.net/nation={self.sanitize_links_underscore(n)})")
+                    user_nations = ', '.join(nation_list)
+                else:
+                    user_nations = f"[**{verified['main_nation']}**]" \
+                                   f"(https://www.nationstates.net/nation=" \
+                                   f"{self.sanitize_links_underscore(verified['main_nation'])})"
+                    for n in verified['nations']:
+                        if n == verified['main_nation']:
+                            continue
+                        user_nations += f", [{n}](https://www.nationstates.net/nation={self.sanitize_links_underscore(n)})"
+            leave_channel = self.bot.get_channel(674335095628365855)
+            roles_list = [f"<@&{role.id}>" for role in member.roles]
+            roles = "\u2022".join(roles_list)
+            gold = discord.Color.gold()
+            leave_embed = discord.Embed(title=f"{member.name}{member.discriminator} has departed the Kingdom of Thegye.",
+                                        color=gold)
+            leave_embed.add_field(name="Joined server", value=f"{member.created_at.strftime('%d %B %Y')}")
+            leave_embed.add_field(name="Roles", value=f"{roles}")
+            leave_embed.add_field(name="Nations", value=f"{user_nations}")
+            await leave_channel.send(embed=leave_embed)
+
 
 async def setup(bot: Shard):
     # define the cog and add the cog
