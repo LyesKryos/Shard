@@ -740,7 +740,7 @@ class Verification(commands.Cog):
             roles_list = [f"<@&{role.id}>" for role in member.roles]
             if "<@&@everyone>" in roles_list:
                 roles_list.remove("<@&@everyone>")
-            roles = "\u2022".join(roles_list[::-1])
+            roles = "\u2022".join(roles_list)
             gold = discord.Color.gold()
             leave_embed = discord.Embed(title=f"{member.name}{member.discriminator} has departed Thegye.",
                                         color=gold)
