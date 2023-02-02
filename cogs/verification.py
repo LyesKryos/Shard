@@ -738,12 +738,12 @@ class Verification(commands.Cog):
                         user_nations += f", [{n}](https://www.nationstates.net/nation={self.sanitize_links_underscore(n)})"
             leave_channel = self.bot.get_channel(674335095628365855)
             roles_list = [f"<@&{role.id}>" for role in member.roles]
-            roles = "\u2022".join(roles_list)
+            roles = "\u2022".join(roles_list[::-1])
             gold = discord.Color.gold()
-            leave_embed = discord.Embed(title=f"{member.name}{member.discriminator} has departed the Kingdom of Thegye.",
+            leave_embed = discord.Embed(title=f"{member.name}{member.discriminator} has departed Thegye.",
                                         color=gold)
             leave_embed.set_thumbnail(url=member.display_avatar.url)
-            leave_embed.add_field(name="Joined server", value=f"{member.created_at.strftime('%d %B %Y')}")
+            leave_embed.add_field(name="Joined server", value=f"<t:{member.created_at}>")
             leave_embed.add_field(name="Roles", value=f"{roles}")
             leave_embed.add_field(name="Nations", value=f"{user_nations}", inline=False)
             await leave_channel.send(embed=leave_embed)
