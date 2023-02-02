@@ -138,9 +138,7 @@ class BaseCommands(commands.Cog):
         # creates embed
         user_embed = discord.Embed(title=f"{user.display_name}", description=f"Information about server member "
                                                                      f"{user.name}#{user.discriminator}\n"
-                                                                     f"User ID: {user.id}.",
-
-                                   color=user.color)
+                                                                     f"User ID: {user.id}.", color=user.color)
         user_embed.set_thumbnail(url=user.display_avatar.url)
         user_embed.add_field(name="Joined Discord", value=f"{user.created_at.strftime('%d %B %Y')}")
         user_embed.add_field(name="Joined Server", value=f"{user.joined_at.strftime('%d %B %Y')}")

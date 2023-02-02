@@ -742,9 +742,10 @@ class Verification(commands.Cog):
             gold = discord.Color.gold()
             leave_embed = discord.Embed(title=f"{member.name}{member.discriminator} has departed the Kingdom of Thegye.",
                                         color=gold)
+            leave_embed.set_thumbnail(url=member.display_avatar.url)
             leave_embed.add_field(name="Joined server", value=f"{member.created_at.strftime('%d %B %Y')}")
             leave_embed.add_field(name="Roles", value=f"{roles}")
-            leave_embed.add_field(name="Nations", value=f"{user_nations}")
+            leave_embed.add_field(name="Nations", value=f"{user_nations}", inline=False)
             await leave_channel.send(embed=leave_embed)
 
 
