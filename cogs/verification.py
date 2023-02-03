@@ -377,6 +377,8 @@ class Verification(commands.Cog):
                                               f"If you would like to skip verification, "
                                               f"enter \"SKIP\" instead of your nation name.")
                 except discord.Forbidden:
+                    await open_square.send(f"The gods have sent us {member.mention}! Welcome, traveler, "
+                                           f"and introduce yourself!")
                     return await gatehouse.send(f"{user.mention}, I can't DM you! This could be for a few reasons: \n\n"
                                                 f"1. You have me blocked. Sad. \U0001f614 \n"
                                                 f"2. You are no longer in this server or any server we share. "
@@ -385,8 +387,9 @@ class Verification(commands.Cog):
                                                 f"In order to allow me to DM you, go to `Settings > Privacy & Safety > "
                                                 f"Server Privacy Defaults` and toggle **ON** the "
                                                 f"`Allow direct messages from server members.\n\n"
-                                                f"Once you have completed that step, please use the `$verify` "
-                                                f"command again to complete the verification process. ")
+                                                f"Once you have fixed any of the aforementioned issues"
+                                                f", please use the `$verify` command again to complete "
+                                                f"the verification process.")
 
                 def authorcheck(message):
                     return member.id == message.author.id and message.guild is None

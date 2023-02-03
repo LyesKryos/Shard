@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing member leaving message">
-      <change beforePath="$PROJECT_DIR$/cogs/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/base.py" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Mentions for profile embed">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,21 +78,7 @@
       <workItem from="1666613506288" duration="25503000" />
       <workItem from="1668290570429" duration="7730000" />
       <workItem from="1669641797845" duration="11403000" />
-      <workItem from="1673719527207" duration="14794000" />
-    </task>
-    <task id="LOCAL-00301" summary="Cleaning up">
-      <created>1667394476935</created>
-      <option name="number" value="00301" />
-      <option name="presentableId" value="LOCAL-00301" />
-      <option name="project" value="LOCAL" />
-      <updated>1667394476936</updated>
-    </task>
-    <task id="LOCAL-00302" summary="Adding dispatch role to verification and removing from the base">
-      <created>1667652074559</created>
-      <option name="number" value="00302" />
-      <option name="presentableId" value="LOCAL-00302" />
-      <option name="project" value="LOCAL" />
-      <updated>1667652074559</updated>
+      <workItem from="1673719527207" duration="15897000" />
     </task>
     <task id="LOCAL-00303" summary="Adding logger to base bot">
       <created>1667860251704</created>
@@ -422,7 +409,21 @@
       <option name="project" value="LOCAL" />
       <updated>1675347588929</updated>
     </task>
-    <option name="localTasksCounter" value="350" />
+    <task id="LOCAL-00350" summary="Mentions for profile embed">
+      <created>1675347964547</created>
+      <option name="number" value="00350" />
+      <option name="presentableId" value="LOCAL-00350" />
+      <option name="project" value="LOCAL" />
+      <updated>1675347964548</updated>
+    </task>
+    <task id="LOCAL-00351" summary="Mentions for profile embed">
+      <created>1675348163536</created>
+      <option name="number" value="00351" />
+      <option name="presentableId" value="LOCAL-00351" />
+      <option name="project" value="LOCAL" />
+      <updated>1675348163536</updated>
+    </task>
+    <option name="localTasksCounter" value="352" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -440,7 +441,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing moderation.py" />
     <MESSAGE value="Fixing kick" />
     <MESSAGE value="Updating ban commands" />
     <MESSAGE value="Testing ban commands" />
@@ -465,7 +465,8 @@
     <MESSAGE value="Fixing tgq place commas" />
     <MESSAGE value="Adding member leaving message" />
     <MESSAGE value="Fixing member leaving message" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing member leaving message" />
+    <MESSAGE value="Mentions for profile embed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Mentions for profile embed" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$1.coverage" NAME="1 Coverage Results" MODIFIED="1673727138457" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
