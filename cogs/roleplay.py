@@ -15,7 +15,8 @@ class Roleplay(commands.Cog):
     @commands.guild_only()
     async def rsc_check(self, ctx, dispatch_link):
         # fetch dispatch id, establish headers and params, and make API call
-        dispatch_id = (re.findall('\d+', dispatch_link))[0]
+        dispatch_id_raw = (re.findall('id=\d+[a-z]', dispatch_link))[0]
+        dispatch_id = dispatch_id_raw.replace("id=", "")
         headers = {'User-Agent': 'Bassiliya'}
         params = {'q': 'dispatch',
                   'dispatchid': f"{dispatch_id}"}
