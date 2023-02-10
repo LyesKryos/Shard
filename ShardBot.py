@@ -10,6 +10,7 @@ from datetime import datetime as dt
 class Shard(commands.Bot):
     def __init__(self):
         # sets prefix, initiates bot, and loads cogs
+        self.pool = None
         self.prefix = "$"
         super().__init__(command_prefix=self.prefix, intents=discord.Intents.all(),
                          activity=discord.Game(f"{self.prefix}help for commands"),
