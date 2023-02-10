@@ -740,10 +740,9 @@ class Verification(commands.Cog):
                             continue
                         user_nations += f", [{n}](https://www.nationstates.net/nation={self.sanitize_links_underscore(n)})"
             leave_channel = self.bot.get_channel(674335095628365855)
-            roles_list = [f"<@&{role.id}>" for role in member.roles]
-            if "<@&@everyone>" in roles_list:
-                roles_list.remove("<@&@everyone>")
-            roles = "\u2022".join(roles_list)
+            all_roles = member.roles[1:]
+            role_names = [f"<@&{r.id}>" for r in all_roles]
+            roles = ', '.join(role_names[::-1])
             gold = discord.Color.gold()
             leave_embed = discord.Embed(title=f"{member.name}{member.discriminator} has departed Thegye.",
                                         color=gold)
