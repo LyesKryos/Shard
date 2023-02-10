@@ -19,7 +19,7 @@ class Roleplay(commands.Cog):
     @commands.guild_only()
     async def rsc_check(self, ctx, dispatch_link):
         # fetch dispatch id, establish headers and params, and make API call
-        dispatch_id = (re.findall('id=\d+', dispatch_link))[0]
+        dispatch_id = (re.findall('\d+', dispatch_link))[0]
         while True:
             # see if there are enough available calls. if so, break the loop
             try:
