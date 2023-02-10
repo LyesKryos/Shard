@@ -4,11 +4,15 @@ from bs4 import BeautifulSoup
 from discord.ext import commands
 from ShardBot import Shard
 import discord
+from ratelimiter import Ratelimiter
+from customchecks import TooManyRequests
+import asyncio
 
 
 class Roleplay(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
+        self.rate_limit = Ratelimiter()
 
     @commands.command(usage="[RSC/PPRC link]", aliases=['pprc_check'],
                       brief="Calculates total points and percentages for a given dispatch")
@@ -16,6 +20,15 @@ class Roleplay(commands.Cog):
     async def rsc_check(self, ctx, dispatch_link):
         # fetch dispatch id, establish headers and params, and make API call
         dispatch_id = (re.findall('id=\d+', dispatch_link))[0]
+        while True:
+            # see if there are enough available calls. if so, break the loop
+            try:
+                await self.rate_limit.call()
+                break
+            # if there are not enough available calls, continue the loop
+            except TooManyRequests as error:
+                await asyncio.sleep(int(str(error)))
+                continue
         headers = {'User-Agent': 'Bassiliya'}
         params = {'q': 'dispatch',
                   'dispatchid': f"{dispatch_id}"}

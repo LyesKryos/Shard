@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing dispatch id finding for factbooks that are without an id">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing dispatch id">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/roleplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/roleplay.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -78,21 +79,8 @@
       <workItem from="1668290570429" duration="7730000" />
       <workItem from="1669641797845" duration="11403000" />
       <workItem from="1673719527207" duration="17309000" />
-      <workItem from="1675734216307" duration="1050000" />
-    </task>
-    <task id="LOCAL-00305" summary="Fixing startup">
-      <created>1667860386096</created>
-      <option name="number" value="00305" />
-      <option name="presentableId" value="LOCAL-00305" />
-      <option name="project" value="LOCAL" />
-      <updated>1667860386097</updated>
-    </task>
-    <task id="LOCAL-00306" summary="Adding games">
-      <created>1668297649909</created>
-      <option name="number" value="00306" />
-      <option name="presentableId" value="LOCAL-00306" />
-      <option name="project" value="LOCAL" />
-      <updated>1668297649909</updated>
+      <workItem from="1675734216307" duration="1404000" />
+      <workItem from="1676034104864" duration="313000" />
     </task>
     <task id="LOCAL-00307" summary="Fixing the valheim command">
       <created>1668297956810</created>
@@ -423,7 +411,21 @@
       <option name="project" value="LOCAL" />
       <updated>1675735738906</updated>
     </task>
-    <option name="localTasksCounter" value="354" />
+    <task id="LOCAL-00354" summary="Fixing dispatch id finding for factbooks that are without an id">
+      <created>1675736013866</created>
+      <option name="number" value="00354" />
+      <option name="presentableId" value="LOCAL-00354" />
+      <option name="project" value="LOCAL" />
+      <updated>1675736013866</updated>
+    </task>
+    <task id="LOCAL-00355" summary="Fixing dispatch id">
+      <created>1675736297131</created>
+      <option name="number" value="00355" />
+      <option name="presentableId" value="LOCAL-00355" />
+      <option name="project" value="LOCAL" />
+      <updated>1675736297131</updated>
+    </task>
+    <option name="localTasksCounter" value="356" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -441,7 +443,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Testing ban commands" />
     <MESSAGE value="Cleaning up" />
     <MESSAGE value="Adding dispatch role to verification and removing from the base" />
     <MESSAGE value="Adding logger to base bot" />
@@ -466,7 +467,8 @@
     <MESSAGE value="Mentions for profile embed" />
     <MESSAGE value="Fixing lack of welcome message for DM-blocking users during verification" />
     <MESSAGE value="Fixing dispatch id finding for factbooks that are without an id" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing dispatch id finding for factbooks that are without an id" />
+    <MESSAGE value="Fixing dispatch id" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing dispatch id" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$1.coverage" NAME="1 Coverage Results" MODIFIED="1673727138457" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
