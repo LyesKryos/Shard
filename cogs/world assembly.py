@@ -1,24 +1,11 @@
 # Shard Verification 0.1b
-import traceback
-from datetime import datetime, timedelta
-from time import localtime, strftime
 
-import discord.channel
-from ShardBot import Shard
-import asyncio
-from discord.ext import commands
-import requests
-from bs4 import BeautifulSoup
-import re
-from apscheduler.triggers.cron import CronTrigger
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from pytz import timezone
-import aiohttp
-import aiofiles
-from typing import Union, Optional
-from customchecks import TooManyRequests
-from ratelimiter import Ratelimiter
 import xml.etree.ElementTree as ET
+
+from discord.ext import commands
+
+from ShardBot import Shard
+from ratelimiter import Ratelimiter
 
 
 class WA(commands.Cog):
