@@ -38,7 +38,7 @@ class Roleplay(commands.Cog):
             return IndexError
         # parse the html and pull out all numbers followed by /100
         textsoup = BeautifulSoup(response.text, 'html.parser')
-        dtext = textsoup.find('text').string
+        dtext = textsoup.find('TEXT').string
         numbers = re.findall(r'\d+?/100', dtext)
         total = 0
         # add all numbers together
