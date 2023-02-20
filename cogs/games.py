@@ -90,6 +90,69 @@ class Games(commands.Cog):
                                              f"**Remember that sharing server access information with others is against"
                                              f" the rules and can lead to a permanent ban.**")
 
+    @commands.command()
+    @commands.guild_only()
+    async def minecraft(self, ctx):
+        # establish pool
+        conn = self.bot.pool
+        # check for an existing entry
+        user_info = await conn.fetchrow('''SELECT * FROM games WHERE game = 'Minecraft' AND user_id = $1;''',
+                                        ctx.author.id)
+        # fetch game information
+        minecraft_info = await conn.fetchrow('''SELECT * FROM games_info WHERE game_name = 'Minecraft';''')
+        # get list of all Steam IDs
+        steam_ids_raw = await conn.fetch('''SELECT steam_id FROM games WHERE game = 'Minecraft';''')
+        steam_ids = [sid['steam_id'] for sid in steam_ids_raw]
+        if user_info is not None:
+            # if the user already exists and is not banned, send them the port and password
+            if user_info['banned'] is False:
+                return await ctx.author.send(f"Server Name: {minecraft_info['server_name']}\n"
+                                             f"Server Port: {minecraft_info['server_port']}\n"
+                                             f"Server Rules: https://www.nationstates.net/page=dispatch/id=1840173\n\n"
+                                             f"**Remember that sharing server access information with others is against "
+                                             f"the rules and can lead to a permanent ban.**")
+            elif user_info['banned'] is True:
+                return await ctx.send("You are banned from playing Minecraft in the Thegye server.")
+            # get the citizen role
+            citizen = discord.utils.get(ctx.guild.roles, id=674260547897917460)
+            if citizen not in ctx.author.roles:
+                return await ctx.send("You must be a citizen in order to join Minecraft.")
+        else:
+            # create the DM with the user
+            author_dm = await ctx.author.create_dm()
+
+            # check the message
+            def authorcheck(message):
+                return ctx.author.id == message.author.id and message.guild is None
+
+            # send the opening dialogue
+            await author_dm.send("To join the Minecraft server, please send your "
+                                 "Minecraft username to me in this DM. "
+                                 "This will help me and the server admin identify your account.")
+            try:
+                steam_id_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
+            except asyncio.TimeoutError:
+                return await author_dm.send("Timed out. Please answer me next time!")
+            # parse the content. if the content is cancel, cancel
+            steam_id = steam_id_reply.content
+            if steam_id.lower() == 'cancel':
+                return await author_dm.send("Process cancelled.")
+            # if the steam id provided already exists as a server user
+            if steam_id in steam_ids:
+                return await author_dm.send("That username is already associated with an existing account.")
+            # send the second dialogue
+            await author_dm.send(f"Your username has been recorded as: {steam_id}.\n"
+                                 f"If this is not your Minecraft username, "
+                                 f"reply with \"Cancel\" and restart the process.")
+            # add the user to the database
+            await conn.execute('''INSERT INTO games(user_id, steam_id, game)
+                 VALUES($1,$2,$3);''', ctx.author.id, steam_id, 'Minecraft')
+            return await author_dm.send(f"Congratulations! You may now log into the Minecraft server!\n"
+                                        f"Server Port: {minecraft_info['server_port']}\n"
+                                        f"Server Rules: https://www.nationstates.net/page=dispatch/id=1840173\n\n"
+                                        f"**Remember that sharing server access information with others is against"
+                                        f" the rules and can lead to a permanent ban.**")
+
 
 async def setup(bot: Shard):
     # define the cog and add the cog
