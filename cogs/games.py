@@ -141,17 +141,27 @@ class Games(commands.Cog):
             if steam_id in steam_ids:
                 return await author_dm.send("That username is already associated with an existing account.")
             # send the second dialogue
-            await author_dm.send(f"Your username has been recorded as: {steam_id}.\n"
-                                 f"If this is not your Minecraft username, "
-                                 f"reply with \"Cancel\" and restart the process.")
-            # add the user to the database
-            await conn.execute('''INSERT INTO games(user_id, steam_id, game)
-                 VALUES($1,$2,$3);''', ctx.author.id, steam_id, 'Minecraft')
-            return await author_dm.send(f"Congratulations! You may now log into the Minecraft server!\n"
-                                        f"Server Port: {minecraft_info['server_port']}\n"
-                                        f"Server Rules: https://www.nationstates.net/page=dispatch/id=1840173\n\n"
-                                        f"**Remember that sharing server access information with others is against"
-                                        f" the rules and can lead to a permanent ban.**")
+            while True:
+                await author_dm.send(f"Your username has been recorded as: {steam_id}.\n"
+                                     f"If this is not your Minecraft username, "
+                                     f"reply with \"Cancel\" within 10 seconds and restart the process.")
+                try:
+                    username_reply = await self.bot.wait_for('message', check=authorcheck, timeout=10)
+                except asyncio.TimeoutError:
+                    # add the user to the database
+                    await conn.execute('''INSERT INTO games(user_id, steam_id, game)
+                                     VALUES($1,$2,$3);''', ctx.author.id, steam_id, 'Minecraft')
+                    return await author_dm.send(f"Congratulations! You may now log into the Minecraft server!\n"
+                                                f"Server Port: {minecraft_info['server_port']}\n"
+                                                f"Server Rules: https://www.nationstates.net/page=dispatch/id=1840173\n\n"
+                                                f"**Remember that sharing server access information with others is against"
+                                                f" the rules and can lead to a permanent ban.**")
+                if username_reply.lower() == "cancel":
+                    continue
+                else:
+                    continue
+
+
 
 
 async def setup(bot: Shard):

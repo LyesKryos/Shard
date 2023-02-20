@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing roles for members leaving">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding Minecraft access">
       <change beforePath="$PROJECT_DIR$/cogs/games.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/games.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -81,14 +80,7 @@
       <workItem from="1673719527207" duration="17309000" />
       <workItem from="1675734216307" duration="1404000" />
       <workItem from="1676034104864" duration="4224000" />
-      <workItem from="1676924059452" duration="1328000" />
-    </task>
-    <task id="LOCAL-00314" summary="Fixing the valheim command">
-      <created>1668299530715</created>
-      <option name="number" value="00314" />
-      <option name="presentableId" value="LOCAL-00314" />
-      <option name="project" value="LOCAL" />
-      <updated>1668299530715</updated>
+      <workItem from="1676924059452" duration="1716000" />
     </task>
     <task id="LOCAL-00315" summary="Fixing the valheim command">
       <created>1668299571567</created>
@@ -426,7 +418,14 @@
       <option name="project" value="LOCAL" />
       <updated>1676061748228</updated>
     </task>
-    <option name="localTasksCounter" value="363" />
+    <task id="LOCAL-00363" summary="Adding Minecraft access">
+      <created>1676925613499</created>
+      <option name="number" value="00363" />
+      <option name="presentableId" value="LOCAL-00363" />
+      <option name="project" value="LOCAL" />
+      <updated>1676925613499</updated>
+    </task>
+    <option name="localTasksCounter" value="364" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -444,7 +443,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing the valheim command" />
     <MESSAGE value="Updating Valheim message&#10;Fixing message deleting" />
     <MESSAGE value="Adding force server check to verification.py" />
     <MESSAGE value="Skipping bot verification.py" />
@@ -469,7 +467,8 @@
     <MESSAGE value="Fixing pool" />
     <MESSAGE value="Optimized imports" />
     <MESSAGE value="Fixing roles for members leaving" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing roles for members leaving" />
+    <MESSAGE value="Adding Minecraft access" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding Minecraft access" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$1.coverage" NAME="1 Coverage Results" MODIFIED="1673727138457" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
