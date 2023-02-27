@@ -19,7 +19,7 @@ class WA(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
         self.rate_limit = Ratelimiter()
-        self.directory_variable = r'~/Documents/Shard/dumps/'
+        self.directory_variable = r'/root/Documents/Shard/dumps/'
         self.channel = bot.get_channel(835579413625569322)
         self.rate_limit = Ratelimiter()
 
