@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Final testing">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding daily dump updating processing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/wa.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/wa.py" afterDir="false" />
@@ -85,14 +85,7 @@
       <workItem from="1676924059452" duration="2388000" />
       <workItem from="1677165868843" duration="4880000" />
       <workItem from="1677439368051" duration="2110000" />
-      <workItem from="1677588022171" duration="10047000" />
-    </task>
-    <task id="LOCAL-00338" summary="Fixing verification.py">
-      <created>1673975876462</created>
-      <option name="number" value="00338" />
-      <option name="presentableId" value="LOCAL-00338" />
-      <option name="project" value="LOCAL" />
-      <updated>1673975876462</updated>
+      <workItem from="1677588022171" duration="10403000" />
     </task>
     <task id="LOCAL-00339" summary="Fixing verification daily update">
       <created>1674091235789</created>
@@ -430,7 +423,14 @@
       <option name="project" value="LOCAL" />
       <updated>1677600420964</updated>
     </task>
-    <option name="localTasksCounter" value="387" />
+    <task id="LOCAL-00387" summary="Adding daily dump updating processing">
+      <created>1677623090485</created>
+      <option name="number" value="00387" />
+      <option name="presentableId" value="LOCAL-00387" />
+      <option name="project" value="LOCAL" />
+      <updated>1677623090485</updated>
+    </task>
+    <option name="localTasksCounter" value="388" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -448,7 +448,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Making tgq have place commas" />
     <MESSAGE value="Fixing tgq place commas" />
     <MESSAGE value="Adding member leaving message" />
     <MESSAGE value="Fixing member leaving message" />
@@ -473,7 +472,8 @@
     <MESSAGE value="Fixing minor type error" />
     <MESSAGE value="Testing load" />
     <MESSAGE value="Final testing" />
-    <option name="LAST_COMMIT_MESSAGE" value="Final testing" />
+    <MESSAGE value="Adding daily dump updating processing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding daily dump updating processing" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$1.coverage" NAME="1 Coverage Results" MODIFIED="1673727138457" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

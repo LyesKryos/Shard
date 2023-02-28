@@ -26,6 +26,7 @@ class WA(commands.Cog):
         self.channel = bot.get_channel(835579413625569322)
         self.rate_limit = Ratelimiter()
         self.loop = self.bot.loop
+        self.daily_dump_task = asyncio.create_task(self.daily_dump())
 
     def sanitize_raw(userinput: str) -> str:
         # replaces user input with proper, url-friendly code
