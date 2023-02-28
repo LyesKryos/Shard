@@ -59,11 +59,9 @@ class WA(commands.Cog):
             rx.write(f"<!-- Update Time: {strftime('%Y-%m-%d %H:%M:%S')}-->")
         # connect to database
         conn = self.bot.pool
-        # clear the region database
-        await conn.execute('''DELETE FROM region_dump;''')
         # open the file with ET.iterparse, events being 'start' and 'end'
         iteration = ET.iterparse(
-            rf"{self.directory_variable}regions.xml",
+            rf"C{self.directory_variable}regions.xml",
             events=('start', 'end'))
         # count regions
         regions = 1
@@ -119,11 +117,17 @@ class WA(commands.Cog):
                         regions += 1
                         # append region data to master list and clear region data
                         items_list.append(items)
-                        await conn.execute('''INSERT INTO region_dump VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10);''',
-                                           items[0], items[1], items[2], items[3], items[4], items[5], items[6],
-                                           items[7], items[8], items[9])
                         items = list()
                 continue
+        # open a csv file and write the master list to it
+        with open(f'{self.directory_variable}region_dump.csv', 'w', newline='', encoding="UTF-8") as region_dump_csv:
+            writer = csv.writer(region_dump_csv)
+            writer.writerows(items_list)
+        # clear the previous region_dump
+        await conn.execute('''DELETE FROM region_dump;''')
+        # open the csv file and mass-copy to that file
+        await conn.execute(r'''copy region_dump FROM '/root/Documents/Shard/dumps/region_dump.csv'
+        WITH csv;''', self.directory_variable)
         # stop stopwatch
         time_end = perf_counter()
         return await self.channel.send(f"Parsed {regions} regions in {time_end - time_start}.")
@@ -154,8 +158,6 @@ class WA(commands.Cog):
             rx.write(f"<!-- Update Time: {strftime('%Y-%m-%d %H:%M:%S')}-->")
         # connect to database
         conn = self.bot.pool
-        # clear nation database
-        await conn.execute('''DELETE FROM nation_dump;''')
         # open the file with ET.iterparse, events being 'start' and 'end'
         iteration = ET.iterparse(
             fr"{self.directory_variable}nations.xml",
@@ -165,10 +167,11 @@ class WA(commands.Cog):
         # declare the list for each region
         nation_items = list()
         # declare the whole list
+        nation_items_list = list()
         # for each event and tag in the iteration, parse out the data, add it to the list, and then add the list to master
         for event, nation in iteration:
             if event == 'end':
-                if nation.tag != "NATION":
+                if nation.tag != "REGION":
                     if nation.tag == "NAME":
                         nation_items.append(nation.text.strip())
                     if nation.tag == "TYPE":
@@ -189,17 +192,24 @@ class WA(commands.Cog):
                     if nation.tag == "FLAG":
                         nation_items.append(nation.text.strip())
                     if nation.tag == "FIRSTLOGIN":
-                        nation_items.append(int(nation.text.strip()))
+                        nation_items.append(nation.text.strip())
                     # DBID indicates the end of the nation's data
                     if nation.tag == "DBID":
                         # increase count
                         nations += 1
                         # append region data to master list and clear region data
-                        await conn.execute('''INSERT INTO nation_dump VALUES($1,$2,$3,$4,$5,$6,$7);''',
-                                           nation_items[0], nation_items[1], nation_items[2], nation_items[3],
-                                           nation_items[4], nation_items[5], nation_items[6])
+                        nation_items_list.append(nation_items)
                         nation_items = list()
                 continue
+        # open a csv file and write the master list to it
+        with open(f'{self.directory_variable}nation_dump.csv', 'w', newline='', encoding="UTF-8") as nation_dump_csv:
+            writer = csv.writer(nation_dump_csv)
+            writer.writerows(nation_items_list)
+        # clear the previous region_dump
+        await conn.execute('''DELETE FROM nation_dump;''')
+        # open the csv file and mass-copy to that file
+        await conn.execute(r'''\copy nation_dump FROM 
+        '/root/Documents/Shard/dumps/nation_dump.csv' WITH csv;''')
         # stop stopwatch
         time_end = perf_counter()
         return await self.channel.send(f"Parsed {nations} nations in {time_end - start_time}.")
