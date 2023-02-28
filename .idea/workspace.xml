@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing testing \copy command">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Testing csv loading">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/wa.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/wa.py" afterDir="false" />
     </list>
@@ -84,14 +84,7 @@
       <workItem from="1676924059452" duration="2388000" />
       <workItem from="1677165868843" duration="4880000" />
       <workItem from="1677439368051" duration="2110000" />
-      <workItem from="1677588022171" duration="4444000" />
-    </task>
-    <task id="LOCAL-00325" summary="Updating time for verification.py">
-      <created>1670158622969</created>
-      <option name="number" value="00325" />
-      <option name="presentableId" value="LOCAL-00325" />
-      <option name="project" value="LOCAL" />
-      <updated>1670158622969</updated>
+      <workItem from="1677588022171" duration="4837000" />
     </task>
     <task id="LOCAL-00326" summary="Updating time for verification.py">
       <created>1670158649797</created>
@@ -429,7 +422,14 @@
       <option name="project" value="LOCAL" />
       <updated>1677591664867</updated>
     </task>
-    <option name="localTasksCounter" value="374" />
+    <task id="LOCAL-00374" summary="Testing csv loading">
+      <created>1677595996218</created>
+      <option name="number" value="00374" />
+      <option name="presentableId" value="LOCAL-00374" />
+      <option name="project" value="LOCAL" />
+      <updated>1677595996218</updated>
+    </task>
+    <option name="localTasksCounter" value="375" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -447,7 +447,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding" />
     <MESSAGE value="Testing verification.py fix" />
     <MESSAGE value="Fixing verification.py" />
     <MESSAGE value="Fixing verification daily update" />
@@ -472,7 +471,8 @@
     <MESSAGE value="Fixing minor type issue" />
     <MESSAGE value="Fixing minor directory issue" />
     <MESSAGE value="Fixing testing \copy command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing testing \copy command" />
+    <MESSAGE value="Testing csv loading" />
+    <option name="LAST_COMMIT_MESSAGE" value="Testing csv loading" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$1.coverage" NAME="1 Coverage Results" MODIFIED="1673727138457" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

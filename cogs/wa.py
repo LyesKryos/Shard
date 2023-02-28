@@ -20,6 +20,7 @@ class WA(commands.Cog):
         self.directory_variable = r'/home/ubuntu/dumps/'
         self.channel = bot.get_channel(835579413625569322)
         self.rate_limit = Ratelimiter()
+        self.loop = self.bot.loop
 
     def sanitize_raw(userinput: str) -> str:
         # replaces user input with proper, url-friendly code
@@ -30,6 +31,15 @@ class WA(commands.Cog):
         # replaces user input with proper, url-friendly code
         to_regex = userinput.replace(" ", "_")
         return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
+
+    async def wnd(self, dump, location: str):
+        # decompress gzip file
+        decompressed = gzip.decompress(dump.content)
+        # open a new tile and replace the last line with the current date and time
+        with open(fr"{self.directory_variable}{location}.xml", "wb") as rx:
+            rx.write(decompressed)
+        with open(fr"{self.directory_variable}{location}.xml", "a") as rx:
+            rx.write(f"<!-- Update Time: {strftime('%Y-%m-%d %H:%M:%S')}-->")
 
     async def region_dump(self, ctx):
         # start the time to count
@@ -48,18 +58,12 @@ class WA(commands.Cog):
             except TooManyRequests as error:
                 await asyncio.sleep(int(str(error)))
                 continue
-        # decompress gzip file
-        decompressed = gzip.decompress(rdump.content)
-        # open a new tile and replace the last line with the current date and time
-        with open(fr"{self.directory_variable}regions.xml", "wb") as rx:
-            rx.write(decompressed)
-        with open(fr"{self.directory_variable}regions.xml", "a") as rx:
-            rx.write(f"<!-- Update Time: {strftime('%Y-%m-%d %H:%M:%S')}-->")
+        await self.loop.run_in_executor(None, self.wnd, rdump, 'regions')
         # connect to database
         conn = self.bot.pool
         # open the file with ET.iterparse, events being 'start' and 'end'
         iteration = ET.iterparse(
-            rf"C{self.directory_variable}regions.xml",
+            rf"{self.directory_variable}regions.xml",
             events=('start', 'end'))
         # count regions
         regions = 1
@@ -147,13 +151,8 @@ class WA(commands.Cog):
             except TooManyRequests as error:
                 await asyncio.sleep(int(str(error)))
                 continue
-        # decompress gzip file
-        decompressed = gzip.decompress(ndump.content)
-        # open a new tile and replace the last line with the current date and time
-        with open(fr"{self.directory_variable}nations.xml", "wb") as rx:
-            rx.write(decompressed)
-        with open(fr"{self.directory_variable}nations.xml", "a") as rx:
-            rx.write(f"<!-- Update Time: {strftime('%Y-%m-%d %H:%M:%S')}-->")
+        # download file
+        await self.loop.run_in_executor(None, self.wnd, ndump, 'regions')
         # connect to database
         conn = self.bot.pool
         # open the file with ET.iterparse, events being 'start' and 'end'
