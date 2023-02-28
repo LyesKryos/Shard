@@ -59,80 +59,80 @@ class WA(commands.Cog):
                 await asyncio.sleep(int(str(error)))
                 continue
         await self.loop.run_in_executor(None, self.wnd, rdump, 'regions')
-        # connect to database
-        conn = self.bot.pool
-        # open the file with ET.iterparse, events being 'start' and 'end'
-        iteration = ET.iterparse(
-            rf"{self.directory_variable}regions.xml",
-            events=('start', 'end'))
-        # count regions
-        regions = 1
-        # declare the list for each region
-        items = list()
-        # declare the whole list
-        items_list = list()
-        # for each event and tag in the iteration, parse out the data,
-        # add it to the list, and then add the list to master
-        for event, region in iteration:
-            if event == 'end':
-                if region.tag != "REGION":
-                    if region.tag == "NAME":
-                        items.append(region.text.strip())
-                    if region.tag == "DELEGATE":
-                        if region.text.strip() == "0":
-                            delegate = "None"
-                        else:
-                            delegate = region.text.strip()
-                        items.append(delegate)
-                    if region.tag == "DELEGATEVOTES":
-                        items.append(int(region.text.strip()))
-                    if region.tag == "DELEGATEAUTH":
-                        items.append(region.text)
-                    if region.tag == "NUMNATIONS":
-                        items.append(int(region.text.strip()))
-                    if region.tag == "FOUNDER":
-                        if region.text is None:
-                            items.append("Founderless")
-                        else:
-                            items.append(region.text.strip())
-                    if region.tag == "FOUNDERAUTH":
-                        if region.text is not None:
-                            if region.text == "XABCEP":
-                                items.append("All")
-                            else:
-                                items.append(region.text.strip())
-                        else:
-                            items.append("Non-exec")
-                    if region.tag == "POWER":
-                        items.append(region.text.strip())
-                    if region.tag == "NATIONS":
-                        if region.text is not None:
-                            items.append(set(region.text.split(":")))
-                        else:
-                            items.append({"None"})
-                    if region.tag == "LASTUPDATE":
-                        if region.text is None:
-                            items.append(0)
-                        else:
-                            items.append(int(region.text.strip()))
-                        # increase count
-                        regions += 1
-                        # append region data to master list and clear region data
-                        items_list.append(items)
-                        items = list()
-                continue
-        # open a csv file and write the master list to it
-        with open(f'{self.directory_variable}region_dump.csv', 'w', newline='', encoding="UTF-8") as region_dump_csv:
-            writer = csv.writer(region_dump_csv)
-            writer.writerows(items_list)
-        # clear the previous region_dump
-        await conn.execute('''DELETE FROM region_dump;''')
-        # open the csv file and mass-copy to that file
-        await conn.execute(r'''copy region_dump FROM '/home/ubuntu/dumps/region_dump.csv'
-        WITH csv;''', self.directory_variable)
-        # stop stopwatch
-        time_end = perf_counter()
-        return await self.channel.send(f"Parsed {regions} regions in {time_end - time_start}.")
+        # # connect to database
+        # conn = self.bot.pool
+        # # open the file with ET.iterparse, events being 'start' and 'end'
+        # iteration = ET.iterparse(
+        #     rf"{self.directory_variable}regions.xml",
+        #     events=('start', 'end'))
+        # # count regions
+        # regions = 1
+        # # declare the list for each region
+        # items = list()
+        # # declare the whole list
+        # items_list = list()
+        # # for each event and tag in the iteration, parse out the data,
+        # # add it to the list, and then add the list to master
+        # for event, region in iteration:
+        #     if event == 'end':
+        #         if region.tag != "REGION":
+        #             if region.tag == "NAME":
+        #                 items.append(region.text.strip())
+        #             if region.tag == "DELEGATE":
+        #                 if region.text.strip() == "0":
+        #                     delegate = "None"
+        #                 else:
+        #                     delegate = region.text.strip()
+        #                 items.append(delegate)
+        #             if region.tag == "DELEGATEVOTES":
+        #                 items.append(int(region.text.strip()))
+        #             if region.tag == "DELEGATEAUTH":
+        #                 items.append(region.text)
+        #             if region.tag == "NUMNATIONS":
+        #                 items.append(int(region.text.strip()))
+        #             if region.tag == "FOUNDER":
+        #                 if region.text is None:
+        #                     items.append("Founderless")
+        #                 else:
+        #                     items.append(region.text.strip())
+        #             if region.tag == "FOUNDERAUTH":
+        #                 if region.text is not None:
+        #                     if region.text == "XABCEP":
+        #                         items.append("All")
+        #                     else:
+        #                         items.append(region.text.strip())
+        #                 else:
+        #                     items.append("Non-exec")
+        #             if region.tag == "POWER":
+        #                 items.append(region.text.strip())
+        #             if region.tag == "NATIONS":
+        #                 if region.text is not None:
+        #                     items.append(set(region.text.split(":")))
+        #                 else:
+        #                     items.append({"None"})
+        #             if region.tag == "LASTUPDATE":
+        #                 if region.text is None:
+        #                     items.append(0)
+        #                 else:
+        #                     items.append(int(region.text.strip()))
+        #                 # increase count
+        #                 regions += 1
+        #                 # append region data to master list and clear region data
+        #                 items_list.append(items)
+        #                 items = list()
+        #         continue
+        # # open a csv file and write the master list to it
+        # with open(f'{self.directory_variable}region_dump.csv', 'w', newline='', encoding="UTF-8") as region_dump_csv:
+        #     writer = csv.writer(region_dump_csv)
+        #     writer.writerows(items_list)
+        # # clear the previous region_dump
+        # await conn.execute('''DELETE FROM region_dump;''')
+        # # open the csv file and mass-copy to that file
+        # await conn.execute(r'''copy region_dump FROM '/home/ubuntu/dumps/region_dump.csv'
+        # WITH csv;''', self.directory_variable)
+        # # stop stopwatch
+        # time_end = perf_counter()
+        # return await self.channel.send(f"Parsed {regions} regions in {time_end - time_start}.")
 
     async def nation_dump(self, ctx):
         # start the time to count
