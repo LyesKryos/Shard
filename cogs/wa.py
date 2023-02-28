@@ -152,7 +152,7 @@ class WA(commands.Cog):
                 await asyncio.sleep(int(str(error)))
                 continue
         # download file
-        await self.loop.run_in_executor(None, self.wnd, ndump, 'regions')
+        await self.loop.run_in_executor(None, self.wnd, ndump, 'nations')
         # connect to database
         conn = self.bot.pool
         # open the file with ET.iterparse, events being 'start' and 'end'
@@ -214,7 +214,7 @@ class WA(commands.Cog):
     @commands.command()
     async def run_dumps(self, ctx):
         async with ctx.typing():
-            await self.loop.run_in_executor(self.nation_dump, ctx)
+            await self.nation_dump(ctx)
             await self.region_dump(ctx)
 
 async def setup(bot: Shard):
