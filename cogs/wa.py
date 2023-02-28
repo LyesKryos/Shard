@@ -127,7 +127,7 @@ class WA(commands.Cog):
         await conn.execute('''DELETE FROM region_dump;''')
         # open the csv file and mass-copy to that file
         await conn.execute(r'''copy region_dump FROM '/root/Documents/Shard/dumps/region_dump.csv'
-        WITH csv;''', self.directory_variable)
+        WITH csv;''')
         # stop stopwatch
         time_end = perf_counter()
         return await self.channel.send(f"Parsed {regions} regions in {time_end - time_start}.")
@@ -209,7 +209,7 @@ class WA(commands.Cog):
         await conn.execute('''DELETE FROM nation_dump;''')
         # open the csv file and mass-copy to that file
         await conn.execute(r'''copy nation_dump FROM 
-        '/root/Documents/Shard/dumps/nation_dump.csv' WITH csv;''', self.directory_variable)
+        '/root/Documents/Shard/dumps/nation_dump.csv' WITH csv;''')
         # stop stopwatch
         time_end = perf_counter()
         return await self.channel.send(f"Parsed {nations} nations in {time_end - start_time}.")
