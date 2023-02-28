@@ -215,6 +215,7 @@ class WA(commands.Cog):
     async def run_dumps(self, ctx):
         async with ctx.typing():
             await self.region_dump(ctx)
+            await self.nation_dump(ctx)
 
 async def setup(bot: Shard):
     # define the cog and add the cog
