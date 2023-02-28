@@ -214,7 +214,7 @@ class WA(commands.Cog):
     @commands.command()
     async def run_dumps(self, ctx):
         async with ctx.typing():
-            await self.nation_dump(ctx)
+            await self.loop.run_in_executor(self.nation_dump, ctx)
             await self.region_dump(ctx)
 
 async def setup(bot: Shard):
