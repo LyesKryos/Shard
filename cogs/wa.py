@@ -63,7 +63,7 @@ class WA(commands.Cog):
         await conn.execute('''DELETE FROM region_dump;''')
         # open the file with ET.iterparse, events being 'start' and 'end'
         iteration = ET.iterparse(
-            rf"C{self.directory_variable}regions.xml",
+            rf"{self.directory_variable}regions.xml",
             events=('start', 'end'))
         # count regions
         regions = 1
