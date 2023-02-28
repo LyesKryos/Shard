@@ -8,11 +8,9 @@ from discord.ext import commands
 import requests
 from bs4 import BeautifulSoup
 import re
-from apscheduler.triggers.cron import CronTrigger
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 import aiohttp
-from typing import Union, Optional
+from typing import Optional
 
 from customchecks import TooManyRequests
 from ratelimiter import Ratelimiter

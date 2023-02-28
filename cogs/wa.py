@@ -4,9 +4,14 @@ import csv
 import gzip
 import re
 import xml.etree.ElementTree as ET
+from datetime import datetime, timedelta
+
 import requests
 from discord.ext import commands
 from time import perf_counter, strftime
+
+from pytz import timezone
+
 from ShardBot import Shard
 from customchecks import TooManyRequests
 from ratelimiter import Ratelimiter
@@ -41,7 +46,39 @@ class WA(commands.Cog):
         with open(fr"{self.directory_variable}{location}.xml", "a") as rx:
             rx.write(f"<!-- Update Time: {strftime('%Y-%m-%d %H:%M:%S')}-->")
 
-    async def region_dump(self, ctx):
+    async def daily_dump(self):
+        # establish connection and ensure readiness
+        await self.bot.wait_until_ready()
+        # define now and timezone
+        eastern = timezone('US/Eastern')
+        now = datetime.now(eastern)
+        # define crashchannel
+        crashchannel = self.bot.get_channel(835579413625569322)
+        while True:
+            # if it is the end of the year, make the next run be in the next year
+            if now.month == 12 and now.day == 31:
+                next_run = now.replace(year=now.year + 1, month=1, day=1, hour=4, minute=00, second=0)
+            else:
+                # sets time to be 3:30 on the next day
+                try:
+                    next_run = now.replace(day=now.day + 1, hour=3, minute=30, second=0)
+                # if there is a value error, the month is probably whacked up
+                except ValueError:
+                    next_run = now.replace(day=1, month=now.month + 1, hour=3, minute=30, second=0)
+            # sends the next runtime
+            await crashchannel.send(f"Daily dump waiting until "
+                                    f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
+            # gets the time to wait
+            delta: timedelta = next_run - now
+            # converts time to seconds
+            seconds = delta.total_seconds()
+            # sleeps until runtime
+            await asyncio.sleep(seconds)
+            await self.nation_dump()
+            await self.region_dump()
+
+
+    async def region_dump(self):
         # start the time to count
         time_start = perf_counter()
         # establish the headers
@@ -134,7 +171,7 @@ class WA(commands.Cog):
         time_end = perf_counter()
         return await self.channel.send(f"Parsed {regions} regions in {time_end - time_start}.")
 
-    async def nation_dump(self, ctx):
+    async def nation_dump(self):
         # start the time to count
         start_time = perf_counter()
         # establish the headers
@@ -214,8 +251,9 @@ class WA(commands.Cog):
     @commands.command()
     async def run_dumps(self, ctx):
         async with ctx.typing():
-            await self.region_dump(ctx)
-            await self.nation_dump(ctx)
+            await self.region_dump()
+            await self.nation_dump()
+
 
 async def setup(bot: Shard):
     # define the cog and add the cog
