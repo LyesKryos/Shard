@@ -195,10 +195,9 @@ class WA(commands.Cog):
                         # increase count
                         nations += 1
                         # append region data to master list and clear region data
-                        await conn.execute('''INSERT INTO nation_dump VALUES($1,$2,$3,$4,$5,$6,$7,$8);''',
+                        await conn.execute('''INSERT INTO nation_dump VALUES($1,$2,$3,$4,$5,$6,$7);''',
                                            nation_items[0], nation_items[1], nation_items[2], nation_items[3],
-                                           nation_items[4], nation_items[5], nation_items[6],
-                                           nation_items[7])
+                                           nation_items[4], nation_items[5], nation_items[6])
                         nation_items = list()
                 continue
         # stop stopwatch
