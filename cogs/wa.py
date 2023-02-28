@@ -62,10 +62,10 @@ class WA(commands.Cog):
             else:
                 # sets time to be 3:30 on the next day
                 try:
-                    next_run = now.replace(day=now.day + 1, hour=3, minute=30, second=0)
+                    next_run = now.replace(day=now.day + 1, hour=4, minute=0, second=0)
                 # if there is a value error, the month is probably whacked up
                 except ValueError:
-                    next_run = now.replace(day=1, month=now.month + 1, hour=3, minute=30, second=0)
+                    next_run = now.replace(day=1, month=now.month + 1, hour=4, minute=0, second=0)
             # sends the next runtime
             await crashchannel.send(f"Daily dump waiting until "
                                     f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")

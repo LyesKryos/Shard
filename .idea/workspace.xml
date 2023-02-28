@@ -5,8 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding daily dump updating processing">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/wa.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/wa.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -85,14 +83,7 @@
       <workItem from="1676924059452" duration="2388000" />
       <workItem from="1677165868843" duration="4880000" />
       <workItem from="1677439368051" duration="2110000" />
-      <workItem from="1677588022171" duration="10403000" />
-    </task>
-    <task id="LOCAL-00339" summary="Fixing verification daily update">
-      <created>1674091235789</created>
-      <option name="number" value="00339" />
-      <option name="presentableId" value="LOCAL-00339" />
-      <option name="project" value="LOCAL" />
-      <updated>1674091235789</updated>
+      <workItem from="1677588022171" duration="10558000" />
     </task>
     <task id="LOCAL-00340" summary="Fixing verification daily update">
       <created>1674857352953</created>
@@ -430,7 +421,14 @@
       <option name="project" value="LOCAL" />
       <updated>1677623090485</updated>
     </task>
-    <option name="localTasksCounter" value="388" />
+    <task id="LOCAL-00388" summary="Adding daily dump updating processing">
+      <created>1677623224371</created>
+      <option name="number" value="00388" />
+      <option name="presentableId" value="LOCAL-00388" />
+      <option name="project" value="LOCAL" />
+      <updated>1677623224371</updated>
+    </task>
+    <option name="localTasksCounter" value="389" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
