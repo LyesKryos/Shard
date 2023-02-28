@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing directory issue" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing directory issue">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/wa.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/wa.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -81,20 +84,7 @@
       <workItem from="1676924059452" duration="2388000" />
       <workItem from="1677165868843" duration="4880000" />
       <workItem from="1677439368051" duration="2110000" />
-    </task>
-    <task id="LOCAL-00318" summary="Adding force server check to verification.py">
-      <created>1669644171052</created>
-      <option name="number" value="00318" />
-      <option name="presentableId" value="LOCAL-00318" />
-      <option name="project" value="LOCAL" />
-      <updated>1669644171052</updated>
-    </task>
-    <task id="LOCAL-00319" summary="Adding force server check to verification.py">
-      <created>1669644299393</created>
-      <option name="number" value="00319" />
-      <option name="presentableId" value="LOCAL-00319" />
-      <option name="project" value="LOCAL" />
-      <updated>1669644299393</updated>
+      <workItem from="1677588022171" duration="843000" />
     </task>
     <task id="LOCAL-00320" summary="Fixing verification.py">
       <created>1669751705272</created>
@@ -425,7 +415,21 @@
       <option name="project" value="LOCAL" />
       <updated>1677504730626</updated>
     </task>
-    <option name="localTasksCounter" value="367" />
+    <task id="LOCAL-00367" summary="Fixing directory issue">
+      <created>1677588266145</created>
+      <option name="number" value="00367" />
+      <option name="presentableId" value="LOCAL-00367" />
+      <option name="project" value="LOCAL" />
+      <updated>1677588266145</updated>
+    </task>
+    <task id="LOCAL-00368" summary="Fixing directory issue">
+      <created>1677588421244</created>
+      <option name="number" value="00368" />
+      <option name="presentableId" value="LOCAL-00368" />
+      <option name="project" value="LOCAL" />
+      <updated>1677588421244</updated>
+    </task>
+    <option name="localTasksCounter" value="369" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
