@@ -168,7 +168,7 @@ class WA(commands.Cog):
         # for each event and tag in the iteration, parse out the data, add it to the list, and then add the list to master
         for event, nation in iteration:
             if event == 'end':
-                if nation.tag != "REGION":
+                if nation.tag != "NATION":
                     if nation.tag == "NAME":
                         nation_items.append(nation.text.strip())
                     if nation.tag == "TYPE":
