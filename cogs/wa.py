@@ -2,9 +2,7 @@
 import asyncio
 import csv
 import gzip
-import logging
 import re
-import traceback
 import xml.etree.ElementTree as ET
 import requests
 from discord.ext import commands
@@ -19,7 +17,7 @@ class WA(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
         self.rate_limit = Ratelimiter()
-        self.directory_variable = r'/root/Documents/Shard/dumps/'
+        self.directory_variable = r'/home/ubuntu/dumps/'
         self.channel = bot.get_channel(835579413625569322)
         self.rate_limit = Ratelimiter()
 
@@ -126,7 +124,7 @@ class WA(commands.Cog):
         # clear the previous region_dump
         await conn.execute('''DELETE FROM region_dump;''')
         # open the csv file and mass-copy to that file
-        await conn.execute(r'''copy region_dump FROM '/root/Documents/Shard/dumps/region_dump.csv'
+        await conn.execute(r'''copy region_dump FROM '/home/ubuntu/dumps/region_dump.csv'
         WITH csv;''', self.directory_variable)
         # stop stopwatch
         time_end = perf_counter()
@@ -208,8 +206,8 @@ class WA(commands.Cog):
         # clear the previous region_dump
         await conn.execute('''DELETE FROM nation_dump;''')
         # open the csv file and mass-copy to that file
-        await conn.execute(r'''\copy nation_dump FROM 
-        '/root/Documents/Shard/dumps/nation_dump.csv' WITH csv;''')
+        await conn.execute(r'''copy nation_dump FROM 
+        '/home/ubuntu/dumps/nation_dump.csv' WITH csv;''')
         # stop stopwatch
         time_end = perf_counter()
         return await self.channel.send(f"Parsed {nations} nations in {time_end - start_time}.")
