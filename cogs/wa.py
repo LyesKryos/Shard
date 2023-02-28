@@ -189,7 +189,7 @@ class WA(commands.Cog):
                     if nation.tag == "FLAG":
                         nation_items.append(nation.text.strip())
                     if nation.tag == "FIRSTLOGIN":
-                        nation_items.append(nation.text.strip())
+                        nation_items.append(int(nation.text.strip()))
                     # DBID indicates the end of the nation's data
                     if nation.tag == "DBID":
                         # increase count
