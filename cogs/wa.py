@@ -129,7 +129,7 @@ class WA(commands.Cog):
         await conn.execute('''DELETE FROM region_dump;''')
         # open the csv file and mass-copy to that file
         await conn.execute(r'''copy region_dump FROM '/home/ubuntu/dumps/region_dump.csv'
-        WITH csv;''', self.directory_variable)
+        WITH csv;''')
         # stop stopwatch
         time_end = perf_counter()
         return await self.channel.send(f"Parsed {regions} regions in {time_end - time_start}.")
