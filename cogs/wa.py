@@ -28,6 +28,9 @@ class WA(commands.Cog):
         self.loop = self.bot.loop
         self.daily_dump_task = asyncio.create_task(self.daily_dump())
 
+    async def cog_unload(self) -> None:
+        self.daily_dump_task.cancel()
+
     def sanitize_raw(userinput: str) -> str:
         # replaces user input with proper, url-friendly code
         to_regex = userinput.replace("_", " ")
