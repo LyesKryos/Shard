@@ -1,4 +1,4 @@
-# Shard WA Program v1.0a
+# Shard WA Program v1.0b
 import asyncio
 import csv
 import gzip
@@ -63,7 +63,7 @@ class WA(commands.Cog):
             if now.month == 12 and now.day == 31:
                 next_run = now.replace(year=now.year + 1, month=1, day=1, hour=4, minute=00, second=0)
             else:
-                # sets time to be 3:30 on the next day
+                # sets time to be 4:00 on the next day
                 try:
                     next_run = now.replace(day=now.day + 1, hour=4, minute=0, second=0)
                 # if there is a value error, the month is probably whacked up
@@ -76,11 +76,12 @@ class WA(commands.Cog):
             delta: timedelta = next_run - now
             # converts time to seconds
             seconds = delta.total_seconds()
+            await crashchannel.send(f"{seconds}")
             # sleeps until runtime
             await asyncio.sleep(seconds)
             await self.nation_dump()
             await self.region_dump()
-
+            continue
 
     async def region_dump(self):
         # start the time to count
@@ -206,7 +207,8 @@ class WA(commands.Cog):
         nation_items = list()
         # declare the whole list
         nation_items_list = list()
-        # for each event and tag in the iteration, parse out the data, add it to the list, and then add the list to master
+        # for each event and tag in the iteration, parse out the data,
+        # add it to the list, and then add the list to master
         for event, nation in iteration:
             if event == 'end':
                 if nation.tag != "NATION":
