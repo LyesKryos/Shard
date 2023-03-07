@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding daily dump updating processing">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Testing econ">
+      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/wa.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/wa.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -83,35 +87,9 @@
       <workItem from="1676924059452" duration="2388000" />
       <workItem from="1677165868843" duration="4880000" />
       <workItem from="1677439368051" duration="2110000" />
-      <workItem from="1677588022171" duration="10558000" />
-    </task>
-    <task id="LOCAL-00340" summary="Fixing verification daily update">
-      <created>1674857352953</created>
-      <option name="number" value="00340" />
-      <option name="presentableId" value="LOCAL-00340" />
-      <option name="project" value="LOCAL" />
-      <updated>1674857352953</updated>
-    </task>
-    <task id="LOCAL-00341" summary="Adding tgq command to NationStates suite">
-      <created>1675033509228</created>
-      <option name="number" value="00341" />
-      <option name="presentableId" value="LOCAL-00341" />
-      <option name="project" value="LOCAL" />
-      <updated>1675033509228</updated>
-    </task>
-    <task id="LOCAL-00342" summary="Making tgq have place commas">
-      <created>1675033663543</created>
-      <option name="number" value="00342" />
-      <option name="presentableId" value="LOCAL-00342" />
-      <option name="project" value="LOCAL" />
-      <updated>1675033663543</updated>
-    </task>
-    <task id="LOCAL-00343" summary="Fixing tgq place commas">
-      <created>1675033768552</created>
-      <option name="number" value="00343" />
-      <option name="presentableId" value="LOCAL-00343" />
-      <option name="project" value="LOCAL" />
-      <updated>1675033768552</updated>
+      <workItem from="1677588022171" duration="13194000" />
+      <workItem from="1677764197280" duration="4634000" />
+      <workItem from="1677854497071" duration="5219000" />
     </task>
     <task id="LOCAL-00344" summary="Adding member leaving message">
       <created>1675345430490</created>
@@ -428,7 +406,35 @@
       <option name="project" value="LOCAL" />
       <updated>1677623224371</updated>
     </task>
-    <option name="localTasksCounter" value="389" />
+    <task id="LOCAL-00389" summary="Adding daily dump updating processing">
+      <created>1677623265200</created>
+      <option name="number" value="00389" />
+      <option name="presentableId" value="LOCAL-00389" />
+      <option name="project" value="LOCAL" />
+      <updated>1677623265200</updated>
+    </task>
+    <task id="LOCAL-00390" summary="Fixing daily dump">
+      <created>1677722876821</created>
+      <option name="number" value="00390" />
+      <option name="presentableId" value="LOCAL-00390" />
+      <option name="project" value="LOCAL" />
+      <updated>1677722876821</updated>
+    </task>
+    <task id="LOCAL-00391" summary="Fixing daily dump">
+      <created>1677852094974</created>
+      <option name="number" value="00391" />
+      <option name="presentableId" value="LOCAL-00391" />
+      <option name="project" value="LOCAL" />
+      <updated>1677852094975</updated>
+    </task>
+    <task id="LOCAL-00392" summary="Testing econ">
+      <created>1677853645975</created>
+      <option name="number" value="00392" />
+      <option name="presentableId" value="LOCAL-00392" />
+      <option name="project" value="LOCAL" />
+      <updated>1677853645975</updated>
+    </task>
+    <option name="localTasksCounter" value="393" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -446,8 +452,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing tgq place commas" />
-    <MESSAGE value="Adding member leaving message" />
     <MESSAGE value="Fixing member leaving message" />
     <MESSAGE value="Mentions for profile embed" />
     <MESSAGE value="Fixing lack of welcome message for DM-blocking users during verification" />
@@ -471,7 +475,9 @@
     <MESSAGE value="Testing load" />
     <MESSAGE value="Final testing" />
     <MESSAGE value="Adding daily dump updating processing" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding daily dump updating processing" />
+    <MESSAGE value="Fixing daily dump" />
+    <MESSAGE value="Testing econ" />
+    <option name="LAST_COMMIT_MESSAGE" value="Testing econ" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$1.coverage" NAME="1 Coverage Results" MODIFIED="1673727138457" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

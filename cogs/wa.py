@@ -6,6 +6,7 @@ import re
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 
+import discord.utils
 import requests
 from discord.ext import commands
 from time import perf_counter, strftime
@@ -59,26 +60,14 @@ class WA(commands.Cog):
         # define crashchannel
         crashchannel = self.bot.get_channel(835579413625569322)
         while True:
-            # if it is the end of the year, make the next run be in the next year
-            if now.month == 12 and now.day == 31:
-                next_run = now.replace(year=now.year + 1, month=1, day=1, hour=4, minute=00, second=0)
-            else:
-                # sets time to be 4:00 on the next day
-                try:
-                    next_run = now.replace(day=now.day + 1, hour=4, minute=0, second=0)
-                # if there is a value error, the month is probably whacked up
-                except ValueError:
-                    next_run = now.replace(day=1, month=now.month + 1, hour=4, minute=0, second=0)
+            # sets time for next day at 4
+            next_run = now.replace(hour=4, minute=0, second=0)
+            next_run += timedelta(days=1)
             # sends the next runtime
-            await crashchannel.send(f"Daily dump waiting until "
+            await crashchannel.send(f"Stock marcket update waiting until "
                                     f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
-            # gets the time to wait
-            delta: timedelta = next_run - now
-            # converts time to seconds
-            seconds = delta.total_seconds()
-            await crashchannel.send(f"{seconds}")
-            # sleeps until runtime
-            await asyncio.sleep(seconds)
+            # sleeps until that time
+            await discord.utils.sleep_until(next_run)
             await self.nation_dump()
             await self.region_dump()
             continue
