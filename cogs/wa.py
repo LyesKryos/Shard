@@ -64,7 +64,7 @@ class WA(commands.Cog):
             next_run = now.replace(hour=4, minute=0, second=0)
             next_run += timedelta(days=1)
             # sends the next runtime
-            await crashchannel.send(f"Stock marcket update waiting until "
+            await crashchannel.send(f"Daily dump update waiting until "
                                     f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
             # sleeps until that time
             await discord.utils.sleep_until(next_run)
