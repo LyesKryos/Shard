@@ -54,12 +54,13 @@ class WA(commands.Cog):
     async def daily_dump(self):
         # establish connection and ensure readiness
         await self.bot.wait_until_ready()
-        # define now and timezone
+        # define timezone
         eastern = timezone('US/Eastern')
-        now = datetime.now(eastern)
         # define crashchannel
         crashchannel = self.bot.get_channel(835579413625569322)
         while True:
+            # define now
+            now = datetime.now(eastern)
             # sets time for next day at 4
             next_run = now.replace(hour=4, minute=0, second=0)
             next_run += timedelta(days=1)
