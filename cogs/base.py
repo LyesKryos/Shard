@@ -96,6 +96,13 @@ class BaseCommands(commands.Cog):
                 await self.bot.load_extension(f"cogs.{filename[:-3]}")
         await ctx.send("Recycled all cogs.")
 
+    @commands.command()
+    @commands.is_owner()
+    async def sync(self, ctx):
+        syncing = await ctx.send("Syncing app commands!")
+        synced = await self.bot.tree.sync()
+        await syncing.edit(content=f"Synced {len(synced)} commands.")
+
     @commands.command(brief="Measures latency between Discord and the host server.")
     async def ping(self, ctx):
         msg = await ctx.send(f"Round trip {round(self.bot.latency * 1000, 2)}ms!")
