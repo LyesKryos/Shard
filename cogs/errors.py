@@ -65,6 +65,11 @@ class ShardErrorHandler(commands.Cog):
             self.bot.logger.warning(msg=error)
         elif isinstance(error, discord.errors.Forbidden):
             await ctx.send("I cannot complete that action.")
+            etype = type(error)
+            trace = error.__traceback__
+            lines = traceback.format_exception(etype, error, trace)
+            traceback_text = ''.join(lines)
+            self.bot.logger.warning(msg=f"{traceback_text}")
         else:
             etype = type(error)
             trace = error.__traceback__
