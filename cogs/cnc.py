@@ -49,7 +49,7 @@ class CNC(commands.Cog):
         if ctx.author.id in [293518673417732098]:
             return True
         else:
-            # if there this is in DMs, check the user id on the Thegye server to ensure proper role
+            # if this is in DMs, check the user id on the Thegye server to ensure proper role
             if ctx.guild is None:
                 aroles = list()
                 thegye = ctx.bot.get_guild(674259612580446230)
