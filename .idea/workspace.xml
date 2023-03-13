@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding syncing">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing errors.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ShardBot.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShardBot.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -113,14 +114,7 @@
       <workItem from="1677854497071" duration="7957000" />
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
-      <workItem from="1678542957088" duration="1136000" />
-    </task>
-    <task id="LOCAL-00349" summary="Fixing member leaving message">
-      <created>1675347588929</created>
-      <option name="number" value="00349" />
-      <option name="presentableId" value="LOCAL-00349" />
-      <option name="project" value="LOCAL" />
-      <updated>1675347588929</updated>
+      <workItem from="1678542957088" duration="2946000" />
     </task>
     <task id="LOCAL-00350" summary="Mentions for profile embed">
       <created>1675347964547</created>
@@ -458,7 +452,14 @@
       <option name="project" value="LOCAL" />
       <updated>1678663068290</updated>
     </task>
-    <option name="localTasksCounter" value="398" />
+    <task id="LOCAL-00398" summary="Fixing errors.py">
+      <created>1678663942533</created>
+      <option name="number" value="00398" />
+      <option name="presentableId" value="LOCAL-00398" />
+      <option name="project" value="LOCAL" />
+      <updated>1678663942533</updated>
+    </task>
+    <option name="localTasksCounter" value="399" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -476,7 +477,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing dispatch id finding for factbooks that are without an id" />
     <MESSAGE value="Fixing dispatch id" />
     <MESSAGE value="Adding ratelimiter to rsc check" />
     <MESSAGE value="Fixing RSC checking" />
@@ -501,7 +501,8 @@
     <MESSAGE value="Fixing WA updating" />
     <MESSAGE value="Adding econ.py" />
     <MESSAGE value="Adding syncing" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding syncing" />
+    <MESSAGE value="Fixing errors.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing errors.py" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

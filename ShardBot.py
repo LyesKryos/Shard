@@ -13,8 +13,7 @@ class Shard(commands.Bot):
         self.pool = None
         self.prefix = "$"
         super().__init__(command_prefix=self.prefix, intents=discord.Intents.all(),
-                         activity=discord.Game(f"{self.prefix}help for commands"),
-                         application_id=849028002406858753)
+                         activity=discord.Game(f"{self.prefix}help for commands"))
         # sets up logging, time, and allowed mentions
         logging.basicConfig(filename="botlogs.log", level=logging.WARNING,
                             format='%(asctime)s %(levelname)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
