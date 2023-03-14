@@ -37,7 +37,7 @@ class RegisterView(View):
         user = interaction.user
         # fetch general fund information
         general_fund_raw = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'General Fund';''')
-        general_fund = general_fund_raw['fund_limit']
+        general_fund = general_fund_raw['funds']
         # calculate starting gift, credit it towards the user, and remove thaler from fund
         registration_gift = round(general_fund * .001, 0)
         await conn.execute('''INSERT INTO rbt_users VALUES($1,$2);''',
@@ -45,7 +45,7 @@ class RegisterView(View):
         await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 WHERE name = 'General Fund';''',
                            registration_gift)
         await interaction.response.edit_message(view=self)
-        return await interaction.followup.send(f"{user.name}{user.discriminator} has been registered "
+        return await interaction.followup.send(f"{user.name}#{user.discriminator} has been registered "
                                                f"as a new member of the Royal Bank of Thegye.\n"
                                                f"This new member has been given **{thaler}"
                                                f"{registration_gift:,.2f}** to get started."
@@ -1060,19 +1060,21 @@ class Economy(commands.Cog):
             stock_value = 0
             for shares in ledger_info:
                 stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
-                this_string = f"{shares['name']}: {shares['amount']} @ {self.thaler}{stock['value']:,.2f}"
+                this_string = f"{shares['name']} (#{shares['stock_id']}: " \
+                              f"{shares['amount']} @ {self.thaler}{stock['value']:,.2f}"
                 if stock['trending'] == "up":
                     this_string += " :chart_with_upwards_trend: +"
                 else:
                     this_string += " :chart_with_downwards_trend: "
-                this_string += f"{stock['change'] * 100}%\n" \
+                this_string += f"{stock['change'] * 100:.2f}%\n" \
                                f"> Sale value: {self.thaler}" \
                                f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
                 ledger_string += this_string
                 stock_value += float(shares['amount']) * float(stock['value'])
             portfolio_embed.add_field(name="Stock Value", value=f"{self.thaler}{stock_value:,.2f}")
             portfolio_embed.add_field(name="Net Worth",
-                                      value=f"{self.thaler}{round(float(stock_value) + float(rbt_member['funds']), 2):,.2f}")
+                                      value=f"{self.thaler}"
+                                            f"{round(float(stock_value) + float(rbt_member['funds']), 2):,.2f}")
             portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
             await interaction.followup.send(embed=portfolio_embed)
 
@@ -1164,7 +1166,7 @@ class Economy(commands.Cog):
         stocks = await conn.fetch('''SELECT * FROM stocks ORDER BY value DESC;''')
         stock_string = " "
         for stock in stocks[0:10]:
-            this_string = f"``{rank}. {stock['name']} (#{stock['stock_id']}: " \
+            this_string = f"``{rank}. {stock['name']} (#{stock['stock_id']}): " \
                           f"{self.thaler}{stock['value']:,.2f}"
             for space in range(0, 48 - len(this_string)):
                 this_string += " "
