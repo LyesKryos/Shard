@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding change to stock command">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding fund command">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
@@ -115,14 +115,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="2629000" />
-    </task>
-    <task id="LOCAL-00364" summary="Fixing Minecraft access">
-      <created>1676926023075</created>
-      <option name="number" value="00364" />
-      <option name="presentableId" value="LOCAL-00364" />
-      <option name="project" value="LOCAL" />
-      <updated>1676926023075</updated>
+      <workItem from="1678819823954" duration="4237000" />
     </task>
     <task id="LOCAL-00365" summary="Adding daily dumps functionality">
       <created>1677504214217</created>
@@ -460,7 +453,14 @@
       <option name="project" value="LOCAL" />
       <updated>1678820885624</updated>
     </task>
-    <option name="localTasksCounter" value="413" />
+    <task id="LOCAL-00413" summary="Adding fund command">
+      <created>1678826009474</created>
+      <option name="number" value="00413" />
+      <option name="presentableId" value="LOCAL-00413" />
+      <option name="project" value="LOCAL" />
+      <updated>1678826009474</updated>
+    </task>
+    <option name="localTasksCounter" value="414" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -478,7 +478,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing minor directory issue" />
     <MESSAGE value="Fixing testing \copy command" />
     <MESSAGE value="Testing csv loading" />
     <MESSAGE value="Testing executor" />
@@ -503,7 +502,8 @@
     <MESSAGE value="Changing commas on buy" />
     <MESSAGE value="Fixing bottoming protection" />
     <MESSAGE value="Adding change to stock command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding change to stock command" />
+    <MESSAGE value="Adding fund command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding fund command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

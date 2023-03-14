@@ -44,6 +44,7 @@ class RegisterView(View):
                            user.id, registration_gift)
         await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 WHERE name = 'General Fund';''',
                            registration_gift)
+
         await interaction.response.edit_message(view=self)
         return await interaction.followup.send(f"{user.name}#{user.discriminator} has been registered "
                                                f"as a new member of the Royal Bank of Thegye.\n"
@@ -756,13 +757,16 @@ class Economy(commands.Cog):
                 value = (value +
                          (((value_roll / 100) + (stock['outstanding'] / stock['issued'] * 10))
                           * value))
+                if value < 5 - stock['risk']:
+                    value = 5 - stock['risk']
                 change = round(1 - (int(stock['value']) / value), 4)
             else:
                 value = (value -
                          (((value_roll / 100) + (stock['outstanding'] / stock['issued'] * 10))
                           * value))
+                if value < 5 - stock['risk']:
+                    value = 5 - stock['risk']
                 change = round(1 - (int(stock['value']) / value), 4)
-
             # if the outstanding shares is between 25 and 50 shares away from the total issued shares,
             # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
             if stock['issued'] - stock['outstanding'] < randint(25, 50):
@@ -800,8 +804,6 @@ class Economy(commands.Cog):
                     self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
                                          "All stock values are decreased by 75%.\n "
                     self.crash = True
-        # ensure no stock drops below 6 - risk thaler (max at 5 thaler)
-        await conn.execute('''UPDATE stocks SET value = 6-risk WHERE value < 5-risk;''')
         # update stocks' value tracker
         await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
                         SELECT stock_id, value, trending FROM stocks;''')
