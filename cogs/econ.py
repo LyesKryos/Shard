@@ -146,7 +146,8 @@ class FeedView(View):
             stocks = await conn.fetch('''SELECT * FROM stocks ORDER BY value DESC;''')
             stock_string = ""
             for stock in stocks[(self.page * 10) - 10:self.page * 10]:
-                this_string = f"``{self.rank}. {stock['name']}: {self.thaler}{stock['value']:,.2f}"
+                this_string = f"``{self.rank}. {stock['name']} (#{stock['stock_id']}: " \
+                              f"{self.thaler}{stock['value']:,.2f}"
                 for space in range(0, 48 - len(this_string)):
                     this_string += " "
                 if stock['trending'] == "up":
@@ -201,7 +202,8 @@ class FeedView(View):
             if (len(stocks[(self.page * 10) - 10:self.page * 10]) / 10) < 1:
                 forward_button.disabled = True
             for stock in stocks[(self.page * 10) - 10:self.page * 10]:
-                this_string = f"``{self.rank}. {stock['name']}: {self.thaler}{stock['value']:,.2f}"
+                this_string = f"``{self.rank}. {stock['name']} (#{stock['stock_id']}: " \
+                              f"{self.thaler}{stock['value']:,.2f}"
                 for space in range(0, 48 - len(this_string)):
                     this_string += " "
                 if stock['trending'] == "up":
@@ -273,6 +275,8 @@ class Economy(commands.Cog):
         await self.bot.wait_until_ready()
         # define crash channel
         crashchannel = self.bot.get_channel(835579413625569322)
+        # define bank channel
+        bankchannel = self.bot.get_channel(855155865023021066)
         # set timezone
         eastern = timezone('US/Eastern')
         while True:
@@ -375,7 +379,9 @@ class Economy(commands.Cog):
                     if datetime.now().weekday() <= 5:
                         await conn.execute('''UPDATE rbt_users SET funds = funds + 20 WHERE user_id = $1;''',
                                            official.id)
-                await crashchannel.send("Done with bank!")
+                        await conn.execute(
+                            '''UPDATE funds SET general_fund = general_fund - 20 WHERE name = 'General Fund';''')
+                await bankchannel.send("Royal Bank of Thegye updated.")
                 continue
             except Exception as error:
                 etype = type(error)
@@ -588,6 +594,8 @@ class Economy(commands.Cog):
             await self.bot.wait_until_ready()
             # define crash channel
             crashchannel = self.bot.get_channel(835579413625569322)
+            # define bank channel
+            bankchannel = self.bot.get_channel(855155865023021066)
             # set timezone
             eastern = timezone('US/Eastern')
             while True:
@@ -686,7 +694,7 @@ class Economy(commands.Cog):
                 await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
                 SELECT stock_id, value, trending FROM stocks;''')
                 # announce
-                await crashchannel.send(content=self.announcement)
+                await bankchannel.send(content=self.announcement)
                 self.announcement = \
                     "The Royal Exchange of Thegye has updated. Below is a summary of any important changes:\n"
                 continue
@@ -820,11 +828,12 @@ class Economy(commands.Cog):
             stock_embed.add_field(name="Description", value=stock['description'], inline=False)
             stock_embed.add_field(name="Value per share", value=f"{self.thaler}{float(stock['value']):,.2f}",
                                   inline=False)
-            stock_embed.add_field(name="Outstanding Shares", value=f"{stock['outstanding']:,.2f}")
-            stock_embed.add_field(name="Issued Shares", value=f"{stock['issued']:,.2f}")
+            stock_embed.add_field(name="Outstanding Shares", value=f"{stock['outstanding']}")
+            stock_embed.add_field(name="Issued Shares", value=f"{stock['issued']}")
             stock_embed.add_field(name="\u200b", value="\u200b")
             stock_embed.add_field(name="Trend", value=f"{stock['trending'].title()}")
             stock_embed.add_field(name="Risk Type", value=f"{risk}")
+            stock_embed.add_field(name="\u200b", value="\u200b")
             return await interaction.followup.send(embed=stock_embed)
 
     @exchange.command(description="Purchases a specified amount of a stock's shares.", name="buy")
@@ -1154,7 +1163,8 @@ class Economy(commands.Cog):
         stocks = await conn.fetch('''SELECT * FROM stocks ORDER BY value DESC;''')
         stock_string = " "
         for stock in stocks[0:10]:
-            this_string = f"``{rank}. {stock['name']}: {self.thaler}{stock['value']:,.2f}"
+            this_string = f"``{self.rank}. {stock['name']} (#{stock['stock_id']}: " \
+                          f"{self.thaler}{stock['value']:,.2f}"
             for space in range(0, 48 - len(this_string)):
                 this_string += " "
             if stock['trending'] == "up":

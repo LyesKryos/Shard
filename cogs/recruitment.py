@@ -1,6 +1,8 @@
 # recruitment 1.1
+import math
 from datetime import datetime, timedelta
 
+from dateutil.relativedelta import relativedelta
 from pytz import timezone
 
 from ShardBot import Shard
@@ -46,10 +48,7 @@ class Recruitment(commands.Cog):
             eastern = timezone('US/Eastern')
             now = datetime.now(eastern)
             # sets time to be midnight on the next month's first day
-            if now.month != 12:
-                next_first = now.replace(month=now.month + 1, day=1, hour=0, minute=0, second=0)
-            else:
-                next_first = now.replace(year=now.year + 1, month=1, day=1, hour=0, minute=0, second=0)
+            next_first = now.replace(day=1, hour=0, minute=0, second=0) + relativedelta(months=1)
             await crashchannel.send(f"Monthly recruiter waiting until "
                                     f"{next_first.strftime('%a, %d %b %Y at %H:%M %Z%z')}")
             while True:
@@ -57,13 +56,9 @@ class Recruitment(commands.Cog):
                 eastern = timezone('US/Eastern')
                 now = datetime.now(eastern)
                 # sets time to be midnight on the next month's first day
-                next_first = now.replace(month=now.month + 1, day=1, hour=0, minute=0, second=0)
-                # gets the time to wait
-                delta: timedelta = next_first - now
-                # converts time to seconds
-                seconds = delta.total_seconds()
+                next_first = now.replace(day=1, hour=0, minute=0, second=0) + relativedelta(months=1)
                 # waits until the next runtime
-                await asyncio.sleep(seconds)
+                await discord.utils.sleep_until(next_first)
                 # connects to database
                 conn = bot.pool
                 # fetches all user data
@@ -83,6 +78,11 @@ class Recruitment(commands.Cog):
                 monthly_total = 0
                 for s in top_recruiter:
                     monthly_total += s['sent_this_month']
+                # give recruiter of the month 500 thaler
+                await conn.execute('''UPDATE rbt_users SET funds = funds + 500 WHERE user_id = $1:''',
+                                   user.id)
+                await conn.execute('''UPDATE funds SET general_fund = general_fund - 500
+                WHERE name = 'General Fund';''')
                 # resets the role
                 await recruiter_of_the_month_role.edit(color=discord.Color.light_grey(),
                                                        name="Recruiter of the Month")
@@ -92,7 +92,8 @@ class Recruitment(commands.Cog):
                     f"distinction of being this month's top recruiter! This month, they have sent "
                     f"{top_recruiter_numbers} telegrams to new players. Wow! {user.display_name} has "
                     f"been awarded the {recruiter_of_the_month_role.mention} role, customizable by "
-                    f"request. Everyone give them a round of applause!\nIn total, {monthly_total:,} telegrams have been "
+                    f"request. {user.display_name} has also received a bonus of 500 thaler!"
+                    f"Everyone give them a round of applause!\nIn total, {monthly_total:,} telegrams have been "
                     f"sent by our wonderful recruiters this month!")
                 await announce.add_reaction("\U0001f44f")
                 # clears all sent_this_month
@@ -302,26 +303,36 @@ class Recruitment(commands.Cog):
                     self.sending_to.clear()
             return
         except asyncio.CancelledError:
+            # send end message
             await ctx.send("Recruitment stopped. Another link may post.")
+            # establish connection
             conn = self.bot.pool
+            # set running = false
             self.running = False
-            userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', ctx.author.id)
-            await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
-                               (self.user_sent + userinfo['sent']),
-                               (self.user_sent + userinfo['sent_this_month']),
-                               ctx.author.id)
-        except Exception:
+            # update relevant tables
+            await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $2
+             WHERE user_id = $3;''', self.user_sent, self.user_sent, ctx.author.id)
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               math.floor(self.user_sent/2), ctx.author.id)
+            await conn.execute('''UPDATE funds SET general_fund = general_fund - $1 WHERE name = 'General Fund';''',
+                               math.floor(self.user_sent/2))
+        except Exception as error:
             conn = self.bot.pool
             self.running = False
             await ctx.send("The recruitment bot has run into an issue. Recruitment has stopped.")
-            userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', ctx.author.id)
-            await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
-                               (self.user_sent + userinfo['sent']),
-                               (self.user_sent + userinfo['sent_this_month']),
-                               ctx.author.id)
+            # update relevant tables
+            await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $2
+             WHERE user_id = $3;''', self.user_sent, self.user_sent, ctx.author.id)
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               math.floor(self.user_sent/2), ctx.author.id)
+            await conn.execute('''UPDATE funds SET general_fund = general_fund - $1 WHERE name = 'General Fund';''',
+                               math.floor(self.user_sent/2))
             self.user_sent = 0
-            crashchannel = self.bot.get_channel(835579413625569322)
-            await crashchannel.send(f"```{traceback.format_exc()}```")
+            etype = type(error)
+            trace = error.__traceback__
+            lines = traceback.format_exception(etype, error, trace)
+            traceback_text = ''.join(lines)
+            self.bot.logger.warning(msg=f"{traceback_text}")
 
     async def still_recruiting_check(self, ctx):
         while self.running:
