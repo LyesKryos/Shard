@@ -875,7 +875,7 @@ class Economy(commands.Cog):
         # check for sufficient funds and return if not
         if transaction > rbt_member['funds']:
             return await interaction.followup.send(f"You do not have enough funds to purchase that amount of shares.\n"
-                                                   f"{amount:,.2f} shares of **{stock['name']}** cost "
+                                                   f"{amount:,} shares of **{stock['name']}** cost "
                                                    f"**{self.thaler}{transaction:,.2f}**, meaning a deficit of "
                                                    f"**{self.thaler}{round(transaction - rbt_member['funds'], 2):,.2f}**.")
         else:
@@ -902,7 +902,7 @@ class Economy(commands.Cog):
                                user.id, 'exchange', f'Bought {amount} {stock["name"]} (id: {stock["stock_id"]}) @ '
                                                     f'{self.thaler}{stock["value"]} for {self.thaler}{transaction}.')
             return await interaction.followup.send(
-                f"You have successfully purchased {amount} shares of {stock['name']} for "
+                f"You have successfully purchased {amount:,} shares of {stock['name']} for "
                 f"{self.thaler}{transaction:,.2f} at {self.thaler}{float(stock['value']):,.2f} per share.\n"
                 f"{self.thaler}{base_price:,.2f} + {self.thaler}{tax:,.2f} (transaction fee) = "
                 f"{self.thaler}{transaction:,.2f}")
