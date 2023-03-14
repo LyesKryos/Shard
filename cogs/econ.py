@@ -146,7 +146,7 @@ class FeedView(View):
             stocks = await conn.fetch('''SELECT * FROM stocks ORDER BY value DESC;''')
             stock_string = ""
             for stock in stocks[(self.page * 10) - 10:self.page * 10]:
-                this_string = f"``{self.rank}. {stock['name']} (#{stock['stock_id']}: " \
+                this_string = f"``{self.rank}. {stock['name']} (#{stock['stock_id']}): " \
                               f"{self.thaler}{stock['value']:,.2f}"
                 for space in range(0, 48 - len(this_string)):
                     this_string += " "
@@ -202,7 +202,7 @@ class FeedView(View):
             if (len(stocks[(self.page * 10) - 10:self.page * 10]) / 10) < 1:
                 forward_button.disabled = True
             for stock in stocks[(self.page * 10) - 10:self.page * 10]:
-                this_string = f"``{self.rank}. {stock['name']} (#{stock['stock_id']}: " \
+                this_string = f"``{self.rank}. {stock['name']} (#{stock['stock_id']}): " \
                               f"{self.thaler}{stock['value']:,.2f}"
                 for space in range(0, 48 - len(this_string)):
                     this_string += " "
