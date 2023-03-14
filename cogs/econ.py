@@ -832,7 +832,7 @@ class Economy(commands.Cog):
             stock_embed.add_field(name="Outstanding Shares", value=f"{stock['outstanding']}")
             stock_embed.add_field(name="Issued Shares", value=f"{stock['issued']}")
             stock_embed.add_field(name="\u200b", value="\u200b")
-            stock_embed.add_field(name="Trend", value=f"{stock['trending'].title()}")
+            stock_embed.add_field(name="Trend", value=f"{stock['trending'].title()} {stock['change']*100:.2f}%")
             stock_embed.add_field(name="Risk Type", value=f"{risk}")
             stock_embed.add_field(name="\u200b", value="\u200b")
             return await interaction.followup.send(embed=stock_embed)
