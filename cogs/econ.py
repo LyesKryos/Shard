@@ -554,7 +554,18 @@ class Economy(commands.Cog):
     @app_commands.describe(fund="The name of the fund.")
     async def fund_info(self, interaction: discord.Interaction,
                         fund: typing.Literal['General Fund', 'Investment Fund']):
-        pass
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # fetch fund
+        fund = await conn.fetchrow('''SELECT * FROM funds WHERE name = $1;''', fund)
+        # create embed
+        fund_embed = discord.Embed(title=f"{fund['name']}", description=f"Information about the {fund['name']}.")
+        fund_embed.add_field(name="Current Funds", value=f"{self.thaler}{fund['current_funds']:,.2f}")
+        fund_embed.add_field(name="Fund Limit", value=f"{self.thaler}{fund['fund_limit']:,.2f}")
+        fund_embed.add_field(name="\u200b", value="\u200b")
+        await interaction.followup.send(embed=fund_embed)
 
     @rbt.command(name='log', description="Sends a log of all trades, buys, sells, signed contracts, "
                                          "and marketplace transactions.")
@@ -832,7 +843,7 @@ class Economy(commands.Cog):
             stock_embed.add_field(name="Outstanding Shares", value=f"{stock['outstanding']}")
             stock_embed.add_field(name="Issued Shares", value=f"{stock['issued']}")
             stock_embed.add_field(name="\u200b", value="\u200b")
-            stock_embed.add_field(name="Trend", value=f"{stock['trending'].title()} {stock['change']*100:.2f}%")
+            stock_embed.add_field(name="Trend", value=f"{stock['trending'].title()} ({stock['change']*100:.2f}%)")
             stock_embed.add_field(name="Risk Type", value=f"{risk}")
             stock_embed.add_field(name="\u200b", value="\u200b")
             return await interaction.followup.send(embed=stock_embed)
@@ -1062,7 +1073,14 @@ class Economy(commands.Cog):
             stock_value = 0
             for shares in ledger_info:
                 stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
-                this_string = f"{shares['name']} (#{shares['stock_id']}): " \
+                risk = ""
+                if stock['risk'] == 1:
+                    risk = "Stable"
+                if stock['risk'] == 2:
+                    risk = "Moderate"
+                if stock['risk'] == 3:
+                    risk = "Volatile"
+                this_string = f"{shares['name']} (#{shares['stock_id']}, {risk}): " \
                               f"{shares['amount']} @ {self.thaler}{stock['value']:,.2f}"
                 if stock['trending'] == "up":
                     this_string += " :chart_with_upwards_trend: +"
