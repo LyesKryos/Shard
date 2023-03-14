@@ -689,8 +689,8 @@ class Economy(commands.Cog):
                             self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
                                                  "All stock values are decreased by 75%.\n "
                             self.crash = True
-                # ensure no stock drops below 6 - risk thaler (max at 5 thaler)
-                await conn.execute('''UPDATE stocks SET value = 6-risk WHERE value < 5-risk;''')
+                # ensure no stock drops below 5 - risk thaler (max at 5 thaler)
+                await conn.execute('''UPDATE stocks SET value = 5-risk WHERE value < 5-risk;''')
                 # update stocks' value tracker
                 await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
                 SELECT stock_id, value, trending FROM stocks;''')
