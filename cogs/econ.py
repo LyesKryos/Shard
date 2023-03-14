@@ -1164,7 +1164,7 @@ class Economy(commands.Cog):
         stocks = await conn.fetch('''SELECT * FROM stocks ORDER BY value DESC;''')
         stock_string = " "
         for stock in stocks[0:10]:
-            this_string = f"``{self.rank}. {stock['name']} (#{stock['stock_id']}: " \
+            this_string = f"``{rank}. {stock['name']} (#{stock['stock_id']}: " \
                           f"{self.thaler}{stock['value']:,.2f}"
             for space in range(0, 48 - len(this_string)):
                 this_string += " "
