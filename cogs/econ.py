@@ -414,7 +414,8 @@ class Economy(commands.Cog):
             view = RegisterView()
             await interaction.followup.send("By becoming a member of the Royal Bank of "
                                             "Thegye, you agree to abide by the Terms of Service "
-                                            "laid out here: LINK", view=view, ephemeral=True)
+                                            "laid out here: https://www.nationstates.net/page=dispatch/id=1849820",
+                                            view=view, ephemeral=True)
 
     @rbt.command(description="Displays Royal Bank of Thegye information about a specified member.",
                  name="info")
