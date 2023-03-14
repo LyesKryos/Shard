@@ -985,8 +985,8 @@ class Economy(commands.Cog):
         conn = self.bot.pool
         # ensure user is a member
         author = interaction.user
-        author = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', author.id)
-        if author is None:
+        author_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', author.id)
+        if author_info is None:
             return await interaction.followup.send("You are not a member of the Bank.")
         recipient_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''',
                                              recipient.id)
