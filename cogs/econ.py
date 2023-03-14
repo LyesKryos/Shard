@@ -1029,6 +1029,8 @@ class Economy(commands.Cog):
                            author.id, 'trade', f'Traded {amount} {stock["name"]} (id: {stock["stock_id"]}) to '
                                                f'{recipient.name}#{recipient.discriminator} ({recipient.id}) @ '
                                                f'{self.thaler}{stock["value"]}.')
+        return await interaction.followup.send(f"You have succesfuly sent {amount} shares of {stock['name']} to"
+                                               f"{recipient.name}#{recipient.discriminator}.")
 
     @exchange.command(name='portfolio', description='Displays information about all owned shares and stocks.')
     @app_commands.describe(user="A Discord user.")
