@@ -37,7 +37,7 @@ class RegisterView(View):
         user = interaction.user
         # fetch general fund information
         general_fund_raw = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'General Fund';''')
-        general_fund = general_fund_raw['funds']
+        general_fund = general_fund_raw['current_funds']
         # calculate starting gift, credit it towards the user, and remove thaler from fund
         registration_gift = round(general_fund * .001, 0)
         await conn.execute('''INSERT INTO rbt_users VALUES($1,$2);''',
@@ -1060,7 +1060,7 @@ class Economy(commands.Cog):
             stock_value = 0
             for shares in ledger_info:
                 stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
-                this_string = f"{shares['name']} (#{shares['stock_id']}: " \
+                this_string = f"{shares['name']} (#{shares['stock_id']}): " \
                               f"{shares['amount']} @ {self.thaler}{stock['value']:,.2f}"
                 if stock['trending'] == "up":
                     this_string += " :chart_with_upwards_trend: +"

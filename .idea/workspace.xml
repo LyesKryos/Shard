@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Putting link in for register">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding some QOL numbers and such" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -114,14 +111,7 @@
       <workItem from="1677854497071" duration="7957000" />
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
-      <workItem from="1678542957088" duration="14948000" />
-    </task>
-    <task id="LOCAL-00354" summary="Fixing dispatch id finding for factbooks that are without an id">
-      <created>1675736013866</created>
-      <option name="number" value="00354" />
-      <option name="presentableId" value="LOCAL-00354" />
-      <option name="project" value="LOCAL" />
-      <updated>1675736013866</updated>
+      <workItem from="1678542957088" duration="15297000" />
     </task>
     <task id="LOCAL-00355" summary="Fixing dispatch id">
       <created>1675736297131</created>
@@ -459,7 +449,14 @@
       <option name="project" value="LOCAL" />
       <updated>1678813447629</updated>
     </task>
-    <option name="localTasksCounter" value="403" />
+    <task id="LOCAL-00403" summary="Adding some QOL numbers and such">
+      <created>1678814405323</created>
+      <option name="number" value="00403" />
+      <option name="presentableId" value="LOCAL-00403" />
+      <option name="project" value="LOCAL" />
+      <updated>1678814405323</updated>
+    </task>
+    <option name="localTasksCounter" value="404" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -477,7 +474,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing pool" />
     <MESSAGE value="Optimized imports" />
     <MESSAGE value="Fixing roles for members leaving" />
     <MESSAGE value="Adding Minecraft access" />
@@ -502,7 +498,8 @@
     <MESSAGE value="Fixing syncing" />
     <MESSAGE value="Updating everything for beta testing" />
     <MESSAGE value="Putting link in for register" />
-    <option name="LAST_COMMIT_MESSAGE" value="Putting link in for register" />
+    <MESSAGE value="Adding some QOL numbers and such" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding some QOL numbers and such" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
