@@ -662,6 +662,9 @@ class Economy(commands.Cog):
                         value = (value -
                                  (((value_roll / 100) + (stock['outstanding'] / stock['issued'] * 10))
                                   * value))
+                        # if the value drops below the floor, set it to be 5 - risk
+                        if value < (5 - stock['risk']):
+                            value = 5 - stock['risk']
                         change = round(1 - (int(stock['value']) / value), 4)
 
                     # if the outstanding shares is between 25 and 50 shares away from the total issued shares,
@@ -701,8 +704,6 @@ class Economy(commands.Cog):
                             self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
                                                  "All stock values are decreased by 75%.\n "
                             self.crash = True
-                # ensure no stock drops below 5 - risk thaler (max at 5 thaler)
-                await conn.execute('''UPDATE stocks SET value = 5-risk WHERE value < 5-risk;''')
                 # update stocks' value tracker
                 await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
                 SELECT stock_id, value, trending FROM stocks;''')
