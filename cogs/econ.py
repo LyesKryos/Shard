@@ -154,8 +154,8 @@ class FeedView(View):
                 if stock['trending'] == "up":
                     this_string += "``:chart_with_upwards_trend: ``+"
                 else:
-                    this_string += "``:chart_with_downwards_trend: ``"
-                this_string += f"{stock['change'] * 100:.2f}%``\n"
+                    this_string += "``:chart_with_downwards_trend: ``-"
+                this_string += f"{abs(stock['change'] * 100):.2f}%``\n"
                 stock_string += this_string
                 self.rank += 1
             feed_embed = discord.Embed(title="Stocks by Share Price", description=stock_string)
@@ -210,8 +210,8 @@ class FeedView(View):
                 if stock['trending'] == "up":
                     this_string += "``:chart_with_upwards_trend: ``+"
                 else:
-                    this_string += "``:chart_with_downwards_trend: ``"
-                this_string += f"{stock['change'] * 100:.2f}%``\n"
+                    this_string += "``:chart_with_downwards_trend: ``-"
+                this_string += f"{abs(stock['change'] * 100):.2f}%``\n"
                 stock_string += this_string
                 self.rank += 1
             feed_embed = discord.Embed(title="Stocks by Share Price", description=stock_string)
@@ -1078,18 +1078,18 @@ class Economy(commands.Cog):
                 stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
                 risk = ""
                 if stock['risk'] == 1:
-                    risk = "Stable"
+                    risk = "S"
                 if stock['risk'] == 2:
-                    risk = "Moderate"
+                    risk = "M"
                 if stock['risk'] == 3:
-                    risk = "Volatile"
+                    risk = "V"
                 this_string = f"{shares['name']} (#{shares['stock_id']}, {risk}): " \
                               f"{shares['amount']} @ {self.thaler}{stock['value']:,.2f}"
                 if stock['trending'] == "up":
-                    this_string += " :chart_with_upwards_trend: +"
+                    this_string += " :chart_with_upwards_trend: ``+"
                 else:
-                    this_string += " :chart_with_downwards_trend: "
-                this_string += f"{stock['change'] * 100:.2f}%\n" \
+                    this_string += " :chart_with_downwards_trend: ``-"
+                this_string += f"{abs(stock['change'] * 100):.2f}%\n" \
                                f"> Sale value: {self.thaler}" \
                                f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
                 ledger_string += this_string
@@ -1196,8 +1196,8 @@ class Economy(commands.Cog):
             if stock['trending'] == "up":
                 this_string += "``:chart_with_upwards_trend: ``+"
             else:
-                this_string += "``:chart_with_downwards_trend: ``"
-            this_string += f"{stock['change'] * 100:.2f}%``\n"
+                this_string += "``:chart_with_downwards_trend: ``-"
+            this_string += f"{abs(stock['change'] * 100):.2f}%``\n"
             rank += 1
             stock_string += this_string
         # create embed
