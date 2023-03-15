@@ -149,13 +149,13 @@ class FeedView(View):
             for stock in stocks[(self.page * 10) - 10:self.page * 10]:
                 this_string = f"``{self.rank}. {stock['name']} (#{stock['stock_id']}): " \
                               f"{self.thaler}{stock['value']:,.2f}"
-                for space in range(0, 48 - len(this_string)):
+                for space in range(0, 50 - len(this_string)):
                     this_string += " "
                 if stock['trending'] == "up":
-                    this_string += "``:chart_with_upwards_trend: +"
+                    this_string += "``:chart_with_upwards_trend: ``+"
                 else:
-                    this_string += "``:chart_with_downwards_trend:"
-                this_string += f"``{stock['change'] * 100:.2f}%``\n"
+                    this_string += "``:chart_with_downwards_trend: ``"
+                this_string += f"{stock['change'] * 100:.2f}%``\n"
                 stock_string += this_string
                 self.rank += 1
             feed_embed = discord.Embed(title="Stocks by Share Price", description=stock_string)
@@ -205,13 +205,13 @@ class FeedView(View):
             for stock in stocks[(self.page * 10) - 10:self.page * 10]:
                 this_string = f"``{self.rank}. {stock['name']} (#{stock['stock_id']}): " \
                               f"{self.thaler}{stock['value']:,.2f}"
-                for space in range(0, 48 - len(this_string)):
+                for space in range(0, 50 - len(this_string)):
                     this_string += " "
                 if stock['trending'] == "up":
-                    this_string += "``:chart_with_upwards_trend: +"
+                    this_string += "``:chart_with_upwards_trend: ``+"
                 else:
-                    this_string += "``:chart_with_downwards_trend:"
-                this_string += f"``{stock['change'] * 100:.2f}%``\n"
+                    this_string += "``:chart_with_downwards_trend: ``"
+                this_string += f"{stock['change'] * 100:.2f}%``\n"
                 stock_string += this_string
                 self.rank += 1
             feed_embed = discord.Embed(title="Stocks by Share Price", description=stock_string)
@@ -1190,7 +1190,7 @@ class Economy(commands.Cog):
         for stock in stocks[0:10]:
             this_string = f"``{rank}. {stock['name']} (#{stock['stock_id']}): " \
                           f"{self.thaler}{stock['value']:,.2f}"
-            for space in range(0, 48 - len(this_string)):
+            for space in range(0, 50 - len(this_string)):
                 this_string += " "
             if stock['trending'] == "up":
                 this_string += "``:chart_with_upwards_trend: ``+"
