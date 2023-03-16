@@ -449,6 +449,28 @@ class Economy(commands.Cog):
             rbtm_embed.add_field(name="Thaler", value=f"{self.thaler}{rbt_member['funds']:,.2f}")
             rbtm_embed.add_field(name="Membership", value=f"{user_type}")
             return await interaction.followup.send(embed=rbtm_embed)
+        
+    @rbt.command(name='directory', description="Displays all registered members of the Royal Bank of Thegye.")
+    async def directory(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # define thegye
+        thegye = self.bot.get_guild(674259612580446230)
+        # establish connection
+        conn = self.bot.pool
+        # fetch all rbt members
+        rbt_members = await conn.fetch('''SELECT * FROM rbt_users;''')
+        # add each member to a string
+        member_string = ""
+        for member in rbt_members:
+            # fetch net worth
+            stock_worth = await conn.fetchrow('''SELECT SUM(value) FROM ledger WHERE user_id = $1;''',
+                                              member['user_id'])
+            # get the user object
+            user_obj = thegye.get_member(member['user_id'])
+            # add to list
+            member_string += f"{user_obj.display_name}"
+
 
     @rbt.command(name="create_contract", description="Creates a new contract.")
     @app_commands.describe(terms="The terms of your contract.")
@@ -1066,7 +1088,7 @@ class Economy(commands.Cog):
         else:
             # create embed for user portfolio
             portfolio_embed = discord.Embed(title=f"Portfolio of {user.nick}",
-                                            description=f"Value information of Royal Bank of Thegye member "
+                                            description=f"Portfolio information of Royal Bank of Thegye member "
                                                         f"{user.name}#{user.discriminator}.")
             portfolio_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
             portfolio_embed.add_field(name="Current Thaler", value=f"{self.thaler}{rbt_member['funds']:,.2f}")
