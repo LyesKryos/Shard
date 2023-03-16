@@ -227,8 +227,10 @@ class FeedView(View):
 
 class BlackjackView(View):
 
-    def __init__(self, bot: Shard, m, dealer_hand, player_hand, bet):
+    def __init__(self, author, bot: Shard, m, dealer_hand, player_hand, bet):
         super().__init__(timeout=120)
+        # define user
+        self.author = author
         # define bot
         self.bot = bot
         # message
@@ -568,6 +570,9 @@ class BlackjackView(View):
             lines = traceback.format_exception(etype, error, trace)
             traceback_text = ''.join(lines)
             self.bot.logger.warning(msg=f"{traceback_text}")
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.author.id
 
 
 def get_card_emoji(card):
@@ -1942,7 +1947,7 @@ class Economy(commands.Cog):
                                       value=f"{dealer_hand_string}")
             blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
             blackjack_message = await interaction.followup.send(embed=blackjack_embed)
-            await blackjack_message.edit(embed=blackjack_embed, view=BlackjackView(bot=self.bot, m=blackjack_message,
+            await blackjack_message.edit(embed=blackjack_embed, view=BlackjackView(author=interaction.user, bot=self.bot, m=blackjack_message,
                                                                                    bet=bet, player_hand=player_hand,
                                                                                    dealer_hand=dealer_hand))
 
