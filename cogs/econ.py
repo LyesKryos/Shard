@@ -454,15 +454,10 @@ class BlackjackView(View):
                 elif card == "A":
                     card = 11
                 dealer_total += card
-            while True:
-                if dealer_total < 17:
-                    self.dealer_hand.append(choice(self.deck))
-                    continue
-                else:
-                    break
+            while dealer_total < 17:
+                self.dealer_hand.append(choice(self.deck))
             # define emojis
             real_dealer_hand_string = "".join([get_card_emoji(c) for c in self.dealer_hand])
-            dealer_hand_string = f"{get_card_emoji(self.dealer_hand[0])}{get_card_emoji('back')}"
             player_hand_string = "".join([get_card_emoji(c) for c in self.player_hand])
             # define totals
             player_total = 0
