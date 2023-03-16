@@ -1278,7 +1278,7 @@ class Economy(commands.Cog):
                                                        f"Dates should be formatted day/month/year. For example: "
                                                        f"9/1/2020.\n"
                                                        f"This command also accepts `today`, `week`, `month`, "
-                                                       f"and `forever` as acceptable arguments.")
+                                                       f"and `forever` as acceptable arguments.", ephemeral=True)
         # if the end date is none, get the time now
         if end_date is None:
             end_date = datetime.now()
@@ -1299,7 +1299,7 @@ class Economy(commands.Cog):
         ax.plot(dates, stock_prices)
         ax.xaxis.set_major_locator(DayLocator(interval=1))
         ax.xaxis.set_minor_locator(HourLocator(interval=1))
-        ax.xaxis.set_major_formatter(DateFormatter("%m/%d/%y"))
+        ax.xaxis.set_major_formatter(DateFormatter("%d/%m/%y"))
         fig.autofmt_xdate()
         if start_date.day - end_date.day >= 3:
             plt.grid(True, which="major")
