@@ -473,8 +473,8 @@ class Economy(commands.Cog):
                 # fetch stock info
                 stock_info = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''',
                                                  stock['stock_id'])
-                stock_value += stock['amount'] * stock_info['value']
-            total_value = stock_value + member['funds']
+                stock_value += stock['amount'] * float(stock_info['value'])
+            total_value = stock_value + float(member['funds'])
             member_dict += {member['user_id']: total_value}
         await interaction.followup.send(f"{member_dict}")
 

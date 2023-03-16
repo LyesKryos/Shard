@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating portfolio description">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Testing directory command">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
@@ -115,14 +115,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="13673000" />
-    </task>
-    <task id="LOCAL-00371" summary="Fixing minor type issue">
-      <created>1677589604163</created>
-      <option name="number" value="00371" />
-      <option name="presentableId" value="LOCAL-00371" />
-      <option name="project" value="LOCAL" />
-      <updated>1677589604163</updated>
+      <workItem from="1678819823954" duration="14114000" />
     </task>
     <task id="LOCAL-00372" summary="Fixing minor directory issue">
       <created>1677590323790</created>
@@ -460,7 +453,14 @@
       <option name="project" value="LOCAL" />
       <updated>1678973211910</updated>
     </task>
-    <option name="localTasksCounter" value="420" />
+    <task id="LOCAL-00420" summary="Testing directory command">
+      <created>1678975064624</created>
+      <option name="number" value="00420" />
+      <option name="presentableId" value="LOCAL-00420" />
+      <option name="project" value="LOCAL" />
+      <updated>1678975064624</updated>
+    </task>
+    <option name="localTasksCounter" value="421" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -478,7 +478,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding daily dump updating processing" />
     <MESSAGE value="Fixing daily dump" />
     <MESSAGE value="Testing econ" />
     <MESSAGE value="Fixing WA updating" />
@@ -503,7 +502,8 @@
     <MESSAGE value="Fixing display for decreasing stocks" />
     <MESSAGE value="Fixing portfolio" />
     <MESSAGE value="Updating portfolio description" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating portfolio description" />
+    <MESSAGE value="Testing directory command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Testing directory command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
