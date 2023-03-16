@@ -381,7 +381,7 @@ class Economy(commands.Cog):
                         await conn.execute('''UPDATE rbt_users SET funds = funds + 20 WHERE user_id = $1;''',
                                            official.id)
                         await conn.execute(
-                            '''UPDATE funds SET general_fund = general_fund - 20 WHERE name = 'General Fund';''')
+                            '''UPDATE funds SET current_funds = current_funds - 20 WHERE name = 'General Fund';''')
                 await bankchannel.send("Royal Bank of Thegye updated.")
                 continue
             except Exception as error:
@@ -944,7 +944,7 @@ class Economy(commands.Cog):
                     await conn.execute('''UPDATE rbt_users SET funds = funds + 20 WHERE user_id = $1;''',
                                        official.id)
                     await conn.execute(
-                        '''UPDATE funds SET general_fund = general_fund - 20 WHERE name = 'General Fund';''')
+                        '''UPDATE funds SET current_funds = current_funds - 20 WHERE name = 'General Fund';''')
             await bankchannel.send("Royal Bank of Thegye updated.")
         except Exception as error:
             etype = type(error)
