@@ -849,6 +849,110 @@ class Economy(commands.Cog):
         self.announcement = \
             "The Royal Exchange of Thegye has updated. Below is a summary of any important changes:\n"
 
+    @commands.command()
+    @commands.is_owner()
+    async def force_bank_update(self, ctx):
+        try:
+            # define channel
+            bankchannel = ctx.channel
+            # establish connection
+            conn = self.bot.pool
+            # GENERAL FUND CHECKS
+            # check general fund for minting/refund
+            general_fund = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'General Fund';''')
+            # if the general fund is near/overdrawn
+            if general_fund['current_funds'] <= (.02 * general_fund['fund_limit']):
+                # set new fund to 150% of old fund
+                new_limit = general_fund['fund_limit'] * 1.5
+                additional_funds = general_fund['fund_limit'] * .5
+                # ADD MARKET INCREASES/DECREASES HERE
+                # update funds
+                await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = current_funds + $2 
+                        WHERE name = 'General Fund';''', new_limit, additional_funds)
+            # if the general fund is overfunded
+            if general_fund['current_funds'] > general_fund['fund_limit']:
+                # ensure the general fund is more than 500,000 thaler
+                if general_fund['fund_limit'] > 500000:
+                    # set the new fund limit to 50%
+                    new_limit = general_fund['fund_limit'] * .5
+                    # calculate refund and new current funds
+                    new_funds = general_fund['fund_limit'] * .25
+                    refund = general_fund['current_funds'] - general_fund['fund_limit']
+                    await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = $2 
+                            WHERE name = 'General Fund';''', new_limit, new_funds)
+                    # count the number of investors
+                    investor_count = await conn.fetchrow('''SELECT COUNT(DESTINCT user_id) 
+                            FROM bank_ledger WHERE type = 'Investment';''')
+                    # calculate how much each investor will receive
+                    investor_cut = (refund * .25) / investor_count['count']
+                    # count the number of premium members
+                    premium_count = await conn.fetchrow('''SELECT COUNT(DESTINCT user_id) 
+                            FROM rbt_users WHERE premeium_user = TRUE AND suspended = FALSE;''')
+                    # calculate how much each premium user will receive
+                    premium_cut = (refund * .25) / premium_count['count']
+                    # count the number of recruiters who have sent more than 100 TGs this month
+                    sender_count = await conn.fetchrow('''SELECT COUNT(DESTINCT user_id) 
+                            FROM recruitment WHERE sent_this_month > 100;''')
+                    # calculate sender cut
+                    sender_cut = (refund * .25) / sender_count['count']
+                    # count the number of registered members
+                    member_count = await conn.fetchrow('''SELECT COUNT(DESTINCT user_id) 
+                            FROM rbt_users WHERE suspended = FALSE;''')
+                    # calculate the member cut
+                    member_cut = (refund * .25) / member_count['count']
+                    # credit premium group
+                    await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
+                            WHERE premeium_user = TRUE AND suspended = FALSE;''', premium_cut)
+                    # credit member group
+                    await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
+                            WHERE suspended = FALSE;''', member_cut)
+                    # credit investor group
+                    investors = await conn.fetch('''SELECT * FROM bank_ledger WHERE type = 'investment';''')
+                    for investor in investors:
+                        await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2
+                                AND suspended = FALSE;''', investor_cut, investor['user_id'])
+                    # credit sender group
+                    senders = await conn.fetch('''SELECT user_id FROM recruitment WHERE sent_this_month > 100;''')
+                    for sender in senders:
+                        await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2
+                                                AND suspended = FALSE;''', sender_cut, sender['user_id'])
+                    self.announcement += "***The Royal Bank of Thegye has issued a general refund!***"
+            # INVESTMENT/LOAN UPDATES
+            # fetch sum of all investments
+            investment_sum_raw = await conn.fetchrow('''SELECT SUM(amount) FROM bank_ledger 
+            WHERE type = 'Investment';''')
+            if investment_sum_raw['sum'] is None:
+                investment_sum = 0
+            else:
+                investment_sum = investment_sum_raw['sum']
+            # increase investments by 2% for investors
+            await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'Investment';''')
+            # increase investment fund by 2%
+            await conn.execute(
+                '''UPDATE funds SET current_funds = current_funds * 1.02 WHERE name = 'Investment Fund';''')
+            # pay 6% dividend to general fund
+            await conn.execute(
+                '''UPDATE funds SET current_funds = current_funds + $1 WHERE name = 'General Fund';''',
+                (investment_sum * .06))
+            # increase loan interest by 1.5%
+            await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'Loan';''')
+            # payroll
+            thegye = self.bot.get_guild(674259612580446230)
+            official_role = thegye.get_role(674278988323225632)
+            for official in official_role.members:
+                if datetime.now().weekday() <= 5:
+                    await conn.execute('''UPDATE rbt_users SET funds = funds + 20 WHERE user_id = $1;''',
+                                       official.id)
+                    await conn.execute(
+                        '''UPDATE funds SET general_fund = general_fund - 20 WHERE name = 'General Fund';''')
+            await bankchannel.send("Royal Bank of Thegye updated.")
+        except Exception as error:
+            etype = type(error)
+            trace = error.__traceback__
+            lines = traceback.format_exception(etype, error, trace)
+            traceback_text = ''.join(lines)
+            self.bot.logger.warning(msg=f"{traceback_text}")
+
     @exchange.command(description="Displays information about a specified stock.", name="stock")
     @app_commands.describe(stock_id="The name or ID of the stock")
     async def stock(self, interaction: discord.Interaction, stock_id: str):
