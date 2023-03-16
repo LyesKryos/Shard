@@ -475,7 +475,7 @@ class Economy(commands.Cog):
                                                  stock['stock_id'])
                 stock_value += stock['amount'] * float(stock_info['value'])
             total_value = stock_value + float(member['funds'])
-            member_dict += {member['user_id']: total_value}
+            member_dict.update({member['user_id']: total_value})
         await interaction.followup.send(f"{member_dict}")
 
 
