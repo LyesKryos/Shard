@@ -1259,7 +1259,8 @@ class Economy(commands.Cog):
             try:
                 stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', int(stock_id))
             except ValueError:
-                return await interaction.followup.send(f"``{stock_id}`` does not exist on the Exchange.")
+                return await interaction.followup.send(f"``{stock_id}`` does not exist on the Exchange.",
+                                                       ephemeral=True)
         # get datetime objects
         # if start_date is today, set for today
         if start_date.lower() == "today":
