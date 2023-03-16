@@ -481,13 +481,12 @@ class Economy(commands.Cog):
         # create string
         ranked_string = ""
         for ranked_member in ranked_members:
-            this_string = f"{ranked_members.index(ranked_member)} {thegye.get_member(ranked_member[0]).display_name}"
-            for space in range(0, 50-len(this_string)):
-                this_string += " "
-            this_string += f"{self.thaler}{ranked_member[1]:,.2f}\n"
+            this_string = f"{ranked_members.index(ranked_member)+1} {thegye.get_member(ranked_member[0]).display_name}:"
+            this_string += f" {self.thaler}{ranked_member[1]:,.2f}\n"
             ranked_string += this_string
         # create and send embed
         directory_embed = discord.Embed(title="Royal Bank of Thegye Directory", description=ranked_string)
+        directory_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
         await interaction.followup.send(embed=directory_embed)
 
     @rbt.command(name="create_contract", description="Creates a new contract.")
