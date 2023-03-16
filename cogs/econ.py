@@ -324,8 +324,12 @@ class BlackjackView(View):
                 elif card == "A":
                     card = 11
                 dealer_total += card
-            if dealer_total < 17:
-                self.dealer_hand.append(choice(self.deck))
+            while True:
+                if dealer_total < 17:
+                    self.dealer_hand.append(choice(self.deck))
+                    continue
+                else:
+                    break
             # define user
             user = interaction.user
             # define bust
@@ -357,7 +361,7 @@ class BlackjackView(View):
                 dealer_total += card
             # if the total is more than 21, change aces
             if player_total > 21:
-                if any(self.player_hand) == 11:
+                if 11 in self.player_hand:
                     for ace in self.player_hand:
                         if ace == 11:
                             player_total -= 10
@@ -366,6 +370,13 @@ class BlackjackView(View):
                 # otherwise, the player busts
                 else:
                     bust = True
+            if dealer_total > 21:
+                if 11 in self.dealer_hand:
+                    for ace in self.dealer_hand:
+                        if ace == 11:
+                            player_total -= 10
+                        if player_total < 21:
+                            break
             if player_total == 21:
                 # create embed
                 blackjack_embed = discord.Embed(title="Blackjack",
@@ -447,8 +458,12 @@ class BlackjackView(View):
                 elif card == "A":
                     card = 11
                 dealer_total += card
-            if dealer_total < 17:
-                self.dealer_hand.append(choice(self.deck))
+            while True:
+                if dealer_total < 17:
+                    self.dealer_hand.append(choice(self.deck))
+                    continue
+                else:
+                    break
             # define emojis
             real_dealer_hand_string = "".join([get_card_emoji(c) for c in self.dealer_hand])
             dealer_hand_string = f"{get_card_emoji(self.dealer_hand[0])}{get_card_emoji('back')}"
@@ -474,8 +489,15 @@ class BlackjackView(View):
                 dealer_total += card
             # if the total is more than 21, change aces
             if player_total > 21:
-                if any(self.player_hand) == 11:
+                if 11 in self.player_hand:
                     for ace in self.player_hand:
+                        if ace == 11:
+                            player_total -= 10
+                        if player_total < 21:
+                            break
+            if dealer_total > 21:
+                if 11 in self.dealer_hand:
+                    for ace in self.dealer_hand:
                         if ace == 11:
                             player_total -= 10
                         if player_total < 21:
@@ -1902,7 +1924,7 @@ class Economy(commands.Cog):
             dealer_total += card
         # if the total is more than 21, change aces
         if player_total > 21:
-            if any(player_hand) == 11:
+            if 11 in player_hand:
                 for ace in player_hand:
                     if ace == 11:
                         player_total -= 10
@@ -1911,6 +1933,13 @@ class Economy(commands.Cog):
             # otherwise, the player busts
             else:
                 bust = True
+        if dealer_total > 21:
+            if 11 in dealer_hand:
+                for ace in dealer_hand:
+                    if ace == 11:
+                        player_total -= 10
+                    if player_total < 21:
+                        break
         if player_total == 21:
             # create embed
             blackjack_embed = discord.Embed(title="Blackjack",

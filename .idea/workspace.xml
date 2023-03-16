@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing wire command">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Altering tax policy for all transactions">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,14 +114,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="25413000" />
-    </task>
-    <task id="LOCAL-00390" summary="Fixing daily dump">
-      <created>1677722876821</created>
-      <option name="number" value="00390" />
-      <option name="presentableId" value="LOCAL-00390" />
-      <option name="project" value="LOCAL" />
-      <updated>1677722876821</updated>
+      <workItem from="1678819823954" duration="26454000" />
     </task>
     <task id="LOCAL-00391" summary="Fixing daily dump">
       <created>1677852094974</created>
@@ -460,7 +452,14 @@
       <option name="project" value="LOCAL" />
       <updated>1678996014673</updated>
     </task>
-    <option name="localTasksCounter" value="439" />
+    <task id="LOCAL-00439" summary="Altering tax policy for all transactions">
+      <created>1678997574406</created>
+      <option name="number" value="00439" />
+      <option name="presentableId" value="LOCAL-00439" />
+      <option name="project" value="LOCAL" />
+      <updated>1678997574406</updated>
+    </task>
+    <option name="localTasksCounter" value="440" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -478,7 +477,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding some QOL numbers and such" />
     <MESSAGE value="Fixing trading" />
     <MESSAGE value="Fixing trading message" />
     <MESSAGE value="Fixing feed stock id display" />
@@ -503,7 +501,8 @@
     <MESSAGE value="Fixing wording for overdrawn stocks&#10;Adding wire command." />
     <MESSAGE value="Buttons for blasckjack and be used only by the user who called the original interaction" />
     <MESSAGE value="Fixing wire command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing wire command" />
+    <MESSAGE value="Altering tax policy for all transactions" />
+    <option name="LAST_COMMIT_MESSAGE" value="Altering tax policy for all transactions" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
