@@ -460,16 +460,23 @@ class Economy(commands.Cog):
         conn = self.bot.pool
         # fetch all rbt members
         rbt_members = await conn.fetch('''SELECT * FROM rbt_users;''')
-        # add each member to a string
-        member_string = ""
+        # create dictionary
+        member_dict = {}
+        # calculate net worth
         for member in rbt_members:
-            # fetch net worth
-            stock_worth = await conn.fetchrow('''SELECT SUM(value) FROM ledger WHERE user_id = $1;''',
-                                              member['user_id'])
-            # get the user object
-            user_obj = thegye.get_member(member['user_id'])
-            # add to list
-            member_string += f"{user_obj.display_name}"
+            # fetch member ledger
+            ledger = await conn.fetch('''SELECT * FROM ledger WHERE user_id = $1;''',
+                                        member['user_id'])
+            # calculate total stock value
+            stock_value = 0
+            for stock in ledger:
+                # fetch stock info
+                stock_info = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''',
+                                                 stock['stock_id'])
+                stock_value += stock['amount'] * stock_info['value']
+            total_value = stock_value + member['funds']
+            member_dict += {member['user_id']: total_value}
+        await interaction.followup.send(f"{member_dict}")
 
 
     @rbt.command(name="create_contract", description="Creates a new contract.")
@@ -673,22 +680,18 @@ class Economy(commands.Cog):
                             trending = "up"
                         else:
                             trending = "down"
+                    # calculation: new_value = value + ((percentage increase + outsanding over issued) * value)
                     value_roll = uniform(1, 7 * stock['risk'])
                     # if the trend is up, increase stock based on risk
                     if trending == "up":
-                        value = (value +
-                                 (((value_roll / 100) + (stock['outstanding'] / stock['issued'] * 10))
-                                  * value))
+                        value = value + (((value_roll / 100) + (stock['outstanding'] / stock['issued'] * 10)) * value)
                         change = round(1 - (int(stock['value']) / value), 4)
                     else:
-                        value = (value -
-                                 (((value_roll / 100) + (stock['outstanding'] / stock['issued'] * 10))
-                                  * value))
+                        value = value - (((value_roll / 100) + (stock['outstanding'] / stock['issued'] * 10)) * value)
                         # if the value drops below the floor, set it to be 5 - risk
                         if value < (5 - stock['risk']):
                             value = 5 - stock['risk']
                         change = round(1 - (int(stock['value']) / value), 4)
-
                     # if the outstanding shares is between 25 and 50 shares away from the total issued shares,
                     # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
                     if stock['issued'] - stock['outstanding'] < randint(25, 50):
@@ -697,8 +700,9 @@ class Economy(commands.Cog):
                             new_shares = stock['issued'] / 5
                             dilution = round(uniform(5 * stock['risk'], 10 * stock['risk']), 2)
                             diluted_value = value * (clip(dilution, 0, 23) / 100)
-                            self.announcement += f"{stock['name']} has been diluted. Issued shares have increased to {new_shares}," \
-                                                 f" and the diluted value is now {self.thaler}{diluted_value} per share.\n"
+                            self.announcement += f"{stock['name']} has been diluted. Issued shares have increased to " \
+                                                 f"{new_shares}, and the diluted value is now " \
+                                                 f"{self.thaler}{diluted_value} per share.\n"
                     # update stock information
                     await conn.execute('''UPDATE stocks SET value = ROUND($1,2), issued = issued + $2, trending = $3, 
                     change = $4 WHERE stock_id = $5;''', value, new_shares, trending, change, stock['stock_id'])
@@ -719,7 +723,7 @@ class Economy(commands.Cog):
                         self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
                                              "All stock values are decreased by 75%.\n "
                 crash_chance = uniform(1, 100)
-                if crash_chance <= 9:
+                if crash_chance <= 1:
                     if self.crash is False:
                         if stock_sum['sum'] > 10 * stock_count['count']:
                             await conn.execute('''UPDATE stocks SET value = round((value * .25)::numeric, 2);''')
