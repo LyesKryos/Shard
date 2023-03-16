@@ -324,12 +324,8 @@ class BlackjackView(View):
                 elif card == "A":
                     card = 11
                 dealer_total += card
-            while True:
-                if dealer_total < 17:
-                    self.dealer_hand.append(choice(self.deck))
-                    continue
-                else:
-                    break
+            while dealer_total < 17:
+                self.dealer_hand.append(choice(self.deck))
             # define user
             user = interaction.user
             # define bust
