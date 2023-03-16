@@ -945,7 +945,7 @@ class Economy(commands.Cog):
             return await interaction.followup.send(f"You do not have {self.thaler}{amount:,.2f}")
         # otherwise, send funds
         await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''', amount, recipient.id)
-        await conn.execute('''UPDATE rbt_users SET fund = funds - $1 WHERE user_id = $2;''', amount, author.id)
+        await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''', amount, author.id)
         await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                            author.id, 'trade', f"Wired {self.thaler}{amount} to "
                                                f"{recipient.name}#{recipient.discriminator} (ID:{recipient.id}")
