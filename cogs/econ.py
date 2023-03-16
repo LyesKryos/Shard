@@ -479,7 +479,7 @@ class Economy(commands.Cog):
         # sort members by total value
         ranked_members = sorted(member_dict.items(), key=lambda x: x[1], reverse=True)
         # create string
-        ranked_string = "Members are ranked on their net worth.\n\n"
+        ranked_string = "Members are ranked by their net worth.\n\n"
         for ranked_member in ranked_members:
             this_string = f"{ranked_members.index(ranked_member)+1}. {thegye.get_member(ranked_member[0]).display_name}"
             this_string += f": {self.thaler}{ranked_member[1]:,.2f}\n"
