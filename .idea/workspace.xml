@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing wording for overdrawn stocks&#10;Adding wire command.">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing wire command">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -114,21 +115,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="23668000" />
-    </task>
-    <task id="LOCAL-00388" summary="Adding daily dump updating processing">
-      <created>1677623224371</created>
-      <option name="number" value="00388" />
-      <option name="presentableId" value="LOCAL-00388" />
-      <option name="project" value="LOCAL" />
-      <updated>1677623224371</updated>
-    </task>
-    <task id="LOCAL-00389" summary="Adding daily dump updating processing">
-      <created>1677623265200</created>
-      <option name="number" value="00389" />
-      <option name="presentableId" value="LOCAL-00389" />
-      <option name="project" value="LOCAL" />
-      <updated>1677623265200</updated>
+      <workItem from="1678819823954" duration="25413000" />
     </task>
     <task id="LOCAL-00390" summary="Fixing daily dump">
       <created>1677722876821</created>
@@ -459,7 +446,21 @@
       <option name="project" value="LOCAL" />
       <updated>1678995289599</updated>
     </task>
-    <option name="localTasksCounter" value="437" />
+    <task id="LOCAL-00437" summary="Buttons for blackjack and be used only by the user who called the original interaction">
+      <created>1678995594061</created>
+      <option name="number" value="00437" />
+      <option name="presentableId" value="LOCAL-00437" />
+      <option name="project" value="LOCAL" />
+      <updated>1678995594061</updated>
+    </task>
+    <task id="LOCAL-00438" summary="Fixing wire command">
+      <created>1678996014673</created>
+      <option name="number" value="00438" />
+      <option name="presentableId" value="LOCAL-00438" />
+      <option name="project" value="LOCAL" />
+      <updated>1678996014673</updated>
+    </task>
+    <option name="localTasksCounter" value="439" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -477,8 +478,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updating everything for beta testing" />
-    <MESSAGE value="Putting link in for register" />
     <MESSAGE value="Adding some QOL numbers and such" />
     <MESSAGE value="Fixing trading" />
     <MESSAGE value="Fixing trading message" />
@@ -502,7 +501,9 @@
     <MESSAGE value="Fixing slots" />
     <MESSAGE value="Fixing casino rank" />
     <MESSAGE value="Fixing wording for overdrawn stocks&#10;Adding wire command." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing wording for overdrawn stocks&#10;Adding wire command." />
+    <MESSAGE value="Buttons for blasckjack and be used only by the user who called the original interaction" />
+    <MESSAGE value="Fixing wire command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing wire command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

@@ -931,6 +931,11 @@ class Economy(commands.Cog):
         conn = self.bot.pool
         # define user
         author = interaction.user
+        # calculate fee
+        tax = round(.005 * amount, 2)
+        if tax < .01:
+            tax = .01
+        total = tax + amount
         # check if user is registered
         author_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', author.id)
         if author_info is None:
@@ -941,17 +946,18 @@ class Economy(commands.Cog):
             return await interaction.followup.send(f"{recipient.display_name} is not a"
                                                    f" registered member of the Royal Bank of Thegye.")
         # check if the sender has enough thaler
-        if amount > author_info['funds']:
+        if total > author_info['funds']:
             return await interaction.followup.send(f"You do not have {self.thaler}{amount:,.2f}")
         # otherwise, send funds
         await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''', amount, recipient.id)
-        await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''', amount, author.id)
+        await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''', total, author.id)
         await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                            author.id, 'trade', f"Wired {self.thaler}{amount} to "
-                                               f"{recipient.name}#{recipient.discriminator} (ID:{recipient.id}")
+                                               f"{recipient.name}#{recipient.discriminator} (ID:{recipient.id})")
+        await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 WHERE name = 'General Fund';''', tax)
         await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                            recipient.id, 'trade', f"Received {self.thaler}{amount} from "
-                                               f"{author.name}#{author.discriminator} (ID:{author.id}")
+                                               f"{author.name}#{author.discriminator} (ID:{author.id})")
         return await interaction.followup.send(f"You have successfully sent {self.thaler}{amount} to "
                                                f"{recipient.display_name}.")
 
@@ -1490,7 +1496,9 @@ class Economy(commands.Cog):
             return await interaction.followup.send(f"You are not a registered member of the Royal Bank of Thegye.")
         # define transaction cost
         base_price = round(float(stock['value']) * amount, 2)
-        tax = math.ceil(base_price * .005)
+        tax = round(base_price * .005, 2)
+        if tax < .01:
+            tax = .01
         transaction = round(base_price + tax, 2)
         # check for sufficient funds and return if not
         if transaction > rbt_member['funds']:
@@ -1572,7 +1580,9 @@ class Economy(commands.Cog):
             amount = shares['amount']
         # calculate transaction
         base_price = round(float(stock['value']) * amount, 2)
-        tax = math.ceil(base_price * .005)
+        tax = round(base_price * .005, 2)
+        if tax < .01:
+            tax = .01
         transaction = round(base_price - tax, 2)
         # ADD FUND MINTING CHECK LATER
         # remove stock from ledger
