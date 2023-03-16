@@ -481,7 +481,7 @@ class Economy(commands.Cog):
         # create string
         ranked_string = "Members are ranked by their net worth.\n\n"
         for ranked_member in ranked_members:
-            this_string = f"{ranked_members.index(ranked_member)+1}. <@{thegye.get_member(ranked_member[0])}>"
+            this_string = f"{ranked_members.index(ranked_member)+1}. <@{thegye.get_member(ranked_member[0]).id}>"
             this_string += f": {self.thaler}{ranked_member[1]:,.2f}\n"
             ranked_string += this_string
         # create and send embed
