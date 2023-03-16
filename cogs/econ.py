@@ -46,7 +46,6 @@ class RegisterView(View):
                            user.id)
         await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 WHERE name = 'General Fund';''',
                            registration_gift)
-
         await interaction.response.edit_message(view=self)
         return await interaction.followup.send(f"{user.name}#{user.discriminator} has been registered "
                                                f"as a new member of the Royal Bank of Thegye.\n"
@@ -1968,22 +1967,42 @@ class Economy(commands.Cog):
         if all(s == slots[0] for s in slots) and slots[0] in jackpot_combo:
             slots_embed.add_field(name="***JACKPOT***", value=f"Total winnings of {self.thaler}{jackpot:,.2f}!",
                                   inline=False)
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               jackpot, user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'casino', f'Won {self.thaler}{jackpot:,.2f} at slots')
             return await interaction.followup.send(embed=slots_embed)
         # search for triple combos
         elif all(s == slots[0] for s in slots) and slots[0] in triple_combo:
             slots_embed.add_field(name="TRIPLE COMBO", value=f"Total winnings of {self.thaler}{triple:,.2f}!")
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               triple, user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'casino', f'Won {self.thaler}{triple:,.2f} at slots')
             return await interaction.followup.send(embed=slots_embed)
         # search for double combos
         elif (slot1 in slots[1:2] and slot1 in double_combo) or (slot2 in [slots[0], slots[2]] and slot2 in double_combo) or (slot3 in slots[0:1] and slot3 in double_combo):
             slots_embed.add_field(name="DOUBLE COMBO", value=f"Total winnings of {self.thaler}{double:,.2f}!")
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               double, user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'casino', f'Won {self.thaler}{double:,.2f} at slots')
             return await interaction.followup.send(embed=slots_embed)
         # search for single combos
         elif slots[0] in single_combo or slots[1] in single_combo or slots[2] in single_combo:
             slots_embed.add_field(name="SINGLE COMBO", value=f"Total winnings of {self.thaler}{single:,.2f}!")
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               single, user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'casino', f'Won {self.thaler}{single:,.2f} at slots')
             return await interaction.followup.send(embed=slots_embed)
         # return no combos
         else:
             slots_embed.add_field(name="***LOSS***", value=f"Total winnings of -{self.thaler}{bet:,.2f}!")
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               -bet, user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'casino', f'Lost {self.thaler}{bet:,.2f} at slots')
             return await interaction.followup.send(embed=slots_embed)
 
 
