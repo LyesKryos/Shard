@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing bank updating">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Altering graphing to be nice looking">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,21 +115,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="16798000" />
-    </task>
-    <task id="LOCAL-00382" summary="Testing load">
-      <created>1677598549973</created>
-      <option name="number" value="00382" />
-      <option name="presentableId" value="LOCAL-00382" />
-      <option name="project" value="LOCAL" />
-      <updated>1677598549973</updated>
-    </task>
-    <task id="LOCAL-00383" summary="Testing load">
-      <created>1677600069118</created>
-      <option name="number" value="00383" />
-      <option name="presentableId" value="LOCAL-00383" />
-      <option name="project" value="LOCAL" />
-      <updated>1677600069118</updated>
+      <workItem from="1678819823954" duration="18436000" />
     </task>
     <task id="LOCAL-00384" summary="Testing load">
       <created>1677600200529</created>
@@ -459,7 +446,21 @@
       <option name="project" value="LOCAL" />
       <updated>1678976665979</updated>
     </task>
-    <option name="localTasksCounter" value="431" />
+    <task id="LOCAL-00431" summary="Altering graphing to be nice looking">
+      <created>1678979124757</created>
+      <option name="number" value="00431" />
+      <option name="presentableId" value="LOCAL-00431" />
+      <option name="project" value="LOCAL" />
+      <updated>1678979124757</updated>
+    </task>
+    <task id="LOCAL-00432" summary="Altering graphing to be nice looking">
+      <created>1678979192170</created>
+      <option name="number" value="00432" />
+      <option name="presentableId" value="LOCAL-00432" />
+      <option name="project" value="LOCAL" />
+      <updated>1678979192170</updated>
+    </task>
+    <option name="localTasksCounter" value="433" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -477,7 +478,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing WA updating" />
     <MESSAGE value="Adding econ.py" />
     <MESSAGE value="Adding syncing" />
     <MESSAGE value="Fixing errors.py" />
@@ -502,7 +502,8 @@
     <MESSAGE value="Testing directory command" />
     <MESSAGE value="Adding force_bank_update command" />
     <MESSAGE value="Fixing bank updating" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing bank updating" />
+    <MESSAGE value="Altering graphing to be nice looking" />
+    <option name="LAST_COMMIT_MESSAGE" value="Altering graphing to be nice looking" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

@@ -5,7 +5,7 @@ import math
 import traceback
 import typing
 from datetime import datetime, timedelta
-from random import randint, uniform
+from random import randint, uniform, choice
 import discord
 from dateutil.relativedelta import relativedelta
 from discord import app_commands
@@ -42,6 +42,8 @@ class RegisterView(View):
         registration_gift = round(general_fund_raw['fund_limit'] * .001, 0)
         await conn.execute('''INSERT INTO rbt_users VALUES($1,$2);''',
                            user.id, registration_gift)
+        await conn.execute('''INSERT INTO casino_rank(user_id) VALUES($1);''',
+                           user.id)
         await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 WHERE name = 'General Fund';''',
                            registration_gift)
 
@@ -223,6 +225,431 @@ class FeedView(View):
             lines = traceback.format_exception(etype, error, trace)
             traceback_text = ''.join(lines)
             self.bot.logger.warning(msg=f"{traceback_text}")
+
+class BlackjackView(View):
+
+    def __init__(self, bot: Shard, m, dealer_hand, player_hand, bet):
+        super().__init__(timeout=120)
+        # define bot
+        self.bot = bot
+        # message
+        self.message = m
+        # dealer hand
+        self.dealer_hand = dealer_hand
+        # player hand
+        self.player_hand = player_hand
+        # deck
+        self.deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'] * 4
+        # bet
+        self.bet = bet
+        # thaler
+        self.thaler = "\u20B8"
+
+    async def on_timeout(self) -> None:
+        # disable all buttons
+        for button in self.children:
+            button.disabled = True
+        return await self.message.edit(view=self)
+
+    @discord.ui.button(label="Fold", style=discord.ButtonStyle.danger)
+    async def fold(self, interaction: discord.Interaction, fold_button: discord.Button):
+        try:
+            # defer response
+            await interaction.response.defer(thinking=False)
+            # define user
+            user = interaction.user
+            # establish connection
+            conn = interaction.client.pool
+            # define emojis
+            dealer_hand_string = "".join([get_card_emoji(c) for c in self.dealer_hand])
+            player_hand_string = "".join([get_card_emoji(c) for c in self.player_hand])
+            # define totals
+            player_total = 0
+            for card in self.player_hand:
+                # if the card is a face card, give it a value of 10
+                if card == "J" or card == "Q" or card == "K":
+                    card = 10
+                # if the card is an ace, give it a value of 11
+                elif card == "A":
+                    card = 11
+                player_total += card
+            dealer_total = 0
+            for card in self.dealer_hand:
+                # if the card is a face card, give it a value of 10
+                if card == "J" or card == "Q" or card == "K":
+                    card = 10
+                # if the card is an ace, give it a value of 11
+                elif card == "A":
+                    card = 11
+                dealer_total += card
+            # create embed
+            blackjack_embed = discord.Embed(title="Blackjack", description="A game of blackjack at the Casino Royal.")
+            blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+            blackjack_embed.add_field(name="Dealer's Hand",
+                                      value=f"{dealer_hand_string} (total: {dealer_total})")
+            blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+            blackjack_embed.add_field(name="Result", value="***FOLD***", inline=False)
+            winnings = self.bet
+            blackjack_embed.set_footer(text=f"Your total winnings: -{self.thaler}{winnings:,.2f}")
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               -winnings, user.id)
+            await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                               -winnings, user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'casino', f'Lost {self.thaler}{winnings:,.2f} at blackjack')
+
+            for buttons in self.children:
+                buttons.disabled = True
+            return await self.message.edit(embed=blackjack_embed, view=self)
+        except Exception as error:
+            etype = type(error)
+            trace = error.__traceback__
+            lines = traceback.format_exception(etype, error, trace)
+            traceback_text = ''.join(lines)
+            self.bot.logger.warning(msg=f"{traceback_text}")
+
+    @discord.ui.button(label="Hit", style=discord.ButtonStyle.gray)
+    async def hit(self, interaction: discord.Interaction, hit: discord.Button):
+        try:
+            # defer response
+            await interaction.response.defer()
+            self.player_hand.append(choice(self.deck))
+            dealer_total = 0
+            for card in self.dealer_hand:
+                # if the card is a face card, give it a value of 10
+                if card == "J" or card == "Q" or card == "K":
+                    card = 10
+                # if the card is an ace, give it a value of 11
+                elif card == "A":
+                    card = 11
+                dealer_total += card
+            if dealer_total < 17:
+                self.dealer_hand.append(choice(self.deck))
+            # define user
+            user = interaction.user
+            # define bust
+            bust = False
+            # establish connection
+            conn = interaction.client.pool
+            # define emojis
+            real_dealer_hand_string = "".join([get_card_emoji(c) for c in self.dealer_hand])
+            dealer_hand_string = f"{get_card_emoji(self.dealer_hand[0])}{get_card_emoji('back')}"
+            player_hand_string = "".join([get_card_emoji(c) for c in self.player_hand])
+            # define totals
+            player_total = 0
+            for card in self.player_hand:
+                # if the card is a face card, give it a value of 10
+                if card == "J" or card == "Q" or card == "K":
+                    card = 10
+                # if the card is an ace, give it a value of 11
+                elif card == "A":
+                    card = 11
+                player_total += card
+            dealer_total = 0
+            for card in self.dealer_hand:
+                # if the card is a face card, give it a value of 10
+                if card == "J" or card == "Q" or card == "K":
+                    card = 10
+                # if the card is an ace, give it a value of 11
+                elif card == "A":
+                    card = 11
+                dealer_total += card
+            # if the total is more than 21, change aces
+            if player_total > 21:
+                if any(self.player_hand) == 11:
+                    for ace in self.player_hand:
+                        if ace == 11:
+                            player_total -= 10
+                        if player_total < 21:
+                            break
+                # otherwise, the player busts
+                else:
+                    bust = True
+            if player_total == 21:
+                # create embed
+                blackjack_embed = discord.Embed(title="Blackjack",
+                                                description="A game of blackjack at the Casino Royal.")
+                blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+                blackjack_embed.add_field(name="Dealer's Hand",
+                                          value=f"{real_dealer_hand_string} (total: {dealer_total})")
+                blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+                if dealer_total != 21:
+                    winnings = round(self.bet * 3, 2) - self.bet
+                    blackjack_embed.add_field(name="Result", value="**BLACKJACK**", inline=False)
+                else:
+                    winnings = self.bet - self.bet
+                    blackjack_embed.add_field(name="Result", value="**PUSH**", inline=False)
+                blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                                   winnings, user.id)
+                await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                                   winnings, user.id)
+                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                   user.id, 'casino', f'Won {self.thaler}{winnings:,.2f} at blackjack')
+                # disable buttons
+                for button in self.children:
+                    button.disabled = True
+                return await self.message.edit(embed=blackjack_embed, view=self)
+            elif bust is True:
+                # create embed
+                blackjack_embed = discord.Embed(title="Blackjack",
+                                                description="A game of blackjack at the Casino Royal.")
+                blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+                blackjack_embed.add_field(name="Dealer's Hand",
+                                          value=f"{real_dealer_hand_string} (total: {dealer_total})")
+                blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+                blackjack_embed.add_field(name="Result", value="***BUST***", inline=False)
+                winnings = self.bet
+                blackjack_embed.set_footer(text=f"Your total winnings: -{self.thaler}{winnings:,.2f}")
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                                   -winnings, user.id)
+                await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                                   -winnings, user.id)
+                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                   user.id, 'casino', f'Lost {self.thaler}{winnings:,.2f} at blackjack')
+
+                # disable buttons
+                for buttons in self.children:
+                    buttons.disabled = True
+                return await self.message.edit(embed=blackjack_embed, view=self)
+            else:
+                # create embed
+                blackjack_embed = discord.Embed(title="Blackjack",
+                                                description="A game of blackjack at the Casino Royal.")
+                blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+                blackjack_embed.add_field(name="Dealer's Hand",
+                                          value=f"{dealer_hand_string}")
+                blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+                await self.message.edit(embed=blackjack_embed, view=self)
+        except Exception as error:
+            etype = type(error)
+            trace = error.__traceback__
+            lines = traceback.format_exception(etype, error, trace)
+            traceback_text = ''.join(lines)
+            self.bot.logger.warning(msg=f"{traceback_text}")
+
+    @discord.ui.button(label="Stand", style=discord.ButtonStyle.green)
+    async def stand(self, interaction: discord.Interaction, hold: discord.Button):
+        try:
+            # defer response
+            await interaction.response.defer()
+            # define user
+            user = interaction.user
+            # establish connection
+            conn = interaction.client.pool
+            dealer_total = 0
+            for card in self.dealer_hand:
+                # if the card is a face card, give it a value of 10
+                if card == "J" or card == "Q" or card == "K":
+                    card = 10
+                # if the card is an ace, give it a value of 11
+                elif card == "A":
+                    card = 11
+                dealer_total += card
+            if dealer_total < 17:
+                self.dealer_hand.append(choice(self.deck))
+            # define emojis
+            real_dealer_hand_string = "".join([get_card_emoji(c) for c in self.dealer_hand])
+            dealer_hand_string = f"{get_card_emoji(self.dealer_hand[0])}{get_card_emoji('back')}"
+            player_hand_string = "".join([get_card_emoji(c) for c in self.player_hand])
+            # define totals
+            player_total = 0
+            for card in self.player_hand:
+                # if the card is a face card, give it a value of 10
+                if card == "J" or card == "Q" or card == "K":
+                    card = 10
+                # if the card is an ace, give it a value of 11
+                elif card == "A":
+                    card = 11
+                player_total += card
+            dealer_total = 0
+            for card in self.dealer_hand:
+                # if the card is a face card, give it a value of 10
+                if card == "J" or card == "Q" or card == "K":
+                    card = 10
+                # if the card is an ace, give it a value of 11
+                elif card == "A":
+                    card = 11
+                dealer_total += card
+            # if the total is more than 21, change aces
+            if player_total > 21:
+                if any(self.player_hand) == 11:
+                    for ace in self.player_hand:
+                        if ace == 11:
+                            player_total -= 10
+                        if player_total < 21:
+                            break
+            if player_total > dealer_total:
+                # create embed
+                blackjack_embed = discord.Embed(title="Blackjack",
+                                                description="A game of blackjack at the Casino Royal.")
+                blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+                blackjack_embed.add_field(name="Dealer's Hand",
+                                          value=f"{real_dealer_hand_string} (total: {dealer_total})")
+                blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+                blackjack_embed.add_field(name="Result", value="**WIN**", inline=False)
+                winnings = round(self.bet * 1.5, 2) - self.bet
+                blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                                   winnings, user.id)
+                await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                                   winnings, user.id)
+                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                   user.id, 'casino', f'Won {self.thaler}{winnings:,.2f} at blackjack')
+                # disable buttons
+                for button in self.children:
+                    button.disabled = True
+                return await self.message.edit(embed=blackjack_embed, view=self)
+            elif dealer_total == player_total:
+                # create embed
+                blackjack_embed = discord.Embed(title="Blackjack",
+                                                description="A game of blackjack at the Casino Royal.")
+                blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+                blackjack_embed.add_field(name="Dealer's Hand",
+                                          value=f"{real_dealer_hand_string} (total: {dealer_total})")
+                blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+                blackjack_embed.add_field(name="Result", value="**PUSH**", inline=False)
+                winnings = self.bet - self.bet
+                blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                                   winnings, user.id)
+                await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                                   winnings, user.id)
+                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                   user.id, 'casino', f'Won {self.thaler}{winnings:,.2f} at blackjack')
+                # disable buttons
+                for button in self.children:
+                    button.disabled = True
+                return await self.message.edit(embed=blackjack_embed, view=self)
+            elif dealer_total > 21:
+                # create embed
+                blackjack_embed = discord.Embed(title="Blackjack",
+                                                description="A game of blackjack at the Casino Royal.")
+                blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+                blackjack_embed.add_field(name="Dealer's Hand",
+                                          value=f"{real_dealer_hand_string} (total: {dealer_total})")
+                blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+                blackjack_embed.add_field(name="Result", value="**WIN**", inline=False)
+                winnings = self.bet * 1.5 - self.bet
+                blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                                   winnings, user.id)
+                await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                                   winnings, user.id)
+                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                   user.id, 'casino', f'Won {self.thaler}{winnings:,.2f} at blackjack')
+                # disable buttons
+                for button in self.children:
+                    button.disabled = True
+                return await self.message.edit(embed=blackjack_embed, view=self)
+            else:
+                # create embed
+                blackjack_embed = discord.Embed(title="Blackjack",
+                                                description="A game of blackjack at the Casino Royal.")
+                blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+                blackjack_embed.add_field(name="Dealer's Hand",
+                                          value=f"{real_dealer_hand_string} (total: {dealer_total})")
+                blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+                blackjack_embed.add_field(name="Result", value="***LOSS***", inline=False)
+                winnings = self.bet
+                blackjack_embed.set_footer(text=f"Your total winnings: -{self.thaler}{winnings:,.2f}")
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                                   -winnings, user.id)
+                await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                                   -winnings, user.id)
+                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                   user.id, 'casino',
+                                   f'Lost {self.thaler}{winnings:,.2f} at blackjack')  # disable buttons
+                for buttons in self.children:
+                    buttons.disabled = True
+                return await self.message.edit(embed=blackjack_embed, view=self)
+        except Exception as error:
+            etype = type(error)
+            trace = error.__traceback__
+            lines = traceback.format_exception(etype, error, trace)
+            traceback_text = ''.join(lines)
+            self.bot.logger.warning(msg=f"{traceback_text}")
+
+
+def get_card_emoji(card):
+    # define emoji strings for card
+    K_card = '<:K_card:1085224694631907409>'
+    Q_card = '<:Q_card:1085224695877603449>'
+    J_card = '<:J_card:1085224693214228640>'
+    A_card = '<:A_card:1085224623517483019>'
+    ten_card = '<:10_card:1085225393616855120> '
+    nine_card = '<:9_card:1085224621625839666>'
+    eight_card = '<:8_card:1085224619960713236>'
+    seven_card = '<:7_card:1085224619050553365>'
+    six_card = '<:6_card:1085224617377009755>'
+    five_card = '<:5_card:1085224615850291253>'
+    four_card = '<:4_card:1085224614550057161>'
+    three_card = '<:3_card:1085224612931047455>'
+    two_card = '<:2_card:1085224612511629392>'
+    back_card = '<:Back:1085224690857029734>'
+    axolotl = '<:axolotl:1079750003729371176>'
+    star = ':dizzy:'
+    moon = ':crescent_moon:'
+    bell = ':bell:'
+    heart = ':hearts:'
+    diamond = ':diamonds:'
+    cherry = ':cherries:'
+    clover = ":four_leaf_clover:"
+    seven = ":seven:"
+    gem = ":gem:"
+    # return the card emoji string for the card called
+    if card == "K":
+        return K_card
+    elif card == "Q":
+        return Q_card
+    elif card == "J":
+        return J_card
+    elif card == "A":
+        return A_card
+    elif card == 10:
+        return ten_card
+    elif card == 9:
+        return nine_card
+    elif card == 8:
+        return eight_card
+    elif card == 7:
+        return seven_card
+    elif card == 6:
+        return six_card
+    elif card == 5:
+        return five_card
+    elif card == 4:
+        return four_card
+    elif card == 3:
+        return three_card
+    elif card == 2:
+        return two_card
+    elif card == "back":
+        return back_card
+    elif card == 'axolotl':
+        return axolotl
+    elif card == 'star':
+        return star
+    elif card == 'moon':
+        return moon
+    elif card == 'bell':
+        return bell
+    elif card == "heart":
+        return heart
+    elif card == "diamond":
+        return diamond
+    elif card == "cherry":
+        return cherry
+    elif card == "clover":
+        return clover
+    elif card == "seven":
+        return seven
+    elif card == "gem":
+        return gem
+    elif card == "doubler":
+        return '<:doubler:1085970114752557086>'
+    elif card == "tripler":
+        return '<:tripler:1085970117059428473>'
 
 
 class Economy(commands.Cog):
@@ -1346,6 +1773,219 @@ class Economy(commands.Cog):
         feed_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
         embed_message = await interaction.followup.send(embed=feed_embed)
         await embed_message.edit(view=FeedView(self.bot, embed_message))
+
+    # creates casino subgroup
+    casino = app_commands.Group(name="casino", description="...", guild_only=True)
+
+    @casino.command(name="rank", description="Displays the rank of casino users over time.")
+    async def rank(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # fetch rank data
+        rank_data = await conn.fetch('''SELECT * FROM casino_rank WHERE winnings != 0 ORDER BY winnings DESC;''')
+        # for all items in the data, attach to rank string
+        rank_string = ""
+        rank = 1
+        for u in rank_data:
+            user = self.bot.get_user(u['user_id'])
+            rank_string += f"{rank}. {user.name}#{user.discriminator}:  "
+            if u['winnings'] < 0:
+                rank_string += "-"
+            rank_string += f"{self.thaler}{abs(u['winnings']):,.2f}"
+            rank += 1
+        rank_embed = discord.Embed(title="Royal Casino Rank by Winnings", description=rank_string)
+        rank_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
+        await interaction.followup.send(embed=rank_embed)
+
+    @casino.command(name="blackjack", description="Starts a game of blackjack, aka 21.")
+    @app_commands.describe(bet="The amount of thaler to bet. Must be a whole number.")
+    async def blackjack(self, interaction: discord.Interaction, bet: app_commands.Range[int, 1]):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # define author
+        user = interaction.user
+        # set bust
+        bust = False
+        # ensure membership
+        rbt_member = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''',
+                                         user.id)
+        if rbt_member is None:
+            return await interaction.followup.send("You are not a registered member of the Royal Bank of Thegye.")
+        # ensure the user has enough thaler
+        if rbt_member['funds'] < bet:
+            return await interaction.followup.send(f"You do not have {self.thaler}{bet:,}.")
+        # define deck
+        deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'] * 4
+        # define face up card
+        up_card = choice(deck)
+        # define face down card
+        hole_card = choice(deck)
+        dealer_hand = [up_card, hole_card]
+        player_hand = [choice(deck), choice(deck)]
+        # define user
+        user = interaction.user
+        # define emojis
+        real_dealer_hand_string = "".join([get_card_emoji(c) for c in dealer_hand])
+        dealer_hand_string = f"{get_card_emoji(dealer_hand[0])}{get_card_emoji('back')}"
+        player_hand_string = "".join([get_card_emoji(c) for c in player_hand])
+        # define totals
+        player_total = 0
+        for card in player_hand:
+            # if the card is a face card, give it a value of 10
+            if card == "J" or card == "Q" or card == "K":
+                card = 10
+            # if the card is an ace, give it a value of 11
+            elif card == "A":
+                card = 11
+            player_total += card
+        dealer_total = 0
+        for card in dealer_hand:
+            # if the card is a face card, give it a value of 10
+            if card == "J" or card == "Q" or card == "K":
+                card = 10
+            # if the card is an ace, give it a value of 11
+            elif card == "A":
+                card = 11
+            dealer_total += card
+        # if the total is more than 21, change aces
+        if player_total > 21:
+            if any(player_hand) == 11:
+                for ace in player_hand:
+                    if ace == 11:
+                        player_total -= 10
+                    if player_total < 21:
+                        break
+            # otherwise, the player busts
+            else:
+                bust = True
+        if player_total == 21:
+            # create embed
+            blackjack_embed = discord.Embed(title="Blackjack",
+                                            description="A game of blackjack at the Casino Royal.")
+            blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{bet:,.2f}", inline=False)
+            blackjack_embed.add_field(name="Dealer's Hand",
+                                      value=f"{real_dealer_hand_string} (total: {dealer_total})")
+            blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+            blackjack_embed.add_field(name="Result", value="**BLACKJACK**", inline=False)
+            winnings = round(bet * 3, 2) - bet
+            blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               winnings, user.id)
+            await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                               winnings, user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'casino', f'Won {self.thaler}{winnings:,.2f} at blackjack')
+            return await interaction.followup.send(embed=blackjack_embed)
+        elif bust is True:
+            # create embed
+            blackjack_embed = discord.Embed(title="Blackjack",
+                                            description="A game of blackjack at the Casino Royal.")
+            blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{bet:,.2f}", inline=False)
+            blackjack_embed.add_field(name="Dealer's Hand",
+                                      value=f"{dealer_hand_string} (total: {dealer_total})")
+            blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+            blackjack_embed.add_field(name="Result", value="***BUST***", inline=False)
+            winnings = bet
+            blackjack_embed.set_footer(text=f"Your total winnings: -{self.thaler}{winnings:,.2f}")
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               -winnings, user.id)
+            await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                               -winnings, user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'casino', f'Lost {self.thaler}{winnings:,.2f} at blackjack')
+
+            return await interaction.followup.send(embed=blackjack_embed)
+        else:
+            # create embed
+            blackjack_embed = discord.Embed(title="Blackjack",
+                                            description="A game of blackjack at the Casino Royal.")
+            blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{bet:,.2f}", inline=False)
+            blackjack_embed.add_field(name="Dealer's Hand",
+                                      value=f"{dealer_hand_string}")
+            blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+            blackjack_message = await interaction.followup.send(embed=blackjack_embed)
+            await blackjack_message.edit(embed=blackjack_embed, view=BlackjackView(bot=self.bot, m=blackjack_message,
+                                                                                   bet=bet, player_hand=player_hand,
+                                                                                   dealer_hand=dealer_hand))
+
+    @casino.command(name="slots", description="Spins the slots.")
+    @app_commands.describe(bet="The amount of thaler to bet. Must be a whole number.")
+    async def slots(self, interaction: discord.Interaction, bet: app_commands.Range[int, 1]):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # define user
+        user = interaction.user
+        # fetch user info
+        user_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''',
+                                        user.id)
+        # if the user does not exist
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the Royal Bank of Thegye.")
+        # ensure user has bet funds
+        if bet > user_info['funds']:
+            return await interaction.followup.send(f"You do not have enough thaler to place that bet.")
+        # define slots
+        items = ["axolotl", "star", "moon", "bell", "heart", "diamond", "cherry", "clover",
+                 "seven", "gem"] * 3
+        items.append("doubler")
+        items.append("tripler")
+        # define combos
+        single_combo = ["cherry", "clover", "bell"]
+        double_combo = ["star", "moon", "bell", "heart", "diamond", "cherry", "clover"]
+        triple_combo = ["star", "moon", "bell", "heart", "diamond", "cherry", "clover",
+                        "seven", "gem"]
+        jackpot_combo = "axolotl"
+        # roll slots
+        slot1 = choice(items)
+        slot2 = choice(items)
+        slot3 = choice(items)
+        slots = [slot1, slot2, slot3]
+        # define payouts
+        single = (bet * 1.1) - bet
+        double = (bet * 1.5) - bet
+        triple = (bet * 3) - bet
+        jackpot = (bet * 10) - bet
+        if "doubler" in slots:
+            single *= 2
+            double *= 2
+        if "tripler" in slots:
+            single *= 3
+            double *= 3
+        # get emojis
+        slot_string = f"\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n" \
+                      f"\u2502{get_card_emoji(slot1)} {get_card_emoji(slot2)} {get_card_emoji(slot3)}\u2502\n" \
+                      f"\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518"
+        # create embed
+        slots_embed = discord.Embed(title="Slots", description="A game of slots at the Royal Casino.")
+        slots_embed.add_field(name="Slots Result", value=slot_string, inline=False)
+        # search jackpot combos
+        if all(s == slots[0] for s in slots) and slots[0] in jackpot_combo:
+            slots_embed.add_field(name="***JACKPOT***", value=f"Total winnings of {self.thaler}{jackpot:,.2f}!",
+                                  inline=False)
+            return await interaction.followup.send(embed=slots_embed)
+        # search for triple combos
+        elif all(s == slots[0] for s in slots) and slots[0] in triple_combo:
+            slots_embed.add_field(name="TRIPLE COMBO", value=f"Total winnings of {self.thaler}{triple:,.2f}!")
+            return await interaction.followup.send(embed=slots_embed)
+        # search for double combos
+        elif (slot1 in slots[1:2] and slot1 in double_combo) or (slot2 in [slots[0], slots[2]] and slot2 in double_combo) or (slot3 in slots[0:1] and slot3 in double_combo):
+            slots_embed.add_field(name="DOUBLE COMBO", value=f"Total winnings of {self.thaler}{double:,.2f}!")
+            return await interaction.followup.send(embed=slots_embed)
+        # search for single combos
+        elif slots[0] in single_combo or slots[1] in single_combo or slots[2] in single_combo:
+            slots_embed.add_field(name="SINGLE COMBO", value=f"Total winnings of {self.thaler}{single:,.2f}!")
+            return await interaction.followup.send(embed=slots_embed)
+        # return no combos
+        else:
+            slots_embed.add_field(name="***LOSS***", value=f"Total winnings of -{self.thaler}{bet:,.2f}!")
+            return await interaction.followup.send(embed=slots_embed)
+
 
 
 async def setup(bot: Shard):
