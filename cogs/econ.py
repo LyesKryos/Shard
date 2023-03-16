@@ -915,6 +915,41 @@ class Economy(commands.Cog):
         directory_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
         await interaction.followup.send(embed=directory_embed)
 
+    @rbt.command(name="wire", description="Sends funds from your account to another account.")
+    @app_commands.describe(amount="The amount you wish to wire. Must be a whole number.",
+                           recipient="The user you want to wire the funds to.")
+    async def wire(self, interaction: discord.Interaction, recipient: discord.User,
+                   amount: app_commands.Range[float, 0.01]):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # define user
+        author = interaction.user
+        # check if user is registered
+        author_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', author.id)
+        if author_info is None:
+            return await interaction.followup.send("You are not a registered member of the Royal Bank of Thegye.")
+        # check if recipient is registered
+        recipient_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', recipient.id)
+        if recipient_info is None:
+            return await interaction.followup.send(f"{recipient.display_name} is not a"
+                                                   f" registered member of the Royal Bank of Thegye.")
+        # check if the sender has enough thaler
+        if amount > author_info['funds']:
+            return await interaction.followup.send(f"You do not have {self.thaler}{amount:,.2f}")
+        # otherwise, send funds
+        await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''', amount, recipient.id)
+        await conn.execute('''UPDATE rbt_users SET fund = funds - $1 WHERE user_id = $2;''', amount, author.id)
+        await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                           author.id, 'trade', f"Wired {self.thaler}{amount} to "
+                                               f"{recipient.name}#{recipient.discriminator} (ID:{recipient.id}")
+        await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                           recipient.id, 'trade', f"Received {self.thaler}{amount} from "
+                                               f"{author.name}#{author.discriminator} (ID:{author.id}")
+        return await interaction.followup.send(f"You have successfully sent {self.thaler}{amount} to "
+                                               f"{recipient.display_name}.")
+
     @rbt.command(name="create_contract", description="Creates a new contract.")
     @app_commands.describe(terms="The terms of your contract.")
     async def create_contract(self, interaction: discord.Interaction,
@@ -1438,8 +1473,8 @@ class Economy(commands.Cog):
         # if the stock would become overdrawn, notify user
         if amount + stock['outstanding'] > stock['issued']:
             return await interaction.followup.send(f"Purchasing {amount} shares of {stock['name']} would cause it to "
-                                                   f"be overdrawn. Either purchase an appropriate number of issued"
-                                                   f"shares or notify a Director to increase the number of shares of"
+                                                   f"be overdrawn. Either purchase an appropriate number of issued "
+                                                   f"shares or notify a Director to increase the number of shares of "
                                                    f"this company.")
         # fetches user information
         user = interaction.user
