@@ -2095,6 +2095,27 @@ class Economy(commands.Cog):
                                user.id, 'casino', f'Lost {self.thaler}{bet:,.2f} at slots')
             return await interaction.followup.send(embed=slots_embed)
 
+    @casino.command(name="slots_outcomes", description="Displays the slots combinations.")
+    async def slots_outcomes(self, interaction: discord.Interaction):
+        # define combos
+        single_combo = ["cherry", "clover", "bell"]
+        double_combo = ["star", "moon", "bell", "heart", "diamond", "cherry", "clover"]
+        triple_combo = ["star", "moon", "bell", "heart", "diamond", "cherry", "clover",
+                        "seven", "gem"]
+        jackpot_combo = "axolotl"
+        # create embed
+        outcomes_embed = discord.Embed(title="List of Slots Combinations")
+        outcomes_embed.add_field(name="Single Combo (2x payout)", value=
+                                 " ".join([get_card_emoji(o) for o in single_combo]), inline=False)
+        outcomes_embed.add_field(name="Double Combo (5x payout)",
+                                 value= " ".join([get_card_emoji(o) for o in double_combo]), inline=False)
+        outcomes_embed.add_field(name="Triple Combo (50x payout)",
+                                 value= " ".join([get_card_emoji(o) for o in triple_combo]), inline=False)
+        outcomes_embed.add_field(name="Jackpot Combo (100x payout)",
+                                 value="".join(get_card_emoji(jackpot_combo)), inline=False)
+        await interaction.response.send_message(embed=outcomes_embed)
+
+
 
 
 async def setup(bot: Shard):
