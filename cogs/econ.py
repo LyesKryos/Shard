@@ -1792,7 +1792,7 @@ class Economy(commands.Cog):
             rank_string += f"{rank}. {user.name}#{user.discriminator}:  "
             if u['winnings'] < 0:
                 rank_string += "-"
-            rank_string += f"{self.thaler}{abs(u['winnings']):,.2f}"
+            rank_string += f"{self.thaler}{abs(u['winnings']):,.2f}\n"
             rank += 1
         rank_embed = discord.Embed(title="Royal Casino Rank by Winnings", description=rank_string)
         rank_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")

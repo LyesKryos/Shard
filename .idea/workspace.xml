@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Setting up casino rank">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing slots">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
@@ -115,14 +115,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="19332000" />
-    </task>
-    <task id="LOCAL-00385" summary="Testing load">
-      <created>1677600261315</created>
-      <option name="number" value="00385" />
-      <option name="presentableId" value="LOCAL-00385" />
-      <option name="project" value="LOCAL" />
-      <updated>1677600261315</updated>
+      <workItem from="1678819823954" duration="19653000" />
     </task>
     <task id="LOCAL-00386" summary="Final testing">
       <created>1677600420964</created>
@@ -460,7 +453,14 @@
       <option name="project" value="LOCAL" />
       <updated>1678987379930</updated>
     </task>
-    <option name="localTasksCounter" value="434" />
+    <task id="LOCAL-00434" summary="Fixing slots">
+      <created>1678990186661</created>
+      <option name="number" value="00434" />
+      <option name="presentableId" value="LOCAL-00434" />
+      <option name="project" value="LOCAL" />
+      <updated>1678990186661</updated>
+    </task>
+    <option name="localTasksCounter" value="435" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -478,7 +478,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding syncing" />
     <MESSAGE value="Fixing errors.py" />
     <MESSAGE value="Fixing syncing" />
     <MESSAGE value="Updating everything for beta testing" />
@@ -503,7 +502,8 @@
     <MESSAGE value="Fixing bank updating" />
     <MESSAGE value="Altering graphing to be nice looking" />
     <MESSAGE value="Setting up casino rank" />
-    <option name="LAST_COMMIT_MESSAGE" value="Setting up casino rank" />
+    <MESSAGE value="Fixing slots" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing slots" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
