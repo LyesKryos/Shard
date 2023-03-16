@@ -449,7 +449,7 @@ class Economy(commands.Cog):
             rbtm_embed.add_field(name="Thaler", value=f"{self.thaler}{rbt_member['funds']:,.2f}")
             rbtm_embed.add_field(name="Membership", value=f"{user_type}")
             return await interaction.followup.send(embed=rbtm_embed)
-        
+
     @rbt.command(name='directory', description="Displays all registered members of the Royal Bank of Thegye.")
     async def directory(self, interaction: discord.Interaction):
         # defer interaction
@@ -466,7 +466,7 @@ class Economy(commands.Cog):
         for member in rbt_members:
             # fetch member ledger
             ledger = await conn.fetch('''SELECT * FROM ledger WHERE user_id = $1;''',
-                                        member['user_id'])
+                                      member['user_id'])
             # calculate total stock value
             stock_value = 0
             for stock in ledger:
@@ -474,10 +474,21 @@ class Economy(commands.Cog):
                 stock_info = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''',
                                                  stock['stock_id'])
                 stock_value += stock['amount'] * float(stock_info['value'])
-            total_value = stock_value + float(member['funds'])
+            total_value = round(stock_value + float(member['funds']), 2)
             member_dict.update({member['user_id']: total_value})
-        await interaction.followup.send(f"{member_dict}")
-
+        # sort members by total value
+        ranked_members = sorted(member_dict.items(), key=lambda x: x[1], reverse=True)
+        # create string
+        ranked_string = ""
+        for ranked_member in ranked_members:
+            this_string = f"{ranked_members.index(ranked_member)} {thegye.get_member(ranked_member[0]).display_name}"
+            for space in range(0, 50-len(this_string)):
+                this_string += " "
+            this_string += f"{self.thaler}{ranked_member[1]:,.2f}\n"
+            ranked_string += this_string
+        # create and send embed
+        directory_embed = discord.Embed(title="Royal Bank of Thegye Directory", description=ranked_string)
+        await interaction.followup.send(embed=directory_embed)
 
     @rbt.command(name="create_contract", description="Creates a new contract.")
     @app_commands.describe(terms="The terms of your contract.")
@@ -872,7 +883,7 @@ class Economy(commands.Cog):
             stock_embed.add_field(name="Outstanding Shares", value=f"{stock['outstanding']}")
             stock_embed.add_field(name="Issued Shares", value=f"{stock['issued']}")
             stock_embed.add_field(name="\u200b", value="\u200b")
-            stock_embed.add_field(name="Trend", value=f"{stock['trending'].title()} ({stock['change']*100:.2f}%)")
+            stock_embed.add_field(name="Trend", value=f"{stock['trending'].title()} ({stock['change'] * 100:.2f}%)")
             stock_embed.add_field(name="Risk Type", value=f"{risk}")
             stock_embed.add_field(name="\u200b", value="\u200b")
             return await interaction.followup.send(embed=stock_embed)
