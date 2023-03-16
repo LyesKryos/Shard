@@ -326,6 +326,16 @@ class BlackjackView(View):
                 dealer_total += card
             while dealer_total < 17:
                 self.dealer_hand.append(choice(self.deck))
+                dealer_total = 0
+                for card in self.dealer_hand:
+                    # if the card is a face card, give it a value of 10
+                    if card == "J" or card == "Q" or card == "K":
+                        card = 10
+                    # if the card is an ace, give it a value of 11
+                    elif card == "A":
+                        card = 11
+                    dealer_total += card
+                await asyncio.sleep(.1)
             # define user
             user = interaction.user
             # define bust
@@ -456,6 +466,16 @@ class BlackjackView(View):
                 dealer_total += card
             while dealer_total < 17:
                 self.dealer_hand.append(choice(self.deck))
+                dealer_total = 0
+                for card in self.dealer_hand:
+                    # if the card is a face card, give it a value of 10
+                    if card == "J" or card == "Q" or card == "K":
+                        card = 10
+                    # if the card is an ace, give it a value of 11
+                    elif card == "A":
+                        card = 11
+                    dealer_total += card
+                await asyncio.sleep(.1)
             # define emojis
             real_dealer_hand_string = "".join([get_card_emoji(c) for c in self.dealer_hand])
             player_hand_string = "".join([get_card_emoji(c) for c in self.player_hand])
