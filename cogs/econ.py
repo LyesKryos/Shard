@@ -39,7 +39,7 @@ class RegisterView(View):
         general_fund_raw = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'General Fund';''')
         general_fund = float(general_fund_raw['current_funds'])
         # calculate starting gift, credit it towards the user, and remove thaler from fund
-        registration_gift = round(general_fund_raw['fund_limit'] * .001, 0)
+        registration_gift = round(float(general_fund_raw['fund_limit']) * .001, 0)
         await conn.execute('''INSERT INTO rbt_users VALUES($1,$2);''',
                            user.id, registration_gift)
         await conn.execute('''INSERT INTO casino_rank(user_id) VALUES($1);''',
