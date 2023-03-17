@@ -310,12 +310,15 @@ class Recruitment(commands.Cog):
             # set running = false
             self.running = False
             # update relevant tables
-            await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $2
-             WHERE user_id = $3;''', self.user_sent, self.user_sent, ctx.author.id)
+            await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $1
+             WHERE user_id = $2;''', self.user_sent, ctx.author.id)
             await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                math.floor(self.user_sent/2), ctx.author.id)
             await conn.execute('''UPDATE funds SET general_fund = general_fund - $1 WHERE name = 'General Fund';''',
                                math.floor(self.user_sent/2))
+            await conn.execute('''INSERT INTO rbt_user_logs VALUES($1,$2,$3);''',
+                               ctx.author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent/2)} from "
+                                                         f"recruitment.")
         except Exception as error:
             conn = self.bot.pool
             self.running = False
@@ -327,6 +330,9 @@ class Recruitment(commands.Cog):
                                math.floor(self.user_sent/2), ctx.author.id)
             await conn.execute('''UPDATE funds SET general_fund = general_fund - $1 WHERE name = 'General Fund';''',
                                math.floor(self.user_sent/2))
+            await conn.execute('''INSERT INTO rbt_user_logs VALUES($1,$2,$3);''',
+                               ctx.author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent/2)} from "
+                                                         f"recruitment.")
             self.user_sent = 0
             etype = type(error)
             trace = error.__traceback__
@@ -363,9 +369,15 @@ class Recruitment(commands.Cog):
                                    (self.user_sent + userinfo['sent']),
                                    (self.user_sent + userinfo['sent_this_month']),
                                    ctx.author.id)
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                                   math.floor(self.user_sent / 2), ctx.author.id)
+                await conn.execute('''UPDATE funds SET general_fund = general_fund - $1 WHERE name = 'General Fund';''',
+                                   math.floor(self.user_sent / 2))
+                await conn.execute('''INSERT INTO rbt_user_logs VALUES($1,$2,$3);''',
+                                   ctx.author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent / 2)} from "
+                                                             f"recruitment.")
                 self.user_sent = 0
                 self.recruitment_gather_object.cancel()
-
                 break
 
     @commands.command(brief="Adds or removes the recruiter role")

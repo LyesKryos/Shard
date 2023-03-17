@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing dealer hitting">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding slots_outcomes command">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,14 +115,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="28460000" />
-    </task>
-    <task id="LOCAL-00395" summary="Fixing WA updating">
-      <created>1678273218549</created>
-      <option name="number" value="00395" />
-      <option name="presentableId" value="LOCAL-00395" />
-      <option name="project" value="LOCAL" />
-      <updated>1678273218549</updated>
+      <workItem from="1678819823954" duration="29155000" />
     </task>
     <task id="LOCAL-00396" summary="Adding econ.py">
       <created>1678662956507</created>
@@ -459,7 +453,14 @@
       <option name="project" value="LOCAL" />
       <updated>1678999706921</updated>
     </task>
-    <option name="localTasksCounter" value="444" />
+    <task id="LOCAL-00444" summary="Adding slots_outcomes command">
+      <created>1679001125255</created>
+      <option name="number" value="00444" />
+      <option name="presentableId" value="LOCAL-00444" />
+      <option name="project" value="LOCAL" />
+      <updated>1679001125255</updated>
+    </task>
+    <option name="localTasksCounter" value="445" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -477,7 +478,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing feed stock id display" />
     <MESSAGE value="Fixing register" />
     <MESSAGE value="Changing commas on buy" />
     <MESSAGE value="Fixing bottoming protection" />
@@ -502,7 +502,8 @@
     <MESSAGE value="Altering tax policy for all transactions" />
     <MESSAGE value="Fixing ace altering" />
     <MESSAGE value="Fixing dealer hitting" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing dealer hitting" />
+    <MESSAGE value="Adding slots_outcomes command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding slots_outcomes command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

@@ -1116,7 +1116,7 @@ class Economy(commands.Cog):
                                          "and marketplace transactions.")
     @app_commands.describe(log_type="Input one of the choices to view your log")
     async def log(self, interaction: discord.Interaction,
-                  log_type: typing.Literal['exchange', 'trade', 'contract', 'market', 'all']):
+                  log_type: typing.Literal['exchange', 'trade', 'contract', 'market', 'payroll', 'all']):
         # defer response
         await interaction.response.defer(thinking=True)
         # establishes connection
