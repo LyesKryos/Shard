@@ -1219,7 +1219,7 @@ class Economy(commands.Cog):
                                user.id, 'bank', f"Opened a new investment account (ID: {interaction.id}) "
                                                 f"with {self.thaler}{amount:,.2f}.")
             return await interaction.followup.send(f"You have successfully opened an investment account (ID: "
-                                                   f"{interaction.id} with {self.thaler}{amount:,.2f}.")
+                                                   f"{interaction.id}) with {self.thaler}{amount:,.2f}.")
 
     @rbt.command(name="manage_account", description="Manages an existing loan or investment account.")
     @app_commands.describe(account_type="The type of account you want to manage.",
@@ -1966,7 +1966,7 @@ class Economy(commands.Cog):
                            author.id, 'trade', f'Traded {amount} {stock["name"]} (id: {stock["stock_id"]}) to '
                                                f'{recipient.name}#{recipient.discriminator} ({recipient.id}) @ '
                                                f'{self.thaler}{stock["value"]}.')
-        return await interaction.followup.send(f"You have succesfuly sent {amount} shares of {stock['name']} to "
+        return await interaction.followup.send(f"You have successfully sent {amount} shares of {stock['name']} to "
                                                f"{recipient.name}#{recipient.discriminator}.")
 
     @exchange.command(name='portfolio', description='Displays information about all owned shares and stocks.')
