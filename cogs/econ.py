@@ -978,9 +978,9 @@ class Economy(commands.Cog):
                 stock_value += stock['amount'] * float(stock_info['value'])
             total_value = round(stock_value + float(member['funds']), 2)
             if investment is not None:
-                total_value += investment['amount']
+                total_value += float(investment['amount'])
             if loan is not None:
-                total_value -= loan['amount']
+                total_value -= float(loan['amount'])
             member_dict.update({member['user_id']: total_value})
         # sort members by total value
         ranked_members = sorted(member_dict.items(), key=lambda x: x[1], reverse=True)
@@ -1544,9 +1544,10 @@ class Economy(commands.Cog):
                 if crash_chance <= 1:
                     if self.crash is False:
                         if stock_sum['sum'] > 10 * stock_count['count']:
-                            await conn.execute('''UPDATE stocks SET value = round((value * .25)::numeric, 2);''')
+                            await conn.execute('''UPDATE stocks 
+                            SET value = round((value * .25)::numeric, 2), trend = 'down';''')
                             self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
-                                                 "All stock values are decreased by 75%.\n "
+                                                 "All stock values are decreased by 75% and begun trending down.\n "
                             self.crash = True
                 # update stocks' value tracker
                 await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
@@ -2077,6 +2078,9 @@ class Economy(commands.Cog):
         conn = self.bot.pool
         # fetches stock information
         stock = await conn.fetchrow('''SELECT * FROM stocks WHERE lower(name) = $1;''', stock_id.lower())
+        # if the graph should be the average over time, graph
+        if stock.lower() == "average":
+            stock = "average"
         # if stock does not exist, return message
         if stock is None:
             try:
@@ -2109,6 +2113,8 @@ class Economy(commands.Cog):
         else:
             end_date = datetime.strptime(end_date, "%d/%m/%Y")
         # get all data from the specified stock
+        if stock == "average":
+            pass
         stock_data = await conn.fetch('''SELECT * FROM exchange_log WHERE (timestamp BETWEEN $1 AND $2) 
         AND stock_id = $3 ORDER BY timestamp ASC;''', start_date, end_date, stock['stock_id'])
         print(stock_data)

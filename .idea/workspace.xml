@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing signed_contracts look">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing dealer_total and player_total mixup">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
@@ -115,14 +115,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="41526000" />
-    </task>
-    <task id="LOCAL-00418" summary="Fixing portfolio">
-      <created>1678875263025</created>
-      <option name="number" value="00418" />
-      <option name="presentableId" value="LOCAL-00418" />
-      <option name="project" value="LOCAL" />
-      <updated>1678875263025</updated>
+      <workItem from="1678819823954" duration="43049000" />
     </task>
     <task id="LOCAL-00419" summary="Updating portfolio description">
       <created>1678973211901</created>
@@ -460,7 +453,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679072039737</updated>
     </task>
-    <option name="localTasksCounter" value="467" />
+    <task id="LOCAL-00467" summary="Fixing dealer_total and player_total mixup">
+      <created>1679072961988</created>
+      <option name="number" value="00467" />
+      <option name="presentableId" value="LOCAL-00467" />
+      <option name="project" value="LOCAL" />
+      <updated>1679072961988</updated>
+    </task>
+    <option name="localTasksCounter" value="468" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -478,7 +478,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing wire command" />
     <MESSAGE value="Altering tax policy for all transactions" />
     <MESSAGE value="Fixing ace altering" />
     <MESSAGE value="Fixing dealer hitting" />
@@ -503,7 +502,8 @@
     <MESSAGE value="Adding signed_contracts" />
     <MESSAGE value="Fixing signed_contracts" />
     <MESSAGE value="Fixing signed_contracts look" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing signed_contracts look" />
+    <MESSAGE value="Fixing dealer_total and player_total mixup" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing dealer_total and player_total mixup" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
