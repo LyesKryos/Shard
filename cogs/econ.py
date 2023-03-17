@@ -1226,7 +1226,7 @@ class Economy(commands.Cog):
                         f"The Investment Fund does not have enough available funds to "
                         f"fill that request.")
                 # add funds to user
-                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id - $2;''',
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                    amount, user.id)
                 # remove funds from investment fund
                 await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 
@@ -1252,7 +1252,7 @@ class Economy(commands.Cog):
                 if amount > loan['amount']:
                     amount = loan['amount']
                 # remove funds from user
-                await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id - $2;''',
+                await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
                                    amount, user.id)
                 # update bank ledger
                 await conn.execute('''UPDATE bank_ledger SET amount = amount - $1 
@@ -1286,7 +1286,7 @@ class Economy(commands.Cog):
                     return await interaction.followup.send(
                         f"The Investment Fund does not have enough available funds to fill that request.")
                 # add funds to user
-                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id - $2;''',
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                    amount, user.id)
                 # update bank ledger
                 await conn.execute('''UPDATE bank_ledger SET amount = amount - $1 
@@ -1307,7 +1307,7 @@ class Economy(commands.Cog):
                 if user_info['funds'] < amount:
                     return await interaction.followup.send("You do not have enough thaler for that.")
                 # remove funds from user
-                await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id - $2;''',
+                await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
                                    amount, user.id)
                 # update bank ledger
                 await conn.execute('''UPDATE bank_ledger SET amount = amount + $1 
