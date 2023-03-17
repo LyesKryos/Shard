@@ -373,6 +373,8 @@ class BlackjackView(View):
                             player_total -= 10
                         if player_total < 21:
                             break
+                    if player_total > 21:
+                        bust = True
                 # otherwise, the player busts
                 else:
                     bust = True
@@ -380,8 +382,8 @@ class BlackjackView(View):
                 if "A" in self.dealer_hand:
                     for ace in self.dealer_hand:
                         if ace == "A":
-                            player_total -= 10
-                        if player_total < 21:
+                            dealer_total -= 10
+                        if dealer_total < 21:
                             break
             if player_total == 21:
                 # create embed
@@ -510,8 +512,8 @@ class BlackjackView(View):
                 if "A" in self.dealer_hand:
                     for ace in self.dealer_hand:
                         if ace == "A":
-                            player_total -= 10
-                        if player_total < 21:
+                            dealer_total -= 10
+                        if dealer_total < 21:
                             break
             if player_total > dealer_total:
                 # create embed
@@ -2252,6 +2254,8 @@ class Economy(commands.Cog):
                         player_total -= 10
                     if player_total < 21:
                         break
+                if player_total > 21:
+                    bust = True
             # otherwise, the player busts
             else:
                 bust = True
@@ -2259,8 +2263,8 @@ class Economy(commands.Cog):
             if "A" in dealer_hand:
                 for ace in dealer_hand:
                     if ace == "A":
-                        player_total -= 10
-                    if player_total < 21:
+                        dealer_total -= 10
+                    if dealer_total < 21:
                         break
         if player_total == 21:
             # create embed
