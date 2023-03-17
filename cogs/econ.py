@@ -1148,7 +1148,7 @@ class Economy(commands.Cog):
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the Royal Bank of Thegye.")
         # fetch all contracts where the user is a signatory
-        contracts = await conn.fetch('''SELECT * FROM contracts WHERE $1 = ANY(signatories);''')
+        contracts = await conn.fetch('''SELECT * FROM contracts WHERE $1 = ANY(signatories);''', user.id)
         # if they have signed no contracts, return
         if contracts is None:
             return await interaction.followup.send("You have not signed any contracts.")
