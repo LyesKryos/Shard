@@ -1155,7 +1155,8 @@ class Economy(commands.Cog):
         # make list
         contract_list = "You have signed the following contract(s): \n"
         for contract in contracts:
-            contract_list += f"`{contract['contract_id']}` (signed `{contract['time'].strftime('%H:%M on %d/%m/%Y')}`\n"
+            contract_list += f"Contract ID: `{contract['contract_id']}` " \
+                             f"\(signed `{contract['time'].strftime('%H:%M on %d/%m/%Y')}`)\n"
         # send list
         return await interaction.followup.send(content=contract_list)
 
