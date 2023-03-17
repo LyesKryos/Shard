@@ -33,7 +33,7 @@ class BaseCommands(commands.Cog):
         infoembed.add_field(name="Created", value="By Lies Kryos#1734\nApril 24, 2021")
         infoembed.add_field(name="Current version", value=f"{self.bot.version}")
         infoembed.add_field(name="Version Notes",
-                            value="Added and implemented verification system.",
+                            value="Introduced new ecnomy system.",
                             inline=False)
         infoembed.add_field(name="Hosting Software", value="Oracle Virtual Cloud Network Virtual Machine")
         await ctx.send(embed=infoembed)
