@@ -37,7 +37,7 @@ class RegisterView(View):
         user = interaction.user
         # fetch general fund information
         general_fund_raw = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'General Fund';''')
-        general_fund = general_fund_raw['current_funds']
+        general_fund = float(general_fund_raw['current_funds'])
         # calculate starting gift, credit it towards the user, and remove thaler from fund
         registration_gift = round(general_fund_raw['fund_limit'] * .001, 0)
         await conn.execute('''INSERT INTO rbt_users VALUES($1,$2);''',
@@ -1155,7 +1155,7 @@ class Economy(commands.Cog):
                                                        f"To deposit, use `/rbt manage_account`.")
             # check if the investment fund has enough funds
             investment_fund = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'Investment Fund';''')
-            if investment_fund['current_funds'] < amount:
+            if float(investment_fund['current_funds']) < amount:
                 return await interaction.followup.send(f"The Investment Fund does not have enough available funds to "
                                                        f"fill that request.")
             # remove funds from investment fund
