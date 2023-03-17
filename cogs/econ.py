@@ -693,11 +693,17 @@ class Economy(commands.Cog):
 
     def __init__(self, bot: Shard):
         self.bot = bot
-        self.thaler = "\u20B8"
         self.announcement = "The Royal Exchange of Thegye has updated. Below is a summary of any important changes:\n"
         self.market_task = asyncio.create_task(self.market_updating())
         self.bank_task = asyncio.create_task(self.bank_updating())
         self.crash = False
+        # define space
+        self.space = "\u200b"
+        # define logo
+        self.logo = "https://i.ibb.co/BKFyd2G/RBT-logo.png"
+        # define thaler icon
+        self.thaler = "\u20B8"
+
 
     async def cog_unload(self) -> None:
         self.market_task.cancel()
@@ -1111,6 +1117,230 @@ class Economy(commands.Cog):
         fund_embed.add_field(name="Fund Limit", value=f"{self.thaler}{fund['fund_limit']:,.2f}")
         fund_embed.add_field(name="\u200b", value="\u200b")
         await interaction.followup.send(embed=fund_embed)
+
+    @rbt.command(name="open_account",
+                 description="Opens an account with the bank, be that an investment or a loan account.")
+    @app_commands.describe(account_type="The type of account you want to open.",
+                           amount="The amount of thaler you wish to invest or borrow.")
+    async def open_account(self, interaction: discord.Interaction, account_type: typing.Literal['investment', 'loan'],
+                           amount: float):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # round amount
+        amount = round(amount, 2)
+        # establish connection
+        conn = self.bot.pool
+        # define user
+        user = interaction.user
+        # fetch user info
+        user_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', user.id)
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the Royal Bank of Thegye.")
+        # ensure the user does not already have an account if they are opening a loan account
+        if account_type == "loan":
+            loan = await conn.fetchrow('''SELECT * FROM bank_ledger WHERE user_id = $1 AND type = 'loan';''',
+                                       user.id)
+            if loan is not None:
+                return await interaction.followup.send(f"You already have an open loan. To view this loan account, "
+                                                       f"use `/rbt view_account loan`."
+                                                       f"To deposit, use `/rbt manage_account`.")
+            # check if the investment fund has enough funds
+            investment_fund = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'Investment Fund';''')
+            if investment_fund['current_funds'] < amount:
+                return await interaction.followup.send(f"The Investment Fund does not have enough available funds to "
+                                                       f"fill that request.")
+            # remove funds from investment fund
+            await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 
+            WHERE name = 'Investment Fund';''', amount)
+            # create loan account
+            await conn.execute('''INSERT INTO bank_ledger VALUES($1,$2,$3,$4);''',
+                               user.id, interaction.id, amount, 'loan')
+            # credit to user account and log
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $1;''',
+                               user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'bank', f"Opened a new loan account (ID: {interaction.id}) "
+                                                f"with {self.thaler}{amount:,.2f}.")
+            return await interaction.followup.send(f"You have successfully opened a loan account (ID:{interaction.id}) "
+                                                   f"with {self.thaler}{amount:,.2f}.")
+        # if the type is investment, ensure the user has the amount to invest
+        if account_type == "investment":
+            if amount > user_info['funds']:
+                return await interaction.followup.send(f"You do not have {self.thaler}{amount:,.2f}.")
+            # ensure they dont already have an account
+            investment_account = await conn.fetchrow('''SELECT * FROM bank_ledger WHERE user_id = $1 
+            AND type = 'investment';''', user.id)
+            if investment_account is not None:
+                return await interaction.followup.send(f"You already have an investment account. To view the account "
+                                                       f"use `/rbt view_account investment`. "
+                                                       f"To deposit or withdraw, use `/rbt manage_account`.")
+            # add funds to investment fund
+            await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
+            WHERE name = 'Investment Fund';''', amount)
+            # create loan account
+            await conn.execute('''INSERT INTO bank_ledger VALUES($1,$2,$3,$4);''',
+                               user.id, interaction.id, amount, 'investment')
+            # credit to user account and log
+            await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $1;''',
+                               user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'bank', f"Opened a new investment account (ID: {interaction.id}) "
+                                                f"with {self.thaler}{amount:,.2f}.")
+            return await interaction.followup.send(f"You have successfully opened an investment account (ID: "
+                                                   f"{interaction.id} with {self.thaler}{amount:,.2f}.")
+
+    @rbt.command(name="manage_account", description="Manages an existing loan or investment account.")
+    @app_commands.describe(account_type="The type of account you want to manage.",
+                           action="The type of action you want to do. Withdrawing from a "
+                                  "loan account will increase the loan and depositing will decrease it.")
+    async def manage_account(self, interaction: discord.Interaction, account_type: typing.Literal['investment', 'loan'],
+                             action: typing.Literal['withdraw', 'deposit'], amount: float):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # define user
+        user = interaction.user
+        # round amount
+        amount = round(amount, 2)
+        # ensure membership
+        user_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''',
+                                        user.id)
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the Royal Bank of Thegye.")
+        # fetch investment fund info
+        investment_fund = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'Investment Fund';''')
+        # loan account management
+        # ensure the user does not already have an account if they are opening a loan account
+        if account_type == "loan":
+            loan = await conn.fetchrow('''SELECT * FROM bank_ledger WHERE user_id = $1 AND type = 'loan';''',
+                                       user.id)
+            if loan is None:
+                return await interaction.followup.send(f"You do not have an open loan account. Use "
+                                                       f"`/rbt open_account` to open a new loan account.")
+            # if the action is withdraw
+            if action == "withdraw":
+                # check if the investment fund has enough funds
+                if investment_fund['current_funds'] < amount:
+                    return await interaction.followup.send(
+                        f"The Investment Fund does not have enough available funds to "
+                        f"fill that request.")
+                # remove funds from investment fund
+                await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 
+                WHERE name = 'Investment Fund';''', amount)
+                # update loan account
+                await conn.execute('''UPDATE bank_ledger SET amount = amount + $1 
+                WHERE user_id = $2 AND type = 'loan';''', amount, user.id)
+                # credit to user account and log
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $1;''',
+                                   user.id)
+                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                   user.id, 'bank', f"Withdraw {self.thaler}{amount:,.2f} from loan account "
+                                                    f"(ID: {loan['account_id']}).")
+                return await interaction.followup.send(f"You have successfully borrowed an additional"
+                                                       f" {self.thaler}{amount:,.2f} from your existing loan account "
+                                                       f"(ID:{interaction.id}).")
+            # if action is deposit
+            if action == "deposit":
+                # ensure user has enough funds
+                if user_info['funds'] < amount:
+                    return await interaction.followup.send("You do not have enough thaler for that.")
+                # if the user is depositing more than the loan amount, auto-adjust
+                if amount > loan['amount']:
+                    amount = loan['amount']
+                # update bank ledger
+                await conn.execute('''UPDATE bank_ledger SET amount = amount - $1 
+                WHERE user_id = $2 AND account_type = 'loan';''', amount, user.id)
+                # update investment fund
+                await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
+                WHERE name = 'Investment Fund';''', amount)
+                # update log
+                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                   user.id, 'bank', f"Repaid {self.thaler}{amount:,.2f} of loan account "
+                                                    f"(ID: {loan['account_id']}).")
+                # remove any accounts with 0 amount
+                await conn.execute('''DELETE FROM bank_ledger WHERE amount <= 0;''')
+                # send message
+                return await interaction.followup.send(f"You have successfully repaid {self.thaler}{amount:,.2f} "
+                                                       f"of loan account (ID: {loan['account_id']}).")
+        if account_type == "investment":
+            # ensure they have an account
+            investment = await conn.fetchrow('''SELECT * FROM bank_ledger WHERE user_id = $1 
+            AND type = 'investment';''', user.id)
+            if investment is None:
+                return await interaction.followup.send("You do not have an active investment account. "
+                                                       "To open a new account, use `/rbt open_account investment`.")
+            # if action is withdraw
+            if action == "withdraw":
+                # check the account for sufficient funds
+                if amount > investment['amount']:
+                    return await interaction.followup.send("You do not have enough thaler in "
+                                                           "your investment account for that.")
+                if investment_fund['current_funds'] < amount:
+                    return await interaction.followup.send(
+                        f"The Investment Fund does not have enough available funds to fill that request.")
+                # update bank ledger
+                await conn.execute('''UPDATE bank_ledger SET amount = amount - $1 
+                WHERE user_id = $2 AND account_type = 'investment';''', amount, user.id)
+                # update investment fund
+                await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 
+                WHERE name = 'Investment Fund';''', amount)
+                # update log
+                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                   user.id, 'bank', f"Withdraw {self.thaler}{amount:,.2f} from investment account "
+                                                    f"(ID: {investment['account_id']}).")
+                # send message
+                return await interaction.followup.send(f"You have successfully withdrawn {self.thaler}{amount:,.2f} "
+                                                       f"from investment account (ID: {investment['account_id']}).")
+            # if action is deposit
+            if action == "deposit":
+                # ensure user has enough funds
+                if user_info['funds'] < amount:
+                    return await interaction.followup.send("You do not have enough thaler for that.")
+                # update bank ledger
+                await conn.execute('''UPDATE bank_ledger SET amount = amount + $1 
+                WHERE user_id = $2 AND account_type = 'investment';''', amount, user.id)
+                # update investment fund
+                await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
+                WHERE name = 'Investment Fund';''', amount)
+                # update log
+                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                   user.id, 'bank', f"Deposited {self.thaler}{amount:,.2f} into investment account "
+                                                    f"(ID: {investment['account_id']}).")
+                # remove any accounts with 0 amount
+                await conn.execute('''DELETE FROM bank_ledger WHERE amount <= 0;''')
+                # send message
+                return await interaction.followup.send(f"You have successfully deposited {self.thaler}{amount:,.2f} "
+                                                       f"into investment account (ID: {investment['account_id']}).")
+
+    @rbt.command(name="view_account", description="Displays information about one of your associated accounts.")
+    @app_commands.describe(account_type="The type of account you want to view.")
+    async def view_account(self, interaction: discord.Interaction, account_type: typing.Literal['investment', 'loan']):
+        # defer interaction
+        await interaction.response.defer(thinking=False)
+        # establish connection
+        conn = self.bot.pool
+        # define user
+        user = interaction.user
+        # ensure they have the type of account they've requested
+        account = await conn.fetchrow('''SELECT * FROM bank_ledger WHERE user_id = $1 and type = $2;''',
+                                      user.id, account_type)
+        if account is None:
+            return await interaction.followup.send(f"You do not have an account of that type.")
+        # create embed
+        account_embed = discord.Embed(title=f"{user.display_name}'s {account_type.title()} Account",
+                                      description=f"{account_type.title()} account for "
+                                                  f"member {user.name}#{user.discriminator}.")
+        account_embed.set_thumbnail(url=self.logo)
+        account_embed.add_field(name="Type", value=f"{account_type.title()}", inline=False)
+        account_embed.add_field(name="Amount", value=f"{self.thaler}{account['amount']:,.2f}")
+        if account_type == "investment":
+            interest = "2% daily"
+        else:
+            interest = "3.5% daily"
+        account_embed.add_field(name="Interest Rate", value=interest)
+        account_embed.add_field(name=self.space, value=self.space)
+        return await interaction.followup.send(embed=account_embed)
 
     @rbt.command(name='log', description="Sends a log of all trades, buys, sells, signed contracts, "
                                          "and marketplace transactions.")
