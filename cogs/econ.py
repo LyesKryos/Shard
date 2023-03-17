@@ -1256,7 +1256,7 @@ class Economy(commands.Cog):
                                    amount, user.id)
                 # update bank ledger
                 await conn.execute('''UPDATE bank_ledger SET amount = amount - $1 
-                WHERE user_id = $2 AND account_type = 'loan';''', amount, user.id)
+                WHERE user_id = $2 AND type = 'loan';''', amount, user.id)
                 # update investment fund
                 await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
                 WHERE name = 'Investment Fund';''', amount)
@@ -1290,7 +1290,7 @@ class Economy(commands.Cog):
                                    amount, user.id)
                 # update bank ledger
                 await conn.execute('''UPDATE bank_ledger SET amount = amount - $1 
-                WHERE user_id = $2 AND account_type = 'investment';''', amount, user.id)
+                WHERE user_id = $2 AND type = 'investment';''', amount, user.id)
                 # update investment fund
                 await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 
                 WHERE name = 'Investment Fund';''', amount)
@@ -1311,7 +1311,7 @@ class Economy(commands.Cog):
                                    amount, user.id)
                 # update bank ledger
                 await conn.execute('''UPDATE bank_ledger SET amount = amount + $1 
-                WHERE user_id = $2 AND account_type = 'investment';''', amount, user.id)
+                WHERE user_id = $2 AND type = 'investment';''', amount, user.id)
                 # update investment fund
                 await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
                 WHERE name = 'Investment Fund';''', amount)
