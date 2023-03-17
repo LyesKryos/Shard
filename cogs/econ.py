@@ -1720,7 +1720,8 @@ class Economy(commands.Cog):
             portfolio_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
             portfolio_embed.add_field(name="Current Thaler", value=f"{self.thaler}{rbt_member['funds']:,.2f}")
             # fetch all ledger information
-            ledger_info = await conn.fetch('''SELECT * FROM ledger WHERE user_id = $1;''', user.id)
+            ledger_info = await conn.fetch('''SELECT * FROM ledger WHERE user_id = $1 ORDER BY stock_id ASC;''',
+                                           user.id)
             ledger_string = ""
             stock_value = 0
             for shares in ledger_info:

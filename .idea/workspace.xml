@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding recruitment earnings&#10;Adding payroll to logs">
-      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding recruitment earnings">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,14 +114,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="29503000" />
-    </task>
-    <task id="LOCAL-00397" summary="Adding syncing">
-      <created>1678663068290</created>
-      <option name="number" value="00397" />
-      <option name="presentableId" value="LOCAL-00397" />
-      <option name="project" value="LOCAL" />
-      <updated>1678663068290</updated>
+      <workItem from="1678819823954" duration="30468000" />
     </task>
     <task id="LOCAL-00398" summary="Fixing errors.py">
       <created>1678663942533</created>
@@ -459,7 +452,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679017333281</updated>
     </task>
-    <option name="localTasksCounter" value="446" />
+    <task id="LOCAL-00446" summary="Adding recruitment earnings">
+      <created>1679017525589</created>
+      <option name="number" value="00446" />
+      <option name="presentableId" value="LOCAL-00446" />
+      <option name="project" value="LOCAL" />
+      <updated>1679017525589</updated>
+    </task>
+    <option name="localTasksCounter" value="447" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -477,7 +477,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Changing commas on buy" />
     <MESSAGE value="Fixing bottoming protection" />
     <MESSAGE value="Adding change to stock command" />
     <MESSAGE value="Adding fund command" />
@@ -502,7 +501,8 @@
     <MESSAGE value="Fixing dealer hitting" />
     <MESSAGE value="Adding slots_outcomes command" />
     <MESSAGE value="Adding recruitment earnings&#10;Adding payroll to logs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding recruitment earnings&#10;Adding payroll to logs" />
+    <MESSAGE value="Adding recruitment earnings" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding recruitment earnings" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
