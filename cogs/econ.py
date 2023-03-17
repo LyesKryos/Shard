@@ -1156,8 +1156,8 @@ class Economy(commands.Cog):
             await conn.execute('''INSERT INTO bank_ledger VALUES($1,$2,$3,$4);''',
                                user.id, interaction.id, amount, 'loan')
             # credit to user account and log
-            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $1;''',
-                               user.id)
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                              amount, user.id)
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                user.id, 'bank', f"Opened a new loan account (ID: {interaction.id}) "
                                                 f"with {self.thaler}{amount:,.2f}.")
@@ -1181,8 +1181,8 @@ class Economy(commands.Cog):
             await conn.execute('''INSERT INTO bank_ledger VALUES($1,$2,$3,$4);''',
                                user.id, interaction.id, amount, 'investment')
             # credit to user account and log
-            await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $1;''',
-                               user.id)
+            await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
+                               amount, user.id)
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                user.id, 'bank', f"Opened a new investment account (ID: {interaction.id}) "
                                                 f"with {self.thaler}{amount:,.2f}.")
@@ -1225,6 +1225,9 @@ class Economy(commands.Cog):
                     return await interaction.followup.send(
                         f"The Investment Fund does not have enough available funds to "
                         f"fill that request.")
+                # add funds to user
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id - $2;''',
+                                   amount, user.id)
                 # remove funds from investment fund
                 await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 
                 WHERE name = 'Investment Fund';''', amount)
@@ -1232,8 +1235,8 @@ class Economy(commands.Cog):
                 await conn.execute('''UPDATE bank_ledger SET amount = amount + $1 
                 WHERE user_id = $2 AND type = 'loan';''', amount, user.id)
                 # credit to user account and log
-                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $1;''',
-                                   user.id)
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                                   amount, user.id)
                 await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                    user.id, 'bank', f"Withdraw {self.thaler}{amount:,.2f} from loan account "
                                                     f"(ID: {loan['account_id']}).")
@@ -1248,6 +1251,9 @@ class Economy(commands.Cog):
                 # if the user is depositing more than the loan amount, auto-adjust
                 if amount > loan['amount']:
                     amount = loan['amount']
+                # remove funds from user
+                await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id - $2;''',
+                                   amount, user.id)
                 # update bank ledger
                 await conn.execute('''UPDATE bank_ledger SET amount = amount - $1 
                 WHERE user_id = $2 AND account_type = 'loan';''', amount, user.id)
@@ -1279,6 +1285,9 @@ class Economy(commands.Cog):
                 if investment_fund['current_funds'] < amount:
                     return await interaction.followup.send(
                         f"The Investment Fund does not have enough available funds to fill that request.")
+                # add funds to user
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id - $2;''',
+                                   amount, user.id)
                 # update bank ledger
                 await conn.execute('''UPDATE bank_ledger SET amount = amount - $1 
                 WHERE user_id = $2 AND account_type = 'investment';''', amount, user.id)
@@ -1297,6 +1306,9 @@ class Economy(commands.Cog):
                 # ensure user has enough funds
                 if user_info['funds'] < amount:
                     return await interaction.followup.send("You do not have enough thaler for that.")
+                # remove funds from user
+                await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id - $2;''',
+                                   amount, user.id)
                 # update bank ledger
                 await conn.execute('''UPDATE bank_ledger SET amount = amount + $1 
                 WHERE user_id = $2 AND account_type = 'investment';''', amount, user.id)
