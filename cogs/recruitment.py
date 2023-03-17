@@ -319,13 +319,14 @@ class Recruitment(commands.Cog):
             await conn.execute('''INSERT INTO rbt_user_logs VALUES($1,$2,$3);''',
                                ctx.author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent/2)} from "
                                                          f"recruitment.")
+            self.user_sent = 0
         except Exception as error:
             conn = self.bot.pool
             self.running = False
             await ctx.send("The recruitment bot has run into an issue. Recruitment has stopped.")
             # update relevant tables
-            await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $2
-             WHERE user_id = $3;''', self.user_sent, self.user_sent, ctx.author.id)
+            await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $1
+             WHERE user_id = $2;''', self.user_sent, ctx.author.id)
             await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                math.floor(self.user_sent/2), ctx.author.id)
             await conn.execute('''UPDATE funds SET general_fund = general_fund - $1 WHERE name = 'General Fund';''',
@@ -459,7 +460,6 @@ class Recruitment(commands.Cog):
         await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
                            (self.user_sent + userinfo['sent']), (self.user_sent + userinfo['sent_this_month']),
                            ctx.author.id)
-        self.user_sent = 0
         self.recruitment_gather_object.cancel()
         return
 
