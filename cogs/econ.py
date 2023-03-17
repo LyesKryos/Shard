@@ -915,6 +915,17 @@ class Economy(commands.Cog):
             investment = await conn.fetchrow('''SELECT * FROM bank_ledger 
             WHERE user_id = $1 AND type = 'investment';''', user.id)
             loan = await conn.fetchrow('''SELECT * FROM bank_ledger WHERE user_id = $1 AND type = 'loan';''', user.id)
+            # fetch stocks and calculate worth
+            ledger = await conn.fetch('''SELECT * FROM ledger WHERE user_id = $1;''',
+                                      user.id)
+            # calculate total stock value
+            stock_value = 0
+            for stock in ledger:
+                # fetch stock info
+                stock_info = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''',
+                                                 stock['stock_id'])
+                stock_value += stock['amount'] * float(stock_info['value'])
+            total_value = round(stock_value + float(rbt_member['funds']), 2)
             # create embed
             rbtm_embed = discord.Embed(title=f"{user.nick}", description=f"Information about the Royal Bank of Thegye"
                                                                          f" member {user.name}#{user.discriminator}.",
@@ -925,8 +936,11 @@ class Economy(commands.Cog):
             rbtm_embed.add_field(name=self.space, value=self.space)
             if investment is not None:
                 rbtm_embed.add_field(name="Investment Account", value=f"{self.thaler}{investment['amount']:,.2f}")
+                total_value += investment['amount']
             if loan is not None:
                 rbtm_embed.add_field(name="Loan Account", value=f"{self.thaler}{loan['amount']:,.2f}")
+                total_value -= loan['amount']
+            rbtm_embed.add_field(name="Net Worth", value=f"{self.thaler}{total_value:,.2f}")
             return await interaction.followup.send(embed=rbtm_embed)
 
     @rbt.command(name='directory', description="Displays all registered members of the Royal Bank of Thegye.")
@@ -946,6 +960,11 @@ class Economy(commands.Cog):
             # fetch member ledger
             ledger = await conn.fetch('''SELECT * FROM ledger WHERE user_id = $1;''',
                                       member['user_id'])
+            # fetch accounts
+            investment = await conn.fetchrow('''SELECT * FROM bank_ledger 
+            WHERE user_id = $1 AND type = 'investment';''', member['user_id'])
+            loan = await conn.fetchrow('''SELECT * FROM bank_ledger 
+            WHERE user_id = $1 AND type = 'laon';''', member['user_id'])
             # calculate total stock value
             stock_value = 0
             for stock in ledger:
@@ -954,6 +973,10 @@ class Economy(commands.Cog):
                                                  stock['stock_id'])
                 stock_value += stock['amount'] * float(stock_info['value'])
             total_value = round(stock_value + float(member['funds']), 2)
+            if investment is not None:
+                total_value += investment['amount']
+            if loan is not None:
+                total_value -= loan['amount']
             member_dict.update({member['user_id']: total_value})
         # sort members by total value
         ranked_members = sorted(member_dict.items(), key=lambda x: x[1], reverse=True)
@@ -1970,6 +1993,11 @@ class Economy(commands.Cog):
                                                         f"{user.name}#{user.discriminator}.")
             portfolio_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
             portfolio_embed.add_field(name="Current Thaler", value=f"{self.thaler}{rbt_member['funds']:,.2f}")
+            # fetches all accounts
+            investment = await conn.fetchrow('''SELECT * FROM bank_ledger 
+            WHERE user_id = $1 AND type = 'investment';''', user.id)
+            loan = await conn.fetchrow('''SELECT * FROM bank_ledger 
+            WHERE user_id = $1 AND type = 'loan';''', user.id)
             # fetch all ledger information
             ledger_info = await conn.fetch('''SELECT * FROM ledger WHERE user_id = $1 ORDER BY stock_id ASC;''',
                                            user.id)
@@ -1995,10 +2023,15 @@ class Economy(commands.Cog):
                                f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
                 ledger_string += this_string
                 stock_value += float(shares['amount']) * float(stock['value'])
+            total_value = float(rbt_member['funds']) + float(stock_value)
+            if investment is not None:
+                total_value += float(investment['amount'])
+            if loan is not None:
+                total_value -= float(loan['amount'])
             portfolio_embed.add_field(name="Stock Value", value=f"{self.thaler}{stock_value:,.2f}")
             portfolio_embed.add_field(name="Net Worth",
                                       value=f"{self.thaler}"
-                                            f"{round(float(stock_value) + float(rbt_member['funds']), 2):,.2f}")
+                                            f"{round(total_value, 2):,.2f}")
             portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
             await interaction.followup.send(embed=portfolio_embed)
 
