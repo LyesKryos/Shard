@@ -767,24 +767,26 @@ class Economy(commands.Cog):
                 # GENERAL FUND CHECKS
                 # check general fund for minting/refund
                 general_fund = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'General Fund';''')
+                current_fund = float(general_fund['current_funds'])
+                fund_limit = float(general_fund['fund_limit'])
                 # if the general fund is near/overdrawn
-                if general_fund['current_funds'] <= (.02 * general_fund['fund_limit']):
+                if current_fund <= (.02 * fund_limit):
                     # set new fund to 150% of old fund
-                    new_limit = general_fund['fund_limit'] * 1.5
-                    additional_funds = general_fund['fund_limit'] * .5
+                    new_limit = fund_limit * 1.5
+                    additional_funds = fund_limit * .5
                     # ADD MARKET INCREASES/DECREASES HERE
                     # update funds
                     await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = current_funds + $2 
                             WHERE name = 'General Fund';''', new_limit, additional_funds)
                 # if the general fund is overfunded
-                if general_fund['current_funds'] > general_fund['fund_limit']:
+                if current_fund > fund_limit:
                     # ensure the general fund is more than 500,000 thaler
-                    if general_fund['fund_limit'] > 500000:
+                    if fund_limit > 500000:
                         # set the new fund limit to 50%
-                        new_limit = general_fund['fund_limit'] * .5
+                        new_limit = fund_limit * .5
                         # calculate refund and new current funds
-                        new_funds = general_fund['fund_limit'] * .25
-                        refund = general_fund['current_funds'] - general_fund['fund_limit']
+                        new_funds = fund_limit * .25
+                        refund = current_fund - fund_limit
                         await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = $2 
                                 WHERE name = 'General Fund';''', new_limit, new_funds)
                         # count the number of investors
@@ -1132,6 +1134,30 @@ class Economy(commands.Cog):
                         f"{contract['terms']}")
         # sends contract terms file
         return await interaction.followup.send(file=discord.File(fp=f"{contract_id}_terms.txt"))
+
+    @rbt.command(name="signed_contracts", description="Displays all contracts a user has signed.")
+    async def signed_contracts(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # define user
+        user = interaction.user
+        # ensure membership
+        user_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', user.id)
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the Royal Bank of Thegye.")
+        # fetch all contracts where the user is a signatory
+        contracts = await conn.fetch('''SELECT * FROM contracts WHERE $1 = ANY(signatories);''')
+        # if they have signed no contracts, return
+        if contracts is None:
+            return await interaction.followup.send("You have not signed any contracts.")
+        # make list
+        contract_list = "You have signed the following contract(s): \n"
+        for contract in contracts:
+            contract_list += f"`{contract['contract_id']}` (signed `{contract.strftime('%H:%M on %d/%m/%Y')}`\n"
+        # send list
+        return await interaction.followup.send(content=contract_list)
 
     @rbt.command(name="fund_info", description="Displays information about a given fund.")
     @app_commands.describe(fund="The name of the fund.")
@@ -1632,31 +1658,31 @@ class Economy(commands.Cog):
     @commands.is_owner()
     async def force_bank_update(self, ctx):
         try:
-            # define channel
-            bankchannel = ctx.channel
             # establish connection
             conn = self.bot.pool
             # GENERAL FUND CHECKS
             # check general fund for minting/refund
             general_fund = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'General Fund';''')
+            current_fund = float(general_fund['current_funds'])
+            fund_limit = float(general_fund['fund_limit'])
             # if the general fund is near/overdrawn
-            if general_fund['current_funds'] <= (.02 * general_fund['fund_limit']):
+            if current_fund <= (.02 * fund_limit):
                 # set new fund to 150% of old fund
-                new_limit = general_fund['fund_limit'] * 1.5
-                additional_funds = general_fund['fund_limit'] * .5
+                new_limit = fund_limit * 1.5
+                additional_funds = fund_limit * .5
                 # ADD MARKET INCREASES/DECREASES HERE
                 # update funds
                 await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = current_funds + $2 
                         WHERE name = 'General Fund';''', new_limit, additional_funds)
             # if the general fund is overfunded
-            if general_fund['current_funds'] > general_fund['fund_limit']:
+            if current_fund > fund_limit:
                 # ensure the general fund is more than 500,000 thaler
-                if general_fund['fund_limit'] > 500000:
+                if fund_limit > 500000:
                     # set the new fund limit to 50%
-                    new_limit = general_fund['fund_limit'] * .5
+                    new_limit = fund_limit * .5
                     # calculate refund and new current funds
-                    new_funds = general_fund['fund_limit'] * .25
-                    refund = general_fund['current_funds'] - general_fund['fund_limit']
+                    new_funds = fund_limit * .25
+                    refund = current_fund - fund_limit
                     await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = $2 
                             WHERE name = 'General Fund';''', new_limit, new_funds)
                     # count the number of investors
@@ -1724,7 +1750,7 @@ class Economy(commands.Cog):
                                        official.id)
                     await conn.execute(
                         '''UPDATE funds SET current_funds = current_funds - 20 WHERE name = 'General Fund';''')
-            await bankchannel.send("Royal Bank of Thegye updated.")
+            await ctx.send("Royal Bank of Thegye updated.")
         except Exception as error:
             etype = type(error)
             trace = error.__traceback__

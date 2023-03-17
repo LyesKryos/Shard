@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Accounting for type change for rbt" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating proper view for all account ID displays">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -112,14 +115,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="38521000" />
-    </task>
-    <task id="LOCAL-00413" summary="Adding fund command">
-      <created>1678826009474</created>
-      <option name="number" value="00413" />
-      <option name="presentableId" value="LOCAL-00413" />
-      <option name="project" value="LOCAL" />
-      <updated>1678826009474</updated>
+      <workItem from="1678819823954" duration="40394000" />
     </task>
     <task id="LOCAL-00414" summary="Altering floor mechanic">
       <created>1678827756483</created>
@@ -457,7 +453,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679069703944</updated>
     </task>
-    <option name="localTasksCounter" value="462" />
+    <task id="LOCAL-00462" summary="Updating proper view for all account ID displays">
+      <created>1679069894430</created>
+      <option name="number" value="00462" />
+      <option name="presentableId" value="LOCAL-00462" />
+      <option name="project" value="LOCAL" />
+      <updated>1679069894430</updated>
+    </task>
+    <option name="localTasksCounter" value="463" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -475,7 +478,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing slots" />
     <MESSAGE value="Fixing casino rank" />
     <MESSAGE value="Fixing wording for overdrawn stocks&#10;Adding wire command." />
     <MESSAGE value="Buttons for blasckjack and be used only by the user who called the original interaction" />
@@ -500,7 +502,8 @@
     <MESSAGE value="Updating net worth calculations with investment and loan accounts" />
     <MESSAGE value="Fixing view for info command" />
     <MESSAGE value="Accounting for type change for rbt" />
-    <option name="LAST_COMMIT_MESSAGE" value="Accounting for type change for rbt" />
+    <MESSAGE value="Updating proper view for all account ID displays" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updating proper view for all account ID displays" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
