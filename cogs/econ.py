@@ -2053,8 +2053,7 @@ class Economy(commands.Cog):
             try:
                 stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', int(stock_id))
             except ValueError:
-                return await interaction.followup.send(f"``{stock_id}`` does not exist on the Exchange.",
-                                                       ephemeral=True)
+                return await interaction.followup.send(f"``{stock_id}`` does not exist on the Exchange.")
         # get datetime objects
         # if start_date is today, set for today
         if start_date.lower() == "today":
@@ -2073,7 +2072,7 @@ class Economy(commands.Cog):
                                                        f"Dates should be formatted day/month/year. For example: "
                                                        f"9/1/2020.\n"
                                                        f"This command also accepts `today`, `week`, `month`, "
-                                                       f"and `forever` as acceptable arguments.", ephemeral=True)
+                                                       f"and `forever` as acceptable arguments.")
         # if the end date is none, get the time now
         if end_date is None:
             end_date = datetime.now()
