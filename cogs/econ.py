@@ -911,6 +911,10 @@ class Economy(commands.Cog):
                 user_type = "Premium"
             else:
                 user_type = "Standard"
+            # fetch all accounts
+            investment = await conn.fetchrow('''SELECT * FROM bank_ledger 
+            WHERE user_id = $1 AND type = 'investment';''', user.id)
+            loan = await conn.fetchrow('''SELECT * FROM bank_ledger WHERE user_id = $1 AND type = 'loan';''', user.id)
             # create embed
             rbtm_embed = discord.Embed(title=f"{user.nick}", description=f"Information about the Royal Bank of Thegye"
                                                                          f" member {user.name}#{user.discriminator}.",
@@ -918,6 +922,11 @@ class Economy(commands.Cog):
             rbtm_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
             rbtm_embed.add_field(name="Thaler", value=f"{self.thaler}{rbt_member['funds']:,.2f}")
             rbtm_embed.add_field(name="Membership", value=f"{user_type}")
+            rbtm_embed.add_field(name=self.space, value=self.space)
+            if investment is not None:
+                rbtm_embed.add_field(name="Investment Account", value=f"{self.thaler}{investment['amount']:,.2f}")
+            if loan is not None:
+                rbtm_embed.add_field(name="Loan Account", value=f"{self.thaler}{loan['amount']:,.2f}")
             return await interaction.followup.send(embed=rbtm_embed)
 
     @rbt.command(name='directory', description="Displays all registered members of the Royal Bank of Thegye.")
