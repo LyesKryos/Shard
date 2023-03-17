@@ -1199,10 +1199,10 @@ class Economy(commands.Cog):
                     value_roll = uniform(1, 7 * stock['risk'])
                     # if the trend is up, increase stock based on risk
                     if trending == "up":
-                        value = value + (((value_roll / 100) + (stock['outstanding'] / stock['issued'] * 10)) * value)
+                        value = value + (((value_roll / 100) + (stock['outstanding'] / stock['issued'])) * value)
                         change = round(1 - (int(stock['value']) / value), 4)
                     else:
-                        value = value - (((value_roll / 100) + (stock['outstanding'] / stock['issued'] * 10)) * value)
+                        value = value - (((value_roll / 100) - (stock['outstanding'] / stock['issued'])) * value)
                         # if the value drops below the floor, set it to be 5 - risk
                         if value < (5 - stock['risk']):
                             value = 5 - stock['risk']
