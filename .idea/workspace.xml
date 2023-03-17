@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating Shard version and name" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Setting verification's sql dialect" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -112,14 +112,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="32152000" />
-    </task>
-    <task id="LOCAL-00400" summary="Updating everything for beta testing">
-      <created>1678812867002</created>
-      <option name="number" value="00400" />
-      <option name="presentableId" value="LOCAL-00400" />
-      <option name="project" value="LOCAL" />
-      <updated>1678812867002</updated>
+      <workItem from="1678819823954" duration="32566000" />
     </task>
     <task id="LOCAL-00401" summary="Putting link in for register">
       <created>1678813313827</created>
@@ -457,7 +450,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679051677787</updated>
     </task>
-    <option name="localTasksCounter" value="449" />
+    <task id="LOCAL-00449" summary="Setting verification's sql dialect">
+      <created>1679051895739</created>
+      <option name="number" value="00449" />
+      <option name="presentableId" value="LOCAL-00449" />
+      <option name="project" value="LOCAL" />
+      <updated>1679051895739</updated>
+    </task>
+    <option name="localTasksCounter" value="450" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -475,7 +475,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding fund command" />
     <MESSAGE value="Altering floor mechanic" />
     <MESSAGE value="Changing feed to look right" />
     <MESSAGE value="Fixing change to not plumet after flooring" />
@@ -500,7 +499,8 @@
     <MESSAGE value="Adding recruitment earnings" />
     <MESSAGE value="Changing portfolio look" />
     <MESSAGE value="Updating Shard version and name" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating Shard version and name" />
+    <MESSAGE value="Setting verification's sql dialect" />
+    <option name="LAST_COMMIT_MESSAGE" value="Setting verification's sql dialect" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

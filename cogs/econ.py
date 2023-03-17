@@ -367,9 +367,9 @@ class BlackjackView(View):
                 dealer_total += card
             # if the total is more than 21, change aces
             if player_total > 21:
-                if 11 in self.player_hand:
+                if "A" in self.player_hand:
                     for ace in self.player_hand:
-                        if ace == 11:
+                        if ace == "A":
                             player_total -= 10
                         if player_total < 21:
                             break
@@ -377,9 +377,9 @@ class BlackjackView(View):
                 else:
                     bust = True
             if dealer_total > 21:
-                if 11 in self.dealer_hand:
+                if "A" in self.dealer_hand:
                     for ace in self.dealer_hand:
-                        if ace == 11:
+                        if ace == "A":
                             player_total -= 10
                         if player_total < 21:
                             break
@@ -500,16 +500,16 @@ class BlackjackView(View):
                 dealer_total += card
             # if the total is more than 21, change aces
             if player_total > 21:
-                if 11 in self.player_hand:
+                if "A" in self.player_hand:
                     for ace in self.player_hand:
-                        if ace == 11:
+                        if ace == "A":
                             player_total -= 10
                         if player_total < 21:
                             break
             if dealer_total > 21:
-                if 11 in self.dealer_hand:
+                if "A" in self.dealer_hand:
                     for ace in self.dealer_hand:
-                        if ace == 11:
+                        if ace == "A":
                             player_total -= 10
                         if player_total < 21:
                             break
@@ -1936,9 +1936,9 @@ class Economy(commands.Cog):
             dealer_total += card
         # if the total is more than 21, change aces
         if player_total > 21:
-            if 11 in player_hand:
+            if "A" in player_hand:
                 for ace in player_hand:
-                    if ace == 11:
+                    if ace == "A":
                         player_total -= 10
                     if player_total < 21:
                         break
@@ -1946,9 +1946,9 @@ class Economy(commands.Cog):
             else:
                 bust = True
         if dealer_total > 21:
-            if 11 in dealer_hand:
+            if "A" in dealer_hand:
                 for ace in dealer_hand:
-                    if ace == 11:
+                    if ace == "A":
                         player_total -= 10
                     if player_total < 21:
                         break
