@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing graph command">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Altering how exchange crashes work">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
@@ -115,14 +115,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="45167000" />
-    </task>
-    <task id="LOCAL-00421" summary="Testing directory command">
-      <created>1678975130841</created>
-      <option name="number" value="00421" />
-      <option name="presentableId" value="LOCAL-00421" />
-      <option name="project" value="LOCAL" />
-      <updated>1678975130841</updated>
+      <workItem from="1678819823954" duration="46627000" />
     </task>
     <task id="LOCAL-00422" summary="Testing directory command">
       <created>1678975235098</created>
@@ -460,7 +453,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679108248484</updated>
     </task>
-    <option name="localTasksCounter" value="470" />
+    <task id="LOCAL-00470" summary="Altering how exchange crashes work">
+      <created>1679110597955</created>
+      <option name="number" value="00470" />
+      <option name="presentableId" value="LOCAL-00470" />
+      <option name="project" value="LOCAL" />
+      <updated>1679110597955</updated>
+    </task>
+    <option name="localTasksCounter" value="471" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -478,7 +478,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing dealer hitting" />
     <MESSAGE value="Adding slots_outcomes command" />
     <MESSAGE value="Adding recruitment earnings&#10;Adding payroll to logs" />
     <MESSAGE value="Adding recruitment earnings" />
@@ -503,7 +502,8 @@
     <MESSAGE value="Fixing dealer_total and player_total mixup" />
     <MESSAGE value="Fixing net worth for directory" />
     <MESSAGE value="Fixing graph command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing graph command" />
+    <MESSAGE value="Altering how exchange crashes work" />
+    <option name="LAST_COMMIT_MESSAGE" value="Altering how exchange crashes work" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

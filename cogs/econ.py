@@ -856,6 +856,8 @@ class Economy(commands.Cog):
                                            official.id)
                         await conn.execute(
                             '''UPDATE funds SET current_funds = current_funds - 20 WHERE name = 'General Fund';''')
+                        await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                           official.id, 'bank', f"Payroll {self.thaler}20.")
                 await bankchannel.send("Royal Bank of Thegye updated.")
                 continue
             except Exception as error:
