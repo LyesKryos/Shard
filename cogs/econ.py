@@ -2079,7 +2079,7 @@ class Economy(commands.Cog):
         # fetches stock information
         stock = await conn.fetchrow('''SELECT * FROM stocks WHERE lower(name) = $1;''', stock_id.lower())
         # if the graph should be the average over time, graph
-        if stock.lower() == "average":
+        if stock_id.lower() == "average":
             stock = "average"
         # if stock does not exist, return message
         if stock is None:
