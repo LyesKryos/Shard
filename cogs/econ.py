@@ -2357,10 +2357,10 @@ class Economy(commands.Cog):
         slot3 = choice(items)
         slots = [slot1, slot2, slot3]
         # define payouts
-        single = (bet * 1.1) - bet
-        double = (bet * 1.5) - bet
-        triple = (bet * 3) - bet
-        jackpot = (bet * 10) - bet
+        single = (bet * 2) - bet
+        double = (bet * 5) - bet
+        triple = (bet * 50) - bet
+        jackpot = (bet * 100) - bet
         if "doubler" in slots:
             single *= 2
             double *= 2
