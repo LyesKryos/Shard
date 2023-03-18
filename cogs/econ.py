@@ -1286,9 +1286,6 @@ class Economy(commands.Cog):
                     return await interaction.followup.send(
                         f"The Investment Fund does not have enough available funds to "
                         f"fill that request.")
-                # add funds to user
-                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
-                                   amount, user.id)
                 # remove funds from investment fund
                 await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 
                 WHERE name = 'Investment Fund';''', amount)
@@ -1541,9 +1538,10 @@ class Economy(commands.Cog):
                         self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
                                              "All stock values are decreased by 75%.\n "
                 crash_chance = uniform(1, 100)
+                if stock_sum['sum'] / stock_count['count'] > 10 * stock_count['count']:
+                    crash_chance += stock_sum['sum'] / stock_count['count']
                 if crash_chance <= 1:
                     if self.crash is False:
-                        if stock_sum['sum'] > 10 * stock_count['count']:
                             await conn.execute('''UPDATE stocks 
                             SET value = round((value * .25)::numeric, 2), trend = 'down';''')
                             self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
