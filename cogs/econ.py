@@ -970,7 +970,7 @@ class Economy(commands.Cog):
             investment = await conn.fetchrow('''SELECT * FROM bank_ledger 
             WHERE user_id = $1 AND type = 'investment';''', member['user_id'])
             loan = await conn.fetchrow('''SELECT * FROM bank_ledger 
-            WHERE user_id = $1 AND type = 'laon';''', member['user_id'])
+            WHERE user_id = $1 AND type = 'loan';''', member['user_id'])
             # calculate total stock value
             stock_value = 0
             for stock in ledger:
