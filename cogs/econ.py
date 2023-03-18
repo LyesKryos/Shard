@@ -983,7 +983,7 @@ class Economy(commands.Cog):
                 total_value += float(investment['amount'])
             if loan is not None:
                 total_value -= float(loan['amount'])
-            member_dict.update({member['user_id']: total_value})
+            member_dict.update({member['user_id']: round(total_value, 2)})
         # sort members by total value
         ranked_members = sorted(member_dict.items(), key=lambda x: x[1], reverse=True)
         # create string
