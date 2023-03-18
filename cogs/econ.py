@@ -1325,7 +1325,7 @@ class Economy(commands.Cog):
                                    user.id, 'bank', f"Repaid {self.thaler}{amount:,.2f} of loan account "
                                                     f"(ID: {loan['account_id']}).")
                 # remove any accounts with 0 amount
-                await conn.execute('''DELETE FROM bank_ledger WHERE amount <= 0;''')
+                await conn.execute('''DELETE FROM bank_ledger WHERE round(amount,2) <= 0;''')
                 # send message
                 return await interaction.followup.send(f"You have successfully repaid {self.thaler}{amount:,.2f} "
                                                        f"of loan account (ID: {loan['account_id']}).")
@@ -1380,7 +1380,7 @@ class Economy(commands.Cog):
                                    user.id, 'bank', f"Deposited {self.thaler}{amount:,.2f} into investment account "
                                                     f"(ID: {investment['account_id']}).")
                 # remove any accounts with 0 amount
-                await conn.execute('''DELETE FROM bank_ledger WHERE amount <= 0;''')
+                await conn.execute('''DELETE FROM bank_ledger WHERE ROUND(amount::numeric,2) <= 0;''')
                 # send message
                 return await interaction.followup.send(f"You have successfully deposited {self.thaler}{amount:,.2f} "
                                                        f"into investment account (ID: {investment['account_id']}).")
