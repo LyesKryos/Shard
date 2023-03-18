@@ -2382,6 +2382,8 @@ class Economy(commands.Cog):
                                jackpot, user.id)
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                user.id, 'casino', f'Won {self.thaler}{jackpot:,.2f} at slots')
+            await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                                bet, user.id)
             return await interaction.followup.send(embed=slots_embed)
         # search for triple combos
         elif all(s == slots[0] for s in slots) and slots[0] in triple_combo:
@@ -2390,6 +2392,8 @@ class Economy(commands.Cog):
                                triple, user.id)
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                user.id, 'casino', f'Won {self.thaler}{triple:,.2f} at slots')
+            await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                               bet, user.id)
             return await interaction.followup.send(embed=slots_embed)
         # search for double combos
         elif (slot1 in slots[1:2] and slot1 in double_combo) or (slot2 in [slots[0], slots[2]] and slot2 in double_combo) or (slot3 in slots[0:1] and slot3 in double_combo):
@@ -2398,6 +2402,8 @@ class Economy(commands.Cog):
                                double, user.id)
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                user.id, 'casino', f'Won {self.thaler}{double:,.2f} at slots')
+            await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                               bet, user.id)
             return await interaction.followup.send(embed=slots_embed)
         # search for single combos
         elif slots[0] in single_combo or slots[1] in single_combo or slots[2] in single_combo:
@@ -2406,6 +2412,8 @@ class Economy(commands.Cog):
                                single, user.id)
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                user.id, 'casino', f'Won {self.thaler}{single:,.2f} at slots')
+            await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                               bet, user.id)
             return await interaction.followup.send(embed=slots_embed)
         # return no combos
         else:
@@ -2414,6 +2422,8 @@ class Economy(commands.Cog):
                                -bet, user.id)
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                user.id, 'casino', f'Lost {self.thaler}{bet:,.2f} at slots')
+            await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                               -bet, user.id)
             return await interaction.followup.send(embed=slots_embed)
 
     @casino.command(name="slots_outcomes", description="Displays the slots combinations.")
