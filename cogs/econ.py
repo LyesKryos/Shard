@@ -1814,12 +1814,23 @@ class Economy(commands.Cog):
             return await interaction.followup.send(embed=stock_embed)
 
     @exchange.command(description="Purchases a specified amount of a stock's shares.", name="buy")
-    @app_commands.describe(stock_id="The name or ID of the stock", amount="A whole number amount")
-    async def buy(self, interaction: discord.Interaction, stock_id: str, amount: app_commands.Range[int, 1, None]):
+    @app_commands.describe(stock_id="The name or ID of the stock",
+                           amount="A whole number amount. Also accepts \"max\".")
+    async def buy(self, interaction: discord.Interaction, stock_id: str, amount: str):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establishes connection
         conn = self.bot.pool
+        # fetches user information
+        user = interaction.user
+        # fetches RBT member information
+        rbt_member = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''',
+                                         user.id)
+        if rbt_member is None:
+            return await interaction.followup.send(f"You are not a registered member of the Royal Bank of Thegye.")
+        # if the amount isn't max, then set the amount = a number
+        if amount.lower() != "max":
+            amount = int(amount)
         # if the amount is less than 0
         if amount <= 0:
             return await interaction.followup.send(f"Positive whole numbers only!")
@@ -1830,26 +1841,31 @@ class Economy(commands.Cog):
             try:
                 stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', int(stock_id))
             except ValueError:
-                return await interaction.followup.send(f"``{stock_id}`` does not exist on the Exchange.")
+                return await interaction.followup.send(f"``{stock_id}`` does not exist on the Exchange.")        # if the amount is maximum, calculate how much the user can purchase
+        if amount.lower() == "max":
+            base_price = round(float(stock['value']))
+            tax = round(base_price * .005, 2)
+            if tax < .01:
+                tax = .01
+            sub_total = round(base_price + tax, 2)
+            amount = math.floor(rbt_member['funds'] / sub_total)
+            # if the user cant afford any
+            if amount < 1:
+                return await interaction.followup.send(f"You cannot afford any shares of {stock['name']}.")
+            transaction = round(amount * sub_total, 2)
+        else:
+            # define transaction cost
+            base_price = round(float(stock['value']) * amount, 2)
+            tax = round(base_price * .005, 2)
+            if tax < .01:
+                tax = .01
+            transaction = round(base_price + tax, 2)
         # if the stock would become overdrawn, notify user
         if amount + stock['outstanding'] > stock['issued']:
             return await interaction.followup.send(f"Purchasing {amount} shares of {stock['name']} would cause it to "
                                                    f"be overdrawn. Either purchase an appropriate number of issued "
                                                    f"shares or notify a Director to increase the number of shares of "
                                                    f"this company.")
-        # fetches user information
-        user = interaction.user
-        # fetches RBT member information
-        rbt_member = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''',
-                                         user.id)
-        if rbt_member is None:
-            return await interaction.followup.send(f"You are not a registered member of the Royal Bank of Thegye.")
-        # define transaction cost
-        base_price = round(float(stock['value']) * amount, 2)
-        tax = round(base_price * .005, 2)
-        if tax < .01:
-            tax = .01
-        transaction = round(base_price + tax, 2)
         # check for sufficient funds and return if not
         if transaction > rbt_member['funds']:
             return await interaction.followup.send(f"You do not have enough funds to purchase that amount of shares.\n"
