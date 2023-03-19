@@ -2204,7 +2204,6 @@ class Economy(commands.Cog):
 
     @casino.command(name="blackjack", description="Starts a game of blackjack, aka 21.")
     @app_commands.describe(bet="The amount of thaler to bet. Must be a whole number.")
-    @app_commands.checks.cooldown(1, 5, key=lambda c: (c.user.id, c.guild_id))
     async def blackjack(self, interaction: discord.Interaction, bet: app_commands.Range[int, 1, 10000]):
         # defer interaction
         await interaction.response.defer(thinking=True)
