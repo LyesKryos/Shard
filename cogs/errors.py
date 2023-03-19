@@ -1,6 +1,7 @@
 import traceback
 
 import discord.errors
+from discord import app_commands
 
 from ShardBot import Shard
 from discord.ext import commands
@@ -55,7 +56,8 @@ class ShardErrorHandler(commands.Cog):
             await ctx.send_help(ctx.invoked_with)
         elif isinstance(error, commands.CommandOnCooldown):
             await ctx.send(f"Slow down! Try again in {error.retry_after:.2f} seconds.")
-            await ctx.send_help(ctx.invoked_with)
+        elif isinstance(error, app_commands.errors.CommandOnCooldown):
+            await ctx.send(f"Slow down! Try again in {error.retry_after:.2f} seconds.")
         elif isinstance(error, SilentFail):
             return
         elif isinstance(error, commands.UserNotFound):
