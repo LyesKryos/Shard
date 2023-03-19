@@ -1930,6 +1930,9 @@ class Economy(commands.Cog):
         # credit funds to user's account
         await conn.execute('''UPDATE rbt_users SET funds = ROUND(funds::numeric + $1, 2) WHERE user_id = $2;''',
                            transaction, user.id)
+        # reduce outstanding shares
+        await conn.execute('''UPDATE stocks SET outstanding = outstanding - $1 WHERE stock_id = $2;''',
+                           amount, stock['stock_id'])
         # log sale
         await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                            user.id, 'exchange', f'Sold {amount} {stock["name"]} (id: {stock["stock_id"]}) @ '
