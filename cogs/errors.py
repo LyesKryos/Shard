@@ -12,6 +12,11 @@ class ShardErrorHandler(commands.Cog):
     def __init__(self, bot: Shard):
         self.bot = bot
 
+    def cog_load(self):
+        tree = self.bot.tree
+        self._old_tree_error = tree.on_error
+        tree.on_error = self.on_app_command_error
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         # parses the error
@@ -75,7 +80,6 @@ class ShardErrorHandler(commands.Cog):
             traceback_text = ''.join(lines)
             self.bot.logger.warning(msg=f"{traceback_text}")
 
-    @commands.Cog.listener()
     async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
         # if the user attempts to use a command in DMs that is not authorized to use in DMs
         if isinstance(error, app_commands.NoPrivateMessage):
