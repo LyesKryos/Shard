@@ -1558,8 +1558,15 @@ class Economy(commands.Cog):
                 # update stocks' value tracker
                 await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
                 SELECT stock_id, value, trending FROM stocks;''')
+                # unpin old message
+                old_message = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_pinned_message';''')
+                old_message = await bankchannel.fetch_message(int(old_message['value']))
+                await old_message.unpin()
                 # announce
-                await bankchannel.send(content=self.announcement)
+                new_announcement = await bankchannel.send(content=self.announcement)
+                await new_announcement.pin()
+                await conn.execute('''UPDATE info SET value = $1 WHERE name = 'rbt_pinned_message';''',
+                                   str(new_announcement.id))
                 self.announcement = \
                     "The Royal Exchange of Thegye has updated. Below is a summary of any important changes:\n"
                 continue
@@ -2210,7 +2217,7 @@ class Economy(commands.Cog):
 
     @casino.command(name="blackjack", description="Starts a game of blackjack, aka 21.")
     @app_commands.describe(bet="The amount of thaler to bet. Must be a whole number.")
-    async def blackjack(self, interaction: discord.Interaction, bet: app_commands.Range[int, 1, 10000]):
+    async def blackjack(self, interaction: discord.Interaction, bet: app_commands.Range[int, 1, 5000]):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establish connection
@@ -2333,7 +2340,7 @@ class Economy(commands.Cog):
     @casino.command(name="slots", description="Spins the slots.")
     @app_commands.describe(bet="The amount of thaler to bet. Must be a whole number.")
     @app_commands.checks.cooldown(1, 5, key=lambda c: (c.user.id, c.guild_id))
-    async def slots(self, interaction: discord.Interaction, bet: app_commands.Range[int, 1, 10000]):
+    async def slots(self, interaction: discord.Interaction, bet: app_commands.Range[int, 1, 5000]):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establish connection
