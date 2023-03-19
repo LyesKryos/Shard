@@ -1436,9 +1436,12 @@ class Economy(commands.Cog):
         if log_type != 'all':
             logs = await conn.fetch('''SELECT * FROM rbt_user_log WHERE user_id = $1 AND action = $2 
             ORDER BY timestamp DESC;''', user.id, log_type)
-        else:
+        elif filter is not None:
             logs = await conn.fetch('''SELECT * FROM rbt_user_log WHERE user_id = $1 AND action != $2
-                        ORDER BY timestamp DESC;''', user.id, filter)
+                                    ORDER BY timestamp DESC;''', user.id, filter)
+        else:
+            logs = await conn.fetch('''SELECT * FROM rbt_user_log WHERE user_id = $1
+                        ORDER BY timestamp DESC;''', user.id)
         with open(rf"{user.id}_exchange_log.txt", "w+", encoding="UTF-8") as exchange_log:
             exchange_log.write("Note that transactions are ordered by most recent.\n")
             for log in logs:
