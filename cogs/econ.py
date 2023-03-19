@@ -1831,9 +1831,9 @@ class Economy(commands.Cog):
         # if the amount isn't max, then set the amount = a number
         if amount.lower() != "max":
             amount = int(amount)
-        # if the amount is less than 0
-        if amount <= 0:
-            return await interaction.followup.send(f"Positive whole numbers only!")
+            # if the amount is less than 0
+            if amount <= 0:
+                return await interaction.followup.send(f"Positive whole numbers only!")
         # fetches stock information
         stock = await conn.fetchrow('''SELECT * FROM stocks WHERE lower(name) = $1;''', stock_id.lower())
         # if stock does not exist, return message
