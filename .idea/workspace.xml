@@ -114,21 +114,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="62984000" />
-    </task>
-    <task id="LOCAL-00440" summary="Fixing ace altering">
-      <created>1678998629975</created>
-      <option name="number" value="00440" />
-      <option name="presentableId" value="LOCAL-00440" />
-      <option name="project" value="LOCAL" />
-      <updated>1678998629975</updated>
-    </task>
-    <task id="LOCAL-00441" summary="Fixing ace altering">
-      <created>1678998888364</created>
-      <option name="number" value="00441" />
-      <option name="presentableId" value="LOCAL-00441" />
-      <option name="project" value="LOCAL" />
-      <updated>1678998888364</updated>
+      <workItem from="1678819823954" duration="63295000" />
     </task>
     <task id="LOCAL-00442" summary="Fixing dealer hitting">
       <created>1678998923459</created>
@@ -459,7 +445,21 @@
       <option name="project" value="LOCAL" />
       <updated>1679265419999</updated>
     </task>
-    <option name="localTasksCounter" value="489" />
+    <task id="LOCAL-00489" summary="Adding slash command error catching">
+      <created>1679265562028</created>
+      <option name="number" value="00489" />
+      <option name="presentableId" value="LOCAL-00489" />
+      <option name="project" value="LOCAL" />
+      <updated>1679265562028</updated>
+    </task>
+    <task id="LOCAL-00490" summary="Adding slash command error catching">
+      <created>1679265715039</created>
+      <option name="number" value="00490" />
+      <option name="presentableId" value="LOCAL-00490" />
+      <option name="project" value="LOCAL" />
+      <updated>1679265715039</updated>
+    </task>
+    <option name="localTasksCounter" value="491" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
