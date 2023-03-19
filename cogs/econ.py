@@ -2345,15 +2345,15 @@ class Economy(commands.Cog):
         if bet > user_info['funds']:
             return await interaction.followup.send(f"You do not have enough thaler to place that bet.")
         # define slots
-        items = ["axolotl", "star", "moon", "bell", "heart", "diamond", "cherry", "clover",
-                 "seven", "gem"] * 3
+        items = ["star", "moon", "bell", "heart", "diamond", "cherry", "clover",
+                 "seven", "gem"] * 10
+        items.append("axolotl")
         items.append("doubler")
         items.append("tripler")
         # define combos
         single_combo = ["cherry", "clover", "bell"]
-        double_combo = ["star", "moon", "bell", "heart", "diamond", "cherry", "clover"]
-        triple_combo = ["star", "moon", "bell", "heart", "diamond", "cherry", "clover",
-                        "seven", "gem"]
+        double_combo = ["star", "moon", "bell", "heart", "diamond"]
+        triple_combo = ["cherry", "clover", "seven", "gem"]
         jackpot_combo = "axolotl"
         # roll slots
         slot1 = choice(items)
@@ -2363,8 +2363,8 @@ class Economy(commands.Cog):
         # define payouts
         single = (bet * 2) - bet
         double = (bet * 5) - bet
-        triple = (bet * 50) - bet
-        jackpot = (bet * 100) - bet
+        triple = (bet * 10) - bet
+        jackpot = (bet * 50) - bet
         if "doubler" in slots:
             single *= 2
             double *= 2
@@ -2400,7 +2400,7 @@ class Economy(commands.Cog):
                                bet, user.id)
             return await interaction.followup.send(embed=slots_embed)
         # search for double combos
-        elif (slot1 in slots[1:2] and slot1 in double_combo) or (slot2 in [slots[0], slots[2]] and slot2 in double_combo) or (slot3 in slots[0:1] and slot3 in double_combo):
+        elif slots[0] == slots[1] and slots[0] in double_combo:
             slots_embed.add_field(name="DOUBLE COMBO", value=f"Total winnings of {self.thaler}{double:,.2f}!")
             await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                double, user.id)
@@ -2410,7 +2410,7 @@ class Economy(commands.Cog):
                                bet, user.id)
             return await interaction.followup.send(embed=slots_embed)
         # search for single combos
-        elif slots[0] in single_combo or slots[1] in single_combo or slots[2] in single_combo:
+        elif slots[0] in single_combo:
             slots_embed.add_field(name="SINGLE COMBO", value=f"Total winnings of {self.thaler}{single:,.2f}!")
             await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                single, user.id)
@@ -2434,9 +2434,8 @@ class Economy(commands.Cog):
     async def slots_outcomes(self, interaction: discord.Interaction):
         # define combos
         single_combo = ["cherry", "clover", "bell"]
-        double_combo = ["star", "moon", "bell", "heart", "diamond", "cherry", "clover"]
-        triple_combo = ["star", "moon", "bell", "heart", "diamond", "cherry", "clover",
-                        "seven", "gem"]
+        double_combo = ["star", "moon", "bell", "heart", "diamond"]
+        triple_combo = ["cherry", "clover", "seven", "gem"]
         jackpot_combo = "axolotl"
         # create embed
         outcomes_embed = discord.Embed(title="List of Slots Combinations")
