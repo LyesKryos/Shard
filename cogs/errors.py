@@ -2,7 +2,6 @@ import traceback
 
 import discord.errors
 from discord import app_commands
-
 from ShardBot import Shard
 from discord.ext import commands
 from customchecks import SilentFail
@@ -15,7 +14,6 @@ class ShardErrorHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        crashchannel = self.bot.get_channel(835579413625569322)
         # parses the error
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
@@ -72,6 +70,18 @@ class ShardErrorHandler(commands.Cog):
             lines = traceback.format_exception(etype, error, trace)
             traceback_text = ''.join(lines)
             self.bot.logger.warning(msg=f"{traceback_text}")
+        else:
+            etype = type(error)
+            trace = error.__traceback__
+            lines = traceback.format_exception(etype, error, trace)
+            traceback_text = ''.join(lines)
+            self.bot.logger.warning(msg=f"{traceback_text}")
+
+    @commands.Cog.listener()
+    async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        # if the user attempts to use a command in DMs that is not authorized to use in DMs
+        if isinstance(error, app_commands.NoPrivateMessage):
+            await interaction.followup.send(f"I cannot run `${interaction.command}` in DMs! Return to the safety of a server.")
         else:
             etype = type(error)
             trace = error.__traceback__
