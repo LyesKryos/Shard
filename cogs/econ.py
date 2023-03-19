@@ -1497,29 +1497,29 @@ class Economy(commands.Cog):
                             trending = "up"
                         else:
                             trending = "down"
-                    # calculation: new_value = value + ((percentage increase + outsanding over issued) * value)
-                    value_roll = uniform(1, 7 * stock['risk'])
+                    # calculation: new_value = value + ((percentage increase + outstanding over issued / 10) * value)
+                    value_roll = uniform(1, 3 * stock['risk'])
                     # if the trend is up, increase stock based on risk
                     if trending == "up":
-                        value = value + (((value_roll / 100) + (stock['outstanding'] / stock['issued'])) * value)
-                        change = round(1 - (int(stock['value']) / value), 4)
+                        value = value + (((value_roll / 100) + ((stock['outstanding'] / stock['issued']) / 10)) * value)
+                        change = round((value/float(stock['value']))-1, 4)
                     else:
-                        value = value - (((value_roll / 100) - (stock['outstanding'] / stock['issued'])) * value)
+                        value = value - (((value_roll / 100) - ((stock['outstanding'] / stock['issued']) / 10)) * value)
                         # if the value drops below the floor, set it to be 5 - risk
                         if value < (5 - stock['risk']):
                             value = 5 - stock['risk']
-                        change = round(1 - (int(stock['value']) / value), 4)
-                    # if the outstanding shares is between 25 and 50 shares away from the total issued shares,
+                        change = round((value/float(stock['value']))-1, 4)
+                    # if the outstanding shares is between 25 and 500 shares away from the total issued shares,
                     # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
-                    if stock['issued'] - stock['outstanding'] < randint(25, 50):
+                    if stock['issued'] - stock['outstanding'] < randint(25, 500):
                         # royal bonds are immune to automatic dilution
                         if stock['stock_id'] != 1:
                             new_shares = stock['issued'] / 5
                             dilution = round(uniform(5 * stock['risk'], 10 * stock['risk']), 2)
-                            diluted_value = value * (clip(dilution, 0, 23) / 100)
+                            value = round(value * (clip(dilution, 0, 23) / 100),2)
                             self.announcement += f"{stock['name']} has been diluted. Issued shares have increased to " \
                                                  f"{new_shares}, and the diluted value is now " \
-                                                 f"{self.thaler}{diluted_value} per share.\n"
+                                                 f"{self.thaler}{value} per share.\n"
                     # update stock information
                     await conn.execute('''UPDATE stocks SET value = ROUND($1,2), issued = issued + $2, trending = $3, 
                     change = $4 WHERE stock_id = $5;''', value, new_shares, trending, change, stock['stock_id'])
@@ -1541,7 +1541,7 @@ class Economy(commands.Cog):
                                              "All stock values are decreased by 75%.\n "
                 crash_chance = uniform(1, 100)
                 if stock_sum['sum'] / stock_count['count'] > 10 * stock_count['count']:
-                    crash_chance += stock_sum['sum'] / stock_count['count']
+                    crash_chance += float(stock_sum['sum']) / int(stock_count['count'])
                 if crash_chance <= 1:
                     if self.crash is False:
                             await conn.execute('''UPDATE stocks 
@@ -2204,7 +2204,8 @@ class Economy(commands.Cog):
 
     @casino.command(name="blackjack", description="Starts a game of blackjack, aka 21.")
     @app_commands.describe(bet="The amount of thaler to bet. Must be a whole number.")
-    async def blackjack(self, interaction: discord.Interaction, bet: app_commands.Range[int, 1]):
+    @app_commands.checks.cooldown(1, 5, key=lambda c: (c.user.id, c.guild_id))
+    async def blackjack(self, interaction: discord.Interaction, bet: app_commands.Range[int, 1, 10000]):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establish connection
@@ -2326,7 +2327,8 @@ class Economy(commands.Cog):
 
     @casino.command(name="slots", description="Spins the slots.")
     @app_commands.describe(bet="The amount of thaler to bet. Must be a whole number.")
-    async def slots(self, interaction: discord.Interaction, bet: app_commands.Range[int, 1]):
+    @app_commands.checks.cooldown(1, 5, key=lambda c: (c.user.id, c.guild_id))
+    async def slots(self, interaction: discord.Interaction, bet: app_commands.Range[int, 1, 10000]):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establish connection
