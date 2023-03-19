@@ -394,7 +394,7 @@ class BlackjackView(View):
                                           value=f"{real_dealer_hand_string} (total: {dealer_total})")
                 blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
                 if dealer_total != 21:
-                    winnings = round(self.bet * 3, 2) - self.bet
+                    winnings = round((self.bet * 3) - self.bet, 2)
                     blackjack_embed.add_field(name="Result", value="**BLACKJACK**", inline=False)
                 else:
                     winnings = self.bet - self.bet
@@ -524,7 +524,7 @@ class BlackjackView(View):
                                           value=f"{real_dealer_hand_string} (total: {dealer_total})")
                 blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
                 blackjack_embed.add_field(name="Result", value="**WIN**", inline=False)
-                winnings = round(self.bet * 1.5, 2) - self.bet
+                winnings = round((self.bet * 1.5) - self.bet, 2)
                 blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
                 await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                    winnings, user.id)
@@ -566,7 +566,7 @@ class BlackjackView(View):
                                           value=f"{real_dealer_hand_string} (total: {dealer_total})")
                 blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
                 blackjack_embed.add_field(name="Result", value="**WIN**", inline=False)
-                winnings = self.bet * 1.5 - self.bet
+                winnings = round((self.bet * 1.5) - self.bet, 2)
                 blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
                 await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                    winnings, user.id)
@@ -2083,7 +2083,7 @@ class Economy(commands.Cog):
         stock = await conn.fetchrow('''SELECT * FROM stocks WHERE lower(name) = $1;''', stock_id.lower())
         # if the graph should be the average over time, graph
         if stock_id.lower() == "average":
-            stock = "average"
+            stock_id = "average"
         # if stock does not exist, return message
         if stock is None:
             try:
@@ -2116,11 +2116,10 @@ class Economy(commands.Cog):
         else:
             end_date = datetime.strptime(end_date, "%d/%m/%Y")
         # get all data from the specified stock
-        if stock == "average":
+        if stock_id == "average":
             pass
         stock_data = await conn.fetch('''SELECT * FROM exchange_log WHERE (timestamp BETWEEN $1 AND $2) 
         AND stock_id = $3 ORDER BY timestamp ASC;''', start_date, end_date, stock['stock_id'])
-        print(stock_data)
         if not stock_data:
             return await interaction.followup.send(f"Unfortunately, I cannot find any data between"
                                                    f"`{start_date.date().strftime('%d/%m/%Y')}` and "
@@ -2138,7 +2137,7 @@ class Economy(commands.Cog):
         else:
             plt.grid(True, which="major")
             plt.grid(True, which="minor")
-        plt.title(f"{stock['name']}")
+        plt.title(f"{stock['name']} (ID: {stock['stock_id']})")
         plt.ylabel("Value")
         plt.xlabel("Time")
         plt.savefig(r"C:\Users\jaedo\OneDrive\Pictures\graph.png")
@@ -2284,7 +2283,7 @@ class Economy(commands.Cog):
                                       value=f"{real_dealer_hand_string} (total: {dealer_total})")
             blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
             blackjack_embed.add_field(name="Result", value="**BLACKJACK**", inline=False)
-            winnings = round(bet * 3, 2) - bet
+            winnings = round((bet * 3) - bet, 2)
             blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
             await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                winnings, user.id)
