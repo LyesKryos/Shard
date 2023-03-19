@@ -82,11 +82,12 @@ class ShardErrorHandler(commands.Cog):
 
     async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
         # if the user attempts to use a command in DMs that is not authorized to use in DMs
-        if isinstance(error, app_commands.NoPrivateMessage):
-            await interaction.followup.send(f"I cannot run `${interaction.command}` in DMs! "
+        if isinstance(error, app_commands.errors.NoPrivateMessage):
+            await interaction.response.send_message(f"I cannot run `{interaction.command}` in DMs! "
                                             f"Return to the safety of a server.")
-        elif isinstance(error, app_commands.CommandOnCooldown):
-            await interaction.followup.send(f"Slow down! Try again in {error.retry_after:.2f} seconds.")
+        elif isinstance(error, app_commands.errors.CommandOnCooldown):
+            await interaction.followup.send_message(f"Slow down! Try again in {error.retry_after:.2f} seconds.",
+                                                    ephemeral=True)
         else:
             etype = type(error)
             trace = error.__traceback__
