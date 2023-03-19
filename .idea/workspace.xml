@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding cooldown response on errors">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Filtering logs">
+      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,14 +114,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="60180000" />
-    </task>
-    <task id="LOCAL-00435" summary="Fixing casino rank">
-      <created>1678990238498</created>
-      <option name="number" value="00435" />
-      <option name="presentableId" value="LOCAL-00435" />
-      <option name="project" value="LOCAL" />
-      <updated>1678990238498</updated>
+      <workItem from="1678819823954" duration="60526000" />
     </task>
     <task id="LOCAL-00436" summary="Fixing wording for overdrawn stocks&#10;Adding wire command.">
       <created>1678995289599</created>
@@ -459,7 +452,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679227311830</updated>
     </task>
-    <option name="localTasksCounter" value="484" />
+    <task id="LOCAL-00484" summary="Filtering logs">
+      <created>1679228433119</created>
+      <option name="number" value="00484" />
+      <option name="presentableId" value="LOCAL-00484" />
+      <option name="project" value="LOCAL" />
+      <updated>1679228433119</updated>
+    </task>
+    <option name="localTasksCounter" value="485" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -477,7 +477,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Accounting for type change of funds" />
     <MESSAGE value="Updating net worth calculations with investment and loan accounts" />
     <MESSAGE value="Fixing view for info command" />
     <MESSAGE value="Accounting for type change for rbt" />
@@ -502,7 +501,8 @@
     <MESSAGE value="Fixing slots outcomes display" />
     <MESSAGE value="Removing blackjack cooldown" />
     <MESSAGE value="Adding cooldown response on errors" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding cooldown response on errors" />
+    <MESSAGE value="Filtering logs" />
+    <option name="LAST_COMMIT_MESSAGE" value="Filtering logs" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

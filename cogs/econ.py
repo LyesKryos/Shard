@@ -1416,7 +1416,8 @@ class Economy(commands.Cog):
 
     @rbt.command(name='log', description="Sends a log of all trades, buys, sells, signed contracts, "
                                          "and marketplace transactions.")
-    @app_commands.describe(log_type="Input one of the choices to view your log")
+    @app_commands.describe(log_type="Input one of the choices to view your log.",
+                           filter="Filters out one type of log when viewing all.")
     async def log(self, interaction: discord.Interaction,
                   log_type: typing.Literal['exchange', 'casino', 'trade', 'contract', 'market', 'payroll', 'all'],
                   filter: typing.Literal['exchange', 'casino', 'trade', 'contract', 'market', 'payroll'] = None):
@@ -1436,7 +1437,7 @@ class Economy(commands.Cog):
             logs = await conn.fetch('''SELECT * FROM rbt_user_log WHERE user_id = $1 AND action = $2 
             ORDER BY timestamp DESC;''', user.id, log_type)
         else:
-            logs = await conn.fetch('''SELECT * FROM rbt_user_log WHERE user_id = $1 AND type != $2
+            logs = await conn.fetch('''SELECT * FROM rbt_user_log WHERE user_id = $1 AND action != $2
                         ORDER BY timestamp DESC;''', user.id, filter)
         with open(rf"{user.id}_exchange_log.txt", "w+", encoding="UTF-8") as exchange_log:
             exchange_log.write("Note that transactions are ordered by most recent.\n")
