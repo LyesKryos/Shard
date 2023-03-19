@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing error handling a little&#10;Fixing loans management" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing floor issue">
+      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -112,14 +114,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="64077000" />
-    </task>
-    <task id="LOCAL-00445" summary="Adding recruitment earnings&#10;Adding payroll to logs">
-      <created>1679017333281</created>
-      <option name="number" value="00445" />
-      <option name="presentableId" value="LOCAL-00445" />
-      <option name="project" value="LOCAL" />
-      <updated>1679017333281</updated>
+      <workItem from="1678819823954" duration="64588000" />
     </task>
     <task id="LOCAL-00446" summary="Adding recruitment earnings">
       <created>1679017525589</created>
@@ -457,7 +452,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679266518299</updated>
     </task>
-    <option name="localTasksCounter" value="494" />
+    <task id="LOCAL-00494" summary="Fixing floor issue">
+      <created>1679266752300</created>
+      <option name="number" value="00494" />
+      <option name="presentableId" value="LOCAL-00494" />
+      <option name="project" value="LOCAL" />
+      <updated>1679266752300</updated>
+    </task>
+    <option name="localTasksCounter" value="495" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -475,7 +477,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updating proper view for all account ID displays" />
     <MESSAGE value="Adding signed_contracts" />
     <MESSAGE value="Fixing signed_contracts" />
     <MESSAGE value="Fixing signed_contracts look" />
@@ -500,7 +501,8 @@
     <MESSAGE value="Fixing logs" />
     <MESSAGE value="Adding slash command error catching" />
     <MESSAGE value="Fixing error handling a little&#10;Fixing loans management" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing error handling a little&#10;Fixing loans management" />
+    <MESSAGE value="Fixing floor issue" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing floor issue" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

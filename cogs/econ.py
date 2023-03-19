@@ -837,7 +837,7 @@ class Economy(commands.Cog):
                 else:
                     investment_sum = investment_sum_raw['sum']
                 # increase investments by 2% for investors
-                await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'Investment';''')
+                await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'investment';''')
                 # increase investment fund by 2%
                 await conn.execute(
                     '''UPDATE funds SET current_funds = current_funds * 1.02 WHERE name = 'Investment Fund';''')
@@ -846,7 +846,7 @@ class Economy(commands.Cog):
                     '''UPDATE funds SET current_funds = current_funds + $1 WHERE name = 'General Fund';''',
                     (investment_sum * .06))
                 # increase loan interest by 1.5%
-                await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'Loan';''')
+                await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'loan';''')
                 # payroll
                 thegye = self.bot.get_guild(674259612580446230)
                 official_role = thegye.get_role(674278988323225632)
@@ -1509,7 +1509,6 @@ class Economy(commands.Cog):
                     # if the trend is up, increase stock based on risk
                     if trending == "up":
                         value = value + (((value_roll / 100) + ((stock['outstanding'] / stock['issued']) / 10)) * value)
-                        change = round((value/float(stock['value']))-1, 4)
                     else:
                         value = value - (((value_roll / 100) - ((stock['outstanding'] / stock['issued']) / 10)) * value)
                         # if the value drops below the floor, set it to be 5 - risk
