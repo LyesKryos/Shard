@@ -1513,9 +1513,9 @@ class Economy(commands.Cog):
                     else:
                         value = value - (((value_roll / 100) - ((stock['outstanding'] / stock['issued']) / 10)) * value)
                         # if the value drops below the floor, set it to be 5 - risk
-                        if value < (5 - stock['risk']):
-                            value = 5 - stock['risk']
-                        change = round((value/float(stock['value']))-1, 4)
+                    if value < (5 - stock['risk']):
+                        value = 5 - stock['risk']
+                    change = round((value/float(stock['value']))-1, 4)
                     # if the outstanding shares is between 25 and 500 shares away from the total issued shares,
                     # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
                     if stock['issued'] - stock['outstanding'] < randint(25, 500):
