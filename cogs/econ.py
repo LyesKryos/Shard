@@ -2443,9 +2443,9 @@ class Economy(commands.Cog):
                                  " ".join([get_card_emoji(o) for o in single_combo]), inline=False)
         outcomes_embed.add_field(name="Double Combo (5x payout)",
                                  value= " ".join([get_card_emoji(o) for o in double_combo]), inline=False)
-        outcomes_embed.add_field(name="Triple Combo (50x payout)",
+        outcomes_embed.add_field(name="Triple Combo (10x payout)",
                                  value= " ".join([get_card_emoji(o) for o in triple_combo]), inline=False)
-        outcomes_embed.add_field(name="Jackpot Combo (100x payout)",
+        outcomes_embed.add_field(name="Jackpot Combo (50x payout)",
                                  value="".join(get_card_emoji(jackpot_combo)), inline=False)
         await interaction.response.send_message(embed=outcomes_embed)
 
