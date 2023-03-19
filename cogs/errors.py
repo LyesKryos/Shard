@@ -87,7 +87,7 @@ class ShardErrorHandler(commands.Cog):
             await interaction.response.send_message(f"I cannot run `{interaction.command}` in DMs! "
                                                     f"Return to the safety of a server.")
         elif isinstance(error, app_commands.errors.CommandOnCooldown):
-            await interaction.response.send_message(f"Slow down! Try again in {error.retry_after:.2f} seconds.",
+            await interaction.response.send_message(f"Slow down! Try again in {int(error.retry_after)} seconds.",
                                                     ephemeral=True)
         else:
             etype = type(error)

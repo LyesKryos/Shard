@@ -1298,7 +1298,7 @@ class Economy(commands.Cog):
                 await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                    amount, user.id)
                 await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                   user.id, 'bank', f"Withdraw {self.thaler}{amount:,.2f} from loan account "
+                                   user.id, 'bank', f"Borrow {self.thaler}{amount:,.2f} from loan account "
                                                     f"(ID: {loan['account_id']}).")
                 return await interaction.followup.send(f"You have successfully borrowed an additional"
                                                        f" {self.thaler}{amount:,.2f} from your existing loan account "
@@ -1325,7 +1325,7 @@ class Economy(commands.Cog):
                                    user.id, 'bank', f"Repaid {self.thaler}{amount:,.2f} of loan account "
                                                     f"(ID: {loan['account_id']}).")
                 # remove any accounts with 0 amount
-                await conn.execute('''DELETE FROM bank_ledger WHERE round(amount,2) <= 0;''')
+                await conn.execute('''DELETE FROM bank_ledger WHERE round(amount::numeric,2) <= 0;''')
                 # send message
                 return await interaction.followup.send(f"You have successfully repaid {self.thaler}{amount:,.2f} "
                                                        f"of loan account (ID: {loan['account_id']}).")
@@ -1356,8 +1356,10 @@ class Economy(commands.Cog):
                 WHERE name = 'Investment Fund';''', amount)
                 # update log
                 await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                   user.id, 'bank', f"Withdraw {self.thaler}{amount:,.2f} from investment account "
+                                   user.id, 'bank', f"Withdrew {self.thaler}{amount:,.2f} from investment account "
                                                     f"(ID: {investment['account_id']}).")
+                # remove any accounts with 0 amount
+                await conn.execute('''DELETE FROM bank_ledger WHERE round(amount::numeric,2) <= 0;''')
                 # send message
                 return await interaction.followup.send(f"You have successfully withdrawn {self.thaler}{amount:,.2f} "
                                                        f"from investment account (ID: {investment['account_id']}).")
