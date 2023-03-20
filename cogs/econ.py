@@ -1829,11 +1829,14 @@ class Economy(commands.Cog):
         if rbt_member is None:
             return await interaction.followup.send(f"You are not a registered member of the Royal Bank of Thegye.")
         # if the amount isn't max, then set the amount = a number
-        if type(amount) != str:
+        try:
             amount = int(amount)
             # if the amount is less than 0
             if amount <= 0:
                 return await interaction.followup.send(f"Positive whole numbers only!")
+        except ValueError:
+            if amount.lower() != "max":
+                return await interaction.followup.send(f"`{amount}` is not a valid argument for this command.")
         # fetches stock information
         stock = await conn.fetchrow('''SELECT * FROM stocks WHERE lower(name) = $1;''', stock_id.lower())
         # if stock does not exist, return message
@@ -1844,7 +1847,7 @@ class Economy(commands.Cog):
                 return await interaction.followup.send(f"``{stock_id}`` does not exist on the Exchange.")        # if the amount is maximum, calculate how much the user can purchase
         if type(amount) == str:
             if amount.lower() != "max":
-                return await interaction.followup.send(f"`amount` is not a valid argument for this command.")
+                return await interaction.followup.send(f"`{amount}` is not a valid argument for this command.")
             base_price = round(float(stock['value']))
             tax = round(base_price * .005, 2)
             if tax < .01:
