@@ -1876,7 +1876,7 @@ class Economy(commands.Cog):
             transaction = round(base_price + tax, 2)
         # check the user's wallet
         wallet_contents = await conn.fetchrow('''SELECT sum(amount) FROM ledger WHERE user_id = $1;''', user.id)
-        if wallet_contents['sum'] > rbt_member['wallet']:
+        if wallet_contents['sum'] + amount > rbt_member['wallet']:
             return await interaction.followup.send(f"Your wallet (size: {rbt_member['wallet']}) "
                                                    f"does not have enough room to buy {amount} "
                                                    f"shares of {stock['name']}.")
