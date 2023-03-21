@@ -924,6 +924,12 @@ class Economy(commands.Cog):
             # fetch stocks and calculate worth
             ledger = await conn.fetch('''SELECT * FROM ledger WHERE user_id = $1;''',
                                       user.id)
+            wallet_contents = await conn.fetchrow('''SELECT SUM(amount) FROM ledger WHERE user_id = $1;''',
+                                      user.id)
+            if wallet_contents is None:
+                wallet_contents = 0
+            else:
+                wallet_contents = wallet_contents['sum']
             # calculate total stock value
             stock_value = 0
             for stock in ledger:
@@ -947,6 +953,7 @@ class Economy(commands.Cog):
                 rbtm_embed.add_field(name="Loan Account", value=f"{self.thaler}{loan['amount']:,.2f}")
                 total_value -= loan['amount']
             rbtm_embed.add_field(name="Net Worth", value=f"{self.thaler}{total_value:,.2f}", inline=False)
+            rbt_embed.add_feild(name="Wallet", value=f"{wallet_contents} shares out of {rbt_member['wallet']} shares")
             return await interaction.followup.send(embed=rbtm_embed)
 
     @rbt.command(name='directory', description="Displays all registered members of the Royal Bank of Thegye.")
