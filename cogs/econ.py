@@ -1487,7 +1487,7 @@ class Economy(commands.Cog):
                     # define trending
                     trending = "up"
                     # define value
-                    value = float(float(stock['value']))
+                    value = float(stock['value'])
                     # calculate trending course if up
                     if stock['trending'] == "up":
                         # if the d100 rolls less than the appropriate percent, change
@@ -1508,9 +1508,9 @@ class Economy(commands.Cog):
                     value_roll = uniform(1, 3 * stock['risk'])
                     # if the trend is up, increase stock based on risk
                     if trending == "up":
-                        value = value + (((value_roll / 100) + ((stock['outstanding'] / stock['issued']) / 10)) * value)
+                        value += (((value_roll / 100) + ((stock['outstanding'] / stock['issued']) / 10)) * value)
                     else:
-                        value = value - (((value_roll / 100) - ((stock['issued'] / stock['outstanding']) / 100)) * value)
+                        value -= (((value_roll / 100) - ((stock['issued'] / (stock['outstanding'] + 1)) / 100)) * value)
                         # if the value drops below the floor, set it to be 5 - risk
                     if value < (5 - stock['risk']):
                         value = 5 - stock['risk']
