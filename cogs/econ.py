@@ -225,6 +225,7 @@ class FeedView(View):
             traceback_text = ''.join(lines)
             self.bot.logger.warning(msg=f"{traceback_text}")
 
+
 class BlackjackView(View):
 
     def __init__(self, author, bot: Shard, m, dealer_hand, player_hand, bet):
@@ -706,7 +707,6 @@ class Economy(commands.Cog):
         # define thaler icon
         self.thaler = "\u20B8"
 
-
     async def cog_unload(self) -> None:
         self.market_task.cancel()
         self.bank_task.cancel()
@@ -925,7 +925,7 @@ class Economy(commands.Cog):
             ledger = await conn.fetch('''SELECT * FROM ledger WHERE user_id = $1;''',
                                       user.id)
             wallet_contents = await conn.fetchrow('''SELECT SUM(amount) FROM ledger WHERE user_id = $1;''',
-                                      user.id)
+                                                  user.id)
             if wallet_contents is None:
                 wallet_contents = 0
             else:
@@ -996,7 +996,7 @@ class Economy(commands.Cog):
         # create string
         ranked_string = "Members are ranked by their net worth.\n\n"
         for ranked_member in ranked_members:
-            this_string = f"{ranked_members.index(ranked_member)+1}. <@{thegye.get_member(ranked_member[0]).id}>"
+            this_string = f"{ranked_members.index(ranked_member) + 1}. <@{thegye.get_member(ranked_member[0]).id}>"
             this_string += f": {self.thaler}{ranked_member[1]:,.2f}\n"
             ranked_string += this_string
         # create and send embed
@@ -1041,7 +1041,7 @@ class Economy(commands.Cog):
         await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 WHERE name = 'General Fund';''', tax)
         await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                            recipient.id, 'trade', f"Received {self.thaler}{amount} from "
-                                               f"{author.name}#{author.discriminator} (ID:{author.id})")
+                                                  f"{author.name}#{author.discriminator} (ID:{author.id})")
         return await interaction.followup.send(f"You have successfully sent {self.thaler}{amount} to "
                                                f"{recipient.display_name}.")
 
@@ -1227,7 +1227,7 @@ class Economy(commands.Cog):
                                user.id, interaction.id, amount, 'loan')
             # credit to user account and log
             await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
-                              amount, user.id)
+                               amount, user.id)
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                user.id, 'bank', f"Opened a new loan account (ID: {interaction.id}) "
                                                 f"with {self.thaler}{amount:,.2f}.")
@@ -1515,7 +1515,7 @@ class Economy(commands.Cog):
                     value_roll = uniform(1, 3 + stock['risk'])
                     # if the trend is up, increase stock based on risk
                     if trending == "up":
-                        value += round(value_roll + (stock['outstanding']/stock['issued']), 2)
+                        value += round(value_roll + (stock['outstanding'] / stock['issued']), 2)
                     else:
                         value -= round(value_roll, 2)
                         # if the value drops below the floor, set it to be 5 - risk
@@ -1528,7 +1528,7 @@ class Economy(commands.Cog):
                         if stock['stock_id'] != 1:
                             new_shares = stock['issued'] / 5
                             dilution = round(uniform(5 * stock['risk'], 10 * stock['risk']), 2)
-                            value = round(value * (clip(dilution, 0, 23) / 100),2)
+                            value = round(value * (clip(dilution, 0, 23) / 100), 2)
                             self.announcement += f"{stock['name']} has been diluted. Issued shares have increased to " \
                                                  f"{new_shares}, and the diluted value is now " \
                                                  f"{self.thaler}{value} per share.\n"
@@ -1558,12 +1558,12 @@ class Economy(commands.Cog):
                     crash_chance += float(stock_sum['sum']) / int(stock_count['count'])
                 if crash_chance <= 1:
                     if self.crash is False:
-                            await conn.execute('''UPDATE stocks 
+                        await conn.execute('''UPDATE stocks 
                             SET value = round((value * .25)::numeric, 2), trend = 'down', 
                             change = ROUND(value*.25::numeric-value::numeric, 2) - 1;''')
-                            self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
-                                                 "All stock values are decreased by 75% and begun trending down.\n "
-                            self.crash = True
+                        self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
+                                             "All stock values are decreased by 75% and begun trending down.\n "
+                        self.crash = True
                 # update stocks' value tracker
                 await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
                 SELECT stock_id, value, trending FROM stocks;''')
@@ -1860,7 +1860,8 @@ class Economy(commands.Cog):
             try:
                 stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', int(stock_id))
             except ValueError:
-                return await interaction.followup.send(f"``{stock_id}`` does not exist on the Exchange.")        # if the amount is maximum, calculate how much the user can purchase
+                return await interaction.followup.send(
+                    f"``{stock_id}`` does not exist on the Exchange.")  # if the amount is maximum, calculate how much the user can purchase
         if type(amount) == str:
             if amount.lower() != "max":
                 return await interaction.followup.send(f"`{amount}` is not a valid argument for this command.")
@@ -2209,7 +2210,8 @@ class Economy(commands.Cog):
                            end_hour="Input a numeber of hours ago desired. Accepts any whole number between 1 and 24. "
                                     "End hour must be less than start hour. Defaults to now.")
     async def graph_stock_price_hourly(self, interaction: discord.Interaction, stock_id: str,
-                                start_hour: app_commands.Range[int, 1, 24], end_hour: app_commands.Range[int, 1, 24]):
+                                       start_hour: app_commands.Range[int, 1, 24],
+                                       end_hour: app_commands.Range[int, 1, 24] = None):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establishes connection
@@ -2432,9 +2434,10 @@ class Economy(commands.Cog):
                                       value=f"{dealer_hand_string}")
             blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
             blackjack_message = await interaction.followup.send(embed=blackjack_embed)
-            await blackjack_message.edit(embed=blackjack_embed, view=BlackjackView(author=interaction.user, bot=self.bot, m=blackjack_message,
-                                                                                   bet=bet, player_hand=player_hand,
-                                                                                   dealer_hand=dealer_hand))
+            await blackjack_message.edit(embed=blackjack_embed,
+                                         view=BlackjackView(author=interaction.user, bot=self.bot, m=blackjack_message,
+                                                            bet=bet, player_hand=player_hand,
+                                                            dealer_hand=dealer_hand))
 
     @casino.command(name="slots", description="Spins the slots.")
     @app_commands.describe(bet="The amount of thaler to bet. Must be a whole number.")
@@ -2498,7 +2501,7 @@ class Economy(commands.Cog):
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                user.id, 'casino', f'Won {self.thaler}{jackpot:,.2f} at slots')
             await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
-                                bet, user.id)
+                               bet, user.id)
             return await interaction.followup.send(embed=slots_embed)
         # search for triple combos
         elif all(s == slots[0] for s in slots) and slots[0] in triple_combo:
@@ -2551,16 +2554,14 @@ class Economy(commands.Cog):
         # create embed
         outcomes_embed = discord.Embed(title="List of Slots Combinations")
         outcomes_embed.add_field(name="Single Combo (2x payout)", value=
-                                 " ".join([get_card_emoji(o) for o in single_combo]), inline=False)
+        " ".join([get_card_emoji(o) for o in single_combo]), inline=False)
         outcomes_embed.add_field(name="Double Combo (5x payout)",
-                                 value= " ".join([get_card_emoji(o) for o in double_combo]), inline=False)
+                                 value=" ".join([get_card_emoji(o) for o in double_combo]), inline=False)
         outcomes_embed.add_field(name="Triple Combo (10x payout)",
-                                 value= " ".join([get_card_emoji(o) for o in triple_combo]), inline=False)
+                                 value=" ".join([get_card_emoji(o) for o in triple_combo]), inline=False)
         outcomes_embed.add_field(name="Jackpot Combo (50x payout)",
                                  value="".join(get_card_emoji(jackpot_combo)), inline=False)
         await interaction.response.send_message(embed=outcomes_embed)
-
-
 
 
 async def setup(bot: Shard):
