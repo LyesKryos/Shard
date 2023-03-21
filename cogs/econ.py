@@ -2209,7 +2209,7 @@ class Economy(commands.Cog):
                                                                  description=f"A graph representing the share prices of"
                                                                              f" {stock['name']}"))
 
-    @exchange.command(name="graph_value", description="Displays a graph of a stock's price.")
+    @exchange.command(name="graph_hourly_value", description="Displays a graph of a stock's price.")
     @app_commands.describe(stock_id="Input the name or ID of the stock.",
                            start_hour="Input a number of hours ago desired. Accepts any whole number between 1 and 24.",
                            end_hour="Input a numeber of hours ago desired. Accepts any whole number between 2 and 24. "
