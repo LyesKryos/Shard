@@ -154,10 +154,12 @@ class FeedView(View):
                 for space in range(0, 50 - len(this_string)):
                     this_string += " "
                 if stock['trending'] == "up":
-                    this_string += "``:chart_with_upwards_trend: ``+"
+                    this_string += "``:chart_with_upwards_trend: ``"
                 else:
-                    this_string += "``:chart_with_downwards_trend: ``-"
-                this_string += f"{abs(stock['change'] * 100):.2f}%``\n"
+                    this_string += "``:chart_with_downwards_trend: ``"
+                if stock['change'] >= 0:
+                    this_string += "+"
+                this_string += f"{stock['change'] * 100:.2f}%``\n"
                 stock_string += this_string
                 self.rank += 1
             feed_embed = discord.Embed(title="Stocks by Share Price", description=stock_string)
@@ -210,10 +212,12 @@ class FeedView(View):
                 for space in range(0, 50 - len(this_string)):
                     this_string += " "
                 if stock['trending'] == "up":
-                    this_string += "``:chart_with_upwards_trend: ``+"
+                    this_string += "``:chart_with_upwards_trend: ``"
                 else:
-                    this_string += "``:chart_with_downwards_trend: ``-"
-                this_string += f"{abs(stock['change'] * 100):.2f}%``\n"
+                    this_string += "``:chart_with_downwards_trend: ``"
+                if stock['change'] >= 0:
+                    this_string += "+"
+                this_string += f"{stock['change'] * 100:.2f}%``\n"
                 stock_string += this_string
                 self.rank += 1
             feed_embed = discord.Embed(title="Stocks by Share Price", description=stock_string)
@@ -2350,10 +2354,12 @@ class Economy(commands.Cog):
             for space in range(0, 50 - len(this_string)):
                 this_string += " "
             if stock['trending'] == "up":
-                this_string += "``:chart_with_upwards_trend: ``+"
+                this_string += "``:chart_with_upwards_trend: ``"
             else:
-                this_string += "``:chart_with_downwards_trend: ``-"
-            this_string += f"{abs(stock['change'] * 100):.2f}%``\n"
+                this_string += "``:chart_with_downwards_trend: ``"
+            if stock['change'] >= 0:
+                this_string += "+"
+            this_string += f"{(stock['change'] * 100):.2f}%``\n"
             rank += 1
             stock_string += this_string
         # create embed
