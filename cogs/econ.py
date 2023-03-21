@@ -2190,7 +2190,7 @@ class Economy(commands.Cog):
         ax.xaxis.set_minor_locator(HourLocator(interval=1))
         ax.xaxis.set_major_formatter(DateFormatter("%d/%m/%y"))
         fig.autofmt_xdate()
-        if start_date.day - end_date.day >= 3:
+        if (start_date - end_date).days >= 3:
             plt.grid(True, which="major")
         else:
             plt.grid(True, which="major")
@@ -2318,7 +2318,7 @@ class Economy(commands.Cog):
         ax.xaxis.set_minor_locator(HourLocator(interval=1))
         ax.xaxis.set_major_formatter(DateFormatter("%d/%m/%y"))
         fig.autofmt_xdate()
-        if start_date.day - end_date.day >= 3:
+        if (start_date - end_date).days >= 3:
             plt.grid(True, which="major")
         else:
             plt.grid(True, which="major")
