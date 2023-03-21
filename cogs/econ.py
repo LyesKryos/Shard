@@ -1508,15 +1508,15 @@ class Economy(commands.Cog):
                     value_roll = uniform(1, 3 * stock['risk'])
                     # if the trend is up, increase stock based on risk
                     if trending == "up":
-                        value += (((value_roll / 100) + ((stock['outstanding'] / stock['issued']) / 10)) * value)
+                        value += round(value_roll + (stock['outstanding']/stock['issued']), 2)
                     else:
-                        value -= (((value_roll / 100) - ((stock['issued'] / (stock['outstanding'] + 1)) / 100)) * value)
+                        value -= round(value_roll, 2)
                         # if the value drops below the floor, set it to be 5 - risk
                     if value < (5 - stock['risk']):
                         value = 5 - stock['risk']
-                    # if the outstanding shares is between 25 and 500 shares away from the total issued shares,
+                    # if the outstanding shares is between 0 and 500 shares away from the total issued shares,
                     # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
-                    if stock['issued'] - stock['outstanding'] < randint(25, 500):
+                    if stock['issued'] - stock['outstanding'] < randint(0, 500):
                         # royal bonds are immune to automatic dilution
                         if stock['stock_id'] != 1:
                             new_shares = stock['issued'] / 5
@@ -1582,7 +1582,7 @@ class Economy(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def force_market_update(self, ctx):
-        crashchannel = ctx
+        bankchannel = ctx
         # establish connection
         conn = self.bot.pool
         # define announcement string
@@ -1595,7 +1595,7 @@ class Economy(commands.Cog):
             # define trending
             trending = "up"
             # define value
-            value = float(float(stock['value']))
+            value = float(stock['value'])
             # calculate trending course if up
             if stock['trending'] == "up":
                 # if the d100 rolls less than the appropriate percent, change
@@ -1612,35 +1612,30 @@ class Economy(commands.Cog):
                     trending = "up"
                 else:
                     trending = "down"
-            value_roll = uniform(1, 7 * stock['risk'])
+            # calculation: new_value = value + ((percentage increase + outstanding over issued / 10) * value)
+            value_roll = uniform(1, 3 * stock['risk'])
             # if the trend is up, increase stock based on risk
             if trending == "up":
-                value = (value +
-                         (((value_roll / 100) + (stock['outstanding'] / stock['issued'] * 10))
-                          * value))
-                if value < 5 - stock['risk']:
-                    value = 5 - stock['risk']
-                change = round(1 - (int(stock['value']) / value), 4)
+                value += round(value_roll + (stock['outstanding'] / stock['issued']), 2)
             else:
-                value = (value -
-                         (((value_roll / 100) + (stock['outstanding'] / stock['issued'] * 10))
-                          * value))
-                if value < 5 - stock['risk']:
-                    value = 5 - stock['risk']
-                change = round(1 - (int(stock['value']) / value), 4)
-            # if the outstanding shares is between 25 and 50 shares away from the total issued shares,
+                value -= round(value_roll, 2)
+                # if the value drops below the floor, set it to be 5 - risk
+            if value < (5 - stock['risk']):
+                value = 5 - stock['risk']
+            # if the outstanding shares is between 0 and 500 shares away from the total issued shares,
             # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
-            if stock['issued'] - stock['outstanding'] < randint(25, 50):
+            if stock['issued'] - stock['outstanding'] < randint(0, 500):
                 # royal bonds are immune to automatic dilution
                 if stock['stock_id'] != 1:
                     new_shares = stock['issued'] / 5
                     dilution = round(uniform(5 * stock['risk'], 10 * stock['risk']), 2)
-                    diluted_value = value * (clip(dilution, 0, 23) / 100)
-                    self.announcement += f"{stock['name']} has been diluted. Issued shares have increased to {new_shares}," \
-                                         f" and the diluted value is now {self.thaler}{diluted_value} per share.\n"
+                    value = round(value * (clip(dilution, 0, 23) / 100), 2)
+                    self.announcement += f"{stock['name']} has been diluted. Issued shares have increased to " \
+                                         f"{new_shares}, and the diluted value is now " \
+                                         f"{self.thaler}{value} per share.\n"
             # update stock information
             await conn.execute('''UPDATE stocks SET value = ROUND($1,2), issued = issued + $2, trending = $3, 
-                            change = $4 WHERE stock_id = $5;''', value, new_shares, trending, change, stock['stock_id'])
+            change = ($1/value)-1 WHERE stock_id = $4;''', value, new_shares, trending, stock['stock_id'])
         # calculate value of stocks
         stock_sum = await conn.fetchrow('''SELECT SUM(value) FROM stocks;''')
         # fetch stock count
@@ -1652,24 +1647,36 @@ class Economy(commands.Cog):
                 self.crash = False
                 self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n" \
                                      "Stock prices have recovered by 25%.\n "
-                await conn.execute('''UPDATE stocks SET value = ROUND((value*.1.25)::numeric, 2);''')
+                await conn.execute('''UPDATE stocks SET value = ROUND((value*1.25)::numeric, 2), 
+                change = ROUND(value*1.25::numeric-value::numeric, 2) - 1;''')
             else:
-                await conn.execute('''UPDATE stocks SET value = ROUND((value * .25)::numeric, 2);''')
+                await conn.execute('''UPDATE stocks SET value = ROUND((value*.25)::numeric, 2), 
+                change = ROUND(value*.25::numeric-value::numeric, 2) - 1;''')
                 self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
                                      "All stock values are decreased by 75%.\n "
         crash_chance = uniform(1, 100)
-        if crash_chance <= 9:
+        if stock_sum['sum'] / stock_count['count'] > 10 * stock_count['count']:
+            crash_chance += float(stock_sum['sum']) / int(stock_count['count'])
+        if crash_chance <= 1:
             if self.crash is False:
-                if stock_sum['sum'] > 10 * stock_count['count']:
-                    await conn.execute('''UPDATE stocks SET value = round((value * .25)::numeric, 2);''')
-                    self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
-                                         "All stock values are decreased by 75%.\n "
-                    self.crash = True
+                await conn.execute('''UPDATE stocks 
+                    SET value = round((value * .25)::numeric, 2), trend = 'down', 
+                    change = ROUND(value*.25::numeric-value::numeric, 2) - 1;''')
+                self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
+                                     "All stock values are decreased by 75% and begun trending down.\n "
+                self.crash = True
         # update stocks' value tracker
         await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
-                        SELECT stock_id, value, trending FROM stocks;''')
+        SELECT stock_id, value, trending FROM stocks;''')
+        # unpin old message
+        old_message = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_pinned_message';''')
+        old_message = await bankchannel.fetch_message(int(old_message['value']))
+        await old_message.unpin()
         # announce
-        await crashchannel.send(content=self.announcement)
+        new_announcement = await bankchannel.send(content=self.announcement)
+        await new_announcement.pin()
+        await conn.execute('''UPDATE info SET value = $1 WHERE name = 'rbt_pinned_message';''',
+                           str(new_announcement.id))
         self.announcement = \
             "The Royal Exchange of Thegye has updated. Below is a summary of any important changes:\n"
 
