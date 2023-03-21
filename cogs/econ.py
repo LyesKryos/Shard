@@ -2328,7 +2328,7 @@ class Economy(commands.Cog):
         plt.xlabel("Time")
         plt.savefig(r"graph.png")
         return await interaction.followup.send(file=discord.File(fp=r"graph.png",
-                                                                 filename=f"Graph of average share price."))
+                                                                 filename=f"Graph of average share price.png"))
     
     @exchange.command(name="feed", description="Displays share price and information about all stocks on the exchange.")
     async def feed(self, interaction: discord.Interaction):
