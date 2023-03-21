@@ -1912,7 +1912,7 @@ class Economy(commands.Cog):
             return await interaction.followup.send(
                 f"You have successfully purchased {amount:,} shares of {stock['name']} for "
                 f"{self.thaler}{transaction:,.2f} at {self.thaler}{float(stock['value']):,.2f} per share.\n"
-                f"{self.thaler}{base_price:,.2f} + {self.thaler}{tax:,.2f} (transaction fee) = "
+                f"{self.thaler}{stock['value']:,.2f} * {amount} + {self.thaler}{tax:,.2f} (transaction fee) = "
                 f"{self.thaler}{transaction:,.2f}")
 
     @exchange.command(description="Sells a specified amount of a stock's shares.",
@@ -1983,8 +1983,9 @@ class Economy(commands.Cog):
         return await interaction.followup.send(f"You have successfully sold {amount} shares of {stock['name']} for "
                                                f"{self.thaler}{transaction:,.2f} at "
                                                f"{self.thaler}{float(stock['value'])} per share.\n"
-                                               f"{self.thaler}{base_price:,.2f} - {self.thaler}{tax:,.2f} "
-                                               f"(transaction fee) = {self.thaler}{transaction:,.2f}")
+                                               f"{self.thaler}{float(stock['value']):,.2f} * {amount} - "
+                                               f"{self.thaler}{tax:,.2f} (transaction fee) = "
+                                               f"{self.thaler}{transaction:,.2f}")
 
     @exchange.command(description="Exchanges stock between two parties.", name="trade")
     @app_commands.describe(recipient="A Discord user you wish to trade with.",
