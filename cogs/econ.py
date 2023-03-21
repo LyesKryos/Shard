@@ -1505,7 +1505,7 @@ class Economy(commands.Cog):
                         else:
                             trending = "down"
                     # calculation: new_value = value + ((percentage increase + outstanding over issued / 10) * value)
-                    value_roll = uniform(1, 3 * stock['risk'])
+                    value_roll = uniform(1, 3 + stock['risk'])
                     # if the trend is up, increase stock based on risk
                     if trending == "up":
                         value += round(value_roll + (stock['outstanding']/stock['issued']), 2)
