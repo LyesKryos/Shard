@@ -953,7 +953,7 @@ class Economy(commands.Cog):
                 rbtm_embed.add_field(name="Loan Account", value=f"{self.thaler}{loan['amount']:,.2f}")
                 total_value -= loan['amount']
             rbtm_embed.add_field(name="Net Worth", value=f"{self.thaler}{total_value:,.2f}", inline=False)
-            rbt_embed.add_feild(name="Wallet", value=f"{wallet_contents} shares out of {rbt_member['wallet']} shares")
+            rbtm_embed.add_feild(name="Wallet", value=f"{wallet_contents} shares out of {rbt_member['wallet']} shares")
             return await interaction.followup.send(embed=rbtm_embed)
 
     @rbt.command(name='directory', description="Displays all registered members of the Royal Bank of Thegye.")
