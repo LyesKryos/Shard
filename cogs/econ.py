@@ -2211,7 +2211,7 @@ class Economy(commands.Cog):
                                     "End hour must be less than start hour. Defaults to now.")
     async def graph_stock_price_hourly(self, interaction: discord.Interaction, stock_id: str,
                                        start_hour: app_commands.Range[int, 1, 24],
-                                       end_hour: app_commands.Range[int, 2, 24] = None):
+                                       end_hour: app_commands.Range[int, 2, 24] = 0):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # make sure hours are unequal
@@ -2232,7 +2232,7 @@ class Economy(commands.Cog):
         # get start hour
         start = now.replace(minute=0, second=0) - timedelta(hours=start_hour)
         # if the end date is none, get the time now
-        if end_hour is None:
+        if end_hour == 0:
             end = datetime.now()
         # otherwise, get the end date
         else:

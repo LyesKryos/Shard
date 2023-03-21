@@ -112,14 +112,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="74978000" />
-    </task>
-    <task id="LOCAL-00468" summary="Fixing net worth for directory">
-      <created>1679074621245</created>
-      <option name="number" value="00468" />
-      <option name="presentableId" value="LOCAL-00468" />
-      <option name="project" value="LOCAL" />
-      <updated>1679074621245</updated>
+      <workItem from="1678819823954" duration="75352000" />
     </task>
     <task id="LOCAL-00469" summary="Fixing graph command">
       <created>1679108248484</created>
@@ -457,7 +450,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679421992485</updated>
     </task>
-    <option name="localTasksCounter" value="517" />
+    <task id="LOCAL-00517" summary="Hour graphing achieved">
+      <created>1679422369078</created>
+      <option name="number" value="00517" />
+      <option name="presentableId" value="LOCAL-00517" />
+      <option name="project" value="LOCAL" />
+      <updated>1679422369078</updated>
+    </task>
+    <option name="localTasksCounter" value="518" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
