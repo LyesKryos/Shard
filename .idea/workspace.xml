@@ -115,21 +115,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="81222000" />
-    </task>
-    <task id="LOCAL-00479" summary="Setting gambling cap&#10;Reworking stock exchange">
-      <created>1679195923273</created>
-      <option name="number" value="00479" />
-      <option name="presentableId" value="LOCAL-00479" />
-      <option name="project" value="LOCAL" />
-      <updated>1679195923273</updated>
-    </task>
-    <task id="LOCAL-00480" summary="Nerfing slots">
-      <created>1679225590980</created>
-      <option name="number" value="00480" />
-      <option name="presentableId" value="LOCAL-00480" />
-      <option name="project" value="LOCAL" />
-      <updated>1679225590980</updated>
+      <workItem from="1678819823954" duration="85460000" />
     </task>
     <task id="LOCAL-00481" summary="Fixing slots outcomes display">
       <created>1679225736394</created>
@@ -460,7 +446,21 @@
       <option name="project" value="LOCAL" />
       <updated>1679429715947</updated>
     </task>
-    <option name="localTasksCounter" value="528" />
+    <task id="LOCAL-00528" summary="Changing command names for clarity">
+      <created>1679430522889</created>
+      <option name="number" value="00528" />
+      <option name="presentableId" value="LOCAL-00528" />
+      <option name="project" value="LOCAL" />
+      <updated>1679430522889</updated>
+    </task>
+    <task id="LOCAL-00529" summary="Changing command names for clarity">
+      <created>1679430570423</created>
+      <option name="number" value="00529" />
+      <option name="presentableId" value="LOCAL-00529" />
+      <option name="project" value="LOCAL" />
+      <updated>1679430570423</updated>
+    </task>
+    <option name="localTasksCounter" value="530" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

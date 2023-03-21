@@ -614,7 +614,29 @@ class BlackjackView(View):
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.author.id
+    
 
+class MarketDropdown(discord.ui.Select):
+
+    def __init__(self):
+
+        # define options
+        options = [
+            discord.SelectOption(label="General Market", description="The market for all general needs, including"
+                                                                     "roles, titles, and RBT amenities.",
+                                 emoji=":coin:"),
+            discord.SelectOption(label="Minecraft Market", description="The market for Minecraft items.",
+                                 emoji="<:diamond_pickaxe:1087876208634638458>"),
+            discord.SelectOption(label="Open Market", description="The market where RBT members may offer their "
+                                                                  "own goods and services to the general public.",
+                                 emoji=":receipt:")
+        ]
+
+        super().__init__(placeholder="Choose the market you wish to view...",
+                         min_values=1, max_values=1, options=options)
+
+        async def callback(self, interaction: discord.Interaction):
+            pass
 
 def get_card_emoji(card):
     # define emoji strings for card
@@ -1889,7 +1911,11 @@ class Economy(commands.Cog):
             transaction = round(base_price + tax, 2)
         # check the user's wallet
         wallet_contents = await conn.fetchrow('''SELECT sum(amount) FROM ledger WHERE user_id = $1;''', user.id)
-        if wallet_contents['sum'] + amount > rbt_member['wallet']:
+        if wallet_contents is None:
+            wallet_contents = 0
+        else:
+            wallet_contents = wallet_contents['sum']
+        if wallet_contents + amount > rbt_member['wallet']:
             return await interaction.followup.send(f"Your wallet (size: {rbt_member['wallet']:,}) "
                                                    f"does not have enough room to buy {amount:,} "
                                                    f"shares of {stock['name']}.")
@@ -2137,7 +2163,7 @@ class Economy(commands.Cog):
                                       "Also accepts \"today\", \"forever\", \"week\", and \"month\".",
                            end_date="Input a valid date in DD/MM/YYYY format. If left blank, defaults to today.")
     async def graph_value(self, interaction: discord.Interaction, stock_id: str,
-                                start_date: str, end_date: str = None):
+                          start_date: str, end_date: str = None):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establishes connection
@@ -2215,8 +2241,8 @@ class Economy(commands.Cog):
                            end_hour="Input a numeber of hours ago desired. Accepts any whole number between 2 and 24. "
                                     "End hour must be less than start hour. Defaults to now.")
     async def graph_hourly_value(self, interaction: discord.Interaction, stock_id: str,
-                                       start_hour: app_commands.Range[int, 1, 24],
-                                       end_hour: app_commands.Range[int, 2, 24] = 0):
+                                 start_hour: app_commands.Range[int, 1, 24],
+                                 end_hour: app_commands.Range[int, 2, 24] = 0):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # make sure hours are unequal
@@ -2273,7 +2299,7 @@ class Economy(commands.Cog):
                                       "Also accepts \"today\", \"forever\", \"week\", and \"month\".",
                            end_date="Input a valid date in DD/MM/YYYY format. If left blank, defaults to today.")
     async def graph_average_value(self, interaction: discord.Interaction,
-                                start_date: str, end_date: str = None):
+                                  start_date: str, end_date: str = None):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establishes connection
@@ -2316,7 +2342,7 @@ class Economy(commands.Cog):
             for s in stock_data:
                 if s['timestamp'] == d:
                     stocks.append(s['value'])
-            averages.append(sum(stocks)/len(stocks))
+            averages.append(sum(stocks) / len(stocks))
         fig, ax = plt.subplots()
         ax.plot(dates, averages)
         ax.xaxis.set_major_locator(DayLocator(interval=1))
@@ -2334,7 +2360,7 @@ class Economy(commands.Cog):
         plt.savefig(r"graph.png")
         return await interaction.followup.send(file=discord.File(fp=r"graph.png",
                                                                  filename=f"Graph of average share price.png"))
-    
+
     @exchange.command(name="feed", description="Displays share price and information about all stocks on the exchange.")
     async def feed(self, interaction: discord.Interaction):
         # defer interaction
@@ -2630,8 +2656,8 @@ class Economy(commands.Cog):
         jackpot_combo = "axolotl"
         # create embed
         outcomes_embed = discord.Embed(title="List of Slots Combinations")
-        outcomes_embed.add_field(name="Single Combo (2x payout)", value=
-        " ".join([get_card_emoji(o) for o in single_combo]), inline=False)
+        outcomes_embed.add_field(name="Single Combo (2x payout)",
+                                 value=" ".join([get_card_emoji(o) for o in single_combo]), inline=False)
         outcomes_embed.add_field(name="Double Combo (5x payout)",
                                  value=" ".join([get_card_emoji(o) for o in double_combo]), inline=False)
         outcomes_embed.add_field(name="Triple Combo (10x payout)",
@@ -2639,6 +2665,25 @@ class Economy(commands.Cog):
         outcomes_embed.add_field(name="Jackpot Combo (50x payout)",
                                  value="".join(get_card_emoji(jackpot_combo)), inline=False)
         await interaction.response.send_message(embed=outcomes_embed)
+
+    # creates market subgroup
+    market = app_commands.Group(name="market", description="...", guild_only=True)
+
+    @market.command(name="market", description="Opens the market and displays options.")
+    async def market(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # define user
+        user = interaction.user
+        # create embed
+        market_embed = discord.Embed(title="Royal Thegyan Market",
+                                     description="Welcome to the Royal Thegye Market!\n"
+                                                 "\n"
+                                                 "To use the market, click on the select menu below and "
+                                                 "select the option you desire to view.")
+
 
 
 async def setup(bot: Shard):
