@@ -2233,7 +2233,7 @@ class Economy(commands.Cog):
         start = now.replace(minute=0, second=0) - timedelta(hours=start_hour)
         # if the end date is none, get the time now
         if end_hour is None:
-            end_date = datetime.now()
+            end = datetime.now()
         # otherwise, get the end date
         else:
             end = now.replace(minute=0, second=0) - timedelta(hours=end_hour)
