@@ -1510,11 +1510,10 @@ class Economy(commands.Cog):
                     if trending == "up":
                         value = value + (((value_roll / 100) + ((stock['outstanding'] / stock['issued']) / 10)) * value)
                     else:
-                        value = value - (((value_roll / 100) - ((stock['outstanding'] / stock['issued']) / 10)) * value)
+                        value = value - ((value_roll / 100) * value)
                         # if the value drops below the floor, set it to be 5 - risk
                     if value < (5 - stock['risk']):
                         value = 5 - stock['risk']
-                    change = round((value/float(stock['value']))-1, 4)
                     # if the outstanding shares is between 25 and 500 shares away from the total issued shares,
                     # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
                     if stock['issued'] - stock['outstanding'] < randint(25, 500):
@@ -1528,7 +1527,7 @@ class Economy(commands.Cog):
                                                  f"{self.thaler}{value} per share.\n"
                     # update stock information
                     await conn.execute('''UPDATE stocks SET value = ROUND($1,2), issued = issued + $2, trending = $3, 
-                    change = $4 WHERE stock_id = $5;''', value, new_shares, trending, change, stock['stock_id'])
+                    change = ($1/value)-1 WHERE stock_id = $4;''', value, new_shares, trending, stock['stock_id'])
                 # calculate value of stocks
                 stock_sum = await conn.fetchrow('''SELECT SUM(value) FROM stocks;''')
                 # fetch stock count
@@ -1540,9 +1539,11 @@ class Economy(commands.Cog):
                         self.crash = False
                         self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n" \
                                              "Stock prices have recovered by 25%.\n "
-                        await conn.execute('''UPDATE stocks SET value = ROUND((value*.1.25)::numeric, 2);''')
+                        await conn.execute('''UPDATE stocks SET value = ROUND((value*1.25)::numeric, 2), 
+                        change = ROUND(value*1.25::numeric-value::numeric, 2) - 1;''')
                     else:
-                        await conn.execute('''UPDATE stocks SET value = ROUND((value * .25)::numeric, 2);''')
+                        await conn.execute('''UPDATE stocks SET value = ROUND((value*.25)::numeric, 2), 
+                        change = ROUND(value*.25::numeric-value::numeric, 2) - 1;''')
                         self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
                                              "All stock values are decreased by 75%.\n "
                 crash_chance = uniform(1, 100)
@@ -1551,7 +1552,8 @@ class Economy(commands.Cog):
                 if crash_chance <= 1:
                     if self.crash is False:
                             await conn.execute('''UPDATE stocks 
-                            SET value = round((value * .25)::numeric, 2), trend = 'down';''')
+                            SET value = round((value * .25)::numeric, 2), trend = 'down', 
+                            change = ROUND(value*.25::numeric-value::numeric, 2) - 1;''')
                             self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
                                                  "All stock values are decreased by 75% and begun trending down.\n "
                             self.crash = True
