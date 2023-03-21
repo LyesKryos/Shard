@@ -1510,7 +1510,7 @@ class Economy(commands.Cog):
                     if trending == "up":
                         value = value + (((value_roll / 100) + ((stock['outstanding'] / stock['issued']) / 10)) * value)
                     else:
-                        value = value - ((value_roll / 100) * value)
+                        value = value - (((value_roll / 100) - ((stock['issued'] / stock['outstanding']) / 100)) * value)
                         # if the value drops below the floor, set it to be 5 - risk
                     if value < (5 - stock['risk']):
                         value = 5 - stock['risk']
