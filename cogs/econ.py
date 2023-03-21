@@ -2263,6 +2263,74 @@ class Economy(commands.Cog):
                                                                  description=f"A graph representing the share prices of"
                                                                              f" {stock['name']}"))
 
+    @exchange.command(name="graph_average_price", description="Displays a graph of the average price of all stocks.")
+    @app_commands.describe(stock_id="Input the name or ID of the stock.",
+                           start_date="Input a valid date in DD/MM/YYYY format. "
+                                      "Also accepts \"today\", \"forever\", \"week\", and \"month\".",
+                           end_date="Input a valid date in DD/MM/YYYY format. If left blank, defaults to today.")
+    async def graph_average_price(self, interaction: discord.Interaction,
+                                start_date: str, end_date: str = None):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establishes connection
+        conn = self.bot.pool
+        # get datetime objects
+        # if start_date is today, set for today
+        if start_date.lower() == "today":
+            start_date = datetime.now().replace(hour=0)
+        elif start_date.lower() == "forever":
+            start_date = datetime.now().replace(year=2000)
+        elif start_date.lower() == "week":
+            start_date = datetime.now() - timedelta(weeks=1)
+        elif start_date.lower() == "month":
+            start_date = datetime.now() - relativedelta(months=1)
+        else:
+            try:
+                start_date = datetime.strptime(start_date, "%d/%m/%Y")
+            except ValueError:
+                return await interaction.followup.send(f"``{start_date}`` is not a properly formatted date.\n"
+                                                       f"Dates should be formatted day/month/year. For example: "
+                                                       f"31/1/2020.\n"
+                                                       f"This command also accepts `today`, `week`, `month`, "
+                                                       f"and `forever` as acceptable arguments.")
+        # if the end date is none, get the time now
+        if end_date is None:
+            end_date = datetime.now()
+        # otherwise, get the end date
+        else:
+            end_date = datetime.strptime(end_date, "%d/%m/%Y")
+        stock_data = await conn.fetch('''SELECT * FROM exchange_log WHERE (timestamp BETWEEN $1 AND $2) 
+        ORDER BY timestamp ASC;''', start_date, end_date)
+        if not stock_data:
+            return await interaction.followup.send(f"Unfortunately, I cannot find any data between"
+                                                   f"`{start_date.date().strftime('%d/%m/%Y')}` and "
+                                                   f"`{end_date.date().strftime('%d/%m/%Y')}`.")
+        dates = set([d['timestamp'] for d in stock_data])
+        averages = []
+        for d in dates:
+            stocks = []
+            for s in stock_data:
+                if s['timestamp'] == d:
+                    stocks.append(s['value'])
+            averages.append(sum(stocks)/len(stocks))
+        fig, ax = plt.subplots()
+        ax.plot(dates, averages)
+        ax.xaxis.set_major_locator(DayLocator(interval=1))
+        ax.xaxis.set_minor_locator(HourLocator(interval=1))
+        ax.xaxis.set_major_formatter(DateFormatter("%d/%m/%y"))
+        fig.autofmt_xdate()
+        if start_date.day - end_date.day >= 3:
+            plt.grid(True, which="major")
+        else:
+            plt.grid(True, which="major")
+            plt.grid(True, which="minor")
+        plt.title(f"Average Stock Price")
+        plt.ylabel("Value")
+        plt.xlabel("Time")
+        plt.savefig(r"graph.png")
+        return await interaction.followup.send(file=discord.File(fp=r"graph.png",
+                                                                 filename=f"Graph of average share price."))
+    
     @exchange.command(name="feed", description="Displays share price and information about all stocks on the exchange.")
     async def feed(self, interaction: discord.Interaction):
         # defer interaction
