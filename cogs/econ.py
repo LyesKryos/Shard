@@ -2131,12 +2131,12 @@ class Economy(commands.Cog):
             portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
             await interaction.followup.send(embed=portfolio_embed)
 
-    @exchange.command(name="graph_stock_price", description="Displays a graph of a stock's price.")
+    @exchange.command(name="graph_value", description="Displays a graph of a stock's price.")
     @app_commands.describe(stock_id="Input the name or ID of the stock.",
                            start_date="Input a valid date in DD/MM/YYYY format. "
                                       "Also accepts \"today\", \"forever\", \"week\", and \"month\".",
                            end_date="Input a valid date in DD/MM/YYYY format. If left blank, defaults to today.")
-    async def graph_stock_price(self, interaction: discord.Interaction, stock_id: str,
+    async def graph_value(self, interaction: discord.Interaction, stock_id: str,
                                 start_date: str, end_date: str = None):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -2209,12 +2209,12 @@ class Economy(commands.Cog):
                                                                  description=f"A graph representing the share prices of"
                                                                              f" {stock['name']}"))
 
-    @exchange.command(name="graph_stock_price_hourly", description="Displays a graph of a stock's price.")
+    @exchange.command(name="graph_value", description="Displays a graph of a stock's price.")
     @app_commands.describe(stock_id="Input the name or ID of the stock.",
                            start_hour="Input a number of hours ago desired. Accepts any whole number between 1 and 24.",
                            end_hour="Input a numeber of hours ago desired. Accepts any whole number between 2 and 24. "
                                     "End hour must be less than start hour. Defaults to now.")
-    async def graph_stock_price_hourly(self, interaction: discord.Interaction, stock_id: str,
+    async def graph_hourly_value(self, interaction: discord.Interaction, stock_id: str,
                                        start_hour: app_commands.Range[int, 1, 24],
                                        end_hour: app_commands.Range[int, 2, 24] = 0):
         # defer interaction
@@ -2268,11 +2268,11 @@ class Economy(commands.Cog):
                                                                  description=f"A graph representing the share prices of"
                                                                              f" {stock['name']}"))
 
-    @exchange.command(name="graph_average_price", description="Displays a graph of the average price of all stocks.")
+    @exchange.command(name="graph_average_value", description="Displays a graph of the average price of all stocks.")
     @app_commands.describe(start_date="Input a valid date in DD/MM/YYYY format. "
                                       "Also accepts \"today\", \"forever\", \"week\", and \"month\".",
                            end_date="Input a valid date in DD/MM/YYYY format. If left blank, defaults to today.")
-    async def graph_average_price(self, interaction: discord.Interaction,
+    async def graph_average_value(self, interaction: discord.Interaction,
                                 start_date: str, end_date: str = None):
         # defer interaction
         await interaction.response.defer(thinking=True)

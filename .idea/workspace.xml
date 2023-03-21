@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing average price graph">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Changing command names for clarity">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -114,21 +115,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="79988000" />
-    </task>
-    <task id="LOCAL-00477" summary="Fixing sales updating">
-      <created>1679192159262</created>
-      <option name="number" value="00477" />
-      <option name="presentableId" value="LOCAL-00477" />
-      <option name="project" value="LOCAL" />
-      <updated>1679192159262</updated>
-    </task>
-    <task id="LOCAL-00478" summary="Fixing blackjack crediting to account">
-      <created>1679194433226</created>
-      <option name="number" value="00478" />
-      <option name="presentableId" value="LOCAL-00478" />
-      <option name="project" value="LOCAL" />
-      <updated>1679194433226</updated>
+      <workItem from="1678819823954" duration="81222000" />
     </task>
     <task id="LOCAL-00479" summary="Setting gambling cap&#10;Reworking stock exchange">
       <created>1679195923273</created>
@@ -459,7 +446,21 @@
       <option name="project" value="LOCAL" />
       <updated>1679428854372</updated>
     </task>
-    <option name="localTasksCounter" value="526" />
+    <task id="LOCAL-00526" summary="Fixing a few strings">
+      <created>1679429379622</created>
+      <option name="number" value="00526" />
+      <option name="presentableId" value="LOCAL-00526" />
+      <option name="project" value="LOCAL" />
+      <updated>1679429379622</updated>
+    </task>
+    <task id="LOCAL-00527" summary="Fixing + and - display for feed">
+      <created>1679429715947</created>
+      <option name="number" value="00527" />
+      <option name="presentableId" value="LOCAL-00527" />
+      <option name="project" value="LOCAL" />
+      <updated>1679429715947</updated>
+    </task>
+    <option name="localTasksCounter" value="528" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -477,9 +478,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Nerfing slots" />
-    <MESSAGE value="Fixing slots outcomes display" />
-    <MESSAGE value="Removing blackjack cooldown" />
     <MESSAGE value="Adding cooldown response on errors" />
     <MESSAGE value="Filtering logs" />
     <MESSAGE value="Fixing logs" />
@@ -502,7 +500,10 @@
     <MESSAGE value="Average graphing" />
     <MESSAGE value="Fixing days for long periods of time" />
     <MESSAGE value="Fixing average price graph" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing average price graph" />
+    <MESSAGE value="Fixing a few strings" />
+    <MESSAGE value="Fixing + and - display for feed" />
+    <MESSAGE value="Changing command names for clarity" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changing command names for clarity" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
