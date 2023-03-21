@@ -2313,7 +2313,7 @@ class Economy(commands.Cog):
                     stocks.append(s['value'])
             averages.append(sum(stocks)/len(stocks))
         fig, ax = plt.subplots()
-        ax.plot([dates], averages)
+        ax.plot(list(dates), averages)
         ax.xaxis.set_major_locator(DayLocator(interval=1))
         ax.xaxis.set_minor_locator(HourLocator(interval=1))
         ax.xaxis.set_major_formatter(DateFormatter("%d/%m/%y"))
