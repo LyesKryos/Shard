@@ -1531,8 +1531,8 @@ class Economy(commands.Cog):
                             dilution = round(uniform(5 * stock['risk'], 10 * stock['risk']), 2)
                             value = round(value * (clip(dilution, 0, 23) / 100), 2)
                             self.announcement += f"{stock['name']} has been diluted. Issued shares have increased to " \
-                                                 f"{new_shares}, and the diluted value is now " \
-                                                 f"{self.thaler}{value} per share.\n"
+                                                 f"{new_shares:,.0f}, and the diluted value is now " \
+                                                 f"{self.thaler}{value:,.2f} per share.\n"
                     # update stock information
                     await conn.execute('''UPDATE stocks SET value = ROUND($1,2), issued = issued + $2, trending = $3, 
                     change = ($1/value)-1 WHERE stock_id = $4;''', value, new_shares, trending, stock['stock_id'])
@@ -1822,8 +1822,8 @@ class Economy(commands.Cog):
             stock_embed.add_field(name="Description", value=stock['description'], inline=False)
             stock_embed.add_field(name="Value per share", value=f"{self.thaler}{float(stock['value']):,.2f}",
                                   inline=False)
-            stock_embed.add_field(name="Outstanding Shares", value=f"{stock['outstanding']}")
-            stock_embed.add_field(name="Issued Shares", value=f"{stock['issued']}")
+            stock_embed.add_field(name="Outstanding Shares", value=f"{stock['outstanding']:,}")
+            stock_embed.add_field(name="Issued Shares", value=f"{stock['issued']:,}")
             stock_embed.add_field(name="\u200b", value="\u200b")
             stock_embed.add_field(name="Trend", value=f"{stock['trending'].title()} ({stock['change'] * 100:.2f}%)")
             stock_embed.add_field(name="Risk Type", value=f"{risk}")
@@ -1886,12 +1886,12 @@ class Economy(commands.Cog):
         # check the user's wallet
         wallet_contents = await conn.fetchrow('''SELECT sum(amount) FROM ledger WHERE user_id = $1;''', user.id)
         if wallet_contents['sum'] + amount > rbt_member['wallet']:
-            return await interaction.followup.send(f"Your wallet (size: {rbt_member['wallet']}) "
-                                                   f"does not have enough room to buy {amount} "
+            return await interaction.followup.send(f"Your wallet (size: {rbt_member['wallet']:,}) "
+                                                   f"does not have enough room to buy {amount:,} "
                                                    f"shares of {stock['name']}.")
         # if the stock would become overdrawn, notify user
         if amount + stock['outstanding'] > stock['issued']:
-            return await interaction.followup.send(f"Purchasing {amount} shares of {stock['name']} would cause it to "
+            return await interaction.followup.send(f"Purchasing {amount:,} shares of {stock['name']} would cause it to "
                                                    f"be overdrawn. Either purchase an appropriate number of issued "
                                                    f"shares or notify a Director to increase the number of shares of "
                                                    f"this company.")
