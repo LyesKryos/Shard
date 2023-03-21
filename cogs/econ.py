@@ -953,7 +953,7 @@ class Economy(commands.Cog):
                                       user.id)
             wallet_contents = await conn.fetchrow('''SELECT SUM(amount) FROM ledger WHERE user_id = $1;''',
                                                   user.id)
-            if wallet_contents is None:
+            if wallet_contents['sum'] is None:
                 wallet_contents = 0
             else:
                 wallet_contents = wallet_contents['sum']
@@ -1911,7 +1911,7 @@ class Economy(commands.Cog):
             transaction = round(base_price + tax, 2)
         # check the user's wallet
         wallet_contents = await conn.fetchrow('''SELECT sum(amount) FROM ledger WHERE user_id = $1;''', user.id)
-        if wallet_contents is None:
+        if wallet_contents['sum'] is None:
             wallet_contents = 0
         else:
             wallet_contents = wallet_contents['sum']
