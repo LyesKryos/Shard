@@ -2207,13 +2207,16 @@ class Economy(commands.Cog):
     @exchange.command(name="graph_stock_price_hourly", description="Displays a graph of a stock's price.")
     @app_commands.describe(stock_id="Input the name or ID of the stock.",
                            start_hour="Input a number of hours ago desired. Accepts any whole number between 1 and 24.",
-                           end_hour="Input a numeber of hours ago desired. Accepts any whole number between 1 and 24. "
+                           end_hour="Input a numeber of hours ago desired. Accepts any whole number between 2 and 24. "
                                     "End hour must be less than start hour. Defaults to now.")
     async def graph_stock_price_hourly(self, interaction: discord.Interaction, stock_id: str,
                                        start_hour: app_commands.Range[int, 1, 24],
-                                       end_hour: app_commands.Range[int, 1, 24] = None):
+                                       end_hour: app_commands.Range[int, 2, 24] = None):
         # defer interaction
         await interaction.response.defer(thinking=True)
+        # make sure hours are unequal
+        if start_hour <= end_hour:
+            return await interaction.followup.send("The end hour cannot be less than the start hour.")
         # establishes connection
         conn = self.bot.pool
         # fetches stock information
