@@ -2130,8 +2130,8 @@ class Economy(commands.Cog):
                            start_date="Input a valid date in DD/MM/YYYY format. "
                                       "Also accepts \"today\", \"forever\", \"week\", and \"month\".",
                            end_date="Input a valid date in DD/MM/YYYY format. If left blank, defaults to today.")
-    async def graph_stock_price(self, interaction: discord.Interaction, stock_id: str, start_date: str,
-                                end_date: str = None):
+    async def graph_stock_price(self, interaction: discord.Interaction, stock_id: str,
+                                start_date: str, end_date: str = None):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establishes connection
@@ -2199,6 +2199,61 @@ class Economy(commands.Cog):
         plt.xlabel("Time")
         plt.savefig(r"C:\Users\jaedo\OneDrive\Pictures\graph.png")
         return await interaction.followup.send(file=discord.File(fp=r"C:\Users\jaedo\OneDrive\Pictures\graph.png",
+                                                                 filename=f"Graph of {stock['name']} share price.png",
+                                                                 description=f"A graph representing the share prices of"
+                                                                             f" {stock['name']}"))
+
+    @exchange.command(name="graph_stock_price", description="Displays a graph of a stock's price.")
+    @app_commands.describe(stock_id="Input the name or ID of the stock.",
+                           start_hour="Input a number of hours ago desired. Accepts any whole number between 1 and 24.",
+                           end_hour="Input a numeber of hours ago desired. Accepts any whole number between 1 and 24. "
+                                    "End hour must be less than start hour. Defaults to now.")
+    async def graph_stock_price_hourly(self, interaction: discord.Interaction, stock_id: str,
+                                start_hour: app_commands.Range[int, 1, 24], end_hour: app_commands.Range[int, 1, 24]):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establishes connection
+        conn = self.bot.pool
+        # fetches stock information
+        stock = await conn.fetchrow('''SELECT * FROM stocks WHERE lower(name) = $1;''', stock_id.lower())
+        # if stock does not exist, return message
+        if stock is None:
+            try:
+                stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', int(stock_id))
+            except ValueError:
+                return await interaction.followup.send(f"``{stock_id}`` does not exist on the Exchange.")
+        # get datetime objects
+        now = datetime.now()
+        # get start hour
+        start = now.replace(minute=0, second=0) - timedelta(hours=start_hour)
+        # if the end date is none, get the time now
+        if end_hour is None:
+            end_date = datetime.now()
+        # otherwise, get the end date
+        else:
+            end = now.replace(minute=0, second=0) - timedelta(hours=end_hour)
+        # get all data from the specified stock
+        if stock_id == "average":
+            pass
+        stock_data = await conn.fetch('''SELECT * FROM exchange_log WHERE (timestamp BETWEEN $1 AND $2) 
+        AND stock_id = $3 ORDER BY timestamp ASC;''', start, end, stock['stock_id'])
+        if not stock_data:
+            return await interaction.followup.send(f"Unfortunately, I cannot find any data between"
+                                                   f"`{start.strftime('%H:%M')}` and "
+                                                   f"`{end.strftime('%H:%M')}`.")
+        stock_prices = [s['value'] for s in stock_data]
+        dates = [d['timestamp'] for d in stock_data]
+        fig, ax = plt.subplots()
+        ax.plot(dates, stock_prices)
+        ax.xaxis.set_major_locator(HourLocator(interval=1))
+        ax.xaxis.set_major_formatter(DateFormatter("%H"))
+        fig.autofmt_xdate()
+        plt.grid(True, which="major")
+        plt.title(f"{stock['name']} (ID: {stock['stock_id']})")
+        plt.ylabel("Value")
+        plt.xlabel("Time")
+        plt.savefig(r"graph.png")
+        return await interaction.followup.send(file=discord.File(fp=r"graph.png",
                                                                  filename=f"Graph of {stock['name']} share price.png",
                                                                  description=f"A graph representing the share prices of"
                                                                              f" {stock['name']}"))
