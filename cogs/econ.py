@@ -7,6 +7,7 @@ import typing
 from datetime import datetime, timedelta
 from random import randint, uniform, choice
 import discord
+import pandas as pd
 from dateutil.relativedelta import relativedelta
 from discord import app_commands
 from discord.ext import commands
@@ -2304,7 +2305,7 @@ class Economy(commands.Cog):
             return await interaction.followup.send(f"Unfortunately, I cannot find any data between"
                                                    f"`{start_date.date().strftime('%d/%m/%Y')}` and "
                                                    f"`{end_date.date().strftime('%d/%m/%Y')}`.")
-        dates = set([d['timestamp'] for d in stock_data])
+        dates = pd.unique([d['timestamp'] for d in stock_data])
         averages = []
         for d in dates:
             stocks = []
@@ -2313,7 +2314,7 @@ class Economy(commands.Cog):
                     stocks.append(s['value'])
             averages.append(sum(stocks)/len(stocks))
         fig, ax = plt.subplots()
-        ax.plot(list(dates), averages)
+        ax.plot(dates, averages)
         ax.xaxis.set_major_locator(DayLocator(interval=1))
         ax.xaxis.set_minor_locator(HourLocator(interval=1))
         ax.xaxis.set_major_formatter(DateFormatter("%d/%m/%y"))
