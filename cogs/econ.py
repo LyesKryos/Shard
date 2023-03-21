@@ -2264,8 +2264,7 @@ class Economy(commands.Cog):
                                                                              f" {stock['name']}"))
 
     @exchange.command(name="graph_average_price", description="Displays a graph of the average price of all stocks.")
-    @app_commands.describe(stock_id="Input the name or ID of the stock.",
-                           start_date="Input a valid date in DD/MM/YYYY format. "
+    @app_commands.describe(start_date="Input a valid date in DD/MM/YYYY format. "
                                       "Also accepts \"today\", \"forever\", \"week\", and \"month\".",
                            end_date="Input a valid date in DD/MM/YYYY format. If left blank, defaults to today.")
     async def graph_average_price(self, interaction: discord.Interaction,
