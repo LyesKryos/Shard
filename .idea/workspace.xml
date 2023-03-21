@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing market updating">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Changing sell and buy message">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -114,14 +114,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="71527000" />
-    </task>
-    <task id="LOCAL-00458" summary="Accounting for type change of funds">
-      <created>1679068146378</created>
-      <option name="number" value="00458" />
-      <option name="presentableId" value="LOCAL-00458" />
-      <option name="project" value="LOCAL" />
-      <updated>1679068146378</updated>
+      <workItem from="1678819823954" duration="73013000" />
     </task>
     <task id="LOCAL-00459" summary="Updating net worth calculations with investment and loan accounts">
       <created>1679068190197</created>
@@ -459,7 +452,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679394230418</updated>
     </task>
-    <option name="localTasksCounter" value="507" />
+    <task id="LOCAL-00507" summary="Changing sell and buy message">
+      <created>1679402797781</created>
+      <option name="number" value="00507" />
+      <option name="presentableId" value="LOCAL-00507" />
+      <option name="project" value="LOCAL" />
+      <updated>1679402797781</updated>
+    </task>
+    <option name="localTasksCounter" value="508" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -477,7 +477,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing slots winnings for casino ranking" />
     <MESSAGE value="Fixing withdrawing to a 0 thaler account" />
     <MESSAGE value="Testing solution to directory net worth calculation" />
     <MESSAGE value="Fixing directory loan" />
@@ -502,7 +501,8 @@
     <MESSAGE value="Testing fix to change.&#10;Altering outstanding/issued problem from down" />
     <MESSAGE value="Fixing 0-division issue" />
     <MESSAGE value="Fixing market updating" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing market updating" />
+    <MESSAGE value="Changing sell and buy message" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changing sell and buy message" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
