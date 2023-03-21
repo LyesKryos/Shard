@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing max buying">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -114,21 +115,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="67846000" />
-    </task>
-    <task id="LOCAL-00450" summary="Fixing ace totaling for blackjack">
-      <created>1679052711931</created>
-      <option name="number" value="00450" />
-      <option name="presentableId" value="LOCAL-00450" />
-      <option name="project" value="LOCAL" />
-      <updated>1679052711931</updated>
-    </task>
-    <task id="LOCAL-00451" summary="Fixing stock calculations for outstanding vs issued shares">
-      <created>1679062938412</created>
-      <option name="number" value="00451" />
-      <option name="presentableId" value="LOCAL-00451" />
-      <option name="project" value="LOCAL" />
-      <updated>1679062938412</updated>
+      <workItem from="1678819823954" duration="68338000" />
     </task>
     <task id="LOCAL-00452" summary="Adding accounts functionality&#10;Updating class-defined objects">
       <created>1679064374734</created>
@@ -459,7 +446,21 @@
       <option name="project" value="LOCAL" />
       <updated>1679269741961</updated>
     </task>
-    <option name="localTasksCounter" value="499" />
+    <task id="LOCAL-00499" summary="Fixing max buying">
+      <created>1679277440784</created>
+      <option name="number" value="00499" />
+      <option name="presentableId" value="LOCAL-00499" />
+      <option name="project" value="LOCAL" />
+      <updated>1679277440784</updated>
+    </task>
+    <task id="LOCAL-00500" summary="Fixing max buying">
+      <created>1679277700100</created>
+      <option name="number" value="00500" />
+      <option name="presentableId" value="LOCAL-00500" />
+      <option name="project" value="LOCAL" />
+      <updated>1679277700100</updated>
+    </task>
+    <option name="localTasksCounter" value="501" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

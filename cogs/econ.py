@@ -2104,9 +2104,9 @@ class Economy(commands.Cog):
 
     @exchange.command(name="graph_stock_price", description="Displays a graph of a stock's price.")
     @app_commands.describe(stock_id="Input the name or ID of the stock.",
-                           start_date="Input a valid date in day/month/year format. "
+                           start_date="Input a valid date in DD/MM/YYYY format. "
                                       "Also accepts \"today\", \"forever\", \"week\", and \"month\".",
-                           end_date="Input a valid date in day/month/year format. If left blank, defaults to today.")
+                           end_date="Input a valid date in DD/MM/YYYY format. If left blank, defaults to today.")
     async def graph_stock_price(self, interaction: discord.Interaction, stock_id: str, start_date: str,
                                 end_date: str = None):
         # defer interaction
