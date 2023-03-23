@@ -1922,9 +1922,12 @@ class Economy(commands.Cog):
         else:
             wallet_contents = wallet_contents['sum']
         if wallet_contents + amount > rbt_member['wallet']:
-            return await interaction.followup.send(f"Your wallet (size: {rbt_member['wallet']:,}) "
-                                                   f"does not have enough room to buy {amount:,} "
-                                                   f"shares of {stock['name']}.")
+            if amount.lower() == "max":
+                amount = rbt_member - wallet_contents
+            else:
+                return await interaction.followup.send(f"Your wallet (size: {rbt_member['wallet']:,}) "
+                                                       f"does not have enough room to buy {amount:,} "
+                                                       f"shares of {stock['name']}.")
         # if the stock would become overdrawn, notify user
         if amount + stock['outstanding'] > stock['issued']:
             return await interaction.followup.send(f"Purchasing {amount:,} shares of {stock['name']} would cause it to "
