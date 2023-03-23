@@ -2704,7 +2704,7 @@ class Economy(commands.Cog):
         # clear stock ledger
         await conn.execute('''DELETE FROM ledger;''')
         # remove stock logs and set stock prices to a random number between 15 and 45
-        await conn.execute('''DELETE FROM exchange_logs;''')
+        await conn.execute('''DELETE FROM exchange_log;''')
         await conn.execute('''UPDATE stocks SET value = $1, change = 0, issued = 10000;''',
                            uniform(15, 45))
         # clear logs
