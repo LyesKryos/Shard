@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding stock restting command">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing spelling">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,14 +114,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="93075000" />
-    </task>
-    <task id="LOCAL-00486" summary="Fixing logs">
-      <created>1679228812567</created>
-      <option name="number" value="00486" />
-      <option name="presentableId" value="LOCAL-00486" />
-      <option name="project" value="LOCAL" />
-      <updated>1679228812567</updated>
+      <workItem from="1678819823954" duration="93730000" />
     </task>
     <task id="LOCAL-00487" summary="Adding slash command error catching">
       <created>1679265225110</created>
@@ -460,7 +452,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679586968678</updated>
     </task>
-    <option name="localTasksCounter" value="535" />
+    <task id="LOCAL-00535" summary="Fixing spelling">
+      <created>1679588135805</created>
+      <option name="number" value="00535" />
+      <option name="presentableId" value="LOCAL-00535" />
+      <option name="project" value="LOCAL" />
+      <updated>1679588135805</updated>
+    </task>
+    <option name="localTasksCounter" value="536" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -478,7 +477,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing error handling a little&#10;Fixing loans management" />
     <MESSAGE value="Fixing floor issue" />
     <MESSAGE value="Fixing investment issue" />
     <MESSAGE value="Capping bets at 5000 thaler" />
@@ -503,7 +501,8 @@
     <MESSAGE value="Fixing empty wallet display" />
     <MESSAGE value="Altering stock market updating" />
     <MESSAGE value="Adding stock restting command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding stock restting command" />
+    <MESSAGE value="Fixing spelling" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing spelling" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
