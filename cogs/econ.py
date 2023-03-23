@@ -614,12 +614,11 @@ class BlackjackView(View):
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.author.id
-    
+
 
 class MarketDropdown(discord.ui.Select):
 
     def __init__(self):
-
         # define options
         options = [
             discord.SelectOption(label="General Market", description="The market for all general needs, including"
@@ -637,7 +636,8 @@ class MarketDropdown(discord.ui.Select):
 
         async def callback(self, interaction: discord.Interaction):
             await interaction.followup.send(self.values)
-        
+
+
 class MarketView(View):
     def __init__(self):
         super().__init__()
@@ -1533,7 +1533,7 @@ class Economy(commands.Cog):
                     change_chance = randint(1, 100)
                     # calculate trending course if up
                     if stock['trending'] == "up":
-                        if change_chance <= 50 + (5*stock['risk']):
+                        if change_chance <= 50 + (5 * stock['risk']):
                             trending = "down"
                         else:
                             trending = "up"
@@ -2690,6 +2690,27 @@ class Economy(commands.Cog):
                                                  "To use the market, click on the select menu below and "
                                                  "select the option you desire to view.")
         return await interaction.followup.send(embed=market_embed, view=MarketView())
+
+    @commands.command()
+    @commands.is_owner()
+    async def stock_reset(self, ctx):
+        # establish connection
+        conn = self.bot.pool
+        # reset all users to 500 thaler
+        await conn.execute('''UPDATE rbt_users SET funds = 500;''')
+        # clear all contracts and accounts
+        await conn.execute('''DELETE FROM contracts;''')
+        await conn.execute('''DELETE FROM bank_ledger;''')
+        # clear stock ledger
+        await conn.execute('''DELETE FROM ledger;''')
+        # remove stock logs and set stock prices to a random number between 15 and 45
+        await conn.execute('''DELETE FROM exchange_logs;''')
+        await conn.execute('''UPDATE stocks SET value = $1, change = 0, issued = 10000;''',
+                           uniform(15, 45))
+        # clear logs
+        await conn.execute('''DELETE FROM rbt_user_log;''')
+        await conn.execute('''DELETE FROM casino_rank;''')
+        await ctx.send("Done!")
 
 
 
