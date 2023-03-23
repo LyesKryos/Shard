@@ -1533,13 +1533,13 @@ class Economy(commands.Cog):
                     change_chance = randint(1, 100)
                     # calculate trending course if up
                     if stock['trending'] == "up":
-                        if change_chance <= 50 + (5 * stock['risk']):
+                        if change_chance <= 25 + (5 * stock['risk']):
                             trending = "down"
                         else:
                             trending = "up"
                     # calculate trending course if down
                     elif stock['trending'] == "down":
-                        if change_chance <= 50 + (5 * stock['risk']):
+                        if change_chance <= 25 + (5 * stock['risk']):
                             trending = "up"
                         else:
                             trending = "down"
