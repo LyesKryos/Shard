@@ -636,7 +636,14 @@ class MarketDropdown(discord.ui.Select):
                          min_values=1, max_values=1, options=options)
 
         async def callback(self, interaction: discord.Interaction):
-            pass
+            await interaction.followup.send(self.values)
+        
+class MarketView(View):
+    def __init__(self):
+        super().__init__()
+
+        self.add_item(MarketDropdown())
+
 
 def get_card_emoji(card):
     # define emoji strings for card
@@ -1522,32 +1529,31 @@ class Economy(commands.Cog):
                     trending = "up"
                     # define value
                     value = float(stock['value'])
+                    # change chance
+                    change_chance = randint(1, 100)
                     # calculate trending course if up
                     if stock['trending'] == "up":
-                        # if the d100 rolls less than the appropriate percent, change
-                        change_chance = randint(1, 100)
-                        if change_chance <= 5 * stock['risk']:
+                        if change_chance <= 50 + (5*stock['risk']):
                             trending = "down"
                         else:
                             trending = "up"
                     # calculate trending course if down
                     elif stock['trending'] == "down":
-                        # if the d100 rolls less than the appropriate percent, change
-                        change_chance = randint(1, 100)
-                        if change_chance <= 7 * stock['risk']:
+                        if change_chance <= 50 + (5 * stock['risk']):
                             trending = "up"
                         else:
                             trending = "down"
                     # calculation: new_value = value + ((percentage increase + outstanding over issued / 10) * value)
-                    value_roll = uniform(1, 3 + stock['risk'])
+                    value_roll = uniform(0, 2 + stock['risk'])
                     # if the trend is up, increase stock based on risk
                     if trending == "up":
                         value += round(value_roll + (stock['outstanding'] / stock['issued']), 2)
                     else:
                         value -= round(value_roll, 2)
                         # if the value drops below the floor, set it to be 5 - risk
-                    if value < (5 - stock['risk']):
-                        value = 5 - stock['risk']
+                    floor = 15 - uniform(0, stock['risk'])
+                    if value < floor:
+                        value = floor
                     # if the outstanding shares is between 0 and 500 shares away from the total issued shares,
                     # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
                     if stock['issued'] - stock['outstanding'] < randint(0, 500):
@@ -1581,7 +1587,7 @@ class Economy(commands.Cog):
                         self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
                                              "All stock values are decreased by 75%.\n "
                 crash_chance = uniform(1, 100)
-                if stock_sum['sum'] / stock_count['count'] > 10 * stock_count['count']:
+                if stock_sum['sum'] / stock_count['count'] > 2 * stock_count['count']:
                     crash_chance += float(stock_sum['sum']) / int(stock_count['count'])
                 if crash_chance <= 1:
                     if self.crash is False:
@@ -2669,8 +2675,8 @@ class Economy(commands.Cog):
     # creates market subgroup
     market = app_commands.Group(name="market", description="...", guild_only=True)
 
-    @market.command(name="market", description="Opens the market and displays options.")
-    async def market(self, interaction: discord.Interaction):
+    @market.command(name="open_market", description="Opens the market and displays options.")
+    async def open_market(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establish connection
@@ -2683,6 +2689,7 @@ class Economy(commands.Cog):
                                                  "\n"
                                                  "To use the market, click on the select menu below and "
                                                  "select the option you desire to view.")
+        return await interaction.followup.send(embed=market_embed, view=MarketView())
 
 
 

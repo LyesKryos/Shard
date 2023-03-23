@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Changing command names for clarity">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing empty wallet display">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
@@ -115,21 +115,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="85460000" />
-    </task>
-    <task id="LOCAL-00481" summary="Fixing slots outcomes display">
-      <created>1679225736394</created>
-      <option name="number" value="00481" />
-      <option name="presentableId" value="LOCAL-00481" />
-      <option name="project" value="LOCAL" />
-      <updated>1679225736394</updated>
-    </task>
-    <task id="LOCAL-00482" summary="Removing blackjack cooldown">
-      <created>1679226854647</created>
-      <option name="number" value="00482" />
-      <option name="presentableId" value="LOCAL-00482" />
-      <option name="project" value="LOCAL" />
-      <updated>1679226854647</updated>
+      <workItem from="1678819823954" duration="88692000" />
     </task>
     <task id="LOCAL-00483" summary="Adding cooldown response on errors">
       <created>1679227311830</created>
@@ -460,7 +446,21 @@
       <option name="project" value="LOCAL" />
       <updated>1679430570423</updated>
     </task>
-    <option name="localTasksCounter" value="530" />
+    <task id="LOCAL-00530" summary="Fixing buy wallet">
+      <created>1679441029650</created>
+      <option name="number" value="00530" />
+      <option name="presentableId" value="LOCAL-00530" />
+      <option name="project" value="LOCAL" />
+      <updated>1679441029650</updated>
+    </task>
+    <task id="LOCAL-00531" summary="Fixing empty wallet display">
+      <created>1679441209542</created>
+      <option name="number" value="00531" />
+      <option name="presentableId" value="LOCAL-00531" />
+      <option name="project" value="LOCAL" />
+      <updated>1679441209542</updated>
+    </task>
+    <option name="localTasksCounter" value="532" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -478,8 +478,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding cooldown response on errors" />
-    <MESSAGE value="Filtering logs" />
     <MESSAGE value="Fixing logs" />
     <MESSAGE value="Adding slash command error catching" />
     <MESSAGE value="Fixing error handling a little&#10;Fixing loans management" />
@@ -503,7 +501,9 @@
     <MESSAGE value="Fixing a few strings" />
     <MESSAGE value="Fixing + and - display for feed" />
     <MESSAGE value="Changing command names for clarity" />
-    <option name="LAST_COMMIT_MESSAGE" value="Changing command names for clarity" />
+    <MESSAGE value="Fixing buy wallet" />
+    <MESSAGE value="Fixing empty wallet display" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing empty wallet display" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
