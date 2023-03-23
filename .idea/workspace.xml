@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Altering stock market updating">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding stock restting command">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
@@ -115,21 +115,7 @@
       <workItem from="1678380590015" duration="832000" />
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
-      <workItem from="1678819823954" duration="92248000" />
-    </task>
-    <task id="LOCAL-00484" summary="Filtering logs">
-      <created>1679228433119</created>
-      <option name="number" value="00484" />
-      <option name="presentableId" value="LOCAL-00484" />
-      <option name="project" value="LOCAL" />
-      <updated>1679228433119</updated>
-    </task>
-    <task id="LOCAL-00485" summary="Fixing logs">
-      <created>1679228671712</created>
-      <option name="number" value="00485" />
-      <option name="presentableId" value="LOCAL-00485" />
-      <option name="project" value="LOCAL" />
-      <updated>1679228671712</updated>
+      <workItem from="1678819823954" duration="93075000" />
     </task>
     <task id="LOCAL-00486" summary="Fixing logs">
       <created>1679228812567</created>
@@ -460,7 +446,21 @@
       <option name="project" value="LOCAL" />
       <updated>1679582873133</updated>
     </task>
-    <option name="localTasksCounter" value="533" />
+    <task id="LOCAL-00533" summary="Adding stock restting command">
+      <created>1679586901244</created>
+      <option name="number" value="00533" />
+      <option name="presentableId" value="LOCAL-00533" />
+      <option name="project" value="LOCAL" />
+      <updated>1679586901244</updated>
+    </task>
+    <task id="LOCAL-00534" summary="Adding stock restting command">
+      <created>1679586968678</created>
+      <option name="number" value="00534" />
+      <option name="presentableId" value="LOCAL-00534" />
+      <option name="project" value="LOCAL" />
+      <updated>1679586968678</updated>
+    </task>
+    <option name="localTasksCounter" value="535" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -478,7 +478,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding slash command error catching" />
     <MESSAGE value="Fixing error handling a little&#10;Fixing loans management" />
     <MESSAGE value="Fixing floor issue" />
     <MESSAGE value="Fixing investment issue" />
@@ -503,7 +502,8 @@
     <MESSAGE value="Fixing buy wallet" />
     <MESSAGE value="Fixing empty wallet display" />
     <MESSAGE value="Altering stock market updating" />
-    <option name="LAST_COMMIT_MESSAGE" value="Altering stock market updating" />
+    <MESSAGE value="Adding stock restting command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding stock restting command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

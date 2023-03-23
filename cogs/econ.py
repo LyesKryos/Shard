@@ -2705,13 +2705,12 @@ class Economy(commands.Cog):
         await conn.execute('''DELETE FROM ledger;''')
         # remove stock logs and set stock prices to a random number between 15 and 45
         await conn.execute('''DELETE FROM exchange_log;''')
-        await conn.execute('''UPDATE stocks SET value = $1, change = 0, issued = 10000;''',
+        await conn.execute('''UPDATE stocks SET value = $1, change = 0, outstanding = 0, issued = 10000;''',
                            uniform(15, 45))
         # clear logs
         await conn.execute('''DELETE FROM rbt_user_log;''')
         await conn.execute('''DELETE FROM casino_rank;''')
         await ctx.send("Done!")
-
 
 
 async def setup(bot: Shard):
