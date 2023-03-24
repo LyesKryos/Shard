@@ -659,9 +659,9 @@ class MarketDropdown(discord.ui.Select):
             market_embed = discord.Embed(title=f"{self.values[0]}",
                                          description="A display of all items in this market.")
             # paginator if there are more than 25 items in a market
-            if len(market_items) > 25:
+            if len(market_items) > 12:
                 page = 1
-                for m in market_items[(page*25)-25:page*25]:
+                for m in market_items[(page*12)-12:page*12]:
                     market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
                                            value=f"Price: {m['value']}")
             await self.message.edit(embed=market_embed)
@@ -671,6 +671,106 @@ class MarketDropdown(discord.ui.Select):
             lines = traceback.format_exception(etype, error, trace)
             traceback_text = ''.join(lines)
             self.bot.logger.warning(msg=f"{traceback_text}")
+
+
+class SubMarketView(View):
+
+    def __init__(self, message, page, values, market):
+        self.message = message
+        self.page = page
+        self.values = values
+        self.market = market
+        super().__init__(timeout=300)
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.blurple, disabled=True, emoji="\u23ea")
+    async def back(self, interaction: discord.Interaction, back_button: discord.Button):
+        # define bot
+        bot = interaction.client
+        try:
+            # defer response
+            await interaction.response.defer()
+            # set foward button on
+            self.forward.disabled = False
+            # establish connection
+            conn = interaction.client.pool
+            # subtract from page
+            self.page -= 1
+            # page cannot be less than 1
+            if self.page <= 1:
+                self.page = 1
+                back_button.disabled = True
+            # fetch market items
+            market_items = await conn.fetch('''SELECT * FROM rbt_market WHERE market = $1 ORDER BY market_id;''',
+                                            self.market)
+            # create embed
+            market_embed = discord.Embed(title=f"{self.values[0]}",
+                                         description="A display of all items in this market.")
+            # paginator if there are more than 25 items in a market
+            if len(market_items) > 12:
+                for m in market_items[(self.page*12)-12:self.page*12]:
+                    market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
+                                           value=f"Price: {m['value']}")
+            await self.message.edit(embed=market_embed)
+        except Exception as error:
+            etype = type(error)
+            trace = error.__traceback__
+            lines = traceback.format_exception(etype, error, trace)
+            traceback_text = ''.join(lines)
+            bot.logger.warning(msg=f"{traceback_text}")
+
+    @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
+    async def close(self, interaction: discord.Interaction, close: discord.Button):
+        # define bot
+        bot = interaction.client
+        try:
+            # defer response
+            await interaction.response.defer()
+            # disable all buttons
+            for button in self.children:
+                button.disabled = True
+            await self.message.edit(view=self)
+        except Exception as error:
+            etype = type(error)
+            trace = error.__traceback__
+            lines = traceback.format_exception(etype, error, trace)
+            traceback_text = ''.join(lines)
+            bot.logger.warning(msg=f"{traceback_text}")
+
+    @discord.ui.button(label="Next", style=discord.ButtonStyle.blurple, emoji="\u23e9")
+    async def forward(self, interaction: discord.Interaction, forward_button: discord.Button):
+        try:
+            # defer response
+            await interaction.response.defer()
+            # enable back button
+            self.back.disabled = False
+            # establish connection
+            conn = interaction.client.pool
+            # subtract from page
+            self.page += 1
+            # fetch all stocks
+            # fetch market items
+            market_items = await conn.fetch('''SELECT * FROM rbt_market WHERE market = $1 ORDER BY market_id;''',
+                                            self.market)
+            # disable forward on last page
+            if (len(market_items[(self.page * 12) - 12:self.page * 12]) / 12) < 1:
+                forward_button.disabled = True
+            # create embed
+            market_embed = discord.Embed(title=f"{self.values[0]}",
+                                         description="A display of all items in this market.")
+            # paginator if there are more than 25 items in a market
+            if len(market_items) > 12:
+                page = 1
+                for m in market_items[(page*12)-12:page*12]:
+                    market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
+                                           value=f"Price: {m['value']}")
+            await self.message.edit(embed=market_embed)
+        except Exception as error:
+            etype = type(error)
+            trace = error.__traceback__
+            lines = traceback.format_exception(etype, error, trace)
+            traceback_text = ''.join(lines)
+            self.bot.logger.warning(msg=f"{traceback_text}")
+
 
 
 class MarketView(View):
