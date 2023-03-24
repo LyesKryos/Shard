@@ -647,12 +647,13 @@ class MarketView(View):
 
 class LoanDropdown(Select):
 
-    def __init__(self, amount, user):
+    def __init__(self, amount, user, message):
         # define thaler icon
         self.thaler = "\u20B8"
         # define stuff we need
         self.amount = amount
         self.user = user
+        self.message = message
         # define weeks from now
         self.one_week = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=7)
         self.two_weeks = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=14)
@@ -705,16 +706,16 @@ class LoanDropdown(Select):
         await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                            self.user.id, 'bank', f"Opened a new loan account (ID: {interaction.id}) "
                                                  f"with {self.thaler}{self.amount:,.2f}.")
-        return await interaction.followup.edit(content=f"You have successfully opened a loan account (ID:{interaction.id}) "
+        return await self.message.edit(content=f"You have successfully opened a loan account (ID:{interaction.id}) "
                                                f"with {self.thaler}{self.amount:,.2f}. This loan becomes due: "
                                                f"<t:{int(due.timestamp())}:f>", view=self)
 
 
 class LoanView(View):
-    def __init__(self, amount, user):
+    def __init__(self, amount, user, message: discord.Message):
         super().__init__()
 
-        self.add_item(LoanDropdown(amount, user))
+        self.add_item(LoanDropdown(amount, user, message))
 
 
 def get_card_emoji(card):
@@ -1325,7 +1326,8 @@ class Economy(commands.Cog):
             if float(investment_fund['current_funds']) < amount:
                 return await interaction.followup.send(f"The Investment Fund does not have enough available funds to "
                                                        f"fill that request.")
-            await interaction.followup.send(view=LoanView(amount=amount, user=user))
+            message = interaction.followup.send(content=" ")
+            await interaction.followup.send(view=LoanView(amount=amount, user=user, message=message))
         # if the type is investment, ensure the user has the amount to invest
         if account_type == "investment":
             if amount > user_info['funds']:
