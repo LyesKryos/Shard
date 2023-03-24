@@ -705,7 +705,7 @@ class LoanDropdown(Select):
         await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                            self.user.id, 'bank', f"Opened a new loan account (ID: {interaction.id}) "
                                                  f"with {self.thaler}{self.amount:,.2f}.")
-        return await interaction.followup.edit(f"You have successfully opened a loan account (ID:{interaction.id}) "
+        return await interaction.followup.edit(content=f"You have successfully opened a loan account (ID:{interaction.id}) "
                                                f"with {self.thaler}{self.amount:,.2f}. This loan becomes due: "
                                                f"<t:{int(due.timestamp())}:f>", view=self)
 
