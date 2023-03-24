@@ -11,7 +11,7 @@ import pandas as pd
 from dateutil.relativedelta import relativedelta
 from discord import app_commands
 from discord.ext import commands
-from discord.ui import View, Button
+from discord.ui import View, Select
 from matplotlib import pyplot as plt
 from matplotlib.dates import HourLocator, DateFormatter, DayLocator
 from numpy import clip
@@ -616,7 +616,7 @@ class BlackjackView(View):
         return interaction.user.id == self.author.id
 
 
-class MarketDropdown(discord.ui.Select):
+class MarketDropdown(Select):
 
     def __init__(self):
         # define options
@@ -639,6 +639,78 @@ class MarketDropdown(discord.ui.Select):
 
 
 class MarketView(View):
+    def __init__(self):
+        super().__init__()
+
+        self.add_item(MarketDropdown())
+
+
+class LoanDropdown(Select):
+
+    def __init__(self, amount, user):
+        # define thaler icon
+        self.thaler = "\u20B8"
+        # define stuff we need
+        self.amount = amount
+        self.user = user
+        # define weeks from now
+        self.one_week = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=7)
+        self.two_weeks = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=14)
+        self.three_weeks = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=21)
+        self.month = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + relativedelta(months=1)
+        # define options
+        options = [
+            discord.SelectOption(label="One Week Loan",
+                                 description=f"Loan due <t:{self.one_week.timestamp()}:f> @ 10% interest per term"),
+            discord.SelectOption(label="Two Week Loan",
+                                 description=f"Loan due <t:{self.two_weeks.timestamp()}:f> @ 8% interest per term"),
+            discord.SelectOption(label="Three Week Loan",
+                                 description=f"Loan due <t:{self.three_weeks.timestamp()}:f> @ 6% interest per term"),
+            discord.SelectOption(label="One Month Loan",
+                                 description=f"Loan due <t:{self.month.timestamp()}:f> @ 4% interest per term")
+        ]
+
+        super().__init__(placeholder="Choose the length of loan...",
+                         min_values=1, max_values=1, options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=False)
+        # disable dropdown
+        self.disabled = True
+        # parse interest
+        if self.values[0] == "One Week Loan":
+            interest = 10
+            due = self.one_week
+        elif self.values[0] == "Two Week Loan":
+            interest = 8
+            due = self.two_weeks
+        elif self.values[0] == "Three Week Loan":
+            interest = 6
+            due = self.three_weeks
+        else:
+            interest = 4
+            due = self.month
+        # establish connection
+        conn = interaction.client.pool
+        # remove funds from investment fund
+        await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 
+            WHERE name = 'Investment Fund';''', self.amount)
+        # create loan account
+        await conn.execute('''INSERT INTO bank_ledger VALUES($1,$2,$3,$4,$5,$6);''',
+                           self.user.id, interaction.id, self.amount, 'loan', interest, due)
+        # credit to user account and log
+        await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                           self.amount, self.user.id)
+        await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                           self.user.id, 'bank', f"Opened a new loan account (ID: {interaction.id}) "
+                                                 f"with {self.thaler}{self.amount:,.2f}.")
+        return await interaction.followup.send(f"You have successfully opened a loan account (ID:{interaction.id}) "
+                                               f"with {self.thaler}{self.amount:,.2f}. This loan becomes due: "
+                                               f"<t:{due.timestamp()}:f>")
+
+
+class LoanView(View):
     def __init__(self):
         super().__init__()
 
@@ -1282,8 +1354,8 @@ class Economy(commands.Cog):
             await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
             WHERE name = 'Investment Fund';''', amount)
             # create loan account
-            await conn.execute('''INSERT INTO bank_ledger VALUES($1,$2,$3,$4);''',
-                               user.id, interaction.id, amount, 'investment')
+            await conn.execute('''INSERT INTO bank_ledger VALUES($1,$2,$3,$4,$5);''',
+                               user.id, interaction.id, amount, 'investment', 2.0)
             # credit to user account and log
             await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
                                amount, user.id)
