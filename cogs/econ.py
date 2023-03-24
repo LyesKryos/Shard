@@ -623,6 +623,8 @@ class MarketDropdown(discord.ui.Select):
         self.bot = None
         # define message
         self.message = message
+        # define page
+        self.page = 1
         # define options
         options = [
             discord.SelectOption(label="General Market", description="The market for all general needs.",
@@ -651,13 +653,17 @@ class MarketDropdown(discord.ui.Select):
             else:
                 market = 'open'
             # fetch market items
-            market_items = await conn.fetch('''SELECT * FROM rbt_market WHERE market = $1;''', market)
+            market_items = await conn.fetch('''SELECT * FROM rbt_market WHERE market = $1 ORDER BY market_id;''',
+                                            market)
             # create embed
             market_embed = discord.Embed(title=f"{self.values[0]}",
                                          description="A display of all items in this market.")
-            for m in market_items:
-                market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
-                                       value=f"Price: {m['value']}")
+            # paginator if there are more than 25 items in a market
+            if len(market_items) > 25:
+                page = 1
+                for m in market_items[(page*25)-25:page*25]:
+                    market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
+                                           value=f"Price: {m['value']}")
             await self.message.edit(embed=market_embed)
         except Exception as error:
             etype = type(error)
