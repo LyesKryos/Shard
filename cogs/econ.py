@@ -2832,7 +2832,7 @@ class Economy(commands.Cog):
                                                  "To use the market, click on the select menu below and "
                                                  "select the option you desire to view.")
         message = await interaction.followup.send(embed=market_embed)
-        message.edit(view=MarketView(message))
+        await message.edit(view=MarketView(message))
 
     @commands.command()
     @commands.is_owner()
