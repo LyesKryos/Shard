@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding loan dropdown">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing realtive timestamp">
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -115,21 +115,7 @@
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
       <workItem from="1678819823954" duration="98671000" />
-      <workItem from="1679659589295" duration="1240000" />
-    </task>
-    <task id="LOCAL-00492" summary="Adding slash command error catching">
-      <created>1679265974324</created>
-      <option name="number" value="00492" />
-      <option name="presentableId" value="LOCAL-00492" />
-      <option name="project" value="LOCAL" />
-      <updated>1679265974324</updated>
-    </task>
-    <task id="LOCAL-00493" summary="Fixing error handling a little&#10;Fixing loans management">
-      <created>1679266518299</created>
-      <option name="number" value="00493" />
-      <option name="presentableId" value="LOCAL-00493" />
-      <option name="project" value="LOCAL" />
-      <updated>1679266518299</updated>
+      <workItem from="1679659589295" duration="1550000" />
     </task>
     <task id="LOCAL-00494" summary="Fixing floor issue">
       <created>1679266752300</created>
@@ -460,7 +446,21 @@
       <option name="project" value="LOCAL" />
       <updated>1679660620262</updated>
     </task>
-    <option name="localTasksCounter" value="541" />
+    <task id="LOCAL-00541" summary="Adding loan dropdown">
+      <created>1679660903113</created>
+      <option name="number" value="00541" />
+      <option name="presentableId" value="LOCAL-00541" />
+      <option name="project" value="LOCAL" />
+      <updated>1679660903114</updated>
+    </task>
+    <task id="LOCAL-00542" summary="Fixing realtive timestamp">
+      <created>1679661008823</created>
+      <option name="number" value="00542" />
+      <option name="presentableId" value="LOCAL-00542" />
+      <option name="project" value="LOCAL" />
+      <updated>1679661008823</updated>
+    </task>
+    <option name="localTasksCounter" value="543" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -478,7 +478,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing max buying" />
     <MESSAGE value="Altering graph wording" />
     <MESSAGE value="Testing fix to change.&#10;Removing outstanding/issued from down calculation" />
     <MESSAGE value="Testing fix to change.&#10;Altering outstanding/issued problem from down" />
@@ -503,7 +502,8 @@
     <MESSAGE value="Adding max consideration for wallet size" />
     <MESSAGE value="Messing with up and down chance to make it a bit more stable" />
     <MESSAGE value="Adding loan dropdown" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding loan dropdown" />
+    <MESSAGE value="Fixing realtive timestamp" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing realtive timestamp" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

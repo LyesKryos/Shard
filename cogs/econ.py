@@ -661,17 +661,13 @@ class LoanDropdown(Select):
         # define options
         options = [
             discord.SelectOption(label="One Week Loan",
-                                 description=f"Loan due <t:{int(self.one_week.timestamp())}:f> "
-                                             f"@ 10% interest per term"),
+                                 description=f"Loan due one week from today at midnight @ 10% interest per term"),
             discord.SelectOption(label="Two Week Loan",
-                                 description=f"Loan due <t:{int(self.two_weeks.timestamp())}:f> "
-                                             f"@ 8% interest per term"),
+                                 description=f"Loan due two weeks from today at midnight @ 8% interest per term"),
             discord.SelectOption(label="Three Week Loan",
-                                 description=f"Loan due <t:{int(self.three_weeks.timestamp())}:f> "
-                                             f"@ 6% interest per term"),
+                                 description=f"Loan due three weeks from today at midnight @ 6% interest per term"),
             discord.SelectOption(label="One Month Loan",
-                                 description=f"Loan due <t:{int(self.month.timestamp())}:f> "
-                                             f"@ 4% interest per term")
+                                 description=f"Loan due one month from today at midnight @ 4% interest per term")
         ]
 
         super().__init__(placeholder="Choose the length of loan...",
@@ -709,9 +705,9 @@ class LoanDropdown(Select):
         await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                            self.user.id, 'bank', f"Opened a new loan account (ID: {interaction.id}) "
                                                  f"with {self.thaler}{self.amount:,.2f}.")
-        return await interaction.followup.send(f"You have successfully opened a loan account (ID:{interaction.id}) "
+        return await interaction.followup.edit(f"You have successfully opened a loan account (ID:{interaction.id}) "
                                                f"with {self.thaler}{self.amount:,.2f}. This loan becomes due: "
-                                               f"<t:{int(due.timestamp())}:f>")
+                                               f"<t:{int(due.timestamp())}:f>", view=self)
 
 
 class LoanView(View):
