@@ -736,7 +736,7 @@ class SubMarketView(View):
             await interaction.response.defer()
             # disable all buttons
             for button in self.children:
-                button.disabled = True
+                self.remove_item(button)
             await self.message.edit(view=self)
         except Exception as error:
             etype = type(error)
