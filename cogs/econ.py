@@ -644,10 +644,6 @@ class MarketDropdown(discord.ui.Select):
             await interaction.response.defer(thinking=False)
             # define bot
             self.bot = interaction.client
-            # remove buttons
-            for button in self.view.children:
-                if type(button) == discord.Button:
-                    self.view.remove_item(button)
             # establish connection
             conn = self.bot.pool
             # parse market
@@ -2412,7 +2408,7 @@ class Economy(commands.Cog):
                 else:
                     this_string += " :chart_with_downwards_trend: -"
                 this_string += f"{abs(stock['change'] * 100):.2f}%\n" \
-                               f"> Sale value: {self.thaler}" \
+                               f">>> Sale value: {self.thaler}" \
                                f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
                 ledger_string += this_string
                 stock_value += float(shares['amount']) * float(stock['value'])
