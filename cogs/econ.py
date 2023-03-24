@@ -756,7 +756,6 @@ class SubMarketView(View):
             conn = interaction.client.pool
             # subtract from page
             self.page += 1
-            # fetch all stocks
             # fetch market items
             market_items = await conn.fetch('''SELECT * FROM rbt_market WHERE market = $1 ORDER BY market_id;''',
                                             self.market)
@@ -768,7 +767,6 @@ class SubMarketView(View):
                                          description="A display of all items in this market.")
             # paginator if there are more than 25 items in a market
             if len(market_items) > 12:
-                page = 1
                 for m in market_items[(page*12)-12:page*12]:
                     market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
                                            value=f"Price: {m['value']:,}")
