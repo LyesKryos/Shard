@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing the open market command">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Paginating the market">
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -116,21 +115,7 @@
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
       <workItem from="1678819823954" duration="98671000" />
-      <workItem from="1679659589295" duration="8918000" />
-    </task>
-    <task id="LOCAL-00506" summary="Fixing market updating">
-      <created>1679394230418</created>
-      <option name="number" value="00506" />
-      <option name="presentableId" value="LOCAL-00506" />
-      <option name="project" value="LOCAL" />
-      <updated>1679394230418</updated>
-    </task>
-    <task id="LOCAL-00507" summary="Changing sell and buy message">
-      <created>1679402797781</created>
-      <option name="number" value="00507" />
-      <option name="presentableId" value="LOCAL-00507" />
-      <option name="project" value="LOCAL" />
-      <updated>1679402797781</updated>
+      <workItem from="1679659589295" duration="9232000" />
     </task>
     <task id="LOCAL-00508" summary="Adding wallet size">
       <created>1679420360589</created>
@@ -461,7 +446,21 @@
       <option name="project" value="LOCAL" />
       <updated>1679679390389</updated>
     </task>
-    <option name="localTasksCounter" value="555" />
+    <task id="LOCAL-00555" summary="Paginating the market">
+      <created>1679680730860</created>
+      <option name="number" value="00555" />
+      <option name="presentableId" value="LOCAL-00555" />
+      <option name="project" value="LOCAL" />
+      <updated>1679680730860</updated>
+    </task>
+    <task id="LOCAL-00556" summary="Paginating the market">
+      <created>1679680952296</created>
+      <option name="number" value="00556" />
+      <option name="presentableId" value="LOCAL-00556" />
+      <option name="project" value="LOCAL" />
+      <updated>1679680952296</updated>
+    </task>
+    <option name="localTasksCounter" value="557" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -479,7 +478,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding wallet size" />
     <MESSAGE value="Adding wallet to info" />
     <MESSAGE value="Hour graphing achieved" />
     <MESSAGE value="Average graphing" />
@@ -504,7 +502,8 @@
     <MESSAGE value="Adding commas to recruitment rank" />
     <MESSAGE value="Adding proper open market" />
     <MESSAGE value="Fixing the open market command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing the open market command" />
+    <MESSAGE value="Paginating the market" />
+    <option name="LAST_COMMIT_MESSAGE" value="Paginating the market" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

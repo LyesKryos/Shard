@@ -719,7 +719,7 @@ class SubMarketView(View):
                 for m in market_items[(self.page*12)-12:self.page*12]:
                     market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
                                            value=f"Price: {m['value']}")
-            await self.message.edit(embed=market_embed)
+            await self.message.edit(embed=market_embed, view=self)
         except Exception as error:
             etype = type(error)
             trace = error.__traceback__
@@ -771,14 +771,14 @@ class SubMarketView(View):
                 page = 1
                 for m in market_items[(page*12)-12:page*12]:
                     market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
-                                           value=f"Price: {m['value']}")
-            await self.message.edit(embed=market_embed)
+                                           value=f"Price: {m['value']:,}")
+            await self.message.edit(embed=market_embed, view=self)
         except Exception as error:
             etype = type(error)
             trace = error.__traceback__
             lines = traceback.format_exception(etype, error, trace)
             traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
+            bot.logger.warning(msg=f"{traceback_text}")
 
 
 
