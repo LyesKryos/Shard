@@ -661,13 +661,17 @@ class LoanDropdown(Select):
         # define options
         options = [
             discord.SelectOption(label="One Week Loan",
-                                 description=f"Loan due <t:{self.one_week.timestamp()}:f> @ 10% interest per term"),
+                                 description=f"Loan due <t:{int(self.one_week.timestamp())}:f> "
+                                             f"@ 10% interest per term"),
             discord.SelectOption(label="Two Week Loan",
-                                 description=f"Loan due <t:{self.two_weeks.timestamp()}:f> @ 8% interest per term"),
+                                 description=f"Loan due <t:{int(self.two_weeks.timestamp())}:f> "
+                                             f"@ 8% interest per term"),
             discord.SelectOption(label="Three Week Loan",
-                                 description=f"Loan due <t:{self.three_weeks.timestamp()}:f> @ 6% interest per term"),
+                                 description=f"Loan due <t:{int(self.three_weeks.timestamp())}:f> "
+                                             f"@ 6% interest per term"),
             discord.SelectOption(label="One Month Loan",
-                                 description=f"Loan due <t:{self.month.timestamp()}:f> @ 4% interest per term")
+                                 description=f"Loan due <t:{int(self.month.timestamp())}:f> "
+                                             f"@ 4% interest per term")
         ]
 
         super().__init__(placeholder="Choose the length of loan...",
@@ -707,7 +711,7 @@ class LoanDropdown(Select):
                                                  f"with {self.thaler}{self.amount:,.2f}.")
         return await interaction.followup.send(f"You have successfully opened a loan account (ID:{interaction.id}) "
                                                f"with {self.thaler}{self.amount:,.2f}. This loan becomes due: "
-                                               f"<t:{due.timestamp()}:f>")
+                                               f"<t:{int(due.timestamp())}:f>")
 
 
 class LoanView(View):
