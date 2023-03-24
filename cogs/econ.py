@@ -642,7 +642,12 @@ class MarketDropdown(discord.ui.Select):
         try:
             # defer interaction
             await interaction.response.defer(thinking=False)
+            # define bot
             self.bot = interaction.client
+            # remove buttons
+            for button in self.view.children:
+                if type(button) == discord.Button:
+                    self.view.remove_item(button)
             # establish connection
             conn = self.bot.pool
             # parse market
