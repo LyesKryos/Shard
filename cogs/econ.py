@@ -697,8 +697,8 @@ class LoanDropdown(Select):
         await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 
             WHERE name = 'Investment Fund';''', self.amount)
         # create loan account
-        await conn.execute('''INSERT INTO bank_ledger VALUES($1,$2,$3,$4,$5,$6);''',
-                           self.user.id, interaction.id, self.amount, 'loan', interest, due)
+        await conn.execute('''INSERT INTO bank_ledger(user_id, account_id, amount, type, interest, due_date) 
+        VALUES($1,$2,$3,$4,$5,$6);''', self.user.id, interaction.id, self.amount, 'loan', interest, due)
         # credit to user account and log
         await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                            self.amount, self.user.id)
