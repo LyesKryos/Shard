@@ -616,33 +616,69 @@ class BlackjackView(View):
         return interaction.user.id == self.author.id
 
 
-class MarketDropdown(Select):
+class MarketDropdown(discord.ui.Select):
 
-    def __init__(self):
+    def __init__(self, message):
+        # define bot
+        self.bot = None
+        # define message
+        self.message = message
         # define options
         options = [
-            discord.SelectOption(label="General Market", description="The market for all general needs, including"
-                                                                     "roles, titles, and RBT amenities.",
-                                 emoji=":coin:"),
+            discord.SelectOption(label="General Market", description="The market for all general needs.",
+                                 emoji="\U0001fa99"),
             discord.SelectOption(label="Minecraft Market", description="The market for Minecraft items.",
                                  emoji="<:diamond_pickaxe:1087876208634638458>"),
-            discord.SelectOption(label="Open Market", description="The market where RBT members may offer their "
-                                                                  "own goods and services to the general public.",
-                                 emoji=":receipt:")
+            discord.SelectOption(label="Open Market", description="Public market for entrepreneurs.",
+                                 emoji="\U0001F9FE")
         ]
 
         super().__init__(placeholder="Choose the market you wish to view...",
                          min_values=1, max_values=1, options=options)
 
-        async def callback(self, interaction: discord.Interaction):
-            await interaction.followup.send(self.values)
+    async def callback(self, interaction: discord.Interaction):
+        try:
+            # defer interaction
+            await interaction.response.defer(thinking=False)
+            self.bot = interaction.client
+            # establish connection
+            conn = self.bot.pool
+            # parse market
+            if self.values[0] == 'General Market':
+                market = 'general'
+            elif self.values[0] == 'Minecraft Market':
+                market = 'minecraft'
+            else:
+                market = 'open'
+            # fetch market items
+            market_items = await conn.fetch('''SELECT * FROM rbt_market WHERE market = $1;''', market)
+            # create embed
+            market_embed = discord.Embed(title=f"{self.values[0]}",
+                                         description="A display of all items in this market.")
+            for m in market_items:
+                market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
+                                       value=f"Price: {m['value']}")
+            await self.message.edit(embed=market_embed)
+        except Exception as error:
+            etype = type(error)
+            trace = error.__traceback__
+            lines = traceback.format_exception(etype, error, trace)
+            traceback_text = ''.join(lines)
+            self.bot.logger.warning(msg=f"{traceback_text}")
 
 
 class MarketView(View):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, message):
+        self.message = message
+        super().__init__(timeout=300)
 
-        self.add_item(MarketDropdown())
+        self.add_item(MarketDropdown(message=self.message))
+
+    async def on_timeout(self) -> None:
+        # remove dropdown
+        for item in self.children:
+            self.remove_item(item)
+        return await self.message.edit(content="Market closed.", view=self)
 
 
 class LoanDropdown(Select):
@@ -694,6 +730,8 @@ class LoanDropdown(Select):
             due = self.month
         # establish connection
         conn = interaction.client.pool
+        # apply interest to amount
+        self.amount = round(self.amount * 1+(interest/100), 2)
         # remove funds from investment fund
         await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 
             WHERE name = 'Investment Fund';''', self.amount)
@@ -708,7 +746,9 @@ class LoanDropdown(Select):
                                                  f"with {self.thaler}{self.amount:,.2f}.")
         return await self.message.edit(content=f"You have successfully opened a loan account (ID:{interaction.id}) "
                                                f"with {self.thaler}{self.amount:,.2f}. This loan becomes due: "
-                                               f"<t:{int(due.timestamp())}:f>", view=self.view)
+                                               f"<t:{int(due.timestamp())}:f>.\n"
+                                               f"Note that interest is applied to the principle proactively.",
+                                       view=self.view)
 
 
 class LoanView(View):
@@ -938,7 +978,7 @@ class Economy(commands.Cog):
                 # INVESTMENT/LOAN UPDATES
                 # fetch sum of all investments
                 investment_sum_raw = await conn.fetchrow('''SELECT SUM(amount) FROM bank_ledger 
-                WHERE type = 'Investment';''')
+                WHERE type = 'investment';''')
                 if investment_sum_raw['sum'] is None:
                     investment_sum = 0
                 else:
@@ -952,8 +992,46 @@ class Economy(commands.Cog):
                 await conn.execute(
                     '''UPDATE funds SET current_funds = current_funds + $1 WHERE name = 'General Fund';''',
                     (investment_sum * .06))
-                # increase loan interest by 1.5%
-                await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'loan';''')
+                # increase loan by interest rate
+                await conn.execute('''UPDATE bank_ledger SET amount = amount * (1+(interest/100)) 
+                WHERE type = 'loan';''')
+                # LOANS DUE
+                today = datetime.now()
+                loans_due = await conn.fetch('''SELECT * FROM bank_ledger WHERE due_date < $1 AND type = 'loan';''',
+                                             today)
+                # for all the loans in due, reposes thaler or default
+                for loan in loans_due:
+                    amount = loan['amount']
+                    borrower = loan['user_id']
+                    borrower_snowflake = self.bot.get_user(borrower)
+                    # fetch borrower information
+                    borrower_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', borrower)
+                    # if the user does not have enough thaler in their funds, increase loan by 35%
+                    if borrower_info['funds'] < amount:
+                        await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.35, due_date = $2 
+                        WHERE account_id = $1;''', loan['account_id'], today + timedelta(days=14))
+                        # create and send user a DM
+                        default_dm = await self.bot.create_dm(borrower_snowflake)
+                        await default_dm.send(f"This is your official notice from the Royal Bank of Thegye that you "
+                                              f"have defaulted on your loan account (ID: {loan['account_id']}. "
+                                              f"This loan has been increased by 35% in lieu of payment and will "
+                                              f"become due two weeks from today.")
+                        continue
+                    else:
+                        # remove funds from user
+                        await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
+                                           amount, borrower)
+                        # add funds to investment fund
+                        await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
+                        WHERE name = 'Investment Fund';''', amount)
+                        # remove loan account
+                        await conn.execute('''DELETE FROM bank_ledger WHERE account_id = $1;''', loan['account_id'])
+                        # log action
+                        await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                           borrower, 'bank', f"Loan account #{loan['account_id']} automatically "
+                                                             f"repaid by {borrower_snowflake.name}#"
+                                                             f"{borrower_snowflake.discriminator}.")
+                        continue
                 # payroll
                 thegye = self.bot.get_guild(674259612580446230)
                 official_role = thegye.get_role(674278988323225632)
@@ -2753,7 +2831,8 @@ class Economy(commands.Cog):
                                                  "\n"
                                                  "To use the market, click on the select menu below and "
                                                  "select the option you desire to view.")
-        return await interaction.followup.send(embed=market_embed, view=MarketView())
+        message = await interaction.followup.send(embed=market_embed)
+        message.edit(view=MarketView(message))
 
     @commands.command()
     @commands.is_owner()
