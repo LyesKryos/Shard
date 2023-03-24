@@ -678,7 +678,7 @@ class LoanDropdown(Select):
         # defer interaction
         await interaction.response.defer(thinking=False)
         # disable dropdown
-        self.disabled = True
+        self.view.remove_item(item=self)
         # parse interest
         if self.values[0] == "One Week Loan":
             interest = 10

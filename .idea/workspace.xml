@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Disabling dropdown menu">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Removing dropdown menu on submit">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -115,28 +116,7 @@
       <workItem from="1678420957279" duration="2383000" />
       <workItem from="1678542957088" duration="18721000" />
       <workItem from="1678819823954" duration="98671000" />
-      <workItem from="1679659589295" duration="2186000" />
-    </task>
-    <task id="LOCAL-00498" summary="Fixing max buying">
-      <created>1679269741961</created>
-      <option name="number" value="00498" />
-      <option name="presentableId" value="LOCAL-00498" />
-      <option name="project" value="LOCAL" />
-      <updated>1679269741961</updated>
-    </task>
-    <task id="LOCAL-00499" summary="Fixing max buying">
-      <created>1679277440784</created>
-      <option name="number" value="00499" />
-      <option name="presentableId" value="LOCAL-00499" />
-      <option name="project" value="LOCAL" />
-      <updated>1679277440784</updated>
-    </task>
-    <task id="LOCAL-00500" summary="Fixing max buying">
-      <created>1679277700100</created>
-      <option name="number" value="00500" />
-      <option name="presentableId" value="LOCAL-00500" />
-      <option name="project" value="LOCAL" />
-      <updated>1679277700100</updated>
+      <workItem from="1679659589295" duration="2903000" />
     </task>
     <task id="LOCAL-00501" summary="Altering graph wording">
       <created>1679362490414</created>
@@ -460,7 +440,28 @@
       <option name="project" value="LOCAL" />
       <updated>1679661786513</updated>
     </task>
-    <option name="localTasksCounter" value="547" />
+    <task id="LOCAL-00547" summary="Disabling dropdown menu">
+      <created>1679661877896</created>
+      <option name="number" value="00547" />
+      <option name="presentableId" value="LOCAL-00547" />
+      <option name="project" value="LOCAL" />
+      <updated>1679661877896</updated>
+    </task>
+    <task id="LOCAL-00548" summary="Disabling dropdown menu">
+      <created>1679661934921</created>
+      <option name="number" value="00548" />
+      <option name="presentableId" value="LOCAL-00548" />
+      <option name="project" value="LOCAL" />
+      <updated>1679661934922</updated>
+    </task>
+    <task id="LOCAL-00549" summary="Disabling dropdown menu">
+      <created>1679662186645</created>
+      <option name="number" value="00549" />
+      <option name="presentableId" value="LOCAL-00549" />
+      <option name="project" value="LOCAL" />
+      <updated>1679662186645</updated>
+    </task>
+    <option name="localTasksCounter" value="550" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -478,7 +479,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Testing fix to change.&#10;Altering outstanding/issued problem from down" />
     <MESSAGE value="Fixing 0-division issue" />
     <MESSAGE value="Fixing market updating" />
     <MESSAGE value="Changing sell and buy message" />
@@ -503,7 +503,8 @@
     <MESSAGE value="Fixing realtive timestamp" />
     <MESSAGE value="Fixing relative timestamp" />
     <MESSAGE value="Disabling dropdown menu" />
-    <option name="LAST_COMMIT_MESSAGE" value="Disabling dropdown menu" />
+    <MESSAGE value="Removing dropdown menu on submit" />
+    <option name="LAST_COMMIT_MESSAGE" value="Removing dropdown menu on submit" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
