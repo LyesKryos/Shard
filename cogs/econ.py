@@ -756,13 +756,15 @@ class SubMarketView(View):
             self.back.disabled = False
             # establish connection
             conn = interaction.client.pool
-            # subtract from page
+            # add page
             self.page += 1
             # fetch market items
             market_items = await conn.fetch('''SELECT * FROM rbt_market WHERE market = $1 ORDER BY market_id;''',
                                             self.market)
+            # set max
+            max_page = math.ceil(len(market_items) / 12)
             # disable forward on last page
-            if (len(market_items[(self.page * 12) - 12:self.page * 12]) / 12) <= 1:
+            if self.page == max_page:
                 forward_button.disabled = True
             # create embed
             market_embed = discord.Embed(title=f"{self.values[0]}",
