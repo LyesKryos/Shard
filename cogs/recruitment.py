@@ -534,7 +534,7 @@ class Recruitment(commands.Cog):
             # adds each user, by rank, to the list
             rank = 1
             for ranks in userinfo:
-                userstring = f"**{rank}.** {self.bot.get_user(ranks['user_id'])}: {ranks['sent']}\n"
+                userstring = f"**{rank}.** {self.bot.get_user(ranks['user_id'])}: {ranks['sent']:,}\n"
                 ranksstr += userstring
                 rank += 1
             await ctx.send(f"{ranksstr}")
