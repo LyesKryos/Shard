@@ -708,7 +708,7 @@ class LoanDropdown(Select):
                                                  f"with {self.thaler}{self.amount:,.2f}.")
         return await self.message.edit(content=f"You have successfully opened a loan account (ID:{interaction.id}) "
                                                f"with {self.thaler}{self.amount:,.2f}. This loan becomes due: "
-                                               f"<t:{int(due.timestamp())}:f>", view=self)
+                                               f"<t:{int(due.timestamp())}:f>", view=self.view)
 
 
 class LoanView(View):
@@ -1326,7 +1326,7 @@ class Economy(commands.Cog):
             if float(investment_fund['current_funds']) < amount:
                 return await interaction.followup.send(f"The Investment Fund does not have enough available funds to "
                                                        f"fill that request.")
-            message = await interaction.followup.send(content="\u200b")
+            message = await interaction.followup.send(content="Use the dropdown menu below to choose loan type:")
             await message.edit(view=LoanView(amount=amount, user=user, message=message))
         # if the type is investment, ensure the user has the amount to invest
         if account_type == "investment":
