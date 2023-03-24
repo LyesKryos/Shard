@@ -664,7 +664,8 @@ class MarketDropdown(discord.ui.Select):
                 for m in market_items[(page*12)-12:page*12]:
                     market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
                                            value=f"Price: {m['value']}")
-            await self.message.edit(embed=market_embed)
+            await self.message.edit(embed=market_embed, view=SubMarketView(market=market, message=self.message,
+                                                                           values=self.values))
         except Exception as error:
             etype = type(error)
             trace = error.__traceback__
@@ -675,12 +676,20 @@ class MarketDropdown(discord.ui.Select):
 
 class SubMarketView(View):
 
-    def __init__(self, message, page, values, market):
+    def __init__(self, message, values, market):
         self.message = message
-        self.page = page
+        self.page = 1
         self.values = values
         self.market = market
         super().__init__(timeout=300)
+        self.add_item(MarketDropdown(message))
+
+    async def on_timeout(self) -> None:
+        # remove dropdown
+        for item in self.children:
+            self.remove_item(item)
+        return await self.message.edit(content="Market closed.", view=self)
+
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.blurple, disabled=True, emoji="\u23ea")
     async def back(self, interaction: discord.Interaction, back_button: discord.Button):
