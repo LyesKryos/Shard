@@ -748,6 +748,7 @@ class SubMarketView(View):
 
     @discord.ui.button(label="Next", style=discord.ButtonStyle.blurple, emoji="\u23e9")
     async def forward(self, interaction: discord.Interaction, forward_button: discord.Button):
+        bot = interaction.client
         try:
             # defer response
             await interaction.response.defer()
@@ -761,7 +762,7 @@ class SubMarketView(View):
             market_items = await conn.fetch('''SELECT * FROM rbt_market WHERE market = $1 ORDER BY market_id;''',
                                             self.market)
             # disable forward on last page
-            if (len(market_items[(self.page * 12) - 12:self.page * 12]) / 12) < 1:
+            if (len(market_items[(self.page * 12) - 12:self.page * 12]) / 12) <= 1:
                 forward_button.disabled = True
             # create embed
             market_embed = discord.Embed(title=f"{self.values[0]}",
@@ -1054,28 +1055,28 @@ class Economy(commands.Cog):
                         await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = $2 
                                 WHERE name = 'General Fund';''', new_limit, new_funds)
                         # count the number of investors
-                        investor_count = await conn.fetchrow('''SELECT COUNT(DESTINCT user_id) 
-                                FROM bank_ledger WHERE type = 'Investment';''')
+                        investor_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+                                FROM bank_ledger WHERE type = 'investment';''')
                         # calculate how much each investor will receive
                         investor_cut = (refund * .25) / investor_count['count']
                         # count the number of premium members
-                        premium_count = await conn.fetchrow('''SELECT COUNT(DESTINCT user_id) 
-                                FROM rbt_users WHERE premeium_user = TRUE AND suspended = FALSE;''')
+                        premium_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+                                FROM rbt_users WHERE premium_user = TRUE AND suspended = FALSE;''')
                         # calculate how much each premium user will receive
                         premium_cut = (refund * .25) / premium_count['count']
                         # count the number of recruiters who have sent more than 100 TGs this month
-                        sender_count = await conn.fetchrow('''SELECT COUNT(DESTINCT user_id) 
+                        sender_count = await conn.fetchrow('''SELECT COUNT(user_id) 
                                 FROM recruitment WHERE sent_this_month > 100;''')
                         # calculate sender cut
                         sender_cut = (refund * .25) / sender_count['count']
                         # count the number of registered members
-                        member_count = await conn.fetchrow('''SELECT COUNT(DESTINCT user_id) 
+                        member_count = await conn.fetchrow('''SELECT COUNT(user_id) 
                                 FROM rbt_users WHERE suspended = FALSE;''')
                         # calculate the member cut
                         member_cut = (refund * .25) / member_count['count']
                         # credit premium group
                         await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
-                                WHERE premeium_user = TRUE AND suspended = FALSE;''', premium_cut)
+                                WHERE premium_user = TRUE AND suspended = FALSE;''', premium_cut)
                         # credit member group
                         await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
                                 WHERE suspended = FALSE;''', member_cut)
@@ -1846,7 +1847,7 @@ class Economy(commands.Cog):
                 if crash_chance <= 1:
                     if self.crash is False:
                         await conn.execute('''UPDATE stocks 
-                            SET value = round((value * .25)::numeric, 2), trend = 'down', 
+                            SET value = round((value * .25)::numeric, 2), trending = 'down', 
                             change = ROUND(value*.25::numeric-value::numeric, 2) - 1;''')
                         self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
                                              "All stock values are decreased by 75% and begun trending down.\n "
@@ -1954,7 +1955,7 @@ class Economy(commands.Cog):
         if crash_chance <= 1:
             if self.crash is False:
                 await conn.execute('''UPDATE stocks 
-                    SET value = round((value * .25)::numeric, 2), trend = 'down', 
+                    SET value = round((value * .25)::numeric, 2), trending = 'down', 
                     change = ROUND(value*.25::numeric-value::numeric, 2) - 1;''')
                 self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
                                      "All stock values are decreased by 75% and begun trending down.\n "
@@ -2006,28 +2007,28 @@ class Economy(commands.Cog):
                     await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = $2 
                             WHERE name = 'General Fund';''', new_limit, new_funds)
                     # count the number of investors
-                    investor_count = await conn.fetchrow('''SELECT COUNT(DESTINCT user_id) 
+                    investor_count = await conn.fetchrow('''SELECT COUNT(user_id) 
                             FROM bank_ledger WHERE type = 'Investment';''')
                     # calculate how much each investor will receive
                     investor_cut = (refund * .25) / investor_count['count']
                     # count the number of premium members
-                    premium_count = await conn.fetchrow('''SELECT COUNT(DESTINCT user_id) 
-                            FROM rbt_users WHERE premeium_user = TRUE AND suspended = FALSE;''')
+                    premium_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+                            FROM rbt_users WHERE premium_user = TRUE AND suspended = FALSE;''')
                     # calculate how much each premium user will receive
                     premium_cut = (refund * .25) / premium_count['count']
                     # count the number of recruiters who have sent more than 100 TGs this month
-                    sender_count = await conn.fetchrow('''SELECT COUNT(DESTINCT user_id) 
+                    sender_count = await conn.fetchrow('''SELECT COUNT(user_id) 
                             FROM recruitment WHERE sent_this_month > 100;''')
                     # calculate sender cut
                     sender_cut = (refund * .25) / sender_count['count']
                     # count the number of registered members
-                    member_count = await conn.fetchrow('''SELECT COUNT(DESTINCT user_id) 
+                    member_count = await conn.fetchrow('''SELECT COUNT(user_id) 
                             FROM rbt_users WHERE suspended = FALSE;''')
                     # calculate the member cut
                     member_cut = (refund * .25) / member_count['count']
                     # credit premium group
                     await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
-                            WHERE premeium_user = TRUE AND suspended = FALSE;''', premium_cut)
+                            WHERE premium_user = TRUE AND suspended = FALSE;''', premium_cut)
                     # credit member group
                     await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
                             WHERE suspended = FALSE;''', member_cut)

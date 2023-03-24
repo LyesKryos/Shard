@@ -117,21 +117,7 @@
       <workItem from="1678542957088" duration="18721000" />
       <workItem from="1678819823954" duration="98671000" />
       <workItem from="1679659589295" duration="9232000" />
-      <workItem from="1679682470900" duration="388000" />
-    </task>
-    <task id="LOCAL-00510" summary="Adding wallet to info">
-      <created>1679420753421</created>
-      <option name="number" value="00510" />
-      <option name="presentableId" value="LOCAL-00510" />
-      <option name="project" value="LOCAL" />
-      <updated>1679420753421</updated>
-    </task>
-    <task id="LOCAL-00511" summary="Adding wallet to info">
-      <created>1679420769503</created>
-      <option name="number" value="00511" />
-      <option name="presentableId" value="LOCAL-00511" />
-      <option name="project" value="LOCAL" />
-      <updated>1679420769503</updated>
+      <workItem from="1679682470900" duration="1142000" />
     </task>
     <task id="LOCAL-00512" summary="Adding wallet to info">
       <created>1679420783147</created>
@@ -462,7 +448,21 @@
       <option name="project" value="LOCAL" />
       <updated>1679682861438</updated>
     </task>
-    <option name="localTasksCounter" value="559" />
+    <task id="LOCAL-00559" summary="Fixing pagination">
+      <created>1679683062445</created>
+      <option name="number" value="00559" />
+      <option name="presentableId" value="LOCAL-00559" />
+      <option name="project" value="LOCAL" />
+      <updated>1679683062445</updated>
+    </task>
+    <task id="LOCAL-00560" summary="Fixing pagination">
+      <created>1679683161819</created>
+      <option name="number" value="00560" />
+      <option name="presentableId" value="LOCAL-00560" />
+      <option name="project" value="LOCAL" />
+      <updated>1679683161819</updated>
+    </task>
+    <option name="localTasksCounter" value="561" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
