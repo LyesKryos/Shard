@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing pagination">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing pagination" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -117,21 +114,7 @@
       <workItem from="1678542957088" duration="18721000" />
       <workItem from="1678819823954" duration="98671000" />
       <workItem from="1679659589295" duration="9232000" />
-      <workItem from="1679682470900" duration="1142000" />
-    </task>
-    <task id="LOCAL-00512" summary="Adding wallet to info">
-      <created>1679420783147</created>
-      <option name="number" value="00512" />
-      <option name="presentableId" value="LOCAL-00512" />
-      <option name="project" value="LOCAL" />
-      <updated>1679420783147</updated>
-    </task>
-    <task id="LOCAL-00513" summary="Hour graphing achieved">
-      <created>1679421676047</created>
-      <option name="number" value="00513" />
-      <option name="presentableId" value="LOCAL-00513" />
-      <option name="project" value="LOCAL" />
-      <updated>1679421676048</updated>
+      <workItem from="1679682470900" duration="1497000" />
     </task>
     <task id="LOCAL-00514" summary="Hour graphing achieved">
       <created>1679421712087</created>
@@ -462,7 +445,21 @@
       <option name="project" value="LOCAL" />
       <updated>1679683161819</updated>
     </task>
-    <option name="localTasksCounter" value="561" />
+    <task id="LOCAL-00561" summary="Fixing various database errors">
+      <created>1679683803246</created>
+      <option name="number" value="00561" />
+      <option name="presentableId" value="LOCAL-00561" />
+      <option name="project" value="LOCAL" />
+      <updated>1679683803246</updated>
+    </task>
+    <task id="LOCAL-00562" summary="Fixing pagination">
+      <created>1679683974347</created>
+      <option name="number" value="00562" />
+      <option name="presentableId" value="LOCAL-00562" />
+      <option name="project" value="LOCAL" />
+      <updated>1679683974347</updated>
+    </task>
+    <option name="localTasksCounter" value="563" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -480,7 +477,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Hour graphing achieved" />
     <MESSAGE value="Average graphing" />
     <MESSAGE value="Fixing days for long periods of time" />
     <MESSAGE value="Fixing average price graph" />
@@ -504,6 +500,7 @@
     <MESSAGE value="Adding proper open market" />
     <MESSAGE value="Fixing the open market command" />
     <MESSAGE value="Paginating the market" />
+    <MESSAGE value="Fixing various database errors" />
     <MESSAGE value="Fixing pagination" />
     <option name="LAST_COMMIT_MESSAGE" value="Fixing pagination" />
   </component>

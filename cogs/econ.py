@@ -715,10 +715,9 @@ class SubMarketView(View):
             market_embed = discord.Embed(title=f"{self.values[0]}",
                                          description="A display of all items in this market.")
             # paginator if there are more than 25 items in a market
-            if len(market_items) > 12:
-                for m in market_items[(self.page*12)-12:self.page*12]:
-                    market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
-                                           value=f"Price: {m['value']}")
+            for m in market_items[(self.page*12)-12:self.page*12]:
+                market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
+                                       value=f"Price: {m['value']}")
             market_embed.set_footer(text=f"Page #{self.page}")
             await self.message.edit(embed=market_embed, view=self)
         except Exception as error:
@@ -735,10 +734,10 @@ class SubMarketView(View):
         try:
             # defer response
             await interaction.response.defer()
-            # disable all buttons
-            for button in self.children:
-                self.remove_item(button)
-            await self.message.edit(view=self)
+            # remove dropdown and buttons
+            for item in self.children:
+                self.remove_item(item)
+            return await self.message.edit(content="Market closed.", view=self)
         except Exception as error:
             etype = type(error)
             trace = error.__traceback__
@@ -770,10 +769,11 @@ class SubMarketView(View):
             market_embed = discord.Embed(title=f"{self.values[0]}",
                                          description="A display of all items in this market.")
             # paginator if there are more than 25 items in a market
-            if len(market_items) > 12:
-                for m in market_items[(self.page*12)-12:self.page*12]:
-                    market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
-                                           value=f"Price: {m['value']:,}")
+            for m in market_items[(self.page*12)-12:self.page*12]:
+                market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
+                                       value=f"Price: {m['value']:,}")
+            for space in range(12-len(market_items[(self.page*12)-12:self.page*12])):
+                market_embed.add_field(name="\u200b", value="\u200b")
             market_embed.set_footer(text=f"Page #{self.page}")
             await self.message.edit(embed=market_embed, view=self)
         except Exception as error:
