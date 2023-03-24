@@ -1327,7 +1327,7 @@ class Economy(commands.Cog):
                 return await interaction.followup.send(f"The Investment Fund does not have enough available funds to "
                                                        f"fill that request.")
             message = await interaction.followup.send(content="\u200b")
-            await interaction.followup.send(view=LoanView(amount=amount, user=user, message=message))
+            await message.edit(view=LoanView(amount=amount, user=user, message=message))
         # if the type is investment, ensure the user has the amount to invest
         if account_type == "investment":
             if amount > user_info['funds']:
