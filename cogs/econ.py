@@ -711,10 +711,10 @@ class LoanDropdown(Select):
 
 
 class LoanView(View):
-    def __init__(self):
+    def __init__(self, amount, user):
         super().__init__()
 
-        self.add_item(MarketDropdown())
+        self.add_item(LoanDropdown(amount, user))
 
 
 def get_card_emoji(card):
@@ -1325,20 +1325,7 @@ class Economy(commands.Cog):
             if float(investment_fund['current_funds']) < amount:
                 return await interaction.followup.send(f"The Investment Fund does not have enough available funds to "
                                                        f"fill that request.")
-            # remove funds from investment fund
-            await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 
-            WHERE name = 'Investment Fund';''', amount)
-            # create loan account
-            await conn.execute('''INSERT INTO bank_ledger VALUES($1,$2,$3,$4);''',
-                               user.id, interaction.id, amount, 'loan')
-            # credit to user account and log
-            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
-                               amount, user.id)
-            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                               user.id, 'bank', f"Opened a new loan account (ID: {interaction.id}) "
-                                                f"with {self.thaler}{amount:,.2f}.")
-            return await interaction.followup.send(f"You have successfully opened a loan account (ID:{interaction.id}) "
-                                                   f"with {self.thaler}{amount:,.2f}.")
+            await interaction.followup.send(view=LoanView(amount=amount, user=user))
         # if the type is investment, ensure the user has the amount to invest
         if account_type == "investment":
             if amount > user_info['funds']:
