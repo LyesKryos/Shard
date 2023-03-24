@@ -719,6 +719,7 @@ class SubMarketView(View):
                 for m in market_items[(self.page*12)-12:self.page*12]:
                     market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
                                            value=f"Price: {m['value']}")
+            market_embed.set_footer(text=f"Page #{self.page}")
             await self.message.edit(embed=market_embed, view=self)
         except Exception as error:
             etype = type(error)
@@ -767,9 +768,10 @@ class SubMarketView(View):
                                          description="A display of all items in this market.")
             # paginator if there are more than 25 items in a market
             if len(market_items) > 12:
-                for m in market_items[(page*12)-12:page*12]:
+                for m in market_items[(self.page*12)-12:self.page*12]:
                     market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
                                            value=f"Price: {m['value']:,}")
+            market_embed.set_footer(text=f"Page #{self.page}")
             await self.message.edit(embed=market_embed, view=self)
         except Exception as error:
             etype = type(error)
