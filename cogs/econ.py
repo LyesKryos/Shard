@@ -2405,7 +2405,7 @@ class Economy(commands.Cog):
                 else:
                     this_string += " :chart_with_downwards_trend: -"
                 this_string += f"{abs(stock['change'] * 100):.2f}%\n" \
-                               f">>> Sale value: {self.thaler}" \
+                               f"> Sale value: {self.thaler}" \
                                f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
                 ledger_string += this_string
                 stock_value += float(shares['amount']) * float(stock['value'])
