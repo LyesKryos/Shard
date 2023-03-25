@@ -662,7 +662,7 @@ class MarketDropdown(discord.ui.Select):
             # paginator if there are more than 25 items in a market
             if len(market_items) > 12:
                 page = 1
-                for m in market_items[(page*12)-12:page*12]:
+                for m in market_items[(page * 12) - 12:page * 12]:
                     market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
                                            value=f"Price: {m['value']}")
             await self.message.edit(embed=market_embed, view=SubMarketView(market=market, message=self.message,
@@ -691,7 +691,6 @@ class SubMarketView(View):
             self.remove_item(item)
         return await self.message.edit(content="Market closed.", view=self)
 
-
     @discord.ui.button(label="Back", style=discord.ButtonStyle.blurple, disabled=True, emoji="\u23ea")
     async def back(self, interaction: discord.Interaction, back_button: discord.Button):
         # define bot
@@ -716,7 +715,7 @@ class SubMarketView(View):
             market_embed = discord.Embed(title=f"{self.values[0]}",
                                          description="A display of all items in this market.")
             # paginator if there are more than 25 items in a market
-            for m in market_items[(self.page*12)-12:self.page*12]:
+            for m in market_items[(self.page * 12) - 12:self.page * 12]:
                 market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
                                        value=f"Price: {m['value']}")
             market_embed.set_footer(text=f"Page #{self.page}")
@@ -770,10 +769,10 @@ class SubMarketView(View):
             market_embed = discord.Embed(title=f"{self.values[0]}",
                                          description="A display of all items in this market.")
             # paginator if there are more than 25 items in a market
-            for m in market_items[(self.page*12)-12:self.page*12]:
+            for m in market_items[(self.page * 12) - 12:self.page * 12]:
                 market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
                                        value=f"Price: {m['value']:,}")
-            for space in range(12-len(market_items[(self.page*12)-12:self.page*12])):
+            for space in range(12 - len(market_items[(self.page * 12) - 12:self.page * 12])):
                 market_embed.add_field(name="\u200b", value="\u200b")
             market_embed.set_footer(text=f"Page #{self.page}")
             await self.message.edit(embed=market_embed, view=self)
@@ -783,7 +782,6 @@ class SubMarketView(View):
             lines = traceback.format_exception(etype, error, trace)
             traceback_text = ''.join(lines)
             bot.logger.warning(msg=f"{traceback_text}")
-
 
 
 class MarketView(View):
@@ -850,7 +848,7 @@ class LoanDropdown(Select):
         # establish connection
         conn = interaction.client.pool
         # apply interest to amount
-        self.amount = round(self.amount * 1+(interest/100), 2)
+        self.amount = round(self.amount * 1 + (interest / 100), 2)
         # remove funds from investment fund
         await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 
             WHERE name = 'Investment Fund';''', self.amount)
@@ -1130,11 +1128,10 @@ class Economy(commands.Cog):
                         await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.35, due_date = $2 
                         WHERE account_id = $1;''', loan['account_id'], today + timedelta(days=14))
                         # create and send user a DM
-                        default_dm = await self.bot.create_dm(borrower_snowflake)
-                        await default_dm.send(f"This is your official notice from the Royal Bank of Thegye that you "
-                                              f"have defaulted on your loan account (ID: {loan['account_id']}. "
-                                              f"This loan has been increased by 35% in lieu of payment and will "
-                                              f"become due two weeks from today.")
+                        await borrower_snowflake.send(f"This is your official notice from the Royal Bank of Thegye "
+                                                      f"that you have defaulted on your loan account "
+                                                      f"(ID: {loan['account_id']}. This loan has been increased by 35% "
+                                                      f"in lieu of payment and will become due two weeks from today.")
                         continue
                     else:
                         # remove funds from user
@@ -2936,14 +2933,10 @@ class Economy(commands.Cog):
     # creates market subgroup
     market = app_commands.Group(name="market", description="...", guild_only=True)
 
-    @market.command(name="open_market", description="Opens the market and displays options.")
-    async def open_market(self, interaction: discord.Interaction):
+    @market.command(name="open", description="Opens the market and displays options.")
+    async def market_open(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer(thinking=True)
-        # establish connection
-        conn = self.bot.pool
-        # define user
-        user = interaction.user
         # create embed
         market_embed = discord.Embed(title="Royal Thegyan Market",
                                      description="Welcome to the Royal Thegye Market!\n"
@@ -2952,6 +2945,44 @@ class Economy(commands.Cog):
                                                  "select the option you desire to view.")
         message = await interaction.followup.send(embed=market_embed)
         await message.edit(view=MarketView(message))
+
+    @market.command(name="buy", description="Buys an item from the marketplace.")
+    @app_commands.describe(item_id="The ID number of the item you want to buy.")
+    async def market_buy(self, interaction: discord.Interaction, item_id: int):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # define user
+        user = interaction.user
+        # fetch user information
+        user_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', user.id)
+        # ensure user registration
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the Royal Bank of Thegye.")
+        # fetch item information
+        item_info = await conn.fetchrow('''SELECT * FROM rbt_market WHERE market_id = $1;''', item_id)
+        # ensure item existence
+        if item_info is None:
+            return await interaction.followup.send(f"No item with ID `{item_id}` exists.")
+        # ensure the user can afford item
+        if item_info['value'] > user_info['funds']:
+            return await interaction.followup.send(f"You do not have enough thaler to purchase {item_info['name']}.")
+        # remove funds from user
+        await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
+                           item_info['value'], user.id)
+        # add funds to general fund
+        await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 WHERE name = 'General Fund';''',
+                           item_info['value'])
+        # add to market_ledger
+        await conn.execute('''INSERT INTO market_ledger VALUES ($1,$2);''',
+                           item_info['market_id'], user.id)
+        # update logs
+        await conn.execute('''INSERT INTO rbt_user_log VALUES ($1,$2,$3);''',
+                           user.id, 'market', f"Bought {item_info['name']} (ID: {item_info['market_id']}) from the"
+                                              f"{item_info['market']} for {self.thaler}{item_info['value']:,}.")
+        return await interaction.followup.send(f"You have successfully purchased {item_info['name']} for "
+                                               f"{self.thaler}{item_info['value']:,}")
 
     @commands.command()
     @commands.is_owner()
