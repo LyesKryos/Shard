@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing things">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing quote bar in portfolio">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -116,14 +116,7 @@
       <workItem from="1678542957088" duration="18721000" />
       <workItem from="1678819823954" duration="98671000" />
       <workItem from="1679659589295" duration="9232000" />
-      <workItem from="1679682470900" duration="6566000" />
-    </task>
-    <task id="LOCAL-00518" summary="Hour graphing achieved">
-      <created>1679422648164</created>
-      <option name="number" value="00518" />
-      <option name="presentableId" value="LOCAL-00518" />
-      <option name="project" value="LOCAL" />
-      <updated>1679422648164</updated>
+      <workItem from="1679682470900" duration="7215000" />
     </task>
     <task id="LOCAL-00519" summary="Average graphing">
       <created>1679425415509</created>
@@ -461,7 +454,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679767126292</updated>
     </task>
-    <option name="localTasksCounter" value="567" />
+    <task id="LOCAL-00567" summary="Fixing quote bar in portfolio">
+      <created>1679770933821</created>
+      <option name="number" value="00567" />
+      <option name="presentableId" value="LOCAL-00567" />
+      <option name="project" value="LOCAL" />
+      <updated>1679770933821</updated>
+    </task>
+    <option name="localTasksCounter" value="568" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -479,7 +479,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing + and - display for feed" />
     <MESSAGE value="Changing command names for clarity" />
     <MESSAGE value="Fixing buy wallet" />
     <MESSAGE value="Fixing empty wallet display" />
@@ -504,7 +503,8 @@
     <MESSAGE value="Removing buttons on change of market" />
     <MESSAGE value="Fixing portfolio to show quote bar" />
     <MESSAGE value="Fixing things" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing things" />
+    <MESSAGE value="Fixing quote bar in portfolio" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing quote bar in portfolio" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

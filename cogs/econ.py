@@ -848,7 +848,7 @@ class LoanDropdown(Select):
         # establish connection
         conn = interaction.client.pool
         # apply interest to amount
-        self.amount = round(self.amount * 1 + (interest / 100), 2)
+        self.amount = round(self.amount * (1 + (interest / 100)), 2)
         # remove funds from investment fund
         await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 
             WHERE name = 'Investment Fund';''', self.amount)
