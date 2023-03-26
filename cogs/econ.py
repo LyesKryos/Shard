@@ -13,7 +13,7 @@ from discord import app_commands
 from discord.ext import commands
 from discord.ui import View, Select
 from matplotlib import pyplot as plt
-from matplotlib.dates import HourLocator, DateFormatter, DayLocator
+from matplotlib.dates import HourLocator, DateFormatter, DayLocator, YearLocator
 from numpy import clip
 from pytz import timezone
 from ShardBot import Shard
@@ -2530,12 +2530,23 @@ class Economy(commands.Cog):
         fig, ax = plt.subplots()
         ax.plot(dates, stock_prices)
         ax.xaxis.set_major_locator(DayLocator(interval=1))
-        ax.xaxis.set_minor_locator(HourLocator(interval=1))
         ax.xaxis.set_major_formatter(DateFormatter("%d/%m/%y"))
         fig.autofmt_xdate()
-        if (start_date - end_date).days >= 2:
+        days = (end_date - start_date).days
+        if days >= 2:
             plt.grid(True, which="major")
+            if days > 7:
+                ax.xaxis.set_major_locator(DayLocator(interval=3))
+            elif days > 30:
+                ax.xaxis.set_major_locator(DayLocator(interval=10))
+            elif days > 90:
+                ax.xaxis.set_major_locator(DayLocator(interval=30))
+            elif days > 180:
+                ax.xaxis.set_major_locator(DayLocator(interval=60))
+            elif days > 360:
+                ax.xaxis.set_major_locator(YearLocator(month=start_date.month, day=start_date.day))
         else:
+            ax.xaxis.set_minor_locator(HourLocator(interval=1))
             plt.grid(True, which="major")
             plt.grid(True, which="minor")
         plt.title(f"{stock['name']} (ID: {stock['stock_id']})")
@@ -2658,12 +2669,23 @@ class Economy(commands.Cog):
         fig, ax = plt.subplots()
         ax.plot(dates, averages)
         ax.xaxis.set_major_locator(DayLocator(interval=1))
-        ax.xaxis.set_minor_locator(HourLocator(interval=1))
         ax.xaxis.set_major_formatter(DateFormatter("%d/%m/%y"))
         fig.autofmt_xdate()
-        if (start_date - end_date).days >= 2:
+        days = (end_date - start_date).days
+        if days >= 2:
             plt.grid(True, which="major")
+            if days > 7:
+                ax.xaxis.set_major_locator(DayLocator(interval=3))
+            elif days > 30:
+                ax.xaxis.set_major_locator(DayLocator(interval=10))
+            elif days > 90:
+                ax.xaxis.set_major_locator(DayLocator(interval=30))
+            elif days > 180:
+                ax.xaxis.set_major_locator(DayLocator(interval=60))
+            elif days > 360:
+                ax.xaxis.set_major_locator(YearLocator(month=start_date.month, day=start_date.day))
         else:
+            ax.xaxis.set_minor_locator(HourLocator(interval=1))
             plt.grid(True, which="major")
             plt.grid(True, which="minor")
         plt.title(f"Average Stock Price")
