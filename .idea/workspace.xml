@@ -116,28 +116,7 @@
       <workItem from="1678542957088" duration="18721000" />
       <workItem from="1678819823954" duration="98671000" />
       <workItem from="1679659589295" duration="9232000" />
-      <workItem from="1679682470900" duration="11939000" />
-    </task>
-    <task id="LOCAL-00525" summary="Fixing average price graph">
-      <created>1679428854372</created>
-      <option name="number" value="00525" />
-      <option name="presentableId" value="LOCAL-00525" />
-      <option name="project" value="LOCAL" />
-      <updated>1679428854372</updated>
-    </task>
-    <task id="LOCAL-00526" summary="Fixing a few strings">
-      <created>1679429379622</created>
-      <option name="number" value="00526" />
-      <option name="presentableId" value="LOCAL-00526" />
-      <option name="project" value="LOCAL" />
-      <updated>1679429379622</updated>
-    </task>
-    <task id="LOCAL-00527" summary="Fixing + and - display for feed">
-      <created>1679429715947</created>
-      <option name="number" value="00527" />
-      <option name="presentableId" value="LOCAL-00527" />
-      <option name="project" value="LOCAL" />
-      <updated>1679429715947</updated>
+      <workItem from="1679682470900" duration="12627000" />
     </task>
     <task id="LOCAL-00528" summary="Changing command names for clarity">
       <created>1679430522889</created>
@@ -461,7 +440,28 @@
       <option name="project" value="LOCAL" />
       <updated>1679864102962</updated>
     </task>
-    <option name="localTasksCounter" value="574" />
+    <task id="LOCAL-00574" summary="Changing interest rate display on view_account">
+      <created>1679864262570</created>
+      <option name="number" value="00574" />
+      <option name="presentableId" value="LOCAL-00574" />
+      <option name="project" value="LOCAL" />
+      <updated>1679864262570</updated>
+    </task>
+    <task id="LOCAL-00575" summary="Changing interest rate display on view_account">
+      <created>1679864290526</created>
+      <option name="number" value="00575" />
+      <option name="presentableId" value="LOCAL-00575" />
+      <option name="project" value="LOCAL" />
+      <updated>1679864290526</updated>
+    </task>
+    <task id="LOCAL-00576" summary="Changing interest rate display on view_account">
+      <created>1679864308818</created>
+      <option name="number" value="00576" />
+      <option name="presentableId" value="LOCAL-00576" />
+      <option name="project" value="LOCAL" />
+      <updated>1679864308818</updated>
+    </task>
+    <option name="localTasksCounter" value="577" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

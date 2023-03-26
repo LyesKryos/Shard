@@ -2519,8 +2519,6 @@ class Economy(commands.Cog):
         else:
             end_date = datetime.strptime(end_date, "%d/%m/%Y")
         # get all data from the specified stock
-        if stock_id == "average":
-            pass
         stock_data = await conn.fetch('''SELECT * FROM exchange_log WHERE (timestamp BETWEEN $1 AND $2) 
         AND stock_id = $3 ORDER BY timestamp ASC;''', start_date, end_date, stock['stock_id'])
         if not stock_data:
@@ -2535,7 +2533,7 @@ class Economy(commands.Cog):
         ax.xaxis.set_minor_locator(HourLocator(interval=1))
         ax.xaxis.set_major_formatter(DateFormatter("%d/%m/%y"))
         fig.autofmt_xdate()
-        if (start_date - end_date).days >= 3:
+        if (start_date - end_date).days >= 2:
             plt.grid(True, which="major")
         else:
             plt.grid(True, which="major")
@@ -2644,7 +2642,7 @@ class Economy(commands.Cog):
         else:
             end_date = datetime.strptime(end_date, "%d/%m/%Y")
         stock_data = await conn.fetch('''SELECT * FROM exchange_log WHERE (timestamp BETWEEN $1 AND $2) 
-        ORDER BY timestamp ASC;''', start_date, end_date)
+        ORDER BY timestamp;''', start_date, end_date)
         if not stock_data:
             return await interaction.followup.send(f"Unfortunately, I cannot find any data between"
                                                    f"`{start_date.date().strftime('%d/%m/%Y')}` and "
@@ -2663,7 +2661,7 @@ class Economy(commands.Cog):
         ax.xaxis.set_minor_locator(HourLocator(interval=1))
         ax.xaxis.set_major_formatter(DateFormatter("%d/%m/%y"))
         fig.autofmt_xdate()
-        if (start_date - end_date).days >= 3:
+        if (start_date - end_date).days >= 2:
             plt.grid(True, which="major")
         else:
             plt.grid(True, which="major")
