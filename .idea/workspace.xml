@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding loan limit">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Changing interest rate display on view_account">
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -117,14 +116,7 @@
       <workItem from="1678542957088" duration="18721000" />
       <workItem from="1678819823954" duration="98671000" />
       <workItem from="1679659589295" duration="9232000" />
-      <workItem from="1679682470900" duration="11613000" />
-    </task>
-    <task id="LOCAL-00524" summary="Fixing days for long periods of time">
-      <created>1679428741225</created>
-      <option name="number" value="00524" />
-      <option name="presentableId" value="LOCAL-00524" />
-      <option name="project" value="LOCAL" />
-      <updated>1679428741226</updated>
+      <workItem from="1679682470900" duration="11939000" />
     </task>
     <task id="LOCAL-00525" summary="Fixing average price graph">
       <created>1679428854372</created>
@@ -462,7 +454,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679862535781</updated>
     </task>
-    <option name="localTasksCounter" value="573" />
+    <task id="LOCAL-00573" summary="Changing interest rate display on view_account">
+      <created>1679864102961</created>
+      <option name="number" value="00573" />
+      <option name="presentableId" value="LOCAL-00573" />
+      <option name="project" value="LOCAL" />
+      <updated>1679864102962</updated>
+    </task>
+    <option name="localTasksCounter" value="574" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -480,7 +479,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing spelling" />
     <MESSAGE value="Fixing resetting" />
     <MESSAGE value="Adding max consideration for wallet size" />
     <MESSAGE value="Messing with up and down chance to make it a bit more stable" />
@@ -505,7 +503,8 @@
     <MESSAGE value="Fixing opening an investment account" />
     <MESSAGE value="Updating force bank update" />
     <MESSAGE value="Adding loan limit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding loan limit" />
+    <MESSAGE value="Changing interest rate display on view_account" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changing interest rate display on view_account" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
