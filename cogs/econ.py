@@ -1708,7 +1708,7 @@ class Economy(commands.Cog):
         account_embed.set_thumbnail(url=self.logo)
         account_embed.add_field(name="Type", value=f"{account_type.title()}", inline=False)
         account_embed.add_field(name="Amount", value=f"{self.thaler}{account['amount']:,.2f}")
-        account_embed.add_field(name="Interest Rate", value=f"{account['interest']:.2f}%")
+        account_embed.add_field(name="Interest Rate", value=f"{account['interest']:.2f}% per day")
         account_embed.add_field(name=self.space, value=self.space)
         return await interaction.followup.send(embed=account_embed)
 
