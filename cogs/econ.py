@@ -2008,7 +2008,7 @@ class Economy(commands.Cog):
                             WHERE name = 'General Fund';''', new_limit, new_funds)
                     # count the number of investors
                     investor_count = await conn.fetchrow('''SELECT COUNT(user_id) 
-                            FROM bank_ledger WHERE type = 'Investment';''')
+                            FROM bank_ledger WHERE type = 'investment';''')
                     # calculate how much each investor will receive
                     investor_cut = (refund * .25) / investor_count['count']
                     # count the number of premium members
@@ -2046,13 +2046,13 @@ class Economy(commands.Cog):
             # INVESTMENT/LOAN UPDATES
             # fetch sum of all investments
             investment_sum_raw = await conn.fetchrow('''SELECT SUM(amount) FROM bank_ledger 
-            WHERE type = 'Investment';''')
+            WHERE type = 'investment';''')
             if investment_sum_raw['sum'] is None:
                 investment_sum = 0
             else:
                 investment_sum = investment_sum_raw['sum']
             # increase investments by 2% for investors
-            await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'Investment';''')
+            await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'investment';''')
             # increase investment fund by 2%
             await conn.execute(
                 '''UPDATE funds SET current_funds = current_funds * 1.02 WHERE name = 'Investment Fund';''')
@@ -2060,8 +2060,45 @@ class Economy(commands.Cog):
             await conn.execute(
                 '''UPDATE funds SET current_funds = current_funds + $1 WHERE name = 'General Fund';''',
                 (investment_sum * .06))
-            # increase loan interest by 1.5%
-            await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'Loan';''')
+            # increase loan by interest rate
+            await conn.execute('''UPDATE bank_ledger SET amount = amount * (1+(interest/100)) 
+            WHERE type = 'loan';''')
+            # LOANS DUE
+            today = datetime.now()
+            loans_due = await conn.fetch('''SELECT * FROM bank_ledger WHERE due_date < $1 AND type = 'loan';''',
+                                         today)
+            # for all the loans in due, reposes thaler or default
+            for loan in loans_due:
+                amount = loan['amount']
+                borrower = loan['user_id']
+                borrower_snowflake = self.bot.get_user(borrower)
+                # fetch borrower information
+                borrower_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', borrower)
+                # if the user does not have enough thaler in their funds, increase loan by 35%
+                if borrower_info['funds'] < amount:
+                    await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.35, due_date = $2 
+                    WHERE account_id = $1;''', loan['account_id'], today + timedelta(days=14))
+                    # create and send user a DM
+                    await borrower_snowflake.send(f"This is your official notice from the Royal Bank of Thegye "
+                                                  f"that you have defaulted on your loan account "
+                                                  f"(ID: {loan['account_id']}. This loan has been increased by 35% "
+                                                  f"in lieu of payment and will become due two weeks from today.")
+                    continue
+                else:
+                    # remove funds from user
+                    await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
+                                       amount, borrower)
+                    # add funds to investment fund
+                    await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
+                    WHERE name = 'Investment Fund';''', amount)
+                    # remove loan account
+                    await conn.execute('''DELETE FROM bank_ledger WHERE account_id = $1;''', loan['account_id'])
+                    # log action
+                    await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                       borrower, 'bank', f"Loan account #{loan['account_id']} automatically "
+                                                         f"repaid by {borrower_snowflake.name}#"
+                                                         f"{borrower_snowflake.discriminator}.")
+                    continue
             # payroll
             thegye = self.bot.get_guild(674259612580446230)
             official_role = thegye.get_role(674278988323225632)
@@ -2071,6 +2108,8 @@ class Economy(commands.Cog):
                                        official.id)
                     await conn.execute(
                         '''UPDATE funds SET current_funds = current_funds - 20 WHERE name = 'General Fund';''')
+                    await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                       official.id, 'bank', f"Payroll {self.thaler}20.")
             await ctx.send("Royal Bank of Thegye updated.")
         except Exception as error:
             etype = type(error)
@@ -3006,7 +3045,7 @@ class Economy(commands.Cog):
         outstanding = 0, issued = 10000;''')
         # clear logs
         await conn.execute('''DELETE FROM rbt_user_log;''')
-        await conn.execute('''DELETE FROM casino_rank;''')
+        await conn.execute('''UPDATE casino_rank SET winnings = 0;;''')
         # reset funds
         await conn.execute('''UPDATE funds SET current_funds = 250000, fund_limit = 500000 
         WHERE name = 'General Fund';''')
