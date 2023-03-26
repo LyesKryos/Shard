@@ -1509,6 +1509,10 @@ class Economy(commands.Cog):
             return await interaction.followup.send("You are not a registered member of the Royal Bank of Thegye.")
         # ensure the user does not already have an account if they are opening a loan account
         if account_type == "loan":
+            # ensure the amount is over 1000
+            if amount < 1000:
+                return await interaction.followup.send(f"The Royal Bank of Thegye does not issue loans "
+                                                       f"below {self.thaler}1,000.")
             loan = await conn.fetchrow('''SELECT * FROM bank_ledger WHERE user_id = $1 AND type = 'loan';''',
                                        user.id)
             if loan is not None:
@@ -1840,18 +1844,19 @@ class Economy(commands.Cog):
                         await conn.execute('''UPDATE stocks SET value = ROUND((value*.25)::numeric, 2), 
                         change = ROUND(value*.25::numeric-value::numeric, 2) - 1;''')
                         self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
-                                             "All stock values are decreased by 75%.\n "
-                crash_chance = uniform(1, 100)
-                if stock_sum['sum'] / stock_count['count'] > 2 * stock_count['count']:
-                    crash_chance += float(stock_sum['sum']) / int(stock_count['count'])
-                if crash_chance <= 1:
-                    if self.crash is False:
-                        await conn.execute('''UPDATE stocks 
-                            SET value = round((value * .25)::numeric, 2), trending = 'down', 
-                            change = ROUND(value*.25::numeric-value::numeric, 2) - 1;''')
-                        self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
-                                             "All stock values are decreased by 75% and begun trending down.\n "
-                        self.crash = True
+                                             "All stock values are decreased by 75%.\n"
+                else:
+                    crash_chance = uniform(1, 100)
+                    if stock_sum['sum'] / stock_count['count'] > 2 * stock_count['count']:
+                        crash_chance += float(stock_sum['sum']) / int(stock_count['count'])
+                    if crash_chance <= 1:
+                        if self.crash is False:
+                            await conn.execute('''UPDATE stocks 
+                                SET value = round((value * .25)::numeric, 2), trending = 'down', 
+                                change = ROUND(value*.25::numeric-value::numeric, 2) - 1;''')
+                            self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
+                                                 "All stock values are decreased by 75% and begun trending down.\n "
+                            self.crash = True
                 # update stocks' value tracker
                 await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
                 SELECT stock_id, value, trending FROM stocks;''')

@@ -117,14 +117,7 @@
       <workItem from="1678542957088" duration="18721000" />
       <workItem from="1678819823954" duration="98671000" />
       <workItem from="1679659589295" duration="9232000" />
-      <workItem from="1679682470900" duration="8816000" />
-    </task>
-    <task id="LOCAL-00522" summary="Average graphing">
-      <created>1679426031783</created>
-      <option name="number" value="00522" />
-      <option name="presentableId" value="LOCAL-00522" />
-      <option name="project" value="LOCAL" />
-      <updated>1679426031783</updated>
+      <workItem from="1679682470900" duration="10225000" />
     </task>
     <task id="LOCAL-00523" summary="Average graphing">
       <created>1679426069625</created>
@@ -462,7 +455,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679832193575</updated>
     </task>
-    <option name="localTasksCounter" value="571" />
+    <task id="LOCAL-00571" summary="Updating force bank update">
+      <created>1679832873226</created>
+      <option name="number" value="00571" />
+      <option name="presentableId" value="LOCAL-00571" />
+      <option name="project" value="LOCAL" />
+      <updated>1679832873226</updated>
+    </task>
+    <option name="localTasksCounter" value="572" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
