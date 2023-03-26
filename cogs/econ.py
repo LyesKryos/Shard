@@ -1537,8 +1537,8 @@ class Economy(commands.Cog):
             await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
             WHERE name = 'Investment Fund';''', amount)
             # create loan account
-            await conn.execute('''INSERT INTO bank_ledger VALUES($1,$2,$3,$4,$5);''',
-                               user.id, interaction.id, amount, 'investment', 2.0)
+            await conn.execute('''INSERT INTO bank_ledger VALUES($1,$2,$3,$4);''',
+                               user.id, interaction.id, amount, 'investment')
             # credit to user account and log
             await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
                                amount, user.id)
