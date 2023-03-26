@@ -2233,7 +2233,11 @@ class Economy(commands.Cog):
         # establishes connection
         conn = self.bot.pool
         if amount.lower() != "all":
-            amount = int(amount)
+            try:
+                amount = int(amount)
+            except ValueError:
+                return await interaction.followup.send(f"The command only accepts "
+                                                       f"whole numbers and \"all\" as arguments.")
             # if the amount is less than 0
             if amount <= 0:
                 return await interaction.followup.send(f"Positive whole numbers only!")
