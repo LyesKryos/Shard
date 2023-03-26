@@ -1708,11 +1708,7 @@ class Economy(commands.Cog):
         account_embed.set_thumbnail(url=self.logo)
         account_embed.add_field(name="Type", value=f"{account_type.title()}", inline=False)
         account_embed.add_field(name="Amount", value=f"{self.thaler}{account['amount']:,.2f}")
-        if account_type == "investment":
-            interest = "2% daily"
-        else:
-            interest = "3.5% daily"
-        account_embed.add_field(name="Interest Rate", value=interest)
+        account_embed.add_field(name="Interest Rate", value=account['interest'])
         account_embed.add_field(name=self.space, value=self.space)
         return await interaction.followup.send(embed=account_embed)
 
@@ -1831,6 +1827,9 @@ class Economy(commands.Cog):
                 stock_sum = await conn.fetchrow('''SELECT SUM(value) FROM stocks;''')
                 # fetch stock count
                 stock_count = await conn.fetchrow('''SELECT COUNT(*) FROM stocks;''')
+                # fetch crash
+                crash = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_crash';''')
+                self.crash = crash['bool']
                 # calculate market crash chance
                 if self.crash is True:
                     recovery_chance = uniform(1, 20)
@@ -1862,12 +1861,12 @@ class Economy(commands.Cog):
                 SELECT stock_id, value, trending FROM stocks;''')
                 # unpin old message
                 old_message = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_pinned_message';''')
-                old_message = await bankchannel.fetch_message(int(old_message['value']))
+                old_message = await bankchannel.fetch_message(int(old_message['bigint']))
                 await old_message.unpin()
                 # announce
                 new_announcement = await bankchannel.send(content=self.announcement)
                 await new_announcement.pin()
-                await conn.execute('''UPDATE info SET value = $1 WHERE name = 'rbt_pinned_message';''',
+                await conn.execute('''UPDATE info SET bigint = $1 WHERE name = 'rbt_pinned_message';''',
                                    str(new_announcement.id))
                 self.announcement = \
                     "The Royal Exchange of Thegye has updated. Below is a summary of any important changes:\n"
@@ -1940,6 +1939,9 @@ class Economy(commands.Cog):
         stock_sum = await conn.fetchrow('''SELECT SUM(value) FROM stocks;''')
         # fetch stock count
         stock_count = await conn.fetchrow('''SELECT COUNT(*) FROM stocks;''')
+        # fetch crash
+        crash = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_crash';''')
+        self.crash = crash['bool']
         # calculate market crash chance
         if self.crash is True:
             recovery_chance = uniform(1, 20)
@@ -1970,12 +1972,12 @@ class Economy(commands.Cog):
         SELECT stock_id, value, trending FROM stocks;''')
         # unpin old message
         old_message = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_pinned_message';''')
-        old_message = await bankchannel.fetch_message(int(old_message['value']))
+        old_message = await bankchannel.fetch_message(int(old_message['bigint']))
         await old_message.unpin()
         # announce
         new_announcement = await bankchannel.send(content=self.announcement)
         await new_announcement.pin()
-        await conn.execute('''UPDATE info SET value = $1 WHERE name = 'rbt_pinned_message';''',
+        await conn.execute('''UPDATE info SET bigint = $1 WHERE name = 'rbt_pinned_message';''',
                            str(new_announcement.id))
         self.announcement = \
             "The Royal Exchange of Thegye has updated. Below is a summary of any important changes:\n"
