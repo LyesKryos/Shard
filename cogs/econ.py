@@ -1861,13 +1861,13 @@ class Economy(commands.Cog):
                 SELECT stock_id, value, trending FROM stocks;''')
                 # unpin old message
                 old_message = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_pinned_message';''')
-                old_message = await bankchannel.fetch_message(int(old_message['bigint']))
+                old_message = await bankchannel.fetch_message(old_message['bigint'])
                 await old_message.unpin()
                 # announce
                 new_announcement = await bankchannel.send(content=self.announcement)
                 await new_announcement.pin()
                 await conn.execute('''UPDATE info SET bigint = $1 WHERE name = 'rbt_pinned_message';''',
-                                   str(new_announcement.id))
+                                   new_announcement.id)
                 self.announcement = \
                     "The Royal Exchange of Thegye has updated. Below is a summary of any important changes:\n"
                 continue
