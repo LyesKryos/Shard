@@ -3050,7 +3050,7 @@ class Economy(commands.Cog):
         item_info = await conn.fetchrow('''SELECT * FROM rbt_market WHERE market_id = $1;''', item_id)
         # if there is no item, return such
         if item_info is None:
-            return await interaction.followup.send("There is no item with that ID.", ephemeral=True)
+            return await interaction.followup.send(content="There is no item with that ID.", ephemeral=True)
         # create the embed for the item
         item_embed = discord.Embed(title=f"{item_info['name']}", description=f"Cost: {self.thaler}{item_info['value']}")
         item_embed.set_thumbnail(url=self.logo)
