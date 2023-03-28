@@ -665,8 +665,14 @@ class MarketDropdown(discord.ui.Select):
                 for m in market_items[(page * 12) - 12:page * 12]:
                     market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
                                            value=f"Price: {m['value']}")
-            await self.message.edit(embed=market_embed, view=SubMarketView(market=market, message=self.message,
-                                                                           values=self.values))
+                await self.message.edit(embed=market_embed, view=SubMarketView(market=market, message=self.message,
+                                                                               values=self.values))
+            else:
+                page = 1
+                for m in market_items[(page * 12) - 12:page * 12]:
+                    market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
+                                           value=f"Price: {m['value']}")
+                await self.message.edit(embed=market_embed)
         except Exception as error:
             etype = type(error)
             trace = error.__traceback__
@@ -3021,7 +3027,7 @@ class Economy(commands.Cog):
     market = app_commands.Group(name="market", description="...", guild_only=True)
 
     @market.command(name="open", description="Opens the market and displays options.")
-    async def market_open(self, interaction: discord.Interaction):
+    async def open(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # create embed
@@ -3035,7 +3041,7 @@ class Economy(commands.Cog):
 
     @market.command(name="buy", description="Buys an item from the marketplace.")
     @app_commands.describe(item_id="The ID number of the item you want to buy.")
-    async def market_buy(self, interaction: discord.Interaction, item_id: int):
+    async def buy(self, interaction: discord.Interaction, item_id: int):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establish connection
