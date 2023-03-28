@@ -1871,7 +1871,7 @@ class Economy(commands.Cog):
                                              "All stock values are decreased by 75%.\n"
                 else:
                     crash_chance = uniform(1, 100)
-                    if stock_sum['sum'] / stock_count['count'] > 2 * stock_count['count']:
+                    if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
                         crash_chance += float(stock_sum['sum']) / int(stock_count['count'])
                     if crash_chance <= 1:
                         if self.crash is False:
