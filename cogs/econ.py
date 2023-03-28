@@ -840,17 +840,20 @@ class LoanDropdown(Select):
             interest = 8
             due = self.two_weeks
             if self.amount < 10000:
-                return await interaction.followup.edit(content=f"Two week loans must be more than {self.thaler}10,000.")
+                return await interaction.followup.send(f"Two week loans must be more than {self.thaler}10,000.",
+                                                       ephemeral=True)
         elif self.values[0] == "Three Week Loan":
             interest = 6
             due = self.three_weeks
             if self.amount < 50000:
-                return await interaction.followup.edit(content=f"Three week loans must be more than {self.thaler}50,000.")
+                return await interaction.followup.send(f"Three week loans must be more than {self.thaler}50,000.",
+                                                       ephemeral=True)
         else:
             interest = 4
             due = self.month
             if self.amount < 100000:
-                return await interaction.followup.edit(content=f"Month loans must be more than {self.thaler}100,000.")
+                return await interaction.followup.send(f"Month loans must be more than {self.thaler}100,000.",
+                                                       ephemeral=True)
         # establish connection
         conn = interaction.client.pool
         # apply interest to amount
