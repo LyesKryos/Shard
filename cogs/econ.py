@@ -3054,7 +3054,8 @@ class Economy(commands.Cog):
         if item_info is None:
             return await interaction.followup.send(content="There is no item with that ID.", ephemeral=True)
         # create the embed for the item
-        item_embed = discord.Embed(title=f"{item_info['name']}", description=f"Cost: {self.thaler}{item_info['value']}")
+        item_embed = discord.Embed(title=f"{item_info['name']}",
+                                   description=f"Cost: {self.thaler}{item_info['value']:,}")
         item_embed.set_thumbnail(url=self.logo)
         item_embed.add_field(name="Description", value=f"{item_info['description']}")
         await interaction.followup.send(embed=item_embed)
