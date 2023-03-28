@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Editing loan dropdown">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing graph ticks" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -117,14 +114,7 @@
       <workItem from="1678542957088" duration="18721000" />
       <workItem from="1678819823954" duration="98671000" />
       <workItem from="1679659589295" duration="9232000" />
-      <workItem from="1679682470900" duration="27868000" />
-    </task>
-    <task id="LOCAL-00553" summary="Fixing the open market command">
-      <created>1679678841359</created>
-      <option name="number" value="00553" />
-      <option name="presentableId" value="LOCAL-00553" />
-      <option name="project" value="LOCAL" />
-      <updated>1679678841359</updated>
+      <workItem from="1679682470900" duration="28177000" />
     </task>
     <task id="LOCAL-00554" summary="Fixing the open market command">
       <created>1679679390389</created>
@@ -462,7 +452,14 @@
       <option name="project" value="LOCAL" />
       <updated>1680036330869</updated>
     </task>
-    <option name="localTasksCounter" value="602" />
+    <task id="LOCAL-00602" summary="Fixing graph ticks">
+      <created>1680042358296</created>
+      <option name="number" value="00602" />
+      <option name="presentableId" value="LOCAL-00602" />
+      <option name="project" value="LOCAL" />
+      <updated>1680042358296</updated>
+    </task>
+    <option name="localTasksCounter" value="603" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -480,7 +477,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing pagination spacing" />
     <MESSAGE value="Removing buttons on change of market" />
     <MESSAGE value="Fixing portfolio to show quote bar" />
     <MESSAGE value="Fixing things" />
@@ -505,7 +501,8 @@
     <MESSAGE value="Keeping loans one-user only" />
     <MESSAGE value="Removing loan dropdown" />
     <MESSAGE value="Editing loan dropdown" />
-    <option name="LAST_COMMIT_MESSAGE" value="Editing loan dropdown" />
+    <MESSAGE value="Fixing graph ticks" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing graph ticks" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

@@ -2583,6 +2583,7 @@ class Economy(commands.Cog):
         plt.title(f"{stock['name']} (ID: {stock['stock_id']})")
         plt.ylabel("Value")
         plt.xlabel("Time")
+        plt.gcf().autofmt_xdate()
         plt.savefig(r"C:\Users\jaedo\OneDrive\Pictures\graph.png")
         return await interaction.followup.send(file=discord.File(fp=r"C:\Users\jaedo\OneDrive\Pictures\graph.png",
                                                                  filename=f"Graph of {stock['name']} share price.png",
@@ -2722,6 +2723,7 @@ class Economy(commands.Cog):
         plt.title(f"Average Stock Price")
         plt.ylabel("Value")
         plt.xlabel("Time")
+        plt.gcf().autofmt_xdate()
         plt.savefig(r"graph.png")
         return await interaction.followup.send(file=discord.File(fp=r"graph.png",
                                                                  filename=f"Graph of average share price.png"))
