@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Portfolio change alteration">
-      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding updated loan limits" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -116,21 +114,7 @@
       <workItem from="1678542957088" duration="18721000" />
       <workItem from="1678819823954" duration="98671000" />
       <workItem from="1679659589295" duration="9232000" />
-      <workItem from="1679682470900" duration="18181000" />
-    </task>
-    <task id="LOCAL-00533" summary="Adding stock restting command">
-      <created>1679586901244</created>
-      <option name="number" value="00533" />
-      <option name="presentableId" value="LOCAL-00533" />
-      <option name="project" value="LOCAL" />
-      <updated>1679586901244</updated>
-    </task>
-    <task id="LOCAL-00534" summary="Adding stock restting command">
-      <created>1679586968678</created>
-      <option name="number" value="00534" />
-      <option name="presentableId" value="LOCAL-00534" />
-      <option name="project" value="LOCAL" />
-      <updated>1679586968678</updated>
+      <workItem from="1679682470900" duration="18561000" />
     </task>
     <task id="LOCAL-00535" summary="Fixing spelling">
       <created>1679588135805</created>
@@ -461,7 +445,21 @@
       <option name="project" value="LOCAL" />
       <updated>1680015704844</updated>
     </task>
-    <option name="localTasksCounter" value="582" />
+    <task id="LOCAL-00582" summary="Adding updated loan limits">
+      <created>1680016472649</created>
+      <option name="number" value="00582" />
+      <option name="presentableId" value="LOCAL-00582" />
+      <option name="project" value="LOCAL" />
+      <updated>1680016472649</updated>
+    </task>
+    <task id="LOCAL-00583" summary="Adding updated loan limits">
+      <created>1680016622075</created>
+      <option name="number" value="00583" />
+      <option name="presentableId" value="LOCAL-00583" />
+      <option name="project" value="LOCAL" />
+      <updated>1680016622075</updated>
+    </task>
+    <option name="localTasksCounter" value="584" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -479,7 +477,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding loan dropdown" />
     <MESSAGE value="Fixing realtive timestamp" />
     <MESSAGE value="Fixing relative timestamp" />
     <MESSAGE value="Disabling dropdown menu" />
@@ -504,7 +501,8 @@
     <MESSAGE value="Changing graphs to display minor lines for shorter time" />
     <MESSAGE value="Fixing market updating" />
     <MESSAGE value="Portfolio change alteration" />
-    <option name="LAST_COMMIT_MESSAGE" value="Portfolio change alteration" />
+    <MESSAGE value="Adding updated loan limits" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding updated loan limits" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
