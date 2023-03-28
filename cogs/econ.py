@@ -1061,7 +1061,9 @@ class Economy(commands.Cog):
                     # set new fund to 150% of old fund
                     new_limit = fund_limit * 1.5
                     additional_funds = fund_limit * .5
-                    # ADD MARKET INCREASES/DECREASES HERE
+                    # update all market items in the general and minecraft market to increase by 25%
+                    await conn.execute('''UPDATE rbt_market SET value = value * 1.25 
+                    WHERE market != 'open' AND name = 'Wallet Expansion';''')
                     # update funds
                     await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = current_funds + $2 
                             WHERE name = 'General Fund';''', new_limit, additional_funds)
