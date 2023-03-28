@@ -2451,10 +2451,12 @@ class Economy(commands.Cog):
                 this_string = f"{shares['name']} (#{shares['stock_id']}, {risk}): " \
                               f"{shares['amount']} @ {self.thaler}{stock['value']:,.2f}"
                 if stock['trending'] == "up":
-                    this_string += " :chart_with_upwards_trend: +"
+                    this_string += " :chart_with_upwards_trend: "
                 else:
-                    this_string += " :chart_with_downwards_trend: -"
-                this_string += f"{abs(stock['change'] * 100):.2f}%\n" \
+                    this_string += " :chart_with_downwards_trend: "
+                if stock['change'] > 0:
+                    this_string += "+"
+                this_string += f"{(stock['change'] * 100):.2f}%\n" \
                                f"> Sale value: {self.thaler}" \
                                f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
                 ledger_string += this_string
