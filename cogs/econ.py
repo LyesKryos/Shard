@@ -878,11 +878,12 @@ class LoanDropdown(Select):
                                                  f"with {self.thaler}{self.amount:,.2f}.")
         for item in self.view.children:
             self.view.remove_item(item)
-        return await self.message.edit(content=f"You have successfully opened a loan account (ID:{interaction.id}) "
+        await interaction.followup.send(f"You have successfully opened a loan account (ID:{interaction.id}) "
                                                f"with {self.thaler}{self.amount:,.2f}. This loan becomes due: "
                                                f"<t:{int(due.timestamp())}:f>.\n"
                                                f"Note that interest is applied to the principle proactively.",
-                                       view=self.view, ephemeral=False)
+                                        ephemeral=False)
+        return await self.message.edit(view=self.view)
 
 
 class LoanView(View):
