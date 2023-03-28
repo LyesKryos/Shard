@@ -1743,7 +1743,7 @@ class Economy(commands.Cog):
                   log_type: typing.Literal['exchange', 'casino', 'trade', 'contract', 'market', 'payroll', 'all'],
                   filter: typing.Literal['exchange', 'casino', 'trade', 'contract', 'market', 'payroll'] = None):
         # defer response
-        await interaction.response.defer(thinking=True)
+        await interaction.response.defer(thinking=True, ephemeral=True)
         # establishes connection
         conn = self.bot.pool
         # defines user
@@ -1768,8 +1768,8 @@ class Economy(commands.Cog):
             for log in logs:
                 exchange_log.write(f"[{log['timestamp']}] {log['description']}\n")
         await interaction.followup.send(file=discord.File(fp=f"{user.id}_exchange_log.txt",
-                                                                 filename=f"{user.id}_exchange_log.txt"),
-                                               ephemeral=True)
+                                                          filename=f"{user.id}_exchange_log.txt"),
+                                        ephemeral=True)
         return
 
     # creates exchange subgroup
@@ -3062,7 +3062,6 @@ class Economy(commands.Cog):
         item_embed.add_field(name="Description", value=f"{item_info['description']}")
         await interaction.followup.send(embed=item_embed)
 
-
     @market.command(name="buy", description="Buys an item from the marketplace.")
     @app_commands.describe(item_id="The ID number of the item you want to buy.")
     async def buy(self, interaction: discord.Interaction, item_id: int):
@@ -3086,7 +3085,7 @@ class Economy(commands.Cog):
         value = item_info['value']
         # if the item is the wallet expansion, multiply accordingly
         if item_info['name'] == "Wallet Expansion":
-            value = (user_info['wallet']/100) * 1000
+            value = (user_info['wallet'] / 100) * 1000
         # ensure the user can afford item
         if value > user_info['funds']:
             return await interaction.followup.send(f"You do not have enough thaler to purchase {item_info['name']}.")
