@@ -890,8 +890,6 @@ class LoanView(View):
         return await self.message.edit(content="Loans closed.", view=self)
 
 
-
-
 def get_card_emoji(card):
     # define emoji strings for card
     K_card = '<:K_card:1085224694631907409>'

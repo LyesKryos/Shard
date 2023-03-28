@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding updated loan limits" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Timeout added for loan dropdown">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -114,35 +117,7 @@
       <workItem from="1678542957088" duration="18721000" />
       <workItem from="1678819823954" duration="98671000" />
       <workItem from="1679659589295" duration="9232000" />
-      <workItem from="1679682470900" duration="18561000" />
-    </task>
-    <task id="LOCAL-00535" summary="Fixing spelling">
-      <created>1679588135805</created>
-      <option name="number" value="00535" />
-      <option name="presentableId" value="LOCAL-00535" />
-      <option name="project" value="LOCAL" />
-      <updated>1679588135805</updated>
-    </task>
-    <task id="LOCAL-00536" summary="Fixing resetting">
-      <created>1679590957114</created>
-      <option name="number" value="00536" />
-      <option name="presentableId" value="LOCAL-00536" />
-      <option name="project" value="LOCAL" />
-      <updated>1679590957114</updated>
-    </task>
-    <task id="LOCAL-00537" summary="Adding max consideration for wallet size">
-      <created>1679594768688</created>
-      <option name="number" value="00537" />
-      <option name="presentableId" value="LOCAL-00537" />
-      <option name="project" value="LOCAL" />
-      <updated>1679594768688</updated>
-    </task>
-    <task id="LOCAL-00538" summary="Messing with up and down chance to make it a bit more stable">
-      <created>1679604128295</created>
-      <option name="number" value="00538" />
-      <option name="presentableId" value="LOCAL-00538" />
-      <option name="project" value="LOCAL" />
-      <updated>1679604128295</updated>
+      <workItem from="1679682470900" duration="20579000" />
     </task>
     <task id="LOCAL-00539" summary="Adding loan dropdown">
       <created>1679660300870</created>
@@ -459,7 +434,35 @@
       <option name="project" value="LOCAL" />
       <updated>1680016622075</updated>
     </task>
-    <option name="localTasksCounter" value="584" />
+    <task id="LOCAL-00584" summary="Adding updated loan limits">
+      <created>1680016691354</created>
+      <option name="number" value="00584" />
+      <option name="presentableId" value="LOCAL-00584" />
+      <option name="project" value="LOCAL" />
+      <updated>1680016691354</updated>
+    </task>
+    <task id="LOCAL-00585" summary="Adding updated loan limits">
+      <created>1680016757206</created>
+      <option name="number" value="00585" />
+      <option name="presentableId" value="LOCAL-00585" />
+      <option name="project" value="LOCAL" />
+      <updated>1680016757206</updated>
+    </task>
+    <task id="LOCAL-00586" summary="Adding updated loan limits">
+      <created>1680016887012</created>
+      <option name="number" value="00586" />
+      <option name="presentableId" value="LOCAL-00586" />
+      <option name="project" value="LOCAL" />
+      <updated>1680016887012</updated>
+    </task>
+    <task id="LOCAL-00587" summary="Timeout added for loan dropdown">
+      <created>1680017228380</created>
+      <option name="number" value="00587" />
+      <option name="presentableId" value="LOCAL-00587" />
+      <option name="project" value="LOCAL" />
+      <updated>1680017228380</updated>
+    </task>
+    <option name="localTasksCounter" value="588" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -477,7 +480,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing realtive timestamp" />
     <MESSAGE value="Fixing relative timestamp" />
     <MESSAGE value="Disabling dropdown menu" />
     <MESSAGE value="Removing dropdown menu on submit" />
@@ -502,7 +504,8 @@
     <MESSAGE value="Fixing market updating" />
     <MESSAGE value="Portfolio change alteration" />
     <MESSAGE value="Adding updated loan limits" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding updated loan limits" />
+    <MESSAGE value="Timeout added for loan dropdown" />
+    <option name="LAST_COMMIT_MESSAGE" value="Timeout added for loan dropdown" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
