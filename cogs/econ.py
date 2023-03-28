@@ -3039,6 +3039,25 @@ class Economy(commands.Cog):
         message = await interaction.followup.send(embed=market_embed)
         await message.edit(view=MarketView(message))
 
+    @market.command(name="item", description="Opens the market and displays options.")
+    @app_commands.describe(item_id="The ID number of the item you want to buy.")
+    async def item(self, interaction: discord.Interaction, item_id: int):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # fetch item information
+        item_info = await conn.fetchrow('''SELECT * FROM rbt_market WHERE market_id = $1;''', item_id)
+        # if there is no item, return such
+        if item_info is None:
+            return await interaction.followup.send("There is no item with that ID.", ephemeral=True)
+        # create the embed for the item
+        item_embed = discord.Embed(title=f"{item_info['name']}", description=f"Cost: {self.thaler}{item_info['value']}")
+        item_embed.set_thumbnail(url=self.logo)
+        item_embed.add_field(name="Description", value=f"{item_info['description']}")
+        await interaction.followup.send(embed=item_embed)
+
+
     @market.command(name="buy", description="Buys an item from the marketplace.")
     @app_commands.describe(item_id="The ID number of the item you want to buy.")
     async def buy(self, interaction: discord.Interaction, item_id: int):
@@ -3058,24 +3077,32 @@ class Economy(commands.Cog):
         # ensure item existence
         if item_info is None:
             return await interaction.followup.send(f"No item with ID `{item_id}` exists.")
+        # define item value
+        value = item_info['value']
+        # if the item is the wallet expansion, multiply accordingly
+        if item_info['name'] == "Wallet Expansion":
+            value = (user_info['wallet']/100) * 1000
         # ensure the user can afford item
-        if item_info['value'] > user_info['funds']:
+        if value > user_info['funds']:
             return await interaction.followup.send(f"You do not have enough thaler to purchase {item_info['name']}.")
         # remove funds from user
         await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
-                           item_info['value'], user.id)
+                           value, user.id)
         # add funds to general fund
         await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 WHERE name = 'General Fund';''',
-                           item_info['value'])
+                           value)
         # add to market_ledger
         await conn.execute('''INSERT INTO market_ledger VALUES ($1,$2);''',
                            item_info['market_id'], user.id)
         # update logs
         await conn.execute('''INSERT INTO rbt_user_log VALUES ($1,$2,$3);''',
                            user.id, 'market', f"Bought {item_info['name']} (ID: {item_info['market_id']}) from the"
-                                              f"{item_info['market']} for {self.thaler}{item_info['value']:,}.")
+                                              f"{item_info['market']} for {self.thaler}{value:,}.")
+        # if the user bought a wallet expansion, upgrade wallet
+        if item_info['name'] == "Wallet Expansion":
+            await conn.execute('''UPDATE rbt_users SET wallet = wallet + 100 WHERE user_id = $1;''', user.id)
         return await interaction.followup.send(f"You have successfully purchased {item_info['name']} for "
-                                               f"{self.thaler}{item_info['value']:,}")
+                                               f"{self.thaler}{value:,}")
 
     @commands.command()
     @commands.is_owner()

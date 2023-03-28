@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Timeout added for loan dropdown">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing market pagination">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
@@ -117,21 +117,7 @@
       <workItem from="1678542957088" duration="18721000" />
       <workItem from="1678819823954" duration="98671000" />
       <workItem from="1679659589295" duration="9232000" />
-      <workItem from="1679682470900" duration="20579000" />
-    </task>
-    <task id="LOCAL-00539" summary="Adding loan dropdown">
-      <created>1679660300870</created>
-      <option name="number" value="00539" />
-      <option name="presentableId" value="LOCAL-00539" />
-      <option name="project" value="LOCAL" />
-      <updated>1679660300871</updated>
-    </task>
-    <task id="LOCAL-00540" summary="Adding loan dropdown">
-      <created>1679660620262</created>
-      <option name="number" value="00540" />
-      <option name="presentableId" value="LOCAL-00540" />
-      <option name="project" value="LOCAL" />
-      <updated>1679660620262</updated>
+      <workItem from="1679682470900" duration="22018000" />
     </task>
     <task id="LOCAL-00541" summary="Adding loan dropdown">
       <created>1679660903113</created>
@@ -462,7 +448,21 @@
       <option name="project" value="LOCAL" />
       <updated>1680017228380</updated>
     </task>
-    <option name="localTasksCounter" value="588" />
+    <task id="LOCAL-00588" summary="Changing stuff">
+      <created>1680028418857</created>
+      <option name="number" value="00588" />
+      <option name="presentableId" value="LOCAL-00588" />
+      <option name="project" value="LOCAL" />
+      <updated>1680028418857</updated>
+    </task>
+    <task id="LOCAL-00589" summary="Fixing market pagination">
+      <created>1680028733677</created>
+      <option name="number" value="00589" />
+      <option name="presentableId" value="LOCAL-00589" />
+      <option name="project" value="LOCAL" />
+      <updated>1680028733677</updated>
+    </task>
+    <option name="localTasksCounter" value="590" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -480,8 +480,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing relative timestamp" />
-    <MESSAGE value="Disabling dropdown menu" />
     <MESSAGE value="Removing dropdown menu on submit" />
     <MESSAGE value="Adding commas to recruitment rank" />
     <MESSAGE value="Adding proper open market" />
@@ -505,7 +503,9 @@
     <MESSAGE value="Portfolio change alteration" />
     <MESSAGE value="Adding updated loan limits" />
     <MESSAGE value="Timeout added for loan dropdown" />
-    <option name="LAST_COMMIT_MESSAGE" value="Timeout added for loan dropdown" />
+    <MESSAGE value="Changing stuff" />
+    <MESSAGE value="Fixing market pagination" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing market pagination" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
