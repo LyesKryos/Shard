@@ -883,7 +883,7 @@ class LoanDropdown(Select):
                                                f"<t:{int(due.timestamp())}:f>.\n"
                                                f"Note that interest is applied to the principle proactively.",
                                         ephemeral=False)
-        return await self.message.edit(view=self.view)
+        return await self.message.edit(content="Loan opened.", view=self.view)
 
 
 class LoanView(View):

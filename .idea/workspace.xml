@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Keeping loans one-user only">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Removing loan dropdown">
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -117,28 +116,7 @@
       <workItem from="1678542957088" duration="18721000" />
       <workItem from="1678819823954" duration="98671000" />
       <workItem from="1679659589295" duration="9232000" />
-      <workItem from="1679682470900" duration="26408000" />
-    </task>
-    <task id="LOCAL-00549" summary="Disabling dropdown menu">
-      <created>1679662186645</created>
-      <option name="number" value="00549" />
-      <option name="presentableId" value="LOCAL-00549" />
-      <option name="project" value="LOCAL" />
-      <updated>1679662186645</updated>
-    </task>
-    <task id="LOCAL-00550" summary="Removing dropdown menu on submit">
-      <created>1679662522385</created>
-      <option name="number" value="00550" />
-      <option name="presentableId" value="LOCAL-00550" />
-      <option name="project" value="LOCAL" />
-      <updated>1679662522385</updated>
-    </task>
-    <task id="LOCAL-00551" summary="Adding commas to recruitment rank">
-      <created>1679678011410</created>
-      <option name="number" value="00551" />
-      <option name="presentableId" value="LOCAL-00551" />
-      <option name="project" value="LOCAL" />
-      <updated>1679678011410</updated>
+      <workItem from="1679682470900" duration="26742000" />
     </task>
     <task id="LOCAL-00552" summary="Adding proper open market">
       <created>1679678604701</created>
@@ -462,7 +440,28 @@
       <option name="project" value="LOCAL" />
       <updated>1680034795520</updated>
     </task>
-    <option name="localTasksCounter" value="598" />
+    <task id="LOCAL-00598" summary="Keeping loans one-user only">
+      <created>1680035942127</created>
+      <option name="number" value="00598" />
+      <option name="presentableId" value="LOCAL-00598" />
+      <option name="project" value="LOCAL" />
+      <updated>1680035942127</updated>
+    </task>
+    <task id="LOCAL-00599" summary="Removing loan dropdown">
+      <created>1680036007918</created>
+      <option name="number" value="00599" />
+      <option name="presentableId" value="LOCAL-00599" />
+      <option name="project" value="LOCAL" />
+      <updated>1680036007918</updated>
+    </task>
+    <task id="LOCAL-00600" summary="Removing loan dropdown">
+      <created>1680036125051</created>
+      <option name="number" value="00600" />
+      <option name="presentableId" value="LOCAL-00600" />
+      <option name="project" value="LOCAL" />
+      <updated>1680036125051</updated>
+    </task>
+    <option name="localTasksCounter" value="601" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -480,7 +479,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing various database errors" />
     <MESSAGE value="Fixing pagination" />
     <MESSAGE value="Fixing pagination spacing" />
     <MESSAGE value="Removing buttons on change of market" />
@@ -505,7 +503,8 @@
     <MESSAGE value="Making log sending ephemeral" />
     <MESSAGE value="Altering crash chance" />
     <MESSAGE value="Keeping loans one-user only" />
-    <option name="LAST_COMMIT_MESSAGE" value="Keeping loans one-user only" />
+    <MESSAGE value="Removing loan dropdown" />
+    <option name="LAST_COMMIT_MESSAGE" value="Removing loan dropdown" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
