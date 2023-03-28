@@ -879,9 +879,9 @@ class LoanDropdown(Select):
         for item in self.view.children:
             self.view.remove_item(item)
         await interaction.followup.send(f"You have successfully opened a loan account (ID:{interaction.id}) "
-                                               f"with {self.thaler}{self.amount:,.2f}. This loan becomes due: "
-                                               f"<t:{int(due.timestamp())}:f>.\n"
-                                               f"Note that interest is applied to the principle proactively.",
+                                        f"with {self.thaler}{self.amount:,.2f}. This loan becomes due: "
+                                        f"<t:{int(due.timestamp())}:f>.\n"
+                                        f"Note that interest is applied to the principle proactively.",
                                         ephemeral=False)
         return await self.message.edit(content="Loan opened.", view=self.view)
 
@@ -897,7 +897,6 @@ class LoanView(View):
         for item in self.children:
             self.remove_item(item)
         return await self.message.edit(content="Loans closed.", view=self)
-
 
 
 def get_card_emoji(card):
@@ -2567,16 +2566,16 @@ class Economy(commands.Cog):
         days = (end_date - start_date).days
         if days >= 2:
             plt.grid(True, which="major")
-            if days > 10:
-                ax.xaxis.set_major_locator(DayLocator(interval=3))
-            elif days > 30:
-                ax.xaxis.set_major_locator(DayLocator(interval=10))
-            elif days > 90:
-                ax.xaxis.set_major_locator(DayLocator(interval=30))
+            if days > 360:
+                ax.xaxis.set_major_locator(YearLocator(month=start_date.month, day=start_date.day))
             elif days > 180:
                 ax.xaxis.set_major_locator(DayLocator(interval=60))
-            elif days > 360:
-                ax.xaxis.set_major_locator(YearLocator(month=start_date.month, day=start_date.day))
+            elif days > 90:
+                ax.xaxis.set_major_locator(DayLocator(interval=30))
+            elif days > 30:
+                ax.xaxis.set_major_locator(DayLocator(interval=10))
+            elif days > 10:
+                ax.xaxis.set_major_locator(DayLocator(bymonthday=range(1, end_date.day), interval=3))
         else:
             ax.xaxis.set_minor_locator(HourLocator(interval=1))
             plt.grid(True, which="major")
@@ -2706,16 +2705,16 @@ class Economy(commands.Cog):
         days = (end_date - start_date).days
         if days >= 2:
             plt.grid(True, which="major")
-            if days > 7:
-                ax.xaxis.set_major_locator(DayLocator(interval=3))
-            elif days > 30:
-                ax.xaxis.set_major_locator(DayLocator(interval=10))
-            elif days > 90:
-                ax.xaxis.set_major_locator(DayLocator(interval=30))
+            if days > 360:
+                ax.xaxis.set_major_locator(YearLocator(month=start_date.month, day=start_date.day))
             elif days > 180:
                 ax.xaxis.set_major_locator(DayLocator(interval=60))
-            elif days > 360:
-                ax.xaxis.set_major_locator(YearLocator(month=start_date.month, day=start_date.day))
+            elif days > 90:
+                ax.xaxis.set_major_locator(DayLocator(interval=30))
+            elif days > 30:
+                ax.xaxis.set_major_locator(DayLocator(interval=10))
+            elif days > 10:
+                ax.xaxis.set_major_locator(DayLocator(bymonthday=range(1, end_date.day), interval=3))
         else:
             ax.xaxis.set_minor_locator(HourLocator(interval=1))
             plt.grid(True, which="major")
