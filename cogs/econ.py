@@ -880,7 +880,7 @@ class LoanDropdown(Select):
                                                f"with {self.thaler}{self.amount:,.2f}. This loan becomes due: "
                                                f"<t:{int(due.timestamp())}:f>.\n"
                                                f"Note that interest is applied to the principle proactively.",
-                                       view=self.view)
+                                       view=self.view, ephemeral=False)
 
 
 class LoanView(View):
@@ -894,6 +894,7 @@ class LoanView(View):
         for item in self.children:
             self.remove_item(item)
         return await self.message.edit(content="Loans closed.", view=self)
+
 
 
 def get_card_emoji(card):
@@ -1519,7 +1520,7 @@ class Economy(commands.Cog):
     async def open_account(self, interaction: discord.Interaction, account_type: typing.Literal['investment', 'loan'],
                            amount: float):
         # defer interaction
-        await interaction.response.defer(thinking=True)
+        await interaction.response.defer(thinking=True, ephemeral=True)
         # round amount
         amount = round(amount, 2)
         # establish connection
@@ -1573,7 +1574,8 @@ class Economy(commands.Cog):
                                user.id, 'bank', f"Opened a new investment account (ID: {interaction.id}) "
                                                 f"with {self.thaler}{amount:,.2f}.")
             return await interaction.followup.send(f"You have successfully opened an investment account (ID: "
-                                                   f"{interaction.id}) with {self.thaler}{amount:,.2f}.")
+                                                   f"{interaction.id}) with {self.thaler}{amount:,.2f}.",
+                                                   ephemeral=False)
 
     @rbt.command(name="manage_account", description="Manages an existing loan or investment account.")
     @app_commands.describe(account_type="The type of account you want to manage.",
