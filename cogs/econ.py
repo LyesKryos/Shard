@@ -879,9 +879,17 @@ class LoanDropdown(Select):
 
 class LoanView(View):
     def __init__(self, amount, user, message: discord.Message):
-        super().__init__()
-
+        self.message = message
+        super().__init__(timeout=300)
         self.add_item(LoanDropdown(amount, user, message))
+
+    async def on_timeout(self):
+        # remove dropdown
+        for item in self.children:
+            self.remove_item(item)
+        return await self.message.edit(content="Loans closed.", view=self)
+
+
 
 
 def get_card_emoji(card):
