@@ -1767,9 +1767,10 @@ class Economy(commands.Cog):
             exchange_log.write("Note that transactions are ordered by most recent.\n")
             for log in logs:
                 exchange_log.write(f"[{log['timestamp']}] {log['description']}\n")
-        return await interaction.followup.send(file=discord.File(fp=f"{user.id}_exchange_log.txt",
+        await interaction.followup.send(file=discord.File(fp=f"{user.id}_exchange_log.txt",
                                                                  filename=f"{user.id}_exchange_log.txt"),
                                                ephemeral=True)
+        return
 
     # creates exchange subgroup
     exchange = app_commands.Group(name="exchange", description="...", guild_only=True)
