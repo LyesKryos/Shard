@@ -2716,7 +2716,7 @@ class Economy(commands.Cog):
             elif days > 30:
                 ax.xaxis.set_major_locator(DayLocator(interval=10))
             elif days > 10:
-                ax.xaxis.set_major_locator(DayLocator(bymonthday=range(1, end_date.day), interval=3))
+                ax.xaxis.set_major_locator(DayLocator(bymonthday=range(1, end_date.day), interval=1))
         else:
             ax.xaxis.set_minor_locator(HourLocator(interval=1))
             plt.grid(True, which="major")
@@ -2724,7 +2724,6 @@ class Economy(commands.Cog):
         plt.title(f"Average Stock Price")
         plt.ylabel("Value")
         plt.xlabel("Time")
-        plt.gcf().autofmt_xdate()
         plt.savefig(r"graph.png")
         return await interaction.followup.send(file=discord.File(fp=r"graph.png",
                                                                  filename=f"Graph of average share price.png"))
