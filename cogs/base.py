@@ -36,6 +36,7 @@ class BaseCommands(commands.Cog):
                             value="Introduced new ecnomy system.",
                             inline=False)
         infoembed.add_field(name="Hosting Software", value="Oracle Virtual Cloud Network Virtual Machine")
+        infoembed.set_footer(text="[Donate to the creator!](https://ko-fi.com/shardbot)")
         await ctx.send(embed=infoembed)
 
     @commands.command(brief="Shuts down the bot with a global message")
