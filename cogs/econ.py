@@ -2297,7 +2297,7 @@ class Economy(commands.Cog):
             return await interaction.followup.send(
                 f"You have successfully purchased {amount:,} shares of {stock['name']} for "
                 f"{self.thaler}{transaction:,.2f} at {self.thaler}{float(stock['value']):,.2f} per share.\n"
-                f"{self.thaler}{stock['value']:,.2f} * {amount} + {self.thaler}{tax,.2f} (transaction fee) = "
+                f"{self.thaler}{stock['value']:,.2f} * {amount} + {self.thaler}{tax:,.2f} (transaction fee) = "
                 f"{self.thaler}{transaction:,.2f}")
 
     @exchange.command(description="Sells a specified amount of a stock's shares.",
