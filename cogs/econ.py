@@ -2253,8 +2253,11 @@ class Economy(commands.Cog):
         else:
             wallet_contents = wallet_contents['sum']
         if wallet_contents + amount > rbt_member['wallet']:
-            if amount.lower() == "max":
-                amount = rbt_member - wallet_contents
+            if type(amount) != int:
+                if amount.lower() == "max":
+                    amount = rbt_member - wallet_contents
+                else:
+                    return await interaction.followup.send(f"`{amount}` is not a valid argument for this command.")
             else:
                 return await interaction.followup.send(f"Your wallet (size: {rbt_member['wallet']:,}) "
                                                        f"does not have enough room to buy {amount:,} "
