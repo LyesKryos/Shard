@@ -984,8 +984,8 @@ async def get_role_name(color: str, bot: Shard):
     # get the role's name
     role = color.replace(' Role', '')
     thegye = bot.get_guild(674259612580446230)
-    role = discord.utils.get(thegye.roles, name=role)
-    return role
+    discord_role = discord.utils.get(thegye.roles, name=role)
+    return discord_role
 
 
 class Economy(commands.Cog):
