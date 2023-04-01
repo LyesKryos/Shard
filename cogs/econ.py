@@ -980,11 +980,11 @@ def get_card_emoji(card):
         return '<:tripler:1085970117059428473>'
 
 
-async def get_role_name(color: str, bot: Shard):
+def get_role_name(color: str, bot: Shard):
     # get the role's name
     role = color.replace(' Role', '')
     thegye = bot.get_guild(674259612580446230)
-    discord_role = discord.utils.get(thegye.roles, name=role)
+    discord_role = discord.utils.get(thegye.roles, name=str(role))
     return discord_role
 
 
@@ -3124,8 +3124,9 @@ class Economy(commands.Cog):
             await conn.execute('''UPDATE rbt_users SET wallet = wallet + 100 WHERE user_id = $1;''', user.id)
         # if the item is a role, parse out the role
         if item_info['notes'] == "role":
-            role = await get_role_name(item_info['name'], self.bot)
-            await interaction.followup.send(role)
+            role = get_role_name(item_info['name'], self.bot)
+            thegye = self.bot.get_guild(674259612580446230)
+            user = thegye.get_member(user.id)
             await user.add_roles(role)
         return await interaction.followup.send(f"You have successfully purchased {item_info['name']} for "
                                                f"{self.thaler}{value:,}.")
