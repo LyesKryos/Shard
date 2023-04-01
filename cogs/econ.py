@@ -664,7 +664,7 @@ class MarketDropdown(discord.ui.Select):
                 page = 1
                 for m in market_items[(page * 12) - 12:page * 12]:
                     market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
-                                           value=f"Price: {m['value']}")
+                                           value=f"Price: {m['value']:,}")
                 await self.message.edit(embed=market_embed, view=SubMarketView(market=market, message=self.message,
                                                                                values=self.values))
             else:
@@ -978,6 +978,14 @@ def get_card_emoji(card):
         return '<:doubler:1085970114752557086>'
     elif card == "tripler":
         return '<:tripler:1085970117059428473>'
+
+
+async def get_role_name(color: str, bot: Shard):
+    # get the role's name
+    role = color.replace(' Role', '')
+    thegye = bot.get_guild(674259612580446230)
+    role = discord.utils.get(thegye.roles, name=role)
+    return role
 
 
 class Economy(commands.Cog):
@@ -3093,7 +3101,7 @@ class Economy(commands.Cog):
         # define item value
         value = item_info['value']
         # if the item is the wallet expansion, multiply accordingly
-        if item_info['name'] == "Wallet Expansion":
+        if item_info['notes'] == "wallet_expansion":
             value = (user_info['wallet'] / 100) * 1000
         # ensure the user can afford item
         if value > user_info['funds']:
@@ -3114,8 +3122,12 @@ class Economy(commands.Cog):
         # if the user bought a wallet expansion, upgrade wallet
         if item_info['name'] == "Wallet Expansion":
             await conn.execute('''UPDATE rbt_users SET wallet = wallet + 100 WHERE user_id = $1;''', user.id)
+        # if the item is a role, parse out the role
+        if item_info['notes'] == "role":
+            role = await get_role_name(item_info['name'], self.bot)
+            await user.add_roles(role)
         return await interaction.followup.send(f"You have successfully purchased {item_info['name']} for "
-                                               f"{self.thaler}{value:,}")
+                                               f"{self.thaler}{value:,}.")
 
     @commands.command()
     @commands.is_owner()
