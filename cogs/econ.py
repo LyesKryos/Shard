@@ -3125,6 +3125,7 @@ class Economy(commands.Cog):
         # if the item is a role, parse out the role
         if item_info['notes'] == "role":
             role = await get_role_name(item_info['name'], self.bot)
+            await interaction.followup.send(role)
             await user.add_roles(role)
         return await interaction.followup.send(f"You have successfully purchased {item_info['name']} for "
                                                f"{self.thaler}{value:,}.")
