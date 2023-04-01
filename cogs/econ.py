@@ -723,7 +723,7 @@ class SubMarketView(View):
             # paginator if there are more than 25 items in a market
             for m in market_items[(self.page * 12) - 12:self.page * 12]:
                 market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
-                                       value=f"Price: {m['value']}")
+                                       value=f"Price: {m['value']:,}")
             market_embed.set_footer(text=f"Page #{self.page}")
             await self.message.edit(embed=market_embed, view=self)
         except Exception as error:
