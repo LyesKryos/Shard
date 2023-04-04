@@ -79,9 +79,9 @@ class Recruitment(commands.Cog):
                 for s in top_recruiter:
                     monthly_total += s['sent_this_month']
                 # give recruiter of the month 500 thaler
-                await conn.execute('''UPDATE rbt_users SET funds = funds + 500 WHERE user_id = $1:''',
+                await conn.execute('''UPDATE rbt_users SET funds = funds + 500 WHERE user_id = $1;''',
                                    user.id)
-                await conn.execute('''UPDATE funds SET general_fund = general_fund - 500
+                await conn.execute('''UPDATE funds SET current_funds = current_funds - 500
                 WHERE name = 'General Fund';''')
                 # resets the role
                 await recruiter_of_the_month_role.edit(color=discord.Color.light_grey(),
@@ -314,7 +314,7 @@ class Recruitment(commands.Cog):
              WHERE user_id = $2;''', self.user_sent, ctx.author.id)
             await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                math.floor(self.user_sent/2), ctx.author.id)
-            await conn.execute('''UPDATE funds SET general_fund = general_fund - $1 WHERE name = 'General Fund';''',
+            await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 WHERE name = 'General Fund';''',
                                math.floor(self.user_sent/2))
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                ctx.author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent/2)} from "
@@ -329,7 +329,7 @@ class Recruitment(commands.Cog):
              WHERE user_id = $2;''', self.user_sent, ctx.author.id)
             await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                math.floor(self.user_sent/2), ctx.author.id)
-            await conn.execute('''UPDATE funds SET general_fund = general_fund - $1 WHERE name = 'General Fund';''',
+            await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 WHERE name = 'General Fund';''',
                                math.floor(self.user_sent/2))
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                ctx.author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent/2)} from "
@@ -370,7 +370,7 @@ class Recruitment(commands.Cog):
                                    self.user_sent, self.user_sent, ctx.author.id)
                 await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                    math.floor(self.user_sent / 2), ctx.author.id)
-                await conn.execute('''UPDATE funds SET general_fund = general_fund - $1 WHERE name = 'General Fund';''',
+                await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 WHERE name = 'General Fund';''',
                                    math.floor(self.user_sent / 2))
                 await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                    ctx.author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent / 2)} from "

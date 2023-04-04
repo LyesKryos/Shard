@@ -75,8 +75,13 @@ class Verification(commands.Cog):
                     member_info = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
                                                       member.id)
                     await member.remove_roles(wa_role, thegye_role, karma_role, traveler_role, cte_role)
+                    # skips bots
                     bot_role = thegye_server.get_role(783751789299105812)
                     if bot_role in member.roles:
+                        continue
+                    # skips exempt
+                    exempt_role = thegye_server.get_role(1082047811887054898)
+                    if exempt_role in member.roles:
                         continue
                     # if the member is not verified at all, remove all relevant roles and move to the next member
                     if member_info is None:
