@@ -331,7 +331,7 @@ class Recruitment(commands.Cog):
     recruitment_gather_object = None
     loops_gather_object = None
 
-    async def recruitment(self, interaction: discord.Interaction, user, channel, template):
+    async def recruitment(self, interaction: discord.Interaction, user, channel: discord.Interaction.channel, template):
         try:
             # runs the code until the stop command is given
             author = interaction.user
@@ -523,7 +523,7 @@ class Recruitment(commands.Cog):
         self.running = True
         self.user_sent = 0
         user = interaction.user
-        channel = interaction.channel()
+        channel = interaction.channel
         # gathers two asyncio functions together to run simultaneously
         self.recruitment_gather_object = asyncio.gather(self.recruitment(interaction=interaction, user=user,
                                                                          channel=channel, template=template),
