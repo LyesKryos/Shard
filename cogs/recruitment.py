@@ -331,7 +331,7 @@ class Recruitment(commands.Cog):
     recruitment_gather_object = None
     loops_gather_object = None
 
-    async def recruitment(self, interaction: discord.Interaction, user, template):
+    async def recruitment(self, interaction: discord.Interaction, user, channel, template):
         try:
             # runs the code until the stop command is given
             author = interaction.user
@@ -374,7 +374,7 @@ class Recruitment(commands.Cog):
                         f"https://www.nationstates.net/page=compose_telegram?tgto={recruit_string};"
                         f"message={template}")
                     # send the url and mention the author
-                    await interaction.followup.send(f'{author.mention} [{len(self.sending_to)} nation(s)] {url}')
+                    await channel.send(f'{author.mention} [{len(self.sending_to)} nation(s)] {url}')
                     # if there is only one nation in the queue, and extra 15 seconds is waited
                     if len(self.sending_to) == 1:
                         await asyncio.sleep(15)
@@ -388,7 +388,7 @@ class Recruitment(commands.Cog):
             return
         except asyncio.CancelledError:
             # send end message
-            await interaction.followup.send("Recruitment stopped. Another link may post.")
+            await channel.send("Recruitment stopped. Another link may post.")
             # establish connection
             conn = self.bot.pool
             # set running = false
@@ -397,17 +397,17 @@ class Recruitment(commands.Cog):
             await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $1
              WHERE user_id = $2;''', self.user_sent, user.id)
             await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
-                               math.floor(self.user_sent / 2), author.id)
+                               math.floor(self.user_sent / 2), user.id)
             await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 WHERE name = 'General Fund';''',
                                math.floor(self.user_sent / 2))
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                               author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent / 2)} from "
+                               user.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent / 2)} from "
                                                      f"recruitment.")
             self.user_sent = 0
         except Exception as error:
             conn = self.bot.pool
             self.running = False
-            await interaction.followup.send("The recruitment bot has run into an issue. Recruitment has stopped.")
+            await channel.send("The recruitment bot has run into an issue. Recruitment has stopped.")
             # update relevant tables
             await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $1
              WHERE user_id = $2;''', self.user_sent, user.id)
@@ -425,7 +425,7 @@ class Recruitment(commands.Cog):
             traceback_text = ''.join(lines)
             self.bot.logger.warning(msg=f"{traceback_text}")
 
-    async def still_recruiting_check(self, interaction: discord.Interaction):
+    async def still_recruiting_check(self, interaction: discord.Interaction, channel):
         while self.running:
             # connects to database
             conn = self.bot.pool
@@ -435,9 +435,9 @@ class Recruitment(commands.Cog):
             await asyncio.sleep(5)
             if self.running is False:
                 break
-            # sends mesage. if the reaction is hit, recruitment continues
-            msg = await interaction.followup.send(f"Still recruiting,{user.mention}? "
-                                                  f"Hit the reaction within 3 minutes to continue.")
+            # sends message. if the reaction is hit, recruitment continues
+            msg = await channel.send(f"Still recruiting,{user.mention}? "
+                                     f"Hit the reaction within 3 minutes to continue.")
             await msg.add_reaction("\U0001f4e8")
 
             def check(reaction, user):
@@ -451,7 +451,6 @@ class Recruitment(commands.Cog):
                 # if the reaction times out, stop the code
                 self.running = False
                 # updates information
-                userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', user.id)
                 await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
                                    self.user_sent, self.user_sent, user.id)
                 await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
@@ -524,9 +523,12 @@ class Recruitment(commands.Cog):
         self.running = True
         self.user_sent = 0
         user = interaction.user
+        channel = interaction.channel()
         # gathers two asyncio functions together to run simultaneously
-        self.recruitment_gather_object = asyncio.gather(self.recruitment(interaction, user, template),
-                                                        self.still_recruiting_check(interaction))
+        self.recruitment_gather_object = asyncio.gather(self.recruitment(interaction=interaction, user=user,
+                                                                         channel=channel, template=template),
+                                                        self.still_recruiting_check(interaction=interaction,
+                                                                                    channel=channel))
 
     @commands.command(brief="Stops the recruitment process")
     @commands.guild_only()
