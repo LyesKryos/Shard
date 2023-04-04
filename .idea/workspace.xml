@@ -118,21 +118,7 @@
       <workItem from="1679659589295" duration="9232000" />
       <workItem from="1679682470900" duration="29539000" />
       <workItem from="1680142938087" duration="10169000" />
-      <workItem from="1680568682352" duration="10451000" />
-    </task>
-    <task id="LOCAL-00570" summary="Fixing opening an investment account">
-      <created>1679832193575</created>
-      <option name="number" value="00570" />
-      <option name="presentableId" value="LOCAL-00570" />
-      <option name="project" value="LOCAL" />
-      <updated>1679832193575</updated>
-    </task>
-    <task id="LOCAL-00571" summary="Updating force bank update">
-      <created>1679832873226</created>
-      <option name="number" value="00571" />
-      <option name="presentableId" value="LOCAL-00571" />
-      <option name="project" value="LOCAL" />
-      <updated>1679832873226</updated>
+      <workItem from="1680568682352" duration="10971000" />
     </task>
     <task id="LOCAL-00572" summary="Adding loan limit">
       <created>1679862535781</created>
@@ -463,7 +449,21 @@
       <option name="project" value="LOCAL" />
       <updated>1680638818598</updated>
     </task>
-    <option name="localTasksCounter" value="619" />
+    <task id="LOCAL-00619" summary="Trying interactions for recruitment">
+      <created>1680639270613</created>
+      <option name="number" value="00619" />
+      <option name="presentableId" value="LOCAL-00619" />
+      <option name="project" value="LOCAL" />
+      <updated>1680639270613</updated>
+    </task>
+    <task id="LOCAL-00620" summary="Trying interactions for recruitment">
+      <created>1680639610347</created>
+      <option name="number" value="00620" />
+      <option name="presentableId" value="LOCAL-00620" />
+      <option name="project" value="LOCAL" />
+      <updated>1680639610347</updated>
+    </task>
+    <option name="localTasksCounter" value="621" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
