@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing user_sent error">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing recruitment and verification" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -119,14 +116,7 @@
       <workItem from="1679659589295" duration="9232000" />
       <workItem from="1679682470900" duration="29539000" />
       <workItem from="1680142938087" duration="10169000" />
-      <workItem from="1680568682352" duration="2513000" />
-    </task>
-    <task id="LOCAL-00567" summary="Fixing quote bar in portfolio">
-      <created>1679770933821</created>
-      <option name="number" value="00567" />
-      <option name="presentableId" value="LOCAL-00567" />
-      <option name="project" value="LOCAL" />
-      <updated>1679770933821</updated>
+      <workItem from="1680568682352" duration="3312000" />
     </task>
     <task id="LOCAL-00568" summary="Fixing initial loan interest">
       <created>1679781394440</created>
@@ -464,7 +454,14 @@
       <option name="project" value="LOCAL" />
       <updated>1680570003537</updated>
     </task>
-    <option name="localTasksCounter" value="616" />
+    <task id="LOCAL-00616" summary="Fixing recruitment and verification">
+      <created>1680630148331</created>
+      <option name="number" value="00616" />
+      <option name="presentableId" value="LOCAL-00616" />
+      <option name="project" value="LOCAL" />
+      <updated>1680630148331</updated>
+    </task>
+    <option name="localTasksCounter" value="617" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -482,7 +479,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding loan limit" />
     <MESSAGE value="Changing interest rate display on view_account" />
     <MESSAGE value="Changing graphs to display minor lines for shorter time" />
     <MESSAGE value="Fixing market updating" />
@@ -507,7 +503,8 @@
     <MESSAGE value="Fixing visual commas" />
     <MESSAGE value="Adding relative timestamp to region command" />
     <MESSAGE value="Fixing user_sent error" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing user_sent error" />
+    <MESSAGE value="Fixing recruitment and verification" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing recruitment and verification" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

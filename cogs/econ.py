@@ -2232,7 +2232,25 @@ class Economy(commands.Cog):
                 stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', int(stock_id))
             except ValueError:
                 return await interaction.followup.send(
-                    f"``{stock_id}`` does not exist on the Exchange.")  # if the amount is maximum, calculate how much the user can purchase
+                    f"``{stock_id}`` does not exist on the Exchange.")
+        # check the user's wallet
+        wallet_contents = await conn.fetchrow('''SELECT sum(amount) FROM ledger WHERE user_id = $1;''', user.id)
+        if wallet_contents['sum'] is None:
+            wallet_contents = 0
+        else:
+            wallet_contents = wallet_contents['sum']
+        if wallet_contents + amount > rbt_member['wallet']:
+            if type(amount) != int:
+                if amount.lower() == "max":
+                    amount = int(rbt_member['wallet']) - wallet_contents
+                else:
+                    return await interaction.followup.send(
+                        f"`{amount}` is not a valid argument for this command.")
+            else:
+                return await interaction.followup.send(f"Your wallet (size: {rbt_member['wallet']:,}) "
+                                                       f"does not have enough room to buy {amount:,} "
+                                                       f"shares of {stock['name']}.")
+        # if the amount is maximum, calculate how much the user can purchase
         if type(amount) == str:
             if amount.lower() != "max":
                 return await interaction.followup.send(f"`{amount}` is not a valid argument for this command.")
@@ -2254,22 +2272,6 @@ class Economy(commands.Cog):
             if tax < .01:
                 tax = .01
             transaction = round(base_price + tax, 2)
-        # check the user's wallet
-        wallet_contents = await conn.fetchrow('''SELECT sum(amount) FROM ledger WHERE user_id = $1;''', user.id)
-        if wallet_contents['sum'] is None:
-            wallet_contents = 0
-        else:
-            wallet_contents = wallet_contents['sum']
-        if wallet_contents + amount > rbt_member['wallet']:
-            if type(amount) != int:
-                if amount.lower() == "max":
-                    amount = rbt_member - wallet_contents
-                else:
-                    return await interaction.followup.send(f"`{amount}` is not a valid argument for this command.")
-            else:
-                return await interaction.followup.send(f"Your wallet (size: {rbt_member['wallet']:,}) "
-                                                       f"does not have enough room to buy {amount:,} "
-                                                       f"shares of {stock['name']}.")
         # if the stock would become overdrawn, notify user
         if amount + stock['outstanding'] > stock['issued']:
             return await interaction.followup.send(f"Purchasing {amount:,} shares of {stock['name']} would cause it to "
