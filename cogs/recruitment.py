@@ -3,6 +3,7 @@ import math
 from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
+from discord import app_commands
 from pytz import timezone
 
 from ShardBot import Shard
@@ -15,23 +16,19 @@ import re
 import aiohttp
 from time import perf_counter, strftime
 from PIL import ImageColor
-from customchecks import RecruitmentCheck
+from customchecks import RecruitmentCheck, TooManyRequests
 import traceback
 import os
+
+from ratelimiter import Ratelimiter
 
 
 class Recruitment(commands.Cog):
 
     def __init__(self, bot: Shard):
+        self.rate_limit = Ratelimiter()
         self.bot = bot
         self.db_error = False
-
-        fd = os.open(os.devnull, os.O_RDWR)
-        # NB: even if stdin is closed, fd >= 0
-        os.dup2(fd, 1)
-        os.dup2(fd, 2)
-        if fd > 2:
-            os.close(fd)
 
         def error_log(error):
             etype = type(error)
@@ -101,59 +98,97 @@ class Recruitment(commands.Cog):
                 continue
 
         async def retention(bot):
+            # wait for the bot to be ready
             await bot.wait_until_ready()
+            # define channels
             recruitment_channel = bot.get_channel(674342850296807454)
             crashchannel = bot.get_channel(835579413625569322)
             thegye_server = bot.get_guild(674259612580446230)
             notifrole = thegye_server.get_role(950950836006187018)
+            # let the crash channel know
             await crashchannel.send("Starting retention loop.")
             try:
+                # connect to the API
                 async with aiohttp.ClientSession() as session:
                     headers = {"User-Agent": "Bassiliya"}
                     params = {'q': 'nations',
                               'region': 'thegye'}
                     async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                            headers=headers, params=params) as recruitsresp:
-                        recruits = await recruitsresp.text()
-                        await asyncio.sleep(.6)
-                    recruitssoup = BeautifulSoup(recruits, 'lxml')
-                    Recruitment.all_nations = set(recruitssoup.nations.text.split(':'))
+                        nations = await recruitsresp.text()
+                        # ratelimiter
+                        while True:
+                            # see if there are enough available calls. if so, break the loop
+                            try:
+                                await self.rate_limit.call()
+                                break
+                            # if there are not enough available calls, continue the loop
+                            except TooManyRequests as error:
+                                await asyncio.sleep(int(str(error)))
+                                continue
+                    # parse out current nations and set
+                    citizen_soup = BeautifulSoup(nations, 'lxml')
+                    self.all_nations = set(citizen_soup.nations.text.split(':'))
                     while True:
                         async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                                headers=headers, params=params) as recruitsresp:
-                            recruits = await recruitsresp.text()
-                            await asyncio.sleep(.6)
-                        recruitssoup = BeautifulSoup(recruits, 'lxml')
-                        crashcheck = recruitssoup.nations.text
-                        if re.search("Database Connection Error", crashcheck):
-                            await crashchannel.send("Error: `NationStates Database Connection Error`"
-                                                    "\nWaiting 15 minutes and retrying.")
-                            bot.db_error = True
+                            nations = await recruitsresp.text()
+                            # ratelimiter
+                            while True:
+                                # see if there are enough available calls. if so, break the loop
+                                try:
+                                    await self.rate_limit.call()
+                                    break
+                                # if there are not enough available calls, continue the loop
+                                except TooManyRequests as error:
+                                    await asyncio.sleep(int(str(error)))
+                                    continue
+                        # parse out new recruits
+                        new_nations_soup = BeautifulSoup(nations, 'lxml')
+                        # if the site is down, continue after 15 minutes
+                        try:
+                            crashcheck = new_nations_soup.nations.text
+                        except AttributeError:
+                            await crashchannel.send(f"Database error. Retrying in 15 minutes.")
                             await asyncio.sleep(900)
                             continue
-                        else:
-                            bot.db_error = False
-                        Recruitment.new_nations = set(recruitssoup.nations.text.split(':')).difference(
-                            Recruitment.all_nations)
-                        departed_nations = Recruitment.all_nations.difference(set(recruitssoup.nations.text.split(':')))
-                        if Recruitment.new_nations:
-                            for n in Recruitment.new_nations:
+                        # the new nations are set and parsed
+                        self.new_nations = set(new_nations_soup.nations.text.split(':')).difference(
+                            self.all_nations)
+                        # parses departed nations
+                        departed_nations = self.all_nations.difference(set(new_nations_soup.nations.text.split(':')))
+                        # for every new nation, send a notification
+                        if self.new_nations:
+                            for n in self.new_nations:
                                 notif = await recruitment_channel.send(
                                     f"A new nation has arrived, {notifrole.mention}!"
                                     f"\nhttps://www.nationstates.net/nation={n}")
                                 await notif.add_reaction("\U0001f4ec")
+                        # for every nation in departed nations, send notification
                         if departed_nations:
                             for n in departed_nations:
                                 async with session.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={n}",
                                                        headers=headers) as exist:
+                                    # ratelimiter
+                                    while True:
+                                        # see if there are enough available calls. if so, break the loop
+                                        try:
+                                            await self.rate_limit.call()
+                                            break
+                                        # if there are not enough available calls, continue the loop
+                                        except TooManyRequests as error:
+                                            await asyncio.sleep(int(str(error)))
+                                            continue
                                     try:
                                         exist.raise_for_status()
                                     except Exception:
                                         continue
+                                # define and send notification
                                 notif = await recruitment_channel.send(f"A nation has departed, {notifrole.mention}!"
                                                                        f"\nhttps://www.nationstates.net/nation={n}")
                                 await notif.add_reaction("\U0001f4ec")
-                        Recruitment.all_nations = set(recruitssoup.nations.text.split(':'))
+                        # set all nations to the new nations and sleep 5 minutes
+                        self.all_nations = set(new_nations_soup.nations.text.split(':'))
                         await asyncio.sleep(300)
                         continue
             except Exception as error:
@@ -162,12 +197,16 @@ class Recruitment(commands.Cog):
 
         async def world_assembly_notification(bot):
             try:
+                # wait until the bot is ready
                 await bot.wait_until_ready()
+                # define channels
                 wa_pings = bot.get_channel(676437972819640357)
                 crashchannel = bot.get_channel(835579413625569322)
                 thegye_server = bot.get_guild(674259612580446230)
                 wa_role = thegye_server.get_role(674283915870994442)
+                # notify crash channel
                 await crashchannel.send("Starting WA notification loop.")
+                # connect to API
                 async with aiohttp.ClientSession() as session:
                     headers = {"User-Agent": "Bassiliya"}
                     params = {'q': 'nations',
@@ -177,44 +216,89 @@ class Recruitment(commands.Cog):
                     async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                            headers=headers, params=params) as nationsresp:
                         nations = await nationsresp.text()
-                        await asyncio.sleep(.6)
+                        # ratelimiter
+                        while True:
+                            # see if there are enough available calls. if so, break the loop
+                            try:
+                                await self.rate_limit.call()
+                                break
+                            # if there are not enough available calls, continue the loop
+                            except TooManyRequests as error:
+                                await asyncio.sleep(int(str(error)))
+                                continue
+                    # parse out nations
                     nationsoup = BeautifulSoup(nations, 'lxml')
                     nations = set(nationsoup.nations.text.split(':'))
                     async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                            headers=headers, params=waparams) as membersresp:
                         members = await membersresp.text()
-                        await asyncio.sleep(.6)
+                        # ratelimiter
+                        while True:
+                            # see if there are enough available calls. if so, break the loop
+                            try:
+                                await self.rate_limit.call()
+                                break
+                            # if there are not enough available calls, continue the loop
+                            except TooManyRequests as error:
+                                await asyncio.sleep(int(str(error)))
+                                continue
+                    # parse out wa members
                     membersoup = BeautifulSoup(members, 'lxml')
                     members = set(membersoup.members.text.split(','))
-                    Recruitment.all_wa = nations.intersection(members)
+                    self.all_wa = nations.intersection(members)
+                    # start loop
                     while True:
                         async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                                headers=headers, params=params) as nationsresp:
                             nations = await nationsresp.text()
-                            await asyncio.sleep(.6)
+                            # ratelimiter
+                            while True:
+                                # see if there are enough available calls. if so, break the loop
+                                try:
+                                    await self.rate_limit.call()
+                                    break
+                                # if there are not enough available calls, continue the loop
+                                except TooManyRequests as error:
+                                    await asyncio.sleep(int(str(error)))
+                                    continue
+                        # parse out nations
                         nationsoup = BeautifulSoup(nations, 'lxml')
                         nations = set(nationsoup.nations.text.split(':'))
                         async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                                headers=headers, params=waparams) as membersresp:
                             members = await membersresp.text()
-                            await asyncio.sleep(.6)
+                            # ratelimiter
+                            while True:
+                                # see if there are enough available calls. if so, break the loop
+                                try:
+                                    await self.rate_limit.call()
+                                    break
+                                # if there are not enough available calls, continue the loop
+                                except TooManyRequests as error:
+                                    await asyncio.sleep(int(str(error)))
+                                    continue
                         membersoup = BeautifulSoup(members, 'lxml')
                         members = nations.intersection(set(membersoup.members.text.split(',')))
-                        Recruitment.new_wa = members.difference(Recruitment.all_wa)
-                        if len(members) == len(Recruitment.new_wa):
+                        # find new WA members
+                        self.new_wa = members.difference(self.all_wa)
+                        # if there are no new members, check back in 30 seconds
+                        if len(members) == len(self.new_wa):
                             await asyncio.sleep(30)
                             continue
-                        if Recruitment.new_wa:
+                        # if there are new wa members
+                        if self.new_wa:
+                            # for each new member, send notification
                             for n in Recruitment.new_wa:
                                 wa_notif = await wa_pings.send(f"New World Assembly nation, {wa_role.mention}!"
                                                                f"\nPlease endorse: https://www.nationstates.net/nation={n}.")
                                 await wa_notif.add_reaction("\U0001f310")
-                        Recruitment.all_wa = members
+                        self.all_wa = members
                         await asyncio.sleep(300)
                         continue
             except Exception as error:
                 error_log(error)
 
+        # create 24/7 tasks
         self.monthly_recruiter = asyncio.create_task(monthly_recruiter(bot))
         self.retention = asyncio.create_task(retention(bot))
         self.world_assembly_notification = asyncio.create_task(world_assembly_notification(bot))
@@ -247,10 +331,10 @@ class Recruitment(commands.Cog):
     recruitment_gather_object = None
     loops_gather_object = None
 
-    async def recruitment(self, ctx, template):
+    async def recruitment(self, interaction: discord.Interaction, user, template):
         try:
             # runs the code until the stop command is given
-            author = ctx.author
+            author = interaction.user
             # self.api_loop.cancel()
             while self.running:
                 # call headers
@@ -290,7 +374,7 @@ class Recruitment(commands.Cog):
                         f"https://www.nationstates.net/page=compose_telegram?tgto={recruit_string};"
                         f"message={template}")
                     # send the url and mention the author
-                    await ctx.send(f'{author.mention} {url}')
+                    await interaction.followup.send(f'{author.mention} [{len(self.sending_to)} nation(s)] {url}')
                     # if there is only one nation in the queue, and extra 15 seconds is waited
                     if len(self.sending_to) == 1:
                         await asyncio.sleep(15)
@@ -304,36 +388,36 @@ class Recruitment(commands.Cog):
             return
         except asyncio.CancelledError:
             # send end message
-            await ctx.send("Recruitment stopped. Another link may post.")
+            await interaction.followup.send("Recruitment stopped. Another link may post.")
             # establish connection
             conn = self.bot.pool
             # set running = false
             self.running = False
             # update relevant tables
             await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $1
-             WHERE user_id = $2;''', self.user_sent, ctx.author.id)
+             WHERE user_id = $2;''', self.user_sent, user.id)
             await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
-                               math.floor(self.user_sent/2), ctx.author.id)
+                               math.floor(self.user_sent / 2), author.id)
             await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 WHERE name = 'General Fund';''',
-                               math.floor(self.user_sent/2))
+                               math.floor(self.user_sent / 2))
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                               ctx.author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent/2)} from "
-                                                         f"recruitment.")
+                               author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent / 2)} from "
+                                                     f"recruitment.")
             self.user_sent = 0
         except Exception as error:
             conn = self.bot.pool
             self.running = False
-            await ctx.send("The recruitment bot has run into an issue. Recruitment has stopped.")
+            await interaction.followup.send("The recruitment bot has run into an issue. Recruitment has stopped.")
             # update relevant tables
             await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $1
-             WHERE user_id = $2;''', self.user_sent, ctx.author.id)
+             WHERE user_id = $2;''', self.user_sent, user.id)
             await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
-                               math.floor(self.user_sent/2), ctx.author.id)
+                               math.floor(self.user_sent / 2), user.id)
             await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 WHERE name = 'General Fund';''',
-                               math.floor(self.user_sent/2))
+                               math.floor(self.user_sent / 2))
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                               ctx.author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent/2)} from "
-                                                         f"recruitment.")
+                               user.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent / 2)} from "
+                                                   f"recruitment.")
             self.user_sent = 0
             etype = type(error)
             trace = error.__traceback__
@@ -341,59 +425,61 @@ class Recruitment(commands.Cog):
             traceback_text = ''.join(lines)
             self.bot.logger.warning(msg=f"{traceback_text}")
 
-    async def still_recruiting_check(self, ctx):
+    async def still_recruiting_check(self, interaction: discord.Interaction):
         while self.running:
             # connects to database
             conn = self.bot.pool
+            # defines user
+            user = interaction.user
             # sleep for 10 minutes
-            await asyncio.sleep(600)
+            await asyncio.sleep(5)
             if self.running is False:
                 break
             # sends mesage. if the reaction is hit, recruitment continues
-            msg = await ctx.send(f"Still recruiting,{ctx.author.mention}? Hit the reaction within 3 minutes to "
-                                 f"continue.")
+            msg = await interaction.followup.send(f"Still recruiting,{user.mention}? "
+                                                  f"Hit the reaction within 3 minutes to continue.")
             await msg.add_reaction("\U0001f4e8")
 
             def check(reaction, user):
-                return user == ctx.message.author and str(reaction.emoji) == "\U0001f4e8"
+                return user == user and str(reaction.emoji) == "\U0001f4e8"
 
             try:
                 # if reaction is hit, do nothing
-                await self.bot.wait_for('reaction_add', timeout=180, check=check)
+                await self.bot.wait_for('reaction_add', timeout=1, check=check)
 
             except asyncio.TimeoutError:
                 # if the reaction times out, stop the code
                 self.running = False
                 # updates information
-                userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', ctx.author.id)
+                userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', user.id)
                 await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
-                                   self.user_sent, self.user_sent, ctx.author.id)
+                                   self.user_sent, self.user_sent, user.id)
                 await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
-                                   math.floor(self.user_sent / 2), ctx.author.id)
-                await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 WHERE name = 'General Fund';''',
-                                   math.floor(self.user_sent / 2))
+                                   math.floor(self.user_sent / 2), user.id)
+                await conn.execute(
+                    '''UPDATE funds SET current_funds = current_funds - $1 WHERE name = 'General Fund';''',
+                    math.floor(self.user_sent / 2))
                 await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                   ctx.author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent / 2)} from "
-                                                             f"recruitment.")
+                                   user.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent / 2)} from "
+                                                       f"recruitment.")
                 self.user_sent = 0
                 self.recruitment_gather_object.cancel()
                 break
 
-    @commands.command(brief="Adds or removes the recruiter role")
-    @commands.guild_only()
-    @commands.has_role(674260547897917460)
-    async def recruiter(self, ctx):
-        recruiterrole = ctx.guild.get_role(674339578102153216)
+    @app_commands.command(name="recruiter", description="Adds or removes the recruiter role.")
+    @app_commands.guild_only()
+    @app_commands.checks.has_role(674260547897917460)
+    async def recruiter(self, interaction: discord.Interaction):
+        # defer interation
+        await interaction.response.defer(thinking=False)
+        # define role, channel, and author
+        recruiterrole = interaction.guild.get_role(674339578102153216)
         channel = self.bot.get_channel(674342850296807454)
-        author = ctx.author
-        # gets all author roles
-        authorroles = list()
-        for ar in ctx.message.author.roles:
-            authorroles.append(ar.id)
+        author = interaction.user
         # if the Recruiter role is not in the author roles, will add
-        if recruiterrole.id not in authorroles:
+        if recruiterrole not in author.roles:
             await author.add_roles(recruiterrole)
-            await ctx.send("Role added.")
+            await interaction.followup.send("Role added.")
             # sends message to new recruiter with mention
             await channel.send(f"**INSTRUCTIONS FOR BOT USE** \n- Follow the instructions for creating a template to "
                                f"send as recruitment in the pins. Once you have gotten your template, copy the ID. It "
@@ -408,37 +494,39 @@ class Recruitment(commands.Cog):
                                f"simply type `$help Recruitment`. If you would like to re-read these instructions, "
                                f"use the `$instructions` command to review them. Happy recruiting, {author.mention}!")
         # if the Recruiter role is in the author roles, will remove
-        if recruiterrole.id in authorroles:
+        if recruiterrole in author.roles:
             await author.remove_roles(recruiterrole)
-            await ctx.send("Role removed.")
+            await interaction.followup.send("Role removed.")
 
-    @commands.command(brief="Begins the recruitment process")
-    @commands.guild_only()
+    @app_commands.command(name="recruit", description="Starts recruitment.")
+    @app_commands.guild_only()
     @RecruitmentCheck()
-    async def recruit(self, ctx):
+    async def recruit(self, interaction: discord.Interaction):
+        # defers interaction
+        await interaction.response.defer(thinking=True)
         # checks status
         if self.running:
-            waiting = discord.utils.get(ctx.guild.emojis, name="itsaguywaiting")
-            already = await ctx.send("Someone is already recruiting! Wait for them to finish first.")
+            waiting = discord.utils.get(interaction.guild.emojis, name="itsaguywaiting")
+            already = await interaction.followup.send("Someone is already recruiting! Wait for them to finish first.")
             await already.add_reaction(waiting)
             return
         # connects to database
         conn = self.bot.pool
-        author = ctx.author
+        author = interaction.user
         # fetches template
         recruiter = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', author.id)
         # if the user is not registered
         if recruiter is None:
-            await ctx.send("User not registered.")
+            await interaction.followup.send("User not registered.")
             return
         # gathers the template, beings the code
         template = recruiter['template']
         self.running = True
         self.user_sent = 0
-        await ctx.send("Gathering...")
+        user = interaction.user
         # gathers two asyncio functions together to run simultaneously
-        self.recruitment_gather_object = asyncio.gather(self.recruitment(ctx, template),
-                                                        self.still_recruiting_check(ctx))
+        self.recruitment_gather_object = asyncio.gather(self.recruitment(interaction, user, template),
+                                                        self.still_recruiting_check(interaction))
 
     @commands.command(brief="Stops the recruitment process")
     @commands.guild_only()

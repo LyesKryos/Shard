@@ -28,7 +28,6 @@ class Verification(commands.Cog):
         to_regex = userinput.replace(" ", "_")
         return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
 
-
     async def daily_check(self):
         try:
             # establishes connection
@@ -56,7 +55,7 @@ class Verification(commands.Cog):
                 else:
                     # sets time to be 3:30 on the next day
                     try:
-                        next_run = now.replace(day=now.day+1, hour=3, minute=30, second=0)
+                        next_run = now.replace(day=now.day + 1, hour=3, minute=30, second=0)
                     # if there is a value error, the month is probably whacked up
                     except ValueError:
                         next_run = now.replace(day=1, month=now.month + 1, hour=3, minute=30, second=0)
@@ -714,7 +713,6 @@ class Verification(commands.Cog):
                                     await member.add_roles(traveler_role)
                                     await member.remove_roles(cte_role)
         await ctx.send(f"{thegye_server.member_count} users checked and roles updated.")
-
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
