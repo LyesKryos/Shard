@@ -331,7 +331,8 @@ class Recruitment(commands.Cog):
     recruitment_gather_object = None
     loops_gather_object = None
 
-    async def recruitment(self, interaction: discord.Interaction, user, channel: discord.Interaction.channel, template):
+    async def recruitment_program(self, interaction: discord.Interaction, user,
+                                  channel: discord.Interaction.channel, template):
         try:
             # runs the code until the stop command is given
             author = interaction.user
@@ -465,7 +466,10 @@ class Recruitment(commands.Cog):
                 self.recruitment_gather_object.cancel()
                 break
 
-    @app_commands.command(name="recruiter", description="Adds or removes the recruiter role.")
+    # creates recruitment group
+    recruitment = app_commands.Group(name="recruitment", description="...")
+
+    @recruitment.command(name="recruiter", description="Adds or removes the recruiter role.")
     @app_commands.guild_only()
     @app_commands.checks.has_role(674260547897917460)
     async def recruiter(self, interaction: discord.Interaction):
@@ -497,7 +501,7 @@ class Recruitment(commands.Cog):
             await author.remove_roles(recruiterrole)
             await interaction.followup.send("Role removed.")
 
-    @app_commands.command(name="recruit", description="Starts recruitment.")
+    @recruitment.command(name="recruit", description="Starts recruitment.")
     @app_commands.guild_only()
     @RecruitmentCheck()
     async def recruit(self, interaction: discord.Interaction):
@@ -525,12 +529,12 @@ class Recruitment(commands.Cog):
         user = interaction.user
         channel = interaction.channel
         # gathers two asyncio functions together to run simultaneously
-        self.recruitment_gather_object = asyncio.gather(self.recruitment(interaction=interaction, user=user,
-                                                                         channel=channel, template=template),
+        self.recruitment_gather_object = asyncio.gather(self.recruitment_program(interaction=interaction, user=user,
+                                                                                 channel=channel, template=template),
                                                         self.still_recruiting_check(interaction=interaction,
                                                                                     channel=channel))
 
-    @app_commands.command(name="stop", description="Stops recruitment.")
+    @recruitment.command(name="stop", description="Stops recruitment.")
     @app_commands.guild_only()
     @RecruitmentCheck()
     async def stop(self, ctx):
@@ -558,7 +562,7 @@ class Recruitment(commands.Cog):
         elif self.running is False:
             await ctx.send("Recruitment is not running.")
 
-    @app_commands.command(name="sent", description="Displays the amount of sent telegrams of a specified user")
+    @recruitment.command(name="sent", description="Displays the amount of sent telegrams of a specified user")
     @app_commands.guild_only()
     @RecruitmentCheck()
     async def sent(self, interaction: discord.Interaction, user: discord.User = None, global_sent: bool = None):
@@ -600,7 +604,7 @@ class Recruitment(commands.Cog):
                 f"have been sent this month.")
             return
 
-    @app_commands.command(name="rank", description="Displays the all time or monthly ranks.")
+    @recruitment.command(name="rank", description="Displays the all time or monthly ranks.")
     @app_commands.guild_only()
     @RecruitmentCheck()
     async def rank(self, interaction: discord.Interaction, monthly: bool = None):
@@ -634,7 +638,7 @@ class Recruitment(commands.Cog):
                 rank += 1
             return await interaction.followup.send(f"{ranksstr}")
 
-    @app_commands.command(name="register", description="Registers a user and a template")
+    @recruitment.command(name="register", description="Registers a user and a template")
     @app_commands.guild_only()
     @RecruitmentCheck()
     async def register(self, interaction: discord.Interaction, template_id: str):
@@ -652,7 +656,7 @@ class Recruitment(commands.Cog):
         await conn.execute('''INSERT INTO recruitment(user_id, template) VALUES($1, $2);''', author.id, template_id)
         await interaction.followup.send(f"Registered successfully with template ID: `{template_id}`.")
 
-    @app_commands.command(name="edit_template", description="Edits an existing template.")
+    @recruitment.command(name="edit_template", description="Edits an existing template.")
     @app_commands.guild_only()
     @RecruitmentCheck()
     async def edit_template(self, interaction: discord.Interaction, template_id: str):
@@ -671,7 +675,7 @@ class Recruitment(commands.Cog):
         await conn.execute('''UPDATE recruitment SET template = $2 WHERE user_id = $1;''', author.id, template_id)
         await interaction.followup.send(f"Template ID for {author} set to `{template_id}` successfully.")
 
-    @app_commands.command(name="view_template", description="Displays a user's template")
+    @recruitment.command(name="view_template", description="Displays a user's template")
     @app_commands.guild_only()
     @RecruitmentCheck()
     async def view_template(self, interaction: discord.Interaction):
