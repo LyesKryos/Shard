@@ -402,7 +402,7 @@ class Recruitment(commands.Cog):
                                math.floor(self.user_sent / 2))
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                user.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent / 2)} from "
-                                                     f"recruitment.")
+                                                   f"recruitment.")
             self.user_sent = 0
         except Exception as error:
             conn = self.bot.pool
@@ -502,7 +502,7 @@ class Recruitment(commands.Cog):
     @RecruitmentCheck()
     async def recruit(self, interaction: discord.Interaction):
         # defers interaction
-        await interaction.response.defer(thinking=True)
+        await interaction.response.defer(thinking=False)
         # checks status
         if self.running:
             waiting = discord.utils.get(interaction.guild.emojis, name="itsaguywaiting")
@@ -530,8 +530,8 @@ class Recruitment(commands.Cog):
                                                         self.still_recruiting_check(interaction=interaction,
                                                                                     channel=channel))
 
-    @commands.command(brief="Stops the recruitment process")
-    @commands.guild_only()
+    @app_commands.command(name="stop", description="Stops recruitment.")
+    @app_commands.guild_only()
     @RecruitmentCheck()
     async def stop(self, ctx):
         # if the recruitment is not running
@@ -558,27 +558,36 @@ class Recruitment(commands.Cog):
         elif self.running is False:
             await ctx.send("Recruitment is not running.")
 
-    @commands.command(usage="<(user, global)>",
-                      brief="Displays sent information for a specified user, the requesting user, or all sent telegrams")
-    @commands.guild_only()
+    @app_commands.command(name="sent", description="Displays the amount of sent telegrams of a specified user")
+    @app_commands.guild_only()
     @RecruitmentCheck()
-    async def sent(self, ctx, *, args=None):
-        # fetches the sent amount of the specified user
-        author = ctx.author
+    async def sent(self, interaction: discord.Interaction, user: discord.User = None, global_sent: bool = None):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
         # connects to database
         conn = self.bot.pool
         # if the call is for the author
-        if args is None:
+        if user is None:
+            author = interaction.user
             # fetches relevant user data
             userinfo = await conn.fetchrow('''SELECT sent FROM recruitment WHERE user_id = $1;''', author.id)
             sent = userinfo['sent']
             if sent is None:
-                await ctx.send("You are not registered.")
+                await interaction.followup.send("You are not registered.")
             # sends amount
-            await ctx.send(f"{author} has sent {sent} telegrams.")
+            await interaction.followup.send(f"{author} has sent {sent:,} telegrams.")
             return
-        elif args == "global":
-            # fetches relevant user data
+        else:
+            # connects to the database
+            conn = self.bot.pool  # fetches relevant user data and sends it
+            userinfo = await conn.fetchrow('''SELECT sent FROM recruitment WHERE user_id = $1;''', user.id)
+            sent = userinfo['sent']
+            if sent is None:
+                await interaction.followup.send(f"{user.display_name} is not registered.")
+                return
+            await interaction.followup.send(f"{user} has sent {sent:,} telegrams.")
+        if global_sent is True:
+            # fetches relevant data
             allsent = await conn.fetch('''SELECT sent, sent_this_month FROM recruitment;''')
             totalsent = 0
             monthlytotal = 0
@@ -586,27 +595,15 @@ class Recruitment(commands.Cog):
                 totalsent += s['sent']
                 monthlytotal += s['sent_this_month']
             # sends amount
-            await ctx.send(
+            await interaction.followup.send(
                 f"A total of {totalsent:,} telegrams have been sent.\nA total of {monthlytotal:,} telegrams "
                 f"have been sent this month.")
             return
-        elif args is not None:
-            # fetches the user object via the converter
-            user = args
-            user = await commands.converter.MemberConverter().convert(ctx, user)
-            # connects to the database
-            conn = self.bot.pool  # fetches relevant user data and sends it
-            userinfo = await conn.fetchrow('''SELECT sent FROM recruitment WHERE user_id = $1;''', user.id)
-            sent = userinfo['sent']
-            if sent is None:
-                await ctx.send(f"{user.display_name} is not registered.")
-                return
-            await ctx.send(f"{user} has sent {sent} telegrams.")
 
-    @commands.command(usage="<m>", brief="Displays the all time or monthly ranks")
-    @commands.guild_only()
+    @app_commands.command(name="rank", description="Displays the all time or monthly ranks.")
+    @app_commands.guild_only()
     @RecruitmentCheck()
-    async def rank(self, ctx, monthly: str = None):
+    async def rank(self, interaction: discord.Interaction, monthly: bool = None):
         # connects to the database
         conn = self.bot.pool
         # if the user wants the regular ranks
@@ -622,9 +619,9 @@ class Recruitment(commands.Cog):
                 userstring = f"**{rank}.** {self.bot.get_user(ranks['user_id'])}: {ranks['sent']:,}\n"
                 ranksstr += userstring
                 rank += 1
-            return await ctx.send(f"{ranksstr}")
+            return await interaction.followup.send(f"{ranksstr}")
         # if the user wants the sent monthly list
-        elif monthly in ['m', 'month', 'monthly']:
+        if monthly is True:
             # fetches relevant user data, sorted by 'sent_this_month`
             userinfo = await conn.fetch('''SELECT * FROM recruitment WHERE sent_this_month > 0 
             ORDER BY sent_this_month DESC LIMIT 10;''')
@@ -635,50 +632,52 @@ class Recruitment(commands.Cog):
                 userstring = f"**{rank}.** {self.bot.get_user(ranks['user_id'])}: {ranks['sent_this_month']:,}\n"
                 ranksstr += userstring
                 rank += 1
-            await ctx.send(f"{ranksstr}")
-            return
-        else:
-            raise commands.UserInputError()
+            return await interaction.followup.send(f"{ranksstr}")
 
-    @commands.command(usage='[template id]', brief="Registers a user and a template")
-    @commands.guild_only()
+    @app_commands.command(name="register", description="Registers a user and a template")
+    @app_commands.guild_only()
     @RecruitmentCheck()
-    async def register(self, ctx, templateid):
-        author = ctx.author
+    async def register(self, interaction: discord.Interaction, template_id: str):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        author = interaction.user
         # connects to the database
         conn = self.bot.pool
         # fetches data to ensure that the user doesn't exist
         exist = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', author.id)
         # if the user already exists
         if exist is not None:
-            await ctx.send("You are already registered!")
-            return
+            return await interaction.followup.send("You are already registered!")
         # inserts data into database
-        await conn.execute('''INSERT INTO recruitment(user_id, template) VALUES($1, $2);''', author.id, templateid)
-        await ctx.send(f"Registered successfully with template ID: `{templateid}`.")
+        await conn.execute('''INSERT INTO recruitment(user_id, template) VALUES($1, $2);''', author.id, template_id)
+        await interaction.followup.send(f"Registered successfully with template ID: `{template_id}`.")
 
-    @commands.command(usage='[template id]', brief="Edits an existing template")
-    @commands.guild_only()
+    @app_commands.command(name="edit_template", description="Edits an existing template.")
+    @app_commands.guild_only()
     @RecruitmentCheck()
-    async def edit_template(self, ctx, templateid):
-        author = ctx.author
+    async def edit_template(self, interaction: discord.Interaction, template_id: str):
+        # defer response
+        await interaction.response.defer(thinking=True)
+        author = interaction.user
         # connects to database
         conn = self.bot.pool
         # checks for user existance
         exist = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', author.id)
         # if the user does not exist
         if exist is None:
-            await ctx.send("You are not registered!")
+            await interaction.followup.send("You are not registered!")
             return
         # updates the template
-        await conn.execute('''UPDATE recruitment SET template = $2 WHERE user_id = $1;''', author.id, templateid)
-        await ctx.send(f"Template ID for {author} set to `{templateid}` successfully.")
+        await conn.execute('''UPDATE recruitment SET template = $2 WHERE user_id = $1;''', author.id, template_id)
+        await interaction.followup.send(f"Template ID for {author} set to `{template_id}` successfully.")
 
-    @commands.command(brief="Displays a user's template")
-    @commands.guild_only()
+    @app_commands.command(name="view_template", description="Displays a user's template")
+    @app_commands.guild_only()
     @RecruitmentCheck()
-    async def view_template(self, ctx):
-        author = ctx.author
+    async def view_template(self, interaction: discord.Interaction):
+        # defer response
+        await interaction.response.defer(thinking=True)
+        author = interaction.user
         # connects to database
         conn = self.bot.pool
         try:
@@ -686,21 +685,17 @@ class Recruitment(commands.Cog):
             template = await conn.fetchrow('''SELECT template FROM recruitment WHERE user_id = $1;''', author.id)
             # if the user does not exist
             if template is None:
-                await ctx.send("You are not registered!")
-
-                return
+                return await interaction.followup.send("You are not registered!")
             # sends relevant data, along with access link
             template = template['template']
             templateid = re.findall(r"\d+", template)
             templateid = list(map(int, templateid))
-            await ctx.send(f"{author.name}'s template is {template}.\n"
+            await interaction.followup.send(f"{author.name}'s template is {template}.\n"
                            f"The telegram template can be found here: "
                            f"https://www.nationstates.net/page=tg/tgid={templateid[0]}")
             return
         except Exception as error:
-            await ctx.send(error)
-
-            return
+            self.error_handler(error)
 
     @commands.command(brief="Generates a WA campaign")
     @commands.guild_only()
