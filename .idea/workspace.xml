@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing visual commas">
-      <change beforePath="$PROJECT_DIR$/cogs/ns.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/ns.py" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding relative timestamp to region command">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,14 +118,8 @@
       <workItem from="1678819823954" duration="98671000" />
       <workItem from="1679659589295" duration="9232000" />
       <workItem from="1679682470900" duration="29539000" />
-      <workItem from="1680142938087" duration="7199000" />
-    </task>
-    <task id="LOCAL-00565" summary="Fixing portfolio to show quote bar">
-      <created>1679684687216</created>
-      <option name="number" value="00565" />
-      <option name="presentableId" value="LOCAL-00565" />
-      <option name="project" value="LOCAL" />
-      <updated>1679684687216</updated>
+      <workItem from="1680142938087" duration="10169000" />
+      <workItem from="1680568682352" duration="302000" />
     </task>
     <task id="LOCAL-00566" summary="Fixing things">
       <created>1679767126292</created>
@@ -462,7 +457,14 @@
       <option name="project" value="LOCAL" />
       <updated>1680354501896</updated>
     </task>
-    <option name="localTasksCounter" value="614" />
+    <task id="LOCAL-00614" summary="Adding relative timestamp to region command">
+      <created>1680358582543</created>
+      <option name="number" value="00614" />
+      <option name="presentableId" value="LOCAL-00614" />
+      <option name="project" value="LOCAL" />
+      <updated>1680358582543</updated>
+    </task>
+    <option name="localTasksCounter" value="615" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -480,7 +482,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing opening an investment account" />
     <MESSAGE value="Updating force bank update" />
     <MESSAGE value="Adding loan limit" />
     <MESSAGE value="Changing interest rate display on view_account" />
@@ -505,7 +506,8 @@
     <MESSAGE value="Fixing max and wallet issues" />
     <MESSAGE value="Adding role colors to market" />
     <MESSAGE value="Fixing visual commas" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing visual commas" />
+    <MESSAGE value="Adding relative timestamp to region command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding relative timestamp to region command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

@@ -316,7 +316,7 @@ class Recruitment(commands.Cog):
                                math.floor(self.user_sent/2), ctx.author.id)
             await conn.execute('''UPDATE funds SET general_fund = general_fund - $1 WHERE name = 'General Fund';''',
                                math.floor(self.user_sent/2))
-            await conn.execute('''INSERT INTO rbt_user_logs VALUES($1,$2,$3);''',
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                ctx.author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent/2)} from "
                                                          f"recruitment.")
             self.user_sent = 0
@@ -331,7 +331,7 @@ class Recruitment(commands.Cog):
                                math.floor(self.user_sent/2), ctx.author.id)
             await conn.execute('''UPDATE funds SET general_fund = general_fund - $1 WHERE name = 'General Fund';''',
                                math.floor(self.user_sent/2))
-            await conn.execute('''INSERT INTO rbt_user_logs VALUES($1,$2,$3);''',
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                ctx.author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent/2)} from "
                                                          f"recruitment.")
             self.user_sent = 0
@@ -367,14 +367,12 @@ class Recruitment(commands.Cog):
                 # updates information
                 userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', ctx.author.id)
                 await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
-                                   (self.user_sent + userinfo['sent']),
-                                   (self.user_sent + userinfo['sent_this_month']),
-                                   ctx.author.id)
+                                   self.user_sent, self.user_sent, ctx.author.id)
                 await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                    math.floor(self.user_sent / 2), ctx.author.id)
                 await conn.execute('''UPDATE funds SET general_fund = general_fund - $1 WHERE name = 'General Fund';''',
                                    math.floor(self.user_sent / 2))
-                await conn.execute('''INSERT INTO rbt_user_logs VALUES($1,$2,$3);''',
+                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                    ctx.author.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent / 2)} from "
                                                              f"recruitment.")
                 self.user_sent = 0
@@ -436,6 +434,7 @@ class Recruitment(commands.Cog):
         # gathers the template, beings the code
         template = recruiter['template']
         self.running = True
+        self.user_sent = 0
         await ctx.send("Gathering...")
         # gathers two asyncio functions together to run simultaneously
         self.recruitment_gather_object = asyncio.gather(self.recruitment(ctx, template),
@@ -449,17 +448,13 @@ class Recruitment(commands.Cog):
         if self.running is False:
             await ctx.send("Recruitment is not running.")
             return
-        author = ctx.author
         # sets the running to false, quitting the loops
         self.running = False
         # connects to database
         conn = self.bot.pool
-        # fetches relevant user info
-        userinfo = await conn.fetchrow('''SELECT * FROM recruitment WHERE user_id = $1;''', author.id)
         # updates relevant user info
-        await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
-                           (self.user_sent + userinfo['sent']), (self.user_sent + userinfo['sent_this_month']),
-                           ctx.author.id)
+        await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $2 
+        WHERE user_id = $3;''', self.user_sent, self.user_sent, ctx.author.id)
         self.recruitment_gather_object.cancel()
         return
 
@@ -537,9 +532,7 @@ class Recruitment(commands.Cog):
                 userstring = f"**{rank}.** {self.bot.get_user(ranks['user_id'])}: {ranks['sent']:,}\n"
                 ranksstr += userstring
                 rank += 1
-            await ctx.send(f"{ranksstr}")
-
-            return
+            return await ctx.send(f"{ranksstr}")
         # if the user wants the sent monthly list
         elif monthly in ['m', 'month', 'monthly']:
             # fetches relevant user data, sorted by 'sent_this_month`
