@@ -452,8 +452,8 @@ class Recruitment(commands.Cog):
                 # if the reaction times out, stop the code
                 self.running = False
                 # updates information
-                await conn.execute('''UPDATE recruitment SET sent = $1, sent_this_month = $2 WHERE user_id = $3;''',
-                                   self.user_sent, self.user_sent, user.id)
+                await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month = $2 
+                WHERE user_id = $3;''', self.user_sent, self.user_sent, user.id)
                 await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
                                    math.floor(self.user_sent / 2), user.id)
                 await conn.execute(
