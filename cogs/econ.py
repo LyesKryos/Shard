@@ -2239,17 +2239,6 @@ class Economy(commands.Cog):
             wallet_contents = 0
         else:
             wallet_contents = wallet_contents['sum']
-        if wallet_contents + amount > rbt_member['wallet']:
-            if type(amount) != int:
-                if amount.lower() == "max":
-                    amount = int(rbt_member['wallet']) - wallet_contents
-                else:
-                    return await interaction.followup.send(
-                        f"`{amount}` is not a valid argument for this command.")
-            else:
-                return await interaction.followup.send(f"Your wallet (size: {rbt_member['wallet']:,}) "
-                                                       f"does not have enough room to buy {amount:,} "
-                                                       f"shares of {stock['name']}.")
         # if the amount is maximum, calculate how much the user can purchase
         if type(amount) == str:
             if amount.lower() != "max":
@@ -2260,6 +2249,8 @@ class Economy(commands.Cog):
                 tax = .01
             sub_total = round(base_price + tax, 2)
             amount = math.floor(rbt_member['funds'] / sub_total)
+            if amount + wallet_contents > rbt_member['wallet']:
+                amount = int(rbt_member['wallet']) - wallet_contents
             # if the user cant afford any
             if amount < 1:
                 return await interaction.followup.send(f"You cannot afford any shares of {stock['name']}.")
@@ -2284,6 +2275,10 @@ class Economy(commands.Cog):
                                                    f"{amount:,} shares of **{stock['name']}** cost "
                                                    f"**{self.thaler}{transaction:,.2f}**, meaning a deficit of "
                                                    f"**{self.thaler}{round(transaction - rbt_member['funds'], 2):,.2f}**.")
+        if wallet_contents + amount > rbt_member['wallet']:
+            return await interaction.followup.send(f"Your wallet (size: {rbt_member['wallet']:,}) "
+                                                   f"does not have enough room to buy {amount:,} "
+                                                   f"shares of {stock['name']}.")
         else:
             # remove appropriate funds from user
             await conn.execute('''UPDATE rbt_users SET funds = ROUND(funds::numeric - $1, 2) WHERE user_id = $2;''',

@@ -608,6 +608,8 @@ class Recruitment(commands.Cog):
     @app_commands.guild_only()
     @RecruitmentCheck()
     async def rank(self, interaction: discord.Interaction, monthly: bool = None):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
         # connects to the database
         conn = self.bot.pool
         # if the user wants the regular ranks
