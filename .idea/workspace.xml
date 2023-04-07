@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing WA notification">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing recruitment">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,28 +119,7 @@
       <workItem from="1679659589295" duration="9232000" />
       <workItem from="1679682470900" duration="29539000" />
       <workItem from="1680142938087" duration="10169000" />
-      <workItem from="1680568682352" duration="17814000" />
-    </task>
-    <task id="LOCAL-00579" summary="Changing graphs to display minor lines for shorter time">
-      <created>1679866575077</created>
-      <option name="number" value="00579" />
-      <option name="presentableId" value="LOCAL-00579" />
-      <option name="project" value="LOCAL" />
-      <updated>1679866575077</updated>
-    </task>
-    <task id="LOCAL-00580" summary="Fixing market updating">
-      <created>1679962011063</created>
-      <option name="number" value="00580" />
-      <option name="presentableId" value="LOCAL-00580" />
-      <option name="project" value="LOCAL" />
-      <updated>1679962011063</updated>
-    </task>
-    <task id="LOCAL-00581" summary="Portfolio change alteration">
-      <created>1680015704844</created>
-      <option name="number" value="00581" />
-      <option name="presentableId" value="LOCAL-00581" />
-      <option name="project" value="LOCAL" />
-      <updated>1680015704844</updated>
+      <workItem from="1680568682352" duration="18491000" />
     </task>
     <task id="LOCAL-00582" summary="Adding updated loan limits">
       <created>1680016472649</created>
@@ -464,7 +443,28 @@
       <option name="project" value="LOCAL" />
       <updated>1680866985250</updated>
     </task>
-    <option name="localTasksCounter" value="628" />
+    <task id="LOCAL-00628" summary="Fixing recruitment">
+      <created>1680871758721</created>
+      <option name="number" value="00628" />
+      <option name="presentableId" value="LOCAL-00628" />
+      <option name="project" value="LOCAL" />
+      <updated>1680871758721</updated>
+    </task>
+    <task id="LOCAL-00629" summary="Fixing recruitment">
+      <created>1680871900668</created>
+      <option name="number" value="00629" />
+      <option name="presentableId" value="LOCAL-00629" />
+      <option name="project" value="LOCAL" />
+      <updated>1680871900668</updated>
+    </task>
+    <task id="LOCAL-00630" summary="Fixing recruitment">
+      <created>1680871968298</created>
+      <option name="number" value="00630" />
+      <option name="presentableId" value="LOCAL-00630" />
+      <option name="project" value="LOCAL" />
+      <updated>1680871968298</updated>
+    </task>
+    <option name="localTasksCounter" value="631" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -482,7 +482,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding market item command" />
     <MESSAGE value="Changing market to inflate after general fund overdrawn" />
     <MESSAGE value="Making log sending ephemeral" />
     <MESSAGE value="Altering crash chance" />
@@ -507,7 +506,8 @@
     <MESSAGE value="Fixing auto-stopping telegram tracking" />
     <MESSAGE value="Fixing telegram stopping" />
     <MESSAGE value="Fixing WA notification" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing WA notification" />
+    <MESSAGE value="Fixing recruitment" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing recruitment" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
