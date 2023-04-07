@@ -341,6 +341,8 @@ class Recruitment(commands.Cog):
 
     async def recruitment_program(self, interaction: discord.Interaction, user,
                                   channel: discord.Interaction.channel, template):
+        # defer interaction
+        await interaction.response.defer(thinking=False)
         try:
             # runs the code until the stop command is given
             author = interaction.user
