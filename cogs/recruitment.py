@@ -539,7 +539,8 @@ class Recruitment(commands.Cog):
         if self.running is False:
             return await interaction.followup.send("Recruitment is not running.")
         # delete thinking
-        await interaction.followup.delete()
+        message = await interaction.followup.send("Stopping...")
+        await interaction.followup.delete_message(message.id)
         # sets the running to false, quitting the loops
         self.running = False
         self.recruitment_gather_object.cancel()
