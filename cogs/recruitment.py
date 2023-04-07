@@ -228,7 +228,10 @@ class Recruitment(commands.Cog):
                                 continue
                     # parse out nations
                     nationsoup = BeautifulSoup(nations, 'lxml')
-                    nations = set(nationsoup.nations.text.split(':'))
+                    try:
+                        nations = set(nationsoup.nations.text.split(':'))
+                    except AttributeError:
+                        await crashchannel.send(f"Database error on WA .")
                     async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                            headers=headers, params=waparams) as membersresp:
                         members = await membersresp.text()
@@ -263,7 +266,12 @@ class Recruitment(commands.Cog):
                                     continue
                         # parse out nations
                         nationsoup = BeautifulSoup(nations, 'lxml')
-                        nations = set(nationsoup.nations.text.split(':'))
+                        try:
+                            nations = set(nationsoup.nations.text.split(':'))
+                        except AttributeError:
+                            await crashchannel.send(f"Database error. Retrying in 15 minutes.")
+                            await asyncio.sleep(900)
+                            continue
                         async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                                headers=headers, params=waparams) as membersresp:
                             members = await membersresp.text()
