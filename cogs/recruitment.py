@@ -536,6 +536,7 @@ class Recruitment(commands.Cog):
         # if the recruitment is not running
         if self.running is False:
             return await interaction.response.send_message("Recruitment is not running.")
+        await interaction.response.pong()
         # sets the running to false, quitting the loops
         self.running = False
         self.recruitment_gather_object.cancel()
