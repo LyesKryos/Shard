@@ -537,18 +537,21 @@ class Recruitment(commands.Cog):
     @recruitment.command(name="stop", description="Stops recruitment.")
     @app_commands.guild_only()
     @RecruitmentCheck()
-    async def stop(self, ctx):
+    async def stop(self, interaction: discord.Interaction):
+        # defer response
+        await interaction.response.defer(thinking=True)
+        # define author
+        author = interaction.user
         # if the recruitment is not running
         if self.running is False:
-            await ctx.send("Recruitment is not running.")
-            return
+            return await interaction.followup.send("Recruitment is not running.")
         # sets the running to false, quitting the loops
         self.running = False
         # connects to database
         conn = self.bot.pool
         # updates relevant user info
         await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $2 
-        WHERE user_id = $3;''', self.user_sent, self.user_sent, ctx.author.id)
+        WHERE user_id = $3;''', self.user_sent, self.user_sent, author.id)
         self.recruitment_gather_object.cancel()
         return
 
