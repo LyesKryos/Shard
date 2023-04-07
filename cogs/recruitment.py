@@ -531,12 +531,15 @@ class Recruitment(commands.Cog):
     @app_commands.guild_only()
     @RecruitmentCheck()
     async def stop(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=False)
         # define author
         author = interaction.user
         # if the recruitment is not running
         if self.running is False:
-            return await interaction.response.send_message("Recruitment is not running.")
-        await interaction.response.pong()
+            return await interaction.followup.send("Recruitment is not running.")
+        # delete thinking
+        await interaction.followup.delete()
         # sets the running to false, quitting the loops
         self.running = False
         self.recruitment_gather_object.cancel()
