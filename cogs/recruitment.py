@@ -522,6 +522,7 @@ class Recruitment(commands.Cog):
         user = interaction.user
         channel = interaction.channel
         # gathers two asyncio functions together to run simultaneously
+        message = await interaction.followup.send("Gathering...")
         self.recruitment_gather_object = asyncio.gather(self.recruitment_program(user=user,
                                                                                  channel=channel, template=template),
                                                         self.still_recruiting_check(user=user,
