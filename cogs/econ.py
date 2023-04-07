@@ -1068,7 +1068,7 @@ class Economy(commands.Cog):
                 current_fund = float(general_fund['current_funds'])
                 fund_limit = float(general_fund['fund_limit'])
                 # if the general fund is near/overdrawn
-                if current_fund <= (.02 * fund_limit):
+                if current_fund <= (.10 * fund_limit):
                     # set new fund to 150% of old fund
                     new_limit = fund_limit * 1.5
                     additional_funds = fund_limit * .5
