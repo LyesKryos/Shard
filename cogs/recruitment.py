@@ -339,13 +339,11 @@ class Recruitment(commands.Cog):
     recruitment_gather_object = None
     loops_gather_object = None
 
-    async def recruitment_program(self, interaction: discord.Interaction, user,
+    async def recruitment_program(self, user,
                                   channel: discord.Interaction.channel, template):
         try:
-            # defer interaction
-            await interaction.response.defer(thinking=False)
             # runs the code until the stop command is given
-            author = interaction.user
+            author = user
             # self.api_loop.cancel()
             while self.running:
                 # call headers
@@ -436,12 +434,8 @@ class Recruitment(commands.Cog):
             traceback_text = ''.join(lines)
             self.bot.logger.warning(msg=f"{traceback_text}")
 
-    async def still_recruiting_check(self, interaction: discord.Interaction, channel):
+    async def still_recruiting_check(self, user, channel):
         while self.running:
-            # connects to database
-            conn = self.bot.pool
-            # defines user
-            user = interaction.user
             # sleep for 10 minutes
             await asyncio.sleep(300)
             if self.running is False:
@@ -528,9 +522,9 @@ class Recruitment(commands.Cog):
         user = interaction.user
         channel = interaction.channel
         # gathers two asyncio functions together to run simultaneously
-        self.recruitment_gather_object = asyncio.gather(self.recruitment_program(interaction=interaction, user=user,
+        self.recruitment_gather_object = asyncio.gather(self.recruitment_program(user=user,
                                                                                  channel=channel, template=template),
-                                                        self.still_recruiting_check(interaction=interaction,
+                                                        self.still_recruiting_check(user=user,
                                                                                     channel=channel))
 
     @recruitment.command(name="stop", description="Stops recruitment.")
