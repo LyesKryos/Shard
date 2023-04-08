@@ -423,7 +423,6 @@ class Recruitment(commands.Cog):
         except Exception as error:
             conn = self.bot.pool
             self.running = False
-            await channel.send("The recruitment bot has run into an issue. Recruitment has stopped.")
             # update relevant tables
             await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $1
              WHERE user_id = $2;''', self.user_sent, user.id)
@@ -434,6 +433,7 @@ class Recruitment(commands.Cog):
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                user.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent / 2)} from "
                                                    f"recruitment.")
+            await channel.send("The recruitment bot has run into an issue. Recruitment has stopped.")
             self.user_sent = 0
             etype = type(error)
             trace = error.__traceback__
@@ -461,8 +461,6 @@ class Recruitment(commands.Cog):
 
             except asyncio.TimeoutError:
                 # if the reaction times out, stop the code
-                self.running = False
-                self.user_sent = 0
                 self.recruitment_gather_object.cancel()
                 break
 
