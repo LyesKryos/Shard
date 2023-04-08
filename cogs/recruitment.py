@@ -396,23 +396,30 @@ class Recruitment(commands.Cog):
                     self.sending_to.clear()
             return
         except asyncio.CancelledError:
-            # send end message
-            await channel.send("Recruitment stopped. Another link may post.")
-            # establish connection
-            conn = self.bot.pool
-            # set running = false
-            self.running = False
-            # update relevant tables
-            await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $1
-             WHERE user_id = $2;''', self.user_sent, user.id)
-            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
-                               math.floor(self.user_sent / 2), user.id)
-            await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 WHERE name = 'General Fund';''',
-                               math.floor(self.user_sent / 2))
-            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                               user.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent / 2)} from "
-                                                   f"recruitment.")
-            self.user_sent = 0
+            try:
+                # establish connection
+                conn = self.bot.pool
+                # set running = false
+                self.running = False
+                # update relevant tables
+                await conn.execute('''UPDATE recruitment SET sent = sent + $1, sent_this_month = sent_this_month + $1
+                 WHERE user_id = $2;''', self.user_sent, user.id)
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                                   math.floor(self.user_sent / 2), user.id)
+                await conn.execute('''UPDATE funds SET current_funds = current_funds - $1 WHERE name = 'General Fund';''',
+                                   math.floor(self.user_sent / 2))
+                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                   user.id, 'payroll', f"Earned \u20B8{math.floor(self.user_sent / 2)} from "
+                                                       f"recruitment.")
+                self.user_sent = 0
+                # send end message
+                await channel.send("Recruitment stopped. Another link may post.")
+            except Exception as error:
+                etype = type(error)
+                trace = error.__traceback__
+                lines = traceback.format_exception(etype, error, trace)
+                traceback_text = ''.join(lines)
+                self.bot.logger.warning(msg=f"{traceback_text}")
         except Exception as error:
             conn = self.bot.pool
             self.running = False
