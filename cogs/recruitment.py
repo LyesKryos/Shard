@@ -437,7 +437,7 @@ class Recruitment(commands.Cog):
     async def still_recruiting_check(self, user, channel):
         while self.running:
             # sleep for 10 minutes
-            await asyncio.sleep(300)
+            await asyncio.sleep(5)
             if self.running is False:
                 break
             # sends message. if the reaction is hit, recruitment continues
@@ -450,7 +450,7 @@ class Recruitment(commands.Cog):
 
             try:
                 # if reaction is hit, do nothing
-                await self.bot.wait_for('reaction_add', timeout=180, check=check)
+                await self.bot.wait_for('reaction_add', timeout=5, check=check)
 
             except asyncio.TimeoutError:
                 # if the reaction times out, stop the code
