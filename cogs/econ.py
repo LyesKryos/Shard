@@ -1884,7 +1884,7 @@ class Economy(commands.Cog):
                 else:
                     crash_chance = uniform(1, 100)
                     if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
-                        crash_chance += float(stock_sum['sum']) / int(stock_count['count'])
+                        crash_chance -= float(stock_sum['sum']) / int(stock_count['count'])
                     if crash_chance <= 1:
                         if self.crash is False:
                             await conn.execute('''UPDATE stocks 
