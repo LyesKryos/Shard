@@ -1878,9 +1878,9 @@ class Economy(commands.Cog):
                         change = ROUND(value*1.25::numeric-value::numeric, 2) - 1;''')
                     else:
                         await conn.execute('''UPDATE stocks SET value = ROUND((value*.25)::numeric, 2), 
-                        change = ROUND(value*.25::numeric-value::numeric, 2) - 1;''')
+                        change = ROUND(value-RANDOM()*(10-1)+1::numeric-value::numeric, 2) - 1, trending = 'down';''')
                         self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
-                                             "All stock values are decreased by 75%.\n"
+                                             "All stock values are decreased and are trending down.\n"
                 else:
                     crash_chance = uniform(1, 100)
                     if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
@@ -1889,9 +1889,9 @@ class Economy(commands.Cog):
                         if self.crash is False:
                             await conn.execute('''UPDATE stocks 
                                 SET value = round((value * .25)::numeric, 2), trending = 'down', 
-                                change = ROUND(value*.25::numeric-value::numeric, 2) - 1;''')
+                                change = ROUND(value-RANDOM()*(25-5)+5::numeric-value::numeric, 2) - 1;''')
                             self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
-                                                 "All stock values are decreased by 75% and begun trending down.\n "
+                                                 "All stock values are decreased and begun trending down.\n "
                             self.crash = True
                 # update stocks' value tracker
                 await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
@@ -3152,6 +3152,21 @@ class Economy(commands.Cog):
         WHERE name = 'General Fund';''')
         await conn.execute('''UPDATE funds SET current_funds = 50000 WHERE name = 'Investment Fund';''')
         await ctx.send("Done!")
+
+    @commands.command()
+    @commands.is_owner()
+    async def revert_stocks(self, ctx, timestamp):
+        # establish connection
+        conn = self.bot.pool
+        # fetch all stock data from the log
+        stock_data = await conn.fetch('''SELECT * FROM exchange_log WHERE timestamp = $1;''', timestamp)
+        # parse all data
+        for stock in stock_data:
+            await conn.execute('''UPDATE stocks SET value = $1, trending = $2 WHERE stock_id = $3;''',
+                               stock['value'], stock['trend'], stock['stock_id'])
+        await ctx.send("Done!")
+
+
 
 
 async def setup(bot: Shard):
