@@ -3158,6 +3158,8 @@ class Economy(commands.Cog):
     async def revert_stocks(self, ctx, timestamp):
         # establish connection
         conn = self.bot.pool
+        # convert to time
+        timestamp = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S.%f")
         # fetch all stock data from the log
         stock_data = await conn.fetch('''SELECT * FROM exchange_log WHERE timestamp = $1;''', timestamp)
         # parse all data
