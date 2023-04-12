@@ -1875,7 +1875,7 @@ class Economy(commands.Cog):
                         await conn.execute('''UPDATE info SET bool = FALSE WHERE name = 'rbt_crash';''')
                         self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n"
                     else:
-                        for s in stock_count:
+                        for s in stock_count['count']:
                             random_down = uniform(1, 10)
                             await conn.execute('''UPDATE stocks SET value = value - $1, 
                             change = (value - $1)/value, trending = 'down' WHERE stock_id = $2;''', random_down, s)
@@ -1888,7 +1888,7 @@ class Economy(commands.Cog):
                         crash_chance -= float(stock_sum['sum']) / int(stock_count['count'])
                     if crash_chance <= 1:
                         if self.crash is False:
-                            for s in stock_count:
+                            for s in stock_count['count']:
                                 random_down = uniform(10, 25)
                                 await conn.execute('''UPDATE stocks SET value = value - $1, 
                                 change = (value - $1)/value, trending = 'down' WHERE stock_id = $2;''', random_down, s)
@@ -1989,7 +1989,7 @@ class Economy(commands.Cog):
                 await conn.execute('''UPDATE info SET bool = FALSE WHERE name = 'rbt_crash';''')
                 self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n"
             else:
-                for s in stock_count:
+                for s in stock_count['count']:
                     random_down = uniform(1, 10)
                     await conn.execute('''UPDATE stocks SET value = value - $1, 
                     change = (value - $1)/value, trending = 'down' WHERE stock_id = $2;''', random_down, s)
@@ -2002,7 +2002,7 @@ class Economy(commands.Cog):
                 crash_chance -= float(stock_sum['sum']) / int(stock_count['count'])
             if crash_chance <= 1:
                 if self.crash is False:
-                    for s in stock_count:
+                    for s in stock_count['count']:
                         random_down = uniform(10, 25)
                         await conn.execute('''UPDATE stocks SET value = value - $1, 
                         change = (value - $1)/value, trending = 'down' WHERE stock_id = $2;''', random_down, s)
