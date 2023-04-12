@@ -1879,7 +1879,7 @@ class Economy(commands.Cog):
                             random_down = uniform(1, 10)
                             await conn.execute('''UPDATE stocks SET value = value - $1, 
                             change = value - $1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
-                        await conn.execite('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
+                        await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
                         self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
                                              "All stock values continue to decrease and trend down.\n"
                 else:
@@ -1892,7 +1892,7 @@ class Economy(commands.Cog):
                                 random_down = uniform(10, 25)
                                 await conn.execute('''UPDATE stocks SET value = value - $1, 
                                 change = value - $1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
-                            await conn.execite('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
+                            await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
                             self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
                                                  "All stock values are decreased and begun trending down.\n "
                             await conn.execute('''UPDATE info SET bool = TRUE WHERE name = 'rbt_crash';''')
@@ -1993,7 +1993,7 @@ class Economy(commands.Cog):
                     random_down = uniform(1, 10)
                     await conn.execute('''UPDATE stocks SET value = value - $1, 
                     change = value - $1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
-                await conn.execite('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
+                await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
                 self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
                                      "All stock values continue to decrease and trend down.\n"
         else:
@@ -2006,7 +2006,7 @@ class Economy(commands.Cog):
                         random_down = uniform(10, 25)
                         await conn.execute('''UPDATE stocks SET value = value - $1, 
                         change = value - $1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
-                    await conn.execite('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
+                    await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
                     self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
                                          "All stock values are decreased and begun trending down.\n "
                     await conn.execute('''UPDATE info SET bool = TRUE WHERE name = 'rbt_crash';''')
