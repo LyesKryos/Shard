@@ -1992,7 +1992,7 @@ class Economy(commands.Cog):
                 for s in stock_count:
                     random_down = uniform(1, 10)
                     await conn.execute('''UPDATE stocks SET value = value - $1, 
-                    change = value - $1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
+                    change = (value - $1)/value, trending = 'down' WHERE stock_id = $2;''', random_down, s)
                 await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
                 self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
                                      "All stock values continue to decrease and trend down.\n"
@@ -2005,7 +2005,7 @@ class Economy(commands.Cog):
                     for s in stock_count:
                         random_down = uniform(10, 25)
                         await conn.execute('''UPDATE stocks SET value = value - $1, 
-                        change = value - $1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
+                        change = (value - $1)/value, trending = 'down' WHERE stock_id = $2;''', random_down, s)
                     await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
                     self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
                                          "All stock values are decreased and begun trending down.\n "
