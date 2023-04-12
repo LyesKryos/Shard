@@ -118,14 +118,7 @@
       <workItem from="1679659589295" duration="9232000" />
       <workItem from="1679682470900" duration="29539000" />
       <workItem from="1680142938087" duration="10169000" />
-      <workItem from="1680568682352" duration="30696000" />
-    </task>
-    <task id="LOCAL-00603" summary="Fixing graph ticks">
-      <created>1680042771874</created>
-      <option name="number" value="00603" />
-      <option name="presentableId" value="LOCAL-00603" />
-      <option name="project" value="LOCAL" />
-      <updated>1680042771874</updated>
+      <workItem from="1680568682352" duration="31051000" />
     </task>
     <task id="LOCAL-00604" summary="Properly displaying tax on max buy">
       <created>1680143278678</created>
@@ -463,7 +456,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681297897574</updated>
     </task>
-    <option name="localTasksCounter" value="652" />
+    <task id="LOCAL-00652" summary="Fixing change calcuations">
+      <created>1681298089226</created>
+      <option name="number" value="00652" />
+      <option name="presentableId" value="LOCAL-00652" />
+      <option name="project" value="LOCAL" />
+      <updated>1681298089226</updated>
+    </task>
+    <option name="localTasksCounter" value="653" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
