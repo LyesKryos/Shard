@@ -1932,32 +1932,31 @@ class Economy(commands.Cog):
             trending = "up"
             # define value
             value = float(stock['value'])
+            # change chance
+            change_chance = randint(1, 100)
             # calculate trending course if up
             if stock['trending'] == "up":
-                # if the d100 rolls less than the appropriate percent, change
-                change_chance = randint(1, 100)
-                if change_chance <= 5 * stock['risk']:
+                if change_chance <= 25 + (5 * stock['risk']):
                     trending = "down"
                 else:
                     trending = "up"
             # calculate trending course if down
             elif stock['trending'] == "down":
-                # if the d100 rolls less than the appropriate percent, change
-                change_chance = randint(1, 100)
-                if change_chance <= 7 * stock['risk']:
+                if change_chance <= 25 + (5 * stock['risk']):
                     trending = "up"
                 else:
                     trending = "down"
             # calculation: new_value = value + ((percentage increase + outstanding over issued / 10) * value)
-            value_roll = uniform(1, 3 * stock['risk'])
+            value_roll = uniform(0, 2 + stock['risk'])
             # if the trend is up, increase stock based on risk
             if trending == "up":
                 value += round(value_roll + (stock['outstanding'] / stock['issued']), 2)
             else:
                 value -= round(value_roll, 2)
                 # if the value drops below the floor, set it to be 5 - risk
-            if value < (5 - stock['risk']):
-                value = 5 - stock['risk']
+            floor = 15 - uniform(0, stock['risk'])
+            if value < floor:
+                value = floor
             # if the outstanding shares is between 0 and 500 shares away from the total issued shares,
             # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
             if stock['issued'] - stock['outstanding'] < randint(0, 500):
@@ -1967,8 +1966,8 @@ class Economy(commands.Cog):
                     dilution = round(uniform(5 * stock['risk'], 10 * stock['risk']), 2)
                     value = round(value * (clip(dilution, 0, 23) / 100), 2)
                     self.announcement += f"{stock['name']} has been diluted. Issued shares have increased to " \
-                                         f"{new_shares}, and the diluted value is now " \
-                                         f"{self.thaler}{value} per share.\n"
+                                         f"{new_shares:,.0f}, and the diluted value is now " \
+                                         f"{self.thaler}{value:,.2f} per share.\n"
             # update stock information
             await conn.execute('''UPDATE stocks SET value = ROUND($1,2), issued = issued + $2, trending = $3, 
             change = ($1/value)-1 WHERE stock_id = $4;''', value, new_shares, trending, stock['stock_id'])
@@ -1990,32 +1989,33 @@ class Economy(commands.Cog):
                 change = ROUND(value*1.25::numeric-value::numeric, 2) - 1;''')
             else:
                 await conn.execute('''UPDATE stocks SET value = ROUND((value*.25)::numeric, 2), 
-                change = ROUND(value*.25::numeric-value::numeric, 2) - 1;''')
+                change = ROUND(value-RANDOM()*(10-1)+1::numeric-value::numeric, 2) - 1, trending = 'down';''')
                 self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
-                                     "All stock values are decreased by 75%.\n "
-        crash_chance = uniform(1, 100)
-        if stock_sum['sum'] / stock_count['count'] > 10 * stock_count['count']:
-            crash_chance += float(stock_sum['sum']) / int(stock_count['count'])
-        if crash_chance <= 1:
-            if self.crash is False:
-                await conn.execute('''UPDATE stocks 
-                    SET value = round((value * .25)::numeric, 2), trending = 'down', 
-                    change = ROUND(value*.25::numeric-value::numeric, 2) - 1;''')
-                self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
-                                     "All stock values are decreased by 75% and begun trending down.\n "
-                self.crash = True
+                                     "All stock values are decreased and are trending down.\n"
+        else:
+            crash_chance = uniform(1, 100)
+            if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
+                crash_chance -= float(stock_sum['sum']) / int(stock_count['count'])
+            if crash_chance <= 1:
+                if self.crash is False:
+                    await conn.execute('''UPDATE stocks 
+                        SET value = round((value * .25)::numeric, 2), trending = 'down', 
+                        change = ROUND(value-RANDOM()*(25-5)+5::numeric-value::numeric, 2) - 1;''')
+                    self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
+                                         "All stock values are decreased and begun trending down.\n "
+                    self.crash = True
         # update stocks' value tracker
         await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
         SELECT stock_id, value, trending FROM stocks;''')
         # unpin old message
         old_message = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_pinned_message';''')
-        old_message = await bankchannel.fetch_message(int(old_message['bigint']))
+        old_message = await bankchannel.fetch_message(old_message['bigint'])
         await old_message.unpin()
         # announce
         new_announcement = await bankchannel.send(content=self.announcement)
         await new_announcement.pin()
         await conn.execute('''UPDATE info SET bigint = $1 WHERE name = 'rbt_pinned_message';''',
-                           str(new_announcement.id))
+                           new_announcement.id)
         self.announcement = \
             "The Royal Exchange of Thegye has updated. Below is a summary of any important changes:\n"
 
