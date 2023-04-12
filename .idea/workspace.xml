@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing crash mechanic, adding revert command">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating force channel command">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
@@ -119,21 +119,7 @@
       <workItem from="1679659589295" duration="9232000" />
       <workItem from="1679682470900" duration="29539000" />
       <workItem from="1680142938087" duration="10169000" />
-      <workItem from="1680568682352" duration="26286000" />
-    </task>
-    <task id="LOCAL-00596" summary="Making log sending ephemeral">
-      <created>1680034486820</created>
-      <option name="number" value="00596" />
-      <option name="presentableId" value="LOCAL-00596" />
-      <option name="project" value="LOCAL" />
-      <updated>1680034486820</updated>
-    </task>
-    <task id="LOCAL-00597" summary="Altering crash chance">
-      <created>1680034795520</created>
-      <option name="number" value="00597" />
-      <option name="presentableId" value="LOCAL-00597" />
-      <option name="project" value="LOCAL" />
-      <updated>1680034795520</updated>
+      <workItem from="1680568682352" duration="27005000" />
     </task>
     <task id="LOCAL-00598" summary="Keeping loans one-user only">
       <created>1680035942127</created>
@@ -464,7 +450,21 @@
       <option name="project" value="LOCAL" />
       <updated>1681260318635</updated>
     </task>
-    <option name="localTasksCounter" value="645" />
+    <task id="LOCAL-00645" summary="fixing revert command">
+      <created>1681260753820</created>
+      <option name="number" value="00645" />
+      <option name="presentableId" value="LOCAL-00645" />
+      <option name="project" value="LOCAL" />
+      <updated>1681260753820</updated>
+    </task>
+    <task id="LOCAL-00646" summary="Updating force channel command">
+      <created>1681260975454</created>
+      <option name="number" value="00646" />
+      <option name="presentableId" value="LOCAL-00646" />
+      <option name="project" value="LOCAL" />
+      <updated>1681260975454</updated>
+    </task>
+    <option name="localTasksCounter" value="647" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -482,8 +482,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Altering crash chance" />
-    <MESSAGE value="Keeping loans one-user only" />
     <MESSAGE value="Removing loan dropdown" />
     <MESSAGE value="Editing loan dropdown" />
     <MESSAGE value="Fixing graph ticks" />
@@ -507,7 +505,9 @@
     <MESSAGE value="Fixing recruitment" />
     <MESSAGE value="Fixing crash chance increase with high stock value" />
     <MESSAGE value="Fixing crash mechanic, adding revert command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing crash mechanic, adding revert command" />
+    <MESSAGE value="fixing revert command" />
+    <MESSAGE value="Updating force channel command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updating force channel command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

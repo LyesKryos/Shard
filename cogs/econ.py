@@ -1872,27 +1872,28 @@ class Economy(commands.Cog):
                     recovery_chance = uniform(1, 20)
                     if recovery_chance <= 8:
                         self.crash = False
-                        self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n" \
-                                             "Stock prices have recovered by 25%.\n "
-                        await conn.execute('''UPDATE stocks SET value = ROUND((value*1.25)::numeric, 2), 
-                        change = ROUND(value*1.25::numeric-value::numeric, 2) - 1;''')
+                        await conn.execute('''UPDATE info SET bool = FALSE WHERE name = 'rbt_crash';''')
+                        self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n"
                     else:
-                        await conn.execute('''UPDATE stocks SET value = ROUND((value*.25)::numeric, 2), 
-                        change = ROUND(value-RANDOM()*(10-1)+1::numeric-value::numeric, 2) - 1, trending = 'down';''')
+                        for s in stock_count:
+                            random_down = uniform(1, 10)
+                            await conn.execute('''UPDATE stocks SET value = value - $1, 
+                            change = value - $1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
                         self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
-                                             "All stock values are decreased and are trending down.\n"
+                                             "All stock values continue to decrease and trend down.\n"
                 else:
                     crash_chance = uniform(1, 100)
                     if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
                         crash_chance -= float(stock_sum['sum']) / int(stock_count['count'])
                     if crash_chance <= 1:
                         if self.crash is False:
-                            await conn.execute('''UPDATE stocks 
-                                SET value = round((value * .25)::numeric, 2), trending = 'down', 
-                                change = ROUND(value-RANDOM()*(25-5)+5::numeric-value::numeric, 2) - 1;''')
+                            for s in stock_count:
+                                random_down = uniform(10, 25)
+                                await conn.execute('''UPDATE stocks SET value = value - $1, 
+                                change = value - $1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
                             self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
                                                  "All stock values are decreased and begun trending down.\n "
-                            self.crash = True
+                            await conn.execute('''UPDATE info SET bool = TRUE WHERE name = 'rbt_crash';''')
                 # update stocks' value tracker
                 await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
                 SELECT stock_id, value, trending FROM stocks;''')
@@ -1983,27 +1984,28 @@ class Economy(commands.Cog):
             recovery_chance = uniform(1, 20)
             if recovery_chance <= 8:
                 self.crash = False
-                self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n" \
-                                     "Stock prices have recovered by 25%.\n "
-                await conn.execute('''UPDATE stocks SET value = ROUND((value*1.25)::numeric, 2), 
-                change = ROUND(value*1.25::numeric-value::numeric, 2) - 1;''')
+                await conn.execute('''UPDATE info SET bool = FALSE WHERE name = 'rbt_crash';''')
+                self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n"
             else:
-                await conn.execute('''UPDATE stocks SET value = ROUND((value*.25)::numeric, 2), 
-                change = ROUND(value-RANDOM()*(10-1)+1::numeric-value::numeric, 2) - 1, trending = 'down';''')
+                for s in stock_count:
+                    random_down = uniform(1, 10)
+                    await conn.execute('''UPDATE stocks SET value = value - $1, 
+                    change = value - $1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
                 self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
-                                     "All stock values are decreased and are trending down.\n"
+                                     "All stock values continue to decrease and trend down.\n"
         else:
             crash_chance = uniform(1, 100)
             if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
                 crash_chance -= float(stock_sum['sum']) / int(stock_count['count'])
             if crash_chance <= 1:
                 if self.crash is False:
-                    await conn.execute('''UPDATE stocks 
-                        SET value = round((value * .25)::numeric, 2), trending = 'down', 
-                        change = ROUND(value-RANDOM()*(25-5)+5::numeric-value::numeric, 2) - 1;''')
+                    for s in stock_count:
+                        random_down = uniform(10, 25)
+                        await conn.execute('''UPDATE stocks SET value = value - $1, 
+                        change = value - $1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
                     self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
                                          "All stock values are decreased and begun trending down.\n "
-                    self.crash = True
+                    await conn.execute('''UPDATE info SET bool = TRUE WHERE name = 'rbt_crash';''')
         # update stocks' value tracker
         await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
         SELECT stock_id, value, trending FROM stocks;''')
