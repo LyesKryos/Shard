@@ -1869,8 +1869,10 @@ class Economy(commands.Cog):
                 self.crash = crash['bool']
                 # calculate market crash chance
                 if self.crash is True:
-                    recovery_chance = uniform(1, 20)
-                    if recovery_chance <= 8:
+                    recovery_chance = uniform(1, 100)
+                    if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
+                        recovery_chance += float(stock_sum['sum']) / int(stock_count['count'])
+                    if recovery_chance <= 10:
                         self.crash = False
                         await conn.execute('''UPDATE info SET bool = FALSE WHERE name = 'rbt_crash';''')
                         self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n"
@@ -2590,7 +2592,7 @@ class Economy(commands.Cog):
             elif days > 30:
                 ax.xaxis.set_major_locator(DayLocator(interval=10))
             elif days > 10:
-                ax.xaxis.set_major_locator(DayLocator(bymonthday=range(1, end_date.day), interval=3))
+                ax.xaxis.set_major_locator(DayLocator(interval=3))
         else:
             ax.xaxis.set_minor_locator(HourLocator(interval=1))
             plt.grid(True, which="major")
@@ -2730,7 +2732,7 @@ class Economy(commands.Cog):
             elif days > 30:
                 ax.xaxis.set_major_locator(DayLocator(interval=10))
             elif days > 10:
-                ax.xaxis.set_major_locator(DayLocator(bymonthday=range(1, end_date.day), interval=1))
+                ax.xaxis.set_major_locator(DayLocator(interval=3))
         else:
             ax.xaxis.set_minor_locator(HourLocator(interval=1))
             plt.grid(True, which="major")
