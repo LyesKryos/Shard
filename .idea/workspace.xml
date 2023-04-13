@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Playing around with graph">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -119,28 +118,7 @@
       <workItem from="1679659589295" duration="9232000" />
       <workItem from="1679682470900" duration="29539000" />
       <workItem from="1680142938087" duration="10169000" />
-      <workItem from="1680568682352" duration="33442000" />
-    </task>
-    <task id="LOCAL-00607" summary="Adding Ko-fi to the info command">
-      <created>1680179647885</created>
-      <option name="number" value="00607" />
-      <option name="presentableId" value="LOCAL-00607" />
-      <option name="project" value="LOCAL" />
-      <updated>1680179647885</updated>
-    </task>
-    <task id="LOCAL-00608" summary="Fixing max and wallet issues">
-      <created>1680263244135</created>
-      <option name="number" value="00608" />
-      <option name="presentableId" value="LOCAL-00608" />
-      <option name="project" value="LOCAL" />
-      <updated>1680263244135</updated>
-    </task>
-    <task id="LOCAL-00609" summary="Adding role colors to market">
-      <created>1680353241999</created>
-      <option name="number" value="00609" />
-      <option name="presentableId" value="LOCAL-00609" />
-      <option name="project" value="LOCAL" />
-      <updated>1680353242000</updated>
+      <workItem from="1680568682352" duration="33792000" />
     </task>
     <task id="LOCAL-00610" summary="Adding role colors to market">
       <created>1680353319485</created>
@@ -464,7 +442,28 @@
       <option name="project" value="LOCAL" />
       <updated>1681348384639</updated>
     </task>
-    <option name="localTasksCounter" value="656" />
+    <task id="LOCAL-00656" summary="Playing around with graph">
+      <created>1681383729127</created>
+      <option name="number" value="00656" />
+      <option name="presentableId" value="LOCAL-00656" />
+      <option name="project" value="LOCAL" />
+      <updated>1681383729127</updated>
+    </task>
+    <task id="LOCAL-00657" summary="Playing around with graph">
+      <created>1681383888699</created>
+      <option name="number" value="00657" />
+      <option name="presentableId" value="LOCAL-00657" />
+      <option name="project" value="LOCAL" />
+      <updated>1681383888699</updated>
+    </task>
+    <task id="LOCAL-00658" summary="Playing around with graph">
+      <created>1681384062752</created>
+      <option name="number" value="00658" />
+      <option name="presentableId" value="LOCAL-00658" />
+      <option name="project" value="LOCAL" />
+      <updated>1681384062752</updated>
+    </task>
+    <option name="localTasksCounter" value="659" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
