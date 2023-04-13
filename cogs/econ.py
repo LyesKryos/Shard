@@ -2681,7 +2681,7 @@ class Economy(commands.Cog):
         if start_date.lower() == "today":
             start_date = datetime.now().replace(hour=0)
         elif start_date.lower() == "forever":
-            start_date = datetime.now().replace(year=2000)
+            start_date = datetime.strptime("2023-3-1", "%Y-%m-%d")
         elif start_date.lower() == "week":
             start_date = datetime.now() - timedelta(weeks=1)
         elif start_date.lower() == "month":
