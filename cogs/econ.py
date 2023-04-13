@@ -2725,7 +2725,7 @@ class Economy(commands.Cog):
             plt.grid(True, which="major")
             if days > 360:
                 ax.xaxis.set_major_locator(YearLocator(month=start_date.month, day=start_date.day))
-                elif days > 180:
+            elif days > 180:
                 ax.xaxis.set_major_locator(DayLocator(interval=15))
             elif days > 90:
                 ax.xaxis.set_major_locator(DayLocator(interval=10))
