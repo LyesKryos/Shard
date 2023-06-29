@@ -27,6 +27,7 @@ class Recruitment(commands.Cog):
         self.rate_limit = Ratelimiter()
         self.bot = bot
         self.db_error = False
+        self.verbose_mode = False
 
         def error_log(error):
             etype = type(error)
@@ -395,6 +396,8 @@ class Recruitment(commands.Cog):
                             continue
                     async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                            headers=headers, params=telegram_params) as tg_response:
+                        if self.verbose_mode:
+                            await crashchannel.send(f"```{tg_response}```")
                         if tg_response.status == 429:
                             retry = tg_response.headers['Retry-After']
                             await asyncio.sleep(int(retry))
@@ -915,6 +918,17 @@ class Recruitment(commands.Cog):
         elif retention_role in ctx.author.roles:
             await ctx.author.remove_roles(retention_role)
             await ctx.send("Role removed.")
+
+
+    @commands.command()
+    @commands.is_owner()
+    async def verbose_mode(self, ctx):
+        if self.verbose_mode is True:
+            self.verbose_mode = False
+            await ctx.send("Verbose mode turned off.")
+        else:
+            self.verbose_mode = True
+            await ctx.send("Verbose mode turned on.")
 
 
 async def setup(bot):
