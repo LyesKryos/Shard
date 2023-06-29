@@ -1877,10 +1877,11 @@ class Economy(commands.Cog):
                         await conn.execute('''UPDATE info SET bool = FALSE WHERE name = 'rbt_crash';''')
                         self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n"
                     else:
-                        for s in range(1, stock_count['count']):
-                            random_down = uniform(1, 10)
+                        for s in range(1, stock_count['count']+1):
+                            random_down = uniform(1, 5)
                             await conn.execute('''UPDATE stocks SET value = value - $1, 
-                            change = ((value - $1)/value) -1 , trending = 'down' WHERE stock_id = $2;''', random_down, s)
+                            change = ((value - $1)/value) -1 , trending = 'down' WHERE stock_id = $2;''',
+                                               random_down, s)
                         await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
                         self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
                                              "All stock values continue to decrease and trend down.\n"
@@ -1890,7 +1891,7 @@ class Economy(commands.Cog):
                         crash_chance -= float(stock_sum['sum']) / int(stock_count['count'])
                     if crash_chance <= 1:
                         if self.crash is False:
-                            for s in range(1, stock_count['count']):
+                            for s in range(1, stock_count['count']+1):
                                 random_down = uniform(10, 25)
                                 await conn.execute('''UPDATE stocks SET value = value - $1, 
                                 change = ((value - $1)/value)-1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
@@ -1985,16 +1986,19 @@ class Economy(commands.Cog):
         self.crash = crash['bool']
         # calculate market crash chance
         if self.crash is True:
-            recovery_chance = uniform(1, 20)
-            if recovery_chance <= 8:
+            recovery_chance = uniform(1, 100)
+            if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
+                recovery_chance += float(stock_sum['sum']) / int(stock_count['count'])
+            if recovery_chance <= 10:
                 self.crash = False
                 await conn.execute('''UPDATE info SET bool = FALSE WHERE name = 'rbt_crash';''')
                 self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n"
             else:
                 for s in range(1, stock_count['count']):
-                    random_down = uniform(1, 10)
+                    random_down = uniform(1, 5)
                     await conn.execute('''UPDATE stocks SET value = value - $1, 
-                    change = ((value - $1)/value) - 1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
+                    change = ((value - $1)/value) -1 , trending = 'down' WHERE stock_id = $2;''',
+                                       random_down, s)
                 await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
                 self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
                                      "All stock values continue to decrease and trend down.\n"
@@ -2007,7 +2011,7 @@ class Economy(commands.Cog):
                     for s in range(1, stock_count['count']):
                         random_down = uniform(10, 25)
                         await conn.execute('''UPDATE stocks SET value = value - $1, 
-                        change = ((value - $1)/value) - 1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
+                        change = ((value - $1)/value)-1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
                     await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
                     self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
                                          "All stock values are decreased and begun trending down.\n "

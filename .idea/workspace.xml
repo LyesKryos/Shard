@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Playing around with graph">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding autogrammer">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,6 +121,11 @@
       <workItem from="1679682470900" duration="29539000" />
       <workItem from="1680142938087" duration="10169000" />
       <workItem from="1680568682352" duration="33792000" />
+      <workItem from="1681848542797" duration="913000" />
+      <workItem from="1683767179438" duration="1577000" />
+      <workItem from="1685201174798" duration="2580000" />
+      <workItem from="1686430358018" duration="1008000" />
+      <workItem from="1688042056561" duration="2069000" />
     </task>
     <task id="LOCAL-00610" summary="Adding role colors to market">
       <created>1680353319485</created>
@@ -481,7 +488,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding role colors to market" />
     <MESSAGE value="Fixing visual commas" />
     <MESSAGE value="Adding relative timestamp to region command" />
     <MESSAGE value="Fixing user_sent error" />
@@ -506,7 +512,8 @@
     <MESSAGE value="Fixing crash" />
     <MESSAGE value="Fixing change calculations on crash" />
     <MESSAGE value="Playing around with graph" />
-    <option name="LAST_COMMIT_MESSAGE" value="Playing around with graph" />
+    <MESSAGE value="Adding autogrammer" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding autogrammer" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
