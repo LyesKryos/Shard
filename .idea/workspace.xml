@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding autogrammer cutting">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding autogrammer cutting" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -124,21 +121,7 @@
       <workItem from="1683767179438" duration="1577000" />
       <workItem from="1685201174798" duration="2580000" />
       <workItem from="1686430358018" duration="1008000" />
-      <workItem from="1688042056561" duration="4360000" />
-    </task>
-    <task id="LOCAL-00618" summary="Trying interactions for recruitment">
-      <created>1680638818597</created>
-      <option name="number" value="00618" />
-      <option name="presentableId" value="LOCAL-00618" />
-      <option name="project" value="LOCAL" />
-      <updated>1680638818598</updated>
-    </task>
-    <task id="LOCAL-00619" summary="Trying interactions for recruitment">
-      <created>1680639270613</created>
-      <option name="number" value="00619" />
-      <option name="presentableId" value="LOCAL-00619" />
-      <option name="project" value="LOCAL" />
-      <updated>1680639270613</updated>
+      <workItem from="1688042056561" duration="4685000" />
     </task>
     <task id="LOCAL-00620" summary="Trying interactions for recruitment">
       <created>1680639610347</created>
@@ -469,7 +452,21 @@
       <option name="project" value="LOCAL" />
       <updated>1688051686858</updated>
     </task>
-    <option name="localTasksCounter" value="667" />
+    <task id="LOCAL-00667" summary="Adding autogrammer cutting">
+      <created>1688052168967</created>
+      <option name="number" value="00667" />
+      <option name="presentableId" value="LOCAL-00667" />
+      <option name="project" value="LOCAL" />
+      <updated>1688052168967</updated>
+    </task>
+    <task id="LOCAL-00668" summary="Adding autogrammer cutting">
+      <created>1688052367384</created>
+      <option name="number" value="00668" />
+      <option name="presentableId" value="LOCAL-00668" />
+      <option name="project" value="LOCAL" />
+      <updated>1688052367384</updated>
+    </task>
+    <option name="localTasksCounter" value="669" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

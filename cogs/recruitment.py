@@ -645,6 +645,13 @@ class Recruitment(commands.Cog):
             await message.edit(content="Autogrammer uncut.")
 
     @commands.command()
+    @commands.is_owner()
+    async def start_autogrammer(self, ctx):
+        # starts autogrammer
+        self.autogrammer_task = asyncio.create_task(self.autogrammer())
+        await ctx.send("Autogrammer starting")
+
+    @commands.command()
     @commands.guild_only()
     @commands.is_owner()
     async def rstatus(self, ctx):
