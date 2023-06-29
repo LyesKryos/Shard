@@ -354,6 +354,8 @@ class Recruitment(commands.Cog):
                            'client': 'cb97eee2',
                            'tgid': '25352330',
                            'key': 'b777d3383626'}
+        # send message
+        await crashchannel.send("Starting autogrammer.")
         # start the session
         async with aiohttp.ClientSession() as session:
             while True:
@@ -629,6 +631,18 @@ class Recruitment(commands.Cog):
         self.running = False
         self.recruitment_gather_object.cancel()
         return
+
+    @commands.command()
+    @commands.is_owner()
+    async def cut_autogrammer(self, ctx):
+        # stops autogrammer
+        message = await ctx.send("Cutting...")
+        self.autogrammer_task.cancel()
+        await asyncio.sleep(1)
+        if self.autogrammer_task.cancelled():
+            await message.edit(content="Autogrammer cut.")
+        else:
+            await message.edit(content="Autogrammer uncut.")
 
     @commands.command()
     @commands.guild_only()

@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing autogrammer">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding autogrammer cutting">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -123,28 +124,7 @@
       <workItem from="1683767179438" duration="1577000" />
       <workItem from="1685201174798" duration="2580000" />
       <workItem from="1686430358018" duration="1008000" />
-      <workItem from="1688042056561" duration="3563000" />
-    </task>
-    <task id="LOCAL-00615" summary="Fixing user_sent error">
-      <created>1680570003537</created>
-      <option name="number" value="00615" />
-      <option name="presentableId" value="LOCAL-00615" />
-      <option name="project" value="LOCAL" />
-      <updated>1680570003537</updated>
-    </task>
-    <task id="LOCAL-00616" summary="Fixing recruitment and verification">
-      <created>1680630148331</created>
-      <option name="number" value="00616" />
-      <option name="presentableId" value="LOCAL-00616" />
-      <option name="project" value="LOCAL" />
-      <updated>1680630148331</updated>
-    </task>
-    <task id="LOCAL-00617" summary="Fixing max buying with wallet">
-      <created>1680631558470</created>
-      <option name="number" value="00617" />
-      <option name="presentableId" value="LOCAL-00617" />
-      <option name="project" value="LOCAL" />
-      <updated>1680631558470</updated>
+      <workItem from="1688042056561" duration="4360000" />
     </task>
     <task id="LOCAL-00618" summary="Trying interactions for recruitment">
       <created>1680638818597</created>
@@ -468,7 +448,28 @@
       <option name="project" value="LOCAL" />
       <updated>1688050723220</updated>
     </task>
-    <option name="localTasksCounter" value="664" />
+    <task id="LOCAL-00664" summary="Fixing autogrammer">
+      <created>1688051259245</created>
+      <option name="number" value="00664" />
+      <option name="presentableId" value="LOCAL-00664" />
+      <option name="project" value="LOCAL" />
+      <updated>1688051259245</updated>
+    </task>
+    <task id="LOCAL-00665" summary="Fixing autogrammer">
+      <created>1688051443747</created>
+      <option name="number" value="00665" />
+      <option name="presentableId" value="LOCAL-00665" />
+      <option name="project" value="LOCAL" />
+      <updated>1688051443747</updated>
+    </task>
+    <task id="LOCAL-00666" summary="Automating waiting">
+      <created>1688051686858</created>
+      <option name="number" value="00666" />
+      <option name="presentableId" value="LOCAL-00666" />
+      <option name="project" value="LOCAL" />
+      <updated>1688051686858</updated>
+    </task>
+    <option name="localTasksCounter" value="667" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -486,8 +487,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding relative timestamp to region command" />
-    <MESSAGE value="Fixing user_sent error" />
     <MESSAGE value="Fixing recruitment and verification" />
     <MESSAGE value="Fixing max buying with wallet" />
     <MESSAGE value="Trying interactions for recruitment" />
@@ -511,7 +510,9 @@
     <MESSAGE value="Playing around with graph" />
     <MESSAGE value="Adding autogrammer" />
     <MESSAGE value="Fixing autogrammer" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing autogrammer" />
+    <MESSAGE value="Automating waiting" />
+    <MESSAGE value="Adding autogrammer cutting" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding autogrammer cutting" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
