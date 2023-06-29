@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding autogrammer">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing autogrammer" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -125,35 +121,7 @@
       <workItem from="1683767179438" duration="1577000" />
       <workItem from="1685201174798" duration="2580000" />
       <workItem from="1686430358018" duration="1008000" />
-      <workItem from="1688042056561" duration="2069000" />
-    </task>
-    <task id="LOCAL-00610" summary="Adding role colors to market">
-      <created>1680353319485</created>
-      <option name="number" value="00610" />
-      <option name="presentableId" value="LOCAL-00610" />
-      <option name="project" value="LOCAL" />
-      <updated>1680353319485</updated>
-    </task>
-    <task id="LOCAL-00611" summary="Adding role colors to market">
-      <created>1680353388557</created>
-      <option name="number" value="00611" />
-      <option name="presentableId" value="LOCAL-00611" />
-      <option name="project" value="LOCAL" />
-      <updated>1680353388557</updated>
-    </task>
-    <task id="LOCAL-00612" summary="Adding role colors to market">
-      <created>1680354031275</created>
-      <option name="number" value="00612" />
-      <option name="presentableId" value="LOCAL-00612" />
-      <option name="project" value="LOCAL" />
-      <updated>1680354031275</updated>
-    </task>
-    <task id="LOCAL-00613" summary="Fixing visual commas">
-      <created>1680354501896</created>
-      <option name="number" value="00613" />
-      <option name="presentableId" value="LOCAL-00613" />
-      <option name="project" value="LOCAL" />
-      <updated>1680354501896</updated>
+      <workItem from="1688042056561" duration="2960000" />
     </task>
     <task id="LOCAL-00614" summary="Adding relative timestamp to region command">
       <created>1680358582543</created>
@@ -470,7 +438,35 @@
       <option name="project" value="LOCAL" />
       <updated>1681384062752</updated>
     </task>
-    <option name="localTasksCounter" value="659" />
+    <task id="LOCAL-00659" summary="Adding autogrammer">
+      <created>1688044215611</created>
+      <option name="number" value="00659" />
+      <option name="presentableId" value="LOCAL-00659" />
+      <option name="project" value="LOCAL" />
+      <updated>1688044215612</updated>
+    </task>
+    <task id="LOCAL-00660" summary="Fixing autogrammer">
+      <created>1688044290208</created>
+      <option name="number" value="00660" />
+      <option name="presentableId" value="LOCAL-00660" />
+      <option name="project" value="LOCAL" />
+      <updated>1688044290208</updated>
+    </task>
+    <task id="LOCAL-00661" summary="Fixing autogrammer">
+      <created>1688044352037</created>
+      <option name="number" value="00661" />
+      <option name="presentableId" value="LOCAL-00661" />
+      <option name="project" value="LOCAL" />
+      <updated>1688044352037</updated>
+    </task>
+    <task id="LOCAL-00662" summary="Fixing autogrammer">
+      <created>1688044407684</created>
+      <option name="number" value="00662" />
+      <option name="presentableId" value="LOCAL-00662" />
+      <option name="project" value="LOCAL" />
+      <updated>1688044407684</updated>
+    </task>
+    <option name="localTasksCounter" value="663" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -488,7 +484,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing visual commas" />
     <MESSAGE value="Adding relative timestamp to region command" />
     <MESSAGE value="Fixing user_sent error" />
     <MESSAGE value="Fixing recruitment and verification" />
@@ -513,7 +508,8 @@
     <MESSAGE value="Fixing change calculations on crash" />
     <MESSAGE value="Playing around with graph" />
     <MESSAGE value="Adding autogrammer" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding autogrammer" />
+    <MESSAGE value="Fixing autogrammer" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing autogrammer" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

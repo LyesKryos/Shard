@@ -384,7 +384,7 @@ class Recruitment(commands.Cog):
         self.world_assembly_notification.cancel()
 
     def cog_load(self) -> None:
-        asyncio.get_running_loop().run_until_complete(self.autogrammer())
+        asyncio.run(self.autogrammer())
 
     # cog variables
     do_not_recruit = list()
