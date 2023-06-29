@@ -395,7 +395,7 @@ class Recruitment(commands.Cog):
                 async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                        headers=headers, params=telegram_params) as tg_response:
                     if tg_response.status == 429:
-                        retry = tg_response.headers.get('X-Retry-After')
+                        retry = tg_response.headers['X-Retry-After']
                         await asyncio.sleep(int(retry))
                         await crashchannel.send(f"Too many requests. Retrying after {int(retry)} seconds.")
                     elif tg_response.status != 200:
