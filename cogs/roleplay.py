@@ -122,12 +122,15 @@ class Roleplay(commands.Cog):
         await smoking_room.send(f"Senators, please welcome {interaction.user.mention} to the Grand Senate of the "
                                 f"United Kingdom of Thegye!\n\n"
                                 f"Now that your application is approved, you can begin being involved by saying hello"
-                                f"in the #backroom OOC chat or introducing your character in the #smoking_room IC chat."
+                                f"in the https://discord.com/channels/674259612580446230/1112080185949437983"
+                                f" OOC chat or introducing your character in the "
+                                f"https://discord.com/channels/674259612580446230/1106961957002686464 IC chat."
                                 f"You can also check out current legislation on the #floor, "
                                 f"proposals in #the_chancellery, and the most recent news in the #newsroom. You can"
                                 f"also create an account on our dedicated wiki (<https://thegye.miraheze.org/>),"
                                 f"where legislation, characters, Ministry of Information Reports, and more are stored"
-                                f"and created. If you have questions, feel free to ask them in #backroom. "
+                                f"and created. If you have questions, feel free to ask them in "
+                                f"https://discord.com/channels/674259612580446230/1112080185949437983. "
                                 f"Once again, welcome!")
         await interaction.user.add_roles(senator_role)
         await interaction.followup.send("Application submitted!")
