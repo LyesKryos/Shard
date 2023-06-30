@@ -1,4 +1,6 @@
 import re
+import typing
+
 import requests
 from bs4 import BeautifulSoup
 from discord import app_commands
@@ -102,8 +104,11 @@ class Roleplay(commands.Cog):
                            senator_wiki_page: str = None):
         # defer interation
         await interaction.response.defer(thinking=False, ephemeral=True)
+        # get the senator role
+        thegye_server = self.bot.get_guild(674259612580446230)
+        senator_role = thegye_server.get_role(1109211491170783293)
         # if the user already has the senator role, end the interaction
-        if 1109211491170783293 in interaction.user.roles:
+        if senator_role in interaction.user.roles:
             await interaction.followup.send("You already have the Senator role!")
             return
         # post information in #roleplay_mods
@@ -115,7 +120,62 @@ class Roleplay(commands.Cog):
         # post information in #smoking_room
         smoking_room = self.bot.get_channel(1106961957002686464)
         await smoking_room.send(f"Senators, please welcome {interaction.user.mention} to the Grand Senate of the "
-                                f"United Kingdom of Thegye!")
+                                f"United Kingdom of Thegye!\n\n"
+                                f"Now that your application is approved, you can begin being involved by saying hello"
+                                f"in the #backroom OOC chat or introducing your character in the #smoking_room IC chat."
+                                f"You can also check out current legislation on the #floor, "
+                                f"proposals in #the_chancellery, and the most recent news in the #newsroom. You can"
+                                f"also create an account on our dedicated wiki (<https://thegye.miraheze.org/>),"
+                                f"where legislation, characters, Ministry of Information Reports, and more are stored"
+                                f"and created. If you have questions, feel free to ask them in #backroom. "
+                                f"Once again, welcome!")
+        await interaction.user.add_roles(senator_role)
+        await interaction.followup.send("Application submitted!")
+
+    @senate.command(name="open_debate", description="Allows the Chancellor to open debate on legislation.")
+    @app_commands.guild_only()
+    @app_commands.checks.has_role(1110374275740868628)
+    @app_commands.describe(title="The official title of the legislation", author="The full name of the Senator.",
+                           url="Link to the wiki page of the legislation")
+    async def open_debate(self, interaction: discord.Interaction, title: str, author: str, url: str):
+        # defer interaction
+        await interaction.response.defer(thinking=False, ephemeral=True)
+        # get the forum channel
+        floor_channel = self.bot.get_channel(1106963321896325241)
+        # get the senator role
+        thegye_server = self.bot.get_guild(674259612580446230)
+        senator_role = thegye_server.get_role(1109211491170783293)
+        # create a new thread
+        content_string = f"Presented by Senator {author}.\n" \
+                         f"{url}\n" \
+                         # f"{senator_role.mention}s, this bill is now open for debate."
+        thread = await floor_channel.create_thread(name=title, content=content_string)
+        # pin the first message
+        await thread.message.pin()
+        # add tupper
+        tupper = self.bot.get_user(431544605209788416)
+        await thread.add_user(tupper)
+        await interaction.followup.send("Done!")
+        return
+
+    @senate.command(name="party_role", description="Allows party leaders to add party roles.")
+    @app_commands.guild_only()
+    @app_commands.checks.has_role(1124422828641505300)
+    async def party_role(self, interaction: discord.Interaction, senator: discord.Member):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # get the senator role
+        thegye_server = self.bot.get_guild(674259612580446230)
+        senator_role = thegye_server.get_role(1109211491170783293)
+        # check for role
+        if senator_role not in senator.roles:
+            await interaction.followup.send(f"{senator} is not a member of the Grand Senate of Thegye.")
+            return
+
+
+
+
+
 
 
 
