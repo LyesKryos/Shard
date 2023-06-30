@@ -3,6 +3,8 @@ import traceback
 from typing import Optional
 
 import discord
+from discord import app_commands
+
 from ShardBot import Shard
 from discord.ext import commands
 import os
@@ -169,6 +171,13 @@ class BaseCommands(commands.Cog):
     @commands.is_owner()
     async def silent_error(self, ctx, *, args):
         raise SilentFail
+
+    @commands.command()
+    @commands.is_owner()
+    async def repeat(self, ctx, *, args):
+        await ctx.send(args)
+        return
+
 
 async def setup(bot: Shard):
     async def alive(bot):

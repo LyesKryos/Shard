@@ -1,6 +1,7 @@
 import re
 import requests
 from bs4 import BeautifulSoup
+from discord import app_commands
 from discord.ext import commands
 from ShardBot import Shard
 import discord
@@ -89,6 +90,33 @@ class Roleplay(commands.Cog):
         # updates link
         await conn.execute('''UPDATE roleplay SET link = $1 WHERE name = 'map';''', link)
         return await ctx.send("Map updated!")
+
+    senate = app_commands.Group(name="senate", description="...")
+
+    @senate.command(name="apply", description="Submits an application to become a Senator.")
+    @app_commands.guild_only()
+    @app_commands.describe(senator_name="The name of your Senator character.",
+                           senator_constituency="The name of your Senator's constituency.",
+                           senator_wiki_page="A URL to your Senator's page on the Thegye Wiki.")
+    async def senate_apply(self, interaction: discord.Interaction, senator_name: str, senator_constituency: str,
+                           senator_wiki_page: str = None):
+        # defer interation
+        await interaction.response.defer(thinking=False, ephemeral=True)
+        # if the user already has the senator role, end the interaction
+        if 1109211491170783293 in interaction.user.roles:
+            await interaction.followup.send("You already have the Senator role!")
+            return
+        # post information in #roleplay_mods
+        mod_channel = self.bot.get_channel(674338490321862672)
+        await mod_channel.send(f"{interaction.user} has applied for the mock government roleplay.\n"
+                               f"Senator: {senator_name}\n"
+                               f"Constituency: {senator_constituency}\n"
+                               f"Wiki page: {senator_wiki_page}")
+        # post information in #smoking_room
+        smoking_room = self.bot.get_channel(1106961957002686464)
+        await smoking_room.send(f"Senators, please welcome {interaction.user.mention} to the Grand Senate of the "
+                                f"United Kingdom of Thegye!")
+
 
 
 async def setup(bot: Shard):
