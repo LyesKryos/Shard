@@ -148,13 +148,13 @@ class Roleplay(commands.Cog):
         # create a new thread
         content_string = f"Presented by Senator {author}.\n" \
                          f"{url}\n" \
-                         # f"{senator_role.mention}s, this bill is now open for debate."
+                         f"{senator_role.mention}s, this bill is now open for debate."
         thread = await floor_channel.create_thread(name=title, content=content_string)
         # pin the first message
         await thread.message.pin()
         # add tupper
         tupper = self.bot.get_user(431544605209788416)
-        await thread.add_user(tupper)
+        await thread.thread.add_user(tupper)
         await interaction.followup.send("Done!")
         return
 
