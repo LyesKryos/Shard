@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding autogrammer starting">
-      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing autogrammer auto-waiting" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -123,28 +121,7 @@
       <workItem from="1683767179438" duration="1577000" />
       <workItem from="1685201174798" duration="2580000" />
       <workItem from="1686430358018" duration="1008000" />
-      <workItem from="1688042056561" duration="5034000" />
-    </task>
-    <task id="LOCAL-00621" summary="Cleaning up interactions for recruitment">
-      <created>1680639829113</created>
-      <option name="number" value="00621" />
-      <option name="presentableId" value="LOCAL-00621" />
-      <option name="project" value="LOCAL" />
-      <updated>1680639829113</updated>
-    </task>
-    <task id="LOCAL-00622" summary="Standardizing slash commands for recruitment.py">
-      <created>1680641559590</created>
-      <option name="number" value="00622" />
-      <option name="presentableId" value="LOCAL-00622" />
-      <option name="project" value="LOCAL" />
-      <updated>1680641559590</updated>
-    </task>
-    <task id="LOCAL-00623" summary="Standardizing slash commands for recruitment.py">
-      <created>1680641901936</created>
-      <option name="number" value="00623" />
-      <option name="presentableId" value="LOCAL-00623" />
-      <option name="project" value="LOCAL" />
-      <updated>1680641901936</updated>
+      <workItem from="1688042056561" duration="6050000" />
     </task>
     <task id="LOCAL-00624" summary="Fixing buying max and wallet">
       <created>1680659192662</created>
@@ -468,7 +445,28 @@
       <option name="project" value="LOCAL" />
       <updated>1688052586796</updated>
     </task>
-    <option name="localTasksCounter" value="670" />
+    <task id="LOCAL-00670" summary="Adding autogrammer starting">
+      <created>1688052734823</created>
+      <option name="number" value="00670" />
+      <option name="presentableId" value="LOCAL-00670" />
+      <option name="project" value="LOCAL" />
+      <updated>1688052734823</updated>
+    </task>
+    <task id="LOCAL-00671" summary="Fixing autogrammer auto-waiting">
+      <created>1688052980586</created>
+      <option name="number" value="00671" />
+      <option name="presentableId" value="LOCAL-00671" />
+      <option name="project" value="LOCAL" />
+      <updated>1688052980586</updated>
+    </task>
+    <task id="LOCAL-00672" summary="Fixing autogrammer auto-waiting">
+      <created>1688057394634</created>
+      <option name="number" value="00672" />
+      <option name="presentableId" value="LOCAL-00672" />
+      <option name="project" value="LOCAL" />
+      <updated>1688057394634</updated>
+    </task>
+    <option name="localTasksCounter" value="673" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -486,7 +484,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing max buying with wallet" />
     <MESSAGE value="Trying interactions for recruitment" />
     <MESSAGE value="Cleaning up interactions for recruitment" />
     <MESSAGE value="Standardizing slash commands for recruitment.py" />
@@ -511,7 +508,8 @@
     <MESSAGE value="Automating waiting" />
     <MESSAGE value="Adding autogrammer cutting" />
     <MESSAGE value="Adding autogrammer starting" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding autogrammer starting" />
+    <MESSAGE value="Fixing autogrammer auto-waiting" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing autogrammer auto-waiting" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

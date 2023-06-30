@@ -381,9 +381,14 @@ class Recruitment(commands.Cog):
                         newnations_prefilter = list(nnsoup.newnations.string.split(","))
                         # grabs the first nation
                         recipient = newnations_prefilter[0]
+                        # check for redundant telegraming
+                        if recipient in self.do_not_recruit:
+                            continue
                         # send the telegram to the recipient
                         recipient_dict = {'to': recipient}
                         telegram_params.update(recipient_dict)
+                        # update the do_not_recruit list
+                        self.do_not_recruit += recipient
                     # ratelimiter
                     while True:
                         # see if there are enough available calls. if so, break the loop
