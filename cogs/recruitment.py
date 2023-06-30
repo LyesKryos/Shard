@@ -24,6 +24,7 @@ from ratelimiter import Ratelimiter
 class Recruitment(commands.Cog):
 
     def __init__(self, bot: Shard):
+        self.autogrammer_task = None
         self.rate_limit = Ratelimiter()
         self.bot = bot
         self.db_error = False
