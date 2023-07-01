@@ -113,7 +113,7 @@ class Roleplay(commands.Cog):
             return
         # post information in #roleplay_mods
         mod_channel = self.bot.get_channel(674338490321862672)
-        await mod_channel.send(f"{interaction.user} has applied for the mock government roleplay.\n"
+        await mod_channel.send(f"{interaction.user.name} has applied for the mock government roleplay.\n"
                                f"Senator: {senator_name}\n"
                                f"Constituency: {senator_constituency}\n"
                                f"Wiki page: {senator_wiki_page}")
@@ -164,7 +164,7 @@ class Roleplay(commands.Cog):
     @senate.command(name="party_role", description="Allows party leaders to add party roles.")
     @app_commands.guild_only()
     @app_commands.checks.has_role(1124422828641505300)
-    async def party_role(self, interaction: discord.Interaction, senator: discord.Member):
+    async def party_role(self, interaction: discord.Interaction, senator: discord.Member, role: discord.Role):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # get the senator role
@@ -174,12 +174,18 @@ class Roleplay(commands.Cog):
         if senator_role not in senator.roles:
             await interaction.followup.send(f"{senator} is not a member of the Grand Senate of Thegye.")
             return
-
-
-
-
-
-
+        # get party roles
+        bullturtle_party = thegye_server.get_role(1112893883832086622)
+        rrp = thegye_server.get_role(1112894000995762266)
+        party_roles = [bullturtle_party, rrp]
+        # check to make sure the role is right
+        if role not in party_roles:
+            await interaction.followup.send(f"{role.name} is not a party role.")
+            return
+        # add the role
+        await senator.add_roles(role)
+        await interaction.followup.send(f"{role.name} added to {senator.nick}.")
+        return
 
 
 async def setup(bot: Shard):
