@@ -182,9 +182,14 @@ class Roleplay(commands.Cog):
         if role not in party_roles:
             await interaction.followup.send(f"{role.name} is not a party role.")
             return
-        # add the role
-        await senator.add_roles(role)
-        await interaction.followup.send(f"{role.name} added to {senator.nick}.")
+        # if the user does not have the role, add the role
+        if role not in senator.roles:
+            await senator.add_roles(role)
+            await interaction.followup.send(f"{role.name} added to {senator.nick}.")
+        # if the user has the role, remove the role
+        if role in senator.roles:
+            await senator.remove_roles(role)
+            await interaction.followup.send(f"{role.name} removed from {senator.nick}.")
         return
 
 
