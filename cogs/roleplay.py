@@ -119,21 +119,24 @@ class Roleplay(commands.Cog):
                                f"Wiki page: {senator_wiki_page}")
         # post information in #smoking_room
         smoking_room = self.bot.get_channel(1106961957002686464)
-        await smoking_room.send(f"Senators, please welcome {senator_name} ({interaction.user.mention})"
-                                f" to the Grand Senate of the United Kingdom of Thegye!\n\n"
+        backroom = self.bot.get_channel(1112080185949437983)
+        floor = self.bot.get_channel(1106963321896325241)
+        chancellery = self.bot.get_channel(1106962638723887204)
+        newsroom = self.bot.get_channel(1106962988960845925)
+        await smoking_room.send(f"Senators, please welcome {senator_name} of {senator_constituency} "
+                                f"({interaction.user.mention}) to the Grand Senate of the United Kingdom of Thegye!\n\n"
                                 f"Now that your application is approved, you can begin being involved by saying hello"
-                                f"in the <https://discord.com/channels/674259612580446230/1112080185949437983>"
-                                f" OOC chat or introducing your character in the "
-                                f"<https://discord.com/channels/674259612580446230/1106961957002686464> IC chat."
-                                f"You can also check out current legislation on the #floor, "
-                                f"proposals in #the_chancellery, and the most recent news in the #newsroom. You can"
-                                f"also create an account on our dedicated wiki (<https://thegye.miraheze.org/>),"
-                                f"where legislation, characters, Ministry of Information Reports, and more are stored"
-                                f"and created. If you have questions, feel free to ask them in "
-                                f"<https://discord.com/channels/674259612580446230/1112080185949437983>. "
+                                f"in the {backroom.mention} OOC chat or introducing your character in the "
+                                f"{smoking_room.mention} IC chat. You can also check out current legislation on the "
+                                f"{floor.mention}, proposals in {chancellery.mention}, and the most recent news in the "
+                                f"{newsroom.mention}. You can also create an account on our dedicated wiki "
+                                f"(<https://thegye.miraheze.org/>), where legislation, characters, "
+                                f"Ministry of Information Reports, and more are created and stored. "
+                                f"If you have questions, feel free to ask them in {backroom.mention}. "
                                 f"Once again, welcome!")
         await interaction.user.add_roles(senator_role)
         await interaction.followup.send("Application submitted!")
+        return
 
     @senate.command(name="open_debate", description="Allows the Chancellor to open debate on legislation.")
     @app_commands.guild_only()
