@@ -89,6 +89,8 @@ class ShardErrorHandler(commands.Cog):
         elif isinstance(error, app_commands.errors.CommandOnCooldown):
             await interaction.response.send_message(f"Slow down! Try again in {int(error.retry_after)} seconds.",
                                                     ephemeral=True)
+        elif isinstance(error, app_commands.errors.MissingRole):
+            await interaction.response.send_message("You are missing the proper roles for this command.")
         else:
             etype = type(error)
             trace = error.__traceback__
