@@ -89,7 +89,7 @@ class Recruitment(commands.Cog):
                     f"distinction of being this month's top recruiter! This month, they have sent "
                     f"{top_recruiter_numbers} telegrams to new players. Wow! {user.display_name} has "
                     f"been awarded the {recruiter_of_the_month_role.mention} role, customizable by "
-                    f"request. {user.display_name} has also received a bonus of 500 thaler!"
+                    f"request. {user.display_name} has also received a bonus of 500 thaler! "
                     f"Everyone give them a round of applause!\nIn total, {monthly_total:,} telegrams have been "
                     f"sent by our wonderful recruiters this month!")
                 await announce.add_reaction("\U0001f44f")
@@ -355,8 +355,8 @@ class Recruitment(commands.Cog):
             newnationsparams = {'q': 'newnations'}
             telegram_params = {'a': 'sendTG',
                                'client': 'cb97eee2',
-                               'tgid': '25352330',
-                               'key': 'b777d3383626'}
+                               'tgid': '29620544',
+                               'key': 'b9dff257c2de'}
             # send message
             await crashchannel.send("Starting autogrammer.")
             # start the session
