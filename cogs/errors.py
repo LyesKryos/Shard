@@ -82,6 +82,9 @@ class ShardErrorHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        # unwrap error
+        if isinstance(error, app_commands.CommandInvokeError):
+            error = error.original
         # if the user attempts to use a command in DMs that is not authorized to use in DMs
         if isinstance(error, app_commands.errors.NoPrivateMessage):
             await interaction.response.send_message(f"I cannot run `{interaction.command}` in DMs! "
