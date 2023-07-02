@@ -164,7 +164,7 @@ class Roleplay(commands.Cog):
         await interaction.followup.send("Done!")
         return
 
-    @senate.command(name="party_role", description="Allows party leaders to add party roles.")
+    @senate.command(name="party_role", description="Allows party leaders to add and remove party roles.")
     @app_commands.guild_only()
     @app_commands.checks.has_role(1124422828641505300)
     async def party_role(self, interaction: discord.Interaction, senator: discord.Member, role: discord.Role):
