@@ -180,7 +180,8 @@ class Roleplay(commands.Cog):
         # get party roles
         bullturtle_party = thegye_server.get_role(1112893883832086622)
         rrp = thegye_server.get_role(1112894000995762266)
-        party_roles = [bullturtle_party, rrp]
+        ntrp = thegye_server.get_role(1125135876008190013)
+        party_roles = [bullturtle_party, rrp, ntrp]
         # check to make sure the role is right
         if role not in party_roles:
             await interaction.followup.send(f"{role.name} is not a party role.")
