@@ -149,14 +149,7 @@
       <workItem from="1685201174798" duration="2580000" />
       <workItem from="1686430358018" duration="1008000" />
       <workItem from="1688042056561" duration="6050000" />
-      <workItem from="1688134880285" duration="25201000" />
-    </task>
-    <task id="LOCAL-00647" summary="Fixing crashes">
-      <created>1681261595106</created>
-      <option name="number" value="00647" />
-      <option name="presentableId" value="LOCAL-00647" />
-      <option name="project" value="LOCAL" />
-      <updated>1681261595106</updated>
+      <workItem from="1688134880285" duration="25590000" />
     </task>
     <task id="LOCAL-00648" summary="Setting crash floor at random 4 to 6 - risk">
       <created>1681263300163</created>
@@ -494,7 +487,14 @@
       <option name="project" value="LOCAL" />
       <updated>1688758010410</updated>
     </task>
-    <option name="localTasksCounter" value="696" />
+    <task id="LOCAL-00696" summary="Troubleshooting svg">
+      <created>1688759592789</created>
+      <option name="number" value="00696" />
+      <option name="presentableId" value="LOCAL-00696" />
+      <option name="project" value="LOCAL" />
+      <updated>1688759592789</updated>
+    </task>
+    <option name="localTasksCounter" value="697" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

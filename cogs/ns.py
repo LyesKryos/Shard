@@ -122,8 +122,7 @@ class NationStates(commands.Cog):
                 img = Image.open(BytesIO(get_flag))
             except PIL.UnidentifiedImageError:
                 bytes = svg2png(url=flag_link)
-                await ctx.send(bytes)
-                # img = Image.frombytes(data=bytes)
+                img = Image.frombytes(data=bytes, mode="RGB", size=(30,30))
             rgb_color = self.get_dominant_color(img)
             flag_color = discord.Colour.from_rgb(rgb_color[0], rgb_color[1], rgb_color[2])
             creation_time = datetime.datetime.fromtimestamp(int(founded_epoch), tz=self.eastern)
