@@ -493,7 +493,7 @@ class Verification(commands.Cog):
 
     @verification.command(name="unverify", description="Remove a nation from your verified list.")
     @app_commands.describe(nation_name="The name of the nation you would like to unverify.")
-    async def unverify(self, interaction: discord.Interaction, nation_name):
+    async def unverify(self, interaction: discord.Interaction, nation_name: str):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establish connection

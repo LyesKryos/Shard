@@ -153,7 +153,7 @@ class NationStates(commands.Cog):
             nation_embed.add_field(name="Population", value=population)
             await ctx.send(embed=nation_embed)
 
-    async def get_region(self, ctx, region):
+    async def get_region(self, interaction: discord.Interaction, region):
         async with aiohttp.ClientSession() as nation_session:
             headers = {'User-Agent': 'Bassiliya'}
             params = {'region': region,
@@ -173,7 +173,7 @@ class NationStates(commands.Cog):
                                           headers=headers, params=params) as region_data:
                 # if the nation does not exist
                 if region_data.status == 404:
-                    return await ctx.send("That region does not seem to exist.")
+                    return await interaction.followup.send("That region does not seem to exist.")
                 # parse data
                 region_data_raw = await region_data.text()
                 region_info = BeautifulSoup(region_data_raw, 'lxml')
@@ -224,7 +224,7 @@ class NationStates(commands.Cog):
             region_embed.add_field(name="\u200b", value="\u200b")
             region_embed.add_field(name="Influence", value=f"{influence_level}")
             region_embed.add_field(name="Last Update", value=f"<t:{update}:T>", inline=False)
-            await ctx.send(embed=region_embed)
+            await interaction.followup.send(embed=region_embed)
 
     @commands.command(brief="Displays information about a nation", aliases=['n'])
     async def nation(self, ctx, *, args=None):
