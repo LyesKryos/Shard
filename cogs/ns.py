@@ -1,6 +1,8 @@
 # dispatch cog v 1.4
 import datetime
 from io import BytesIO
+from cairosvg import svg2png
+import PIL
 import aiohttp
 import discord
 from ShardBot import Shard
@@ -116,7 +118,10 @@ class NationStates(commands.Cog):
                                           headers=headers) as flag:
                 # parse data
                 get_flag = await flag.read()
-            img = Image.open(BytesIO(get_flag))
+            try:
+                img = Image.open(BytesIO(get_flag))
+            except PIL.UnidentifiedImageError:
+                img = svg2png(bytestring=get_flag)
             rgb_color = self.get_dominant_color(img)
             flag_color = discord.Colour.from_rgb(rgb_color[0], rgb_color[1], rgb_color[2])
             creation_time = datetime.datetime.fromtimestamp(int(founded_epoch), tz=self.eastern)
