@@ -2,6 +2,8 @@
 import traceback
 from datetime import datetime, timedelta
 import discord.channel
+from discord import app_commands
+
 from ShardBot import Shard
 import asyncio
 from discord.ext import commands
@@ -132,23 +134,27 @@ class Verification(commands.Cog):
     def cog_unload(self):
         self.daily_verification.cancel()
 
-    @commands.command(brief="Verifies a nation.")
-    async def verify(self, ctx):
+    verification = app_commands.Group(name="verification", description="...")
+
+    @verification.command(name="verify", description="Verifies a specified nation.")
+    async def verify(self, interaction: discord.Interaction, nation_name: str):
+        # defers the interaction
+        await interaction.response.defer(thinking=True)
         # establishes connection
         conn = self.bot.pool
         # establishes author
-        author = ctx.author
+        author = interaction.user
         # creates DM
         author_message = await author.create_dm()
         # define thegye server and unverified role
         thegye_sever = self.bot.get_guild(674259612580446230)
         unverified_role = thegye_sever.get_role(1028144304507592704)
-        if ctx.guild is not None:
-            await ctx.send("Sent you a DM!")
+        if interaction.guild is not None:
+            await interaction.followup.send("Sent you a DM!")
 
         # checks to make sure the author is the author and the guild is a DM
         def authorcheck(message):
-            return ctx.author.id == message.author.id and message.guild is None
+            return interaction.user.id == message.author.id and message.guild is None
 
         # checks to see if the user has already verified yet or not
         verified_check = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''', author.id)
