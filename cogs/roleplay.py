@@ -155,7 +155,12 @@ class Roleplay(commands.Cog):
         content_string = f"Presented by Senator {author}.\n" \
                          f"{url}\n" \
                          f"{senator_role.mention}s, this bill is now open for debate."
-        thread = await floor_channel.create_thread(name=title, content=content_string)
+        tags = floor_channel.available_tags
+        for t in tags:
+            if t.name == "Debating":
+                debating = t
+        thread = await floor_channel.create_thread(name=title, content=content_string,
+                                                   applied_tags=[debating])
         # pin the first message
         await thread.message.pin()
         # add tupper
