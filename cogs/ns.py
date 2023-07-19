@@ -1,10 +1,13 @@
 # dispatch cog v 1.4
 import datetime
+import typing
 from io import BytesIO
 from cairosvg import svg2png
 import PIL
 import aiohttp
 import discord
+from discord import app_commands
+
 from ShardBot import Shard
 import asyncio
 from discord.ext import commands
@@ -41,7 +44,7 @@ class NationStates(commands.Cog):
         to_regex = userinput.replace(" ", "_")
         return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
 
-    async def get_nation(self, ctx, nation):
+    async def get_nation(self, interaction: discord.Interaction, nation: str):
         async with aiohttp.ClientSession() as nation_session:
             headers = {'User-Agent': 'Bassiliya'}
             params = {'nation': nation}
@@ -60,9 +63,9 @@ class NationStates(commands.Cog):
                                           headers=headers, params=params) as nation_info:
                 # if the nation does not exist
                 if nation_info.status == 404:
-                    return await ctx.send(f"That nation does not seem to exist. "
-                                          f"You can check for CTEd nations in the Boneyard: "
-                                          f"https://www.nationstates.net/page=boneyard")
+                    return await interaction.followup.send(f"That nation does not seem to exist. "
+                                                           f"You can check for CTEd nations in the Boneyard: "
+                                                           f"https://www.nationstates.net/page=boneyard")
                 # parse data
                 nation_info_raw = await nation_info.text()
                 nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
@@ -121,8 +124,8 @@ class NationStates(commands.Cog):
             try:
                 img = Image.open(BytesIO(get_flag))
             except PIL.UnidentifiedImageError:
-                bytes = svg2png(url=flag_link)
-                img = Image.frombytes(data=bytes, mode="RGB", size=(30,30))
+                svg_bytes = svg2png(url=flag_link)
+                img = Image.frombytes(data=svg_bytes, mode="RGB", size=(30, 30))
                 flag_link = flag_link.replace(".svg", ".png")
             rgb_color = self.get_dominant_color(img)
             flag_color = discord.Colour.from_rgb(rgb_color[0], rgb_color[1], rgb_color[2])
@@ -153,7 +156,7 @@ class NationStates(commands.Cog):
             else:
                 population = f"{float(population)} million {demonym}"
             nation_embed.add_field(name="Population", value=population)
-            await ctx.send(embed=nation_embed)
+            await interaction.followup.send(embed=nation_embed)
 
     async def get_region(self, ctx, region):
         async with aiohttp.ClientSession() as nation_session:
@@ -228,25 +231,31 @@ class NationStates(commands.Cog):
             region_embed.add_field(name="Last Update", value=f"<t:{update}:T>", inline=False)
             await ctx.send(embed=region_embed)
 
-    @commands.command(brief="Displays information about a nation", aliases=['n'])
-    async def nation(self, ctx, *, args=None):
+    ns = app_commands.Group(name="ns", description="...")
+
+    @ns.command(name="nation", description="Displays information about a nation")
+    @app_commands.describe(nation_name="The name of the nation you would like to search for.")
+    async def nation(self, interaction: discord.Interaction, nation_name: typing.Optional[str]):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
         # establishes connection
         conn = self.bot.pool
         # defines nation
-        if args is None:
+        if nation_name is None:
             # fetches nation info
-            main_nation = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''', ctx.author.id)
+            main_nation = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
+                                              interaction.user.id)
             # if there is no verified nation
             if main_nation['main_nation'] is None:
                 raise commands.UserInputError
             # otherwise
             else:
-                await self.get_nation(ctx, main_nation['main_nation'])
+                await self.get_nation(interaction, main_nation['main_nation'])
         else:
-            await self.get_nation(ctx, args)
+            await self.get_nation(interaction, nation_name)
 
-    @commands.command(brief="Displays information about a region", aliases=['r'])
-    async def region(self, ctx, *, args):
+    @ns.command(description="Displays information about a region")
+    async def region(self, interaction: discord.Interaction, region_name: str):
         await self.get_region(ctx, args)
 
     @commands.command(brief="Displays the NS telegram queue", aliases=['tgq'])
