@@ -257,6 +257,8 @@ class NationStates(commands.Cog):
     @ns.command(description="Displays information about a region")
     @app_commands.describe(region_name="The name of the region you would like to search for")
     async def region(self, interaction: discord.Interaction, region_name: str):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
         await self.get_region(interaction=interaction, region=region_name)
 
     @commands.command(brief="Displays the NS telegram queue", aliases=['tgq'])
