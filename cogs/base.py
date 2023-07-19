@@ -162,6 +162,34 @@ class BaseCommands(commands.Cog):
         channel = self.bot.get_channel(835579413625569322)
         await channel.send("We are online.")
 
+    @app_commands.command(name="add_role", description="Adds a legal role to a user.")
+    @app_commands.describe(role="The role you wish to add.", user="MODERATORS ONLY")
+    async def manage_roles(self, interaction: discord.Interaction, role: discord.Role, user: discord.User = None):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        moderator = interaction.guild.get_role(798416884462387220)
+        admin = interaction.guild.get_role(674278353204674598)
+        # if the user tries to assign a role to someone else and they are not a moderator, refuse
+        if moderator not in interaction.user.roles:
+            if admin not in interaction.user.roles:
+                return interaction.followup.send("You do not have the permissions to assign roles to other users.")
+        # make connection
+        conn = self.bot.pool
+        # fetch all the role IDs
+        roles = await conn.fetchrow('''SELECT * FROM info WHERE name="roles";''')
+        roles = roles['number_list']
+        if role.id not in roles:
+            return await interaction.followup.send("That role cannot be self-assigned.")
+        else:
+            if role in interaction.user.roles:
+                await interaction.user.remove_roles(role)
+                return await interaction.followup.send(f"You have removed the `{role.name}` role.")
+            else:
+                await interaction.user.add_roles(role)
+                return await interaction.followup.send(f"You have added the `{role.name}` role.")
+
+
+
     @commands.command()
     @commands.is_owner()
     async def error(self, ctx):
