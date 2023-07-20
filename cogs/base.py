@@ -176,7 +176,7 @@ class BaseCommands(commands.Cog):
         # make connection
         conn = self.bot.pool
         # fetch all the role IDs
-        roles = await conn.fetchrow('''SELECT * FROM info WHERE name="roles";''')
+        roles = await conn.fetchrow('''SELECT * FROM info WHERE name='roles';''')
         roles = roles['number_list']
         if role.id not in roles:
             return await interaction.followup.send("That role cannot be self-assigned.")
