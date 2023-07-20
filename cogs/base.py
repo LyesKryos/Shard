@@ -162,7 +162,7 @@ class BaseCommands(commands.Cog):
         channel = self.bot.get_channel(835579413625569322)
         await channel.send("We are online.")
 
-    @app_commands.command(name="add_role", description="Adds a legal role to a user.")
+    @app_commands.command(name="manage_roles", description="Adds a legal role to a user.")
     @app_commands.describe(role="The role you wish to add.", user="MODERATORS ONLY")
     async def manage_roles(self, interaction: discord.Interaction, role: discord.Role, user: discord.User = None):
         # defer interaction
