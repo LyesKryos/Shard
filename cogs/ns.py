@@ -247,7 +247,7 @@ class NationStates(commands.Cog):
                                               interaction.user.id)
             # if there is no verified nation
             if main_nation['main_nation'] is None:
-                raise commands.UserInputError
+                return await interaction.followup.send("You have no main nation set.")
             # otherwise
             else:
                 await self.get_nation(interaction, main_nation['main_nation'])
