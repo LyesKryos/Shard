@@ -128,10 +128,10 @@ class WA(commands.Cog):
                         else:
                             items.append(region.text.strip())
                     if region.tag == "FOUNDERAUTH":
-                        if region.text is not None:
-                            items.append(region.text.strip())
-                        else:
+                        if region.text is None:
                             items.append("Non-exec")
+                        else:
+                            items.append(region.text.strip())
                     if region.tag == "POWER":
                         items.append(region.text.strip())
                     if region.tag == "NATIONS":
