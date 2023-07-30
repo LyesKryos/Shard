@@ -129,10 +129,7 @@ class WA(commands.Cog):
                             items.append(region.text.strip())
                     if region.tag == "FOUNDERAUTH":
                         if region.text is not None:
-                            if region.text == "XABCEP":
-                                items.append("All")
-                            else:
-                                items.append(region.text.strip())
+                            items.append(region.text.strip())
                         else:
                             items.append("Non-exec")
                     if region.tag == "POWER":
