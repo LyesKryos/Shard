@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 
 import discord.utils
 import requests
+from discord import app_commands
 from discord.ext import commands
 from time import perf_counter, strftime
 
@@ -243,6 +244,14 @@ class WA(commands.Cog):
         async with ctx.typing():
             await self.region_dump()
             await self.nation_dump()
+
+    @app_commands.command(name="spyglass", description="Loads a current spyglass file.")
+    async def spyglass(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        with open(f'{self.directory_variable}region_dump.csv', 'rb+', ) as region_dump:
+            return await interaction.followup.send(content="Enjoy!", file=discord.File(region_dump, "region_dump.csv"))
+
 
 
 async def setup(bot: Shard):
