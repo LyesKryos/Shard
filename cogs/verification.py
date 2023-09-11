@@ -19,11 +19,11 @@ from customchecks import TooManyRequests
 from ratelimiter import Ratelimiter
 
 class VerificationView(View):
-    def __init__(self, member, message):
+    def __init__(self, member, message, ctx):
         self.member = member
         self.message = message
         super().__init__(timeout=300)
-        self.add_item(VerificationDropdown(member))
+        self.add_item(VerificationDropdown(member, ctx))
 
     async def on_timeout(self) -> None:
         # remove dropdown
@@ -35,7 +35,7 @@ class VerificationView(View):
 
 class VerificationDropdown(discord.ui.Select):
 
-    def __init__(self, member):
+    def __init__(self, member, ctx):
         # define bot
         self.bot = None
         # define message
@@ -589,7 +589,7 @@ class Verification(commands.Cog):
                                                      "Please try again.")
 
     @commands.Cog.listener()
-    async def on_member_join(self, member):
+    async def on_member_join(self, member, ctx):
         # if this is the Thegye server
         if member.guild.id == 674259612580446230:
             thegye_server = self.bot.get_guild(674259612580446230)
@@ -599,7 +599,7 @@ class Verification(commands.Cog):
             await member.add_roles(unverified_role, dispatch_role)
             welcome_message = await gatehouse_channel.send(f"Welcome to the official "
                                                            f"Thegye Discord server, {member.mention}!")
-            await welcome_message.edit(view=VerificationView(member, welcome_message))
+            await welcome_message.edit(view=VerificationView(member, welcome_message, ctx))
 
 
     @verification.command(name="unverify", description="Remove a nation from your verified list.")
