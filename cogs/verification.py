@@ -46,7 +46,7 @@ class VerificationDropdown(discord.ui.Select):
         options = [
             discord.SelectOption(label="NationStates",
                                  description="You're here because of the NationStates Thegye region!",
-                                 emoji=discord.PartialEmoji(name="thegyeofficialflag")),
+                                 emoji="<:thegyeofficialflag:1098650865331613836>"),
             discord.SelectOption(label="Geopolitical Roleplay",
                                  description="You're here to roleplay within the Thegye geopolitical universe!",
                                  emoji="\U0001f310"),
