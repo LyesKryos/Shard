@@ -27,9 +27,9 @@ class VerificationView(View):
 
     async def on_timeout(self) -> None:
         # remove dropdown
-        for item in self.children:
+        '''''''''''for item in self.children:
             self.remove_item(item)
-        return await self.message.edit(content="Timed out. Please respond next time!", view=self)
+        return await self.message.edit(content="Timed out. Please respond next time!", view=self)'''''''''''
 
 
 
@@ -300,7 +300,6 @@ class VerificationDropdown(discord.ui.Select):
             open_square = thegye_server.get_channel(674335095628365855)
             await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
                                    f"and introduce yourself!")
-
         except Exception as error:
             etype = type(error)
             trace = error.__traceback__
