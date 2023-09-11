@@ -66,7 +66,7 @@ class VerificationDropdown(discord.ui.Select):
         to_regex = userinput.replace(" ", "_")
         return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
 
-    async def callback(self, bot):
+    async def callback(self):
         try:
             # establish connection
             conn = self.bot.pool
@@ -77,6 +77,7 @@ class VerificationDropdown(discord.ui.Select):
             nationstates_role = thegye_server.get_role(674280677268652047)
             roleplay_role = thegye_server.get_role(674339122491424789)
             gatehouse = thegye_server.get_channel(674284159128043530)
+            user = self.member
             # assign roles for nationstates
             if self.values[0] == "NationStates":
                 # add the nationstates role
