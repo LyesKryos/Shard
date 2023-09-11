@@ -66,7 +66,7 @@ class VerificationDropdown(discord.ui.Select):
         to_regex = userinput.replace(" ", "_")
         return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
 
-    async def callback(self):
+    async def callback(self, bot):
         try:
             # establish connection
             conn = self.bot.pool
