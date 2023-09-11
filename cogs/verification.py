@@ -19,11 +19,11 @@ from customchecks import TooManyRequests
 from ratelimiter import Ratelimiter
 
 class VerificationView(View):
-    def __init__(self, member, message, ctx):
+    def __init__(self, member, message, bot):
         self.member = member
         self.message = message
         super().__init__(timeout=300)
-        self.add_item(VerificationDropdown(member, ctx))
+        self.add_item(VerificationDropdown(member, bot))
 
     async def on_timeout(self) -> None:
         # remove dropdown
@@ -35,9 +35,9 @@ class VerificationView(View):
 
 class VerificationDropdown(discord.ui.Select):
 
-    def __init__(self, member, ctx):
+    def __init__(self, member, bot):
         # define bot
-        self.bot = None
+        self.bot = bot
         # define message
         self.member = member
         # define page
@@ -66,9 +66,8 @@ class VerificationDropdown(discord.ui.Select):
         to_regex = userinput.replace(" ", "_")
         return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
 
-    async def callback(self, ctx):
+    async def callback(self, bot):
         try:
-            self.bot = ctx.bot
             # establish connection
             conn = self.bot.pool
             # define roles
@@ -77,11 +76,12 @@ class VerificationDropdown(discord.ui.Select):
             unverified_role = thegye_server.get_role(1028144304507592704)
             nationstates_role = thegye_server.get_role(674280677268652047)
             roleplay_role = thegye_server.get_role(674339122491424789)
+            gatehouse = thegye_server.get_channel(674284159128043530)
             # assign roles for nationstates
             if self.values[0] == "NationStates":
                 # add the nationstates role
                 await user.add_roles(nationstates_role)
-                await ctx.send("I am sending you a DM!")
+                await gatehouse.send("I am sending you a DM!")
                 # send the user a DM asking for a nation
                 try:
                     verify_dm = await user.create_dm()
@@ -92,7 +92,6 @@ class VerificationDropdown(discord.ui.Select):
                 except discord.Forbidden:
                     # send a message welcoming the user
                     open_square = thegye_server.get_channel(674335095628365855)
-                    gatehouse = thegye_server.get_channel(674284159128043530)
                     await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
                                            f"and introduce yourself!")
                     return await gatehouse.send(f"{user.mention}, I can't DM you! This could be for a few reasons: \n\n"
@@ -589,7 +588,7 @@ class Verification(commands.Cog):
                                                      "Please try again.")
 
     @commands.Cog.listener()
-    async def on_member_join(self, member, ctx):
+    async def on_member_join(self, member):
         # if this is the Thegye server
         if member.guild.id == 674259612580446230:
             thegye_server = self.bot.get_guild(674259612580446230)
@@ -599,7 +598,7 @@ class Verification(commands.Cog):
             await member.add_roles(unverified_role, dispatch_role)
             welcome_message = await gatehouse_channel.send(f"Welcome to the official "
                                                            f"Thegye Discord server, {member.mention}!")
-            await welcome_message.edit(view=VerificationView(member, welcome_message, ctx))
+            await welcome_message.edit(view=VerificationView(member, welcome_message, bot=self.bot))
 
 
     @verification.command(name="unverify", description="Remove a nation from your verified list.")
