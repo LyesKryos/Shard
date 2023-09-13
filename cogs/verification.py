@@ -81,224 +81,223 @@ class VerificationDropdown(discord.ui.Select):
             gatehouse = thegye_server.get_channel(674284159128043530)
             user = self.member
             # assign roles for nationstates
-            if "NationStates" in self.values:
-                # add the nationstates role
-                await user.add_roles(nationstates_role)
-                await gatehouse.send("I am sending you a DM!")
-                # send the user a DM asking for a nation
-                try:
-                    verify_dm = await user.create_dm()
-                    await verify_dm.send("Please reply in this DM with your nation's name. "
-                                         "Please only include the nation's offical name; for example, "
-                                         "if your nation appears as \"The Botique Empire of Bassiliya\", "
-                                         "please enter only \"Bassiliya\".")
-                except discord.Forbidden:
-                    # send a message welcoming the user
-                    open_square = thegye_server.get_channel(674335095628365855)
-                    await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
-                                           f"and introduce yourself!")
-                    return await gatehouse.send(f"{user.mention}, I can't DM you! This could be for a few reasons: \n\n"
-                                                f"1. You have me blocked. Sad. \U0001f614 \n"
-                                                f"2. You are no longer in this server or any server we share. "
-                                                f"*Come back!*\n"
-                                                f"3. You accept DMs only from users you have in your Friends list. "
-                                                f"In order to allow me to DM you, go to `Settings > Privacy & Safety > "
-                                                f"Server Privacy Defaults` and toggle **ON** the "
-                                                f"`Allow direct messages from server members.\n\n"
-                                                f"Once you have fixed any of the aforementioned issues"
-                                                f", please use the `$verify` command again to complete "
-                                                f"the verification process.")
-                # checks to make sure the author is the author and the guild is a DM
-                def authorcheck(message):
-                    return user.id == message.author.id and message.guild is None
+            for response in self.values:
+                if response == "NationStates":
+                    # add the nationstates role
+                    await user.add_roles(nationstates_role)
+                    await gatehouse.send("I am sending you a DM!")
+                    # send the user a DM asking for a nation
+                    try:
+                        verify_dm = await user.create_dm()
+                        await verify_dm.send("Please reply in this DM with your nation's name. "
+                                             "Please only include the nation's offical name; for example, "
+                                             "if your nation appears as \"The Botique Empire of Bassiliya\", "
+                                             "please enter only \"Bassiliya\".")
+                    except discord.Forbidden:
+                        # send a message welcoming the user
+                        open_square = thegye_server.get_channel(674335095628365855)
+                        await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
+                                               f"and introduce yourself!")
+                        return await gatehouse.send(f"{user.mention}, I can't DM you! This could be for a few reasons: \n\n"
+                                                    f"1. You have me blocked. Sad. \U0001f614 \n"
+                                                    f"2. You are no longer in this server or any server we share. "
+                                                    f"*Come back!*\n"
+                                                    f"3. You accept DMs only from users you have in your Friends list. "
+                                                    f"In order to allow me to DM you, go to `Settings > Privacy & Safety > "
+                                                    f"Server Privacy Defaults` and toggle **ON** the "
+                                                    f"`Allow direct messages from server members.\n\n"
+                                                    f"Once you have fixed any of the aforementioned issues"
+                                                    f", please use the `$verify` command again to complete "
+                                                    f"the verification process.")
+                    # checks to make sure the author is the author and the guild is a DM
+                    def authorcheck(message):
+                        return user.id == message.author.id and message.guild is None
 
-                try:
-                    nation_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
-                except asyncio.TimeoutError:
-                    return await verify_dm.send("Timed out. Please answer me next time!")
-                # get the content
-                nation = nation_reply.content
-                # if content is cancel, cancel
-                if nation.lower() == "cancel":
-                    return await verify_dm.send("Cancelling!")
-                # checks to see if the user has already verified yet or not
-                verified_check = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
-                                                     user.id)
-                # if the user has no verified nations
-                if verified_check is None:
-                    # sends DM to initiate verification
-                    await verify_dm.send(f"**Welcome to the Shard Verification, {user.name}!** \n\n"
-                                         f"To begin the verification process, please login to {nation}. "
-                                         f"Here is a URL to your nation page: https://www.nationstates.net/nation="
-                                         f"{self.sanitize_links_underscore(nation)}")
-                # if the user does have some verified nation(s)
-                else:
-                    # sends DM to initiate verification
-                    await verify_dm.send(f"**Welcome back to the Shard Verification, {user.name}!** \n\n"
-                                         f"To begin the verification process, please login to {nation}. "
-                                         f"Here is a URL to your nation page: https://www.nationstates.net/nation="
-                                         f"{self.sanitize_links_underscore(nation)}")
-                # waits for the user to reply with their nation
-                headers = {"User-Agent": "Bassiliya"}
-                nation_exist = requests.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={nation}",
-                                            headers=headers)
-                # if the nation does not exist, let the user know
-                if nation_exist.status_code == 404:
+                    try:
+                        nation_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
+                    except asyncio.TimeoutError:
+                        return await verify_dm.send("Timed out. Please answer me next time!")
+                    # get the content
+                    nation = nation_reply.content
+                    # if content is cancel, cancel
+                    if nation.lower() == "cancel":
+                        return await verify_dm.send("Cancelling!")
+                    # checks to see if the user has already verified yet or not
+                    verified_check = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
+                                                         user.id)
+                    # if the user has no verified nations
+                    if verified_check is None:
+                        # sends DM to initiate verification
+                        await verify_dm.send(f"**Welcome to the Shard Verification, {user.name}!** \n\n"
+                                             f"To begin the verification process, please login to {nation}. "
+                                             f"Here is a URL to your nation page: https://www.nationstates.net/nation="
+                                             f"{self.sanitize_links_underscore(nation)}")
+                    # if the user does have some verified nation(s)
+                    else:
+                        # sends DM to initiate verification
+                        await verify_dm.send(f"**Welcome back to the Shard Verification, {user.name}!** \n\n"
+                                             f"To begin the verification process, please login to {nation}. "
+                                             f"Here is a URL to your nation page: https://www.nationstates.net/nation="
+                                             f"{self.sanitize_links_underscore(nation)}")
+                    # waits for the user to reply with their nation
+                    headers = {"User-Agent": "Bassiliya"}
+                    nation_exist = requests.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={nation}",
+                                                headers=headers)
+                    # if the nation does not exist, let the user know
+                    if nation_exist.status_code == 404:
+                        await verify_dm.send(
+                            f"No such nation as `{nation}`. Please check that you are using only the nation's"
+                            f" name, without the pretitle. **You will need to use the `/verify` command again.**")
+                        return
+                    # get official nation name
+                    nation_raw = nation_exist.text
+                    nation_soup = BeautifulSoup(nation_raw, 'lxml')
+                    nation_name = nation_soup.find('name').text
+                    # if the user has already verified that nation
+                    if verified_check is not None:
+                        if nation_name.lower() in [n.lower() for n in verified_check['nations']]:
+                            return await verify_dm.send(
+                                f"You have already verified `{nation_name}`. To view your verified nations, "
+                                f"use `/view_verified`.")
+                    # send verification instructions via DM
                     await verify_dm.send(
-                        f"No such nation as `{nation}`. Please check that you are using only the nation's"
-                        f" name, without the pretitle. **You will need to use the `/verify` command again.**")
-                    return
-                # get official nation name
-                nation_raw = nation_exist.text
-                nation_soup = BeautifulSoup(nation_raw, 'lxml')
-                nation_name = nation_soup.find('name').text
-                # if the user has already verified that nation
-                if verified_check is not None:
-                    if nation_name.lower() in [n.lower() for n in verified_check['nations']]:
-                        return await verify_dm.send(
-                            f"You have already verified `{nation_name}`. To view your verified nations, "
-                            f"use `/view_verified`.")
-                # send verification instructions via DM
-                await verify_dm.send(
-                    f"Please login to {nation_name}. Once complete, head to this link and send me the "
-                    f"verification code displayed: https://www.nationstates.net/page=verify_login. "
-                    f"You may give the code displayed to an external website or tool, like me, "
-                    f"which can use it to verify that you are indeed currently logged in as this nation. "
-                    f"This is *all* I can do with it: It does not allow me to access your nation.")
-                # wait for response
-                try:
-                    code_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
-                except asyncio.TimeoutError:
-                    return await verify_dm.send("Verification timed out. Please answer me next time!")
-                # define headers and parameters
-                params = {'a': 'verify',
-                          'nation': nation_name,
-                          'checksum': code_reply.content,
-                          'q': 'region+wa'}
-                # start session
-                async with aiohttp.ClientSession() as verify_session:
-                    # call for necessary data
-                    async with verify_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                                  headers=headers, params=params) as verifying:
-                        await asyncio.sleep(.6)
-                        # parse the verification response
-                        verification_raw = await verifying.text()
-                        verification_soup = BeautifulSoup(verification_raw, 'lxml')
-                        # fetch verification
-                        verification = verification_soup.verify.string
-                        # if the verification code is good
-                        if int(verification) == 1:
-                            # if the user has no verified nation, add a new row
-                            if verified_check is None:
-                                await conn.execute(
-                                    '''INSERT INTO verified_nations(user_id, nations) VALUES ($1, $2);''',
-                                    user.id, [nation_name])
-                                # if the nation's region is Thegye, add the Thegye role
-                                if verification_soup.region.text == "Thegye":
-                                    thegye_role = thegye_server.get_role(674260547897917460)
-                                    user = thegye_server.get_member(user.id)
-                                    # if the nation is in the WA, add the WA role
-                                    if verification_soup.unstatus.text != "Non-member":
-                                        wa_role = thegye_server.get_role(674283915870994442)
-                                        await user.add_roles(wa_role)
-                                    await user.add_roles(thegye_role)
-                                    await user.remove_roles(unverified_role)
-                                # if the nation's region is Karma, add the Karma role
-                                elif verification_soup.region.text == "Karma":
+                        f"Please login to {nation_name}. Once complete, head to this link and send me the "
+                        f"verification code displayed: https://www.nationstates.net/page=verify_login. "
+                        f"You may give the code displayed to an external website or tool, like me, "
+                        f"which can use it to verify that you are indeed currently logged in as this nation. "
+                        f"This is *all* I can do with it: It does not allow me to access your nation.")
+                    # wait for response
+                    try:
+                        code_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
+                    except asyncio.TimeoutError:
+                        return await verify_dm.send("Verification timed out. Please answer me next time!")
+                    # define headers and parameters
+                    params = {'a': 'verify',
+                              'nation': nation_name,
+                              'checksum': code_reply.content,
+                              'q': 'region+wa'}
+                    # start session
+                    async with aiohttp.ClientSession() as verify_session:
+                        # call for necessary data
+                        async with verify_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                                      headers=headers, params=params) as verifying:
+                            await asyncio.sleep(.6)
+                            # parse the verification response
+                            verification_raw = await verifying.text()
+                            verification_soup = BeautifulSoup(verification_raw, 'lxml')
+                            # fetch verification
+                            verification = verification_soup.verify.string
+                            # if the verification code is good
+                            if int(verification) == 1:
+                                # if the user has no verified nation, add a new row
+                                if verified_check is None:
+                                    await conn.execute(
+                                        '''INSERT INTO verified_nations(user_id, nations) VALUES ($1, $2);''',
+                                        user.id, [nation_name])
+                                    # if the nation's region is Thegye, add the Thegye role
+                                    if verification_soup.region.text == "Thegye":
+                                        thegye_role = thegye_server.get_role(674260547897917460)
+                                        user = thegye_server.get_member(user.id)
+                                        # if the nation is in the WA, add the WA role
+                                        if verification_soup.unstatus.text != "Non-member":
+                                            wa_role = thegye_server.get_role(674283915870994442)
+                                            await user.add_roles(wa_role)
+                                        await user.add_roles(thegye_role)
+                                        await user.remove_roles(unverified_role)
+                                    # if the nation's region is Karma, add the Karma role
+                                    elif verification_soup.region.text == "Karma":
+                                        thegye_server = self.bot.get_guild(674259612580446230)
+                                        karma_role = thegye_server.get_role(771456227674685440)
+                                        user = thegye_server.get_member(user.id)
+                                        await user.add_roles(karma_role)
+                                        await user.remove_roles(unverified_role)
+                                    # otherwise, add the traveler role
+                                    else:
+                                        thegye_server = self.bot.get_guild(674259612580446230)
+                                        traveler_role = thegye_server.get_role(674280677268652047)
+                                        user = thegye_server.get_member(user.id)
+                                        await user.add_roles(traveler_role)
+                                        await user.remove_roles(unverified_role)
+                                # if the user has previously verified a nation
+                                else:
+                                    # append the verified nation to the list
+                                    await conn.execute('''UPDATE verified_nations SET nations = nations || $1
+                                    WHERE user_id = $2;''', [nation_name], user.id)
+                                    all_nations = await conn.fetchrow(
+                                        '''SELECT * FROM verified_nations WHERE user_id = $1;''',
+                                        user.id)
                                     thegye_server = self.bot.get_guild(674259612580446230)
+                                    thegye_role = thegye_server.get_role(674260547897917460)
+                                    traveler_role = thegye_server.get_role(674280677268652047)
                                     karma_role = thegye_server.get_role(771456227674685440)
                                     user = thegye_server.get_member(user.id)
-                                    await user.add_roles(karma_role)
-                                    await user.remove_roles(unverified_role)
-                                # otherwise, add the traveler role
-                                else:
-                                    thegye_server = self.bot.get_guild(674259612580446230)
-                                    traveler_role = thegye_server.get_role(674280677268652047)
-                                    user = thegye_server.get_member(user.id)
-                                    await user.add_roles(traveler_role)
-                                    await user.remove_roles(unverified_role)
-                            # if the user has previously verified a nation
+                                    await user.remove_roles(thegye_role, traveler_role, karma_role)
+                                    for n in all_nations['nations']:
+                                        async with verify_session.get(
+                                                f"https://www.nationstates.net/cgi-bin/api.cgi?nation={n}",
+                                                headers=headers) as nation_info:
+                                            await asyncio.sleep(.6)
+                                            nation_info_raw = await nation_info.text()
+                                            nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
+                                            region = nation_info_soup.region.text
+                                            # if the nation's region is Thegye, add the Thegye role
+                                            if region == "Thegye":
+                                                await user.remove_roles(traveler_role, karma_role)
+                                                await verify_dm.send(
+                                                    f"Success! You have now verified `{nation_name}`. "
+                                                    f"Your roles will update momentarily. "
+                                                    f"If you would like to set your main nation, "
+                                                    f"use the `$set_main` command to do so.")
+                                                # if the nation is in the WA, add the WA role
+                                                if nation_info_soup.unstatus.text != "Non-member":
+                                                    wa_role = thegye_server.get_role(674283915870994442)
+                                                    await user.add_roles(wa_role)
+                                                return await user.add_roles(thegye_role)
+                                            # if the nation's region is Karma, add the Karma role
+                                            elif region == "Karma":
+                                                await user.add_roles(karma_role)
+                                            # otherwise, add the traveler role
+                                            else:
+                                                await user.add_roles(traveler_role)
+                                verifying.close()
+                                return await verify_dm.send(f"Success! You have now verified `{nation_name}`. "
+                                                                 f"Your roles will update momentarily. "
+                                                                 f"If you would like to set your main nation, "
+                                                                 f"use the `/set_main` command to do so.")
                             else:
-                                # append the verified nation to the list
-                                await conn.execute('''UPDATE verified_nations SET nations = nations || $1
-                                WHERE user_id = $2;''', [nation_name], user.id)
-                                all_nations = await conn.fetchrow(
-                                    '''SELECT * FROM verified_nations WHERE user_id = $1;''',
-                                    user.id)
-                                thegye_server = self.bot.get_guild(674259612580446230)
-                                thegye_role = thegye_server.get_role(674260547897917460)
-                                traveler_role = thegye_server.get_role(674280677268652047)
-                                karma_role = thegye_server.get_role(771456227674685440)
-                                user = thegye_server.get_member(user.id)
-                                await user.remove_roles(thegye_role, traveler_role, karma_role)
-                                for n in all_nations['nations']:
-                                    async with verify_session.get(
-                                            f"https://www.nationstates.net/cgi-bin/api.cgi?nation={n}",
-                                            headers=headers) as nation_info:
-                                        await asyncio.sleep(.6)
-                                        nation_info_raw = await nation_info.text()
-                                        nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
-                                        region = nation_info_soup.region.text
-                                        # if the nation's region is Thegye, add the Thegye role
-                                        if region == "Thegye":
-                                            await user.remove_roles(traveler_role, karma_role)
-                                            await verify_dm.send(
-                                                f"Success! You have now verified `{nation_name}`. "
-                                                f"Your roles will update momentarily. "
-                                                f"If you would like to set your main nation, "
-                                                f"use the `$set_main` command to do so.")
-                                            # if the nation is in the WA, add the WA role
-                                            if nation_info_soup.unstatus.text != "Non-member":
-                                                wa_role = thegye_server.get_role(674283915870994442)
-                                                await user.add_roles(wa_role)
-                                            return await user.add_roles(thegye_role)
-                                        # if the nation's region is Karma, add the Karma role
-                                        elif region == "Karma":
-                                            await user.add_roles(karma_role)
-                                        # otherwise, add the traveler role
-                                        else:
-                                            await user.add_roles(traveler_role)
-                            verifying.close()
-                            return await verify_dm.send(f"Success! You have now verified `{nation_name}`. "
-                                                             f"Your roles will update momentarily. "
-                                                             f"If you would like to set your main nation, "
-                                                             f"use the `/set_main` command to do so.")
-                        else:
-                            return await verify_dm.send("That is not a valid or correct verification code. "
-                                                             "Please try again.")
-
-            # assign roles for nation RP
-            if "Geopolitical Roleplay" in self.values:
-                await user.add_roles(roleplay_role, unverified_role)
-                ooc_chat = thegye_server.get_channel(674337504933052469)
-                await ooc_chat.send(f"Welcome to the Geopolitical Roleplay channels, {user.mention}!\n\n"
-                                    f"These channels are used solely for the geopolitical roleplay within the Thegye "
-                                    f"universe. Here you can browse current RPs, participate in worldbuilding, and chat"
-                                    f" with your fellow RPers. If you'd like to join our RP, you will need to:\n"
-                                    f"**1.** Have a nation within the [**Thegye NationStates region**]"
-                                    f"(<https://www.nationstates.net/region=thegye>)\n"
-                                    f"**2.** Fill out the [**Roleplay Statistics Chart**]"
-                                    f"(<https://www.nationstates.net/page=dispatch/id=1371516>)\n"
-                                    f"**3.** Apply for a location on the [**nation map**]"
-                                    f"(<https://www.nationstates.net/page=dispatch/id=1310572>)\n\n"
-                                    f"After you have completed those steps, you are ready to go! Check out our "
-                                    f"[**roleplay dispatch**](<https://www.nationstates.net/page=dispatch/id=1370630>)"
-                                    f" for more information! Feel free to let us know if you have any questions.")
-            # assign roles for Senate RP
-            if "Grand Senate of Thegye Roleplay" in self.values:
-                await user.remove_roles(unverified_role)
-                backroom_channel = thegye_server.get_channel(1112080185949437983)
-                await backroom_channel.send(f"Welcome to the Grand Senate of Thegye, {user.mention}!\n\n"
-                                            f"To apply for the Senate role, just use the `/senate apply` command and "
-                                            f"fill out all the required fields. If you've like to find more information"
-                                            f" about our roleplay and how you can participate before applying, "
-                                            f"be sure to check out our [dedicated wiki]"
-                                            f"(<https://thegye.miraheze.org/wiki/Main_Page>) where you can find helpful"
-                                            f" information and more! Be sure to let us know if you have any questions.")
-
-            # assign roles for other
-            if "Other" in self.values:
-                await user.add_roles(traveler_role)
+                                return await verify_dm.send("That is not a valid or correct verification code. "
+                                                                 "Please try again.")
+                # assign roles for nation RP
+                if response == "Geopolitical Roleplay":
+                    await user.add_roles(roleplay_role, unverified_role)
+                    ooc_chat = thegye_server.get_channel(674337504933052469)
+                    await ooc_chat.send(f"Welcome to the Geopolitical Roleplay channels, {user.mention}!\n\n"
+                                        f"These channels are used solely for the geopolitical roleplay within the Thegye "
+                                        f"universe. Here you can browse current RPs, participate in worldbuilding, and chat"
+                                        f" with your fellow RPers. If you'd like to join our RP, you will need to:\n"
+                                        f"**1.** Have a nation within the [**Thegye NationStates region**]"
+                                        f"(<https://www.nationstates.net/region=thegye>)\n"
+                                        f"**2.** Fill out the [**Roleplay Statistics Chart**]"
+                                        f"(<https://www.nationstates.net/page=dispatch/id=1371516>)\n"
+                                        f"**3.** Apply for a location on the [**nation map**]"
+                                        f"(<https://www.nationstates.net/page=dispatch/id=1310572>)\n\n"
+                                        f"After you have completed those steps, you are ready to go! Check out our "
+                                        f"[**roleplay dispatch**](<https://www.nationstates.net/page=dispatch/id=1370630>)"
+                                        f" for more information! Feel free to let us know if you have any questions.")
+                # assign roles for Senate RP
+                if response == "Grand Senate of Thegye Roleplay" in self.values:
+                    await user.remove_roles(unverified_role)
+                    backroom_channel = thegye_server.get_channel(1112080185949437983)
+                    await backroom_channel.send(f"Welcome to the Grand Senate of Thegye, {user.mention}!\n\n"
+                                                f"To apply for the Senate role, just use the `/senate apply` command and "
+                                                f"fill out all the required fields. If you've like to find more information"
+                                                f" about our roleplay and how you can participate before applying, "
+                                                f"be sure to check out our [dedicated wiki]"
+                                                f"(<https://thegye.miraheze.org/wiki/Main_Page>) where you can find helpful"
+                                                f" information and more! Be sure to let us know if you have any questions.")
+                # assign roles for other
+                if response == "Other" in self.values:
+                    await user.add_roles(traveler_role)
             open_square = thegye_server.get_channel(674335095628365855)
             await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
                                    f"and introduce yourself!")
