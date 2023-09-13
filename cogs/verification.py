@@ -116,11 +116,13 @@ class VerificationDropdown(discord.ui.Select):
                     try:
                         nation_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
                     except asyncio.TimeoutError:
+                        await user.add_role(traveler_role)
                         return await verify_dm.send("Timed out. Please answer me next time!")
                     # get the content
                     nation = nation_reply.content
                     # if content is cancel, cancel
                     if nation.lower() == "cancel":
+                        await user.add_role(traveler_role)
                         return await verify_dm.send("Cancelling!")
                     # checks to see if the user has already verified yet or not
                     verified_check = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
@@ -148,7 +150,7 @@ class VerificationDropdown(discord.ui.Select):
                         await verify_dm.send(
                             f"No such nation as `{nation}`. Please check that you are using only the nation's"
                             f" name, without the pretitle. **You will need to use the `/verify` command again.**")
-                        return
+                        return await user.add_role(traveler_role)
                     # get official nation name
                     nation_raw = nation_exist.text
                     nation_soup = BeautifulSoup(nation_raw, 'lxml')
@@ -170,6 +172,7 @@ class VerificationDropdown(discord.ui.Select):
                     try:
                         code_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
                     except asyncio.TimeoutError:
+                        await user.add_role(traveler_role)
                         return await verify_dm.send("Verification timed out. Please answer me next time!")
                     # define headers and parameters
                     params = {'a': 'verify',
@@ -203,21 +206,18 @@ class VerificationDropdown(discord.ui.Select):
                                             wa_role = thegye_server.get_role(674283915870994442)
                                             await user.add_roles(wa_role)
                                         await user.add_roles(thegye_role)
-                                        await user.remove_roles(unverified_role)
                                     # if the nation's region is Karma, add the Karma role
                                     elif verification_soup.region.text == "Karma":
                                         thegye_server = self.bot.get_guild(674259612580446230)
                                         karma_role = thegye_server.get_role(771456227674685440)
                                         user = thegye_server.get_member(user.id)
                                         await user.add_roles(karma_role)
-                                        await user.remove_roles(unverified_role)
                                     # otherwise, add the traveler role
                                     else:
                                         thegye_server = self.bot.get_guild(674259612580446230)
                                         traveler_role = thegye_server.get_role(674280677268652047)
                                         user = thegye_server.get_member(user.id)
                                         await user.add_roles(traveler_role)
-                                        await user.remove_roles(unverified_role)
                                 # if the user has previously verified a nation
                                 else:
                                     # append the verified nation to the list
@@ -226,11 +226,8 @@ class VerificationDropdown(discord.ui.Select):
                                     all_nations = await conn.fetchrow(
                                         '''SELECT * FROM verified_nations WHERE user_id = $1;''',
                                         user.id)
-                                    thegye_server = self.bot.get_guild(674259612580446230)
                                     thegye_role = thegye_server.get_role(674260547897917460)
-                                    traveler_role = thegye_server.get_role(674280677268652047)
                                     karma_role = thegye_server.get_role(771456227674685440)
-                                    user = thegye_server.get_member(user.id)
                                     await user.remove_roles(thegye_role, traveler_role, karma_role)
                                     for n in all_nations['nations']:
                                         async with verify_session.get(
@@ -265,11 +262,12 @@ class VerificationDropdown(discord.ui.Select):
                                                                  f"If you would like to set your main nation, "
                                                                  f"use the `/set_main` command to do so.")
                             else:
+                                await user.add_role(traveler_role)
                                 return await verify_dm.send("That is not a valid or correct verification code. "
                                                                  "Please try again.")
                 # assign roles for nation RP
                 if response == "Geopolitical Roleplay":
-                    await user.add_roles(roleplay_role, unverified_role)
+                    await user.add_roles(roleplay_role, traveler_role)
                     ooc_chat = thegye_server.get_channel(674337504933052469)
                     await ooc_chat.send(f"Welcome to the Geopolitical Roleplay channels, {user.mention}!\n\n"
                                         f"These channels are used solely for the geopolitical roleplay within the Thegye "
@@ -287,6 +285,7 @@ class VerificationDropdown(discord.ui.Select):
                 # assign roles for Senate RP
                 if response == "Grand Senate of Thegye Roleplay" in self.values:
                     await user.remove_roles(unverified_role)
+                    await user.add_roles(traveler_role)
                     backroom_channel = thegye_server.get_channel(1112080185949437983)
                     await backroom_channel.send(f"Welcome to the Grand Senate of Thegye, {user.mention}!\n\n"
                                                 f"To apply for the Senate role, just use the `/senate apply` command and "
@@ -298,6 +297,7 @@ class VerificationDropdown(discord.ui.Select):
                 # assign roles for other
                 if response == "Other" in self.values:
                     await user.add_roles(traveler_role)
+            await user.remove_roles(unverified_role)
             open_square = thegye_server.get_channel(674335095628365855)
             await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
                                    f"and introduce yourself!")
