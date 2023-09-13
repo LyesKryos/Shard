@@ -23,7 +23,7 @@ class VerificationView(View):
         self.member = member
         self.message = message
         super().__init__(timeout=300)
-        self.add_item(VerificationDropdown(member, bot))
+        self.add_item(VerificationDropdown(member, bot, message))
 
     async def on_timeout(self) -> None:
         # remove dropdown
@@ -35,10 +35,11 @@ class VerificationView(View):
 
 class VerificationDropdown(discord.ui.Select):
 
-    def __init__(self, member, bot):
+    def __init__(self, member, bot, message):
         # define bot
         self.bot = bot
         # define message
+        self.message = message
         self.member = member
         # define page
         self.page = 1
@@ -76,10 +77,11 @@ class VerificationDropdown(discord.ui.Select):
             unverified_role = thegye_server.get_role(1028144304507592704)
             nationstates_role = thegye_server.get_role(674280677268652047)
             roleplay_role = thegye_server.get_role(674339122491424789)
+            traveler_role = thegye_server.get_role(674280677268652047)
             gatehouse = thegye_server.get_channel(674284159128043530)
             user = self.member
             # assign roles for nationstates
-            if self.values[0] == "NationStates":
+            if "NationStates" in self.values:
                 # add the nationstates role
                 await user.add_roles(nationstates_role)
                 await gatehouse.send("I am sending you a DM!")
@@ -266,7 +268,7 @@ class VerificationDropdown(discord.ui.Select):
                                                              "Please try again.")
 
             # assign roles for nation RP
-            if self.values[0] == "Geopolitical Roleplay":
+            if "Geopolitical Roleplay" in self.values:
                 await user.add_roles(roleplay_role, unverified_role)
                 ooc_chat = thegye_server.get_channel(674337504933052469)
                 await ooc_chat.send(f"Welcome to the Geopolitical Roleplay channels, {user.mention}!\n\n"
@@ -283,7 +285,7 @@ class VerificationDropdown(discord.ui.Select):
                                     f"[**roleplay dispatch**](<https://www.nationstates.net/page=dispatch/id=1370630>)"
                                     f" for more information! Feel free to let us know if you have any questions.")
             # assign roles for Senate RP
-            if self.values[0] == "Grand Senate of Thegye Roleplay":
+            if "Grand Senate of Thegye Roleplay" in self.values:
                 await user.remove_roles(unverified_role)
                 backroom_channel = thegye_server.get_channel(1112080185949437983)
                 await backroom_channel.send(f"Welcome to the Grand Senate of Thegye, {user.mention}!\n\n"
@@ -295,11 +297,12 @@ class VerificationDropdown(discord.ui.Select):
                                             f" information and more! Be sure to let us know if you have any questions.")
 
             # assign roles for other
-            if self.values[0] == "Other":
-                pass
+            if "Other" in self.values:
+                await user.add_roles(traveler_role)
             open_square = thegye_server.get_channel(674335095628365855)
             await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
                                    f"and introduce yourself!")
+            await self.message.delete()
         except Exception as error:
             etype = type(error)
             trace = error.__traceback__
@@ -598,7 +601,7 @@ class Verification(commands.Cog):
             await member.add_roles(unverified_role, dispatch_role)
             welcome_message = await gatehouse_channel.send(f"Welcome to the official "
                                                            f"Thegye Discord server, {member.mention}!")
-            await welcome_message.edit(view=VerificationView(member, welcome_message, bot=self.bot))
+            await welcome_message.edit(view=VerificationView(member=member, message=welcome_message, bot=self.bot))
 
 
     @verification.command(name="unverify", description="Remove a nation from your verified list.")
