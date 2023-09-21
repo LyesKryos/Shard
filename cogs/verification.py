@@ -18,6 +18,7 @@ from typing import Optional
 from customchecks import TooManyRequests
 from ratelimiter import Ratelimiter
 
+
 class VerificationView(View):
     def __init__(self, member, message, bot):
         self.member = member
@@ -30,7 +31,6 @@ class VerificationView(View):
         '''''''''''for item in self.children:
             self.remove_item(item)
         return await self.message.edit(content="Timed out. Please respond next time!", view=self)'''''''''''
-
 
 
 class VerificationDropdown(discord.ui.Select):
@@ -98,17 +98,19 @@ class VerificationDropdown(discord.ui.Select):
                         open_square = thegye_server.get_channel(674335095628365855)
                         await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
                                                f"and introduce yourself!")
-                        return await gatehouse.send(f"{user.mention}, I can't DM you! This could be for a few reasons: \n\n"
-                                                    f"1. You have me blocked. Sad. \U0001f614 \n"
-                                                    f"2. You are no longer in this server or any server we share. "
-                                                    f"*Come back!*\n"
-                                                    f"3. You accept DMs only from users you have in your Friends list. "
-                                                    f"In order to allow me to DM you, go to `Settings > "
-                                                    f"Privacy & Safety > Server Privacy Defaults` and toggle **ON** the"
-                                                    f" `Allow direct messages from server members.\n\n"
-                                                    f"Once you have fixed any of the aforementioned issues"
-                                                    f", please use the `/verification verify` command again to complete"
-                                                    f" the verification process.")
+                        return await gatehouse.send(
+                            f"{user.mention}, I can't DM you! This could be for a few reasons: \n\n"
+                            f"1. You have me blocked. Sad. \U0001f614 \n"
+                            f"2. You are no longer in this server or any server we share. "
+                            f"*Come back!*\n"
+                            f"3. You accept DMs only from users you have in your Friends list. "
+                            f"In order to allow me to DM you, go to `Settings > "
+                            f"Privacy & Safety > Server Privacy Defaults` and toggle **ON** the"
+                            f" `Allow direct messages from server members.\n\n"
+                            f"Once you have fixed any of the aforementioned issues"
+                            f", please use the `/verification verify` command again to complete"
+                            f" the verification process.")
+
                     # checks to make sure the author is the author and the guild is a DM
                     def authorcheck(message):
                         return user.id == message.author.id and message.guild is None
@@ -195,8 +197,8 @@ class VerificationDropdown(discord.ui.Select):
                                 # if the user has no verified nation, add a new row
                                 if verified_check is None:
                                     await conn.execute(
-                                        '''INSERT INTO verified_nations(user_id, nations) VALUES ($1, $2);''',
-                                        user.id, [nation_name])
+                                        '''INSERT INTO verified_nations(user_id, main_nation) VALUES ($1, $2);''',
+                                        user.id, nation_name)
                                     # if the nation's region is Thegye, add the Thegye role
                                     if verification_soup.region.text == "Thegye":
                                         thegye_role = thegye_server.get_role(674260547897917460)
@@ -221,50 +223,44 @@ class VerificationDropdown(discord.ui.Select):
                                 # if the user has previously verified a nation
                                 else:
                                     # append the verified nation to the list
-                                    await conn.execute('''UPDATE verified_nations SET nations = nations || $1
-                                    WHERE user_id = $2;''', [nation_name], user.id)
-                                    all_nations = await conn.fetchrow(
-                                        '''SELECT * FROM verified_nations WHERE user_id = $1;''',
-                                        user.id)
+                                    await conn.execute('''UPDATE verified_nations SET main_nation = $1 
+                                    WHERE user_id = $2;''', nation_name, user.id)
                                     thegye_role = thegye_server.get_role(674260547897917460)
                                     karma_role = thegye_server.get_role(771456227674685440)
                                     await user.remove_roles(thegye_role, traveler_role, karma_role)
-                                    for n in all_nations['nations']:
-                                        async with verify_session.get(
-                                                f"https://www.nationstates.net/cgi-bin/api.cgi?nation={n}",
-                                                headers=headers) as nation_info:
-                                            await asyncio.sleep(.6)
-                                            nation_info_raw = await nation_info.text()
-                                            nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
-                                            region = nation_info_soup.region.text
-                                            # if the nation's region is Thegye, add the Thegye role
-                                            if region == "Thegye":
-                                                await user.remove_roles(traveler_role, karma_role)
-                                                await verify_dm.send(
-                                                    f"Success! You have now verified `{nation_name}`. "
-                                                    f"Your roles will update momentarily. "
-                                                    f"If you would like to set your main nation, "
-                                                    f"use the `$set_main` command to do so.")
-                                                # if the nation is in the WA, add the WA role
-                                                if nation_info_soup.unstatus.text != "Non-member":
-                                                    wa_role = thegye_server.get_role(674283915870994442)
-                                                    await user.add_roles(wa_role)
-                                                return await user.add_roles(thegye_role)
-                                            # if the nation's region is Karma, add the Karma role
-                                            elif region == "Karma":
-                                                await user.add_roles(karma_role)
-                                            # otherwise, add the traveler role
-                                            else:
-                                                await user.add_roles(traveler_role)
+                                    async with verify_session.get(
+                                            f"https://www.nationstates.net/cgi-bin/api.cgi?nation={nation_name}",
+                                            headers=headers) as nation_info:
+                                        await asyncio.sleep(.6)
+                                        nation_info_raw = await nation_info.text()
+                                        nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
+                                        region = nation_info_soup.region.text
+                                        # if the nation's region is Thegye, add the Thegye role
+                                        if region == "Thegye":
+                                            await user.remove_roles(traveler_role, karma_role)
+                                            await verify_dm.send(
+                                                f"Success! You have now verified `{nation_name}`. "
+                                                f"Your roles will update momentarily. "
+                                                f"If you would like to set your main nation, "
+                                                f"use the `$set_main` command to do so.")
+                                            # if the nation is in the WA, add the WA role
+                                            if nation_info_soup.unstatus.text != "Non-member":
+                                                wa_role = thegye_server.get_role(674283915870994442)
+                                                await user.add_roles(wa_role)
+                                            return await user.add_roles(thegye_role)
+                                        # if the nation's region is Karma, add the Karma role
+                                        elif region == "Karma":
+                                            await user.add_roles(karma_role)
+                                        # otherwise, add the traveler role
+                                        else:
+                                            await user.add_roles(traveler_role)
                                 verifying.close()
                                 await verify_dm.send(f"Success! You have now verified `{nation_name}`. "
-                                                                 f"Your roles will update momentarily. "
-                                                                 f"If you would like to set your main nation, "
-                                                                 f"use the `/set_main` command to do so.")
+                                                     f"Your roles will update momentarily.")
                             else:
                                 await user.add_role(traveler_role)
                                 return await verify_dm.send("That is not a valid or correct verification code. "
-                                                                 "Please try again.")
+                                                            "Please try again.")
                 # assign roles for nation RP
                 if response == "Geopolitical Roleplay":
                     await user.add_roles(roleplay_role, traveler_role)
@@ -487,9 +483,9 @@ class Verification(commands.Cog):
         nation_name = nation_soup.find('name').text
         # if the user has already verified that nation
         if verified_check is not None:
-            if nation_name.lower() in [n.lower() for n in verified_check['nations']]:
+            if nation_name.lower() == verified_check['main_nation'].lower():
                 return await author_message.send(
-                    f"You have already verified `{nation_name}`. To view your verified nations, "
+                    f"You have already verified `{nation_name}`. To view your verified nation, "
                     f"use `/view_verified`.")
         # send verification instructions via DM
         await author_message.send(f"Please login to {nation_name}. Once complete, head to this link and send me the "
@@ -547,42 +543,36 @@ class Verification(commands.Cog):
                     # if the user has previously verified a nation
                     else:
                         # append the verified nation to the list
-                        await conn.execute('''UPDATE verified_nations SET nations = nations || $1
-                        WHERE user_id = $2;''', [nation_name], author.id)
-                        all_nations = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
-                                                          author.id)
+                        await conn.execute('''UPDATE verified_nations SET main_nation = $1 WHERE user_id = $2;''',
+                                           nation_name, author.id)
                         user = thegye_server.get_member(author.id)
                         await user.remove_roles(thegye_role, traveler_role, karma_role)
-                        for n in all_nations['nations']:
-                            async with verify_session.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={n}",
-                                                          headers=headers) as nation_info:
-                                await asyncio.sleep(.6)
-                                nation_info_raw = await nation_info.text()
-                                nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
-                                region = nation_info_soup.region.text
-                                # if the nation's region is Thegye, add the Thegye role
-                                if region == "Thegye":
-                                    await user.remove_roles(traveler_role, karma_role)
-                                    await author_message.send(f"Success! You have now verified `{nation_name}`. "
-                                                              f"Your roles will update momentarily. "
-                                                              f"If you would like to set your main nation, "
-                                                              f"use the `$set_main` command to do so.")
-                                    # if the nation is in the WA, add the WA role
-                                    if nation_info_soup.unstatus.text != "Non-member":
-                                        wa_role = thegye_server.get_role(674283915870994442)
-                                        await user.add_roles(wa_role)
-                                    return await user.add_roles(thegye_role)
-                                # if the nation's region is Karma, add the Karma role
-                                elif region == "Karma":
-                                    await user.add_roles(karma_role)
-                                # otherwise, add the traveler role
-                                else:
-                                    await user.add_roles(traveler_role)
+                        async with verify_session.get(
+                                f"https://www.nationstates.net/cgi-bin/api.cgi?nation={nation_name}",
+                                headers=headers) as nation_info:
+                            await asyncio.sleep(.6)
+                            nation_info_raw = await nation_info.text()
+                            nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
+                            region = nation_info_soup.region.text
+                            # if the nation's region is Thegye, add the Thegye role
+                            if region == "Thegye":
+                                await user.remove_roles(traveler_role, karma_role)
+                                await author_message.send(f"Success! You have now verified `{nation_name}`. "
+                                                          f"Your roles will update momentarily.")
+                                # if the nation is in the WA, add the WA role
+                                if nation_info_soup.unstatus.text != "Non-member":
+                                    wa_role = thegye_server.get_role(674283915870994442)
+                                    await user.add_roles(wa_role)
+                                return await user.add_roles(thegye_role)
+                            # if the nation's region is Karma, add the Karma role
+                            elif region == "Karma":
+                                await user.add_roles(karma_role)
+                            # otherwise, add the traveler role
+                            else:
+                                await user.add_roles(traveler_role)
                     verifying.close()
-                    return await author_message.send(f"Success! You have now verified `{nation_name}`. "
-                                                     f"Your roles will update momentarily. "
-                                                     f"If you would like to set your main nation, "
-                                                     f"use the `/set_main` command to do so.")
+                    return await author_message.send(f"Success! You are now verified as `{nation_name}`. "
+                                                     f"Your roles will update momentarily.")
                 else:
                     return await author_message.send("That is not a valid or correct verification code. "
                                                      "Please try again.")
@@ -600,32 +590,21 @@ class Verification(commands.Cog):
                                                            f"Thegye Discord server, {member.mention}!")
             await welcome_message.edit(view=VerificationView(member=member, message=welcome_message, bot=self.bot))
 
-
-    @verification.command(name="unverify", description="Remove a nation from your verified list.")
-    @app_commands.describe(nation_name="The name of the nation you would like to unverify.")
-    async def unverify(self, interaction: discord.Interaction, nation_name: str):
+    @verification.command(name="unverify", description="Remove your verified nation.")
+    async def unverify(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establish connection
         conn = self.bot.pool
         # sets author
         author = interaction.user
-        # fetches nation information
-        nation_check = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
-                                           author.id)
-        # if the user has no verified nations, return
-        if nation_check is None:
-            return await interaction.followup.send("You have no nations registered.")
-        # if the nation specified is not in the list
-        if nation_name.lower() not in [n.lower() for n in nation_check['nations']]:
-            return await interaction.followup.send(f"`{nation_name}` is not registered to your Discord account.")
         # remove all nations
         await conn.execute('''DELETE FROM verified_nations WHERE user_id = $1;''', author.id)
+        # update roles
         thegye_server = self.bot.get_guild(674259612580446230)
         thegye_role = thegye_server.get_role(674260547897917460)
         traveler_role = thegye_server.get_role(674280677268652047)
         karma_role = thegye_server.get_role(771456227674685440)
-        # define and give nationstates role
         nationstates_role = thegye_server.get_role(1150861314424573992)
         await author.remove_roles(thegye_role, karma_role, nationstates_role)
         await author.add_roles(traveler_role)
