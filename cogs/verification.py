@@ -765,7 +765,7 @@ class Verification(commands.Cog):
             # first nation in list
             nation = user['nations'][0]
             # update user with nation as main
-            await conn.update('''UPDATE verified_nations SET main_nation = $1 WHERE user_id = $2;''',
+            await conn.execute('''UPDATE verified_nations SET main_nation = $1 WHERE user_id = $2;''',
                               nation, user['user_id'])
             counter += 1
         return await ctx.send(f"{counter} users in compliance.")
