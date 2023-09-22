@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating verify, unverify, and set main commands">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing wording">
       <change afterPath="$PROJECT_DIR$/cogs/cnc_old.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
@@ -198,7 +198,7 @@
       <workItem from="1694452675067" duration="189000" />
       <workItem from="1694453117150" duration="9883000" />
       <workItem from="1694631532927" duration="2392000" />
-      <workItem from="1695249261903" duration="6355000" />
+      <workItem from="1695249261903" duration="7599000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -543,7 +543,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="726" />
+    <option name="localTasksCounter" value="728" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -561,8 +561,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Setting new autogrammer TG" />
-    <MESSAGE value="Adding ntrp party role" />
     <MESSAGE value="Editing party_role command" />
     <MESSAGE value="Fixing directory for out-of-server user" />
     <MESSAGE value="Fixing SVG flag file reading" />
@@ -586,7 +584,9 @@
     <MESSAGE value="Adding traveler role as base role after response" />
     <MESSAGE value="Updating verify and unverify" />
     <MESSAGE value="Updating verify, unverify, and set main commands" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating verify, unverify, and set main commands" />
+    <MESSAGE value="Fixing set_mains" />
+    <MESSAGE value="Fixing wording" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing wording" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

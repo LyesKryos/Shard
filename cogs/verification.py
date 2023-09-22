@@ -426,6 +426,7 @@ class Verification(commands.Cog):
 
     @verification.command(name="verify", description="Verifies a specified nation.")
     @app_commands.describe(nation_name="The name of the nation you would like to verify.")
+    @app_commands.guild_only()
     async def verify(self, interaction: discord.Interaction, nation_name: str):
         # defers the interaction
         await interaction.response.defer(thinking=True)
