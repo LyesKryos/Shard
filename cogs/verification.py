@@ -548,8 +548,6 @@ class Verification(commands.Cog):
                             # if the nation's region is Thegye, add the Thegye role
                             if region == "Thegye":
                                 await user.remove_roles(traveler_role, karma_role)
-                                await author_message.send(f"Success! You have now verified `{nation_name}`. "
-                                                          f"Your roles will update momentarily.")
                                 # if the nation is in the WA, add the WA role
                                 if nation_info_soup.unstatus.text != "Non-member":
                                     wa_role = thegye_server.get_role(674283915870994442)
@@ -557,7 +555,7 @@ class Verification(commands.Cog):
                                 return await user.add_roles(thegye_role)
                             # if the nation's region is Karma, add the Karma role
                             elif region == "Karma":
-                                await user.add_roles(karma_role)
+                                return await user.add_roles(karma_role)
                             # otherwise, add the traveler role
                             else:
                                 await user.add_roles(traveler_role)
@@ -751,7 +749,6 @@ class Verification(commands.Cog):
             leave_embed.add_field(name="Nations", value=f"{user_nations}", inline=False)
             await leave_channel.send(embed=leave_embed)
 
-
     @commands.command()
     @commands.is_owner()
     async def set_mains(self, ctx):
@@ -766,7 +763,7 @@ class Verification(commands.Cog):
             nation = user['nations'][0]
             # update user with nation as main
             await conn.execute('''UPDATE verified_nations SET main_nation = $1 WHERE user_id = $2;''',
-                              nation, user['user_id'])
+                               nation, user['user_id'])
             counter += 1
         return await ctx.send(f"{counter} users in compliance.")
 
