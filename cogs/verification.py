@@ -602,8 +602,8 @@ class Verification(commands.Cog):
         return await interaction.followup.send(f"Your roles have been updated accordingly. "
                                                f"All nations have been removed from your Discord account.")
 
-    @verification.command(name="view_verified", description="Displays a list of all verified nations.")
-    @app_commands.describe(user="Optional server member view_verified")
+    @verification.command(name="view_verified", description="Displays a list of a user's verified nation.")
+    @app_commands.describe(user="Optional server member")
     async def view_verified(self, interaction: discord.Interaction, user: Optional[discord.Member]):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -623,7 +623,7 @@ class Verification(commands.Cog):
                     verified_nations = f"{verified['main_nation']}"
                 else:
                     return await interaction.followup.send("You have no verified nation record")
-                return await interaction.followup.send(f"Verified nations of {author.name}: {verified_nations}")
+                return await interaction.followup.send(f"Verified nation of {author.name}: {verified_nations}")
         if user is not None:
             # get author
             author = user
