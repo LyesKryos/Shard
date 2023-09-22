@@ -480,6 +480,7 @@ class Verification(commands.Cog):
                     f"You have already verified `{nation_name}`. To view your verified nation, "
                     f"use `/view_verified`.")
         # send verification instructions via DM
+        await asyncio.sleep(5)
         await author_message.send(f"Please login to {nation_name}. Once complete, head to this link and send me the "
                                   f"verification code displayed: https://www.nationstates.net/page=verify_login. "
                                   f"You may give the code displayed to an external website or tool, like me, "
@@ -520,12 +521,12 @@ class Verification(commands.Cog):
                                 wa_role = thegye_server.get_role(674283915870994442)
                                 await user.add_roles(wa_role)
                             await user.add_roles(thegye_role)
-                            await user.remove_roles(unverified_role)
+                            await user.remove_roles(unverified_role, traveler_role)
                         # if the nation's region is Karma, add the Karma role
                         elif verification_soup.region.text == "Karma":
                             user = thegye_server.get_member(author.id)
                             await user.add_roles(karma_role)
-                            await user.remove_roles(unverified_role)
+                            await user.remove_roles(unverified_role, traveler_role)
                         # otherwise, add the traveler role
                         else:
                             traveler_role = thegye_server.get_role(674280677268652047)
