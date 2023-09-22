@@ -509,8 +509,8 @@ class Verification(commands.Cog):
                 if int(verification) == 1:
                     # if the user has no verified nation, add a new row
                     if verified_check is None:
-                        await conn.execute('''INSERT INTO verified_nations(user_id, nations) VALUES ($1, $2);''',
-                                           author.id, [nation_name])
+                        await conn.execute('''INSERT INTO verified_nations(user_id, main_nation) VALUES ($1, $2);''',
+                                           author.id, nation_name)
                         # if the nation's region is Thegye, add the Thegye role
                         if verification_soup.region.text == "Thegye":
                             user = thegye_server.get_member(author.id)
