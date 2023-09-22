@@ -454,19 +454,10 @@ class Verification(commands.Cog):
         # checks to see if the user has already verified yet or not
         verified_check = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''', author.id)
         # if the user has no verified nations
-        if verified_check is None:
-            # sends DM to initiate verification
-            await author_message.send(f"**Welcome to the Shard Verification, {author.name}!** \n\n"
-                                      f"To begin the verification process, please login to {nation_name}. "
-                                      f"Here is a URL to your nation page: https://www.nationstates.net/nation="
-                                      f"{self.sanitize_links_underscore(nation_name)}")
-        # if the user does have some verified nation(s)
-        else:
-            # sends DM to initiate verification
-            await author_message.send(f"**Welcome back to the Shard Verification, {author.name}!** \n\n"
-                                      f"To begin the verification process, please login to {nation_name}. "
-                                      f"Here is a URL to your nation page: https://www.nationstates.net/nation="
-                                      f"{self.sanitize_links_underscore(nation_name)}")
+        await author_message.send(f"**Welcome to the Shard Verification, {author.name}!** \n\n"
+                                  f"To begin the verification process, please login to {nation_name}. "
+                                  f"Here is a URL to your nation page: https://www.nationstates.net/nation="
+                                  f"{self.sanitize_links_underscore(nation_name)}")
         # waits for the user to reply with their nation
         headers = {"User-Agent": "Bassiliya"}
         nation_exist = requests.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={nation_name}",
@@ -629,13 +620,9 @@ class Verification(commands.Cog):
                                                        "Use `/verify` to verify a nation.")
             else:
                 if verified['main_nation'] is not None:
-                    verified_nations = f"**{verified['main_nation']}**"
-                    for n in verified['nations']:
-                        if n == verified['main_nation']:
-                            continue
-                        verified_nations += f", {n}"
+                    verified_nations = f"{verified['main_nation']}"
                 else:
-                    verified_nations = ", ".join(verified['nations'])
+                    return await interaction.followup.send("You have no verified nation record")
                 return await interaction.followup.send(f"Verified nations of {author.name}: {verified_nations}")
         if user is not None:
             # get author
@@ -647,51 +634,10 @@ class Verification(commands.Cog):
                 return await interaction.followup.send(f"{user.nick} does not have any verified nations.")
             else:
                 if verified['main_nation'] is not None:
-                    verified_nations = f"**{verified['main_nation']}**"
-                    for n in verified['nations']:
-                        if n == verified['main_nation']:
-                            continue
-                        verified_nations += f", {n}"
+                    verified_nations = f"{verified['main_nation']}"
                 else:
-                    verified_nations = ", ".join(verified['nations'])
+                    return await interaction.followup.send("You have no verified nation recorded.")
                 return await interaction.followup.send(f"Verified nations of {author.name}: {verified_nations}")
-
-    @verification.command(name="set_main", description="Sets a previously verified nation as the main nation.")
-    @app_commands.describe(nation_name="The name of the verified nation you would like to set as your main.")
-    async def set_main(self, interaction: discord.Interaction, nation_name: str):
-        # defer interaction
-        await interaction.response.defer(thinking=True)
-        # establish connection
-        conn = self.bot.pool
-        # get author
-        author = interaction.user
-        # checks if nation is already verified and returns if not
-        nation_info = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
-                                          author.id)
-        # if the user has no verified nations
-        if nation_info is None:
-            return await interaction.followup.send("You do not have any verified nations. Use the `/verify` command to "
-                                                   "verify a nation first.")
-        # if the nation is not previously verified
-        if nation_name.lower() not in [n.lower() for n in nation_info['nations']]:
-            return await interaction.followup.send(
-                f"`{nation_name}` is not a verified nation associated with your account.")
-        # if the nation is already the main nation
-        if nation_info['main_nation'] is not None:
-            if nation_name.lower() == nation_info['main_nation'].lower():
-                return await interaction.followup.send(f"{nation_info['main_nation']} is already your main nation.")
-        # set the nation as the main nation
-        headers = {'User-Agent': 'Bassiliya'}
-        nation_exist = requests.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={nation_name}",
-                                    headers=headers)
-        # get official nation name
-        nation_raw = nation_exist.text
-        nation_soup = BeautifulSoup(nation_raw, 'lxml')
-        nation_name = nation_soup.find('name').text
-        # update the database
-        await conn.execute('''UPDATE verified_nations SET main_nation = $1 WHERE user_id = $2;''',
-                           nation_name, author.id)
-        return await interaction.followup.send(f"Success! {nation_name} is now your main nation.")
 
     @commands.command()
     @commands.is_owner()
@@ -804,6 +750,25 @@ class Verification(commands.Cog):
             leave_embed.add_field(name="Roles", value=f"{roles}")
             leave_embed.add_field(name="Nations", value=f"{user_nations}", inline=False)
             await leave_channel.send(embed=leave_embed)
+
+
+    @commands.command()
+    @commands.is_owner()
+    async def set_mains(self, ctx):
+        # define pool
+        conn = self.bot.pool
+        # fetch all users without a main nation
+        all_users = await conn.fetch('''SELECT * FROM verified_nations WHERE main_nation is NULL;''')
+        # set first verified nation as main nation
+        counter = 0
+        for user in all_users:
+            # first nation in list
+            nation = user['nations'][0]
+            # update user with nation as main
+            await conn.update('''UPDATE verified_nations SET main_nation = $1 WHERE user_id = $2;''',
+                              nation, user['user_id'])
+            counter += 1
+        return await ctx.send(f"{counter} users in compliance.")
 
 
 async def setup(bot: Shard):
