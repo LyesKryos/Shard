@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating roleplay intro">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating roleplay intro for member join">
       <change afterPath="$PROJECT_DIR$/cogs/cnc_old.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/roleplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/roleplay.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -199,7 +200,7 @@
       <workItem from="1694453117150" duration="9883000" />
       <workItem from="1694631532927" duration="2392000" />
       <workItem from="1695249261903" duration="7980000" />
-      <workItem from="1695665992152" duration="1838000" />
+      <workItem from="1695665992152" duration="2546000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -544,7 +545,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="732" />
+    <option name="localTasksCounter" value="733" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -562,7 +563,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Changing verification to a slash command" />
     <MESSAGE value="Updating verification commands to slash commands" />
     <MESSAGE value="Troubleshooting svg" />
     <MESSAGE value="Finalizing SVG flag fixing" />
@@ -587,7 +587,8 @@
     <MESSAGE value="Setting verification to guild only" />
     <MESSAGE value="Deleting message for entry" />
     <MESSAGE value="Updating roleplay intro" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating roleplay intro" />
+    <MESSAGE value="Updating roleplay intro for member join" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updating roleplay intro for member join" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

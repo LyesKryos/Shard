@@ -53,11 +53,17 @@ class Roleplay(commands.Cog):
         return await ctx.send(f"Total: {total} points\nTotal Percentages: {percents_total} percentage points")
 
 
-    @commands.command(usage="[user]", aliases=['rpi'], brief="Gives information to a user about roleplay.")
-    @commands.has_role(674278988323225632)
-    async def roleplay_intro(self, ctx, user: discord.Member):
+    @app_commands.command(name="roleplay_intro", description="Sends information concerning the roleplay to new RPers.")
+    @app_commands.describe(user="The user being introduced")
+    async def roleplay_intro(self, interaction: discord.Interaction, user: discord.Member):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
         # get channel
         thegye_server = self.bot.get_guild(674259612580446230)
+        rp_mod_role = thegye_server.get_role(674338522962067478)
+        if rp_mod_role not in interaction.user.roles:
+            return await interaction.followup.send("You do not have the appropriate role for this command.",
+                                                   ephemeral=True)
         ooc_channel = thegye_server.get_channel(674337504933052469)
         await ooc_channel.send("**Welcome to Thegye RP!** \n\n"
                                "First, you should check out our roleplay dispatch located here: "
