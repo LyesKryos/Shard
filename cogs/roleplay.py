@@ -61,16 +61,17 @@ class Roleplay(commands.Cog):
         ooc_channel = thegye_server.get_channel(674337504933052469)
         await ooc_channel.send("**Welcome to Thegye RP!** \n\n"
                                "First, you should check out our roleplay dispatch located here: "
-                               "https://www.nationstates.net/page=dispatch/id=1370630 It has all the information to get"
-                               " you started in the world of Thegye roleplay. "
+                               "[**Roleplay Dispatch**](https://www.nationstates.net/page=dispatch/id=1370630)"
+                               " It has all the information to get you started in the world of Thegye roleplay. "
                                "However, before you dive into actual roleplay, you'll need to claim a place on the "
-                               "regional map and fill out an RSC. \n**Map Dispatch:** "
-                               "https://www.nationstates.net/page=dispatch/id=1310572 "
+                               "regional map and fill out an RSC. \n[**Map Dispatch:**]("
+                               "https://www.nationstates.net/page=dispatch/id=1310572) "
                                "*Note that the map on the dispatch is a bit older than the most updated one. "
                                "To view the most updated version, please use $nation_map in #bot_and_vc_chat"
-                               " to see the most accurate map. \n**Roleplay Statistics Chart:** "
-                               "https://www.nationstates.net/page=dispatch/id=1371516 \n\nOnce you've completed those "
-                               "steps, feel free to jump into roleplay! Of course, "
+                               " to see the most accurate map. \n[**Roleplay Statistics Chart**]("
+                               "https://www.nationstates.net/page=dispatch/id=1371516) \n\nOnce you've completed those "
+                               "steps, feel free to jump into roleplay! Be sure to check out our "
+                               "[**iiWiki page**](https://iiwiki.us/wiki/Portal:Thegye) too. Of course, "
                                f"let us know if you have any questions. Happy RPing, {user.mention}!")
         return
 
