@@ -77,9 +77,9 @@ class Roleplay(commands.Cog):
                                " to see the most accurate map. \n[**Roleplay Statistics Chart**]("
                                "https://www.nationstates.net/page=dispatch/id=1371516) \n\nOnce you've completed those "
                                "steps, feel free to jump into roleplay! Be sure to check out our "
-                               "[**iiWiki page**](https://iiwiki.us/wiki/Portal:Thegye) too. Of course, "
+                               "[**iiWiki page**](<https://iiwiki.us/wiki/Portal:Thegye>) too. Of course, "
                                f"let us know if you have any questions. Happy RPing, {user.mention}!")
-        return
+        return await interaction.followup.send("Done!")
 
     @commands.command(brief="Sends the nation map image.")
     @commands.guild_only()
