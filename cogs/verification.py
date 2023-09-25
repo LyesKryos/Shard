@@ -80,8 +80,43 @@ class VerificationDropdown(discord.ui.Select):
             traveler_role = thegye_server.get_role(674280677268652047)
             gatehouse = thegye_server.get_channel(674284159128043530)
             user = self.member
+            # delete message
+            await self.message.delete()
             # assign roles for nationstates
             for response in self.values:
+                # assign roles for nation RP
+                if response == "Geopolitical Roleplay":
+                    await user.remove_roles(unverified_role)
+                    await user.add_roles(roleplay_role, traveler_role)
+                    ooc_chat = thegye_server.get_channel(674337504933052469)
+                    await ooc_chat.send(f"Welcome to the Geopolitical Roleplay channels, {user.mention}!\n\n"
+                                        f"These channels are used solely for the geopolitical roleplay within the Thegye "
+                                        f"universe. Here you can browse current RPs, participate in worldbuilding, and chat"
+                                        f" with your fellow RPers. If you'd like to join our RP, you will need to:\n"
+                                        f"**1.** Have a nation within the [**Thegye NationStates region**]"
+                                        f"(<https://www.nationstates.net/region=thegye>)\n"
+                                        f"**2.** Fill out the [**Roleplay Statistics Chart**]"
+                                        f"(<https://www.nationstates.net/page=dispatch/id=1371516>)\n"
+                                        f"**3.** Apply for a location on the [**nation map**]"
+                                        f"(<https://www.nationstates.net/page=dispatch/id=1310572>)\n\n"
+                                        f"After you have completed those steps, you are ready to go! Check out our "
+                                        f"[**roleplay dispatch**](<https://www.nationstates.net/page=dispatch/id=1370630>)"
+                                        f" for more information! Feel free to let us know if you have any questions.")
+                # assign roles for Senate RP
+                if response == "Grand Senate of Thegye Roleplay" in self.values:
+                    await user.remove_roles(unverified_role)
+                    await user.add_roles(traveler_role)
+                    backroom_channel = thegye_server.get_channel(1112080185949437983)
+                    await backroom_channel.send(f"Welcome to the Grand Senate of Thegye, {user.mention}!\n\n"
+                                                f"To apply for the Senate role, just use the `/senate apply` command and "
+                                                f"fill out all the required fields. If you've like to find more information"
+                                                f" about our roleplay and how you can participate before applying, "
+                                                f"be sure to check out our [dedicated wiki]"
+                                                f"(<https://thegye.miraheze.org/wiki/Main_Page>) where you can find helpful"
+                                                f" information and more! Be sure to let us know if you have any questions.")
+                # assign roles for other
+                if response == "Other" in self.values:
+                    await user.add_roles(traveler_role)
                 if response == "NationStates":
                     # add the nationstates role
                     await user.add_roles(nationstates_role)
@@ -237,17 +272,15 @@ class VerificationDropdown(discord.ui.Select):
                                         region = nation_info_soup.region.text
                                         # if the nation's region is Thegye, add the Thegye role
                                         if region == "Thegye":
-                                            await user.remove_roles(traveler_role, karma_role)
-                                            await verify_dm.send(
-                                                f"Success! You have now verified `{nation_name}`. "
-                                                f"Your roles will update momentarily. "
-                                                f"If you would like to set your main nation, "
-                                                f"use the `$set_main` command to do so.")
                                             # if the nation is in the WA, add the WA role
                                             if nation_info_soup.unstatus.text != "Non-member":
                                                 wa_role = thegye_server.get_role(674283915870994442)
                                                 await user.add_roles(wa_role)
-                                            return await user.add_roles(thegye_role)
+                                            await user.add_roles(thegye_role)
+                                            await user.remove_roles(traveler_role, karma_role)
+                                            await verify_dm.send(
+                                                f"Success! You have now verified `{nation_name}`. "
+                                                f"Your roles will update momentarily. ")
                                         # if the nation's region is Karma, add the Karma role
                                         elif region == "Karma":
                                             await user.add_roles(karma_role)
@@ -259,45 +292,13 @@ class VerificationDropdown(discord.ui.Select):
                                                      f"Your roles will update momentarily.")
                             else:
                                 await user.add_role(traveler_role)
-                                return await verify_dm.send("That is not a valid or correct verification code. "
-                                                            "Please try again.")
-                # assign roles for nation RP
-                if response == "Geopolitical Roleplay":
-                    await user.add_roles(roleplay_role, traveler_role)
-                    ooc_chat = thegye_server.get_channel(674337504933052469)
-                    await ooc_chat.send(f"Welcome to the Geopolitical Roleplay channels, {user.mention}!\n\n"
-                                        f"These channels are used solely for the geopolitical roleplay within the Thegye "
-                                        f"universe. Here you can browse current RPs, participate in worldbuilding, and chat"
-                                        f" with your fellow RPers. If you'd like to join our RP, you will need to:\n"
-                                        f"**1.** Have a nation within the [**Thegye NationStates region**]"
-                                        f"(<https://www.nationstates.net/region=thegye>)\n"
-                                        f"**2.** Fill out the [**Roleplay Statistics Chart**]"
-                                        f"(<https://www.nationstates.net/page=dispatch/id=1371516>)\n"
-                                        f"**3.** Apply for a location on the [**nation map**]"
-                                        f"(<https://www.nationstates.net/page=dispatch/id=1310572>)\n\n"
-                                        f"After you have completed those steps, you are ready to go! Check out our "
-                                        f"[**roleplay dispatch**](<https://www.nationstates.net/page=dispatch/id=1370630>)"
-                                        f" for more information! Feel free to let us know if you have any questions.")
-                # assign roles for Senate RP
-                if response == "Grand Senate of Thegye Roleplay" in self.values:
-                    await user.remove_roles(unverified_role)
-                    await user.add_roles(traveler_role)
-                    backroom_channel = thegye_server.get_channel(1112080185949437983)
-                    await backroom_channel.send(f"Welcome to the Grand Senate of Thegye, {user.mention}!\n\n"
-                                                f"To apply for the Senate role, just use the `/senate apply` command and "
-                                                f"fill out all the required fields. If you've like to find more information"
-                                                f" about our roleplay and how you can participate before applying, "
-                                                f"be sure to check out our [dedicated wiki]"
-                                                f"(<https://thegye.miraheze.org/wiki/Main_Page>) where you can find helpful"
-                                                f" information and more! Be sure to let us know if you have any questions.")
-                # assign roles for other
-                if response == "Other" in self.values:
-                    await user.add_roles(traveler_role)
+                                await user.remove_roles(nationstates_role, unverified_role)
+                                await verify_dm.send("That is not a valid or correct verification code. "
+                                                     "You have not been verified, but you may try again later.")
             await user.remove_roles(unverified_role)
             open_square = thegye_server.get_channel(674335095628365855)
             await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
                                    f"and introduce yourself!")
-            await self.message.delete()
         except Exception as error:
             etype = type(error)
             trace = error.__traceback__
@@ -423,6 +424,19 @@ class Verification(commands.Cog):
         self.daily_verification.cancel()
 
     verification = app_commands.Group(name="verification", description="...")
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        # if this is the Thegye server
+        if member.guild.id == 674259612580446230:
+            thegye_server = self.bot.get_guild(674259612580446230)
+            unverified_role = thegye_server.get_role(1028144304507592704)
+            dispatch_role = thegye_server.get_role(751113326481768479)
+            gatehouse_channel = thegye_server.get_channel(674284159128043530)
+            await member.add_roles(unverified_role, dispatch_role)
+            welcome_message = await gatehouse_channel.send(f"Welcome to the official "
+                                                           f"Thegye Discord server, {member.mention}!")
+            await welcome_message.edit(view=VerificationView(member=member, message=welcome_message, bot=self.bot))
 
     @verification.command(name="verify", description="Verifies a specified nation.")
     @app_commands.describe(nation_name="The name of the nation you would like to verify.")
@@ -567,19 +581,6 @@ class Verification(commands.Cog):
                 else:
                     return await author_message.send("That is not a valid or correct verification code. "
                                                      "Please try again.")
-
-    @commands.Cog.listener()
-    async def on_member_join(self, member):
-        # if this is the Thegye server
-        if member.guild.id == 674259612580446230:
-            thegye_server = self.bot.get_guild(674259612580446230)
-            unverified_role = thegye_server.get_role(1028144304507592704)
-            dispatch_role = thegye_server.get_role(751113326481768479)
-            gatehouse_channel = thegye_server.get_channel(674284159128043530)
-            await member.add_roles(unverified_role, dispatch_role)
-            welcome_message = await gatehouse_channel.send(f"Welcome to the official "
-                                                           f"Thegye Discord server, {member.mention}!")
-            await welcome_message.edit(view=VerificationView(member=member, message=welcome_message, bot=self.bot))
 
     @verification.command(name="unverify", description="Remove your verified nation.")
     async def unverify(self, interaction: discord.Interaction):
