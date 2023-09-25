@@ -96,12 +96,14 @@ class VerificationDropdown(discord.ui.Select):
                                         f"**1.** Have a nation within the [**Thegye NationStates region**]"
                                         f"(<https://www.nationstates.net/region=thegye>)\n"
                                         f"**2.** Fill out the [**Roleplay Statistics Chart**]"
-                                        f"(<https://www.nationstates.net/page=dispatch/id=1371516>)\n"
+                                        f"(<https://www.nationstates.net/page=dispatch/id=1371516>) and follow the "
+                                        f"instructions to submit it for verification.\n"
                                         f"**3.** Apply for a location on the [**nation map**]"
                                         f"(<https://www.nationstates.net/page=dispatch/id=1310572>)\n\n"
                                         f"After you have completed those steps, you are ready to go! Check out our "
                                         f"[**roleplay dispatch**](<https://www.nationstates.net/page=dispatch/id=1370630>)"
-                                        f" for more information! Feel free to let us know if you have any questions.")
+                                        f" and our [**iiWiki page**](<https://iiwiki.us/wiki/Portal:Thegye>) for more "
+                                        f"information! Feel free to let us know if you have any questions.")
                 # assign roles for Senate RP
                 if response == "Grand Senate of Thegye Roleplay" in self.values:
                     await user.remove_roles(unverified_role)
