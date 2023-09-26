@@ -434,8 +434,10 @@ class Verification(commands.Cog):
             dispatch_role = thegye_server.get_role(751113326481768479)
             gatehouse_channel = thegye_server.get_channel(674284159128043530)
             await member.add_roles(unverified_role, dispatch_role)
-            welcome_message = await gatehouse_channel.send(f"Welcome to the official "
-                                                           f"Thegye Discord server, {member.mention}!")
+            welcome_message = await gatehouse_channel.send(
+                f"Welcome to the official Thegye Discord server, {member.mention}!\n"
+                f"Please use the dropdown menu below to select the role options "
+                f"that best describe your reason for being here.")
             await welcome_message.edit(view=VerificationView(member=member, message=welcome_message, bot=self.bot))
 
     @verification.command(name="verify", description="Verifies a specified nation.")
