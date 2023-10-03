@@ -132,7 +132,7 @@ class Roleplay(commands.Cog):
         newsroom = self.bot.get_channel(1106962988960845925)
         await smoking_room.send(f"Senators, please welcome {senator_name} of {senator_constituency} "
                                 f"({interaction.user.mention}) to the Grand Senate of the United Kingdom of Thegye!\n\n"
-                                f"Now that your application is approved, you can begin being involved by saying hello"
+                                f"Now that your application is approved, you can begin being involved by saying hello "
                                 f"in the {backroom.mention} OOC chat or introducing your character in the "
                                 f"{smoking_room.mention} IC chat. You can also check out current legislation on the "
                                 f"{floor.mention}, proposals in {chancellery.mention}, and the most recent news in the "
