@@ -126,20 +126,8 @@ class BaseCommands(commands.Cog):
         if verified is None:
             user_nations = "*None*"
         else:
-            if verified['main_nation'] is None:
-                nation_list = []
-                for n in verified['nations']:
-                    nation_list.append(f"[{n}]"
-                                       f"(https://www.nationstates.net/nation={self.sanitize_links_underscore(n)})")
-                user_nations = ', '.join(nation_list)
-            else:
-                user_nations = f"[**{verified['main_nation']}**]" \
-                               f"(https://www.nationstates.net/nation=" \
-                               f"{self.sanitize_links_underscore(verified['main_nation'])})"
-                for n in verified['nations']:
-                    if n == verified['main_nation']:
-                        continue
-                    user_nations += f", [{n}](https://www.nationstates.net/nation={self.sanitize_links_underscore(n)})"
+            user_nations += (f", [{verified['main_nation']}](https://www.nationstates.net/nation="
+                             f"{self.sanitize_links_underscore(verified['main_nation'])})")
         # defines roles
         all_roles = user.roles[1:]
         role_names = [f"<@&{r.id}>" for r in all_roles]

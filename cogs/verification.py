@@ -196,7 +196,7 @@ class VerificationDropdown(discord.ui.Select):
                     nation_name = nation_soup.find('name').text
                     # if the user has already verified that nation
                     if verified_check is not None:
-                        if nation_name.lower() in [n.lower() for n in verified_check['nations']]:
+                        if nation_name.lower() == verified_check['main_nation'].lower():
                             return await verify_dm.send(
                                 f"You have already verified `{nation_name}`. To view your verified nations, "
                                 f"use `/view_verified`.")
