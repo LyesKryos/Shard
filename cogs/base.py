@@ -126,7 +126,7 @@ class BaseCommands(commands.Cog):
         if verified is None:
             user_nations = "*None*"
         else:
-            user_nations += (f", [{verified['main_nation']}](https://www.nationstates.net/nation="
+            user_nations = (f", [{verified['main_nation']}](https://www.nationstates.net/nation="
                              f"{self.sanitize_links_underscore(verified['main_nation'])})")
         # defines roles
         all_roles = user.roles[1:]
