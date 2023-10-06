@@ -122,7 +122,7 @@ class VerificationDropdown(discord.ui.Select):
                 if response == "NationStates":
                     # add the nationstates role
                     await user.add_roles(nationstates_role)
-                    await gatehouse.send(message="I am sending you a DM!")
+                    await gatehouse.send("I am sending you a DM!")
                     # send the user a DM asking for a nation
                     try:
                         verify_dm = await user.create_dm()
