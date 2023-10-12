@@ -698,7 +698,7 @@ class Verification(commands.Cog):
                         else:
                             await member.add_roles(traveler_role)
                             await member.remove_roles(cte_role)
-            return await interaction.followup.send("Your roles have been updated.")
+                return await interaction.followup.send("Your roles have been updated.")
 
     @commands.command()
     @commands.is_owner()
