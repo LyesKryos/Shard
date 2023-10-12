@@ -55,7 +55,7 @@ class VerificationDropdown(discord.ui.Select):
                                  description="You're here to roleplay as a Senator of the United Kingdom of Thegye!",
                                  emoji="\U0001f3e6"),
             discord.SelectOption(label="Other",
-                                 description="You have ulterior motives!",
+                                 description="You're here to just explore the server!",
                                  emoji="\U0001f575")
         ]
 
@@ -641,6 +641,64 @@ class Verification(commands.Cog):
                 else:
                     return await interaction.followup.send("You have no verified nation recorded.")
                 return await interaction.followup.send(f"Verified nations of {author.name}: {verified_nations}")
+
+    @verification.command(name="role_check", description="Updates your roles according to your verified nation.")
+    async def role_check(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # gets server, channels, and roles
+        thegye_server = self.bot.get_guild(674259612580446230)
+        thegye_role = thegye_server.get_role(674260547897917460)
+        traveler_role = thegye_server.get_role(674280677268652047)
+        karma_role = thegye_server.get_role(771456227674685440)
+        unverified_role = thegye_server.get_role(1028144304507592704)
+        cte_role = thegye_server.get_role(674284482890694657)
+        wa_role = thegye_server.get_role(674283915870994442)
+        nationstates_role = thegye_server.get_role(1150861314424573992)
+        if nationstates_role not in interaction.user.roles:
+            return interaction.followup.send("You do not have any nation associated with the bot.")
+        else:
+            member = interaction.user
+            # calls member information from the database
+            member_info = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
+                                              member.id)
+            await member.remove_roles(wa_role, thegye_role, karma_role, traveler_role, cte_role)
+            # if the member is not verified at all, remove all relevant roles and move to the next member
+            if member_info is None:
+                await member.add_roles(unverified_role)
+            # otherwise, update roles
+            else:
+                async with aiohttp.ClientSession() as verify_session:
+                    headers = {'User-Agent': 'Bassiliya'}
+                    params = {'nation': member_info['main_nation']}
+                    # get data
+                    async with verify_session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                                  headers=headers, params=params) as nation_info:
+                        await asyncio.sleep(.6)
+                        if nation_info.status == 404:
+                            await member.add_roles(cte_role)
+                        nation_info_raw = await nation_info.text()
+                        nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
+                        region = nation_info_soup.region.text
+                        # if the nation's region is Thegye, add the Thegye role
+                        if region == "Thegye":
+                            await member.remove_roles(traveler_role, karma_role)
+                            # if the nation is in the WA, add the WA role
+                            if nation_info_soup.unstatus.text != "Non-member":
+                                await member.add_roles(wa_role)
+                            await member.add_roles(thegye_role)
+                            await member.remove_roles(cte_role)
+                        # if the nation's region is Karma, add the Karma role
+                        elif region == "Karma":
+                            await member.add_roles(karma_role)
+                            await member.remove_roles(cte_role)
+                        # otherwise, add the traveler role
+                        else:
+                            await member.add_roles(traveler_role)
+                            await member.remove_roles(cte_role)
+            return await interaction.followup.send("Your roles have been updated.")
 
     @commands.command()
     @commands.is_owner()
