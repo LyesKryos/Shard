@@ -469,9 +469,7 @@ class Recruitment(commands.Cog):
                     # for all the nations, add them to the string
                     recruit_string = ','.join(self.sending_to)
                     # parse the string to make it sanitized for the url
-                    url = self.sanitize_links_percent(
-                        f"https://www.nationstates.net/page=compose_telegram?tgto={recruit_string};"
-                        f"message={template}")
+                    url = f"https://www.nationstates.net/page=compose_telegram?tgto={recruit_string};message={template}"
                     # send the url and mention the author
                     await channel.send(f'{author.mention} [{len(self.sending_to)} nation(s)] {url}')
                     # if there is only one nation in the queue, and extra 15 seconds is waited

@@ -698,7 +698,7 @@ class Verification(commands.Cog):
                         else:
                             await member.add_roles(traveler_role)
                             await member.remove_roles(cte_role)
-                return await interaction.followup.send("Your roles have been updated.")
+                return await interaction.followup.send("Your roles have been updated successfully.")
 
     @commands.command()
     @commands.is_owner()
@@ -786,19 +786,11 @@ class Verification(commands.Cog):
                 user_nations = "*None*"
             else:
                 if verified['main_nation'] is None:
-                    nation_list = []
-                    for n in verified['nations']:
-                        nation_list.append(f"[{n}]"
-                                           f"(https://www.nationstates.net/nation={self.sanitize_links_underscore(n)})")
-                    user_nations = ', '.join(nation_list)
+                    user_nations = "*None*"
                 else:
-                    user_nations = f"[**{verified['main_nation']}**]" \
+                    user_nations = f"[{verified['main_nation']}]" \
                                    f"(https://www.nationstates.net/nation=" \
                                    f"{self.sanitize_links_underscore(verified['main_nation'])})"
-                    for n in verified['nations']:
-                        if n == verified['main_nation']:
-                            continue
-                        user_nations += f", [{n}](https://www.nationstates.net/nation={self.sanitize_links_underscore(n)})"
             leave_channel = self.bot.get_channel(674335095628365855)
             all_roles = member.roles[1:]
             role_names = [f"<@&{r.id}>" for r in all_roles]
