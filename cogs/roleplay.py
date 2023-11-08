@@ -50,8 +50,8 @@ class Roleplay(commands.Cog):
         for p in percents:
             value = re.sub('&#37', '', p)
             percents_total += int(value)
-        return await ctx.send(f"Total: {total} points / **1300**\n"
-                              f"Total Percentages: {percents_total-20} / **300** percentage points")
+        return await ctx.send(f"Total: {total}/**1300** points\n"
+                              f"Total Percentages: {percents_total-20}/**300** percentage points")
 
 
     @app_commands.command(name="roleplay_intro", description="Sends information concerning the roleplay to new RPers.")
