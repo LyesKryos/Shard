@@ -420,7 +420,7 @@ class Recruitment(commands.Cog):
             await crashchannel.send("Autogramming aborted.")
 
     async def recruitment_program(self, user,
-                                  channel: discord.Interaction.channel, template):
+                                  channel: discord.Interaction.channel, template, timer):
         try:
             # runs the code until the stop command is given
             author = user
@@ -477,8 +477,12 @@ class Recruitment(commands.Cog):
                         await asyncio.sleep(15)
                     # adds the number of nations sent to
                     self.user_sent += len(self.sending_to)
-                    # sleeps for 10 per nation
-                    await asyncio.sleep(len(self.sending_to) * 10)
+                    if timer is None:
+                        # sleeps for 10 per nation
+                        await asyncio.sleep(len(self.sending_to) * 10)
+                    else:
+                        # sleeps for the specified time
+                        await asyncio.sleep(timer)
                     # adds the recruited nations to the do not send list and cleans up the lists
                     self.do_not_recruit += self.sending_to
                     self.sending_to.clear()
@@ -534,7 +538,8 @@ class Recruitment(commands.Cog):
             traceback_text = ''.join(lines)
             self.bot.logger.warning(msg=f"{traceback_text}")
 
-    async def still_recruiting_check(self, user, channel):
+    async def still_recruiting_check(self, user):
+        channel = self.bot.get_channel(674342850296807454)
         while self.running:
             # sleep for 10 minutes
             await asyncio.sleep(500)
@@ -593,9 +598,10 @@ class Recruitment(commands.Cog):
             await interaction.followup.send("Role removed.")
 
     @recruitment.command(name="recruit", description="Starts recruitment.")
+    @app_commands.describe(timer="Set a custom time, in seconds, between pings.")
     @app_commands.guild_only()
     @RecruitmentCheck()
-    async def recruit(self, interaction: discord.Interaction):
+    async def recruit(self, interaction: discord.Interaction, timer: int = None):
         # defers interaction
         await interaction.response.defer(thinking=False)
         # checks status
@@ -619,12 +625,17 @@ class Recruitment(commands.Cog):
         self.user_sent = 0
         user = interaction.user
         channel = interaction.channel
+        # check ping time
+        if 300 < timer:
+            return await interaction.followup.send("Timer cannot be set for more than 5 minutes.")
+        elif timer < 10:
+            return await interaction.followup.send("Timer cannot be set for less than 10 seconds.")
         # gathers two asyncio functions together to run simultaneously
         await interaction.followup.send("Gathering...")
         self.recruitment_gather_object = asyncio.gather(self.recruitment_program(user=user,
-                                                                                 channel=channel, template=template),
-                                                        self.still_recruiting_check(user=user,
-                                                                                    channel=channel))
+                                                                                 channel=channel, template=template,
+                                                                                 timer=timer),
+                                                        self.still_recruiting_check(user=user))
 
     @recruitment.command(name="stop", description="Stops recruitment.")
     @app_commands.guild_only()
