@@ -626,10 +626,11 @@ class Recruitment(commands.Cog):
         user = interaction.user
         channel = interaction.channel
         # check ping time
-        if 300 < timer:
-            return await interaction.followup.send("Timer cannot be set for more than 5 minutes.")
-        elif timer < 10:
-            return await interaction.followup.send("Timer cannot be set for less than 10 seconds.")
+        if timer is not None:
+            if 300 < timer:
+                return await interaction.followup.send("Timer cannot be set for more than 5 minutes.")
+            elif timer < 10:
+                return await interaction.followup.send("Timer cannot be set for less than 10 seconds.")
         # gathers two asyncio functions together to run simultaneously
         await interaction.followup.send("Gathering...")
         self.recruitment_gather_object = asyncio.gather(self.recruitment_program(user=user,

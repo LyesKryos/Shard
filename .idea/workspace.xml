@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding more detail to welcome message">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing timer">
       <change afterPath="$PROJECT_DIR$/cogs/cnc_old.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
@@ -201,7 +201,7 @@
       <workItem from="1694631532927" duration="2392000" />
       <workItem from="1695249261903" duration="7980000" />
       <workItem from="1695665992152" duration="4595000" />
-      <workItem from="1703723343298" duration="664000" />
+      <workItem from="1703723343298" duration="2695000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -546,7 +546,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="737" />
+    <option name="localTasksCounter" value="738" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -564,8 +564,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Finalizing SVG flag fixing" />
-    <MESSAGE value="Adding debating tag to new debates" />
     <MESSAGE value="Adding the automatic addition and removal of roles" />
     <MESSAGE value="Making nation commands into slash commands" />
     <MESSAGE value="Making region commands into slash commands" />
@@ -589,7 +587,9 @@
     <MESSAGE value="Updating roleplay intro" />
     <MESSAGE value="Fixing daily role checking update" />
     <MESSAGE value="Adding more detail to welcome message" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding more detail to welcome message" />
+    <MESSAGE value="Updating recruitment command to include a custom timer" />
+    <MESSAGE value="Fixing timer" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing timer" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
