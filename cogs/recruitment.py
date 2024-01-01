@@ -405,10 +405,11 @@ class Recruitment(commands.Cog):
                         if self.verbose_mode:
                             await crashchannel.send(f"```{tg_response}```")
                         if tg_response.status == 429:
-                            retry = tg_response.headers['Retry-After']
+                            retry = int(tg_response.headers['Retry-After'])
                             await asyncio.sleep(int(retry)+20)
                             await crashchannel.send(f"Too many autogrammer calls. "
-                                                    f"Retrying after {int(retry)+20} seconds.")
+                                                    f"Retrying after {retry+20} seconds.")
+                            await asyncio.sleep(retry+20)
                         elif tg_response.status != 200:
                             await crashchannel.send(f"Bad response for API\n"
                                                     f"```{tg_response}```")

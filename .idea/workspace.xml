@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing timer">
       <change afterPath="$PROJECT_DIR$/cogs/cnc_old.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
@@ -201,7 +200,7 @@
       <workItem from="1694631532927" duration="2392000" />
       <workItem from="1695249261903" duration="7980000" />
       <workItem from="1695665992152" duration="4595000" />
-      <workItem from="1703723343298" duration="2695000" />
+      <workItem from="1703723343298" duration="3395000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -546,7 +545,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="738" />
+    <option name="localTasksCounter" value="739" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
