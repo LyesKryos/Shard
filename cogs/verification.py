@@ -600,7 +600,8 @@ class Verification(commands.Cog):
         traveler_role = thegye_server.get_role(674280677268652047)
         karma_role = thegye_server.get_role(771456227674685440)
         nationstates_role = thegye_server.get_role(1150861314424573992)
-        await author.remove_roles(thegye_role, karma_role, nationstates_role)
+        cte_role = thegye_server.get_role(674284482890694657)
+        await author.remove_roles(thegye_role, karma_role, nationstates_role, cte_role)
         await author.add_roles(traveler_role)
         return await interaction.followup.send(f"Your roles have been updated accordingly. "
                                                f"All nations have been removed from your Discord account.")
