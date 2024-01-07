@@ -539,11 +539,13 @@ class Recruitment(commands.Cog):
             traceback_text = ''.join(lines)
             self.bot.logger.warning(msg=f"{traceback_text}")
 
-    async def still_recruiting_check(self, user):
+    async def still_recruiting_check(self, user, timer):
         channel = self.bot.get_channel(674342850296807454)
+        if timer is None:
+            timer = 120
         while self.running:
-            # sleep for 10 minutes
-            await asyncio.sleep(500)
+            # sleep for timer * 5 (or 10 minutes)
+            await asyncio.sleep(timer*5)
             if self.running is False:
                 break
             # sends message. if the reaction is hit, recruitment continues
@@ -637,7 +639,7 @@ class Recruitment(commands.Cog):
         self.recruitment_gather_object = asyncio.gather(self.recruitment_program(user=user,
                                                                                  channel=channel, template=template,
                                                                                  timer=timer),
-                                                        self.still_recruiting_check(user=user))
+                                                        self.still_recruiting_check(user=user, timer=timer))
 
     @recruitment.command(name="stop", description="Stops recruitment.")
     @app_commands.guild_only()
