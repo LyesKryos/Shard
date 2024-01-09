@@ -1278,9 +1278,15 @@ class Economy(commands.Cog):
                 this_string += f": {self.thaler}{ranked_member[1]:,.2f}\n"
                 ranked_string += this_string
             except AttributeError:
-                this_string = f"{ranked_members.index(ranked_member) + 1}. <@{self.bot.get_user(ranked_member[0]).id}>"
-                this_string += f": {self.thaler}{ranked_member[1]:,.2f}\n"
-                ranked_string += this_string
+                try:
+                    this_string = f"{ranked_members.index(ranked_member) + 1}. <@{self.bot.get_user(ranked_member[0]).id}>"
+                    this_string += f": {self.thaler}{ranked_member[1]:,.2f}\n"
+                    ranked_string += this_string
+                except AttributeError:
+                    this_string = f"{ranked_members.index(ranked_member) + 1}. `deleted user`"
+                    this_string += f": {self.thaler}{ranked_member[1]:,.2f}\n"
+                    ranked_string += this_string
+
         # create and send embed
         directory_embed = discord.Embed(title="Royal Bank of Thegye Directory", description=ranked_string)
         directory_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
