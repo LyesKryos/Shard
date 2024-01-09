@@ -82,6 +82,10 @@ class ShardErrorHandler(commands.Cog):
                                                     ephemeral=True)
         elif isinstance(error, app_commands.errors.MissingRole):
             await interaction.response.send_message("You are missing the proper roles for this command.")
+        else:
+            await interaction.channel.send("An error occurred, check the logs.")
+            await self.on_command_error()
+
 
 
 async def setup(bot: Shard):
