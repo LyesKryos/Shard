@@ -65,20 +65,8 @@ class ShardErrorHandler(commands.Cog):
             await ctx.send("I cannot find that user.")
         elif isinstance(error, commands.CheckFailure):
             await ctx.send("A check failed. Check the logs.")
-            self.bot.logger.warning(msg=error)
         elif isinstance(error, discord.errors.Forbidden):
             await ctx.send("I cannot complete that action.")
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
-        else:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
 
     @commands.Cog.listener()
     async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
@@ -95,11 +83,7 @@ class ShardErrorHandler(commands.Cog):
         elif isinstance(error, app_commands.errors.MissingRole):
             await interaction.response.send_message("You are missing the proper roles for this command.")
         else:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
+            await interaction.response.send_message("An error occurred. Check the logs.")
 
 
 async def setup(bot: Shard):
