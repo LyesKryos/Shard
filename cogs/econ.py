@@ -131,105 +131,83 @@ class FeedView(View):
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.blurple, disabled=True, emoji="\u23ea")
     async def back(self, interaction: discord.Interaction, back_button: discord.Button):
-        try:
-            # defer response
-            await interaction.response.defer()
-            # set foward button on
-            self.forward.disabled = False
-            # establish connection
-            conn = interaction.client.pool
-            # subtract from page
-            self.page -= 1
-            self.rank = (self.page * 10) - 9
-            # page cannot be less than 1
-            if self.page <= 1:
-                self.page = 1
-                back_button.disabled = True
-            # fetch all stocks
-            stocks = await conn.fetch('''SELECT * FROM stocks ORDER BY value DESC;''')
-            stock_string = ""
-            for stock in stocks[(self.page * 10) - 10:self.page * 10]:
-                this_string = f"``{self.rank}. {stock['name']} (#{stock['stock_id']}): " \
-                              f"{self.thaler}{stock['value']:,.2f}"
-                for space in range(0, 50 - len(this_string)):
-                    this_string += " "
-                if stock['trending'] == "up":
-                    this_string += "``:chart_with_upwards_trend: ``"
-                else:
-                    this_string += "``:chart_with_downwards_trend: ``"
-                if stock['change'] >= 0:
-                    this_string += "+"
-                this_string += f"{stock['change'] * 100:.2f}%``\n"
-                stock_string += this_string
-                self.rank += 1
-            feed_embed = discord.Embed(title="Stocks by Share Price", description=stock_string)
-            feed_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
-            await self.message.edit(embed=feed_embed, view=self)
-        except Exception as error:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
+        # defer response
+        await interaction.response.defer()
+        # set foward button on
+        self.forward.disabled = False
+        # establish connection
+        conn = interaction.client.pool
+        # subtract from page
+        self.page -= 1
+        self.rank = (self.page * 10) - 9
+        # page cannot be less than 1
+        if self.page <= 1:
+            self.page = 1
+            back_button.disabled = True
+        # fetch all stocks
+        stocks = await conn.fetch('''SELECT * FROM stocks ORDER BY value DESC;''')
+        stock_string = ""
+        for stock in stocks[(self.page * 10) - 10:self.page * 10]:
+            this_string = f"``{self.rank}. {stock['name']} (#{stock['stock_id']}): " \
+                          f"{self.thaler}{stock['value']:,.2f}"
+            for space in range(0, 50 - len(this_string)):
+                this_string += " "
+            if stock['trending'] == "up":
+                this_string += "``:chart_with_upwards_trend: ``"
+            else:
+                this_string += "``:chart_with_downwards_trend: ``"
+            if stock['change'] >= 0:
+                this_string += "+"
+            this_string += f"{stock['change'] * 100:.2f}%``\n"
+            stock_string += this_string
+            self.rank += 1
+        feed_embed = discord.Embed(title="Stocks by Share Price", description=stock_string)
+        feed_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
+        await self.message.edit(embed=feed_embed, view=self)
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
     async def close(self, interaction: discord.Interaction, close: discord.Button):
-        try:
-            # defer response
-            await interaction.response.defer()
-            # disable all buttons
-            self.back.disabled = True
-            self.forward.disabled = True
-            close.disabled = True
-            await self.message.edit(view=self)
-        except Exception as error:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
+        # defer response
+        await interaction.response.defer()
+        # disable all buttons
+        self.back.disabled = True
+        self.forward.disabled = True
+        close.disabled = True
+        await self.message.edit(view=self)
 
     @discord.ui.button(label="Next", style=discord.ButtonStyle.blurple, emoji="\u23e9")
     async def forward(self, interaction: discord.Interaction, forward_button: discord.Button):
-        try:
-            # defer response
-            await interaction.response.defer()
-            # enable back button
-            self.back.disabled = False
-            # establish connection
-            conn = interaction.client.pool
-            # subtract from page
-            self.page += 1
-            # fetch all stocks
-            stocks = await conn.fetch('''SELECT * FROM stocks ORDER BY value DESC;''')
-            stock_string = ""
-            # disable forward on last page
-            if (len(stocks[(self.page * 10) - 10:self.page * 10]) / 10) < 1:
-                forward_button.disabled = True
-            for stock in stocks[(self.page * 10) - 10:self.page * 10]:
-                this_string = f"``{self.rank}. {stock['name']} (#{stock['stock_id']}): " \
-                              f"{self.thaler}{stock['value']:,.2f}"
-                for space in range(0, 50 - len(this_string)):
-                    this_string += " "
-                if stock['trending'] == "up":
-                    this_string += "``:chart_with_upwards_trend: ``"
-                else:
-                    this_string += "``:chart_with_downwards_trend: ``"
-                if stock['change'] >= 0:
-                    this_string += "+"
-                this_string += f"{stock['change'] * 100:.2f}%``\n"
-                stock_string += this_string
-                self.rank += 1
-            feed_embed = discord.Embed(title="Stocks by Share Price", description=stock_string)
-            feed_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
-            await self.message.edit(embed=feed_embed, view=self)
-        except Exception as error:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
-
+        # defer response
+        await interaction.response.defer()
+        # enable back button
+        self.back.disabled = False
+        # establish connection
+        conn = interaction.client.pool
+        # subtract from page
+        self.page += 1
+        # fetch all stocks
+        stocks = await conn.fetch('''SELECT * FROM stocks ORDER BY value DESC;''')
+        stock_string = ""
+        # disable forward on last page
+        if (len(stocks[(self.page * 10) - 10:self.page * 10]) / 10) < 1:
+            forward_button.disabled = True
+        for stock in stocks[(self.page * 10) - 10:self.page * 10]:
+            this_string = f"``{self.rank}. {stock['name']} (#{stock['stock_id']}): " \
+                          f"{self.thaler}{stock['value']:,.2f}"
+            for space in range(0, 50 - len(this_string)):
+                this_string += " "
+            if stock['trending'] == "up":
+                this_string += "``:chart_with_upwards_trend: ``"
+            else:
+                this_string += "``:chart_with_downwards_trend: ``"
+            if stock['change'] >= 0:
+                this_string += "+"
+            this_string += f"{stock['change'] * 100:.2f}%``\n"
+            stock_string += this_string
+            self.rank += 1
+        feed_embed = discord.Embed(title="Stocks by Share Price", description=stock_string)
+        feed_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
+        await self.message.edit(embed=feed_embed, view=self)
 
 class BlackjackView(View):
 
@@ -260,26 +238,70 @@ class BlackjackView(View):
 
     @discord.ui.button(label="Fold", style=discord.ButtonStyle.danger)
     async def fold(self, interaction: discord.Interaction, fold_button: discord.Button):
-        try:
-            # defer response
-            await interaction.response.defer(thinking=False)
-            # define user
-            user = interaction.user
-            # establish connection
-            conn = interaction.client.pool
-            # define emojis
-            dealer_hand_string = "".join([get_card_emoji(c) for c in self.dealer_hand])
-            player_hand_string = "".join([get_card_emoji(c) for c in self.player_hand])
-            # define totals
-            player_total = 0
-            for card in self.player_hand:
-                # if the card is a face card, give it a value of 10
-                if card == "J" or card == "Q" or card == "K":
-                    card = 10
-                # if the card is an ace, give it a value of 11
-                elif card == "A":
-                    card = 11
-                player_total += card
+        # defer response
+        await interaction.response.defer(thinking=False)
+        # define user
+        user = interaction.user
+        # establish connection
+        conn = interaction.client.pool
+        # define emojis
+        dealer_hand_string = "".join([get_card_emoji(c) for c in self.dealer_hand])
+        player_hand_string = "".join([get_card_emoji(c) for c in self.player_hand])
+        # define totals
+        player_total = 0
+        for card in self.player_hand:
+            # if the card is a face card, give it a value of 10
+            if card == "J" or card == "Q" or card == "K":
+                card = 10
+            # if the card is an ace, give it a value of 11
+            elif card == "A":
+                card = 11
+            player_total += card
+        dealer_total = 0
+        for card in self.dealer_hand:
+            # if the card is a face card, give it a value of 10
+            if card == "J" or card == "Q" or card == "K":
+                card = 10
+            # if the card is an ace, give it a value of 11
+            elif card == "A":
+                card = 11
+            dealer_total += card
+        # create embed
+        blackjack_embed = discord.Embed(title="Blackjack", description="A game of blackjack at the Casino Royal.")
+        blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+        blackjack_embed.add_field(name="Dealer's Hand",
+                                  value=f"{dealer_hand_string} (total: {dealer_total})")
+        blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+        blackjack_embed.add_field(name="Result", value="***FOLD***", inline=False)
+        winnings = self.bet
+        blackjack_embed.set_footer(text=f"Your total winnings: -{self.thaler}{winnings:,.2f}")
+        await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                           -winnings, user.id)
+        await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                           -winnings, user.id)
+        await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                           user.id, 'casino', f'Lost {self.thaler}{winnings:,.2f} at blackjack')
+
+        for buttons in self.children:
+            buttons.disabled = True
+        return await self.message.edit(embed=blackjack_embed, view=self)
+
+    @discord.ui.button(label="Hit", style=discord.ButtonStyle.gray)
+    async def hit(self, interaction: discord.Interaction, hit: discord.Button):
+        # defer response
+        await interaction.response.defer()
+        self.player_hand.append(choice(self.deck))
+        dealer_total = 0
+        for card in self.dealer_hand:
+            # if the card is a face card, give it a value of 10
+            if card == "J" or card == "Q" or card == "K":
+                card = 10
+            # if the card is an ace, give it a value of 11
+            elif card == "A":
+                card = 11
+            dealer_total += card
+        while dealer_total < 17:
+            self.dealer_hand.append(choice(self.deck))
             dealer_total = 0
             for card in self.dealer_hand:
                 # if the card is a face card, give it a value of 10
@@ -289,13 +311,90 @@ class BlackjackView(View):
                 elif card == "A":
                     card = 11
                 dealer_total += card
+            await asyncio.sleep(.1)
+        # define user
+        user = interaction.user
+        # define bust
+        bust = False
+        # establish connection
+        conn = interaction.client.pool
+        # define emojis
+        real_dealer_hand_string = "".join([get_card_emoji(c) for c in self.dealer_hand])
+        dealer_hand_string = f"{get_card_emoji(self.dealer_hand[0])}{get_card_emoji('back')}"
+        player_hand_string = "".join([get_card_emoji(c) for c in self.player_hand])
+        # define totals
+        player_total = 0
+        for card in self.player_hand:
+            # if the card is a face card, give it a value of 10
+            if card == "J" or card == "Q" or card == "K":
+                card = 10
+            # if the card is an ace, give it a value of 11
+            elif card == "A":
+                card = 11
+            player_total += card
+        dealer_total = 0
+        for card in self.dealer_hand:
+            # if the card is a face card, give it a value of 10
+            if card == "J" or card == "Q" or card == "K":
+                card = 10
+            # if the card is an ace, give it a value of 11
+            elif card == "A":
+                card = 11
+            dealer_total += card
+        # if the total is more than 21, change aces
+        if player_total > 21:
+            if "A" in self.player_hand:
+                for ace in self.player_hand:
+                    if ace == "A":
+                        player_total -= 10
+                    if player_total < 21:
+                        break
+                if player_total > 21:
+                    bust = True
+            # otherwise, the player busts
+            else:
+                bust = True
+        if dealer_total > 21:
+            if "A" in self.dealer_hand:
+                for ace in self.dealer_hand:
+                    if ace == "A":
+                        dealer_total -= 10
+                    if dealer_total < 21:
+                        break
+        if player_total == 21:
             # create embed
-            blackjack_embed = discord.Embed(title="Blackjack", description="A game of blackjack at the Casino Royal.")
+            blackjack_embed = discord.Embed(title="Blackjack",
+                                            description="A game of blackjack at the Casino Royal.")
             blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
             blackjack_embed.add_field(name="Dealer's Hand",
-                                      value=f"{dealer_hand_string} (total: {dealer_total})")
+                                      value=f"{real_dealer_hand_string} (total: {dealer_total})")
             blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
-            blackjack_embed.add_field(name="Result", value="***FOLD***", inline=False)
+            if dealer_total != 21:
+                winnings = round((self.bet * 3) - self.bet, 2)
+                blackjack_embed.add_field(name="Result", value="**BLACKJACK**", inline=False)
+            else:
+                winnings = self.bet - self.bet
+                blackjack_embed.add_field(name="Result", value="**PUSH**", inline=False)
+            blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               winnings, user.id)
+            await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                               winnings, user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'casino', f'Won {self.thaler}{winnings:,.2f} at blackjack')
+            # disable buttons
+            for button in self.children:
+                button.disabled = True
+            return await self.message.edit(embed=blackjack_embed, view=self)
+        elif bust is True:
+            # create embed
+            blackjack_embed = discord.Embed(title="Blackjack",
+                                            description="A game of blackjack at the Casino Royal.")
+            blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+            blackjack_embed.add_field(name="Dealer's Hand",
+                                      value=f"{real_dealer_hand_string} (total: {dealer_total})")
+            blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+            blackjack_embed.add_field(name="Result", value="***BUST***", inline=False)
             winnings = self.bet
             blackjack_embed.set_footer(text=f"Your total winnings: -{self.thaler}{winnings:,.2f}")
             await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
@@ -305,164 +404,39 @@ class BlackjackView(View):
             await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
                                user.id, 'casino', f'Lost {self.thaler}{winnings:,.2f} at blackjack')
 
+            # disable buttons
             for buttons in self.children:
                 buttons.disabled = True
             return await self.message.edit(embed=blackjack_embed, view=self)
-        except Exception as error:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
-
-    @discord.ui.button(label="Hit", style=discord.ButtonStyle.gray)
-    async def hit(self, interaction: discord.Interaction, hit: discord.Button):
-        try:
-            # defer response
-            await interaction.response.defer()
-            self.player_hand.append(choice(self.deck))
-            dealer_total = 0
-            for card in self.dealer_hand:
-                # if the card is a face card, give it a value of 10
-                if card == "J" or card == "Q" or card == "K":
-                    card = 10
-                # if the card is an ace, give it a value of 11
-                elif card == "A":
-                    card = 11
-                dealer_total += card
-            while dealer_total < 17:
-                self.dealer_hand.append(choice(self.deck))
-                dealer_total = 0
-                for card in self.dealer_hand:
-                    # if the card is a face card, give it a value of 10
-                    if card == "J" or card == "Q" or card == "K":
-                        card = 10
-                    # if the card is an ace, give it a value of 11
-                    elif card == "A":
-                        card = 11
-                    dealer_total += card
-                await asyncio.sleep(.1)
-            # define user
-            user = interaction.user
-            # define bust
-            bust = False
-            # establish connection
-            conn = interaction.client.pool
-            # define emojis
-            real_dealer_hand_string = "".join([get_card_emoji(c) for c in self.dealer_hand])
-            dealer_hand_string = f"{get_card_emoji(self.dealer_hand[0])}{get_card_emoji('back')}"
-            player_hand_string = "".join([get_card_emoji(c) for c in self.player_hand])
-            # define totals
-            player_total = 0
-            for card in self.player_hand:
-                # if the card is a face card, give it a value of 10
-                if card == "J" or card == "Q" or card == "K":
-                    card = 10
-                # if the card is an ace, give it a value of 11
-                elif card == "A":
-                    card = 11
-                player_total += card
-            dealer_total = 0
-            for card in self.dealer_hand:
-                # if the card is a face card, give it a value of 10
-                if card == "J" or card == "Q" or card == "K":
-                    card = 10
-                # if the card is an ace, give it a value of 11
-                elif card == "A":
-                    card = 11
-                dealer_total += card
-            # if the total is more than 21, change aces
-            if player_total > 21:
-                if "A" in self.player_hand:
-                    for ace in self.player_hand:
-                        if ace == "A":
-                            player_total -= 10
-                        if player_total < 21:
-                            break
-                    if player_total > 21:
-                        bust = True
-                # otherwise, the player busts
-                else:
-                    bust = True
-            if dealer_total > 21:
-                if "A" in self.dealer_hand:
-                    for ace in self.dealer_hand:
-                        if ace == "A":
-                            dealer_total -= 10
-                        if dealer_total < 21:
-                            break
-            if player_total == 21:
-                # create embed
-                blackjack_embed = discord.Embed(title="Blackjack",
-                                                description="A game of blackjack at the Casino Royal.")
-                blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
-                blackjack_embed.add_field(name="Dealer's Hand",
-                                          value=f"{real_dealer_hand_string} (total: {dealer_total})")
-                blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
-                if dealer_total != 21:
-                    winnings = round((self.bet * 3) - self.bet, 2)
-                    blackjack_embed.add_field(name="Result", value="**BLACKJACK**", inline=False)
-                else:
-                    winnings = self.bet - self.bet
-                    blackjack_embed.add_field(name="Result", value="**PUSH**", inline=False)
-                blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
-                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
-                                   winnings, user.id)
-                await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
-                                   winnings, user.id)
-                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                   user.id, 'casino', f'Won {self.thaler}{winnings:,.2f} at blackjack')
-                # disable buttons
-                for button in self.children:
-                    button.disabled = True
-                return await self.message.edit(embed=blackjack_embed, view=self)
-            elif bust is True:
-                # create embed
-                blackjack_embed = discord.Embed(title="Blackjack",
-                                                description="A game of blackjack at the Casino Royal.")
-                blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
-                blackjack_embed.add_field(name="Dealer's Hand",
-                                          value=f"{real_dealer_hand_string} (total: {dealer_total})")
-                blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
-                blackjack_embed.add_field(name="Result", value="***BUST***", inline=False)
-                winnings = self.bet
-                blackjack_embed.set_footer(text=f"Your total winnings: -{self.thaler}{winnings:,.2f}")
-                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
-                                   -winnings, user.id)
-                await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
-                                   -winnings, user.id)
-                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                   user.id, 'casino', f'Lost {self.thaler}{winnings:,.2f} at blackjack')
-
-                # disable buttons
-                for buttons in self.children:
-                    buttons.disabled = True
-                return await self.message.edit(embed=blackjack_embed, view=self)
-            else:
-                # create embed
-                blackjack_embed = discord.Embed(title="Blackjack",
-                                                description="A game of blackjack at the Casino Royal.")
-                blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
-                blackjack_embed.add_field(name="Dealer's Hand",
-                                          value=f"{dealer_hand_string}")
-                blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
-                await self.message.edit(embed=blackjack_embed, view=self)
-        except Exception as error:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
+        else:
+            # create embed
+            blackjack_embed = discord.Embed(title="Blackjack",
+                                            description="A game of blackjack at the Casino Royal.")
+            blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+            blackjack_embed.add_field(name="Dealer's Hand",
+                                      value=f"{dealer_hand_string}")
+            blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+            await self.message.edit(embed=blackjack_embed, view=self)
 
     @discord.ui.button(label="Stand", style=discord.ButtonStyle.green)
     async def stand(self, interaction: discord.Interaction, hold: discord.Button):
-        try:
-            # defer response
-            await interaction.response.defer()
-            # define user
-            user = interaction.user
-            # establish connection
-            conn = interaction.client.pool
+        # defer response
+        await interaction.response.defer()
+        # define user
+        user = interaction.user
+        # establish connection
+        conn = interaction.client.pool
+        dealer_total = 0
+        for card in self.dealer_hand:
+            # if the card is a face card, give it a value of 10
+            if card == "J" or card == "Q" or card == "K":
+                card = 10
+            # if the card is an ace, give it a value of 11
+            elif card == "A":
+                card = 11
+            dealer_total += card
+        while dealer_total < 17:
+            self.dealer_hand.append(choice(self.deck))
             dealer_total = 0
             for card in self.dealer_hand:
                 # if the card is a face card, give it a value of 10
@@ -472,145 +446,128 @@ class BlackjackView(View):
                 elif card == "A":
                     card = 11
                 dealer_total += card
-            while dealer_total < 17:
-                self.dealer_hand.append(choice(self.deck))
-                dealer_total = 0
-                for card in self.dealer_hand:
-                    # if the card is a face card, give it a value of 10
-                    if card == "J" or card == "Q" or card == "K":
-                        card = 10
-                    # if the card is an ace, give it a value of 11
-                    elif card == "A":
-                        card = 11
-                    dealer_total += card
-                await asyncio.sleep(.1)
-            # define emojis
-            real_dealer_hand_string = "".join([get_card_emoji(c) for c in self.dealer_hand])
-            player_hand_string = "".join([get_card_emoji(c) for c in self.player_hand])
-            # define totals
-            player_total = 0
-            for card in self.player_hand:
-                # if the card is a face card, give it a value of 10
-                if card == "J" or card == "Q" or card == "K":
-                    card = 10
-                # if the card is an ace, give it a value of 11
-                elif card == "A":
-                    card = 11
-                player_total += card
-            dealer_total = 0
-            for card in self.dealer_hand:
-                # if the card is a face card, give it a value of 10
-                if card == "J" or card == "Q" or card == "K":
-                    card = 10
-                # if the card is an ace, give it a value of 11
-                elif card == "A":
-                    card = 11
-                dealer_total += card
-            # if the total is more than 21, change aces
-            if player_total > 21:
-                if "A" in self.player_hand:
-                    for ace in self.player_hand:
-                        if ace == "A":
-                            player_total -= 10
-                        if player_total < 21:
-                            break
-            if dealer_total > 21:
-                if "A" in self.dealer_hand:
-                    for ace in self.dealer_hand:
-                        if ace == "A":
-                            dealer_total -= 10
-                        if dealer_total < 21:
-                            break
-            if player_total > dealer_total:
-                # create embed
-                blackjack_embed = discord.Embed(title="Blackjack",
-                                                description="A game of blackjack at the Casino Royal.")
-                blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
-                blackjack_embed.add_field(name="Dealer's Hand",
-                                          value=f"{real_dealer_hand_string} (total: {dealer_total})")
-                blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
-                blackjack_embed.add_field(name="Result", value="**WIN**", inline=False)
-                winnings = round((self.bet * 1.5) - self.bet, 2)
-                blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
-                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
-                                   winnings, user.id)
-                await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
-                                   winnings, user.id)
-                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                   user.id, 'casino', f'Won {self.thaler}{winnings:,.2f} at blackjack')
-                # disable buttons
-                for button in self.children:
-                    button.disabled = True
-                return await self.message.edit(embed=blackjack_embed, view=self)
-            elif dealer_total == player_total:
-                # create embed
-                blackjack_embed = discord.Embed(title="Blackjack",
-                                                description="A game of blackjack at the Casino Royal.")
-                blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
-                blackjack_embed.add_field(name="Dealer's Hand",
-                                          value=f"{real_dealer_hand_string} (total: {dealer_total})")
-                blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
-                blackjack_embed.add_field(name="Result", value="**PUSH**", inline=False)
-                winnings = self.bet - self.bet
-                blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
-                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
-                                   winnings, user.id)
-                await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
-                                   winnings, user.id)
-                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                   user.id, 'casino', f'Won {self.thaler}{winnings:,.2f} at blackjack')
-                # disable buttons
-                for button in self.children:
-                    button.disabled = True
-                return await self.message.edit(embed=blackjack_embed, view=self)
-            elif dealer_total > 21:
-                # create embed
-                blackjack_embed = discord.Embed(title="Blackjack",
-                                                description="A game of blackjack at the Casino Royal.")
-                blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
-                blackjack_embed.add_field(name="Dealer's Hand",
-                                          value=f"{real_dealer_hand_string} (total: {dealer_total})")
-                blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
-                blackjack_embed.add_field(name="Result", value="**WIN**", inline=False)
-                winnings = round((self.bet * 1.5) - self.bet, 2)
-                blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
-                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
-                                   winnings, user.id)
-                await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
-                                   winnings, user.id)
-                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                   user.id, 'casino', f'Won {self.thaler}{winnings:,.2f} at blackjack')
-                # disable buttons
-                for button in self.children:
-                    button.disabled = True
-                return await self.message.edit(embed=blackjack_embed, view=self)
-            else:
-                # create embed
-                blackjack_embed = discord.Embed(title="Blackjack",
-                                                description="A game of blackjack at the Casino Royal.")
-                blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
-                blackjack_embed.add_field(name="Dealer's Hand",
-                                          value=f"{real_dealer_hand_string} (total: {dealer_total})")
-                blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
-                blackjack_embed.add_field(name="Result", value="***LOSS***", inline=False)
-                winnings = self.bet
-                blackjack_embed.set_footer(text=f"Your total winnings: -{self.thaler}{winnings:,.2f}")
-                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
-                                   -winnings, user.id)
-                await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
-                                   -winnings, user.id)
-                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                   user.id, 'casino',
-                                   f'Lost {self.thaler}{winnings:,.2f} at blackjack')  # disable buttons
-                for buttons in self.children:
-                    buttons.disabled = True
-                return await self.message.edit(embed=blackjack_embed, view=self)
-        except Exception as error:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
+            await asyncio.sleep(.1)
+        # define emojis
+        real_dealer_hand_string = "".join([get_card_emoji(c) for c in self.dealer_hand])
+        player_hand_string = "".join([get_card_emoji(c) for c in self.player_hand])
+        # define totals
+        player_total = 0
+        for card in self.player_hand:
+            # if the card is a face card, give it a value of 10
+            if card == "J" or card == "Q" or card == "K":
+                card = 10
+            # if the card is an ace, give it a value of 11
+            elif card == "A":
+                card = 11
+            player_total += card
+        dealer_total = 0
+        for card in self.dealer_hand:
+            # if the card is a face card, give it a value of 10
+            if card == "J" or card == "Q" or card == "K":
+                card = 10
+            # if the card is an ace, give it a value of 11
+            elif card == "A":
+                card = 11
+            dealer_total += card
+        # if the total is more than 21, change aces
+        if player_total > 21:
+            if "A" in self.player_hand:
+                for ace in self.player_hand:
+                    if ace == "A":
+                        player_total -= 10
+                    if player_total < 21:
+                        break
+        if dealer_total > 21:
+            if "A" in self.dealer_hand:
+                for ace in self.dealer_hand:
+                    if ace == "A":
+                        dealer_total -= 10
+                    if dealer_total < 21:
+                        break
+        if player_total > dealer_total:
+            # create embed
+            blackjack_embed = discord.Embed(title="Blackjack",
+                                            description="A game of blackjack at the Casino Royal.")
+            blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+            blackjack_embed.add_field(name="Dealer's Hand",
+                                      value=f"{real_dealer_hand_string} (total: {dealer_total})")
+            blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+            blackjack_embed.add_field(name="Result", value="**WIN**", inline=False)
+            winnings = round((self.bet * 1.5) - self.bet, 2)
+            blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               winnings, user.id)
+            await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                               winnings, user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'casino', f'Won {self.thaler}{winnings:,.2f} at blackjack')
+            # disable buttons
+            for button in self.children:
+                button.disabled = True
+            return await self.message.edit(embed=blackjack_embed, view=self)
+        elif dealer_total == player_total:
+            # create embed
+            blackjack_embed = discord.Embed(title="Blackjack",
+                                            description="A game of blackjack at the Casino Royal.")
+            blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+            blackjack_embed.add_field(name="Dealer's Hand",
+                                      value=f"{real_dealer_hand_string} (total: {dealer_total})")
+            blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+            blackjack_embed.add_field(name="Result", value="**PUSH**", inline=False)
+            winnings = self.bet - self.bet
+            blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               winnings, user.id)
+            await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                               winnings, user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'casino', f'Won {self.thaler}{winnings:,.2f} at blackjack')
+            # disable buttons
+            for button in self.children:
+                button.disabled = True
+            return await self.message.edit(embed=blackjack_embed, view=self)
+        elif dealer_total > 21:
+            # create embed
+            blackjack_embed = discord.Embed(title="Blackjack",
+                                            description="A game of blackjack at the Casino Royal.")
+            blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+            blackjack_embed.add_field(name="Dealer's Hand",
+                                      value=f"{real_dealer_hand_string} (total: {dealer_total})")
+            blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+            blackjack_embed.add_field(name="Result", value="**WIN**", inline=False)
+            winnings = round((self.bet * 1.5) - self.bet, 2)
+            blackjack_embed.set_footer(text=f"Your winnings total: {self.thaler}{winnings:,.2f}")
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               winnings, user.id)
+            await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                               winnings, user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'casino', f'Won {self.thaler}{winnings:,.2f} at blackjack')
+            # disable buttons
+            for button in self.children:
+                button.disabled = True
+            return await self.message.edit(embed=blackjack_embed, view=self)
+        else:
+            # create embed
+            blackjack_embed = discord.Embed(title="Blackjack",
+                                            description="A game of blackjack at the Casino Royal.")
+            blackjack_embed.add_field(name="Bet", value=f"{self.thaler}{self.bet:,.2f}", inline=False)
+            blackjack_embed.add_field(name="Dealer's Hand",
+                                      value=f"{real_dealer_hand_string} (total: {dealer_total})")
+            blackjack_embed.add_field(name="Player's Hand", value=f"{player_hand_string} (total: {player_total})")
+            blackjack_embed.add_field(name="Result", value="***LOSS***", inline=False)
+            winnings = self.bet
+            blackjack_embed.set_footer(text=f"Your total winnings: -{self.thaler}{winnings:,.2f}")
+            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2;''',
+                               -winnings, user.id)
+            await conn.execute('''UPDATE casino_rank SET winnings = winnings + $1 WHERE user_id = $2;''',
+                               -winnings, user.id)
+            await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                               user.id, 'casino',
+                               f'Lost {self.thaler}{winnings:,.2f} at blackjack')  # disable buttons
+            for buttons in self.children:
+                buttons.disabled = True
+            return await self.message.edit(embed=blackjack_embed, view=self)
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.author.id
@@ -639,47 +596,39 @@ class MarketDropdown(discord.ui.Select):
                          min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
-        try:
-            # defer interaction
-            await interaction.response.defer(thinking=False)
-            # define bot
-            self.bot = interaction.client
-            # establish connection
-            conn = self.bot.pool
-            # parse market
-            if self.values[0] == 'General Market':
-                market = 'general'
-            elif self.values[0] == 'Minecraft Market':
-                market = 'minecraft'
-            else:
-                market = 'open'
-            # fetch market items
-            market_items = await conn.fetch('''SELECT * FROM rbt_market WHERE market = $1 ORDER BY market_id;''',
-                                            market)
-            # create embed
-            market_embed = discord.Embed(title=f"{self.values[0]}",
-                                         description="A display of all items in this market.")
-            # paginator if there are more than 25 items in a market
-            if len(market_items) > 12:
-                page = 1
-                for m in market_items[(page * 12) - 12:page * 12]:
-                    market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
-                                           value=f"Price: {m['value']:,}")
-                await self.message.edit(embed=market_embed, view=SubMarketView(market=market, message=self.message,
-                                                                               values=self.values))
-            else:
-                page = 1
-                for m in market_items[(page * 12) - 12:page * 12]:
-                    market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
-                                           value=f"Price: {m['value']}")
-                await self.message.edit(embed=market_embed)
-        except Exception as error:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
-
+        # defer interaction
+        await interaction.response.defer(thinking=False)
+        # define bot
+        self.bot = interaction.client
+        # establish connection
+        conn = self.bot.pool
+        # parse market
+        if self.values[0] == 'General Market':
+            market = 'general'
+        elif self.values[0] == 'Minecraft Market':
+            market = 'minecraft'
+        else:
+            market = 'open'
+        # fetch market items
+        market_items = await conn.fetch('''SELECT * FROM rbt_market WHERE market = $1 ORDER BY market_id;''',
+                                        market)
+        # create embed
+        market_embed = discord.Embed(title=f"{self.values[0]}",
+                                     description="A display of all items in this market.")
+        # paginator if there are more than 25 items in a market
+        if len(market_items) > 12:
+            page = 1
+            for m in market_items[(page * 12) - 12:page * 12]:
+                market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
+                                       value=f"Price: {m['value']:,}")
+            await self.message.edit(embed=market_embed, view=SubMarketView(market=market, message=self.message,
+                                                                           values=self.values))
+        else:
+            page = 1
+            for m in market_items[(page * 12) - 12:page * 12]:
+                market_embed.add_field(name=f"{m['name']} (ID: {m['market_id']})",
+                                       value=f"Price: {m['value']}")
+            await self.message.edit(embed=market_embed)
 
 class SubMarketView(View):
 
@@ -1049,158 +998,151 @@ class Economy(commands.Cog):
         # set timezone
         eastern = timezone('US/Eastern')
         while True:
-            try:
-                # define now
-                now = datetime.now(eastern)
-                # sets the time to be midnight the next day
-                next_run = now.replace(hour=0, minute=0, second=0)
-                next_run += timedelta(days=1)
-                # sends the next runtime
-                await crashchannel.send(f"Bank update waiting until "
-                                        f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
-                # sleeps until runtime
-                await discord.utils.sleep_until(next_run)
-                # establish connection
-                conn = self.bot.pool
-                # GENERAL FUND CHECKS
-                # check general fund for minting/refund
-                general_fund = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'General Fund';''')
-                current_fund = float(general_fund['current_funds'])
-                fund_limit = float(general_fund['fund_limit'])
-                # if the general fund is near/overdrawn
-                if current_fund <= (.10 * fund_limit):
-                    # set new fund to 150% of old fund
-                    new_limit = fund_limit * 1.5
-                    additional_funds = fund_limit * .5
-                    # update all market items in the general and minecraft market to increase by 25%
-                    await conn.execute('''UPDATE rbt_market SET value = value * 1.25 
-                    WHERE market != 'open' AND name = 'Wallet Expansion';''')
-                    # update funds
-                    await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = current_funds + $2 
-                            WHERE name = 'General Fund';''', new_limit, additional_funds)
-                # if the general fund is overfunded
-                if current_fund > fund_limit:
-                    # ensure the general fund is more than 500,000 thaler
-                    if fund_limit > 500000:
-                        # set the new fund limit to 50%
-                        new_limit = fund_limit * .5
-                        # calculate refund and new current funds
-                        new_funds = fund_limit * .25
-                        refund = current_fund - fund_limit
-                        await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = $2 
-                                WHERE name = 'General Fund';''', new_limit, new_funds)
-                        # count the number of investors
-                        investor_count = await conn.fetchrow('''SELECT COUNT(user_id) 
-                                FROM bank_ledger WHERE type = 'investment';''')
-                        # calculate how much each investor will receive
-                        investor_cut = (refund * .25) / investor_count['count']
-                        # count the number of premium members
-                        premium_count = await conn.fetchrow('''SELECT COUNT(user_id) 
-                                FROM rbt_users WHERE premium_user = TRUE AND suspended = FALSE;''')
-                        # calculate how much each premium user will receive
-                        premium_cut = (refund * .25) / premium_count['count']
-                        # count the number of recruiters who have sent more than 100 TGs this month
-                        sender_count = await conn.fetchrow('''SELECT COUNT(user_id) 
-                                FROM recruitment WHERE sent_this_month > 100;''')
-                        # calculate sender cut
-                        sender_cut = (refund * .25) / sender_count['count']
-                        # count the number of registered members
-                        member_count = await conn.fetchrow('''SELECT COUNT(user_id) 
-                                FROM rbt_users WHERE suspended = FALSE;''')
-                        # calculate the member cut
-                        member_cut = (refund * .25) / member_count['count']
-                        # credit premium group
-                        await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
-                                WHERE premium_user = TRUE AND suspended = FALSE;''', premium_cut)
-                        # credit member group
-                        await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
-                                WHERE suspended = FALSE;''', member_cut)
-                        # credit investor group
-                        investors = await conn.fetch('''SELECT * FROM bank_ledger WHERE type = 'investment';''')
-                        for investor in investors:
-                            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2
-                                    AND suspended = FALSE;''', investor_cut, investor['user_id'])
-                        # credit sender group
-                        senders = await conn.fetch('''SELECT user_id FROM recruitment WHERE sent_this_month > 100;''')
-                        for sender in senders:
-                            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2
-                                                    AND suspended = FALSE;''', sender_cut, sender['user_id'])
-                        self.announcement += "***The Royal Bank of Thegye has issued a general refund!***"
-                # INVESTMENT/LOAN UPDATES
-                # fetch sum of all investments
-                investment_sum_raw = await conn.fetchrow('''SELECT SUM(amount) FROM bank_ledger 
-                WHERE type = 'investment';''')
-                if investment_sum_raw['sum'] is None:
-                    investment_sum = 0
+            # define now
+            now = datetime.now(eastern)
+            # sets the time to be midnight the next day
+            next_run = now.replace(hour=0, minute=0, second=0)
+            next_run += timedelta(days=1)
+            # sends the next runtime
+            await crashchannel.send(f"Bank update waiting until "
+                                    f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
+            # sleeps until runtime
+            await discord.utils.sleep_until(next_run)
+            # establish connection
+            conn = self.bot.pool
+            # GENERAL FUND CHECKS
+            # check general fund for minting/refund
+            general_fund = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'General Fund';''')
+            current_fund = float(general_fund['current_funds'])
+            fund_limit = float(general_fund['fund_limit'])
+            # if the general fund is near/overdrawn
+            if current_fund <= (.10 * fund_limit):
+                # set new fund to 150% of old fund
+                new_limit = fund_limit * 1.5
+                additional_funds = fund_limit * .5
+                # update all market items in the general and minecraft market to increase by 25%
+                await conn.execute('''UPDATE rbt_market SET value = value * 1.25 
+                WHERE market != 'open' AND name = 'Wallet Expansion';''')
+                # update funds
+                await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = current_funds + $2 
+                        WHERE name = 'General Fund';''', new_limit, additional_funds)
+            # if the general fund is overfunded
+            if current_fund > fund_limit:
+                # ensure the general fund is more than 500,000 thaler
+                if fund_limit > 500000:
+                    # set the new fund limit to 50%
+                    new_limit = fund_limit * .5
+                    # calculate refund and new current funds
+                    new_funds = fund_limit * .25
+                    refund = current_fund - fund_limit
+                    await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = $2 
+                            WHERE name = 'General Fund';''', new_limit, new_funds)
+                    # count the number of investors
+                    investor_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+                            FROM bank_ledger WHERE type = 'investment';''')
+                    # calculate how much each investor will receive
+                    investor_cut = (refund * .25) / investor_count['count']
+                    # count the number of premium members
+                    premium_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+                            FROM rbt_users WHERE premium_user = TRUE AND suspended = FALSE;''')
+                    # calculate how much each premium user will receive
+                    premium_cut = (refund * .25) / premium_count['count']
+                    # count the number of recruiters who have sent more than 100 TGs this month
+                    sender_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+                            FROM recruitment WHERE sent_this_month > 100;''')
+                    # calculate sender cut
+                    sender_cut = (refund * .25) / sender_count['count']
+                    # count the number of registered members
+                    member_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+                            FROM rbt_users WHERE suspended = FALSE;''')
+                    # calculate the member cut
+                    member_cut = (refund * .25) / member_count['count']
+                    # credit premium group
+                    await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
+                            WHERE premium_user = TRUE AND suspended = FALSE;''', premium_cut)
+                    # credit member group
+                    await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
+                            WHERE suspended = FALSE;''', member_cut)
+                    # credit investor group
+                    investors = await conn.fetch('''SELECT * FROM bank_ledger WHERE type = 'investment';''')
+                    for investor in investors:
+                        await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2
+                                AND suspended = FALSE;''', investor_cut, investor['user_id'])
+                    # credit sender group
+                    senders = await conn.fetch('''SELECT user_id FROM recruitment WHERE sent_this_month > 100;''')
+                    for sender in senders:
+                        await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2
+                                                AND suspended = FALSE;''', sender_cut, sender['user_id'])
+                    self.announcement += "***The Royal Bank of Thegye has issued a general refund!***"
+            # INVESTMENT/LOAN UPDATES
+            # fetch sum of all investments
+            investment_sum_raw = await conn.fetchrow('''SELECT SUM(amount) FROM bank_ledger 
+            WHERE type = 'investment';''')
+            if investment_sum_raw['sum'] is None:
+                investment_sum = 0
+            else:
+                investment_sum = investment_sum_raw['sum']
+            # increase investments by 2% for investors
+            await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'investment';''')
+            # increase investment fund by 2%
+            await conn.execute(
+                '''UPDATE funds SET current_funds = current_funds * 1.02 WHERE name = 'Investment Fund';''')
+            # pay 6% dividend to general fund
+            await conn.execute(
+                '''UPDATE funds SET current_funds = current_funds + $1 WHERE name = 'General Fund';''',
+                (investment_sum * .06))
+            # increase loan by interest rate
+            await conn.execute('''UPDATE bank_ledger SET amount = amount * (1+(interest/100)) 
+            WHERE type = 'loan';''')
+            # LOANS DUE
+            today = datetime.now()
+            loans_due = await conn.fetch('''SELECT * FROM bank_ledger WHERE due_date < $1 AND type = 'loan';''',
+                                         today)
+            # for all the loans in due, reposes thaler or default
+            for loan in loans_due:
+                amount = loan['amount']
+                borrower = loan['user_id']
+                borrower_snowflake = self.bot.get_user(borrower)
+                # fetch borrower information
+                borrower_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', borrower)
+                # if the user does not have enough thaler in their funds, increase loan by 35%
+                if borrower_info['funds'] < amount:
+                    await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.35, due_date = $2 
+                    WHERE account_id = $1;''', loan['account_id'], today + timedelta(days=14))
+                    # create and send user a DM
+                    await borrower_snowflake.send(f"This is your official notice from the Royal Bank of Thegye "
+                                                  f"that you have defaulted on your loan account "
+                                                  f"(ID: {loan['account_id']}. This loan has been increased by 35% "
+                                                  f"in lieu of payment and will become due two weeks from today.")
+                    continue
                 else:
-                    investment_sum = investment_sum_raw['sum']
-                # increase investments by 2% for investors
-                await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'investment';''')
-                # increase investment fund by 2%
-                await conn.execute(
-                    '''UPDATE funds SET current_funds = current_funds * 1.02 WHERE name = 'Investment Fund';''')
-                # pay 6% dividend to general fund
-                await conn.execute(
-                    '''UPDATE funds SET current_funds = current_funds + $1 WHERE name = 'General Fund';''',
-                    (investment_sum * .06))
-                # increase loan by interest rate
-                await conn.execute('''UPDATE bank_ledger SET amount = amount * (1+(interest/100)) 
-                WHERE type = 'loan';''')
-                # LOANS DUE
-                today = datetime.now()
-                loans_due = await conn.fetch('''SELECT * FROM bank_ledger WHERE due_date < $1 AND type = 'loan';''',
-                                             today)
-                # for all the loans in due, reposes thaler or default
-                for loan in loans_due:
-                    amount = loan['amount']
-                    borrower = loan['user_id']
-                    borrower_snowflake = self.bot.get_user(borrower)
-                    # fetch borrower information
-                    borrower_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', borrower)
-                    # if the user does not have enough thaler in their funds, increase loan by 35%
-                    if borrower_info['funds'] < amount:
-                        await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.35, due_date = $2 
-                        WHERE account_id = $1;''', loan['account_id'], today + timedelta(days=14))
-                        # create and send user a DM
-                        await borrower_snowflake.send(f"This is your official notice from the Royal Bank of Thegye "
-                                                      f"that you have defaulted on your loan account "
-                                                      f"(ID: {loan['account_id']}. This loan has been increased by 35% "
-                                                      f"in lieu of payment and will become due two weeks from today.")
-                        continue
-                    else:
-                        # remove funds from user
-                        await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
-                                           amount, borrower)
-                        # add funds to investment fund
-                        await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
-                        WHERE name = 'Investment Fund';''', amount)
-                        # remove loan account
-                        await conn.execute('''DELETE FROM bank_ledger WHERE account_id = $1;''', loan['account_id'])
-                        # log action
-                        await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                           borrower, 'bank', f"Loan account #{loan['account_id']} automatically "
-                                                             f"repaid by {borrower_snowflake.name}#"
-                                                             f"{borrower_snowflake.discriminator}.")
-                        continue
-                # payroll
-                thegye = self.bot.get_guild(674259612580446230)
-                official_role = thegye.get_role(674278988323225632)
-                for official in official_role.members:
-                    if datetime.now().weekday() <= 5:
-                        await conn.execute('''UPDATE rbt_users SET funds = funds + 20 WHERE user_id = $1;''',
-                                           official.id)
-                        await conn.execute(
-                            '''UPDATE funds SET current_funds = current_funds - 20 WHERE name = 'General Fund';''')
-                        await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                           official.id, 'bank', f"Payroll {self.thaler}20.")
-                await bankchannel.send("Royal Bank of Thegye updated.")
-                continue
-            except Exception as error:
-                etype = type(error)
-                trace = error.__traceback__
-                lines = traceback.format_exception(etype, error, trace)
-                traceback_text = ''.join(lines)
-                self.bot.logger.warning(msg=f"{traceback_text}")
+                    # remove funds from user
+                    await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
+                                       amount, borrower)
+                    # add funds to investment fund
+                    await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
+                    WHERE name = 'Investment Fund';''', amount)
+                    # remove loan account
+                    await conn.execute('''DELETE FROM bank_ledger WHERE account_id = $1;''', loan['account_id'])
+                    # log action
+                    await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                       borrower, 'bank', f"Loan account #{loan['account_id']} automatically "
+                                                         f"repaid by {borrower_snowflake.name}#"
+                                                         f"{borrower_snowflake.discriminator}.")
+                    continue
+            # payroll
+            thegye = self.bot.get_guild(674259612580446230)
+            official_role = thegye.get_role(674278988323225632)
+            for official in official_role.members:
+                if datetime.now().weekday() <= 5:
+                    await conn.execute('''UPDATE rbt_users SET funds = funds + 20 WHERE user_id = $1;''',
+                                       official.id)
+                    await conn.execute(
+                        '''UPDATE funds SET current_funds = current_funds - 20 WHERE name = 'General Fund';''')
+                    await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                       official.id, 'bank', f"Payroll {self.thaler}20.")
+            await bankchannel.send("Royal Bank of Thegye updated.")
+            continue
 
     @rbt.command(name="register", description="Registers a new member of the Royal Bank of Thegye.")
     async def register(self, interaction: discord.Interaction):
@@ -1793,138 +1735,131 @@ class Economy(commands.Cog):
     exchange = app_commands.Group(name="exchange", description="...", guild_only=True)
 
     async def market_updating(self):
-        try:
-            # wait for bot to be ready
-            await self.bot.wait_until_ready()
-            # define crash channel
-            crashchannel = self.bot.get_channel(835579413625569322)
-            # define bank channel
-            bankchannel = self.bot.get_channel(855155865023021066)
-            # set timezone
-            eastern = timezone('US/Eastern')
-            while True:
-                # define now
-                now = datetime.now(eastern)
-                # set the run to be the next hour
-                next_run = now.replace(minute=0, second=0)
-                next_run += timedelta(hours=1)
-                # sends the next runtime
-                await crashchannel.send(f"Stock market update waiting until "
-                                        f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
-                # sleep until then
-                await discord.utils.sleep_until(next_run)
-                # establish connection
-                conn = self.bot.pool
-                # define announcement string
-                new_shares = 0
-                # STOCK MARKET UPDATING
-                # fetch all stock info
-                stocks = await conn.fetch('''SELECT * FROM stocks;''')
-                # for each stock, update information
-                for stock in stocks:
-                    # define trending
-                    trending = "up"
-                    # define value
-                    value = float(stock['value'])
-                    # change chance
-                    change_chance = randint(1, 100)
-                    # calculate trending course if up
-                    if stock['trending'] == "up":
-                        if change_chance <= 25 + (5 * stock['risk']):
-                            trending = "down"
-                        else:
-                            trending = "up"
-                    # calculate trending course if down
-                    elif stock['trending'] == "down":
-                        if change_chance <= 25 + (5 * stock['risk']):
-                            trending = "up"
-                        else:
-                            trending = "down"
-                    # calculation: new_value = value + ((percentage increase + outstanding over issued / 10) * value)
-                    value_roll = uniform(0, 2 + stock['risk'])
-                    # if the trend is up, increase stock based on risk
-                    if trending == "up":
-                        value += round(value_roll + (stock['outstanding'] / stock['issued']), 2)
+        # wait for bot to be ready
+        await self.bot.wait_until_ready()
+        # define crash channel
+        crashchannel = self.bot.get_channel(835579413625569322)
+        # define bank channel
+        bankchannel = self.bot.get_channel(855155865023021066)
+        # set timezone
+        eastern = timezone('US/Eastern')
+        while True:
+            # define now
+            now = datetime.now(eastern)
+            # set the run to be the next hour
+            next_run = now.replace(minute=0, second=0)
+            next_run += timedelta(hours=1)
+            # sends the next runtime
+            await crashchannel.send(f"Stock market update waiting until "
+                                    f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
+            # sleep until then
+            await discord.utils.sleep_until(next_run)
+            # establish connection
+            conn = self.bot.pool
+            # define announcement string
+            new_shares = 0
+            # STOCK MARKET UPDATING
+            # fetch all stock info
+            stocks = await conn.fetch('''SELECT * FROM stocks;''')
+            # for each stock, update information
+            for stock in stocks:
+                # define trending
+                trending = "up"
+                # define value
+                value = float(stock['value'])
+                # change chance
+                change_chance = randint(1, 100)
+                # calculate trending course if up
+                if stock['trending'] == "up":
+                    if change_chance <= 25 + (5 * stock['risk']):
+                        trending = "down"
                     else:
-                        value -= round(value_roll, 2)
-                        # if the value drops below the floor, set it to be 5 - risk
-                    floor = 15 - uniform(0, stock['risk'])
-                    if value < floor:
-                        value = floor
-                    # if the outstanding shares is between 0 and 500 shares away from the total issued shares,
-                    # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
-                    if stock['issued'] - stock['outstanding'] < randint(0, 500):
-                        # royal bonds are immune to automatic dilution
-                        if stock['stock_id'] != 1:
-                            new_shares = stock['issued'] / 5
-                            dilution = round(uniform(5 * stock['risk'], 10 * stock['risk']), 2)
-                            value = round(value * (clip(dilution, 0, 23) / 100), 2)
-                            self.announcement += f"{stock['name']} has been diluted. Issued shares have increased to " \
-                                                 f"{new_shares:,.0f}, and the diluted value is now " \
-                                                 f"{self.thaler}{value:,.2f} per share.\n"
-                    # update stock information
-                    await conn.execute('''UPDATE stocks SET value = ROUND($1,2), issued = issued + $2, trending = $3, 
-                    change = ($1/value)-1 WHERE stock_id = $4;''', value, new_shares, trending, stock['stock_id'])
-                # calculate value of stocks
-                stock_sum = await conn.fetchrow('''SELECT SUM(value) FROM stocks;''')
-                # fetch stock count
-                stock_count = await conn.fetchrow('''SELECT COUNT(*) FROM stocks;''')
-                # fetch crash
-                crash = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_crash';''')
-                self.crash = crash['bool']
-                # calculate market crash chance
-                if self.crash is True:
-                    recovery_chance = uniform(1, 100)
-                    if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
-                        recovery_chance += float(stock_sum['sum']) / int(stock_count['count'])
-                    if recovery_chance <= 10:
-                        self.crash = False
-                        await conn.execute('''UPDATE info SET bool = FALSE WHERE name = 'rbt_crash';''')
-                        self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n"
+                        trending = "up"
+                # calculate trending course if down
+                elif stock['trending'] == "down":
+                    if change_chance <= 25 + (5 * stock['risk']):
+                        trending = "up"
                     else:
-                        for s in range(1, stock_count['count']+1):
-                            random_down = uniform(1, 5)
-                            await conn.execute('''UPDATE stocks SET value = value - $1, 
-                            change = ((value - $1)/value) -1 , trending = 'down' WHERE stock_id = $2;''',
-                                               random_down, s)
-                        await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
-                        self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
-                                             "All stock values continue to decrease and trend down.\n"
+                        trending = "down"
+                # calculation: new_value = value + ((percentage increase + outstanding over issued / 10) * value)
+                value_roll = uniform(0, 2 + stock['risk'])
+                # if the trend is up, increase stock based on risk
+                if trending == "up":
+                    value += round(value_roll + (stock['outstanding'] / stock['issued']), 2)
                 else:
-                    crash_chance = uniform(1, 100)
-                    if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
-                        crash_chance -= float(stock_sum['sum']) / int(stock_count['count'])
-                    if crash_chance <= 1:
-                        if self.crash is False:
-                            for s in range(1, stock_count['count']+1):
-                                random_down = uniform(10, 25)
-                                await conn.execute('''UPDATE stocks SET value = value - $1, 
-                                change = ((value - $1)/value)-1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
-                            await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
-                            self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
-                                                 "All stock values are decreased and begun trending down.\n "
-                            await conn.execute('''UPDATE info SET bool = TRUE WHERE name = 'rbt_crash';''')
-                # update stocks' value tracker
-                await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
-                SELECT stock_id, value, trending FROM stocks;''')
-                # unpin old message
-                old_message = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_pinned_message';''')
-                old_message = await bankchannel.fetch_message(old_message['bigint'])
-                await old_message.unpin()
-                # announce
-                new_announcement = await bankchannel.send(content=self.announcement)
-                await new_announcement.pin()
-                await conn.execute('''UPDATE info SET bigint = $1 WHERE name = 'rbt_pinned_message';''',
-                                   new_announcement.id)
-                self.announcement = \
-                    "The Royal Exchange of Thegye has updated. Below is a summary of any important changes:\n"
-                continue
-        except Exception as error:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
+                    value -= round(value_roll, 2)
+                    # if the value drops below the floor, set it to be 5 - risk
+                floor = 15 - uniform(0, stock['risk'])
+                if value < floor:
+                    value = floor
+                # if the outstanding shares is between 0 and 500 shares away from the total issued shares,
+                # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
+                if stock['issued'] - stock['outstanding'] < randint(0, 500):
+                    # royal bonds are immune to automatic dilution
+                    if stock['stock_id'] != 1:
+                        new_shares = stock['issued'] / 5
+                        dilution = round(uniform(5 * stock['risk'], 10 * stock['risk']), 2)
+                        value = round(value * (clip(dilution, 0, 23) / 100), 2)
+                        self.announcement += f"{stock['name']} has been diluted. Issued shares have increased to " \
+                                             f"{new_shares:,.0f}, and the diluted value is now " \
+                                             f"{self.thaler}{value:,.2f} per share.\n"
+                # update stock information
+                await conn.execute('''UPDATE stocks SET value = ROUND($1,2), issued = issued + $2, trending = $3, 
+                change = ($1/value)-1 WHERE stock_id = $4;''', value, new_shares, trending, stock['stock_id'])
+            # calculate value of stocks
+            stock_sum = await conn.fetchrow('''SELECT SUM(value) FROM stocks;''')
+            # fetch stock count
+            stock_count = await conn.fetchrow('''SELECT COUNT(*) FROM stocks;''')
+            # fetch crash
+            crash = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_crash';''')
+            self.crash = crash['bool']
+            # calculate market crash chance
+            if self.crash is True:
+                recovery_chance = uniform(1, 100)
+                if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
+                    recovery_chance += float(stock_sum['sum']) / int(stock_count['count'])
+                if recovery_chance <= 10:
+                    self.crash = False
+                    await conn.execute('''UPDATE info SET bool = FALSE WHERE name = 'rbt_crash';''')
+                    self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n"
+                else:
+                    for s in range(1, stock_count['count']+1):
+                        random_down = uniform(1, 5)
+                        await conn.execute('''UPDATE stocks SET value = value - $1, 
+                        change = ((value - $1)/value) -1 , trending = 'down' WHERE stock_id = $2;''',
+                                           random_down, s)
+                    await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
+                    self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
+                                         "All stock values continue to decrease and trend down.\n"
+            else:
+                crash_chance = uniform(1, 100)
+                if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
+                    crash_chance -= float(stock_sum['sum']) / int(stock_count['count'])
+                if crash_chance <= 1:
+                    if self.crash is False:
+                        for s in range(1, stock_count['count']+1):
+                            random_down = uniform(10, 25)
+                            await conn.execute('''UPDATE stocks SET value = value - $1, 
+                            change = ((value - $1)/value)-1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
+                        await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
+                        self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
+                                             "All stock values are decreased and begun trending down.\n "
+                        await conn.execute('''UPDATE info SET bool = TRUE WHERE name = 'rbt_crash';''')
+            # update stocks' value tracker
+            await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
+            SELECT stock_id, value, trending FROM stocks;''')
+            # unpin old message
+            old_message = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_pinned_message';''')
+            old_message = await bankchannel.fetch_message(old_message['bigint'])
+            await old_message.unpin()
+            # announce
+            new_announcement = await bankchannel.send(content=self.announcement)
+            await new_announcement.pin()
+            await conn.execute('''UPDATE info SET bigint = $1 WHERE name = 'rbt_pinned_message';''',
+                               new_announcement.id)
+            self.announcement = \
+                "The Royal Exchange of Thegye has updated. Below is a summary of any important changes:\n"
+            continue
 
     @commands.command()
     @commands.is_owner()
@@ -2039,145 +1974,138 @@ class Economy(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def force_bank_update(self, ctx):
-        try:
-            # establish connection
-            conn = self.bot.pool
-            # GENERAL FUND CHECKS
-            # check general fund for minting/refund
-            general_fund = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'General Fund';''')
-            current_fund = float(general_fund['current_funds'])
-            fund_limit = float(general_fund['fund_limit'])
-            # if the general fund is near/overdrawn
-            if current_fund <= (.02 * fund_limit):
-                # set new fund to 150% of old fund
-                new_limit = fund_limit * 1.5
-                additional_funds = fund_limit * .5
-                # ADD MARKET INCREASES/DECREASES HERE
-                # update funds
-                await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = current_funds + $2 
-                        WHERE name = 'General Fund';''', new_limit, additional_funds)
-            # if the general fund is overfunded
-            if current_fund > fund_limit:
-                # ensure the general fund is more than 500,000 thaler
-                if fund_limit > 500000:
-                    # set the new fund limit to 50%
-                    new_limit = fund_limit * .5
-                    # calculate refund and new current funds
-                    new_funds = fund_limit * .25
-                    refund = current_fund - fund_limit
-                    await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = $2 
-                            WHERE name = 'General Fund';''', new_limit, new_funds)
-                    # count the number of investors
-                    investor_count = await conn.fetchrow('''SELECT COUNT(user_id) 
-                            FROM bank_ledger WHERE type = 'investment';''')
-                    # calculate how much each investor will receive
-                    investor_cut = (refund * .25) / investor_count['count']
-                    # count the number of premium members
-                    premium_count = await conn.fetchrow('''SELECT COUNT(user_id) 
-                            FROM rbt_users WHERE premium_user = TRUE AND suspended = FALSE;''')
-                    # calculate how much each premium user will receive
-                    premium_cut = (refund * .25) / premium_count['count']
-                    # count the number of recruiters who have sent more than 100 TGs this month
-                    sender_count = await conn.fetchrow('''SELECT COUNT(user_id) 
-                            FROM recruitment WHERE sent_this_month > 100;''')
-                    # calculate sender cut
-                    sender_cut = (refund * .25) / sender_count['count']
-                    # count the number of registered members
-                    member_count = await conn.fetchrow('''SELECT COUNT(user_id) 
-                            FROM rbt_users WHERE suspended = FALSE;''')
-                    # calculate the member cut
-                    member_cut = (refund * .25) / member_count['count']
-                    # credit premium group
-                    await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
-                            WHERE premium_user = TRUE AND suspended = FALSE;''', premium_cut)
-                    # credit member group
-                    await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
-                            WHERE suspended = FALSE;''', member_cut)
-                    # credit investor group
-                    investors = await conn.fetch('''SELECT * FROM bank_ledger WHERE type = 'investment';''')
-                    for investor in investors:
-                        await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2
-                                AND suspended = FALSE;''', investor_cut, investor['user_id'])
-                    # credit sender group
-                    senders = await conn.fetch('''SELECT user_id FROM recruitment WHERE sent_this_month > 100;''')
-                    for sender in senders:
-                        await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2
-                                                AND suspended = FALSE;''', sender_cut, sender['user_id'])
-                    self.announcement += "***The Royal Bank of Thegye has issued a general refund!***"
-            # INVESTMENT/LOAN UPDATES
-            # fetch sum of all investments
-            investment_sum_raw = await conn.fetchrow('''SELECT SUM(amount) FROM bank_ledger 
-            WHERE type = 'investment';''')
-            if investment_sum_raw['sum'] is None:
-                investment_sum = 0
+        # establish connection
+        conn = self.bot.pool
+        # GENERAL FUND CHECKS
+        # check general fund for minting/refund
+        general_fund = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'General Fund';''')
+        current_fund = float(general_fund['current_funds'])
+        fund_limit = float(general_fund['fund_limit'])
+        # if the general fund is near/overdrawn
+        if current_fund <= (.02 * fund_limit):
+            # set new fund to 150% of old fund
+            new_limit = fund_limit * 1.5
+            additional_funds = fund_limit * .5
+            # ADD MARKET INCREASES/DECREASES HERE
+            # update funds
+            await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = current_funds + $2 
+                    WHERE name = 'General Fund';''', new_limit, additional_funds)
+        # if the general fund is overfunded
+        if current_fund > fund_limit:
+            # ensure the general fund is more than 500,000 thaler
+            if fund_limit > 500000:
+                # set the new fund limit to 50%
+                new_limit = fund_limit * .5
+                # calculate refund and new current funds
+                new_funds = fund_limit * .25
+                refund = current_fund - fund_limit
+                await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = $2 
+                        WHERE name = 'General Fund';''', new_limit, new_funds)
+                # count the number of investors
+                investor_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+                        FROM bank_ledger WHERE type = 'investment';''')
+                # calculate how much each investor will receive
+                investor_cut = (refund * .25) / investor_count['count']
+                # count the number of premium members
+                premium_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+                        FROM rbt_users WHERE premium_user = TRUE AND suspended = FALSE;''')
+                # calculate how much each premium user will receive
+                premium_cut = (refund * .25) / premium_count['count']
+                # count the number of recruiters who have sent more than 100 TGs this month
+                sender_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+                        FROM recruitment WHERE sent_this_month > 100;''')
+                # calculate sender cut
+                sender_cut = (refund * .25) / sender_count['count']
+                # count the number of registered members
+                member_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+                        FROM rbt_users WHERE suspended = FALSE;''')
+                # calculate the member cut
+                member_cut = (refund * .25) / member_count['count']
+                # credit premium group
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
+                        WHERE premium_user = TRUE AND suspended = FALSE;''', premium_cut)
+                # credit member group
+                await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
+                        WHERE suspended = FALSE;''', member_cut)
+                # credit investor group
+                investors = await conn.fetch('''SELECT * FROM bank_ledger WHERE type = 'investment';''')
+                for investor in investors:
+                    await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2
+                            AND suspended = FALSE;''', investor_cut, investor['user_id'])
+                # credit sender group
+                senders = await conn.fetch('''SELECT user_id FROM recruitment WHERE sent_this_month > 100;''')
+                for sender in senders:
+                    await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2
+                                            AND suspended = FALSE;''', sender_cut, sender['user_id'])
+                self.announcement += "***The Royal Bank of Thegye has issued a general refund!***"
+        # INVESTMENT/LOAN UPDATES
+        # fetch sum of all investments
+        investment_sum_raw = await conn.fetchrow('''SELECT SUM(amount) FROM bank_ledger 
+        WHERE type = 'investment';''')
+        if investment_sum_raw['sum'] is None:
+            investment_sum = 0
+        else:
+            investment_sum = investment_sum_raw['sum']
+        # increase investments by 2% for investors
+        await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'investment';''')
+        # increase investment fund by 2%
+        await conn.execute(
+            '''UPDATE funds SET current_funds = current_funds * 1.02 WHERE name = 'Investment Fund';''')
+        # pay 6% dividend to general fund
+        await conn.execute(
+            '''UPDATE funds SET current_funds = current_funds + $1 WHERE name = 'General Fund';''',
+            (investment_sum * .06))
+        # increase loan by interest rate
+        await conn.execute('''UPDATE bank_ledger SET amount = amount * (1+(interest/100)) 
+        WHERE type = 'loan';''')
+        # LOANS DUE
+        today = datetime.now()
+        loans_due = await conn.fetch('''SELECT * FROM bank_ledger WHERE due_date < $1 AND type = 'loan';''',
+                                     today)
+        # for all the loans in due, reposes thaler or default
+        for loan in loans_due:
+            amount = loan['amount']
+            borrower = loan['user_id']
+            borrower_snowflake = self.bot.get_user(borrower)
+            # fetch borrower information
+            borrower_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', borrower)
+            # if the user does not have enough thaler in their funds, increase loan by 35%
+            if borrower_info['funds'] < amount:
+                await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.35, due_date = $2 
+                WHERE account_id = $1;''', loan['account_id'], today + timedelta(days=14))
+                # create and send user a DM
+                await borrower_snowflake.send(f"This is your official notice from the Royal Bank of Thegye "
+                                              f"that you have defaulted on your loan account "
+                                              f"(ID: {loan['account_id']}. This loan has been increased by 35% "
+                                              f"in lieu of payment and will become due two weeks from today.")
+                continue
             else:
-                investment_sum = investment_sum_raw['sum']
-            # increase investments by 2% for investors
-            await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'investment';''')
-            # increase investment fund by 2%
-            await conn.execute(
-                '''UPDATE funds SET current_funds = current_funds * 1.02 WHERE name = 'Investment Fund';''')
-            # pay 6% dividend to general fund
-            await conn.execute(
-                '''UPDATE funds SET current_funds = current_funds + $1 WHERE name = 'General Fund';''',
-                (investment_sum * .06))
-            # increase loan by interest rate
-            await conn.execute('''UPDATE bank_ledger SET amount = amount * (1+(interest/100)) 
-            WHERE type = 'loan';''')
-            # LOANS DUE
-            today = datetime.now()
-            loans_due = await conn.fetch('''SELECT * FROM bank_ledger WHERE due_date < $1 AND type = 'loan';''',
-                                         today)
-            # for all the loans in due, reposes thaler or default
-            for loan in loans_due:
-                amount = loan['amount']
-                borrower = loan['user_id']
-                borrower_snowflake = self.bot.get_user(borrower)
-                # fetch borrower information
-                borrower_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', borrower)
-                # if the user does not have enough thaler in their funds, increase loan by 35%
-                if borrower_info['funds'] < amount:
-                    await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.35, due_date = $2 
-                    WHERE account_id = $1;''', loan['account_id'], today + timedelta(days=14))
-                    # create and send user a DM
-                    await borrower_snowflake.send(f"This is your official notice from the Royal Bank of Thegye "
-                                                  f"that you have defaulted on your loan account "
-                                                  f"(ID: {loan['account_id']}. This loan has been increased by 35% "
-                                                  f"in lieu of payment and will become due two weeks from today.")
-                    continue
-                else:
-                    # remove funds from user
-                    await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
-                                       amount, borrower)
-                    # add funds to investment fund
-                    await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
-                    WHERE name = 'Investment Fund';''', amount)
-                    # remove loan account
-                    await conn.execute('''DELETE FROM bank_ledger WHERE account_id = $1;''', loan['account_id'])
-                    # log action
-                    await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                       borrower, 'bank', f"Loan account #{loan['account_id']} automatically "
-                                                         f"repaid by {borrower_snowflake.name}#"
-                                                         f"{borrower_snowflake.discriminator}.")
-                    continue
-            # payroll
-            thegye = self.bot.get_guild(674259612580446230)
-            official_role = thegye.get_role(674278988323225632)
-            for official in official_role.members:
-                if datetime.now().weekday() <= 5:
-                    await conn.execute('''UPDATE rbt_users SET funds = funds + 20 WHERE user_id = $1;''',
-                                       official.id)
-                    await conn.execute(
-                        '''UPDATE funds SET current_funds = current_funds - 20 WHERE name = 'General Fund';''')
-                    await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                       official.id, 'bank', f"Payroll {self.thaler}20.")
-            await ctx.send("Royal Bank of Thegye updated.")
-        except Exception as error:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
+                # remove funds from user
+                await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
+                                   amount, borrower)
+                # add funds to investment fund
+                await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
+                WHERE name = 'Investment Fund';''', amount)
+                # remove loan account
+                await conn.execute('''DELETE FROM bank_ledger WHERE account_id = $1;''', loan['account_id'])
+                # log action
+                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                   borrower, 'bank', f"Loan account #{loan['account_id']} automatically "
+                                                     f"repaid by {borrower_snowflake.name}#"
+                                                     f"{borrower_snowflake.discriminator}.")
+                continue
+        # payroll
+        thegye = self.bot.get_guild(674259612580446230)
+        official_role = thegye.get_role(674278988323225632)
+        for official in official_role.members:
+            if datetime.now().weekday() <= 5:
+                await conn.execute('''UPDATE rbt_users SET funds = funds + 20 WHERE user_id = $1;''',
+                                   official.id)
+                await conn.execute(
+                    '''UPDATE funds SET current_funds = current_funds - 20 WHERE name = 'General Fund';''')
+                await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+                                   official.id, 'bank', f"Payroll {self.thaler}20.")
+        await ctx.send("Royal Bank of Thegye updated.")
 
     @exchange.command(description="Displays information about a specified stock.", name="stock")
     @app_commands.describe(stock_id="The name or ID of the stock")

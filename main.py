@@ -2,6 +2,7 @@ from ShardBot import Shard
 import logging
 import logging.handlers as handlers
 
+
 def main(bot: Shard):
     # define logger for bot
     logging.basicConfig(filename="botlogs.log", level=logging.WARNING,
