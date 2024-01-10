@@ -641,9 +641,13 @@ class Recruitment(commands.Cog):
         await ctx.send("Cutting...")
         self.autogrammer.cancel()
         # if the autogrammer is still running or not, make it known
+        attempts = 0
         while True:
+            attempts += 1
             if not self.autogrammer.is_running():
                 return await ctx.send("Autogrammer aborted.")
+            elif attempts > 5:
+                return await ctx.send("Autgramming not aborted; attempt failed.")
             else:
                 continue
 
