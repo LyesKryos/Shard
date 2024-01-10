@@ -541,6 +541,7 @@ class Recruitment(commands.Cog):
             except asyncio.TimeoutError:
                 # if the reaction times out, stop the code
                 self.recruitment_gather_object.cancel()
+                self.autogrammer.start()
                 break
 
     # creates recruitment group
