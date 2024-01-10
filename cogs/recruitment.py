@@ -24,11 +24,11 @@ from ratelimiter import Ratelimiter
 class Recruitment(commands.Cog):
 
     def __init__(self, bot: Shard):
-        self.autogrammer_task = None
         self.rate_limit = Ratelimiter()
         self.bot = bot
         self.db_error = False
         self.verbose_mode = False
+        self.autogrammer.start()
 
         # define testing channel
 
@@ -100,12 +100,28 @@ class Recruitment(commands.Cog):
             notifrole = thegye_server.get_role(950950836006187018)
             # let the crash channel know
             await crashchannel.send("Starting retention loop.")
-            try:
-                # connect to the API
-                async with aiohttp.ClientSession() as session:
-                    headers = {"User-Agent": "Bassiliya"}
-                    params = {'q': 'nations',
-                              'region': 'thegye'}
+            # connect to the API
+            async with aiohttp.ClientSession() as session:
+                headers = {"User-Agent": "Bassiliya"}
+                params = {'q': 'nations',
+                          'region': 'thegye'}
+                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                       headers=headers, params=params) as recruitsresp:
+                    nations = await recruitsresp.text()
+                    # ratelimiter
+                    while True:
+                        # see if there are enough available calls. if so, break the loop
+                        try:
+                            await self.rate_limit.call()
+                            break
+                        # if there are not enough available calls, continue the loop
+                        except TooManyRequests as error:
+                            await asyncio.sleep(int(str(error)))
+                            continue
+                # parse out current nations and set
+                citizen_soup = BeautifulSoup(nations, 'lxml')
+                self.all_nations = set(citizen_soup.nations.text.split(':'))
+                while True:
                     async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                            headers=headers, params=params) as recruitsresp:
                         nations = await recruitsresp.text()
@@ -119,185 +135,162 @@ class Recruitment(commands.Cog):
                             except TooManyRequests as error:
                                 await asyncio.sleep(int(str(error)))
                                 continue
-                    # parse out current nations and set
-                    citizen_soup = BeautifulSoup(nations, 'lxml')
-                    self.all_nations = set(citizen_soup.nations.text.split(':'))
-                    while True:
-                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                               headers=headers, params=params) as recruitsresp:
-                            nations = await recruitsresp.text()
-                            # ratelimiter
-                            while True:
-                                # see if there are enough available calls. if so, break the loop
-                                try:
-                                    await self.rate_limit.call()
-                                    break
-                                # if there are not enough available calls, continue the loop
-                                except TooManyRequests as error:
-                                    await asyncio.sleep(int(str(error)))
-                                    continue
-                        # parse out new recruits
-                        new_nations_soup = BeautifulSoup(nations, 'lxml')
-                        # if the site is down, continue after 15 minutes
-                        try:
-                            crashcheck = new_nations_soup.nations.text
-                        except AttributeError:
-                            await crashchannel.send(f"Database error. Retrying in 15 minutes.")
-                            await asyncio.sleep(900)
-                            continue
-                        # the new nations are set and parsed
-                        self.new_nations = set(new_nations_soup.nations.text.split(':')).difference(
-                            self.all_nations)
-                        # parses departed nations
-                        departed_nations = self.all_nations.difference(set(new_nations_soup.nations.text.split(':')))
-                        # for every new nation, send a notification
-                        if self.new_nations:
-                            for n in self.new_nations:
-                                notif = await recruitment_channel.send(
-                                    f"A new nation has arrived, {notifrole.mention}!"
-                                    f"\nhttps://www.nationstates.net/nation={n}")
-                                await notif.add_reaction("\U0001f4ec")
-                        # for every nation in departed nations, send notification
-                        if departed_nations:
-                            for n in departed_nations:
-                                async with session.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={n}",
-                                                       headers=headers) as exist:
-                                    # ratelimiter
-                                    while True:
-                                        # see if there are enough available calls. if so, break the loop
-                                        try:
-                                            await self.rate_limit.call()
-                                            break
-                                        # if there are not enough available calls, continue the loop
-                                        except TooManyRequests as error:
-                                            await asyncio.sleep(int(str(error)))
-                                            continue
-                                    try:
-                                        exist.raise_for_status()
-                                    except Exception:
-                                        continue
-                                # define and send notification
-                                notif = await recruitment_channel.send(f"A nation has departed, {notifrole.mention}!"
-                                                                       f"\nhttps://www.nationstates.net/nation={n}")
-                                await notif.add_reaction("\U0001f4ec")
-                        # set all nations to the new nations and sleep 5 minutes
-                        self.all_nations = set(new_nations_soup.nations.text.split(':'))
-                        await asyncio.sleep(300)
+                    # parse out new recruits
+                    new_nations_soup = BeautifulSoup(nations, 'lxml')
+                    # if the site is down, continue after 15 minutes
+                    try:
+                        crashcheck = new_nations_soup.nations.text
+                    except AttributeError:
+                        await crashchannel.send(f"Database error. Retrying in 15 minutes.")
+                        await asyncio.sleep(900)
                         continue
-            except Exception as error:
-                await crashchannel.send(f"`{error}` in retention module.")
-                error_log(error)
+                    # the new nations are set and parsed
+                    self.new_nations = set(new_nations_soup.nations.text.split(':')).difference(
+                        self.all_nations)
+                    # parses departed nations
+                    departed_nations = self.all_nations.difference(set(new_nations_soup.nations.text.split(':')))
+                    # for every new nation, send a notification
+                    if self.new_nations:
+                        for n in self.new_nations:
+                            notif = await recruitment_channel.send(
+                                f"A new nation has arrived, {notifrole.mention}!"
+                                f"\nhttps://www.nationstates.net/nation={n}")
+                            await notif.add_reaction("\U0001f4ec")
+                    # for every nation in departed nations, send notification
+                    if departed_nations:
+                        for n in departed_nations:
+                            async with session.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={n}",
+                                                   headers=headers) as exist:
+                                # ratelimiter
+                                while True:
+                                    # see if there are enough available calls. if so, break the loop
+                                    try:
+                                        await self.rate_limit.call()
+                                        break
+                                    # if there are not enough available calls, continue the loop
+                                    except TooManyRequests as error:
+                                        await asyncio.sleep(int(str(error)))
+                                        continue
+                                try:
+                                    exist.raise_for_status()
+                                except Exception:
+                                    continue
+                            # define and send notification
+                            notif = await recruitment_channel.send(f"A nation has departed, {notifrole.mention}!"
+                                                                   f"\nhttps://www.nationstates.net/nation={n}")
+                            await notif.add_reaction("\U0001f4ec")
+                    # set all nations to the new nations and sleep 5 minutes
+                    self.all_nations = set(new_nations_soup.nations.text.split(':'))
+                    await asyncio.sleep(300)
+                    continue
 
         async def world_assembly_notification(bot):
-            try:
-                # wait until the bot is ready
-                await bot.wait_until_ready()
-                # define channels
-                wa_pings = bot.get_channel(676437972819640357)
-                crashchannel = bot.get_channel(835579413625569322)
-                thegye_server = bot.get_guild(674259612580446230)
-                wa_role = thegye_server.get_role(674283915870994442)
-                # notify crash channel
-                await crashchannel.send("Starting WA notification loop.")
-                # connect to API
-                async with aiohttp.ClientSession() as session:
-                    headers = {"User-Agent": "Bassiliya"}
-                    params = {'q': 'nations',
-                              'region': 'thegye'}
-                    waparams = {'wa': '1',
-                                'q': 'members'}
-                    # ratelimiter
-                    while True:
-                        # see if there are enough available calls. if so, break the loop
-                        try:
-                            await self.rate_limit.call()
-                            break
-                        # if there are not enough available calls, continue the loop
-                        except TooManyRequests as error:
-                            await asyncio.sleep(int(str(error)))
-                            continue
+            # wait until the bot is ready
+            await bot.wait_until_ready()
+            # define channels
+            wa_pings = bot.get_channel(676437972819640357)
+            crashchannel = bot.get_channel(835579413625569322)
+            thegye_server = bot.get_guild(674259612580446230)
+            wa_role = thegye_server.get_role(674283915870994442)
+            # notify crash channel
+            await crashchannel.send("Starting WA notification loop.")
+            # connect to API
+            async with aiohttp.ClientSession() as session:
+                headers = {"User-Agent": "Bassiliya"}
+                params = {'q': 'nations',
+                          'region': 'thegye'}
+                waparams = {'wa': '1',
+                            'q': 'members'}
+                # ratelimiter
+                while True:
+                    # see if there are enough available calls. if so, break the loop
+                    try:
+                        await self.rate_limit.call()
+                        break
+                    # if there are not enough available calls, continue the loop
+                    except TooManyRequests as error:
+                        await asyncio.sleep(int(str(error)))
+                        continue
+                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                       headers=headers, params=params) as nationsresp:
+                    nations = await nationsresp.text()
+                # parse out nations
+                nationsoup = BeautifulSoup(nations, 'lxml')
+                try:
+                    nations = set(nationsoup.nations.text.split(':'))
+                except AttributeError:
+                    await crashchannel.send(f"Database error on WA.")
+                # ratelimiter
+                while True:
+                    # see if there are enough available calls. if so, break the loop
+                    try:
+                        await self.rate_limit.call()
+                        break
+                    # if there are not enough available calls, continue the loop
+                    except TooManyRequests as error:
+                        await asyncio.sleep(int(str(error)))
+                        continue
+                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                       headers=headers, params=waparams) as membersresp:
+                    members = await membersresp.text()
+                # parse out wa members
+                membersoup = BeautifulSoup(members, 'lxml')
+                members = set(membersoup.members.text.split(','))
+                self.all_wa = nations.intersection(members)
+                # start loop
+                while True:
                     async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                            headers=headers, params=params) as nationsresp:
                         nations = await nationsresp.text()
+                        # ratelimiter
+                        while True:
+                            # see if there are enough available calls. if so, break the loop
+                            try:
+                                await self.rate_limit.call()
+                                break
+                            # if there are not enough available calls, continue the loop
+                            except TooManyRequests as error:
+                                await asyncio.sleep(int(str(error)))
+                                continue
                     # parse out nations
                     nationsoup = BeautifulSoup(nations, 'lxml')
                     try:
                         nations = set(nationsoup.nations.text.split(':'))
                     except AttributeError:
-                        await crashchannel.send(f"Database error on WA.")
-                    # ratelimiter
-                    while True:
-                        # see if there are enough available calls. if so, break the loop
-                        try:
-                            await self.rate_limit.call()
-                            break
-                        # if there are not enough available calls, continue the loop
-                        except TooManyRequests as error:
-                            await asyncio.sleep(int(str(error)))
-                            continue
+                        await crashchannel.send(f"Database error. Retrying in 15 minutes.")
+                        await asyncio.sleep(900)
+                        continue
                     async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                            headers=headers, params=waparams) as membersresp:
                         members = await membersresp.text()
-                    # parse out wa members
+                        # ratelimiter
+                        while True:
+                            # see if there are enough available calls. if so, break the loop
+                            try:
+                                await self.rate_limit.call()
+                                break
+                            # if there are not enough available calls, continue the loop
+                            except TooManyRequests as error:
+                                await asyncio.sleep(int(str(error)))
+                                continue
                     membersoup = BeautifulSoup(members, 'lxml')
-                    members = set(membersoup.members.text.split(','))
-                    self.all_wa = nations.intersection(members)
-                    # start loop
-                    while True:
-                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                               headers=headers, params=params) as nationsresp:
-                            nations = await nationsresp.text()
-                            # ratelimiter
-                            while True:
-                                # see if there are enough available calls. if so, break the loop
-                                try:
-                                    await self.rate_limit.call()
-                                    break
-                                # if there are not enough available calls, continue the loop
-                                except TooManyRequests as error:
-                                    await asyncio.sleep(int(str(error)))
-                                    continue
-                        # parse out nations
-                        nationsoup = BeautifulSoup(nations, 'lxml')
-                        try:
-                            nations = set(nationsoup.nations.text.split(':'))
-                        except AttributeError:
-                            await crashchannel.send(f"Database error. Retrying in 15 minutes.")
-                            await asyncio.sleep(900)
-                            continue
-                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                               headers=headers, params=waparams) as membersresp:
-                            members = await membersresp.text()
-                            # ratelimiter
-                            while True:
-                                # see if there are enough available calls. if so, break the loop
-                                try:
-                                    await self.rate_limit.call()
-                                    break
-                                # if there are not enough available calls, continue the loop
-                                except TooManyRequests as error:
-                                    await asyncio.sleep(int(str(error)))
-                                    continue
-                        membersoup = BeautifulSoup(members, 'lxml')
-                        members = nations.intersection(set(membersoup.members.text.split(',')))
-                        # find new WA members
-                        self.new_wa = members.difference(self.all_wa)
-                        # if there are no new members, check back in 30 seconds
-                        if len(members) == len(self.new_wa):
-                            await asyncio.sleep(30)
-                            continue
-                        # if there are new wa members
-                        if self.new_wa:
-                            # for each new member, send notification
-                            for n in Recruitment.new_wa:
-                                wa_notif = await wa_pings.send(f"New World Assembly nation, {wa_role.mention}!"
-                                                               f"\nPlease endorse: https://www.nationstates.net/nation={n}.")
-                                await wa_notif.add_reaction("\U0001f310")
-                        self.all_wa = members
-                        await asyncio.sleep(300)
+                    members = nations.intersection(set(membersoup.members.text.split(',')))
+                    # find new WA members
+                    self.new_wa = members.difference(self.all_wa)
+                    # if there are no new members, check back in 30 seconds
+                    if len(members) == len(self.new_wa):
+                        await asyncio.sleep(30)
                         continue
-            except Exception as error:
-                error_log(error)
+                    # if there are new wa members
+                    if self.new_wa:
+                        # for each new member, send notification
+                        for n in Recruitment.new_wa:
+                            wa_notif = await wa_pings.send(f"New World Assembly nation, {wa_role.mention}!"
+                                                           f"\nPlease endorse: https://www.nationstates.net/nation={n}.")
+                            await wa_notif.add_reaction("\U0001f310")
+                    self.all_wa = members
+                    await asyncio.sleep(300)
+                    continue
 
         # create 24/7 tasks
         self.monthly_recruiter = asyncio.create_task(monthly_recruiter(bot))
@@ -320,10 +313,7 @@ class Recruitment(commands.Cog):
         self.monthly_recruiter.cancel()
         self.retention.cancel()
         self.world_assembly_notification.cancel()
-
-    def cog_load(self):
-        # start the API
-        self.autogrammer_task = asyncio.create_task(self.autogrammer())
+        self.autogrammer.cancel()
 
     # cog variables
     do_not_recruit = list()
@@ -337,81 +327,83 @@ class Recruitment(commands.Cog):
     recruitment_gather_object = None
     loops_gather_object = None
 
+    @tasks.loop(seconds=180)
     async def autogrammer(self):
         # define the crash channel
         crashchannel = self.bot.get_channel(835579413625569322)
-        try:
-            # wait for ready
-            await self.bot.wait_until_ready()
-            # define headers and all telegram information
-            headers = {"User-Agent": "Bassiliya"}
-            newnationsparams = {'q': 'newnations'}
-            telegram_params = {'a': 'sendTG',
-                               'client': 'cb97eee2',
-                               'tgid': '29620544',
-                               'key': 'b9dff257c2de'}
-            # send message
-            await crashchannel.send("Starting autogrammer.")
-            # start the session
-            async with aiohttp.ClientSession() as session:
-                while True:
-                    # ratelimiter
-                    while True:
-                        # see if there are enough available calls. if so, break the loop
-                        try:
-                            await self.rate_limit.call()
-                            break
-                        # if there are not enough available calls, continue the loop
-                        except TooManyRequests as error:
-                            await asyncio.sleep(int(str(error)))
-                            continue
-                    # make the call
-                    async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                           headers=headers, params=newnationsparams) as nnresp:
-                        # parse the response
-                        newnationsraw = await nnresp.text()
-                        # after the list is called, the xml is parsed and the list is made
-                        nnsoup = BeautifulSoup(newnationsraw, "lxml")
-                        newnations_prefilter = list(nnsoup.newnations.string.split(","))
-                        # grabs the first nation
-                        recipient = newnations_prefilter[0]
-                        # check for redundant telegraming
-                        if recipient in self.do_not_recruit:
-                            continue
-                        # send the telegram to the recipient
-                        recipient_dict = {'to': recipient}
-                        telegram_params.update(recipient_dict)
-                        # update the do_not_recruit list
-                        self.do_not_recruit += recipient
-                    # ratelimiter
-                    while True:
-                        # see if there are enough available calls. if so, break the loop
-                        try:
-                            await self.rate_limit.call()
-                            break
-                        # if there are not enough available calls, continue the loop
-                        except TooManyRequests as error:
-                            await asyncio.sleep(int(str(error)))
-                            continue
-                    async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                           headers=headers, params=telegram_params) as tg_response:
-                        if self.verbose_mode:
-                            await crashchannel.send(f"```{tg_response}```")
-                        if tg_response.status == 429:
-                            retry = int(tg_response.headers['Retry-After'])
-                            await asyncio.sleep(int(retry)+20)
-                            await crashchannel.send(f"Too many autogrammer calls. "
-                                                    f"Retrying after {retry+20} seconds.")
-                            await asyncio.sleep(retry+20)
-                        elif tg_response.status != 200:
-                            await crashchannel.send(f"Bad response for API\n"
-                                                    f"```{tg_response}```")
-                        else:
-                            # sleeps for 3 minutes, 1 second (to be safe)
-                            await asyncio.sleep(181)
+        # define headers and all telegram information
+        headers = {"User-Agent": "Bassiliya"}
+        newnationsparams = {'q': 'newnations'}
+        telegram_params = {'a': 'sendTG',
+                           'client': 'cb97eee2',
+                           'tgid': '29620544',
+                           'key': 'b9dff257c2de'}
+        # send message
+        await crashchannel.send("Starting autogrammer.")
+        # start the session
+        async with aiohttp.ClientSession() as session:
+            # ratelimiter
+            while True:
+                # see if there are enough available calls. if so, break the loop
+                try:
+                    await self.rate_limit.call()
+                    break
+                # if there are not enough available calls, continue the loop
+                except TooManyRequests as error:
+                    await asyncio.sleep(int(str(error)))
+                    continue
+            # make the call
+            while True:
+                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                       headers=headers, params=newnationsparams) as nnresp:
+                    # parse the response
+                    newnationsraw = await nnresp.text()
+                    # after the list is called, the xml is parsed and the list is made
+                    nnsoup = BeautifulSoup(newnationsraw, "lxml")
+                    newnations_prefilter = list(nnsoup.newnations.string.split(","))
+                    # grabs the first nation
+                    recipient = newnations_prefilter[0]
+                    # check for redundant telegraming
+                    if recipient in self.do_not_recruit:
                         continue
-        except asyncio.CancelledError:
-            await crashchannel.send("Autogramming aborted.")
+                # send the telegram to the recipient
+                recipient_dict = {'to': recipient}
+                telegram_params.update(recipient_dict)
+                # update the do_not_recruit list
+                self.do_not_recruit += recipient
+            # ratelimiter
+            while True:
+                # see if there are enough available calls. if so, break the loop
+                try:
+                    await self.rate_limit.call()
+                    break
+                # if there are not enough available calls, continue the loop
+                except TooManyRequests as error:
+                    await asyncio.sleep(int(str(error)))
+                    continue
+            async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                   headers=headers, params=telegram_params) as tg_response:
+                if self.verbose_mode:
+                    await crashchannel.send(f"```{tg_response}```")
+                if tg_response.status == 429:
+                    retry = int(tg_response.headers['Retry-After'])
+                    await asyncio.sleep(int(retry)+20)
+                    await crashchannel.send(f"Too many autogrammer calls. "
+                                            f"Retrying after {retry+20} seconds.")
+                    await asyncio.sleep(retry+20)
+                elif tg_response.status != 200:
+                    await crashchannel.send(f"Bad response for API\n"
+                                            f"```{tg_response}```")
+
+    @autogrammer.before_loop
+    async def before_autogrammer(self):
+        await self.bot.wait_until_ready()
+
+    @autogrammer.after_loop
+    async def closing_autogrammer(self):
+        if self.autogrammer.is_being_cancelled():
+            channel = self.bot.get_channel(835579413625569322)
+            await channel.send("Autogramming aborted.")
 
     async def recruitment_program(self, user,
                                   channel: discord.Interaction.channel, template, timer):
@@ -501,7 +493,7 @@ class Recruitment(commands.Cog):
             # send end message
             await channel.send("Recruitment stopped. Another link may post.")
             # restart the autogrammer
-            self.autogrammer_task = asyncio.create_task(self.autogrammer())
+            self.autogrammer.start()
         except Exception as error:
             conn = self.bot.pool
             self.running = False
@@ -517,7 +509,7 @@ class Recruitment(commands.Cog):
                                                    f"recruitment.")
             await channel.send("The recruitment bot has run into an issue. Recruitment has stopped.")
             # restart the autogrammer
-            self.autogrammer_task = asyncio.create_task(self.autogrammer())
+            self.autogrammer.start()
             self.user_sent = 0
 
     async def still_recruiting_check(self, user, timer):
@@ -643,8 +635,9 @@ class Recruitment(commands.Cog):
     @commands.is_owner()
     async def cut_autogrammer(self, ctx):
         # stops autogrammer
-        await ctx.send("Cutting...")
-        self.autogrammer_task.cancel()
+        message = await ctx.send("Cutting...")
+        return self.autogrammer_task.cancel()
+
 
     @commands.command()
     @commands.is_owner()
