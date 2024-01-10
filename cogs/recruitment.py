@@ -365,6 +365,7 @@ class Recruitment(commands.Cog):
                     recipient = newnations_prefilter[0]
                     # check for redundant telegraming
                     if recipient in self.do_not_recruit:
+                        await asyncio.sleep(15)
                         continue
                 # send the telegram to the recipient
                 recipient_dict = {'to': recipient}
@@ -677,10 +678,10 @@ class Recruitment(commands.Cog):
             message += "Recruitment is running.\n"
         elif self.running is False:
             message += "Recruitment is not running.\n"
-        if self.autogrammer_task.cancelled():
-            message += "Autogrammer is not running."
-        else:
+        if self.autogrammer.is_running():
             message += "Autogrammer is running."
+        elif not self.autogrammer.is_running():
+            message += "Autogrammer not is running."
         await ctx.send(message)
 
     @recruitment.command(name="sent", description="Displays the amount of sent telegrams of a specified user")
