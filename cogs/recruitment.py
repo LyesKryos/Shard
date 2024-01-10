@@ -636,6 +636,8 @@ class Recruitment(commands.Cog):
     @commands.is_owner()
     async def cut_autogrammer(self, ctx):
         # stops autogrammer
+        if not self.autogrammer.is_running():
+            return await ctx.send("Autogrammer not running.")
         await ctx.send("Cutting...")
         self.autogrammer.cancel()
         # if the autogrammer is still running or not, make it known
@@ -649,7 +651,10 @@ class Recruitment(commands.Cog):
     @commands.is_owner()
     async def run_autogrammer(self, ctx):
         # runs autogrammer
-        self.autogrammer.start()
+        if not self.autogrammer.is_running():
+            self.autogrammer.start()
+        else:
+            await ctx.send("Autogrammer running.")
 
     @commands.command()
     @commands.is_owner()
