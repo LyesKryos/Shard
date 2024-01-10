@@ -297,7 +297,6 @@ class Recruitment(commands.Cog):
         self.retention = asyncio.create_task(retention(bot))
         self.world_assembly_notification = asyncio.create_task(world_assembly_notification(bot))
 
-
     def sanitize_links_percent(self, url: str) -> str:
         # sanitizes links with %s
         to_regex = url.replace("%", "%25")
@@ -389,15 +388,18 @@ class Recruitment(commands.Cog):
                         await crashchannel.send(f"```{tg_response}```")
                     if tg_response.status == 429:
                         retry = int(tg_response.headers['Retry-After'])
-                        await asyncio.sleep(int(retry)+20)
+                        await asyncio.sleep(int(retry) + 20)
                         await crashchannel.send(f"Too many autogrammer calls. "
-                                                f"Retrying after {retry+20} seconds.")
-                        await asyncio.sleep(retry+20)
+                                                f"Retrying after {retry + 20} seconds.")
+                        await asyncio.sleep(retry + 20)
                     elif tg_response.status != 200:
                         await crashchannel.send(f"Bad response for API\n"
                                                 f"```{tg_response}```")
         except asyncio.CancelledError:
-            await crashchannel.send("Autogramming aborted")
+            await crashchannel.send("Autogramming aborted.")
+        except Exception as error:
+            await crashchannel.send(str(error))
+
 
     @autogrammer.before_loop
     async def before_autogrammer(self):
@@ -408,7 +410,6 @@ class Recruitment(commands.Cog):
         if self.autogrammer.is_being_cancelled():
             channel = self.bot.get_channel(835579413625569322)
             await channel.send("Autogramming aborted.")
-
 
     async def recruitment_program(self, user,
                                   channel: discord.Interaction.channel, template, timer):
@@ -523,7 +524,7 @@ class Recruitment(commands.Cog):
             timer = 120
         while self.running:
             # sleep for timer * 5 (or 10 minutes)
-            await asyncio.sleep(timer*5)
+            await asyncio.sleep(timer * 5)
             if self.running is False:
                 break
             # sends message. if the reaction is hit, recruitment continues
@@ -922,7 +923,6 @@ class Recruitment(commands.Cog):
         elif retention_role in ctx.author.roles:
             await ctx.author.remove_roles(retention_role)
             await ctx.send("Role removed.")
-
 
     @commands.command()
     @commands.is_owner()
