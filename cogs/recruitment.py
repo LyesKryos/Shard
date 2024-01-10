@@ -398,7 +398,7 @@ class Recruitment(commands.Cog):
         except asyncio.CancelledError:
             await crashchannel.send("Autogramming aborted.")
         except Exception as error:
-            await crashchannel.send(str(error))
+            self.bot.logger.exception(error)
 
 
     @autogrammer.before_loop

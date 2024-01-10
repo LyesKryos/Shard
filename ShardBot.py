@@ -14,6 +14,15 @@ class Shard(commands.Bot):
         self.prefix = "$"
         super().__init__(command_prefix=self.prefix, intents=discord.Intents.all(),
                          activity=discord.Game(f"{self.prefix}help for commands"))
+        # define logger for bot
+        logging.basicConfig(filename="botlogs.log", level=logging.WARNING,
+                            format='%(asctime)s %(levelname)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.WARNING)
+        handler = handlers.RotatingFileHandler("botlogs.log", encoding="utf-8",
+                                               mode='a', maxBytes=5000, backupCount=3)
+        handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
+        self.logger.addHandler(handler)
         # sets up time, version, and mentions
         self.time = dt.now().strftime("%Y-%m-%d %H:%M:%S")
         self.version = "Shard Version 1.6"
