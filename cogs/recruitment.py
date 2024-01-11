@@ -672,7 +672,7 @@ class Recruitment(commands.Cog):
         elif self.running is False:
             message += "Recruitment is not running.\n"
         if self.autogrammer.is_running():
-            message += "Autogrammer is running."
+            message += f"Autogrammer is running. Next iteration: {self.autogrammer.next_iteration.strftime('%H:%M:%S')}"
         elif not self.autogrammer.is_running():
             message += "Autogrammer is not running."
         await ctx.send(message)
@@ -801,22 +801,19 @@ class Recruitment(commands.Cog):
         author = interaction.user
         # connects to database
         conn = self.bot.pool
-        try:
-            # fetches user data
-            template = await conn.fetchrow('''SELECT template FROM recruitment WHERE user_id = $1;''', author.id)
-            # if the user does not exist
-            if template is None:
-                return await interaction.followup.send("You are not registered!")
-            # sends relevant data, along with access link
-            template = template['template']
-            templateid = re.findall(r"\d+", template)
-            templateid = list(map(int, templateid))
-            await interaction.followup.send(f"{author.name}'s template is {template}.\n"
-                                            f"The telegram template can be found here: "
-                                            f"https://www.nationstates.net/page=tg/tgid={templateid[0]}")
-            return
-        except Exception as error:
-            self.error_handler(error)
+        # fetches user data
+        template = await conn.fetchrow('''SELECT template FROM recruitment WHERE user_id = $1;''', author.id)
+        # if the user does not exist
+        if template is None:
+            return await interaction.followup.send("You are not registered!")
+        # sends relevant data, along with access link
+        template = template['template']
+        templateid = re.findall(r"\d+", template)
+        templateid = list(map(int, templateid))
+        await interaction.followup.send(f"{author.name}'s template is {template}.\n"
+                                        f"The telegram template can be found here: "
+                                        f"https://www.nationstates.net/page=tg/tgid={templateid[0]}")
+        return
 
     @commands.command(brief="Generates a WA campaign")
     @commands.guild_only()
