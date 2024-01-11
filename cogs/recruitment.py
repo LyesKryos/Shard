@@ -338,8 +338,6 @@ class Recruitment(commands.Cog):
                                'client': 'cb97eee2',
                                'tgid': '29620544',
                                'key': 'b9dff257c2de'}
-            # send message
-            await crashchannel.send("Starting autogrammer.")
             # start the session
             async with aiohttp.ClientSession() as session:
                 # ratelimiter
@@ -405,6 +403,8 @@ class Recruitment(commands.Cog):
     @autogrammer.before_loop
     async def before_autogrammer(self):
         await self.bot.wait_until_ready()
+        crashchannel = self.bot.get_channel(835579413625569322)
+        await crashchannel.send("Starting autogrammer.")
 
     @autogrammer.after_loop
     async def closing_autogrammer(self):
