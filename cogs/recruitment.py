@@ -28,7 +28,8 @@ class Recruitment(commands.Cog):
         self.bot = bot
         self.db_error = False
         self.verbose_mode = False
-        self.autogrammer.start()
+        if not self.autogrammer.is_running():
+            self.autogrammer.start()
 
         # define testing channel
 
@@ -398,7 +399,6 @@ class Recruitment(commands.Cog):
             await crashchannel.send("Autogramming aborted.")
         except Exception as error:
             self.bot.logger.exception(error)
-
 
     @autogrammer.before_loop
     async def before_autogrammer(self):
