@@ -372,6 +372,7 @@ class Recruitment(commands.Cog):
                     telegram_params.update(recipient_dict)
                     # update the do_not_recruit list
                     self.do_not_recruit += recipient
+                    break
                 # ratelimiter
                 while True:
                     # see if there are enough available calls. if so, break the loop
@@ -517,33 +518,37 @@ class Recruitment(commands.Cog):
             # restart the autogrammer
             self.autogrammer.start()
             self.user_sent = 0
+            self.bot.logger.exception(error)
 
     async def still_recruiting_check(self, user, timer):
-        channel = self.bot.get_channel(674342850296807454)
-        if timer is None:
-            timer = 120
-        while self.running:
-            # sleep for timer * 5 (or 10 minutes)
-            await asyncio.sleep(timer * 5)
-            if self.running is False:
-                break
-            # sends message. if the reaction is hit, recruitment continues
-            msg = await channel.send(f"Still recruiting,{user.mention}? "
-                                     f"Hit the reaction within 3 minutes to continue.")
-            await msg.add_reaction("\U0001f4e8")
+        try:
+            channel = self.bot.get_channel(674342850296807454)
+            if timer is None:
+                timer = 120
+            while self.running:
+                # sleep for timer * 5 (or 10 minutes)
+                await asyncio.sleep(timer * 5)
+                if self.running is False:
+                    break
+                # sends message. if the reaction is hit, recruitment continues
+                msg = await channel.send(f"Still recruiting,{user.mention}? "
+                                         f"Hit the reaction within 3 minutes to continue.")
+                await msg.add_reaction("\U0001f4e8")
 
-            def check(reaction, user):
-                return user == user and str(reaction.emoji) == "\U0001f4e8"
+                def check(reaction, user):
+                    return user == user and str(reaction.emoji) == "\U0001f4e8"
 
-            try:
-                # if reaction is hit, do nothing
-                await self.bot.wait_for('reaction_add', timeout=180, check=check)
+                try:
+                    # if reaction is hit, do nothing
+                    await self.bot.wait_for('reaction_add', timeout=180, check=check)
 
-            except asyncio.TimeoutError:
-                # if the reaction times out, stop the code
-                self.recruitment_gather_object.cancel()
-                self.autogrammer.start()
-                break
+                except asyncio.TimeoutError:
+                    # if the reaction times out, stop the code
+                    self.recruitment_gather_object.cancel()
+                    self.autogrammer.start()
+                    break
+        except Exception as error:
+            self.bot.logger.exception(error)
 
     # creates recruitment group
     recruitment = app_commands.Group(name="recruitment", description="...")
@@ -646,7 +651,6 @@ class Recruitment(commands.Cog):
             return await ctx.send("Autogrammer not running.")
         await ctx.send("Cutting...")
         self.autogrammer.cancel()
-        await ctx.send("Autogramming aborted.")
 
     @commands.command()
     @commands.is_owner()
