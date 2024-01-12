@@ -327,7 +327,7 @@ class Recruitment(commands.Cog):
     recruitment_gather_object = None
     loops_gather_object = None
 
-    @tasks.loop(seconds=180)
+    @tasks.loop(seconds=185)
     async def autogrammer(self):
         # define the crash channel
         crashchannel = self.bot.get_channel(835579413625569322)
