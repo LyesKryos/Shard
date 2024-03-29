@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing sundry things about logger">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Making an edit message command.">
       <change afterPath="$PROJECT_DIR$/cogs/cnc_old.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/base.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -209,6 +210,8 @@
       <workItem from="1705598441355" duration="1912000" />
       <workItem from="1706038431740" duration="1172000" />
       <workItem from="1706306117265" duration="589000" />
+      <workItem from="1711303249884" duration="572000" />
+      <workItem from="1711755547934" duration="646000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -571,7 +574,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing callback" />
     <MESSAGE value="Fixing entry" />
     <MESSAGE value="Adding traveler role as base role after response" />
     <MESSAGE value="Updating verify and unverify" />
@@ -596,7 +598,8 @@
     <MESSAGE value="Adding start autogrammer command" />
     <MESSAGE value="Fixing sundry things about autogramming" />
     <MESSAGE value="Fixing sundry things about logger" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing sundry things about logger" />
+    <MESSAGE value="Making an edit message command." />
+    <option name="LAST_COMMIT_MESSAGE" value="Making an edit message command." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

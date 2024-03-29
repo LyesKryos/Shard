@@ -127,15 +127,15 @@ class BaseCommands(commands.Cog):
             user_nations = "*None*"
         else:
             user_nations = (f", [{verified['main_nation']}](https://www.nationstates.net/nation="
-                             f"{self.sanitize_links_underscore(verified['main_nation'])})")
+                            f"{self.sanitize_links_underscore(verified['main_nation'])})")
         # defines roles
         all_roles = user.roles[1:]
         role_names = [f"<@&{r.id}>" for r in all_roles]
         user_roles = ', '.join(role_names[::-1])
         # creates embed
         user_embed = discord.Embed(title=f"{user.display_name}", description=f"Information about server member "
-                                                                     f"{user.name}#{user.discriminator}\n"
-                                                                     f"User ID: {user.id}.", color=user.color)
+                                                                             f"{user.name}#{user.discriminator}\n"
+                                                                             f"User ID: {user.id}.", color=user.color)
         user_embed.set_thumbnail(url=user.display_avatar.url)
         user_embed.add_field(name="Joined Discord", value=f"{user.created_at.strftime('%d %B %Y')}")
         user_embed.add_field(name="Joined Server", value=f"{user.joined_at.strftime('%d %B %Y')}")
@@ -176,7 +176,17 @@ class BaseCommands(commands.Cog):
                 await interaction.user.add_roles(role)
                 return await interaction.followup.send(f"You have added the `{role.name}` role.")
 
-
+    @app_commands.command(name="edit_message", description="Edits a message sent by the bot.")
+    @app_commands.describe(message="The ID of the message you'd like to edit", content="The new message content.")
+    async def edit_message(self, interaction: discord.Interaction, message: discord.Message, content: str):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        if interaction.user.id != 293518673417732098:
+            return await interaction.followup.send("You do not have permissions to use this command.", ephemeral=True)
+        else:
+            await message.edit(content=content)
+            return await interaction.followup.send(f"You have successfully edited the message: {message.jump_url}",
+                                                   ephemeral=True)
 
     @commands.command()
     @commands.is_owner()
