@@ -178,12 +178,13 @@ class BaseCommands(commands.Cog):
 
     @app_commands.command(name="edit_message", description="Edits a message sent by the bot.")
     @app_commands.describe(message="The ID of the message you'd like to edit", content="The new message content.")
-    async def edit_message(self, interaction: discord.Interaction, message: discord.Message, content: str):
+    async def edit_message(self, interaction: discord.Interaction, channel: discord.TextChannel, message: int, content: str):
         # defer interaction
         await interaction.response.defer(thinking=True)
         if interaction.user.id != 293518673417732098:
             return await interaction.followup.send("You do not have permissions to use this command.", ephemeral=True)
         else:
+            message = await channel.fetch_message(message)
             await message.edit(content=content)
             return await interaction.followup.send(f"You have successfully edited the message: {message.jump_url}",
                                                    ephemeral=True)
