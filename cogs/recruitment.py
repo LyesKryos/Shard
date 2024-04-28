@@ -336,9 +336,9 @@ class Recruitment(commands.Cog):
             headers = {"User-Agent": "Bassiliya"}
             newnationsparams = {'q': 'newnations'}
             telegram_params = {'a': 'sendTG',
-                               'client': 'cb97eee2',
-                               'tgid': '29620544',
-                               'key': 'b9dff257c2de'}
+                               'client': '5f98ba8c',
+                               'tgid': '35007722',
+                               'key': 'e05930056abe'}
             # start the session
             async with aiohttp.ClientSession() as session:
                 # ratelimiter

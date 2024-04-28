@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Making an edit message command for threads">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating client key and TGID">
       <change afterPath="$PROJECT_DIR$/cogs/cnc_old.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -209,7 +211,9 @@
       <workItem from="1706038431740" duration="1172000" />
       <workItem from="1706306117265" duration="589000" />
       <workItem from="1711303249884" duration="572000" />
-      <workItem from="1711755547934" duration="2248000" />
+      <workItem from="1711755547934" duration="3500000" />
+      <workItem from="1712013279872" duration="716000" />
+      <workItem from="1714255831257" duration="670000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -554,7 +558,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="756" />
+    <option name="localTasksCounter" value="757" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -572,8 +576,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding traveler role as base role after response" />
-    <MESSAGE value="Updating verify and unverify" />
     <MESSAGE value="Updating verify, unverify, and set main commands" />
     <MESSAGE value="Fixing set_mains" />
     <MESSAGE value="Fixing wording" />
@@ -597,7 +599,9 @@
     <MESSAGE value="Fixing sundry things about logger" />
     <MESSAGE value="Making an edit message command." />
     <MESSAGE value="Making an edit message command for threads" />
-    <option name="LAST_COMMIT_MESSAGE" value="Making an edit message command for threads" />
+    <MESSAGE value="Fixing the edit commands" />
+    <MESSAGE value="Updating client key and TGID" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updating client key and TGID" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
