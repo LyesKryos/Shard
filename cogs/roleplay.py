@@ -228,15 +228,21 @@ class Roleplay(commands.Cog):
         # select the option for from_currency
         if from_currency == "Thaler":
             from_currency_calc = Thaler
+            symbol = "\u20B8"
         elif from_currency == "1880 USD":
             from_currency_calc = USD1880
+            symbol = "\u0024"
         elif from_currency == "1880 GBP":
             from_currency_calc = GBP1880
+            symbol = "\u00A3"
         elif from_currency == "2024 USD":
             from_currency_calc = USD2024
+            symbol = "\u0024"
         elif from_currency == "2024 GBP":
             from_currency_calc = GBP2024
+            symbol = "\u00A3"
         else:
+            symbol = None
             return await interaction.followup.send("Please select a listed option.")
         # select the option for to_currency
         if to_currency == "Thaler":
@@ -252,7 +258,10 @@ class Roleplay(commands.Cog):
         else:
             return await interaction.followup.send("Please select a listed option.")
         conversion = (amount_in * from_currency_calc) * to_currency_calc
-        return await interaction.followup.send(f"{round(conversion, 3)} {to_currency}")
+        if to_currency == "Thaler":
+            return await interaction.followup.send(f"{round(conversion, 3)}{symbol}")
+        else:
+            return await interaction.followup.send(f"{symbol}{round(conversion, 3)} ({to_currency})")
 
 
 

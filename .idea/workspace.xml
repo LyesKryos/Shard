@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding Thaler conversions">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Troubleshooting thaler conversion">
       <change afterPath="$PROJECT_DIR$/cogs/cnc_old.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/roleplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/roleplay.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -212,7 +214,7 @@
       <workItem from="1711755547934" duration="3500000" />
       <workItem from="1712013279872" duration="716000" />
       <workItem from="1714255831257" duration="1289000" />
-      <workItem from="1715038663471" duration="3599000" />
+      <workItem from="1715038663471" duration="4193000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -557,7 +559,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="759" />
+    <option name="localTasksCounter" value="761" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -575,7 +577,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing set_mains" />
     <MESSAGE value="Fixing wording" />
     <MESSAGE value="Fixing verification" />
     <MESSAGE value="Setting verification to guild only" />
@@ -600,7 +601,8 @@
     <MESSAGE value="Fixing the edit commands" />
     <MESSAGE value="Updating client key and TGID" />
     <MESSAGE value="Adding Thaler conversions" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding Thaler conversions" />
+    <MESSAGE value="Troubleshooting thaler conversion" />
+    <option name="LAST_COMMIT_MESSAGE" value="Troubleshooting thaler conversion" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
