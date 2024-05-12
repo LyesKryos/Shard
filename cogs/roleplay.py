@@ -263,9 +263,9 @@ class Roleplay(commands.Cog):
             return await interaction.followup.send("Please select a listed option.")
         conversion = float((amount_in * from_currency_calc) * to_currency_calc)
         if to_currency == "Thaler":
-            return await interaction.followup.send(f"{conversion:,}{symbol}")
+            return await interaction.followup.send(f"{round(conversion, 3):,}{symbol}")
         else:
-            return await interaction.followup.send(f"{symbol}{conversion:,} ({to_currency})")
+            return await interaction.followup.send(f"{symbol}{round(conversion, 3):,} ({to_currency})")
 
 async def setup(bot: Shard):
     await bot.add_cog(Roleplay(bot))
