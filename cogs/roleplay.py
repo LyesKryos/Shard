@@ -252,7 +252,7 @@ class Roleplay(commands.Cog):
         else:
             return await interaction.followup.send("Please select a listed option.")
         conversion = (amount_in * from_currency_calc) * to_currency_calc
-        return await interaction.followup.send(f"{conversion} {to_currency}")
+        return await interaction.followup.send(f"{round(conversion, 3)} {to_currency}")
 
 
 
