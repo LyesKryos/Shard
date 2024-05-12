@@ -10,6 +10,7 @@ import discord
 from ratelimiter import Ratelimiter
 from customchecks import TooManyRequests
 import asyncio
+import typing
 
 
 class Roleplay(commands.Cog):
@@ -209,6 +210,51 @@ class Roleplay(commands.Cog):
             await senator.remove_roles(role)
             await interaction.followup.send(f"{role.name} removed from {senator.nick}.")
         return
+
+    @senate.command(name="convert_thaler", description="Calculates the conversion of thaler.")
+    @app_commands.guild_only()
+    async def convert_thaler(self, interaction: discord.Interaction, amount_in: float, from_currency:
+    typing.Literal ['Thaler', '1880 USD', '1880 GBP', '2024 USD', '2024 GBP'], to_currency:
+    typing.Literal ['Thaler', '1880 USD', '1880 GBP', '2024 USD', '2024 GBP']):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # define the rates
+        Thaler = 1
+        PPP = 2.2
+        USD1880 = Thaler * .2 * PPP
+        GBP1880 = Thaler * .2 * PPP
+        USD2024 = Thaler * 15.21 * PPP
+        GBP2024 = Thaler * 65.67 * PPP
+        # select the option for from_currency
+        if from_currency == "Thaler":
+            from_currency_calc = Thaler
+        elif from_currency == "1880 USD":
+            from_currency_calc = USD1880
+        elif from_currency == "1880 GBP":
+            from_currency_calc = GBP1880
+        elif from_currency == "2024 USD":
+            from_currency_calc = USD2024
+        elif from_currency == "2024 GBP":
+            from_currency_calc = GBP2024
+        else:
+            return await interaction.followup.send("Please select a listed option.")
+        # select the option for to_currency
+        if to_currency == "Thaler":
+            to_currency_calc = Thaler
+        elif to_currency == "1880 USD":
+            to_currency_calc = USD1880
+        elif to_currency == "1880 GBP":
+            to_currency_calc = GBP1880
+        elif to_currency == "2024 USD":
+            to_currency_calc = USD2024
+        elif to_currency == "2024 GBP":
+            to_currency_calc = GBP2024
+        else:
+            return await interaction.followup.send("Please select a listed option.")
+        conversion = (amount_in * from_currency_calc) * to_currency_calc
+        return await interaction.followup.send(f"{conversion} {to_currency}")
+
+
 
 
 async def setup(bot: Shard):

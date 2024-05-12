@@ -8,7 +8,7 @@
       <change afterPath="$PROJECT_DIR$/cogs/cnc_old.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/roleplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/roleplay.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -213,7 +213,8 @@
       <workItem from="1711303249884" duration="572000" />
       <workItem from="1711755547934" duration="3500000" />
       <workItem from="1712013279872" duration="716000" />
-      <workItem from="1714255831257" duration="670000" />
+      <workItem from="1714255831257" duration="1289000" />
+      <workItem from="1715038663471" duration="2735000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -558,7 +559,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="757" />
+    <option name="localTasksCounter" value="758" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
