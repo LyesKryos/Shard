@@ -261,7 +261,7 @@ class Roleplay(commands.Cog):
             symbol = "\u00A3"
         else:
             return await interaction.followup.send("Please select a listed option.")
-        conversion = (amount_in * from_currency_calc) * to_currency_calc
+        conversion = float((amount_in * from_currency_calc) * to_currency_calc)
         if to_currency == "Thaler":
             return await interaction.followup.send(f"{conversion:,.3}{symbol}")
         else:
