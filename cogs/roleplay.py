@@ -11,6 +11,7 @@ from ratelimiter import Ratelimiter
 from customchecks import TooManyRequests
 import asyncio
 import typing
+import math
 
 
 class Roleplay(commands.Cog):
@@ -212,6 +213,8 @@ class Roleplay(commands.Cog):
         return
 
     @senate.command(name="convert_thaler", description="Calculates the conversion of thaler.")
+    @app_commands.describe(amount_in="The amount to be converted.", from_currency="The starting currency.",
+                           to_currency="The currency to be converted to.")
     @app_commands.guild_only()
     async def convert_thaler(self, interaction: discord.Interaction, amount_in: float, from_currency:
     typing.Literal ['Thaler', '1880 USD', '1880 GBP', '2024 USD', '2024 GBP'], to_currency:
@@ -266,6 +269,19 @@ class Roleplay(commands.Cog):
             return await interaction.followup.send(f"{round(conversion, 3):,.3f}{symbol}")
         else:
             return await interaction.followup.send(f"{symbol}{round(conversion, 3):,.3f} ({to_currency})")
+
+    @senate.command(name="divide_thaler",
+                    description="Display the division of a given amount of thaler into respective parts.")
+    @app_commands.describe(amount_in="The amount of Thaler to be divided.")
+    @app_commands.guild_only()
+    async def divide_thaler(self, interaction: discord.Interaction, amount_in: float):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # divide into parts
+        thaler = math.floor(amount_in/1)
+        dire = math.floor((amount_in-thaler)/(1/18))
+        komat = math.ceil(((amount_in-thaler)-(dire*(1/18))/(1/216)))
+        await interaction.followup.send(f"{thaler}\u20B8 {dire}\u1E9F {komat}\u04A1")
 
 async def setup(bot: Shard):
     await bot.add_cog(Roleplay(bot))
