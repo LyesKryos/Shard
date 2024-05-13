@@ -281,7 +281,7 @@ class Roleplay(commands.Cog):
         thaler = math.floor(amount_in/1)
         dire = math.floor((amount_in-thaler)/(1/18))
         komat = math.ceil(((amount_in-thaler)-(dire*(1/18)))/(1/216))
-        await interaction.followup.send(f"{thaler}\u20B8 {dire}\u1E9F {komat}\u04A1")
+        await interaction.followup.send(f"{thaler:,}\u20B8 {dire}\u1E9F {komat}\u04A1")
 
 async def setup(bot: Shard):
     await bot.add_cog(Roleplay(bot))
