@@ -81,3 +81,8 @@ class CNC(commands.Cog):
                                nation_name, color)
 
 
+async def setup(bot: Shard):
+    # define the cog and add the cog
+    cog = CNC(bot)
+    await bot.add_cog(cog)
+
