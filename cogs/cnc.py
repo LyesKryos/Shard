@@ -80,6 +80,16 @@ class CNC(commands.Cog):
             await conn.execute('''INSERT INTO cnc_users(user_id, name, color) VALUES ($1,$2,$3);''', user.id,
                                nation_name, color)
 
+    @cnc.command(name="map", description="Opens the map for viewing.")
+    @app_commands.guild_only()
+    async def map(self, interaction: discord.Interaction):
+        # defer the interaction
+        await interaction.response.defer(thinking=True)
+        # send the map
+        map = await interaction.followup.send("https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
+
+
+
 
 async def setup(bot: Shard):
     # define the cog and add the cog
