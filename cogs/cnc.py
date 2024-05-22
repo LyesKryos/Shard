@@ -48,7 +48,6 @@ class CNC(commands.Cog):
     @app_commands.guild_only()
     @app_commands.describe(nation_name="The name of your new nation.",
                            color="The hex code of your new nation. Include the '#'.")
-    @app_commands.guilds(discord.Object(id=728444080908140575), discord.Object(id=674259612580446230))
     async def register(self, interaction: discord.Interaction, nation_name: str, color: str):
         # defer the interaction
         await interaction.response.defer(thinking=True, ephemeral=True)
@@ -83,7 +82,6 @@ class CNC(commands.Cog):
 
     @cnc.command(name="map", description="Opens the map for viewing.")
     @app_commands.guild_only()
-    @app_commands.guilds(discord.Object(id=728444080908140575), discord.Object(id=674259612580446230))
     async def map(self, interaction: discord.Interaction):
         # defer the interaction
         await interaction.response.defer(thinking=True)
