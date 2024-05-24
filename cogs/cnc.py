@@ -22,6 +22,22 @@ from cnc_research import Technology
 from cnc_events import Events
 from collections import Counter
 import re
+from discord.ui import View, Select
+
+class OptionButton(View):
+
+    def __init__(self, buttons_needed):
+        super().__init__(timeout=120)
+        self.buttons_needed = buttons_needed
+
+    @discord.ui.button(label="Back", emoji="\U000023ea", style=discord.ButtonStyle.blurple)
+    async def back_button(self, interaction: discord.Interaction, left_button: discord.Button):
+        return 2
+
+    @discord.ui.button(label="Forward", emoji="\U000023e9", style=discord.ButtonStyle.blurple)
+    async def forward_button(self, interaction: discord.Interaction, left_button: discord.Button):
+        return 1
+
 
 
 class CNC(commands.Cog):
@@ -40,6 +56,87 @@ class CNC(commands.Cog):
         self.turn_loop.cancel()
         # cancel the running turn task
         self.turn_task.cancel()
+
+    def map_color(self, province, province_cord, hexcode, release: bool = False):
+        # obtain the coordinate information
+        province_cord = ((int(province_cord[0])), (int(province_cord[1])))
+        # get color
+        try:
+            color = ImageColor.getrgb(hexcode)
+        except ValueError:
+            return ValueError("Hex code issue")
+        # open the map and the province images
+        map = Image.open(fr"{self.map_directory}wargame_provinces.png").convert("RGBA")
+        prov = Image.open(fr"{self.province_directory}{province}.png").convert("RGBA")
+        # obtain size and coordinate information
+        width = prov.size[0]
+        height = prov.size[1]
+        cord = (province_cord[0], province_cord[1])
+        # for every pixel, change the color to the owners
+        for x in range(0, width):
+            for y in range(0, height):
+                data = prov.getpixel((x, y))
+                if data != color:
+                    if data != (0, 0, 0, 0):
+                        if data != (255, 255, 255, 0):
+                            prov.putpixel((x, y), color)
+        # if this is a release, change every color to neutral grey
+        if release is True:
+            color = ImageColor.getrgb("#808080")
+            for x in range(0, prov.size[0]):
+                for y in range(0, prov.size[1]):
+                    data = prov.getpixel((x, y))
+                    if data != color:
+                        if data != (0, 0, 0, 0):
+                            if data != (255, 255, 255, 0):
+                                prov.putpixel((x, y), color)
+        # convert, paste, and save the image
+        prov = prov.convert("RGBA")
+        map.paste(prov, box=cord, mask=prov)
+        map.save(fr"{self.map_directory}wargame_provinces.png")
+
+    def occupy_color(self, province, province_cord, occupy_color, owner_color):
+        # get province information
+        province_cord = ((int(province_cord[0])), (int(province_cord[1])))
+        # get colors
+        try:
+            occupyer = ImageColor.getrgb(occupy_color)
+            owner = ImageColor.getrgb(owner_color)
+        except ValueError:
+            return ValueError("Hex code issue")
+        # open map, create draw object, and obtain province information
+        map = Image.open(fr"{self.map_directory}wargame_provinces.png").convert("RGBA")
+        prov = Image.open(fr"{self.province_directory}{province}.png").convert("RGBA")
+        prov_draw = ImageDraw.Draw(prov)
+        width = prov.size[0]
+        height = prov.size[1]
+        cord = (province_cord[0], province_cord[1])
+        # set spacing and list of blank pixels
+        space = 20
+        not_colored = list()
+        # for every non-colored pixel, add it to the list
+        for x in range(0, width):
+            for y in range(0, height):
+                pixel = prov.getpixel((x, y))
+                if pixel == (0, 0, 0, 0) or pixel == (255, 255, 255, 0):
+                    not_colored.append((x, y))
+                else:
+                    prov.putpixel((x, y), owner)
+        # draw lines every 20 pixels with the occupier color
+        for x in range(0, 1000 * 2, space):
+            prov_draw.line([x, 0, x - 1000, 1000], width=5, fill=occupyer)
+        # for every pixel in the non-colored list, remove that pixel
+        for pix in not_colored:
+            prov.putpixel(pix, (0, 0, 0, 0))
+        map.paste(prov, box=cord, mask=prov)
+        map.save(fr"{self.map_directory}wargame_provinces.png")
+
+    def add_ids(self):
+        # open map, open ids image, paste, and save
+        bmap = Image.open(fr"{self.map_directory}wargame_provinces.png").convert("RGBA")
+        ids = Image.open(fr"{self.map_directory}wargame numbers.png").convert("RGBA")
+        bmap.paste(ids, box=(0, 0), mask=ids)
+        bmap.save(fr"{self.map_directory}wargame_nations_map.png")
 
     # the CnC command group
     cnc = app_commands.Group(name="cnc", description="...")
@@ -80,6 +177,7 @@ class CNC(commands.Cog):
             await conn.execute('''INSERT INTO cnc_users(user_id, name, color) VALUES ($1,$2,$3);''', user.id,
                                nation_name, color)
 
+
     @cnc.command(name="map", description="Opens the map for viewing.")
     @app_commands.guild_only()
     async def map(self, interaction: discord.Interaction):
@@ -87,6 +185,12 @@ class CNC(commands.Cog):
         await interaction.response.defer(thinking=True)
         # send the map
         map = await interaction.followup.send("https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
+        button = OptionButton()
+        msg = await interaction.followup.send("text", view=button)
+        if button == 1:
+            return await msg.edit(content="forward")
+        else:
+            return await msg.edit(content="back")
 
 
 
