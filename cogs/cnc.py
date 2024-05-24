@@ -277,11 +277,12 @@ class CNC(commands.Cog):
                                             f"market, earning untold wealth? Will your scientists unlock the mysteries "
                                             f"of the world? Will your people flourish under your hand or cower under "
                                             f"your iron fist? Only the future can tell.\n\n"
-                                            f"To get started, be sure to check out the [Command and Conquest Manual]"
-                                            f"(https://1drv.ms/w/s!AtjcebV95AZNgWR1RbfSyx_0ln31?e=tD0eHa). This "
+                                            f"To get started, be sure to check out the "
+                                            f"[**Command and Conquest Manual**]"
+                                            f"(<https://1drv.ms/w/s!AtjcebV95AZNgWR1RbfSyx_0ln31?e=tD0eHa>). This "
                                             f"document has all the information you need to get started, a new players' "
                                             f"guide, and an overview of all commands.\n\n"
-                                            f"\"I came, I saw, I conquered.\" -Julius Caesar")
+                                            f"**\"I came, I saw, I conquered.\" -Julius Caesar**")
 
 
 
