@@ -59,7 +59,7 @@ class MapButtons(View):
         await self.message.edit(content="https://i.ibb.co/zfjtnYZ/CNC-name-map.png")
 
     @discord.ui.button(label="Close", emoji="\U0000274c", style=discord.ButtonStyle.danger)
-    async def close(self):
+    async def close(self, interaction: discord.Interaction, close: discord.Button):
         # for all buttons, disable
         for button in self.children:
             button.disabled = True
