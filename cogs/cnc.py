@@ -121,7 +121,12 @@ class CNC(commands.Cog):
         # cancel the running turn task
         self.turn_task.cancel()
 
-    def map_color(self, province, province_cord, hexcode, release: bool = False):
+    async def map_color(self, province: int, hexcode, release: bool = False):
+        # establish connection
+        conn = self.bot.pool
+        # pull province information
+        province_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province)
+        province_cord = province_info['cord']
         # obtain the coordinate information
         province_cord = ((int(province_cord[0])), (int(province_cord[1])))
         # get color
@@ -159,8 +164,13 @@ class CNC(commands.Cog):
         map.paste(prov, box=cord, mask=prov)
         map.save(fr"{self.map_directory}wargame_provinces.png")
 
-    def occupy_color(self, province, province_cord, occupy_color, owner_color):
-        # get province information
+    async def occupy_color(self, province: int, occupy_color, owner_color):
+        # establish connection
+        conn = self.bot.pool
+        # pull province information
+        province_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province)
+        province_cord = province_info['cord']
+        # obtain the coordinate information
         province_cord = ((int(province_cord[0])), (int(province_cord[1])))
         # get colors
         try:
@@ -194,6 +204,7 @@ class CNC(commands.Cog):
             prov.putpixel(pix, (0, 0, 0, 0))
         map.paste(prov, box=cord, mask=prov)
         map.save(fr"{self.map_directory}wargame_provinces.png")
+
 
 
     # the CnC command group
@@ -230,15 +241,45 @@ class CNC(commands.Cog):
             try:
                 ImageColor.getrgb(color)
             except ValueError:
+                # if the color isn't a real hex code, return that they need to get the right hex code
                 return await interaction.followup.send(
                     "That doesn't appear to be a valid hex color code. Include the `#` symbol.")
+            # insert the new player into the user database
             await conn.execute('''INSERT INTO cnc_users(user_id, name, color) VALUES ($1,$2,$3);''', user.id,
-                               nation_name, color)
+                               nation_name.title(), color)
+            # select the starting province
+            # the starting province cannot be on one of the few islands do prevent impossible starts
+            # the starting province cannot be owned by any player
+            # (and since unowned provinces cannot be occupied, that too)
+            starting_province = await conn.fetchrow('''SELECT * FROM cnc_provinces 
+            WHERE owner_id = 0 and id NOT IN (130, 441, 442, 621, 622, 623, 65, 486, 215, 923, 926, 924, 
+            925, 771, 772,770, 769, 768, 909, 761, 762, 763, 764, 765, 766, 767, 1207,
+            1208, 1209, 1210, 1211, 1212, 1213, 1214, 744) ORDER BY random();''')
+            # update the provinces database to set the player as the new owner and occupier
+            await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, owner = $2, occupier_id = $1, occupier = $2 
+            WHERE id = $3;''', user.id, nation_name.title(), starting_province['id'])
+            # color the map using the province coordinates and the ID
+            await self.map_color(starting_province['id'], color)
+            # INSERT SOMETHING HERE ABOUT TECHNOLOGY
+            # INSERT SOMETHING HERE ABOUT STARTING ARMY
+            # send welcome message
+            await interaction.followup.send(f"Welcome to the Command and Conquest System, {user.mention}!\n\n"
+                                            f"Your nation, {nation_name.title()}, has risen from the mists of history "
+                                            f"to make a name for itself in the annals of time. Will your people prove "
+                                            f"they are masters of warfare? Will your merchants dominate the global "
+                                            f"market, earning untold wealth? Will your scientists unlock the mysteries "
+                                            f"of the world? Will your people flourish under your hand or cower under "
+                                            f"your iron fist? Only the future can tell.\n\n"
+                                            f"To get started, be sure to check out the [Command and Conquest Manual]"
+                                            f"(https://1drv.ms/w/s!AtjcebV95AZNgWR1RbfSyx_0ln31?e=tD0eHa). This "
+                                            f"document has all the information you need to get started, a new players' "
+                                            f"guide, and an overview of all commands.\n\n"
+                                            f"\"I came, I saw, I conquered.\" -Julius Caesar")
+
 
 
     @cnc.command(name="map", description="Opens the map for viewing.")
     @app_commands.guild_only()
-    @app_commands.checks.cooldown(5, 1)
     async def map(self, interaction: discord.Interaction):
         # defer the interaction
         await interaction.response.defer(thinking=True)
@@ -246,6 +287,14 @@ class CNC(commands.Cog):
         map = await interaction.followup.send("https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
         map_buttons = MapButtons(map, author=interaction.user)
         await map.edit(view=map_buttons)
+
+
+    @commands.command()
+    @commands.is_owner()
+    async def cnc_reset_map(self, ctx):
+        map = Image.open(fr"{self.map_directory}wargame_blank_save.png").convert("RGBA")
+        map.save(fr"{self.map_directory}wargame_provinces.png")
+        await ctx.send("Map reset.")
 
 
 
