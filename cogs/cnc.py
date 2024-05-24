@@ -31,10 +31,12 @@ class OptionButton(View):
 
     @discord.ui.button(label="Back", emoji="\U000023ea", style=discord.ButtonStyle.blurple)
     async def back_button(self, interaction: discord.Interaction, left_button: discord.Button):
+        await interaction.response.send_message("2")
         return 2
 
     @discord.ui.button(label="Forward", emoji="\U000023e9", style=discord.ButtonStyle.blurple)
     async def forward_button(self, interaction: discord.Interaction, left_button: discord.Button):
+        await interaction.response.send_message("1")
         return 1
 
 
