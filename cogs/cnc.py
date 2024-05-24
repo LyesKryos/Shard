@@ -27,27 +27,34 @@ from discord.ui import View, Select
 class MapButtons(View):
 
     def __init__(self, message: discord.InteractionMessage):
+        # set the timeout to two minutes
         super().__init__(timeout=120)
+        # define the original map message
         self.message = message
 
     async def on_timeout(self) -> None:
         # for all buttons, disable
         for button in self.children:
             button.disabled = True
+        # update the view so that the buttons are disabled
         await self.message.edit(view=self)
 
     @discord.ui.button(label="Main", emoji="\U0001f5fa", style=discord.ButtonStyle.blurple)
     async def main_map(self, interaction: discord.Interaction, main: discord.Button):
+        # defer the interaction because otherwise stuff crashes
         await interaction.response.defer(thinking=True)
+        # edit the original message with the numbers map
         await self.message.edit(content="https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
 
     @discord.ui.button(label="Terrain", emoji="\U000026f0", style=discord.ButtonStyle.blurple)
     async def terrain_map(self, interaction: discord.Interaction, terrain: discord.Button):
+        # defer the interaction because otherwise stuff crashes
         await interaction.response.defer(thinking=True)
         await self.message.edit(content="https://i.ibb.co/DwvJ2zc/Terrain-Map.png")
 
     @discord.ui.button(label="Cartography", emoji="\U0001f4cc", style=discord.ButtonStyle.blurple)
     async def carto_map(self, interaction: discord.Interaction, carto: discord.Button):
+        # defer the interaction because otherwise stuff crashes
         await interaction.response.defer(thinking=True)
         await self.message.edit(content="https://i.ibb.co/zfjtnYZ/CNC-name-map.png")
 
@@ -56,6 +63,7 @@ class MapButtons(View):
         # for all buttons, disable
         for button in self.children:
             button.disabled = True
+        # update the view so all the buttons are disabled
         return await self.message.edit(view=self)
 
 class CNC(commands.Cog):
