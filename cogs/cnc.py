@@ -24,22 +24,36 @@ from collections import Counter
 import re
 from discord.ui import View, Select
 
-class OptionButton(View):
+class MapButtons(View):
 
-    def __init__(self):
+    def __init__(self, message: discord.InteractionMessage):
         super().__init__(timeout=120)
+        self.message = message
 
-    @discord.ui.button(label="Back", emoji="\U000023ea", style=discord.ButtonStyle.blurple)
-    async def back_button(self, interaction: discord.Interaction, left_button: discord.Button):
-        await interaction.response.send_message("2")
-        return 1
+    async def on_timeout(self) -> None:
+        # for all buttons, disable
+        for button in self.children:
+            button.disabled = True
+        await self.message.edit(view=self)
 
-    @discord.ui.button(label="Forward", emoji="\U000023e9", style=discord.ButtonStyle.blurple)
-    async def forward_button(self, interaction: discord.Interaction, left_button: discord.Button):
-        await interaction.response.send_message("1")
-        return 2
+    @discord.ui.button(label="Main", emoji="\U0001f5fa", style=discord.ButtonStyle.blurple)
+    async def main_map(self):
+        await self.message.edit(content="https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
 
+    @discord.ui.button(label="Terrain", emoji="\U000026f0", style=discord.ButtonStyle.blurple)
+    async def terrain_map(self):
+        await self.message.edit(content="https://i.ibb.co/DwvJ2zc/Terrain-Map.png")
 
+    @discord.ui.button(label="Cartography", emoji="\U0001f4cc", style=discord.ButtonStyle.blurple)
+    async def carto_map(self):
+        await self.message.edit(content="https://i.ibb.co/zfjtnYZ/CNC-name-map.png")
+
+    @discord.ui.button(label="Close", emoji="\U0000274c", style=discord.ButtonStyle.danger)
+    async def close(self):
+        # for all buttons, disable
+        for button in self.children:
+            button.disabled = True
+        return await self.message.edit(view=self)
 
 class CNC(commands.Cog):
 
@@ -186,14 +200,6 @@ class CNC(commands.Cog):
         await interaction.response.defer(thinking=True)
         # send the map
         map = await interaction.followup.send("https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
-        button = OptionButton()
-        msg = await interaction.followup.send("text", view=button)
-        if button == 1:
-            return await msg.edit(content="forward")
-        elif button == 2:
-            return await msg.edit(content="back")
-
-
 
 
 async def setup(bot: Shard):
