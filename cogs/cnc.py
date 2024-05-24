@@ -37,15 +37,15 @@ class MapButtons(View):
         await self.message.edit(view=self)
 
     @discord.ui.button(label="Main", emoji="\U0001f5fa", style=discord.ButtonStyle.blurple)
-    async def main_map(self):
+    async def main_map(self, interaction: discord.Interaction, main: discord.Button):
         await self.message.edit(content="https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
 
     @discord.ui.button(label="Terrain", emoji="\U000026f0", style=discord.ButtonStyle.blurple)
-    async def terrain_map(self):
+    async def terrain_map(self, interaction: discord.Interaction, terrain: discord.Button):
         await self.message.edit(content="https://i.ibb.co/DwvJ2zc/Terrain-Map.png")
 
     @discord.ui.button(label="Cartography", emoji="\U0001f4cc", style=discord.ButtonStyle.blurple)
-    async def carto_map(self):
+    async def carto_map(self, interaction: discord.Interaction, carto: discord.Button):
         await self.message.edit(content="https://i.ibb.co/zfjtnYZ/CNC-name-map.png")
 
     @discord.ui.button(label="Close", emoji="\U0000274c", style=discord.ButtonStyle.danger)
