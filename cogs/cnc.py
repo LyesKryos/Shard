@@ -200,6 +200,9 @@ class CNC(commands.Cog):
         await interaction.response.defer(thinking=True)
         # send the map
         map = await interaction.followup.send("https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
+        map_buttons = MapButtons(map)
+        await map.edit(view=map_buttons)
+
 
 
 async def setup(bot: Shard):
