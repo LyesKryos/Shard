@@ -77,9 +77,9 @@ class MapButtons(View):
         # defer the interaction because otherwise stuff crashes
         await interaction.response.defer()
         # disable all buttons so people don't keep trying to hit it because IT TAKES A SECOND
-        # for button in self.children:
-        #     button.disabled = True
-        # await interaction.followup.edit(view=self)
+        for button in self.children:
+            button.disabled = True
+        await interaction.followup.edit(view=self)
         # get the running loop, crucial to the map command running without the world ending
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, self.add_ids)
