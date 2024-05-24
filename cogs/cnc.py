@@ -64,7 +64,7 @@ class MapButtons(View):
         for button in self.children:
             button.disabled = True
         # update the view so all the buttons are disabled
-        return await self.message.edit(view=self)
+        await self.message.edit(view=self)
 
 class CNC(commands.Cog):
 
