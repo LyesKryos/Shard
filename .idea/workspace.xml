@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Testing map function for registry">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Making the nation map button unavailable because people aren't patient">
       <change afterPath="$PROJECT_DIR$/cogs/cnc_old.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -213,7 +215,7 @@
       <workItem from="1714255831257" duration="1289000" />
       <workItem from="1715038663471" duration="9800000" />
       <workItem from="1716070503610" duration="1574000" />
-      <workItem from="1716506944113" duration="9058000" />
+      <workItem from="1716506944113" duration="10184000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -558,7 +560,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="795" />
+    <option name="localTasksCounter" value="796" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -576,8 +578,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Allowing unverify to remove CTE role" />
-    <MESSAGE value="Moving log handler to the main file for better logging." />
     <MESSAGE value="Updating recruitment check to be based on timer, not a flat 8.33 minutes" />
     <MESSAGE value="Removing while loops from autogrammer" />
     <MESSAGE value="Adding start autogrammer command" />
@@ -601,7 +601,9 @@
     <MESSAGE value="Testing map buttons" />
     <MESSAGE value="Testing nation map button" />
     <MESSAGE value="Testing map function for registry" />
-    <option name="LAST_COMMIT_MESSAGE" value="Testing map function for registry" />
+    <MESSAGE value="Disabling daily dump for heartbeat reasons" />
+    <MESSAGE value="Making the nation map button unavailable because people aren't patient" />
+    <option name="LAST_COMMIT_MESSAGE" value="Making the nation map button unavailable because people aren't patient" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

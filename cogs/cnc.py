@@ -76,6 +76,10 @@ class MapButtons(View):
     async def nation_map(self, interaction: discord.Interaction, nation_map: discord.Button):
         # defer the interaction because otherwise stuff crashes
         await interaction.response.defer()
+        # disable all buttons so people don't keep trying to hit it because IT TAKES A SECOND
+        for button in self.children:
+            button.disabled = True
+        await interaction.followup.edit(view=self)
         # get the running loop, crucial to the map command running without the world ending
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, self.add_ids)
@@ -93,8 +97,11 @@ class MapButtons(View):
                                                 params)
             # get the response as a json string
             response = upload.json()
+            # re-enable buttons
+            for button in self.children:
+                button.disabled = False
             # parse out the map url and then edit the message accordingly
-            await self.message.edit(content=response["data"]["url"])
+            await self.message.edit(content=response["data"]["url"], view=self)
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
     async def close(self, interaction: discord.Interaction, close: discord.Button):
@@ -216,7 +223,7 @@ class CNC(commands.Cog):
                            color="The hex code of your new nation. Include the '#'.")
     async def register(self, interaction: discord.Interaction, nation_name: str, color: str):
         # defer the interaction
-        await interaction.response.defer(thinking=True, ephemeral=True)
+        await interaction.response.defer(thinking=True)
         # establish connection
         conn = self.bot.pool
         # define user
