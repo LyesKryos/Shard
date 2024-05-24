@@ -81,27 +81,27 @@ class MapButtons(View):
             button.disabled = True
         await interaction.followup.edit(content="Loading...", view=self)
         # get the running loop, crucial to the map command running without the world ending
-        loop = asyncio.get_running_loop()
-        await loop.run_in_executor(None, self.add_ids)
-        # open the nations map from the directory in "reading-binary" mode
-        with open(fr"{self.map_directory}wargame_nations_map.png", "rb") as preimg:
-            # read the image using 64-bit encoding
-            img = b64encode(preimg.read())
-            # set the parameters for imgbb's API call
-            params = {"key": "a64d9505a13854ff660980db67ee3596",
-                      "name": "Nations Map",
-                      "image": img,
-                      "expiration": 86400}
-            # upload the map to imgbb
-            upload = await loop.run_in_executor(None, requests.post, "https://api.imgbb.com/1/upload",
-                                                params)
-            # get the response as a json string
-            response = upload.json()
-            # re-enable buttons
-            for button in self.children:
-                button.disabled = False
-            # parse out the map url and then edit the message accordingly
-            await self.message.edit(content=response["data"]["url"], view=self)
+        # loop = asyncio.get_running_loop()
+        # await loop.run_in_executor(None, self.add_ids)
+        # # open the nations map from the directory in "reading-binary" mode
+        # with open(fr"{self.map_directory}wargame_nations_map.png", "rb") as preimg:
+        #     # read the image using 64-bit encoding
+        #     img = b64encode(preimg.read())
+        #     # set the parameters for imgbb's API call
+        #     params = {"key": "a64d9505a13854ff660980db67ee3596",
+        #               "name": "Nations Map",
+        #               "image": img,
+        #               "expiration": 86400}
+        #     # upload the map to imgbb
+        #     upload = await loop.run_in_executor(None, requests.post, "https://api.imgbb.com/1/upload",
+        #                                         params)
+        #     # get the response as a json string
+        #     response = upload.json()
+        #     # re-enable buttons
+        #     for button in self.children:
+        #         button.disabled = False
+        #     # parse out the map url and then edit the message accordingly
+        #     await self.message.edit(content=response["data"]["url"], view=self)
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
     async def close(self, interaction: discord.Interaction, close: discord.Button):
