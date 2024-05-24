@@ -70,8 +70,8 @@ class WA(commands.Cog):
                                     f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
             # sleeps until that time
             await discord.utils.sleep_until(next_run)
-            await self.nation_dump()
-            await self.region_dump()
+            # await self.nation_dump()
+            # await self.region_dump()
             continue
 
     async def region_dump(self):
