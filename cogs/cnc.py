@@ -32,12 +32,12 @@ class OptionButton(View):
     @discord.ui.button(label="Back", emoji="\U000023ea", style=discord.ButtonStyle.blurple)
     async def back_button(self, interaction: discord.Interaction, left_button: discord.Button):
         await interaction.response.send_message("2")
-        return 2
+        return True
 
     @discord.ui.button(label="Forward", emoji="\U000023e9", style=discord.ButtonStyle.blurple)
     async def forward_button(self, interaction: discord.Interaction, left_button: discord.Button):
         await interaction.response.send_message("1")
-        return 1
+        return False
 
 
 
@@ -188,9 +188,9 @@ class CNC(commands.Cog):
         map = await interaction.followup.send("https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
         button = OptionButton()
         msg = await interaction.followup.send("text", view=button)
-        if button == 1:
+        if button is True:
             return await msg.edit(content="forward")
-        else:
+        elif button is False:
             return await msg.edit(content="back")
 
 
