@@ -26,11 +26,13 @@ from discord.ui import View, Select
 
 class MapButtons(View):
 
-    def __init__(self, message: discord.InteractionMessage):
+    def __init__(self, message: discord.InteractionMessage, author):
         # set the timeout to two minutes
         super().__init__(timeout=120)
         # define the original map message
         self.message = message
+        self.author = author
+        self.map_directory = r"/root/Documents/Shard/CNC/Map Files/Maps/"
 
     async def on_timeout(self) -> None:
         # for all buttons, disable
@@ -38,6 +40,17 @@ class MapButtons(View):
             button.disabled = True
         # update the view so that the buttons are disabled
         await self.message.edit(view=self)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.author.id
+
+    def add_ids(self):
+        # open map, open ids image, paste, and save
+        bmap = Image.open(fr"{self.map_directory}wargame_provinces.png").convert("RGBA")
+        ids = Image.open(fr"{self.map_directory}wargame numbers.png").convert("RGBA")
+        bmap.paste(ids, box=(0, 0), mask=ids)
+        bmap.save(fr"{self.map_directory}wargame_nations_map.png")
+
 
     @discord.ui.button(label="Main", emoji="\U0001f5fa", style=discord.ButtonStyle.blurple)
     async def main_map(self, interaction: discord.Interaction, main: discord.Button):
@@ -57,6 +70,30 @@ class MapButtons(View):
         # defer the interaction because otherwise stuff crashes
         await interaction.response.defer()
         await self.message.edit(content="https://i.ibb.co/zfjtnYZ/CNC-name-map.png")
+
+    @discord.ui.button(label="Nations", emoji="\U0001f3f3", style=discord.ButtonStyle.blurple)
+    async def nation_map(self, interaction: discord.Interaction, nation_map: discord.Button):
+        # defer the interaction because otherwise stuff crashes
+        await interaction.response.defer()
+        # get the running loop, crucial to the map command running without the world ending
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(None, self.add_ids)
+        # open the nations map from the directory in "reading-binary" mode
+        with open(fr"{self.map_directory}wargame_nations_map.png", "rb") as preimg:
+            # read the image using 64-bit encoding
+            img = b64encode(preimg.read())
+            # set the parameters for imgbb's API call
+            params = {"key": "a64d9505a13854ff660980db67ee3596",
+                      "name": "Nations Map",
+                      "image": img,
+                      "expiration": 86400}
+            # upload the map to imgbb
+            upload = await loop.run_in_executor(None, requests.post, "https://api.imgbb.com/1/upload",
+                                                params)
+            # get the response as a json string
+            response = upload.json()
+            # parse out the map url and then edit the message accordingly
+            await self.message.edit(content=response["data"]["url"])
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
     async def close(self, interaction: discord.Interaction, close: discord.Button):
@@ -157,12 +194,6 @@ class CNC(commands.Cog):
         map.paste(prov, box=cord, mask=prov)
         map.save(fr"{self.map_directory}wargame_provinces.png")
 
-    def add_ids(self):
-        # open map, open ids image, paste, and save
-        bmap = Image.open(fr"{self.map_directory}wargame_provinces.png").convert("RGBA")
-        ids = Image.open(fr"{self.map_directory}wargame numbers.png").convert("RGBA")
-        bmap.paste(ids, box=(0, 0), mask=ids)
-        bmap.save(fr"{self.map_directory}wargame_nations_map.png")
 
     # the CnC command group
     cnc = app_commands.Group(name="cnc", description="...")
