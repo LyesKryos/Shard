@@ -26,9 +26,8 @@ from discord.ui import View, Select
 
 class OptionButton(View):
 
-    def __init__(self, buttons_needed):
+    def __init__(self):
         super().__init__(timeout=120)
-        self.buttons_needed = buttons_needed
 
     @discord.ui.button(label="Back", emoji="\U000023ea", style=discord.ButtonStyle.blurple)
     async def back_button(self, interaction: discord.Interaction, left_button: discord.Button):
