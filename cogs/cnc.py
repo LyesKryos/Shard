@@ -42,6 +42,7 @@ class MapButtons(View):
         await self.message.edit(view=self)
 
     async def interaction_check(self, interaction: discord.Interaction):
+        # ensures that the person using the interaction is the original author
         return interaction.user.id == self.author.id
 
     def add_ids(self):
@@ -237,12 +238,13 @@ class CNC(commands.Cog):
 
     @cnc.command(name="map", description="Opens the map for viewing.")
     @app_commands.guild_only()
+    @app_commands.checks.cooldown(5, 1)
     async def map(self, interaction: discord.Interaction):
         # defer the interaction
         await interaction.response.defer(thinking=True)
         # send the map
         map = await interaction.followup.send("https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
-        map_buttons = MapButtons(map)
+        map_buttons = MapButtons(map, author=interaction.user)
         await map.edit(view=map_buttons)
 
 
