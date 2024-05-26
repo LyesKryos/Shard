@@ -70,7 +70,7 @@ class MapButtons(View):
     async def carto_map(self, interaction: discord.Interaction, carto: discord.Button):
         # defer the interaction because otherwise stuff crashes
         await interaction.response.defer()
-        await self.message.edit(content="https://i.ibb.co/zfjtnYZ/CNC-name-map.png")
+        await self.message.edit(content="https://i.ibb.co/XDmDKn3/CNC-name-map.png")
 
     @discord.ui.button(label="Nations", emoji="\U0001f3f3", style=discord.ButtonStyle.blurple)
     async def nation_map(self, interaction: discord.Interaction, nation_map: discord.Button):
