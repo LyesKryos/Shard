@@ -267,8 +267,9 @@ class CNC(commands.Cog):
             WHERE id = $3;''', user.id, nation_name.title(), starting_province['id'])
             # color the map using the province coordinates and the ID
             await self.map_color(starting_province['id'], color)
-            # INSERT SOMETHING HERE ABOUT TECHNOLOGY
-            # INSERT SOMETHING HERE ABOUT STARTING ARMY
+            # create an army of 3,000 troops in the starting province
+            await conn.execute('''INSERT INTO cnc_armies(owner_id, troops, location, army_name) 
+            VALUES ($1, $2, $3, $4);''', user.id, 3000, starting_province['id'], f"Army of {starting_province['name']}")
             # send welcome message
             await interaction.followup.send(f"Welcome to the Command and Conquest System, {user.mention}!\n\n"
                                             f"Your nation, {nation_name.title()}, has risen from the mists of history "
@@ -283,8 +284,6 @@ class CNC(commands.Cog):
                                             f"document has all the information you need to get started, a new players' "
                                             f"guide, and an overview of all commands.\n\n"
                                             f"**\"I came, I saw, I conquered.\" -Julius Caesar**")
-
-
 
     @cnc.command(name="map", description="Opens the map for viewing.")
     @app_commands.guild_only()
