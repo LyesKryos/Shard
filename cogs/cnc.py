@@ -123,10 +123,11 @@ class CNC(commands.Cog):
         self.version = "version 3.0 Golden Crowns"
 
     def cog_unload(self):
-        # stop the running turnloop
-        self.turn_loop.cancel()
-        # cancel the running turn task
-        self.turn_task.cancel()
+        pass
+        # # stop the running turnloop
+        # self.turn_loop.cancel()
+        # # cancel the running turn task
+        # self.turn_task.cancel()
 
     async def map_color(self, province: int, hexcode, release: bool = False):
         # establish connection
