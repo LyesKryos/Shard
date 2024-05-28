@@ -404,7 +404,7 @@ class Recruitment(commands.Cog):
     async def closing_autogrammer(self):
         if self.autogrammer.is_being_cancelled():
             channel = self.bot.get_channel(835579413625569322)
-            await channel.send("Autogramming aborting...")
+            await channel.send("Autogramming aborted")
 
     async def recruitment_program(self, user,
                                   channel: discord.Interaction.channel, template, timer):
@@ -643,8 +643,11 @@ class Recruitment(commands.Cog):
         # stops autogrammer
         if not self.autogrammer.is_running():
             return await ctx.send("Autogrammer not running.")
-        await ctx.send("Cutting...")
+        message = await ctx.send("Cutting...")
         self.autogrammer.stop()
+        await asyncio.sleep(self.autogrammer.next_iteration.second)
+        if not self.autogrammer.is_running():
+            await message.edit(content="Autogrammer cut!")
 
     @commands.command()
     @commands.is_owner()
