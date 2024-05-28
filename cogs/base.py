@@ -45,6 +45,7 @@ class BaseCommands(commands.Cog):
     @commands.command(brief="Shuts down the bot with a global message")
     @commands.is_owner()
     async def shut_down(self, ctx, *args):
+        # Thegye, Karma, Gaia
         channel_ids = [674285035905613825, 319961144091738112, 606505493657288735]
         for channels in channel_ids:
             channel = self.bot.get_channel(channels)
@@ -63,13 +64,13 @@ class BaseCommands(commands.Cog):
     @commands.command(brief="Sends a plaintext message to all channels associated.")
     @commands.is_owner()
     async def announce_global(self, ctx, *, args):
-        try:
-            channel_ids = [674285035905613825, 319961144091738112, 606505493657288735]
-            for id in channel_ids:
-                channel = self.bot.get_channel(id)
+        channel_ids = [674285035905613825, 319961144091738112, 606505493657288735]
+        for channel_id in channel_ids:
+            try:
+                channel = self.bot.get_channel(channel_id)
                 await channel.send(args)
-        except Exception:
-            self.bot.logger.warning(msg=traceback.format_exc())
+            except Exception:
+                self.bot.logger.warning(msg=traceback.format_exc())
 
     @commands.command(brief="Loads cog")
     @commands.is_owner()
@@ -192,7 +193,7 @@ class BaseCommands(commands.Cog):
 
     @app_commands.command(name="edit_message_thread", description="Edits a message sent by the bot.")
     @app_commands.describe(message="The ID of the message you'd like to edit", content="The new message content.")
-    async def edit_message(self, interaction: discord.Interaction, thread: discord.Thread, message: str, content: str):
+    async def edit_message_thread(self, interaction: discord.Interaction, thread: discord.Thread, message: str, content: str):
         # defer interaction
         await interaction.response.defer(thinking=True)
         if interaction.user.id != 293518673417732098:
