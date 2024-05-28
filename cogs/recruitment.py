@@ -29,7 +29,8 @@ class Recruitment(commands.Cog):
         self.db_error = False
         self.verbose_mode = False
         if not self.autogrammer.is_running():
-            self.autogrammer.start()
+            pass
+            # self.autogrammer.start()
 
         # define testing channel
 
@@ -403,7 +404,7 @@ class Recruitment(commands.Cog):
     async def closing_autogrammer(self):
         if self.autogrammer.is_being_cancelled():
             channel = self.bot.get_channel(835579413625569322)
-            await channel.send("Autogramming closed")
+            await channel.send("Autogramming closed.")
 
     async def recruitment_program(self, user,
                                   channel: discord.Interaction.channel, template, timer):
