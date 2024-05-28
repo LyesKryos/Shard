@@ -29,6 +29,7 @@ class Shard(commands.Bot):
             roles=True,  # Whether to ping role @mentions
             replied_user=True,  # Whether to ping on replies to messages
         )
+        self.system_message = ""
 
     async def setup_hook(self):
         for filename in os.listdir("./cogs"):

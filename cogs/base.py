@@ -1,3 +1,4 @@
+import asyncio
 import re
 import traceback
 from typing import Optional
@@ -225,7 +226,8 @@ async def setup(bot: Shard):
         try:
             server = bot.get_guild(728444080908140575)
             channel = server.get_channel(835579413625569322)
-            await channel.send("We are online.")
+            await asyncio.sleep(3)
+            await channel.send(f"We are online.\n{bot.system_message}")
         except Exception:
             bot.logger.warning(msg=traceback.format_exc())
 

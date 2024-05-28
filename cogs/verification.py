@@ -28,9 +28,9 @@ class VerificationView(View):
 
     async def on_timeout(self) -> None:
         # remove dropdown
-        '''''''''''for item in self.children:
+        for item in self.children:
             self.remove_item(item)
-        return await self.message.edit(content="Timed out. Please respond next time!", view=self)'''''''''''
+        return await self.message.edit(content="Timed out. Please respond next time!", view=self)
 
 
 class VerificationDropdown(discord.ui.Select):
@@ -354,7 +354,7 @@ class Verification(commands.Cog):
                     except ValueError:
                         next_run = now.replace(day=1, month=now.month + 1, hour=3, minute=30, second=0)
                 # sends the next runtime
-                await crashchannel.send(f"Verification daily update waiting until "
+                self.bot.system_message += (f"From verification.py: Verification daily update waiting until "
                                         f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
                 # gets the time to wait
                 delta: timedelta = next_run - now

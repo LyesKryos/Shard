@@ -1004,7 +1004,7 @@ class Economy(commands.Cog):
             next_run = now.replace(hour=0, minute=0, second=0)
             next_run += timedelta(days=1)
             # sends the next runtime
-            await crashchannel.send(f"Bank update waiting until "
+            self.bot.system_message += (f"From econ.py: Bank update waiting until "
                                     f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
             # sleeps until runtime
             await discord.utils.sleep_until(next_run)
@@ -1756,7 +1756,7 @@ class Economy(commands.Cog):
             next_run = now.replace(minute=0, second=0)
             next_run += timedelta(hours=1)
             # sends the next runtime
-            await crashchannel.send(f"Stock market update waiting until "
+            self.bot.system_message += (f"From econ.py: Stock market update waiting until "
                                     f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
             # sleep until then
             await discord.utils.sleep_until(next_run)

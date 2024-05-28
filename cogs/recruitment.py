@@ -41,8 +41,8 @@ class Recruitment(commands.Cog):
             now = datetime.now(eastern)
             # sets time to be midnight on the next month's first day
             next_first = now.replace(day=1, hour=0, minute=0, second=0) + relativedelta(months=1)
-            await crashchannel.send(f"Monthly recruiter waiting until "
-                                    f"{next_first.strftime('%a, %d %b %Y at %H:%M %Z%z')}")
+            self.bot.system_message += (f"From recruitment.py: Monthly recruiter waiting until "
+                                        f"{next_first.strftime('%a, %d %b %Y at %H:%M %Z%z')}\n")
             while True:
                 # define now
                 eastern = timezone('US/Eastern')
@@ -101,7 +101,7 @@ class Recruitment(commands.Cog):
             thegye_server = bot.get_guild(674259612580446230)
             notifrole = thegye_server.get_role(950950836006187018)
             # let the crash channel know
-            await crashchannel.send("Starting retention loop.")
+            self.bot.system_message += "From recruitment.py: Starting retention loop.\n"
             # connect to the API
             async with aiohttp.ClientSession() as session:
                 headers = {"User-Agent": "Bassiliya"}
@@ -195,7 +195,7 @@ class Recruitment(commands.Cog):
             thegye_server = bot.get_guild(674259612580446230)
             wa_role = thegye_server.get_role(674283915870994442)
             # notify crash channel
-            await crashchannel.send("Starting WA notification loop.")
+            self.bot.system_message += "From recruitment.py: Starting WA notification loop.\n"
             # connect to API
             async with aiohttp.ClientSession() as session:
                 headers = {"User-Agent": "Bassiliya"}
@@ -297,7 +297,6 @@ class Recruitment(commands.Cog):
         # create 24/7 tasks
         self.monthly_recruiter = asyncio.create_task(monthly_recruiter(bot))
         self.retention = asyncio.create_task(retention(bot))
-        self.world_assembly_notification = asyncio.create_task(world_assembly_notification(bot))
 
     def sanitize_links_percent(self, url: str) -> str:
         # sanitizes links with %s
