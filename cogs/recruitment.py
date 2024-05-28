@@ -403,7 +403,7 @@ class Recruitment(commands.Cog):
     async def closing_autogrammer(self):
         if self.autogrammer.is_being_cancelled():
             channel = self.bot.get_channel(835579413625569322)
-            await channel.send("Autogramming aborted")
+            await channel.send("Autogramming closed")
 
     async def recruitment_program(self, user,
                                   channel: discord.Interaction.channel, template, timer):
