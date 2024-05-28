@@ -385,8 +385,6 @@ class Recruitment(commands.Cog):
                         await asyncio.sleep(int(retry) + 20)
                         await crashchannel.send(f"Too many autogrammer calls. "
                                                 f"Retrying after {retry + 20} seconds.")
-                        await asyncio.sleep(retry + 20)
-                        self.autogrammer.restart()
                     elif tg_response.status != 200:
                         await crashchannel.send(f"Bad response for API\n"
                                                 f"```{tg_response}```")
@@ -673,6 +671,8 @@ class Recruitment(commands.Cog):
             message += f"Autogrammer is running. Next iteration: {self.autogrammer.next_iteration.strftime('%H:%M:%S')}"
         elif not self.autogrammer.is_running():
             message += "Autogrammer is not running."
+        else:
+            message = "Something is wrong."
         await ctx.send(message)
 
     @recruitment.command(name="sent", description="Displays the amount of sent telegrams of a specified user")
