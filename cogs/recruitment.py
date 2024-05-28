@@ -386,6 +386,7 @@ class Recruitment(commands.Cog):
                         await crashchannel.send(f"Too many autogrammer calls. "
                                                 f"Retrying after {retry + 20} seconds.")
                         await asyncio.sleep(retry + 20)
+                        self.autogrammer.restart()
                     elif tg_response.status != 200:
                         await crashchannel.send(f"Bad response for API\n"
                                                 f"```{tg_response}```")
