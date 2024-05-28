@@ -327,7 +327,7 @@ class Recruitment(commands.Cog):
     recruitment_gather_object = None
     loops_gather_object = None
 
-    @tasks.loop(seconds=185)
+    @tasks.loop(seconds=185, reconnect=True)
     async def autogrammer(self):
         # define the crash channel
         crashchannel = self.bot.get_channel(835579413625569322)
@@ -342,46 +342,40 @@ class Recruitment(commands.Cog):
             # start the session
             async with aiohttp.ClientSession() as session:
                 # ratelimiter
-                while True:
-                    # see if there are enough available calls. if so, break the loop
-                    try:
-                        await self.rate_limit.call()
-                        break
-                    # if there are not enough available calls, continue the loop
-                    except TooManyRequests as error:
-                        await asyncio.sleep(int(str(error)))
-                        continue
+                # see if there are enough available calls. if so, break the loop
+                try:
+                    await self.rate_limit.call()
+                # if there are not enough available calls, continue the loop
+                except TooManyRequests as error:
+                    await asyncio.sleep(int(str(error)))
+                    self.autogrammer.restart()
                 # make the call
-                while True:
-                    async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                           headers=headers, params=newnationsparams) as nnresp:
-                        # parse the response
-                        newnationsraw = await nnresp.text()
-                        # after the list is called, the xml is parsed and the list is made
-                        nnsoup = BeautifulSoup(newnationsraw, "lxml")
-                        newnations_prefilter = list(nnsoup.newnations.string.split(","))
-                        # grabs the first nation
-                        recipient = newnations_prefilter[0]
-                        # check for redundant telegraming
-                        if recipient in self.do_not_recruit:
-                            await asyncio.sleep(15)
-                            continue
-                    # send the telegram to the recipient
-                    recipient_dict = {'to': recipient}
-                    telegram_params.update(recipient_dict)
-                    # update the do_not_recruit list
-                    self.do_not_recruit += recipient
-                    break
+                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                       headers=headers, params=newnationsparams) as nnresp:
+                    # parse the response
+                    newnationsraw = await nnresp.text()
+                    # after the list is called, the xml is parsed and the list is made
+                    nnsoup = BeautifulSoup(newnationsraw, "lxml")
+                    newnations_prefilter = list(nnsoup.newnations.string.split(","))
+                    # grabs the first nation
+                    recipient = newnations_prefilter[0]
+                    # check for redundant telegraming
+                    if recipient in self.do_not_recruit:
+                        await asyncio.sleep(15)
+                        self.autogrammer.restart()
+                # send the telegram to the recipient
+                recipient_dict = {'to': recipient}
+                telegram_params.update(recipient_dict)
+                # update the do_not_recruit list
+                self.do_not_recruit += recipient
                 # ratelimiter
-                while True:
-                    # see if there are enough available calls. if so, break the loop
-                    try:
-                        await self.rate_limit.call()
-                        break
-                    # if there are not enough available calls, continue the loop
-                    except TooManyRequests as error:
-                        await asyncio.sleep(int(str(error)))
-                        continue
+                # see if there are enough available calls. if so, break the loop
+                try:
+                    await self.rate_limit.call()
+                # if there are not enough available calls, continue the loop
+                except TooManyRequests as error:
+                    await asyncio.sleep(int(str(error)))
+                    self.autogrammer.restart()
                 async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                        headers=headers, params=telegram_params) as tg_response:
                     if self.verbose_mode:
