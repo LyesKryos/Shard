@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Disabling autogrammer until future time when I can fix it">
-      <change afterPath="$PROJECT_DIR$/cogs/cnc_old.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Retiring old Tech Tree files and cnc_old.py" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -44,7 +42,7 @@
     "database.data.extractors.current.export.id": "SQL Inserts",
     "database.data.extractors.current.id": "SQL Inserts",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/jaedo/OneDrive/Documents/GitHub/Shard/Retired Versions",
+    "last_opened_file_path": "C:/Users/jaedo/OneDrive/Documents/GitHub/Shard/CNC/Tech Tree",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -61,6 +59,9 @@
     <option name="SHOW_DETAILS_PANEL" value="false" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\CNC\Tech Tree" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\Retired Versions" />
       <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\cogs" />
@@ -215,6 +216,7 @@
       <workItem from="1715038663471" duration="9800000" />
       <workItem from="1716070503610" duration="1574000" />
       <workItem from="1716506944113" duration="20247000" />
+      <workItem from="1716931254541" duration="5527000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -559,7 +561,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="814" />
+    <option name="localTasksCounter" value="818" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -577,10 +579,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing the edit commands" />
-    <MESSAGE value="Updating client key and TGID" />
-    <MESSAGE value="Adding Thaler conversions" />
-    <MESSAGE value="Troubleshooting thaler conversion" />
     <MESSAGE value="Updating thaler conversion" />
     <MESSAGE value="Fixing conversion symbols" />
     <MESSAGE value="Updating thaler command" />
@@ -602,7 +600,11 @@
     <MESSAGE value="Troubleshooting bot crashing" />
     <MESSAGE value="Trying to fix autogrammer from eternally looping" />
     <MESSAGE value="Disabling autogrammer until future time when I can fix it" />
-    <option name="LAST_COMMIT_MESSAGE" value="Disabling autogrammer until future time when I can fix it" />
+    <MESSAGE value="Trying to debug via info logging" />
+    <MESSAGE value="Adding system message instead of individual cog messages to avoid ratelimiting" />
+    <MESSAGE value="Updating the announce_global command" />
+    <MESSAGE value="Retiring old Tech Tree files and cnc_old.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Retiring old Tech Tree files and cnc_old.py" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
