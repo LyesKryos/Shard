@@ -67,6 +67,8 @@ class ShardErrorHandler(commands.Cog):
             await ctx.send("A check failed. Check the logs.")
         elif isinstance(error, discord.errors.Forbidden):
             await ctx.send("I cannot complete that action.")
+        else:
+            self.bot.logger.warning(error)
 
     @commands.Cog.listener()
     async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
