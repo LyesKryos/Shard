@@ -1006,7 +1006,7 @@ class Economy(commands.Cog):
                 next_run += timedelta(days=1)
                 # sends the next runtime
                 self.bot.system_message += (f"From econ.py: Bank update waiting until "
-                                        f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
+                                        f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}\n")
                 # sleeps until runtime
                 await discord.utils.sleep_until(next_run)
                 # establish connection
@@ -1165,7 +1165,7 @@ class Economy(commands.Cog):
                 next_run += timedelta(hours=1)
                 # sends the next runtime
                 self.bot.system_message += (f"From econ.py: Stock market update waiting until "
-                                        f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
+                                        f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}\n")
                 # sleep until then
                 await discord.utils.sleep_until(next_run)
                 # establish connection
@@ -1266,6 +1266,28 @@ class Economy(commands.Cog):
                 old_message = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_pinned_message';''')
                 old_message = await bankchannel.fetch_message(old_message['bigint'])
                 await old_message.unpin()
+                # remove users no longer in the server
+                users = await conn.fetchall('''SELECT * FROM rbt_users;''')
+                thegye = self.bot.get_guild(674259612580446230)
+                # for every user
+                for u in users:
+                    user_id = u['user_id']
+                    # test to see if they are in the server
+                    try:
+                        thegye.get_member(user_id)
+                    # remove any user not in the server
+                    except AttributeError:
+                        await conn.execute('''DELETE FROM rbt_users WHERE user_id = $1;''', user_id)
+                        try:
+                            await crashchannel.send(f"{self.bot.get_user(user_id)} ({user_id}) has been removed from the "
+                                                    f"RBT system. They were previously worth {u['funds']} thaler.")
+                            await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
+                            WHERE name = 'General Fund';''', u['funds'])
+                        except AttributeError:
+                            await crashchannel.send(f"`deleted user` ({user_id}) has been removed from the "
+                                                    f"RBT system. They were previously worth {u['funds']} thaler.")
+                            await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
+                            WHERE name = 'General Fund';''', u['funds'])
                 # announce
                 new_announcement = await bankchannel.send(content=self.announcement)
                 await new_announcement.pin()

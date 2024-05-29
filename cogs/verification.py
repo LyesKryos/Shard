@@ -355,7 +355,7 @@ class Verification(commands.Cog):
                         next_run = now.replace(day=1, month=now.month + 1, hour=3, minute=30, second=0)
                 # sends the next runtime
                 self.bot.system_message += (f"From verification.py: Verification daily update waiting until "
-                                        f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}")
+                                            f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}\n")
                 # gets the time to wait
                 delta: timedelta = next_run - now
                 # converts time to seconds
