@@ -3174,6 +3174,7 @@ class Economy(commands.Cog):
                                             f"RBT system. They were previously worth {u['funds']} thaler.")
                     await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
                     WHERE name = 'General Fund';''', u['funds'])
+        await ctx.send("Done!")
 
 
 
