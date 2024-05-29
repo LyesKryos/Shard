@@ -1267,7 +1267,7 @@ class Economy(commands.Cog):
                 old_message = await bankchannel.fetch_message(old_message['bigint'])
                 await old_message.unpin()
                 # remove users no longer in the server
-                users = await conn.fetchall('''SELECT * FROM rbt_users;''')
+                users = await conn.fetch('''SELECT * FROM rbt_users;''')
                 thegye = self.bot.get_guild(674259612580446230)
                 # for every user
                 for u in users:
