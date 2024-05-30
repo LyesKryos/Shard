@@ -1,27 +1,11 @@
-import random
-from typing import Literal
 from discord import app_commands
 from ShardBot import Shard
 import discord
 from discord.ext import commands, tasks
 import asyncio
-from random import randint, uniform, choice, randrange, sample
-from battlesim import calculations
-import math
-import datetime
 from PIL import Image, ImageColor, ImageDraw
 from base64 import b64encode
 import requests
-from time import sleep, localtime, time, strftime, perf_counter
-from customchecks import modcheck, SilentFail, WrongInput
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
-from pytz import timezone
-import traceback
-from cnc_research import Technology
-from cnc_events import Events
-from collections import Counter
-import re
 from discord.ui import View, Select
 
 class MapButtons(View):
@@ -118,16 +102,9 @@ class CNC(commands.Cog):
         self.province_directory = r"/root/Documents/Shard/CNC/Map Files/Province Layers/"
         self.interaction_directory = r"/root/Documents/Shard/CNC/Interaction Files/"
         self.bot = bot
-        self.turn_task = None
         self.banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2"]
-        self.version = "version 3.0 Golden Crowns"
-
-    def cog_unload(self):
-        pass
-        # # stop the running turnloop
-        # self.turn_loop.cancel()
-        # # cancel the running turn task
-        # self.turn_task.cancel()
+        self.version = "version 4.0 New Horizons"
+        self.version_notes = ""
 
     async def map_color(self, province: int, hexcode, release: bool = False):
         # establish connection

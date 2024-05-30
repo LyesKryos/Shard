@@ -3160,7 +3160,7 @@ class Economy(commands.Cog):
             user_id = u['user_id']
             # test to see if they are in the server
             try:
-                thegye.get_member(user_id)
+                user = thegye.get_member(user_id).id
             # remove any user not in the server
             except AttributeError:
                 await conn.execute('''DELETE FROM rbt_users WHERE user_id = $1;''', user_id)
