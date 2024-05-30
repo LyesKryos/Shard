@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Retiring old Tech Tree files and cnc_old.py" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Cleaning up" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -18,7 +18,26 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "LyesKryos"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="dbe6dcc9-d7c3-4fd0-a243-d73c8dbd7ccd" />
+        <option name="url" value="https://github.com/LyesKryos/Shard.git" />
+      </UrlAndAccount>
+    </option>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -216,7 +235,7 @@
       <workItem from="1715038663471" duration="9800000" />
       <workItem from="1716070503610" duration="1574000" />
       <workItem from="1716506944113" duration="20247000" />
-      <workItem from="1716931254541" duration="5527000" />
+      <workItem from="1716931254541" duration="11308000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -561,7 +580,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="818" />
+    <option name="localTasksCounter" value="828" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -579,15 +598,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updating thaler conversion" />
-    <MESSAGE value="Fixing conversion symbols" />
-    <MESSAGE value="Updating thaler command" />
-    <MESSAGE value="Fixing error logging" />
-    <MESSAGE value="Fixing format rounding" />
-    <MESSAGE value="Adding divide thaler command" />
-    <MESSAGE value="Fixing divide thaler command" />
-    <MESSAGE value="Updating divide thaler command" />
-    <MESSAGE value="Testing buttons" />
     <MESSAGE value="Testing map buttons" />
     <MESSAGE value="Testing nation map button" />
     <MESSAGE value="Testing map function for registry" />
@@ -604,7 +614,16 @@
     <MESSAGE value="Adding system message instead of individual cog messages to avoid ratelimiting" />
     <MESSAGE value="Updating the announce_global command" />
     <MESSAGE value="Retiring old Tech Tree files and cnc_old.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Retiring old Tech Tree files and cnc_old.py" />
+    <MESSAGE value="Updating workspace" />
+    <MESSAGE value="Adding try/except to econ.py" />
+    <MESSAGE value="Removing user from RBT that are inactive on the server" />
+    <MESSAGE value="Fixing small bug" />
+    <MESSAGE value="Adding user removing to force market update" />
+    <MESSAGE value="Fixing errors.py" />
+    <MESSAGE value="Adding manual user removal" />
+    <MESSAGE value="More debugging" />
+    <MESSAGE value="Cleaning up" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleaning up" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
