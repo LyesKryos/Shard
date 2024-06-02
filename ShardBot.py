@@ -35,7 +35,8 @@ class Shard(commands.Bot):
             if filename.endswith(".py"):
                 await self.load_extension(f"cogs.{filename[:-3]}")
         # creates connection pool
-        self.pool: asyncpg.Pool = await asyncpg.create_pool('postgresql://shard@127.0.0.1:5432', database="botdb")
+        self.pool: asyncpg.Pool = await asyncpg.create_pool('postgresql://shard@127.0.0.1:5432', database="botdb",
+                                                            password="ShardBot")
 
     async def close(self):
         await super().close()
