@@ -29,8 +29,7 @@ class Recruitment(commands.Cog):
         self.db_error = False
         self.verbose_mode = False
         if not self.autogrammer.is_running():
-            pass
-            # self.autogrammer.start()
+            self.autogrammer.start()
 
         # define testing channel
 
