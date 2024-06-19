@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Setting up new DB user">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding autogrammer back into the mix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -307,6 +308,7 @@
       <workItem from="1716931254541" duration="13349000" />
       <workItem from="1717260898064" duration="816000" />
       <workItem from="1717363787823" duration="5024000" />
+      <workItem from="1718759784455" duration="993000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -651,7 +653,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="831" />
+    <option name="localTasksCounter" value="832" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -669,7 +671,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Testing nation map button" />
     <MESSAGE value="Testing map function for registry" />
     <MESSAGE value="Disabling daily dump for heartbeat reasons" />
     <MESSAGE value="Making the nation map button unavailable because people aren't patient" />
@@ -694,7 +695,8 @@
     <MESSAGE value="More debugging" />
     <MESSAGE value="Cleaning up" />
     <MESSAGE value="Setting up new DB user" />
-    <option name="LAST_COMMIT_MESSAGE" value="Setting up new DB user" />
+    <MESSAGE value="Adding autogrammer back into the mix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding autogrammer back into the mix" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

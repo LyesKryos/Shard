@@ -8,6 +8,7 @@ from base64 import b64encode
 import requests
 from discord.ui import View, Select
 
+
 class MapButtons(View):
 
     def __init__(self, message: discord.InteractionMessage, author):
@@ -35,7 +36,6 @@ class MapButtons(View):
         ids = Image.open(fr"{self.map_directory}wargame numbers.png").convert("RGBA")
         bmap.paste(ids, box=(0, 0), mask=ids)
         bmap.save(fr"{self.map_directory}wargame_nations_map.png")
-
 
     @discord.ui.button(label="Main", emoji="\U0001f5fa", style=discord.ButtonStyle.blurple)
     async def main_map(self, interaction: discord.Interaction, main: discord.Button):
@@ -94,6 +94,7 @@ class MapButtons(View):
             button.disabled = True
         # update the view so all the buttons are disabled
         await interaction.response.edit_message(view=self)
+
 
 class CNC(commands.Cog):
 
@@ -190,8 +191,6 @@ class CNC(commands.Cog):
         map.paste(prov, box=cord, mask=prov)
         map.save(fr"{self.map_directory}wargame_provinces.png")
 
-
-
     # the CnC command group
     cnc = app_commands.Group(name="cnc", description="...")
 
@@ -273,7 +272,6 @@ class CNC(commands.Cog):
         map_buttons = MapButtons(map, author=interaction.user)
         await map.edit(view=map_buttons)
 
-
     @commands.command()
     @commands.is_owner()
     async def cnc_reset_map(self, ctx):
@@ -281,10 +279,36 @@ class CNC(commands.Cog):
         map.save(fr"{self.map_directory}wargame_provinces.png")
         await ctx.send("Map reset.")
 
+    @commands.command()
+    @commands.is_owner()
+    async def permanent_delete_user(self, ctx, user_id: int):
+        # sent a confirmation message
+        delete_confirm = await ctx.send(f"Are you certain you would like to delete {self.bot.get_user(user_id).name} "
+                                        f"from the Command and Conquest System?")
 
+        # wait for a confirmation message
+        def confirmation_check(message, user):
+            return user == ctx.message.author and message == f"Confirm deletion of {user_id}"
+
+        try:
+            user, message = await self.bot.wait_for('message', timeout=30, check=confirmation_check)
+        except asyncio.TimeoutError:
+            return await delete_confirm.edit(content=f"Permanent deletion of {self.bot.get_user(user_id).name} "
+                                                     f"from the Command and Conquest System aborted.")
+        conn = self.bot.pool
+        user = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', user_id)
+        if user is None:
+            return await ctx.send("No such user in the CNC system.")
+        await conn.execute('''DELETE FROM cnc_users WHERE user_id = $1;''', user_id)
+        await conn.execute('''DELETE FROM cnc_researching WHERE owner_id = $1;''', user_id)
+        await conn.execute('''UPDATE cnc_provinces SET owner_id = 0, owner = '', occupier_id = owner_id, 
+        occupier = owner WHERE owner_id = $1 AND occupier_id = $1;''', user_id)
+        await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user_id)
+        await delete_confirm.delete()
+        return await ctx.send(f"Permanent deletion of {self.bot.get_user(user_id).name} "
+                       "from the Command and Conquest System completed.")
 
 async def setup(bot: Shard):
     # define the cog and add the cog
     cog = CNC(bot)
     await bot.add_cog(cog)
-
