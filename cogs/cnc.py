@@ -388,11 +388,13 @@ class CNC(commands.Cog):
                                         f"from the Command and Conquest System?")
 
         # wait for a confirmation message
-        def confirmation_check(user, message):
-            return user == ctx.message.author and message == f"Confirm deletion of {user_id}"
+        def confirmation_check(user):
+            return user == ctx.message.author
 
         try:
-            await self.bot.wait_for('message', timeout=30, check=confirmation_check)
+            message = await self.bot.wait_for('message', timeout=30, check=confirmation_check)
+            if message.content != "Confirm":
+                return await ctx.send("Must confirm deletion")
         except asyncio.TimeoutError:
             return await delete_confirm.edit(content=f"Permanent deletion of {self.bot.get_user(user_id).name} "
                                                      f"from the Command and Conquest System aborted.")
