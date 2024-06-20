@@ -191,8 +191,23 @@ class CNC(commands.Cog):
         map.paste(prov, box=cord, mask=prov)
         map.save(fr"{self.map_directory}wargame_provinces.png")
 
+    async def user_db_info(self, user_id: int):
+        conn = self.bot.pool
+        # pull the user data
+        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', user_id)
+        return user_info
+
+    async def nation_db_info(self, nation_name: str):
+        conn = self.bot.pool
+        # check if the user already exists
+        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE name = $1;''', nation_name)
+        return user_info
+
+
     # the CnC command group
     cnc = app_commands.Group(name="cnc", description="...")
+
+    # REGISTER AND INFO COMMANDS
 
     @cnc.command(name="register", description="Registers a new player nation.")
     @app_commands.guild_only()
@@ -206,7 +221,7 @@ class CNC(commands.Cog):
         # define user
         user = interaction.user
         # check if the user already exists
-        check_call = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', user.id)
+        check_call = await self.user_db_info(user.id)
         if check_call is not None:
             return await interaction.followup.response(
                 f"You are already a registered player of the Command and Conquest system. "
@@ -262,6 +277,7 @@ class CNC(commands.Cog):
                                             f"guide, and an overview of all commands.\n\n"
                                             f"**\"I came, I saw, I conquered.\" -Julius Caesar**")
 
+
     @cnc.command(name="map", description="Opens the map for viewing.")
     @app_commands.guild_only()
     async def map(self, interaction: discord.Interaction):
@@ -271,6 +287,92 @@ class CNC(commands.Cog):
         map = await interaction.followup.send("https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
         map_buttons = MapButtons(map, author=interaction.user)
         await map.edit(view=map_buttons)
+
+    @cnc.command(name="nation", description="Displays information concerning a specified nation by name or user. \n"
+                                            "For your own nation, leave the nation option blank.")
+    @app_commands.guild_only()
+    async def nation(self, interaction: discord.Interaction, nation: str = None, user: discord.Member = None):
+        # defeer the interaction
+        await interaction.response.defer(thinking=True)
+        # if the nation is called
+        if nation is not None:
+            # pull info from nation name
+            user_info = await self.nation_db_info(nation.title())
+            if user_info is None:
+                return await interaction.followup.send(f"`{nation.title()}` not found.", ephemeral=True)
+        elif user is not None:
+            user_info = await self.user_db_info(user.id)
+            if user_info is None:
+                return await interaction.followup.send(f"That user is not a registered player of the CNC system.",
+                                                       ephemeral=True)
+        else:
+            return
+        # define connection
+        conn = self.bot.pool
+        # pull territory information
+        provinces = await conn.fetch('''SELECT id FROM cnc_provinces WHERE owner_id = $1;''', user_info['user_id'])
+        # for every entry, pull out the ID
+        provinces = [t['id'] for t in provinces]
+        # count the number of entries
+        province_count = len(provinces)
+        # sort the provinces
+        provinces.sort()
+        # divide the list and deliniate with commas
+        province_list = ', '.join(str(p) for p in provinces)
+        # pull the name of the capital
+        capital = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', user_info['capital'])
+        if capital is None:
+            capital = "None"
+        else:
+            capital = capital['name']
+        # pull relations information
+        alliances = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE members = ANY($1) AND type = "alliance";''',
+                                     [user_info['name']])
+        wars = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE members = ANY($1) AND type = "war";''',
+                                [user_info['name']])
+        trade_pacts = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE members = ANY($1) AND type = "trade";''',
+                                       [user_info['name']])
+        military_access = await conn.fetch('''SELECT * FROM cnc_diplomacy 
+        WHERE members = ANY($1) AND type = "access";''', [user_info['name']])
+        def parse_relations(relations):
+            if relations is None:
+                output = "None"
+                return output
+            else:
+                output = ""
+                for relation in relations:
+                    buffer_output = ", ".join([r for r in relation['members'] if r != user_info['name']])
+                    output += buffer_output
+                return output
+        allies = parse_relations(alliances)
+        wars = parse_relations(wars)
+        trade_pacts = parse_relations(trade_pacts)
+        military_access = parse_relations(military_access)
+        # build embed, populate title with pretitle and nation name, set color to user color,
+        # and set description to Discord user.
+        user_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
+                                   color=discord.Color(int(user_info["color"].lstrip('#'), 16),),
+                                   description=f"Registered nation of "
+                                               f"{(self.bot.get_user(user_info['user_id'])).mention}")
+        user_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}")
+        user_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}")
+        user_embed.add_field(name="Capital", value=f"{capital}")
+        user_embed.add_field(name="Political Authority", value=f"{user_info['pol_auth']}")
+        user_embed.add_field(name="Military Authority", value=f"{user_info['mil_auth']}")
+        user_embed.add_field(name="Economic Authority", value=f"{user_info['econ_auth']}")
+        user_embed.add_field(name="Stability", value=f"{user_info['stability']}")
+        user_embed.add_field(name="Allies", value=f"{allies}")
+        user_embed.add_field(name="Wars", value=f"{wars}")
+        user_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
+        user_embed.add_field(name="Military Access", value=f"{military_access}")
+
+        return await interaction.followup.send(embed=user_embed)
+
+
+
+
+
+
 
     @commands.command()
     @commands.is_owner()
@@ -306,7 +408,8 @@ class CNC(commands.Cog):
         await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user_id)
         await delete_confirm.delete()
         return await ctx.send(f"Permanent deletion of {self.bot.get_user(user_id).name} "
-                       "from the Command and Conquest System completed.")
+                              "from the Command and Conquest System completed.")
+
 
 async def setup(bot: Shard):
     # define the cog and add the cog
