@@ -388,7 +388,7 @@ class CNC(commands.Cog):
                                         f"from the Command and Conquest System?")
 
         # wait for a confirmation message
-        def confirmation_check(message, user):
+        def confirmation_check(user, message):
             return user == ctx.message.author and message == f"Confirm deletion of {user_id}"
 
         try:
