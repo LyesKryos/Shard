@@ -89,7 +89,6 @@ class ShardErrorHandler(commands.Cog):
             await interaction.channel.send("An error occurred, check the logs.")
 
 
-
 async def setup(bot: Shard):
     errorhandler = ShardErrorHandler(bot)
     await bot.add_cog(errorhandler)

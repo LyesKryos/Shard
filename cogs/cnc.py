@@ -223,7 +223,7 @@ class CNC(commands.Cog):
         # check if the user already exists
         check_call = await self.user_db_info(user.id)
         if check_call is not None:
-            return await interaction.followup.response(
+            return await interaction.followup.send(
                 f"You are already a registered player of the Command and Conquest system. "
                 f"Your nation name is {check_call['name']}", ephemeral=True)
         # otherwise, continue with player registration
@@ -365,7 +365,6 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Wars", value=f"{wars}")
         user_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
         user_embed.add_field(name="Military Access", value=f"{military_access}")
-
         return await interaction.followup.send(embed=user_embed)
 
 
