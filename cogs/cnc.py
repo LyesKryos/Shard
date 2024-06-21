@@ -332,7 +332,6 @@ class CNC(commands.Cog):
                                        user_info['name'])
         military_access = await conn.fetch('''SELECT * FROM cnc_diplomacy 
         WHERE $1 = ANY(members) AND type = 'access';''', user_info['name'])
-        await interaction.followup.send(wars)
 
         def parse_relations(relations):
             if not relations:
@@ -399,7 +398,7 @@ class CNC(commands.Cog):
             return await ctx.send("No such user in the CNC system.")
         await conn.execute('''DELETE FROM cnc_users WHERE user_id = $1;''', user_id)
         await conn.execute('''DELETE FROM cnc_armies WHERE owner_id = $1;''', user_id)
-        await conn.execute('''UPDATE cnc_provinces SET owner_id = 0, occupier_id = owner_id 
+        await conn.execute('''UPDATE cnc_provinces SET owner_id = DEFUALT, occupier_id = DEFUALT 
         WHERE owner_id = $1 AND occupier_id = $1;''', user_id)
         await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user_id)
         await delete_confirm.delete()
