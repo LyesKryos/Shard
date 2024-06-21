@@ -334,7 +334,7 @@ class CNC(commands.Cog):
         WHERE $1 = ANY(members) AND type = 'access';''', user_info['name'])
 
         def parse_relations(relations):
-            if relations is None:
+            if relations[0] is None:
                 output = "None"
                 return output
             else:
@@ -353,7 +353,7 @@ class CNC(commands.Cog):
         user_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
                                    color=discord.Color(int(user_info["color"].lstrip('#'), 16), ),
                                    description=f"Registered nation of "
-                                               f"{(self.bot.get_user(user_info['user_id'])).mention}")
+                                               f"{(self.bot.get_user(user_info['user_id'])).mention}.")
         user_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}")
         user_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}")
         user_embed.add_field(name="Capital", value=f"{capital}")
