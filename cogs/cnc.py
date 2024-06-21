@@ -389,11 +389,11 @@ class CNC(commands.Cog):
 
         # wait for a confirmation message
         def confirmation_check(reaction, user):
-            return user == ctx.message.author
+            return user == ctx.message.author and str(reaction.emoji)
 
         try:
-            user, reaction = await self.bot.wait_for('reaction_add', timeout=30, check=confirmation_check)
-            if str(reaction) != "\U00002705":
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=30, check=confirmation_check)
+            if str(reaction.emoji) != "\U00002705":
                 return await ctx.send("Must confirm deletion with: \U00002705")
         except asyncio.TimeoutError:
             return await delete_confirm.edit(content=f"Permanent deletion of {self.bot.get_user(user_id).name} "
