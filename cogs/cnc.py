@@ -432,6 +432,8 @@ class CNC(commands.Cog):
         troops = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE owner_id = $1;''', user_id)
         armies = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE owner_id = $1;''', user_id)
         generals = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_generals WHERE owner_id = $1;''', user_id)
+        total_manpower = await conn.fetchrow('''SELECT SUM(manpower) FROM cnc_provinces WHERE owner_id = $1;''',
+                                             user_id)
         # build embed, populate title with pretitle and nation name, set color to user color,
         # and set description to Discord user.
         user_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
@@ -444,18 +446,20 @@ class CNC(commands.Cog):
         user_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}", inline=False)
         # populate authority and gains
         user_embed.add_field(name="Political Authority (Change Last Turn)",
-                             value=f"{user_info['pol_auth']} ({plus_minus(user_info['last_pol_auth_gain'])}")
+                             value=f"{user_info['pol_auth']} ({plus_minus(user_info['last_pol_auth_gain'])})")
         user_embed.add_field(name="Military Authority (Change Last Turn)",
-                             value=f"{user_info['mil_auth']} ({plus_minus(user_info['last_mil_auth_gain'])}")
+                             value=f"{user_info['mil_auth']} ({plus_minus(user_info['last_mil_auth_gain'])})")
         user_embed.add_field(name="Economic Authority (Change Last Turn)",
-                             value=f"{user_info['econ_auth']} ({plus_minus(user_info['last_econ_auth_gain'])}")
+                             value=f"{user_info['econ_auth']} ({plus_minus(user_info['last_econ_auth_gain'])})")
         # populate troops and armies
-        user_embed.add_field(name="Troops", value=f"{troops['sum']}")
+        user_embed.add_field(name="Troops", value=f"{troops['sum']:,}")
         user_embed.add_field(name="Armies", value=f"{armies['count']}")
         user_embed.add_field(name="Generals", value=f"{generals['count']}")
         # populate manpower
-        user_embed.add_field(name="Manpower (Manpower Gain)", value=f"{user_info['manpower']} "
-                                                                    f"({user_info['manpower_regen']})", inline=False)
+        user_embed.add_field(name="Manpower (Manpower Regen)", value=f"{user_info['manpower']:,} "
+                                                                     f"({user_info['manpower_regen']}%)")
+        user_embed.add_field(name="Manpower Access", value=f"{user_info['manpower_access']}%")
+        user_embed.add_field(name="Total Manpower", value=f"{total_manpower['sum']:,}")
         # populate tax and spending stats
         user_embed.add_field(name="Taxation Level", value=f"{user_info['tax_level']}")
         user_embed.add_field(name="Public Spending Cost",
