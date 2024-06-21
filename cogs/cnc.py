@@ -9,6 +9,16 @@ import requests
 from discord.ui import View, Select
 
 
+def plus_minus(number: int) -> str:
+    """Adds a plus and minus to a number, turning it into a string."""
+    if not isinstance(number, int):
+        raise TypeError
+    if number >= 0:
+        return str(f"+{number}")
+    elif number < 0:
+        return str(f"-{number}")
+
+
 class MapButtons(View):
 
     def __init__(self, message: discord.InteractionMessage, author):
@@ -192,16 +202,45 @@ class CNC(commands.Cog):
         map.save(fr"{self.map_directory}wargame_provinces.png")
 
     async def user_db_info(self, user_id: int):
+        """Pulls user info from the database using Discord user ID."""
+        # establish connection
         conn = self.bot.pool
         # pull the user data
         user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', user_id)
         return user_info
 
     async def nation_db_info(self, nation_name: str):
+        """Pulls user info from the database using the nation name."""
+        # estbalish connection
         conn = self.bot.pool
-        # check if the user already exists
-        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE name = $1;''', nation_name)
+        # pull user information based on nation name
+        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE LOWER(name) = $1;''', nation_name.lower())
         return user_info
+
+    async def nation_provinces_db_info(self, user_id: int):
+        """Pulls info from the database about ALL of a user's provinces using Discord user ID.
+        Returns a sorted list of provinces and the count of provinces."""
+        # establish connection
+        conn = self.bot.pool
+        # pull territory information
+        provinces = await conn.fetch('''SELECT id FROM cnc_provinces WHERE owner_id = $1;''', user_id)
+        # for every entry, pull out the ID
+        provinces = [t['id'] for t in provinces]
+        # count the number of entries
+        province_count = len(provinces)
+        # sort the provinces
+        provinces.sort()
+        # divide the list and deliniate with commas
+        province_list = ', '.join(str(p) for p in provinces)
+        return province_list, province_count
+
+    async def province_db_info(self, province_id: int):
+        """Pulls info from the database about a particular province using province ID."""
+        # establish connection
+        conn = self.bot.pool
+        # pull province information
+        province = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+        return province
 
     # the CnC command group
     cnc = app_commands.Group(name="cnc", description="...")
@@ -314,16 +353,8 @@ class CNC(commands.Cog):
             return
         # define connection
         conn = self.bot.pool
-        # pull territory information
-        provinces = await conn.fetch('''SELECT id FROM cnc_provinces WHERE owner_id = $1;''', user_info['user_id'])
-        # for every entry, pull out the ID
-        provinces = [t['id'] for t in provinces]
-        # count the number of entries
-        province_count = len(provinces)
-        # sort the provinces
-        provinces.sort()
-        # divide the list and deliniate with commas
-        province_list = ', '.join(str(p) for p in provinces)
+        # pull province data
+        province_list, province_count = await self.nation_provinces_db_info(user_info['user_id'])
         # pull the name of the capital
         capital = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', user_info['capital'])
         if capital is None:
@@ -361,24 +392,94 @@ class CNC(commands.Cog):
                                    color=discord.Color(int(user_info["color"].lstrip('#'), 16), ),
                                    description=f"Registered nation of "
                                                f"{(self.bot.get_user(user_info['user_id'])).mention}.")
+        # populate government type and subtype
         user_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}")
+        # populate territory and count
         user_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}")
+        # populate capital
         user_embed.add_field(name="Capital", value=f"{capital}")
+        # populate all three types of authority
         user_embed.add_field(name="Political Authority", value=f"{user_info['pol_auth']}")
         user_embed.add_field(name="Military Authority", value=f"{user_info['mil_auth']}")
         user_embed.add_field(name="Economic Authority", value=f"{user_info['econ_auth']}")
+        # populate stability
         user_embed.add_field(name="Stability", value=f"{user_info['stability']}")
+        # populate all four types of relations
         user_embed.add_field(name="Allies", value=f"{allies}")
         user_embed.add_field(name="Wars", value=f"{wars}")
         user_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
         user_embed.add_field(name="Military Access", value=f"{military_access}")
+        # send the embed
         return await interaction.followup.send(embed=user_embed)
+
+    @cnc.command(name="dossier", description="Displays detailed information about your nation.")
+    @app_commands.describe(direct_message="Optional: select True to send a private DM.")
+    async def dossier(self, interaction: discord.Interaction, direct_message: bool = None):
+        # defer interaction
+        await interaction.response.defer(thinking=True, ephemeral=True)
+        # establish connection
+        conn = self.bot.pool
+        # fetch user information
+        user_id = interaction.user.id
+        user_info = await self.user_db_info(user_id)
+        # if the user does not exist
+        if user_info is None:
+            # return error message
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # pull province data
+        province_list, province_count = await self.nation_provinces_db_info(user_id)
+        # pull troop and army data
+        troops = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE owner_id = $1;''', user_id)
+        armies = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE owner_id = $1;''', user_id)
+        generals = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_generals WHERE owner_id = $1;''', user_id)
+        # build embed, populate title with pretitle and nation name, set color to user color,
+        # and set description to Discord user.
+        user_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
+                                   color=discord.Color(int(user_info["color"].lstrip('#'), 16), ),
+                                   description=f"Registered nation of "
+                                               f"{(self.bot.get_user(user_info['user_id'])).mention}.")
+        # populate government type and subtype
+        user_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}")
+        # populate territory and count on its own line
+        user_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}", inline=False)
+        # populate authority and gains
+        user_embed.add_field(name="Political Authority (Change Last Turn)",
+                             value=f"{user_info['pol_auth']} ({plus_minus(user_info['last_pol_auth_gain'])}")
+        user_embed.add_field(name="Military Authority (Change Last Turn)",
+                             value=f"{user_info['mil_auth']} ({plus_minus(user_info['last_mil_auth_gain'])}")
+        user_embed.add_field(name="Economic Authority (Change Last Turn)",
+                             value=f"{user_info['econ_auth']} ({plus_minus(user_info['last_econ_auth_gain'])}")
+        # populate troops and armies
+        user_embed.add_field(name="Troops", value=f"{troops['count']}")
+        user_embed.add_field(name="Armies", value=f"{armies['count']}")
+        user_embed.add_field(name="Generals", value=f"{generals['count']}")
+        # populate manpower
+        user_embed.add_field(name="Manpower (Manpower Gain)", value=f"{user_info['manpower']} "
+                                                                    f"({user_info['manpower_regen']})", inline=False)
+        # populate tax and spending stats
+        user_embed.add_field(name="Taxation Level", value=f"{user_info['tax_level']}")
+        user_embed.add_field(name="Public Spending Cost",
+                             value=f"{user_info['public_spend']} Economic Authority per turn")
+        user_embed.add_field(name="Military Upkeep Cost",
+                             value=f"{user_info['mil_upkeep']} Economic Authority per turn")
+        # populate unrest, stability, overextension
+        user_embed.add_field(name="National Unrest", value=f"{user_info['unrest']}")
+        user_embed.add_field(name="Stability", value=f"{user_info['stability']}")
+        user_embed.add_field(name="Overextension Limit", value=f"{user_info['overextend_limit']}")
+        # populate overlord, if applicable
+        if user_info['overlord']:
+            user_embed.add_field(name="Overlord", value=f"{user_info['overlord']}")
+        # send to direct message if required
+        if direct_message is True:
+            return await interaction.user.send(embed=user_embed)
+        else:
+            return await interaction.followup.send(embed=user_embed)
 
     @commands.command()
     @commands.is_owner()
     async def cnc_reset_map(self, ctx):
-        map = Image.open(fr"{self.map_directory}wargame_blank_save.png").convert("RGBA")
-        map.save(fr"{self.map_directory}wargame_provinces.png")
+        map_image = Image.open(fr"{self.map_directory}wargame_blank_save.png").convert("RGBA")
+        map_image.save(fr"{self.map_directory}wargame_provinces.png")
         await ctx.send("Map reset.")
 
     @commands.command()
