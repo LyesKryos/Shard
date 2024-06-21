@@ -17,7 +17,7 @@ class MapButtons(View):
         # define the original map message
         self.message = message
         self.author = author
-        self.map_directory = r"/root/Documents/Shard/CNC/Map Files/Maps/"
+        self.map_directory = r"/root/Shard/CNC/Map Files/Maps/"
 
     async def on_timeout(self) -> None:
         # for all buttons, disable
