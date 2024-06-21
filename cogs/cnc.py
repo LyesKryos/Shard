@@ -335,7 +335,7 @@ class CNC(commands.Cog):
         await interaction.followup.send(wars)
 
         def parse_relations(relations):
-            if relations is None:
+            if not relations:
                 output = "None"
                 return output
             else:
