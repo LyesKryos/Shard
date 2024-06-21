@@ -225,7 +225,7 @@ class CNC(commands.Cog):
         if check_call is not None:
             return await interaction.followup.send(
                 f"You are already a registered player of the Command and Conquest system. "
-                f"Your nation name is {check_call['name']}", ephemeral=True)
+                f"Your nation name is {check_call['name']}.", ephemeral=True)
         # otherwise, continue with player registration
         else:
             # check if the color is taken, banned, or even a color
