@@ -332,9 +332,10 @@ class CNC(commands.Cog):
                                        user_info['name'])
         military_access = await conn.fetch('''SELECT * FROM cnc_diplomacy 
         WHERE $1 = ANY(members) AND type = 'access';''', user_info['name'])
+        await interaction.followup.send(wars)
 
         def parse_relations(relations):
-            if relations[0] is None:
+            if relations is None:
                 output = "None"
                 return output
             else:
