@@ -326,14 +326,14 @@ class CNC(commands.Cog):
         else:
             capital = capital['name']
         # pull relations information
-        alliances = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE members = ANY($1) AND type = "alliance";''',
+        alliances = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE $1 = ANY(members) AND type = "alliance";''',
                                      [user_info['name']])
-        wars = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE members = ANY($1) AND type = "war";''',
+        wars = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE $1 = ANY(members) AND type = "war";''',
                                 [user_info['name']])
-        trade_pacts = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE members = ANY($1) AND type = "trade";''',
+        trade_pacts = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE $1 = ANY(members) AND type = "trade";''',
                                        [user_info['name']])
         military_access = await conn.fetch('''SELECT * FROM cnc_diplomacy 
-        WHERE members = ANY($1) AND type = "access";''', [user_info['name']])
+        WHERE $1 = ANY(members) AND type = "access";''', [user_info['name']])
         def parse_relations(relations):
             if relations is None:
                 output = "None"
