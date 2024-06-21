@@ -432,7 +432,7 @@ class CNC(commands.Cog):
         troops = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE owner_id = $1;''', user_id)
         armies = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE owner_id = $1;''', user_id)
         generals = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_generals WHERE owner_id = $1;''', user_id)
-        total_manpower = await conn.fetchrow('''SELECT SUM(manpower) FROM cnc_provinces WHERE owner_id = $1;''',
+        total_manpower = await conn.fetchrow('''SELECT SUM(citizens) FROM cnc_provinces WHERE owner_id = $1;''',
                                              user_id)
         # build embed, populate title with pretitle and nation name, set color to user color,
         # and set description to Discord user.
@@ -456,9 +456,10 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Armies", value=f"{armies['count']}")
         user_embed.add_field(name="Generals", value=f"{generals['count']}")
         # populate manpower
-        user_embed.add_field(name="Manpower (Manpower Regen)", value=f"{user_info['manpower']:,} "
-                                                                     f"({user_info['manpower_regen']}%)")
-        user_embed.add_field(name="Manpower Access", value=f"{user_info['manpower_access']}%")
+        user_embed.add_field(name="Manpower (Manpower Access)", value=f"{user_info['manpower']:,} "
+                                                                      f"({user_info['manpower_access']}%)")
+        user_embed.add_field(name="Manpower Regen", value=f"{total_manpower['sum'] * (user_info['manpower_regen']/100)}"
+                                                          f"({user_info['manpower_regen']}%)")
         user_embed.add_field(name="Total Manpower", value=f"{total_manpower['sum']:,}")
         # populate tax and spending stats
         user_embed.add_field(name="Taxation Level", value=f"{user_info['tax_level']}")
