@@ -203,7 +203,6 @@ class CNC(commands.Cog):
         user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE name = $1;''', nation_name)
         return user_info
 
-
     # the CnC command group
     cnc = app_commands.Group(name="cnc", description="...")
 
@@ -278,7 +277,6 @@ class CNC(commands.Cog):
                                             f"**\"I came, I saw, I conquered.\" -Julius Caesar**")
             return
 
-
     @cnc.command(name="map", description="Opens the map for viewing.")
     @app_commands.guild_only()
     async def map(self, interaction: discord.Interaction):
@@ -326,14 +324,15 @@ class CNC(commands.Cog):
         else:
             capital = capital['name']
         # pull relations information
-        alliances = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE $1 = ANY(members) AND type = "alliance";''',
+        alliances = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE $1 = ANY(members) AND type = 'alliance';''',
                                      [user_info['name']])
-        wars = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE $1 = ANY(members) AND type = "war";''',
+        wars = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE $1 = ANY(members) AND type = 'wars';''',
                                 [user_info['name']])
-        trade_pacts = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE $1 = ANY(members) AND type = "trade";''',
+        trade_pacts = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE $1 = ANY(members) AND type = 'trade';''',
                                        [user_info['name']])
         military_access = await conn.fetch('''SELECT * FROM cnc_diplomacy 
-        WHERE $1 = ANY(members) AND type = "access";''', [user_info['name']])
+        WHERE $1 = ANY(members) AND type = 'access';''', [user_info['name']])
+
         def parse_relations(relations):
             if relations is None:
                 output = "None"
@@ -344,6 +343,7 @@ class CNC(commands.Cog):
                     buffer_output = ", ".join([r for r in relation['members'] if r != user_info['name']])
                     output += buffer_output
                 return output
+
         allies = parse_relations(alliances)
         wars = parse_relations(wars)
         trade_pacts = parse_relations(trade_pacts)
@@ -351,7 +351,7 @@ class CNC(commands.Cog):
         # build embed, populate title with pretitle and nation name, set color to user color,
         # and set description to Discord user.
         user_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
-                                   color=discord.Color(int(user_info["color"].lstrip('#'), 16),),
+                                   color=discord.Color(int(user_info["color"].lstrip('#'), 16), ),
                                    description=f"Registered nation of "
                                                f"{(self.bot.get_user(user_info['user_id'])).mention}")
         user_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}")
@@ -366,12 +366,6 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
         user_embed.add_field(name="Military Access", value=f"{military_access}")
         return await interaction.followup.send(embed=user_embed)
-
-
-
-
-
-
 
     @commands.command()
     @commands.is_owner()
