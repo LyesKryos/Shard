@@ -113,7 +113,7 @@ class CNC(commands.Cog):
         self.province_directory = r"/root/Shard/CNC/Map Files/Province Layers/"
         self.interaction_directory = r"/root/Shard/CNC/Interaction Files/"
         self.bot = bot
-        self.banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2"]
+        self.banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2", "#999999"]
         self.version = "version 4.0 New Horizons"
         self.version_notes = ""
 
@@ -450,7 +450,7 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Economic Authority (Change Last Turn)",
                              value=f"{user_info['econ_auth']} ({plus_minus(user_info['last_econ_auth_gain'])}")
         # populate troops and armies
-        user_embed.add_field(name="Troops", value=f"{troops['count']}")
+        user_embed.add_field(name="Troops", value=f"{troops['sum']}")
         user_embed.add_field(name="Armies", value=f"{armies['count']}")
         user_embed.add_field(name="Generals", value=f"{generals['count']}")
         # populate manpower
