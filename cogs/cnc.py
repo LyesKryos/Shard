@@ -99,9 +99,9 @@ class MapButtons(View):
 class CNC(commands.Cog):
 
     def __init__(self, bot: Shard):
-        self.map_directory = r"/root/Documents/Shard/CNC/Map Files/Maps/"
-        self.province_directory = r"/root/Documents/Shard/CNC/Map Files/Province Layers/"
-        self.interaction_directory = r"/root/Documents/Shard/CNC/Interaction Files/"
+        self.map_directory = r"/root/Shard/CNC/Map Files/Maps/"
+        self.province_directory = r"/root/Shard/CNC/Map Files/Province Layers/"
+        self.interaction_directory = r"/root/Shard/CNC/Interaction Files/"
         self.bot = bot
         self.banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2"]
         self.version = "version 4.0 New Horizons"
