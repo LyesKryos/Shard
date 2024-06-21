@@ -403,9 +403,9 @@ class CNC(commands.Cog):
         if user is None:
             return await ctx.send("No such user in the CNC system.")
         await conn.execute('''DELETE FROM cnc_users WHERE user_id = $1;''', user_id)
-        await conn.execute('''DELETE FROM cnc_researching WHERE owner_id = $1;''', user_id)
-        await conn.execute('''UPDATE cnc_provinces SET owner_id = 0, owner = '', occupier_id = owner_id, 
-        occupier = owner WHERE owner_id = $1 AND occupier_id = $1;''', user_id)
+        await conn.execute('''DELETE FROM cnc_armies WHERE owner_id = $1;''', user_id)
+        await conn.execute('''UPDATE cnc_provinces SET owner_id = 0, occupier_id = owner_id 
+        WHERE owner_id = $1 AND occupier_id = $1;''', user_id)
         await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user_id)
         await delete_confirm.delete()
         return await ctx.send(f"Permanent deletion of {self.bot.get_user(user_id).name} "
