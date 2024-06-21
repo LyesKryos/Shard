@@ -276,6 +276,7 @@ class CNC(commands.Cog):
                                             f"document has all the information you need to get started, a new players' "
                                             f"guide, and an overview of all commands.\n\n"
                                             f"**\"I came, I saw, I conquered.\" -Julius Caesar**")
+            return
 
 
     @cnc.command(name="map", description="Opens the map for viewing.")
