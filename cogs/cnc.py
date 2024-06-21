@@ -289,7 +289,7 @@ class CNC(commands.Cog):
         map_buttons = MapButtons(map, author=interaction.user)
         await map.edit(view=map_buttons)
 
-    @cnc.command(name="nation", description="Displays information concerning a specified nation by name or user. \n"
+    @cnc.command(name="nation", description="Displays information concerning a specified nation by name or user. "
                                             "For your own nation, leave the nation option blank.")
     @app_commands.guild_only()
     async def nation(self, interaction: discord.Interaction, nation: str = None, user: discord.Member = None):
