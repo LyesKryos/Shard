@@ -393,7 +393,7 @@ class CNC(commands.Cog):
 
         try:
             user, reaction = await self.bot.wait_for('reaction_add', timeout=30, check=confirmation_check)
-            if reaction != "\U00002705":
+            if str(reaction) != "\U00002705":
                 return await ctx.send("Must confirm deletion with: \U00002705")
         except asyncio.TimeoutError:
             return await delete_confirm.edit(content=f"Permanent deletion of {self.bot.get_user(user_id).name} "
