@@ -290,10 +290,13 @@ class CNC(commands.Cog):
     @cnc.command(name="nation", description="Displays nation information for specified nation or player.")
     @app_commands.guild_only()
     @app_commands.describe(nation="The name of the nation you wish to query.", user="The user you wish to query.")
-    async def nation(self, interaction: discord.Interaction, nation: str = None, user: discord.Member = None):
-        # if neither argument is submitted, return message
+    async def nation(self, interaction: discord.Interaction, user: discord.Member = None, nation: str = None):
+        # if neither argument is submitted, return error message
         if (nation is None) and (user is None):
             return await interaction.response.send_message("This command requires at least one input.", ephemeral=True)
+        # if both are submitted, return error message
+        if (nation is not None) and (user is not None):
+            return await interaction.response.send_message("This command can take only one argument.", ephemeral=True)
         # defer the interaction
         await interaction.response.defer(thinking=True)
         # if the nation is called
