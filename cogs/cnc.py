@@ -255,8 +255,8 @@ class CNC(commands.Cog):
             925, 771, 772,770, 769, 768, 909, 761, 762, 763, 764, 765, 766, 767, 1207,
             1208, 1209, 1210, 1211, 1212, 1213, 1214, 744) ORDER BY random();''')
             # update the provinces database to set the player as the new owner and occupier
-            await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, owner = $2, occupier_id = $1, occupier = $2 
-            WHERE id = $3;''', user.id, nation_name.title(), starting_province['id'])
+            await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1 WHERE id = $2;''',
+                               user.id, starting_province['id'])
             # color the map using the province coordinates and the ID
             await self.map_color(starting_province['id'], color)
             # create an army of 3,000 troops in the starting province
