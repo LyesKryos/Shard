@@ -7,6 +7,7 @@ from PIL import Image, ImageColor, ImageDraw
 from base64 import b64encode
 import requests
 from discord.ui import View, Select
+import math
 
 
 def plus_minus(number: int) -> str:
@@ -456,13 +457,14 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Armies", value=f"{armies['count']}")
         user_embed.add_field(name="Generals", value=f"{generals['count']}")
         # populate manpower
-        user_embed.add_field(name="Manpower (Manpower Access)", value=f"{user_info['manpower']:,} "
+        user_embed.add_field(name="Manpower \n(Manpower Access)", value=f"{user_info['manpower']:,} "
                                                                       f"({user_info['manpower_access']}%)")
-        user_embed.add_field(name="Manpower Regen", value=f"{total_manpower['sum'] * (user_info['manpower_regen']/100)}"
+        user_embed.add_field(name="Manpower Regen", value=f"{math.floor(total_manpower['sum'] * 
+                                                                        (user_info['manpower_regen']/100))} "
                                                           f"({user_info['manpower_regen']}%)")
         user_embed.add_field(name="Total Manpower", value=f"{total_manpower['sum']:,}")
         # populate tax and spending stats
-        user_embed.add_field(name="Taxation Level", value=f"{user_info['tax_level']}")
+        user_embed.add_field(name="Taxation Level", value=f"{user_info['tax_level']}%")
         user_embed.add_field(name="Public Spending Cost",
                              value=f"{user_info['public_spend']} Economic Authority per turn")
         user_embed.add_field(name="Military Upkeep Cost",
