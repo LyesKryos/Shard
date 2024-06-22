@@ -478,6 +478,7 @@ class CNC(commands.Cog):
             user_embed.add_field(name="Overlord", value=f"{user_info['overlord']}")
         # send to direct message if required
         if direct_message is True:
+            await interaction.followup.send("Sent you a DM!")
             return await interaction.user.send(embed=user_embed)
         else:
             return await interaction.followup.send(embed=user_embed)
