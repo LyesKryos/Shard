@@ -514,7 +514,7 @@ class CNC(commands.Cog):
             return terrain_name['name']
         # defining the count and clear parameters
         count = 0
-        if count > 23:
+        if count >= 24:
             await interaction.followup.send(embed=sv_embed)
             sv_embed.clear_fields()
             count = 0
@@ -525,9 +525,12 @@ class CNC(commands.Cog):
                                      f"Trade Good: {p['trade_good']}\n"
                                      f"Production: {p['citizens'] / 1000:,.3}\n"
                                      f"Structures: {p['structures']}\n"
-                                     f"Fort Leve: {p['fort_level']}")
+                                     f"Fort Level: {p['fort_level']}")
             count += 1
-        return interaction.followup.send(embed=sv_embed)
+        if count != 0:
+            return interaction.followup.send(embed=sv_embed)
+        else:
+            return
 
 
 
