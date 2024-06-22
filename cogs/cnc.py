@@ -218,7 +218,7 @@ class CNC(commands.Cog):
         user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE LOWER(name) = $1;''', nation_name.lower())
         return user_info
 
-    async def nation_provinces_db_info(self, user_id: int):
+    async def nation_provinces_db_sort(self, user_id: int):
         """Pulls info from the database about ALL of a user's provinces using Discord user ID.
         Returns a sorted list of provinces and the count of provinces."""
         # establish connection
@@ -234,6 +234,14 @@ class CNC(commands.Cog):
         # divide the list and deliniate with commas
         province_list = ', '.join(str(p) for p in provinces)
         return province_list, province_count
+
+    async def nation_provinces_db_info(self, user_id: int):
+        """Returns a database call of all provinces owned by the user indicated."""
+        # establish connection
+        conn = self.bot.pool
+        # pull all the provinces info
+        provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id = $1;''', user_id)
+        return provinces
 
     async def province_db_info(self, province_id: int):
         """Pulls info from the database about a particular province using province ID."""
@@ -355,7 +363,7 @@ class CNC(commands.Cog):
         # define connection
         conn = self.bot.pool
         # pull province data
-        province_list, province_count = await self.nation_provinces_db_info(user_info['user_id'])
+        province_list, province_count = await self.nation_provinces_db_sort(user_info['user_id'])
         # pull the name of the capital
         capital = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', user_info['capital'])
         if capital is None:
@@ -482,6 +490,48 @@ class CNC(commands.Cog):
             return await interaction.user.send(embed=user_embed)
         else:
             return await interaction.followup.send(embed=user_embed)
+
+    @cnc.command(name="strategic_view", description="Displays information about every province owned.")
+    async def strategic_view(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # pull user information
+        user_id = interaction.user.id
+        user_info = await self.user_db_info(user_id)
+        # check if the user exists
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # pull province information
+        provinces = await self.nation_provinces_db_info(user_id)
+        # creating the embed that the provinces will go into
+        sv_embed = discord.Embed(title=f"Strategic View for {user_info['name']}",
+                                     color=discord.Color(int(user_info["color"].lstrip('#'), 16)))
+        # pull terrain types
+        async def terrain_name(terrain_id: int) -> str:
+            # define connection
+            conn = self.bot.pool
+            terrain_name = await conn.fetchrow('''SELECT name FROM cnc_terrains WHERE id = $1;''', terrain_id)
+            return terrain_name['name']
+        # defining the count and clear parameters
+        count = 0
+        if count > 23:
+            await interaction.followup.send(embed=sv_embed)
+            sv_embed.clear_fields()
+            count = 0
+        for p in provinces:
+            sv_embed.add_field(name=f"{p['name']} ({p['id']})",
+                               value=f"Terrain: {terrain_name(p['terrain'])}\n"
+                                     f"Citizens: {p['citizens']:,}\n"
+                                     f"Trade Good: {p['trade_good']}\n"
+                                     f"Production: {p['citizens'] / 1000:,.3}\n"
+                                     f"Structures: {p['structures']}\n"
+                                     f"Fort Leve: {p['fort_level']}")
+            count += 1
+        return interaction.followup.send(embed=sv_embed)
+
+
+
+
 
     @commands.command()
     @commands.is_owner()
