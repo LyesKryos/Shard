@@ -202,6 +202,41 @@ class CNC(commands.Cog):
         map.paste(prov, box=cord, mask=prov)
         map.save(fr"{self.map_directory}wargame_provinces.png")
 
+    async def locate_color(self, province: int, prov_cords):
+        # define loop
+        loop = self.bot.loop
+        # fetch map and province
+        map_image = Image.open(fr"{self.map_directory}wargame_blank_save.png").convert("RGBA")
+        prov = Image.open(fr"{self.province_directory}{province}.png").convert("RGBA")
+        # get color
+        color = ImageColor.getrgb("#FF00DC")
+        # obtain size and coordinate information
+        width = prov.size[0]
+        height = prov.size[1]
+        cord = (prov_cords[0], prov_cords[1])
+        # for every pixel, change the color to the owners
+        for x in range(0, width):
+            for y in range(0, height):
+                data = prov.getpixel((x, y))
+                if data != color:
+                    if data != (0, 0, 0, 0):
+                        if data != (255, 255, 255, 0):
+                            prov.putpixel((x, y), color)
+        # convert, paste, and save the image
+        prov = prov.convert("RGBA")
+        map_image.paste(prov, box=cord, mask=prov)
+        map_image.save(fr"{self.map_directory}highlight_map.png")
+
+        with open(fr"{self.map_directory}highlight_map.png", "rb") as preimg:
+            img = b64encode(preimg.read())
+        params = {"key": "a64d9505a13854ff660980db67ee3596",
+                  "image": img}
+        await asyncio.sleep(1)
+        upload = await loop.run_in_executor(None, requests.post, "https://api.imgbb.com/1/upload",
+                                            params)
+        response = upload.json()
+        return response['data']['url']
+
     async def user_db_info(self, user_id: int):
         """Pulls user info from the database using Discord user ID."""
         # establish connection
@@ -334,6 +369,22 @@ class CNC(commands.Cog):
         map = await interaction.followup.send("https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
         map_buttons = MapButtons(map, author=interaction.user)
         await map.edit(view=map_buttons)
+
+    @cnc.command(name="locate_province", description="Highlights a province on the map.")
+    @app_commands.describe(province="The ID of the province to locate.")
+    @app_commands.guild_only()
+    async def locate_province(self, interaction: discord.Interaction, province: int):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # gather province info
+        prov_info = await self.province_db_info(province)
+        # if the province doesn't exist
+        if prov_info is None:
+            # return error message
+            return await interaction.followup.send("No such province.")
+        cords = prov_info['cord']
+        url = await self.locate_color(province, cords)
+        return await interaction.followup.send(url)
 
     @cnc.command(name="nation", description="Displays nation information for specified nation or player.")
     @app_commands.guild_only()
@@ -492,9 +543,10 @@ class CNC(commands.Cog):
             return await interaction.followup.send(embed=user_embed)
 
     @cnc.command(name="strategic_view", description="Displays information about every province owned.")
-    async def strategic_view(self, interaction: discord.Interaction):
+    @app_commands.describe(direct_message="Optional: select True to send a private DM.")
+    async def strategic_view(self, interaction: discord.Interaction, direct_message: bool = None):
         # defer interaction
-        await interaction.response.defer(thinking=True)
+        await interaction.response.defer(thinking=True, ephemeral=True)
         # pull user information
         user_id = interaction.user.id
         user_info = await self.user_db_info(user_id)
@@ -507,15 +559,23 @@ class CNC(commands.Cog):
         sv_embed = discord.Embed(title=f"Strategic View for {user_info['name']}",
                                      color=discord.Color(int(user_info["color"].lstrip('#'), 16)))
         # pull terrain types
+
         async def terrain_name(terrain_id: int) -> str:
             # define connection
             conn = self.bot.pool
             terrain_name = await conn.fetchrow('''SELECT name FROM cnc_terrains WHERE id = $1;''', terrain_id)
             return terrain_name['name']
+
+        # defining DM/ephemeral message
+        if direct_message is True:
+            message_source = interaction.user
+        else:
+            message_source = interaction.followup
+
         # defining the count and clear parameters
         count = 0
         if count >= 24:
-            await interaction.followup.send(embed=sv_embed)
+            await message_source.send(embed=sv_embed)
             sv_embed.clear_fields()
             count = 0
         for p in provinces:
@@ -528,7 +588,7 @@ class CNC(commands.Cog):
                                      f"Fort Level: {p['fort_level']}")
             count += 1
         if count != 0:
-            return interaction.followup.send(embed=sv_embed)
+            return message_source.send(embed=sv_embed)
         else:
             return
 
