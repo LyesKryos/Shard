@@ -278,13 +278,24 @@ class CNC(commands.Cog):
         provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id = $1;''', user_id)
         return provinces
 
-    async def province_db_info(self, province_id: int):
+    async def province_db_info(self, province_id: int = None, province_name: str = None):
         """Pulls info from the database about a particular province using province ID."""
         # establish connection
         conn = self.bot.pool
         # pull province information
-        province = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+        if province_id is not None:
+            province = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+        elif province_name is not None:
+            province = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE name = $1;''', province_name)
+        else:
+            raise TypeError
         return province
+
+    async def terrain_name(self, terrain_id: int) -> str:
+        # define connection
+        conn = self.bot.pool
+        terrain_name = await conn.fetchrow('''SELECT name FROM cnc_terrains WHERE id = $1;''', terrain_id)
+        return terrain_name['name']
 
     # the CnC command group
     cnc = app_commands.Group(name="cnc", description="...")
@@ -557,21 +568,12 @@ class CNC(commands.Cog):
         provinces = await self.nation_provinces_db_info(user_id)
         # creating the embed that the provinces will go into
         sv_embed = discord.Embed(title=f"Strategic View for {user_info['name']}",
-                                     color=discord.Color(int(user_info["color"].lstrip('#'), 16)))
-        # pull terrain types
-
-        async def terrain_name(terrain_id: int) -> str:
-            # define connection
-            conn = self.bot.pool
-            terrain_name = await conn.fetchrow('''SELECT name FROM cnc_terrains WHERE id = $1;''', terrain_id)
-            return terrain_name['name']
-
+                                 color=discord.Color(int(user_info["color"].lstrip('#'), 16)))
         # defining DM/ephemeral message
         if direct_message is True:
             message_source = interaction.user
         else:
             message_source = interaction.followup
-
         # defining the count and clear parameters
         count = 0
         if count >= 24:
@@ -580,7 +582,7 @@ class CNC(commands.Cog):
             count = 0
         for p in provinces:
             sv_embed.add_field(name=f"{p['name']} ({p['id']})",
-                               value=f"Terrain: {terrain_name(p['terrain'])}\n"
+                               value=f"Terrain: {self.terrain_name(p['terrain'])}\n"
                                      f"Citizens: {p['citizens']:,}\n"
                                      f"Trade Good: {p['trade_good']}\n"
                                      f"Production: {p['citizens'] / 1000:,.3}\n"
@@ -588,13 +590,57 @@ class CNC(commands.Cog):
                                      f"Fort Level: {p['fort_level']}")
             count += 1
         if count != 0:
-            return message_source.send(embed=sv_embed)
+            return await message_source.send(embed=sv_embed)
         else:
             return
 
-
-
-
+    @cnc.command(name="province", description="Displays basic information about a province.")
+    @app_commands.describe(province_id="The ID of the province.", name="The name of the province.")
+    async def province(self, interaction: discord.Interaction, province_id: int = None, province_name: str = None):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # gather province information
+        if (province_id is None) and (province_name is None):
+            return await interaction.followup.send("This command requires at least one argument.")
+        elif province_id is not None:
+            prov_info = await self.province_db_info(province_id=province_id)
+        elif province_name is not None:
+            prov_info = await self.province_db_info(province_name=province_name)
+        else:
+            raise TypeError
+        # if the province doesn't exist
+        if prov_info is None:
+            return await interaction.followup.send("That province does not appear to exist.")
+        # owner and occupier info
+        if prov_info['owner'] != 0:
+            owner = await self.user_db_info(prov_info['owner_id'])
+            owner = owner['name']
+        else:
+            owner = "Natives"
+        if prov_info['occupier'] != 0:
+            occupier = await self.user_db_info(prov_info['occupier_id'])
+            occupier = occupier['name']
+        else:
+            occupier = "Natives"
+        # troops and armies
+        troop_count = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE location = $1;''',
+                                          prov_info['id'])
+        army_count = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE location = $1''', prov_info['id'])
+        # build embed for province and populate name and ID
+        prov_embed = discord.Embed(title=f"Province of {prov_info['name']}", description=f"Province #{prov_info['id']}",
+                                   color=discord.Color.red())
+        # populate bordering
+        prov_embed.add_field(name="Bordering Provinces", value=", ".join([p for p in prov_info['bordering']]),
+                             inline=False)
+        prov_embed.add_field(name="Owner", value=owner)
+        prov_embed.add_field(name="Occupier", value=occupier)
+        prov_embed.add_field(name="Troops and Armies", value=f"{troop_count['sum']:,} troops "
+                                                             f"in {army_count['count']} armies.")
+        prov_embed.add_field(name="Terrain", value=f"{self.terrain_name(prov_info['terrain'])}")
+        prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
+        prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
 
     @commands.command()
     @commands.is_owner()
