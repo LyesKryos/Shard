@@ -614,12 +614,12 @@ class CNC(commands.Cog):
         if prov_info is None:
             return await interaction.followup.send("That province does not appear to exist.")
         # owner and occupier info
-        if prov_info['owner'] != 0:
+        if prov_info['owner_id'] != 0:
             owner = await self.user_db_info(prov_info['owner_id'])
             owner = owner['name']
         else:
             owner = "Natives"
-        if prov_info['occupier'] != 0:
+        if prov_info['occupier_id'] != 0:
             occupier = await self.user_db_info(prov_info['occupier_id'])
             occupier = occupier['name']
         else:
