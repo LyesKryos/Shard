@@ -30,7 +30,8 @@ class ShardErrorHandler(commands.Cog):
         elif isinstance(error, commands.ExtensionAlreadyLoaded):
             await ctx.send("Fool, you already loaded it!")
         elif isinstance(error, commands.ExtensionError):
-            await ctx.send(f"Extension error: ``{error}``.")
+            await ctx.send(f"Extension error. Check logs.")
+            self.bot.logger.exception(msg=error)
         # if the command used does not exist
         elif isinstance(error, commands.CommandNotFound):
             await ctx.send(f"Command `{self.bot.prefix}{ctx.invoked_with}` not found.")
