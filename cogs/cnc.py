@@ -650,6 +650,11 @@ class CNC(commands.Cog):
         prov_embed.add_field(name="Armies Present", value=f"{','.join([a['name'] for a in army_count])}")
         return await interaction.followup.send(embed=prov_embed)
 
+    @cnc.command(name="tech", description="Displays information about a specified technology.")
+    @app_commands.guild_only()
+    async def tech(self, interaction: discord.Interaction, tech: str):
+        pass
+
 
     @commands.command()
     @commands.is_owner()
