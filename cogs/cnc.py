@@ -595,7 +595,7 @@ class CNC(commands.Cog):
             return
 
     @cnc.command(name="province", description="Displays basic information about a province.")
-    @app_commands.describe(province_id="The ID of the province.", name="The name of the province.")
+    @app_commands.describe(province_id="The ID of the province.", province_name="The name of the province.")
     async def province(self, interaction: discord.Interaction, province_id: int = None, province_name: str = None):
         # defer interaction
         await interaction.response.defer(thinking=True)
