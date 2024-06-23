@@ -295,7 +295,7 @@ class CNC(commands.Cog):
         # define connection
         conn = self.bot.pool
         terrain_name = await conn.fetchrow('''SELECT name FROM cnc_terrains WHERE id = $1;''', terrain_id)
-        return terrain_name['name']
+        return str(terrain_name['name'])
 
     # the CnC command group
     cnc = app_commands.Group(name="cnc", description="...")
@@ -638,7 +638,7 @@ class CNC(commands.Cog):
         prov_embed.add_field(name="Occupier", value=occupier)
         prov_embed.add_field(name="Troops and Armies", value=f"{troop_count['sum']:,} troops "
                                                              f"in {army_count['count']} armies.")
-        prov_embed.add_field(name="Terrain", value=f"{self.terrain_name(prov_info['terrain'])}")
+        prov_embed.add_field(name="Terrain", value=f"{await self.terrain_name(prov_info['terrain'])}")
         prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
         prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
 
