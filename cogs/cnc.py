@@ -585,7 +585,7 @@ class CNC(commands.Cog):
                                value=f"Terrain: {await self.terrain_name(p['terrain'])}\n"
                                      f"Citizens: {p['citizens']:,}\n"
                                      f"Trade Good: {p['trade_good']}\n"
-                                     f"Production: {p['citizens'] / 1000:,.3}\n"
+                                     f"Production: {p['production']:,.3}\n"
                                      f"Structures: {p['structures']}\n"
                                      f"Fort Level: {p['fort_level']}")
             count += 1
@@ -624,23 +624,32 @@ class CNC(commands.Cog):
             occupier = occupier['name']
         else:
             occupier = "Natives"
+        if prov_info['river'] is True:
+            river = ", River"
+        else:
+            river = ""
         # troops and armies
         troop_count = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE location = $1;''',
                                           prov_info['id'])
-        army_count = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE location = $1''', prov_info['id'])
+        army_count = await conn.fetch('''SELECT * FROM cnc_armies WHERE location = $1''', prov_info['id'])
         # build embed for province and populate name and ID
         prov_embed = discord.Embed(title=f"Province of {prov_info['name']}", description=f"Province #{prov_info['id']}",
                                    color=discord.Color.red())
         # populate bordering
         prov_embed.add_field(name="Bordering Provinces", value=", ".join([p for p in prov_info['bordering']]),
                              inline=False)
-        prov_embed.add_field(name="Owner", value=owner)
+        prov_embed.add_field(name="Core Owner", value=owner)
         prov_embed.add_field(name="Occupier", value=occupier)
         prov_embed.add_field(name="Troops and Armies", value=f"{troop_count['sum']:,} troops "
                                                              f"in {army_count['count']} armies.")
-        prov_embed.add_field(name="Terrain", value=f"{await self.terrain_name(prov_info['terrain'])}")
+        prov_embed.add_field(name="Terrain", value=f"{await self.terrain_name(prov_info['terrain'])}"+river)
         prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
         prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
+        prov_embed.add_field(name="Production", value=f"{prov_info['production']:,.3}")
+        prov_embed.add_field(name="Troops Present", value=f"{troop_count['sum']:,}")
+        prov_embed.add_field(name="Armies Present", value=f"{','.join([a['name'] for a in army_count])}")
+        return await interaction.followup.send(embed=prov_embed)
+
 
     @commands.command()
     @commands.is_owner()
