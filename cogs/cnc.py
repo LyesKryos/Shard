@@ -582,7 +582,7 @@ class CNC(commands.Cog):
             count = 0
         for p in provinces:
             sv_embed.add_field(name=f"{p['name']} ({p['id']})",
-                               value=f"Terrain: {self.terrain_name(p['terrain'])}\n"
+                               value=f"Terrain: {await self.terrain_name(p['terrain'])}\n"
                                      f"Citizens: {p['citizens']:,}\n"
                                      f"Trade Good: {p['trade_good']}\n"
                                      f"Production: {p['citizens'] / 1000:,.3}\n"
