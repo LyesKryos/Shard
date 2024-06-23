@@ -632,13 +632,12 @@ class CNC(commands.Cog):
         troop_count = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE location = $1;''',
                                           prov_info['id'])
         army_count = await conn.fetch('''SELECT * FROM cnc_armies WHERE location = $1''', prov_info['id'])
-        await interaction.followup.send(prov_info['bordering'])
         # build embed for province and populate name and ID
         prov_embed = discord.Embed(title=f"Province of {prov_info['name']}", description=f"Province #{prov_info['id']}",
                                    color=discord.Color.red())
         # populate bordering
         prov_embed.add_field(name="Bordering Provinces",
-                             value=f"{', '.join([str(p) for p in prov_info['bordering'].sort()])}",
+                             value=f"{', '.join(prov_info['bordering'])}",
                              inline=False)
         prov_embed.add_field(name="Core Owner", value=owner)
         prov_embed.add_field(name="Occupier", value=occupier)
