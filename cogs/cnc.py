@@ -636,7 +636,7 @@ class CNC(commands.Cog):
         prov_embed = discord.Embed(title=f"Province of {prov_info['name']}", description=f"Province #{prov_info['id']}",
                                    color=discord.Color.red())
         # populate bordering
-        prov_embed.add_field(name="Bordering Provinces", value=", ".join([p for p in prov_info['bordering']]),
+        prov_embed.add_field(name="Bordering Provinces", value=f"{", ".join([p for p in prov_info['bordering']]}""),
                              inline=False)
         prov_embed.add_field(name="Core Owner", value=owner)
         prov_embed.add_field(name="Occupier", value=occupier)
