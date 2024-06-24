@@ -631,7 +631,17 @@ class CNC(commands.Cog):
         # troops and armies
         troop_count = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE location = $1;''',
                                           prov_info['id'])
-        army_count = await conn.fetch('''SELECT * FROM cnc_armies WHERE location = $1''', prov_info['id'])
+        # parse out troop count
+        if troop_count is None:
+            troop_count = 0
+        else:
+            troop_count = troop_count['sum']
+        army_list = await conn.fetch('''SELECT * FROM cnc_armies WHERE location = $1''', prov_info['id'])
+        # parse out army list
+        if army_list is None:
+            army_list = "None"
+        else:
+            army_list = ", ".join(a['name'] for a in army_list)
         # build embed for province and populate name and ID
         prov_embed = discord.Embed(title=f"Province of {prov_info['name']}", description=f"Province #{prov_info['id']}",
                                    color=discord.Color.red())
@@ -641,14 +651,12 @@ class CNC(commands.Cog):
                              inline=False)
         prov_embed.add_field(name="Core Owner", value=owner)
         prov_embed.add_field(name="Occupier", value=occupier)
-        prov_embed.add_field(name="Troops and Armies", value=f"{troop_count['sum']:,} troops "
-                                                             f"in {army_count['count']} armies.")
+        prov_embed.add_field(name="Troops and Armies", value=f"{troop_count:,} troops "
+                                                             f"in {army_list} armies.")
         prov_embed.add_field(name="Terrain", value=f"{await self.terrain_name(prov_info['terrain'])}"+river)
         prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
         prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
         prov_embed.add_field(name="Production", value=f"{prov_info['production']:,.3}")
-        prov_embed.add_field(name="Troops Present", value=f"{troop_count['sum']:,}")
-        prov_embed.add_field(name="Armies Present", value=f"{(', '.join([a['name'] for a in army_count]))}")
         return await interaction.followup.send(embed=prov_embed)
 
     @cnc.command(name="tech", description="Displays information about a specified technology.")
