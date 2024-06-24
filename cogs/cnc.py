@@ -632,13 +632,13 @@ class CNC(commands.Cog):
         troop_count = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE location = $1;''',
                                           prov_info['id'])
         # parse out troop count
-        if troop_count is None:
+        if troop_count['sum'] is None:
             troop_count = 0
         else:
             troop_count = f"{troop_count['sum']:,}"
         army_list = await conn.fetch('''SELECT * FROM cnc_armies WHERE location = $1''', prov_info['id'])
         # parse out army list
-        if army_list is None:
+        if army_list['count'] is None:
             army_list = "None"
         else:
             army_list = ", ".join(a['name'] for a in army_list)
