@@ -637,7 +637,7 @@ class CNC(commands.Cog):
                                    color=discord.Color.red())
         # populate bordering
         prov_embed.add_field(name="Bordering Provinces",
-                             value=f"{', '.join(prov_info['bordering'])}",
+                             value=f"{prov_info['bordering']}",
                              inline=False)
         prov_embed.add_field(name="Core Owner", value=owner)
         prov_embed.add_field(name="Occupier", value=occupier)
@@ -648,7 +648,7 @@ class CNC(commands.Cog):
         prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
         prov_embed.add_field(name="Production", value=f"{prov_info['production']:,.3}")
         prov_embed.add_field(name="Troops Present", value=f"{troop_count['sum']:,}")
-        prov_embed.add_field(name="Armies Present", value=f"{(','.join([a['name'] for a in army_count]))}")
+        prov_embed.add_field(name="Armies Present", value=f"{(', '.join([a['name'] for a in army_count]))}")
         return await interaction.followup.send(embed=prov_embed)
 
     @cnc.command(name="tech", description="Displays information about a specified technology.")
