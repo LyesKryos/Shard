@@ -635,7 +635,7 @@ class CNC(commands.Cog):
         if troop_count is None:
             troop_count = 0
         else:
-            troop_count = troop_count['sum']
+            troop_count = f"{troop_count['sum']:,}"
         army_list = await conn.fetch('''SELECT * FROM cnc_armies WHERE location = $1''', prov_info['id'])
         # parse out army list
         if army_list is None:
@@ -651,7 +651,7 @@ class CNC(commands.Cog):
                              inline=False)
         prov_embed.add_field(name="Core Owner", value=owner)
         prov_embed.add_field(name="Occupier", value=occupier)
-        prov_embed.add_field(name="Troops and Armies", value=f"{troop_count:,} troops "
+        prov_embed.add_field(name="Troops and Armies", value=f"{troop_count} troops "
                                                              f"in {army_list} armies.")
         prov_embed.add_field(name="Terrain", value=f"{await self.terrain_name(prov_info['terrain'])}"+river)
         prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
