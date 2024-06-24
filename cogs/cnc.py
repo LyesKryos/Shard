@@ -647,7 +647,7 @@ class CNC(commands.Cog):
                                    color=discord.Color.red())
         # populate bordering
         prov_embed.add_field(name="Bordering Provinces",
-                             value=f"{prov_info['bordering']}",
+                             value=f"{', '.join([str(b) for b in prov_info['bordering']])}",
                              inline=False)
         prov_embed.add_field(name="Core Owner", value=owner)
         prov_embed.add_field(name="Occupier", value=occupier)
