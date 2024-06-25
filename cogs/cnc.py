@@ -664,6 +664,22 @@ class CNC(commands.Cog):
     async def tech(self, interaction: discord.Interaction, tech: str):
         # defer interaction
         await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull the tech data
+        tech = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE lower(name) = $1;''', tech.lower())
+        # if the tech doesn't exist
+        if tech is None:
+            # return the error message
+            return await interaction.followup.send("No such technology found.")
+        # create tech embed
+        tech_embed = discord.Embed(title=f"{tech['name']}", description=f"{tech['description']}")
+        tech_embed.set_thumbnail(url=f"{tech['image']}")
+        tech_embed.add_field(name="Effect", value=f"{tech['effect']}")
+        tech_embed.add_field(name="Prerequisites", value=f"{', '.join([str(p) for p in tech['prereqs']])}")
+        tech_embed.add_field(name="Exclusive with", value=f"{tech['exclusive']}")
+        return await interaction.followup.send(embed=tech_embed)
+
 
 
 
