@@ -498,7 +498,10 @@ class CNC(commands.Cog):
             # return error message
             return await interaction.followup.send("You are not a registered member of the CNC system.")
         # pull province data
-        province_list, province_count = await self.nation_provinces_db_info(user_id)
+        province_list = await self.nation_provinces_db_info(user_id)
+        province_list = [p['id'] for p in province_list]
+        povince_count = len(province_list)
+        province_list = ", ".join(str(p) for p in province_list.sort())
         # pull troop and army data
         troops = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE owner_id = $1;''', user_id)
         armies = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE owner_id = $1;''', user_id)
