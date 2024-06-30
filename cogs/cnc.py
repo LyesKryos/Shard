@@ -501,7 +501,7 @@ class CNC(commands.Cog):
         province_list = await self.nation_provinces_db_info(user_id)
         province_list = [p['id'] for p in province_list]
         povince_count = len(province_list)
-        province_list = ", ".join(str(p) for p in province_list.sort())
+        province_list = ", ".join(str(p) for p in province_list)
         # pull troop and army data
         troops = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE owner_id = $1;''', user_id)
         armies = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE owner_id = $1;''', user_id)

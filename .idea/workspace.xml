@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Troubleshooting province command" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting dossier command" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -334,6 +334,7 @@
       <workItem from="1717363787823" duration="5024000" />
       <workItem from="1718759784455" duration="34127000" />
       <workItem from="1719422401598" duration="811000" />
+      <workItem from="1719711222353" duration="429000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -678,7 +679,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="893" />
+    <option name="localTasksCounter" value="895" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -696,8 +697,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updating verbiage" />
-    <MESSAGE value="Fixing delete command" />
     <MESSAGE value="Updating CNC map directory" />
     <MESSAGE value="Fixing nation page description" />
     <MESSAGE value="Fixing nation command description" />
@@ -721,7 +720,9 @@
     <MESSAGE value="Adding tech command" />
     <MESSAGE value="Fixing province command" />
     <MESSAGE value="Troubleshooting province command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Troubleshooting province command" />
+    <MESSAGE value="Updated the info command with new hosting software" />
+    <MESSAGE value="Correcting dossier command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcting dossier command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
