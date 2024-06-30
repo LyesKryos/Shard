@@ -139,6 +139,9 @@
       <module name="Shard" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/cogs" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -330,6 +333,7 @@
       <workItem from="1717260898064" duration="816000" />
       <workItem from="1717363787823" duration="5024000" />
       <workItem from="1718759784455" duration="34127000" />
+      <workItem from="1719422401598" duration="811000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
