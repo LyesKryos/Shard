@@ -657,6 +657,8 @@ class Verification(commands.Cog):
         wa_role = thegye_server.get_role(674283915870994442)
         nationstates_role = thegye_server.get_role(1150861314424573992)
         if nationstates_role not in interaction.user.roles:
+            await member.add_roles(traveler_role)
+            await member.remove_roles(unverified_role)
             return await interaction.followup.send("You do not have any nation associated with the bot.")
         else:
             member = interaction.user
