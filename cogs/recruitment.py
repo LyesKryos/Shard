@@ -20,11 +20,14 @@ import os
 
 from ratelimiter import Ratelimiter
 
+
 class RecruitmentButton(discord.ui.View):
     def __init__(self, link: str, message):
         super().__init__(timeout=600)
-        self.link = link
         self.message = message
+        self.link_button = discord.ui.Button(label="*Click here to open link*",
+                                        style=discord.ButtonStyle.url, url=link)
+        self.add_item(self.link_button)
 
     async def on_timeout(self) -> None:
         # for all buttons, disable
@@ -32,15 +35,10 @@ class RecruitmentButton(discord.ui.View):
             button.disabled = True
         self.message.edit(view=self)
 
-    @discord.ui.button(url="text",
-                       label="*Click here to open link*",
-                       style=discord.ButtonStyle.url)
-    async def link(self, interaction: discord.Interaction, link_button: discord.Button):
+    async def link(self, interaction: discord.Interaction):
         await interaction.response.defer(thinking=False)
-        link_button.disabled = True
+        self.link_button.disabled = True
         return await self.message.edit(view=self)
-
-
 
 
 class Recruitment(commands.Cog):
@@ -50,6 +48,7 @@ class Recruitment(commands.Cog):
         self.bot = bot
         self.db_error = False
         self.verbose_mode = False
+
         # if not self.autogrammer.is_running():
         #     self.autogrammer.start()
 
