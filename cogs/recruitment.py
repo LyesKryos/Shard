@@ -20,6 +20,28 @@ import os
 
 from ratelimiter import Ratelimiter
 
+class RecruitmentButton(discord.ui.View):
+    def __init__(self, link: str, message):
+        super().__init__(timeout=600)
+        self.link = link
+        self.message = message
+
+    async def on_timeout(self) -> None:
+        # for all buttons, disable
+        for button in self.children:
+            button.disabled = True
+        self.message.edit(view=self)
+
+    @discord.ui.button(url="text",
+                       label="*Click here to open link*",
+                       style=discord.ButtonStyle.url)
+    async def link(self, interaction: discord.Interaction, link_button: discord.Button):
+        await interaction.response.defer(thinking=False)
+        link_button.disabled = True
+        return await self.message.edit(view=self)
+
+
+
 
 class Recruitment(commands.Cog):
 
@@ -456,7 +478,8 @@ class Recruitment(commands.Cog):
                     # parse the string to make it sanitized for the url
                     url = f"https://www.nationstates.net/page=compose_telegram?tgto={recruit_string};message={template}"
                     # send the url and mention the author
-                    await channel.send(f'{author.mention} [{len(self.sending_to)} nation(s)] {url}')
+                    recruit_message = await channel.send(f'{author.mention}')
+                    await recruit_message.edit(view=RecruitmentButton(url, recruit_message))
                     # if there is only one nation in the queue, and extra 15 seconds is waited
                     if len(self.sending_to) == 1:
                         await asyncio.sleep(15)
