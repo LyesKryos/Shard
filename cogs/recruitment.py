@@ -25,8 +25,8 @@ class RecruitmentButton(discord.ui.View):
     def __init__(self, link: str, message):
         super().__init__(timeout=600)
         self.message = message
-        self.link_button = discord.ui.Button(label="*Click here to open link*",
-                                        style=discord.ButtonStyle.url, url=link)
+        self.link_button = discord.ui.Button(label="Click here to open recruitment link",
+                                             style=discord.ButtonStyle.url, url=link)
         self.add_item(self.link_button)
 
     async def on_timeout(self) -> None:
