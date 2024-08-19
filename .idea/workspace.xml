@@ -124,6 +124,7 @@
     </configuration>
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="Shard" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -146,6 +147,7 @@
     </configuration>
     <configuration name="cnc" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Shard" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -168,13 +170,13 @@
     </configuration>
     <configuration name="scratch" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Shard" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="C:\Users\jaedo\AppData\Local\Programs\Python\Python39\python.exe" />
-      <option name="SDK_NAME" value="Python 3.9" />
       <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -214,6 +216,7 @@
     </configuration>
     <configuration name="verification" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Shard" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
