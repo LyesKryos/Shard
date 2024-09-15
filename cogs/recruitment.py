@@ -666,9 +666,11 @@ class Recruitment(commands.Cog):
             return await ctx.send("Autogrammer not running.")
         message = await ctx.send("Cutting...")
         self.autogrammer.stop()
+        if not self.autogrammer.is_running():
+            return await message.edit("Autogrammer cut!")
         await asyncio.sleep(self.autogrammer.next_iteration.second)
         if not self.autogrammer.is_running():
-            await message.edit(content="Autogrammer cut!")
+            return await message.edit(content="Autogrammer cut!")
 
     @commands.command()
     @commands.is_owner()

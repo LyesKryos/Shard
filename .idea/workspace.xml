@@ -5,8 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Excepting correct error for aborted autogramming.">
-      <change beforePath="$PROJECT_DIR$/.idea/Shard.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Shard.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,6 +74,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -357,7 +357,7 @@
       <workItem from="1723495846810" duration="751000" />
       <workItem from="1723497138887" duration="1925000" />
       <workItem from="1725726028279" duration="1560000" />
-      <workItem from="1726424825033" duration="929000" />
+      <workItem from="1726424825033" duration="1176000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -702,7 +702,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="902" />
+    <option name="localTasksCounter" value="903" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
