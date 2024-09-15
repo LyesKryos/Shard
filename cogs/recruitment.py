@@ -1,4 +1,5 @@
 # recruitment 1.1
+# recruitment 1.1
 import math
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -408,7 +409,7 @@ class Recruitment(commands.Cog):
                     elif tg_response.status != 200:
                         await crashchannel.send(f"Bad response for API\n"
                                                 f"```{tg_response}```")
-        except asyncio.CancelledError:
+        except asyncio.exceptions.CancelledError:
             await crashchannel.send("Autogramming aborted.")
         except Exception as error:
             self.bot.logger.exception(error)
