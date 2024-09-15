@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing adding button to recruitment">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/bb2d0ebf-f42f-44a6-b0c8-014a065395ac.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Excepting correct error for aborted autogramming.">
+      <change beforePath="$PROJECT_DIR$/.idea/Shard.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Shard.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -358,7 +357,7 @@
       <workItem from="1723495846810" duration="751000" />
       <workItem from="1723497138887" duration="1925000" />
       <workItem from="1725726028279" duration="1560000" />
-      <workItem from="1726424825033" duration="625000" />
+      <workItem from="1726424825033" duration="929000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -703,7 +702,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="901" />
+    <option name="localTasksCounter" value="902" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -721,7 +720,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing nation command DB calls" />
     <MESSAGE value="Fixing parse_relations" />
     <MESSAGE value="Troubleshooting parse relations" />
     <MESSAGE value="Working out how to have two optional arguments, but still require at least one." />
@@ -746,7 +744,8 @@
     <MESSAGE value="Disabling autogrammer temporarily" />
     <MESSAGE value="Adding button to recruitment" />
     <MESSAGE value="Fixing adding button to recruitment" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing adding button to recruitment" />
+    <MESSAGE value="Excepting correct error for aborted autogramming." />
+    <option name="LAST_COMMIT_MESSAGE" value="Excepting correct error for aborted autogramming." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
