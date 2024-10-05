@@ -113,6 +113,7 @@ class CNC(commands.Cog):
         self.map_directory = r"/root/Shard/CNC/Map Files/Maps/"
         self.province_directory = r"/root/Shard/CNC/Map Files/Province Layers/"
         self.interaction_directory = r"/root/Shard/CNC/Interaction Files/"
+        self.tech_directory = r"/root/Shard/CNC/Tech Tree/"
         self.bot = bot
         self.banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2", "#999999"]
         self.version = "version 4.0 New Horizons"
@@ -683,8 +684,29 @@ class CNC(commands.Cog):
         tech_embed.add_field(name="Exclusive with", value=f"{tech['exclusive']}")
         return await interaction.followup.send(embed=tech_embed)
 
-
-
+    @cnc.command(name="view_tech_tree", description="Displays researched techs.")
+    @app_commands.guild_only()
+    async def view_tech_tree(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull user's tech
+        techs = await conn.fetchrow('''SELECT tech FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        # parse tech
+        techs = techs['tech']
+        # map techs
+        tech_map = Image.open(fr"{self.tech_directory}CNC Tech Map.png").convert('RGBA')
+        gear_icon = Image.open(fr"{self.tech_directory}CNC Gear Tech Icon.png").convert('RGBA')
+        # pull tech info
+        for tech in techs:
+            tech_info = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE name = $1;''', tech)
+            gear_cords = tech_info['gear_cords']
+            tech_map.paste(gear_icon, (gear_cords[0], gear_cords[1]) , mask=gear_icon)
+        # save image
+        tech_map.save(fr"{self.tech_directory}CNC Tech Map Rendered.png")
+        # upload image
+        await interaction.followup.send(file=discord.File(fr"{self.tech_directory}CNC Tech Map Rendered.png"))
 
     @commands.command()
     @commands.is_owner()
