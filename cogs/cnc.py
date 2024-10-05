@@ -301,7 +301,7 @@ class CNC(commands.Cog):
     # the CnC command group
     cnc = app_commands.Group(name="cnc", description="...")
 
-    # REGISTER AND INFO COMMANDS
+    # === User Commands and View Commands === #
 
     @cnc.command(name="register", description="Registers a new player nation.")
     @app_commands.guild_only()
@@ -663,6 +663,8 @@ class CNC(commands.Cog):
         prov_embed.add_field(name="Production", value=f"{prov_info['production']:,.3}")
         return await interaction.followup.send(embed=prov_embed)
 
+    # === Tech Commands === #
+
     @cnc.command(name="tech", description="Displays information about a specified technology.")
     @app_commands.guild_only()
     async def tech(self, interaction: discord.Interaction, tech: str):
@@ -702,11 +704,14 @@ class CNC(commands.Cog):
         for tech in techs:
             tech_info = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE name = $1;''', tech)
             gear_cords = tech_info['gear_cords']
-            tech_map.paste(gear_icon, (gear_cords[0], gear_cords[1]) , mask=gear_icon)
+            tech_map.paste(gear_icon, (int(gear_cords[0]), int(gear_cords[1])) , mask=gear_icon)
         # save image
         tech_map.save(fr"{self.tech_directory}CNC Tech Map Rendered.png")
         # upload image
         await interaction.followup.send(file=discord.File(fr"{self.tech_directory}CNC Tech Map Rendered.png"))
+
+
+
 
     @commands.command()
     @commands.is_owner()

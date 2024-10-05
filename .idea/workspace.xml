@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating cutting command for better response time.">
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding view_tech_tree command">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -368,7 +367,7 @@
       <workItem from="1727010823254" duration="12000" />
       <workItem from="1727056459775" duration="346000" />
       <workItem from="1727126493173" duration="16000" />
-      <workItem from="1728131265721" duration="3122000" />
+      <workItem from="1728131265721" duration="4296000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -713,7 +712,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="904" />
+    <option name="localTasksCounter" value="905" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -731,7 +730,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Troubleshooting parse relations" />
     <MESSAGE value="Working out how to have two optional arguments, but still require at least one." />
     <MESSAGE value="Enforcing complex interdependent arguments" />
     <MESSAGE value="Adding dossier command" />
@@ -756,7 +754,8 @@
     <MESSAGE value="Fixing adding button to recruitment" />
     <MESSAGE value="Excepting correct error for aborted autogramming." />
     <MESSAGE value="Updating cutting command for better response time." />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating cutting command for better response time." />
+    <MESSAGE value="Adding view_tech_tree command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding view_tech_tree command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
