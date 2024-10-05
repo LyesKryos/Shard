@@ -704,7 +704,7 @@ class CNC(commands.Cog):
         for tech in techs:
             tech_info = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE name = $1;''', tech)
             gear_cords = tech_info['gear_cords']
-            tech_map.paste(gear_icon, (int(gear_cords[0]*4), int(gear_cords[1]*4)) , mask=gear_icon)
+            tech_map.paste(gear_icon, (int(gear_cords[0]*4.0005), int(gear_cords[1]*4.0005)) , mask=gear_icon)
         # save image
         tech_map.save(fr"{self.tech_directory}CNC Tech Map Rendered.png")
         # upload image
