@@ -711,6 +711,60 @@ class CNC(commands.Cog):
         # upload image
         await interaction.followup.send(file=discord.File(fr"{self.tech_directory}CNC Tech Map Rendered.png"))
 
+    @cnc.command(name="research", description="Begins researching a specified tech.")
+    @app_commands.guild_only()
+    async def research(self, interaction: discord.Interaction, tech: str):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull user info
+        user_id = interaction.user.id
+        user_info = await self.user_db_info(user_id=user_id)
+        # if the user does not exist
+        if user_info is None:
+            # return a message
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # check if that tech is an existing tech
+        tech_info = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE lower(name) = $1;''', tech.lower())
+        # if it is not an existing tech
+        if tech_info is None:
+            # return denial
+            return await interaction.followup.send("That is not a recognized tech.")
+        # pull techs
+        techs = user_info['tech']
+        # check if the requested tech is already researched
+        if tech.lower() in techs.lower():
+            # return denial
+            return await interaction.followup.send("That tech has already been researched.")
+        # check if a tech is already being researched
+        researching_tech = await conn.fetchrow('''SELECT * FROM cnc_researching WHERE user_id = $1;''', user_id)
+        if researching_tech is not None:
+            # return denial
+            return await interaction.followup.send("A tech is already being researched.")
+        # if the tech is not yet unlocked and another tech is not already being researched, add the tech to the research queue
+        # determine research time
+        # set base research time as four turns
+        research_time = 4
+        # pull development score
+        total_dev = await conn.fetchrow('''SELECT sum(development) FROM cnc_provinces WHERE owner_id = $1;''', user_id)
+        total_dev = total_dev['sum']
+        # pull research time
+        research_buff = user_info['research_time']
+        # calculate total research time
+        research_time += (total_dev//10) + research_buff
+        # add to researching database
+        await conn.execute('''INSERT INTO cnc_researching VALUES($1,$2,$3);''',
+                           user_id, tech_info['name'], research_time)
+        # send confirmation message and research time
+        return await interaction.followup.send(f"{tech_info['name']} will be researched in {research_time} turns.\n"
+                                        f"||Research Time = {total_dev//10} (development) +"
+                                        f" {research_buff} (national research time) + 4 (base research time)||")
+
+
+
+
+
 
 
 
