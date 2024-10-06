@@ -734,7 +734,7 @@ class CNC(commands.Cog):
         # pull techs
         techs = user_info['tech']
         # check if the requested tech is already researched
-        if tech.lower() in techs.lower():
+        if tech.lower() in [t.lower() for t in techs]:
             # return denial
             return await interaction.followup.send("That tech has already been researched.")
         # check if a tech is already being researched
