@@ -329,7 +329,7 @@ class Roleplay(commands.Cog):
         message += f"Independents: {540-senators_in_parties}\n"
         message += "\n\n*Note: these numbers are provisional and are not official.*"
         # send message
-        await interaction.followup.send(message)
+        return await interaction.followup.send(message)
 
 
 
