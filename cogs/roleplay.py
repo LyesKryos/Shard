@@ -179,6 +179,27 @@ class Roleplay(commands.Cog):
         await interaction.followup.send("Done!")
         return
 
+    @senate.command(name="add_party", description="Adds a new party to the Grand Senate.")
+    @app_commands.checks.has_role(674260151506698251)
+    async def add_party(self, interaction: discord.Interaction, party_name: str, party_color: discord.Color,
+                        leader: discord.Member):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # create party role
+        thegye_server = self.bot.get_guild(674259612580446230)
+        new_party_role = await thegye_server.create_role(name=party_name, color=party_color)
+        # assign the role to the leader
+        party_leader_role = thegye_server.get_role(1124422828641505300)
+        await leader.add_roles(party_leader_role, new_party_role)
+        # update the database
+        await conn.execute('''INSERT INTO senate_parties VALUES ($1, $2);''', party_name, new_party_role.id)
+        # send message
+        return await interaction.followup.send(f"Party role {new_party_role.name} has been added to the Grand Senate.\n"
+                                               f"Party leader assigned to {leader.display_name}.")
+
+
     @senate.command(name="party_role", description="Allows party leaders to add and remove party roles.")
     @app_commands.guild_only()
     @app_commands.checks.has_role(1124422828641505300)
@@ -190,13 +211,14 @@ class Roleplay(commands.Cog):
         senator_role = thegye_server.get_role(1109211491170783293)
         # check for role
         if senator_role not in senator.roles:
-            await interaction.followup.send(f"{senator} is not a member of the Grand Senate of Thegye.")
+            await interaction.followup.send(f"{senator.display_name} is not a member of the Grand Senate of Thegye.")
             return
-        # get party roles
-        gsp = thegye_server.get_role(1112893883832086622)
-        rrp = thegye_server.get_role(1112894000995762266)
-        ptp = thegye_server.get_role(1287879910496669769)
-        party_roles = [gsp, rrp, ptp]
+        # pull party data
+        conn = self.bot.pool
+        party_data = await conn.fetch('''SELECT * FROM senate_parties WHERE active = True;''')
+        party_roles = list()
+        for party in party_data:
+            party_roles.append(thegye_server.get_role(party['role_id']))
         # check to make sure the role is right
         if role not in party_roles:
             await interaction.followup.send(f"{role.name} is not a party role.")
@@ -204,11 +226,11 @@ class Roleplay(commands.Cog):
         # if the user does not have the role, add the role
         if role not in senator.roles:
             await senator.add_roles(role)
-            await interaction.followup.send(f"{role.name} added to {senator.nick}.")
+            await interaction.followup.send(f"{role.name} added to {senator.display_name}.")
         # if the user has the role, remove the role
         if role in senator.roles:
             await senator.remove_roles(role)
-            await interaction.followup.send(f"{role.name} removed from {senator.nick}.")
+            await interaction.followup.send(f"{role.name} removed from {senator.display_name}.")
         return
 
     @senate.command(name="convert_thaler", description="Calculates the conversion of thaler.")
@@ -281,6 +303,35 @@ class Roleplay(commands.Cog):
         dire = math.floor((amount_in-thaler)/(1/18))
         komat = math.ceil(((amount_in-thaler)-(dire*(1/18)))/(1/216))
         await interaction.followup.send(f"{thaler:,}\u20B8 {dire}\u1E9F {komat}\u04A1")
+
+    @senate.command(name="count_members", description="Display the partisan division of the Grand Senate of Thegye.")
+    @app_commands.guild_only()
+    async def count_members(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # define the server
+        thegye_server = self.bot.get_guild(674259612580446230)
+        # count senator roles
+        senator_role = thegye_server.get_role(1109211491170783293)
+        senator_number = len(senator_role.members)
+        # count party roles
+        conn = self.bot.pool
+        parties = await conn.fetch('''SELECT * FROM senate_parties WHERE active = True;''')
+        party_roles = list()
+        for p in parties:
+            party_roles.append(thegye_server.get_role(p['role_id']))
+        # construct message
+        message = "**Senators**: 540\n"
+        senators_in_parties = 0
+        for p in party_roles:
+            message += f"{p.name}: {math.floor((len(p.members)/senator_number)*540)}\n"
+            senators_in_parties += math.floor((len(p.members)/senator_number)*540)
+        message += f"Independents: {540-senators_in_parties}\n"
+        message += "\n\n*Note: these numbers are provisional and are not official.*"
+        # send message
+        await interaction.followup.send(message)
+
+
 
 async def setup(bot: Shard):
     await bot.add_cog(Roleplay(bot))
