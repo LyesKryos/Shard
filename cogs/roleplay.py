@@ -245,7 +245,18 @@ class Roleplay(commands.Cog):
             # get role
             thegye_server = self.bot.get_guild(674259612580446230)
             party_role = thegye_server.get_role(party_info['role_id'])
+            party_room = thegye_server.get_channel(party_info['party_room'])
+            party_leader = thegye_server.get_member(party_info['party_leader'])
+            party_leader_role = thegye_server.get_role(1124422828641505300)
             # delete role
+            await party_role.delete()
+            # delete room
+            await party_room.delete()
+            # remove leader
+            await party_leader.remove_roles(party_leader_role)
+            await conn.execute('''UPDATE senate_parties SET active = False WHERE role_id = $1;''', party_name.id)
+            return await interaction.followup.send(f"{party_name.name} has been removed from the Grand Senate.")
+
 
 
 
