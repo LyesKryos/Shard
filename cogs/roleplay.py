@@ -250,8 +250,10 @@ class Roleplay(commands.Cog):
             party_leader_role = thegye_server.get_role(1124422828641505300)
             # delete role
             await party_role.delete()
-            # delete room
-            await party_room.delete()
+            # archive room
+            archive_category = utils.get(thegye_server.categories, name="Archive")
+            await party_room.move(category=archive_category)
+            await party_room.edit(sync_permissions=True)
             # remove leader
             await party_leader.remove_roles(party_leader_role)
             await conn.execute('''UPDATE senate_parties SET active = False WHERE role_id = $1;''', party_name.id)
