@@ -203,7 +203,7 @@ class Roleplay(commands.Cog):
         overwrites = {
             thegye_server.default_role: discord.PermissionOverwrite(view_channel=False),
             new_party_role: discord.PermissionOverwrite(read_messages=True, view_channel=True),
-            party_leader_role: discord.Permissions(manage_channels=True)
+            party_leader_role: discord.PermissionOverwrite(manage_channels=True)
         }
         party_info_position = thegye_server.get_channel(1110371598487269417).position
         senate_category = utils.get(thegye_server.categories, name="The Grand Senate")
