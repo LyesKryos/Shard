@@ -192,8 +192,7 @@ class Roleplay(commands.Cog):
         conn = self.bot.pool
         # create party role
         thegye_server = self.bot.get_guild(674259612580446230)
-        senator = thegye_server.get_role(1109211491170783293)
-        senator_position = senator.position
+        senator_position = thegye_server.get_role(1109211491170783293).position
         new_party_role = await thegye_server.create_role(name=party_name, color=discord.Color.from_str(party_color))
         await new_party_role.edit(position=senator_position-1)
         # assign the role to the leader
@@ -208,7 +207,7 @@ class Roleplay(commands.Cog):
         party_info_position = thegye_server.get_channel(1110371598487269417).position
         senate_category = utils.get(thegye_server.categories, name="The Grand Senate")
         party_channel = await thegye_server.create_text_channel(name=party_name, overwrites=overwrites,
-                                                          position=party_info_position-1, category=senate_category)
+                                                          position=party_info_position+1, category=senate_category)
         # update the database
         await conn.execute('''INSERT INTO senate_parties(name, role_id, party_leader, party_room) 
         VALUES ($1, $2, $3, $4);''',
