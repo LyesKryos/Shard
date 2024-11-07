@@ -257,11 +257,32 @@ class Roleplay(commands.Cog):
             await conn.execute('''UPDATE senate_parties SET active = False WHERE role_id = $1;''', party_name.id)
             return await interaction.followup.send(f"{party_name.name} has been removed from the Grand Senate.")
 
-
-
-
-
-
+    @senate.command(name="alter_leader", description="Alter the party leader for a given party.")
+    @app_commands.guild_only()
+    @app_commands.describe(party_name="The name of the party that needs a new leader.",
+                           new_leader="The player that is the new leader of the party.")
+    async def alter_leader(self, interaction: discord.Interaction, party_name: discord.Role, new_leader: discord.Member):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # search for party role
+        party_info = await conn.fetchrow('''SELECT * FROM senate_parties WHERE role_id = $1;''', party_name.id)
+        # if the party doesn't exist, return such
+        if party_info is None:
+            return await interaction.followup.send("That party does not exist.")
+        # otherwise, carry on
+        else:
+            # define server
+            thegye_server = self.bot.get_guild(674259612580446230)
+            leader_role = thegye_server.get_role(1124422828641505300)
+            # remove the previous leader
+            previous_leader = thegye_server.get_member(party_info['party_leader'])
+            await previous_leader.remove_roles(leader_role)
+            # add leader role to new leader
+            await new_leader.add_roles(leader_role)
+            return await interaction.followup.send(f"{new_leader.display_name} is now party leader "
+                                                   f"of {party_name.name}.")
 
     @senate.command(name="party_role", description="Allows party leaders to add and remove party roles.")
     @app_commands.guild_only()
