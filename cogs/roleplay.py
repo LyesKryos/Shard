@@ -3,7 +3,7 @@ import typing
 
 import requests
 from bs4 import BeautifulSoup
-from discord import app_commands
+from discord import app_commands, utils
 from discord.ext import commands
 from ShardBot import Shard
 import discord
@@ -179,7 +179,7 @@ class Roleplay(commands.Cog):
         await interaction.followup.send("Done!")
         return
 
-    @senate.command(name="add_party", description="Adds a new party to the Grand Senate.")
+    @senate.command(name="create_party", description="Adds a new party to the Grand Senate.")
     @app_commands.describe(party_name="The name of the party. Please spell and capitalize correctly.",
                            party_color="Hex code of the party role. Ex: #123456",
                            leader="The player to be assigned the Party Leader role.")
@@ -199,11 +199,47 @@ class Roleplay(commands.Cog):
         # assign the role to the leader
         party_leader_role = thegye_server.get_role(1124422828641505300)
         await leader.add_roles(party_leader_role, new_party_role)
+        # create a party room
+        overwrites = {
+            thegye_server.default_role: discord.PermissionOverwrite(view_channel=False),
+            new_party_role: discord.PermissionOverwrite(read_messages=True, view_channel=True),
+            party_leader_role: discord.Permissions(manage_channels=True)
+        }
+        party_info_position = thegye_server.get_channel(1110371598487269417).position
+        senate_category = utils.get(thegye_server.categories, name="The Grand Senate")
+        party_channel = await thegye_server.create_text_channel(name=party_name, overwrites=overwrites,
+                                                          position=party_info_position-1, category=senate_category)
         # update the database
-        await conn.execute('''INSERT INTO senate_parties VALUES ($1, $2);''', party_name, new_party_role.id)
+        await conn.execute('''INSERT INTO senate_parties(name, role_id, party_leader, party_channel) VALUES ($1, $2, $3);''',
+                           party_name, new_party_role.id, leader.id, party_channel.id)
         # send message
         return await interaction.followup.send(f"Party role {new_party_role.name} has been added to the Grand Senate.\n"
                                                f"Party leader assigned to {leader.display_name}.")
+
+    @senate.command(name="remove_party", description="Removes an inactive party from the Grand Senate. "
+                                                     "USE WITH CAUTION.")
+    @app_commands.checks.has_any_role(674260151506698251, 1110374275740868628)
+    @app_commands.guild_only()
+    async def remove_party(self, interaction: discord.Interaction, party_name: discord.Role):
+        # defer interaction
+        await interaction.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # search for party role
+        party_info = await conn.fetchrow('''SELECT * FROM senate_parties WHERE role_id = $1;''', party_name.id)
+        # if the party doesn't exist, return such
+        if party_info is None:
+            return await interaction.followup.send("That party does not exist.")
+        # otherwise, carry on
+        else:
+            # get role
+            thegye_server = self.bot.get_guild(674259612580446230)
+            party_role = thegye_server.get_role(party_info['role_id'])
+            # delete role
+
+
+
+
 
 
     @senate.command(name="party_role", description="Allows party leaders to add and remove party roles.")
