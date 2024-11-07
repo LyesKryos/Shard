@@ -276,6 +276,11 @@ class Roleplay(commands.Cog):
             # define server
             thegye_server = self.bot.get_guild(674259612580446230)
             leader_role = thegye_server.get_role(1124422828641505300)
+            # if the new leader isn't in the party
+            if leader_role not in new_leader.roles:
+                # return denial message
+                return await interaction.followup.send(f"{new_leader.display_name} is not a "
+                                                       f"member of {party_name.name}.")
             # remove the previous leader
             previous_leader = thegye_server.get_member(party_info['party_leader'])
             await previous_leader.remove_roles(leader_role)
