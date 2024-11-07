@@ -207,14 +207,24 @@ class Roleplay(commands.Cog):
         party_info_position = thegye_server.get_channel(1110371598487269417).position
         senate_category = utils.get(thegye_server.categories, name="The Grand Senate")
         party_channel = await thegye_server.create_text_channel(name=party_name, overwrites=overwrites,
-                                                          position=party_info_position+1, category=senate_category)
+                                                          position=party_info_position+1, category=senate_category,
+                                                                topic=f"The party channel for {party_name}.")
+        # define tupper and poll bots
+        tupper = thegye_server.get_member(431544605209788416)
+        poll_bot = thegye_server.get_member(437618149505105920)
+        await party_channel.set_permissions(tupper, read_messages=True, send_messages=True, manage_messages=True)
+        await party_channel.set_permissions(poll_bot, read_messages=True, send_messages=True)
         # update the database
         await conn.execute('''INSERT INTO senate_parties(name, role_id, party_leader, party_room) 
         VALUES ($1, $2, $3, $4);''',
                            party_name, new_party_role.id, leader.id, party_channel.id)
         # send message
-        return await interaction.followup.send(f"Party role {new_party_role.name} has been added to the Grand Senate.\n"
+        await interaction.followup.send(f"Party role {new_party_role.name} has been added to the Grand Senate.\n"
                                                f"Party leader assigned to {leader.display_name}.")
+        return await party_channel.send(content=f"{party_leader_role.mention} of {new_party_role.mention}, "
+                                                f"your party has been added to the Grand Senate of Thegye. "
+                                                f"This channel will act as your party's official private channel. "
+                                                f"The Party Leader will have control over the channel.")
 
     @senate.command(name="remove_party", description="Removes an inactive party from the Grand Senate. "
                                                      "USE WITH CAUTION.")
