@@ -276,8 +276,9 @@ class Roleplay(commands.Cog):
             # define server
             thegye_server = self.bot.get_guild(674259612580446230)
             leader_role = thegye_server.get_role(1124422828641505300)
+            party_role = thegye_server.get_role(party_info['role_id'])
             # if the new leader isn't in the party
-            if leader_role not in new_leader.roles:
+            if party_role not in new_leader.roles:
                 # return denial message
                 return await interaction.followup.send(f"{new_leader.display_name} is not a "
                                                        f"member of {party_name.name}.")
