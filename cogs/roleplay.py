@@ -232,7 +232,7 @@ class Roleplay(commands.Cog):
     @app_commands.guild_only()
     async def remove_party(self, interaction: discord.Interaction, party_name: discord.Role):
         # defer interaction
-        await interaction.defer(thinking=True)
+        await interaction.response.defer(thinking=True)
         # establish connection
         conn = self.bot.pool
         # search for party role
