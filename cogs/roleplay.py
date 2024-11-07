@@ -210,7 +210,7 @@ class Roleplay(commands.Cog):
         party_channel = await thegye_server.create_text_channel(name=party_name, overwrites=overwrites,
                                                           position=party_info_position-1, category=senate_category)
         # update the database
-        await conn.execute('''INSERT INTO senate_parties(name, role_id, party_leader, party_channel) VALUES ($1, $2, $3);''',
+        await conn.execute('''INSERT INTO senate_parties(name, role_id, party_leader, party_room) VALUES ($1, $2, $3);''',
                            party_name, new_party_role.id, leader.id, party_channel.id)
         # send message
         return await interaction.followup.send(f"Party role {new_party_role.name} has been added to the Grand Senate.\n"
