@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Trying to fix error logging">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/errors.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/errors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/roleplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/roleplay.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -374,7 +375,7 @@
       <workItem from="1728131265721" duration="7752000" />
       <workItem from="1728169882764" duration="4641000" />
       <workItem from="1730550593887" duration="1974000" />
-      <workItem from="1730762144525" duration="4190000" />
+      <workItem from="1730762144525" duration="5022000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -719,7 +720,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="918" />
+    <option name="localTasksCounter" value="919" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

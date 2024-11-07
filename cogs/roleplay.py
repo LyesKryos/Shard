@@ -180,8 +180,11 @@ class Roleplay(commands.Cog):
         return
 
     @senate.command(name="add_party", description="Adds a new party to the Grand Senate.")
+    @app_commands.describe(party_name="The name of the party. Please spell and capitalize correctly.",
+                           party_color="Hex code of the party role. Ex: #123456",
+                           leader="The player to be assigned the Party Leader role.")
     @app_commands.checks.has_role(674260151506698251)
-    async def add_party(self, interaction: discord.Interaction, party_name: str, party_color: discord.Color,
+    async def add_party(self, interaction: discord.Interaction, party_name: str, party_color: str,
                         leader: discord.Member):
         # defer interaction
         await interaction.response.defer(thinking=True)
