@@ -183,7 +183,7 @@ class Roleplay(commands.Cog):
     @app_commands.describe(party_name="The name of the party. Please spell and capitalize correctly.",
                            party_color="Hex code of the party role. Ex: #123456",
                            leader="The player to be assigned the Party Leader role.")
-    @app_commands.checks.has_role(674260151506698251)
+    @app_commands.checks.has_any_role(674260151506698251, 1110374275740868628)
     async def add_party(self, interaction: discord.Interaction, party_name: str, party_color: str,
                         leader: discord.Member):
         # defer interaction
