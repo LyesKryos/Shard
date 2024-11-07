@@ -192,7 +192,7 @@ class Roleplay(commands.Cog):
         conn = self.bot.pool
         # create party role
         thegye_server = self.bot.get_guild(674259612580446230)
-        new_party_role = await thegye_server.create_role(name=party_name, color=party_color)
+        new_party_role = await thegye_server.create_role(name=party_name, color=discord.Color.from_str(party_color))
         # assign the role to the leader
         party_leader_role = thegye_server.get_role(1124422828641505300)
         await leader.add_roles(party_leader_role, new_party_role)
