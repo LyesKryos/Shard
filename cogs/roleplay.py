@@ -252,7 +252,7 @@ class Roleplay(commands.Cog):
             await party_role.delete()
             # archive room
             archive_category = utils.get(thegye_server.categories, name="Archive")
-            await party_room.move(category=archive_category)
+            await party_room.move(category=archive_category, beginning=True)
             await party_room.edit(sync_permissions=True)
             # remove leader
             await party_leader.remove_roles(party_leader_role)
