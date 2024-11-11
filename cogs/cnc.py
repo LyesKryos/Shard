@@ -667,6 +667,7 @@ class CNC(commands.Cog):
 
     @cnc.command(name="tech", description="Displays information about a specified technology.")
     @app_commands.guild_only()
+    @app_commands.describe(tech="The tech to search.")
     async def tech(self, interaction: discord.Interaction, tech: str):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -713,6 +714,7 @@ class CNC(commands.Cog):
 
     @cnc.command(name="research", description="Begins researching a specified tech.")
     @app_commands.guild_only()
+    @app_commands.describe(tech="The tech to research.")
     async def research(self, interaction: discord.Interaction, tech: str):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -761,6 +763,31 @@ class CNC(commands.Cog):
                                         f"||Research Time = {total_dev//10} (development) +"
                                         f" {research_buff} (national research time) + 4 (base research time)||")
 
+    @cnc.command(name="researching", description="Displays which tech is being researched.")
+    @app_commands.guild_only()
+    async def researching(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # check if the user exists
+        user_id = interaction.user.id
+        user_info = await self.user_db_info(user_id)
+        # if the user doesn't exist
+        if user_info is None:
+            # return denial
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # pull researching information
+        researching = await conn.fetchrow('''SELECT * FROM cnc_researching WHERE user_id = $1;''', user_id)
+        # if there is no tech being researched currently
+        if researching is None:
+            # return message
+            return await interaction.followup.send("No tech is being researched currently.")
+        # if there is a tech being researched, send the info
+        if researching is not None:
+            # return info
+            return await interaction.followup.send(f"Scientists are currently researching the {researching['tech']} "
+                                                   f"tech. Research will be complete in {researching['turns']} turns.")
 
 
 
