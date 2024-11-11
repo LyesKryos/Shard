@@ -813,7 +813,7 @@ class CNC(commands.Cog):
         if researching is not None:
             # send cancel to db
             await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user_id)
-            return await interaction.followup.send(f"Scientists re no longer researching {researching['tech']}.")
+            return await interaction.followup.send(f"Scientists are no longer researching {researching['tech']}.")
 
 
 
