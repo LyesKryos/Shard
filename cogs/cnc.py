@@ -789,6 +789,32 @@ class CNC(commands.Cog):
             return await interaction.followup.send(f"Scientists are currently researching the {researching['tech']} "
                                                    f"tech. Research will be complete in {researching['turns']} turns.")
 
+    @cnc.command(name="cancel_research", description="Cancels the tech currently being researchined.")
+    @app_commands.guild_only()
+    async def cancel_research(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # check if the user exist
+        user_id = interaction.user.id
+        user_info = await self.user_db_info(user_id)
+        # if the user doesn't exist
+        if user_info is None:
+            # return denial
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # pull researching information
+        researching = await conn.fetchrow('''SELECT * FROM cnc_researching WHERE user_id = $1;''', user_id)
+        # if there is no tech being researched currently
+        if researching is None:
+            # return message
+            return await interaction.followup.send("No tech is being researched currently.")
+        # cancel the research currently underway
+        if researching is not None:
+            # send cancel to db
+            await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user_id)
+            return await interaction.followup.send(f"Scientists re no longer researching {researching['tech']}.")
+
 
 
 
