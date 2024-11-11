@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands, tasks
 import asyncio
 from PIL import Image, ImageColor, ImageDraw
+Image.MAX_IMAGE_PIXELS = None
 from base64 import b64encode
 import requests
 from discord.ui import View, Select
@@ -710,7 +711,6 @@ class CNC(commands.Cog):
         # save image
         size = tech_map.size
         tech_map.resize((size[0]//2, size[1]//2), resample=Image.Resampling.LANCZOS)
-        await interaction.followup.send(f"Map size: {tech_map.size}")
         tech_map.save(fr"{self.tech_directory}CNC Tech Map Rendered.png")
         # upload image
         await interaction.followup.send(file=discord.File(fr"{self.tech_directory}CNC Tech Map Rendered.png"))
