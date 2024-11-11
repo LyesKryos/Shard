@@ -709,8 +709,6 @@ class CNC(commands.Cog):
             await interaction.followup.send(gear_cords)
             tech_map.paste(gear_icon, (int(gear_cords[0]/3.778), int(gear_cords[1]/3.778)) , mask=gear_icon)
         # save image
-        size = tech_map.size
-        tech_map.resize((size[0]//2, size[1]//2), resample=Image.Resampling.LANCZOS)
         tech_map.save(fr"{self.tech_directory}CNC Tech Map Rendered.png")
         # upload image
         await interaction.followup.send(file=discord.File(fr"{self.tech_directory}CNC Tech Map Rendered.png"))
