@@ -710,6 +710,7 @@ class CNC(commands.Cog):
         # save image
         size = tech_map.size
         tech_map.resize((size[0]//2, size[1]//2), resample=Image.Resampling.LANCZOS)
+        await interaction.followup.send(f"Map size: {tech_map.size}")
         tech_map.save(fr"{self.tech_directory}CNC Tech Map Rendered.png")
         # upload image
         await interaction.followup.send(file=discord.File(fr"{self.tech_directory}CNC Tech Map Rendered.png"))
