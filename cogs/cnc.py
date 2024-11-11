@@ -699,7 +699,7 @@ class CNC(commands.Cog):
         # parse tech
         techs = techs['tech']
         # map techs
-        tech_map = Image.open(fr"{self.tech_directory}CNC Tech Map.png").convert('RGBA')
+        tech_map = Image.open(fr"{self.tech_directory}CNC Tech Tree.png").convert('RGBA')
         gear_icon = Image.open(fr"{self.tech_directory}CNC Gear Tech Icon.png").convert('RGBA')
         # pull tech info
         for tech in techs:
