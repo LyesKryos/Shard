@@ -685,7 +685,7 @@ class CNC(commands.Cog):
         tech_embed = discord.Embed(title=f"{tech['name']}", description=f"{tech['description']}")
         tech_embed.set_thumbnail(url=f"{tech['image']}")
         tech_embed.add_field(name="Effect", value=f"{tech['effect']}")
-        tech_embed.add_field(name="Prerequisites", value=f"{', '.join([str(p) for p in tech['prereqs']])}")
+        tech_embed.add_field(name="Prerequisites", value=f"{', '.join(tech['prereqs'])}")
         tech_embed.add_field(name="Exclusive with", value=f"{tech['exclusive']}")
         return await interaction.followup.send(embed=tech_embed)
 
@@ -710,7 +710,7 @@ class CNC(commands.Cog):
             await interaction.followup.send(gear_cords)
             tech_map.paste(gear_icon, (int(gear_cords[0]), int(gear_cords[1])) , mask=gear_icon)
         # save image
-        # get the running loop, crucial to the map command running without the world ending
+        # get the running loop, crucial to the map command running without the world enfding
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, tech_map.save, (fr"{self.tech_directory}CNC Tech Map Rendered.png"))
 
