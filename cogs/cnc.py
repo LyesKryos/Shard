@@ -710,8 +710,24 @@ class CNC(commands.Cog):
             tech_map.paste(gear_icon, (int(gear_cords[0]/3.778), int(gear_cords[1]/3.778)) , mask=gear_icon)
         # save image
         tech_map.save(fr"{self.tech_directory}CNC Tech Map Rendered.png")
+        # get the running loop, crucial to the map command running without the world ending
+        loop = asyncio.get_running_loop()
+        # open the nations map from the directory in "reading-binary" mode
+        with open(fr"{self.tech_directory}CNC Tech Map Rendered.png", "rb") as preimg:
+            # read the image using 64-bit encoding
+            img = b64encode(preimg.read())
+            # set the parameters for imgbb's API call
+            params = {"key": "a64d9505a13854ff660980db67ee3596",
+                      "name": "Tech Map",
+                      "image": img,
+                      "expiration": 86400}
+            # upload the map to imgbb
+            upload = await loop.run_in_executor(None, requests.post, "https://api.imgbb.com/1/upload",
+                                                params)
+            # get the response as a json string
+            response = upload.json()
         # upload image
-        await interaction.followup.send(file=discord.File(fr"{self.tech_directory}CNC Tech Map Rendered.png"))
+        await interaction.followup.send(content=response["data"]["url"])
 
     @cnc.command(name="research", description="Begins researching a specified tech.")
     @app_commands.guild_only()
@@ -790,7 +806,7 @@ class CNC(commands.Cog):
             return await interaction.followup.send(f"Scientists are currently researching the {researching['tech']} "
                                                    f"tech. Research will be complete in {researching['turns']} turns.")
 
-    @cnc.command(name="cancel_research", description="Cancels the tech currently being researchined.")
+    @cnc.command(name="cancel_research", description="Cancels the tech currently being researched.")
     @app_commands.guild_only()
     async def cancel_research(self, interaction: discord.Interaction):
         # defer interaction
