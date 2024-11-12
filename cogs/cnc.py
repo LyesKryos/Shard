@@ -6,7 +6,6 @@ import discord
 from discord.ext import commands, tasks
 import asyncio
 from PIL import Image, ImageColor, ImageDraw
-Image.MAX_IMAGE_PIXELS = None
 from base64 import b64encode
 import requests
 from discord.ui import View, Select
