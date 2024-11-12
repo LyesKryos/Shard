@@ -688,7 +688,7 @@ class CNC(commands.Cog):
         # replace the ; with "and". ; indicates needing both techs
         prereqs = prereqs.replace(";", " and ")
         # parse the effects
-        effects_raw = str(tech['effects'])
+        effects_raw = str(tech['effect'])
         # replace the ; with a newline and bullet
         effects = "- " + effects_raw.replace(";", "\n- ")
         # create tech embed
