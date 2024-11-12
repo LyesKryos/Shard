@@ -682,8 +682,8 @@ class CNC(commands.Cog):
             # return the error message
             return await interaction.followup.send("No such technology found.")
         prereqs_raw = str(tech['prereqs'])
-        prereqs = prereqs_raw.replace("/", "or")
-        prereqs = prereqs.replace(";", "and")
+        prereqs = prereqs_raw.replace("/", " or ")
+        prereqs = prereqs.replace(";", " and ")
         # create tech embed
         tech_embed = discord.Embed(title=f"{tech['name']}", description=f"{tech['description']}")
         tech_embed.set_thumbnail(url=f"{tech['image']}")
