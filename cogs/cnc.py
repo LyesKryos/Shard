@@ -708,7 +708,7 @@ class CNC(commands.Cog):
             tech_info = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE name = $1;''', tech)
             gear_cords = tech_info['gear_cords']
             await interaction.followup.send(gear_cords)
-            tech_map.paste(gear_icon, (int(gear_cords[0]/3.778), int(gear_cords[1]/3.778)) , mask=gear_icon)
+            tech_map.paste(gear_icon, (int(gear_cords[0]), int(gear_cords[1])) , mask=gear_icon)
         # save image
         # get the running loop, crucial to the map command running without the world ending
         loop = asyncio.get_running_loop()
