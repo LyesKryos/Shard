@@ -681,13 +681,20 @@ class CNC(commands.Cog):
         if tech is None:
             # return the error message
             return await interaction.followup.send("No such technology found.")
+        # parse the prereqs
         prereqs_raw = str(tech['prereqs'])
+        # replace the slash with "or". Slash indicates needing one or the other tech
         prereqs = prereqs_raw.replace("/", " or ")
+        # replace the ; with "and". ; indicates needing both techs
         prereqs = prereqs.replace(";", " and ")
+        # parse the effects
+        effects_raw = str(tech['effects'])
+        # replace the ; with a newline and bullet
+        effects = "- " + effects_raw.replace(";", "\n- ")
         # create tech embed
         tech_embed = discord.Embed(title=f"{tech['name']}", description=f"{tech['description']}")
         tech_embed.set_thumbnail(url=f"{tech['image']}")
-        tech_embed.add_field(name="Effect", value=f"{tech['effect']}", inline=False)
+        tech_embed.add_field(name="Effect", value=f"{effects}", inline=False)
         tech_embed.add_field(name="Prerequisites", value=f"{prereqs}")
         tech_embed.add_field(name="Exclusive with", value=f"{tech['exclusive']}")
         return await interaction.followup.send(embed=tech_embed)
