@@ -413,10 +413,10 @@ class Roleplay(commands.Cog):
         for p in parties:
             party_roles.append(thegye_server.get_role(p['role_id']))
         # construct message
-        message = "**Senators**: 540\n"
+        message = f"**Senators**: 540 ({senator_number} players)\n"
         senators_in_parties = 0
         for p in party_roles:
-            message += f"{p.name}: {math.floor((len(p.members)/senator_number)*540)} ({senator_number} players)\n"
+            message += f"{p.name}: {math.floor((len(p.members)/senator_number)*540)} ({len(p.members)} players)\n"
             senators_in_parties += math.floor((len(p.members)/senator_number)*540)
         message += f"Independents: {540-senators_in_parties}\n"
         message += "\n*Note: these numbers are provisional and are not official.*"
