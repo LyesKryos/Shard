@@ -662,7 +662,7 @@ class CNC(commands.Cog):
         prov_embed.add_field(name="Terrain", value=f"{await self.terrain_name(prov_info['terrain'])}"+river)
         prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
         prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
-        prov_embed.add_field(name="Production", value=f"{prov_info['production']:,.3}")
+        prov_embed.add_field(name="Production (last turn)", value=f"{prov_info['production']:,.3}")
         return await interaction.followup.send(embed=prov_embed)
 
     # === Tech Commands === #
@@ -751,12 +751,12 @@ class CNC(commands.Cog):
         # check if the requested tech is already researched
         if tech.lower() in [t.lower() for t in techs]:
             # return denial
-            return await interaction.followup.send("That tech has already been researched.")
+            return await interaction.followup.send("Your scientists have already researched that tech.")
         # check if a tech is already being researched
         researching_tech = await conn.fetchrow('''SELECT * FROM cnc_researching WHERE user_id = $1;''', user_id)
         if researching_tech is not None:
             # return denial
-            return await interaction.followup.send("A tech is already being researched.")
+            return await interaction.followup.send("Your scientists are already researching another tech.")
         # if the tech is not yet unlocked and another tech is not already being researched, add the tech to the research queue
         # determine research time
         # set base research time as four turns
@@ -772,7 +772,8 @@ class CNC(commands.Cog):
         await conn.execute('''INSERT INTO cnc_researching VALUES($1,$2,$3);''',
                            user_id, tech_info['name'], research_time)
         # send confirmation message and research time
-        return await interaction.followup.send(f"{tech_info['name']} will be researched in {research_time} turns.\n"
+        return await interaction.followup.send(f"Your scientists will complete researching {tech_info['name']} "
+                                               f"in {research_time} turns.\n"
                                         f"||Research Time = {total_dev//10} (development) +"
                                         f" {research_buff} (national research time) + 4 (base research time)||")
 
