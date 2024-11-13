@@ -415,10 +415,12 @@ class Roleplay(commands.Cog):
         # construct message
         message = f"**Senators**: 540 ({senator_number} players)\n"
         senators_in_parties = 0
+        players_in_parties = 0
         for p in party_roles:
             message += f"{p.name}: {math.floor((len(p.members)/senator_number)*540)} ({len(p.members)} players)\n"
             senators_in_parties += math.floor((len(p.members)/senator_number)*540)
-        message += f"Independents: {540-senators_in_parties}\n"
+            players_in_parties += len(p.members)
+        message += f"Independents: {540-senators_in_parties} ({senator_number-players_in_parties} players)\n"
         message += "\n*Note: these numbers are provisional and are not official.*"
         # send message
         return await interaction.followup.send(message)
