@@ -690,7 +690,7 @@ class CNC(commands.Cog):
         # parse the effects
         effects_raw = str(tech['effect'])
         # replace the ; with a newline and bullet
-        effects = "- " + effects_raw.replace(";", "\n- ")
+        effects = "- " + effects_raw.replace(";", ".\n- ")
         # create tech embed
         tech_embed = discord.Embed(title=f"{tech['name']}", description=f"{tech['description']}")
         tech_embed.set_thumbnail(url=f"{tech['image']}")
@@ -717,7 +717,6 @@ class CNC(commands.Cog):
         for tech in techs:
             tech_info = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE name = $1;''', tech)
             gear_cords = tech_info['gear_cords']
-            await interaction.followup.send(gear_cords)
             tech_map.paste(gear_icon, (int(gear_cords[0]), int(gear_cords[1])) , mask=gear_icon)
         # save image
         # get the running loop, crucial to the map command running without the world enfding
