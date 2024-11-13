@@ -11,11 +11,17 @@ class ShardErrorHandler(commands.Cog):
 
     def __init__(self, bot: Shard):
         self.bot = bot
+        self.debug_mode = False
 
     def cog_load(self):
         tree = self.bot.tree
         self._old_tree_error = tree.on_error
         tree.on_error = self.on_app_command_error
+
+    @commands.command()
+    async def debug_mode(self, ctx, on_off: bool):
+        self.debug_mode = on_off
+        return await ctx.send(f"Debug mode: {self.debug_mode}")
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -87,7 +93,10 @@ class ShardErrorHandler(commands.Cog):
             await interaction.response.send_message("You are missing the proper roles for this command.")
         else:
             self.bot.logger.exception(msg=error)
-            await interaction.channel.send("An error occurred, check the logs.")
+            if self.debug_mode is False:
+                return await interaction.channel.send("An error occurred, check the logs.")
+            elif self.debug_mode is True:
+                return await interaction.channel.send(f"Error:\n```{error}```")
 
 
 async def setup(bot: Shard):
