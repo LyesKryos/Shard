@@ -645,7 +645,7 @@ class CNC(commands.Cog):
         army_list = await conn.fetch('''SELECT * FROM cnc_armies WHERE location = $1''', prov_info['id'])
         # parse out army list
         if army_list is None:
-            army_list = "None"
+            army_list = "no"
         else:
             army_list = ", ".join(a['army_name'] for a in army_list)
         # build embed for province and populate name and ID
@@ -658,7 +658,7 @@ class CNC(commands.Cog):
         prov_embed.add_field(name="Core Owner", value=owner)
         prov_embed.add_field(name="Occupier", value=occupier)
         prov_embed.add_field(name="Troops and Armies", value=f"{troop_count} troops "
-                                                             f"in {len(army_list)} armies.")
+                                                             f"in {army_list} armies.")
         prov_embed.add_field(name="Terrain", value=f"{await self.terrain_name(prov_info['terrain'])}"+river)
         prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
         prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
