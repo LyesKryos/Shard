@@ -205,7 +205,7 @@ class CNC(commands.Cog):
         map.paste(prov, box=cord, mask=prov)
         map.save(fr"{self.map_directory}wargame_provinces.png")
 
-    async def locate_color(self, province: int, prov_cords: int):
+    async def locate_color(self, province: int, prov_cords: tuple):
         # define loop
         loop = self.bot.loop
         # fetch map and province
