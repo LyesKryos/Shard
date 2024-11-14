@@ -647,7 +647,7 @@ class CNC(commands.Cog):
         if army_list is None:
             army_list = "None"
         else:
-            army_list = ", ".join(a['name'] for a in army_list)
+            army_list = ", ".join(a['army_name'] for a in army_list)
         # build embed for province and populate name and ID
         prov_embed = discord.Embed(title=f"Province of {prov_info['name']}", description=f"Province #{prov_info['id']}",
                                    color=discord.Color.red())
