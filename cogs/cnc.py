@@ -216,7 +216,7 @@ class CNC(commands.Cog):
         # obtain size and coordinate information
         width = prov.size[0]
         height = prov.size[1]
-        cord = (prov_cords[0], prov_cords[1])
+        cord = (int(prov_cords[0]), int(prov_cords[1]))
         # for every pixel, change the color to the owners
         for x in range(0, width):
             for y in range(0, height):
