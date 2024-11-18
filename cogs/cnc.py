@@ -660,6 +660,49 @@ class CNC(commands.Cog):
         prov_embed.add_field(name="Production (last turn)", value=f"{prov_info['production']:,.3}")
         return await interaction.followup.send(embed=prov_embed)
 
+    @cnc.command(name="army_view", description="Displays information about a specific army.")
+    @app_commands.describe(army_id="The ID of the army")
+    async def army_view(self, interaction: discord.Interaction, army_id: int):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull army information
+        army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_id)
+        # if there is no such army
+        if army_info is None:
+            return await interaction.followup.send("No such army found.")
+        # otherwise, carry on
+        # define values
+        army_name = army_info['army_name']
+        owner_id = army_info['owner_id']
+        troops = army_info['troops']
+        location = army_info['location']
+        general = army_info['general']
+        if general == 0:
+            general = "None"
+        else:
+            general_info = await conn.fetchrow('''SELECT * FROM cnc_generals WHERE general_id = $1;''', general)
+            general = f"{general_info['name']} (ID: {general_info['general_id']})"
+        movement = army_info['movement']
+        # pull userinfo
+        userinfo = await self.user_db_info(owner_id)
+        user = self.bot.get_user(owner_id)
+        # build embed
+        army_embed = discord.Embed(title=f"{army_name}", description=f"Information about army with the ID {army_id}",
+                                   color=discord.Color.from_str(userinfo['color']))
+        army_embed.add_field(name="Owner", value=f"{userinfo['name']}\n({user.mention})")
+        army_embed.add_field(name="Troops", value=troops)
+        army_embed.add_field(name="Province Location ID", value=location)
+        army_embed.add_field(name="General", value=general)
+        army_embed.add_field(name="Movement Available", value=movement)
+        return await interaction.followup.send(embed=army_embed)
+
+    @cnc.command(name="army_report")
+    async def army_report(self, interaction: discord.Interaction):
+        pass
+
+
     # === Tech Commands === #
 
     @cnc.command(name="tech", description="Displays information about a specified technology.")
