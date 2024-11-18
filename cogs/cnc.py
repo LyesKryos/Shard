@@ -693,7 +693,7 @@ class CNC(commands.Cog):
                                    color=discord.Color.from_str(userinfo['color']))
         army_embed.add_field(name="Owner", value=f"{userinfo['name']}\n({user.mention})")
         army_embed.add_field(name="Troops", value=troops)
-        army_embed.add_field(name="Province Location ID", value=location)
+        army_embed.add_field(name="Province Location ID", value=location, inline=False)
         army_embed.add_field(name="General", value=general)
         army_embed.add_field(name="Movement Available", value=movement)
         return await interaction.followup.send(embed=army_embed)
