@@ -691,6 +691,7 @@ class CNC(commands.Cog):
         # build embed
         army_embed = discord.Embed(title=f"{army_name}", description=f"Information about army with the ID {army_id}",
                                    color=discord.Color.from_str(userinfo['color']))
+        army_embed.set_thumbnail(url=r"https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png")
         army_embed.add_field(name="Owner", value=f"{userinfo['name']}\n({user.mention})")
         army_embed.add_field(name="Troops", value=troops)
         army_embed.add_field(name="Province Location ID", value=location, inline=False)
