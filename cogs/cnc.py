@@ -1,6 +1,9 @@
 import functools
 
 from discord import app_commands
+from discord.ext.commands import Context
+from discord.ext.commands._types import BotT
+
 from ShardBot import Shard
 import discord
 from discord.ext import commands, tasks
@@ -10,6 +13,8 @@ from base64 import b64encode
 import requests
 from discord.ui import View, Select
 import math
+
+from customchecks import SilentFail
 
 
 def plus_minus(number: int) -> str:
@@ -120,6 +125,23 @@ class CNC(commands.Cog):
         self.banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2", "#999999"]
         self.version = "version 4.0 New Horizons"
         self.version_notes = ""
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer()
+        # establish connection
+        conn = self.bot.pool
+        # pull data
+        user_data = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        # check if existing
+        if user_data is None:
+            return True
+        # check blacklisted
+        if user_data['blacklisted'] is True:
+            return False
+        # otherwise, return true
+        else:
+            return True
 
     async def map_color(self, province: int, hexcode, release: bool = False):
         # establish connection
@@ -958,15 +980,7 @@ class CNC(commands.Cog):
         return await ctx.send(
             f"{tech_info['name']} has been forgotten for {user_info['name']} ({user.display_name}).")
 
-
-
-
-
-
-
-
-
-
+    # === Administrator Commands ===
     @commands.command()
     @commands.is_owner()
     async def cnc_reset_map(self, ctx):
