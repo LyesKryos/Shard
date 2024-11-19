@@ -699,7 +699,7 @@ class CNC(commands.Cog):
         army_embed.add_field(name="Movement Available", value=movement)
         return await interaction.followup.send(embed=army_embed)
 
-    @cnc.command(name="army_report")
+    @cnc.command(name="army_report", description="Displays information about all armies.")
     async def army_report(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer(thinking=True, ephemeral=True)
