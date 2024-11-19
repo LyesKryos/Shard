@@ -953,6 +953,7 @@ class CNC(commands.Cog):
         await conn.execute('''UPDATE cnc_users SET tech = array_remove(tech, $1) WHERE user_id = $2;''', tech, user.id)
         # execute tech db call, replacing the pluses with minuses and the minuses with pluses
         db_call = "".join("+" if c == "-" else "-" if c == "+" else c for c in tech_info['db_call'])
+        await ctx.send(db_call)
         await conn.execute(db_call, user.id)
         # send confirmation
         return await ctx.send(
