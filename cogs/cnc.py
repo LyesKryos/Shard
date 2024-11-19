@@ -127,8 +127,6 @@ class CNC(commands.Cog):
         self.version_notes = ""
 
     async def interaction_check(self, interaction: discord.Interaction):
-        # defer interaction
-        await interaction.response.defer()
         # establish connection
         conn = self.bot.pool
         # pull data
