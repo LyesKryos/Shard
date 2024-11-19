@@ -24,7 +24,7 @@ class ShardErrorHandler(commands.Cog):
         return await ctx.send(f"Debug mode: {self.debug_mode}")
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx, error: commands.CommandError):
         # parses the error
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
@@ -75,7 +75,7 @@ class ShardErrorHandler(commands.Cog):
         elif isinstance(error, discord.errors.Forbidden):
             await ctx.send("I cannot complete that action.")
         else:
-            self.bot.logger.exception(error)
+            self.bot.logger.exception(msg=error)
 
     @commands.Cog.listener()
     async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
