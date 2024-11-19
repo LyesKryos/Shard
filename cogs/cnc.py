@@ -734,10 +734,6 @@ class CNC(commands.Cog):
                                                               f"**General**: {general}")
         return await interaction.followup.send(embed=armies_embed)
 
-
-
-
-
     # === Tech Commands === #
 
     @cnc.command(name="tech", description="Displays information about a specified technology.")
@@ -901,6 +897,38 @@ class CNC(commands.Cog):
             # send cancel to db
             await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user_id)
             return await interaction.followup.send(f"Scientists are no longer researching {researching['tech']}.")
+
+    @commands.command()
+    @commands.is_owner()
+    async def cnc_research_tech(self, ctx, user: discord.Member, tech: str):
+        # establish connection
+        conn = self.bot.pool
+        # call user info
+        user_info = await self.user_db_info(user.id)
+        # check if such a user exists
+        if user_info is None:
+            return await ctx.send("No such user.")
+        # otherwise, carry on
+        # search for tech
+        tech_info = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE lower(name) = $1;''', tech.lower())
+        # if the tech name is wrong
+        if tech_info is None:
+            return await ctx.send("No such tech.")
+        # otherwise, carry on
+        techs = user_info['tech']
+        # if the user already has the tech, return denial
+        if tech.lower() in [t.lower() for t in techs]:
+            return await ctx.send("That user already researched that tech.")
+        # otherwise, carry on
+        # add the tech to their list
+        await conn.execute('''UPDATE cnc_users SET tech = tech || $1 WHERE user_id = $2;''', tech, user.id)
+        # execute tech db call
+        await conn.execute(tech_info['db_call'])
+        # send confirmation
+        return await ctx.send(f"{tech_info['name']} has been researched for {user_info['name']} ({user.name}).")
+
+
+
 
 
 
