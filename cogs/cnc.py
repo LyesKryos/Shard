@@ -729,9 +729,9 @@ class CNC(commands.Cog):
                 general = "No"
             else:
                 general = "Yes"
-            armies_embed.add_field(name=f"{army_name}", value=f"Troops: {troops}\n"
-                                                              f"Location: {location}\n"
-                                                              f"General: {general}")
+            armies_embed.add_field(name=f"{army_name}", value=f"*Troops*: {troops}\n"
+                                                              f"*Location*: {location}\n"
+                                                              f"*General*: {general}")
         return await interaction.followup.send(embed=armies_embed)
 
 
