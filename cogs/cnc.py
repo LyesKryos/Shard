@@ -951,11 +951,8 @@ class CNC(commands.Cog):
         # otherwise, carry on
         # remove the tech from their list
         await conn.execute('''UPDATE cnc_users SET tech = array_remove(tech, $1) WHERE user_id = $2;''', tech, user.id)
-        # cycle through all techs to make calls
-        for t in user_info['tech']:
-            t_info = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE name = $1;''', t)
-            # execute tech db call
-            await conn.execute(t_info['db_call'], user.id)
+        # execute tech db call, replacing the pluses with minuses and the minuses with pluses
+        await conn.execute(tech_info['db_call'].replace("+", "-").replace("-", "+"), user.id)
         # send confirmation
         return await ctx.send(
             f"{tech_info['name']} has been forgotten for {user_info['name']} ({user.display_name}).")
