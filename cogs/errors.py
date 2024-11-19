@@ -92,8 +92,6 @@ class ShardErrorHandler(commands.Cog):
         elif isinstance(error, app_commands.errors.MissingRole):
             await interaction.response.send_message("You are missing the proper roles for this command.")
         elif isinstance(error, app_commands.CheckFailure):
-            await interaction.followup.send("Error...")
-            await interaction.delete_original_response()
             await interaction.response.send_message(content="You do not have the right permissions for this command "
                                                     "or are blocked from using this command.", ephemeral=True)
         else:
