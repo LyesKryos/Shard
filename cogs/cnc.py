@@ -689,7 +689,7 @@ class CNC(commands.Cog):
         userinfo = await self.user_db_info(owner_id)
         user = self.bot.get_user(owner_id)
         # build embed
-        army_embed = discord.Embed(title=f"{army_name}", description=f"Information about army with the ID {army_id}",
+        army_embed = discord.Embed(title=f"{army_name}", description=f"Information about an army (ID {army_id}).",
                                    color=discord.Color.from_str(userinfo['color']))
         army_embed.set_thumbnail(url=r"https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png")
         army_embed.add_field(name="Owner", value=f"{userinfo['name']}\n({user.mention})")
@@ -701,7 +701,41 @@ class CNC(commands.Cog):
 
     @cnc.command(name="army_report")
     async def army_report(self, interaction: discord.Interaction):
-        pass
+        # defer interaction
+        await interaction.response.defer(thinking=True, ephemeral=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull user info
+        userinfo = await self.user_db_info(interaction.user.id)
+        # if the user isn't a player, deny
+        if userinfo is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # pull army information
+        army_info = await conn.fetch('''SELECT * FROM cnc_armies WHERE owner_id = $1;''', interaction.user.id)
+        # if there is no info
+        if army_info is None:
+            return await interaction.followup.send(f"{userinfo['name']} does not control any armies.")
+        # otherwise, carry on
+        # create embed
+        armies_embed = discord.Embed(title=f"Army Report for {userinfo['name']}",
+                                     description="Information concerning all controlled armies.")
+        # for each of the entries, make a field
+        for army in army_info:
+            army_name = army['army_name']
+            troops = army['troops']
+            location = army['location']
+            general = army['general']
+            if general == 0:
+                general = "No"
+            else:
+                general = "Yes"
+            armies_embed.add_field(name=f"{army_name}", value=f"Troops: {troops}\n"
+                                                              f"Location: {location}\n"
+                                                              f"General: {general}")
+        return await interaction.followup.send(embed=armies_embed)
+
+
+
 
 
     # === Tech Commands === #

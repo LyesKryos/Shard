@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Editing army_view command">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -381,7 +382,7 @@
       <workItem from="1731522879638" duration="3046000" />
       <workItem from="1731608558688" duration="1331000" />
       <workItem from="1731694576217" duration="1784000" />
-      <workItem from="1731969946288" duration="3815000" />
+      <workItem from="1731969946288" duration="5687000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -726,7 +727,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="977" />
+    <option name="localTasksCounter" value="978" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
