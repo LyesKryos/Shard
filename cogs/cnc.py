@@ -952,7 +952,8 @@ class CNC(commands.Cog):
         # remove the tech from their list
         await conn.execute('''UPDATE cnc_users SET tech = array_remove(tech, $1) WHERE user_id = $2;''', tech, user.id)
         # execute tech db call, replacing the pluses with minuses and the minuses with pluses
-        await conn.execute(tech_info['db_call'].replace("+", "-").replace("-", "+"), user.id)
+        db_call = "".join("+" if c == "-" else "-" if c == "+" else c for c in tech_info['db_call'])
+        await conn.execute(db_call, user.id)
         # send confirmation
         return await ctx.send(
             f"{tech_info['name']} has been forgotten for {user_info['name']} ({user.display_name}).")
