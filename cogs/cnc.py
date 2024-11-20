@@ -456,14 +456,14 @@ class CNC(commands.Cog):
         else:
             capital = capital['name']
         # pull relations information
-        alliances = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE $1 = ANY(members) AND type = 'alliance';''',
+        alliances = await conn.fetch('''SELECT * FROM cnc_alliances WHERE $1 = ANY(members);''',
                                      user_info['name'])
-        wars = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE $1 = ANY(members) AND type = 'wars';''',
+        wars = await conn.fetch('''SELECT * FROM cnc_wars WHERE $1 = ANY(members);''',
                                 user_info['name'])
-        trade_pacts = await conn.fetch('''SELECT * FROM cnc_diplomacy WHERE $1 = ANY(members) AND type = 'trade';''',
+        trade_pacts = await conn.fetch('''SELECT * FROM cnc_trade_pacts WHERE $1 = ANY(members);''',
                                        user_info['name'])
-        military_access = await conn.fetch('''SELECT * FROM cnc_diplomacy 
-        WHERE $1 = ANY(members) AND type = 'access';''', user_info['name'])
+        military_access = await conn.fetch('''SELECT * FROM cnc_military_access 
+        WHERE $1 = ANY(members);''', user_info['name'])
 
         def parse_relations(relations):
             if not relations:
@@ -753,6 +753,8 @@ class CNC(commands.Cog):
                                                               f"**Location**: {location}\n"
                                                               f"**General**: {general}")
         return await interaction.followup.send(embed=armies_embed)
+
+
 
     # === Tech Commands === #
 
