@@ -498,7 +498,7 @@ class CNC(commands.Cog):
         # populate stability
         user_embed.add_field(name="Stability", value=f"{user_info['stability']}")
         # populate all three types of authority
-        user_embed.add_field(name="===================AUTHORITY======================",
+        user_embed.add_field(name="====================AUTHORITY======================",
                              value="Information known about the nation's authority.", inline=False)
         user_embed.add_field(name="Political Authority", value=f"{user_info['pol_auth']}")
         user_embed.add_field(name="Military Authority", value=f"{user_info['mil_auth']}")
