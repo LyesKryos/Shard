@@ -549,6 +549,8 @@ class CNC(commands.Cog):
         # populate territory and count on its own line
         user_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}", inline=False)
         # populate authority and gains
+        user_embed.add_field(name="=====================AUTHORITY=====================",
+                             value="Information known about your nation's authority.", inline=False)
         user_embed.add_field(name="Political Authority (Change Last Turn)",
                              value=f"{user_info['pol_auth']} ({plus_minus(user_info['last_pol_auth_gain'])})")
         user_embed.add_field(name="Military Authority (Change Last Turn)",
@@ -556,6 +558,8 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Economic Authority (Change Last Turn)",
                              value=f"{user_info['econ_auth']} ({plus_minus(user_info['last_econ_auth_gain'])})")
         # populate troops and armies
+        user_embed.add_field(name="=======================ARMY========================",
+                             value="Information known about your nation's army.", inline=False)
         user_embed.add_field(name="Troops", value=f"{troops['sum']:,}")
         user_embed.add_field(name="Armies", value=f"{armies['count']}")
         user_embed.add_field(name="Generals", value=f"{generals['count']}")
@@ -567,12 +571,16 @@ class CNC(commands.Cog):
                                    f"({user_info['manpower_regen']}%)")
         user_embed.add_field(name="Total Manpower", value=f"{total_manpower['sum']:,}")
         # populate tax and spending stats
+        user_embed.add_field(name="======================ECONOMY======================",
+                             value="Information known about your nation's economy.", inline=False)
         user_embed.add_field(name="Taxation Level", value=f"{user_info['tax_level']}%")
         user_embed.add_field(name="Public Spending Cost",
                              value=f"{user_info['public_spend']} Economic Authority per turn")
         user_embed.add_field(name="Military Upkeep Cost",
                              value=f"{user_info['mil_upkeep']} Economic Authority per turn")
         # populate unrest, stability, overextension
+        user_embed.add_field(name="=====================GOVERNMENT=====================",
+                             value="Information known about your nation's government.", inline=False)
         user_embed.add_field(name="National Unrest", value=f"{user_info['unrest']}")
         user_embed.add_field(name="Stability", value=f"{user_info['stability']}")
         user_embed.add_field(name="Overextension Limit", value=f"{user_info['overextend_limit']}")
