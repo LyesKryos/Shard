@@ -558,7 +558,7 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Economic Authority (Change Last Turn)",
                              value=f"{user_info['econ_auth']} ({plus_minus(user_info['last_econ_auth_gain'])})")
         # populate troops and armies
-        user_embed.add_field(name="=======================MILITARY========================",
+        user_embed.add_field(name="=======================MILITARY======================",
                              value="Information known about your nation's military.", inline=False)
         user_embed.add_field(name="Troops", value=f"{troops['sum']:,}")
         user_embed.add_field(name="Armies", value=f"{armies['count']}")
