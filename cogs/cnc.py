@@ -579,7 +579,7 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Military Upkeep Cost",
                              value=f"{user_info['mil_upkeep']} Economic Authority per turn")
         # populate unrest, stability, overextension
-        user_embed.add_field(name="=====================GOVERNMENT=====================",
+        user_embed.add_field(name="=====================GOVERNMENT====================",
                              value="Information known about your nation's government.", inline=False)
         user_embed.add_field(name="National Unrest", value=f"{user_info['unrest']}")
         user_embed.add_field(name="Stability", value=f"{user_info['stability']}")
