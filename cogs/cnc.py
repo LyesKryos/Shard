@@ -487,7 +487,7 @@ class CNC(commands.Cog):
                                    description=f"Registered nation of "
                                                f"{(self.bot.get_user(user_info['user_id'])).mention}.")
         # populate government type and subtype
-        user_embed.add_field(name="===============GOVERNMENT===============",
+        user_embed.add_field(name="====================GOVERNMENT====================",
                              value="Information known about the nation's government.", inline=False)
         user_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}")
         # populate territory and count
@@ -497,13 +497,13 @@ class CNC(commands.Cog):
         # populate stability
         user_embed.add_field(name="Stability", value=f"{user_info['stability']}")
         # populate all three types of authority
-        user_embed.add_field(name="===============AUTHORITY===============",
+        user_embed.add_field(name="====================AUTHORITY====================",
                              value="Information known about the nation's authority.", inline=False)
         user_embed.add_field(name="Political Authority", value=f"{user_info['pol_auth']}")
         user_embed.add_field(name="Military Authority", value=f"{user_info['mil_auth']}")
         user_embed.add_field(name="Economic Authority", value=f"{user_info['econ_auth']}")
         # populate all four types of relations
-        user_embed.add_field(name="===============RELATIONS===============",
+        user_embed.add_field(name="====================RELATIONS====================",
                              value="Information known about the nation's international relationships.", inline=False)
         user_embed.add_field(name="Allies", value=f"{allies}")
         user_embed.add_field(name="Wars", value=f"{wars}")
