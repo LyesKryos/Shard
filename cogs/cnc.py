@@ -485,7 +485,7 @@ class CNC(commands.Cog):
         user_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
                                    color=discord.Color(int(user_info["color"].lstrip('#'), 16), ),
                                    description=f"Registered nation of "
-                                               f"{(self.bot.get_user(user_info['user_id'])).mention}.")
+                                               f"{(self.bot.get_user(user_info['user_id'])).mention}.\n")
         user_embed.set_thumbnail(url=r"https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png")
         # populate government type and subtype
         user_embed.add_field(name="====================GOVERNMENT====================",
