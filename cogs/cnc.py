@@ -486,6 +486,7 @@ class CNC(commands.Cog):
                                    color=discord.Color(int(user_info["color"].lstrip('#'), 16), ),
                                    description=f"Registered nation of "
                                                f"{(self.bot.get_user(user_info['user_id'])).mention}.")
+        user_embed.set_thumbnail(url=r"https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png")
         # populate government type and subtype
         user_embed.add_field(name="====================GOVERNMENT====================",
                              value="Information known about the nation's government.", inline=False)
