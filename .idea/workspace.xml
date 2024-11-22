@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing construct">
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing construct" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,7 +382,7 @@
       <workItem from="1731969946288" duration="9228000" />
       <workItem from="1732040103795" duration="6826000" />
       <workItem from="1732213300088" duration="6280000" />
-      <workItem from="1732297987299" duration="379000" />
+      <workItem from="1732297987299" duration="739000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -729,7 +727,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1017" />
+    <option name="localTasksCounter" value="1020" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -747,7 +745,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updating province command." />
     <MESSAGE value="Adding debug mode to errors.py" />
     <MESSAGE value="Updating province viewing command." />
     <MESSAGE value="Fixing locate province" />
@@ -771,6 +768,7 @@
     <MESSAGE value="Adding construct command" />
     <MESSAGE value="Fixing construct command" />
     <MESSAGE value="Updating errors.py" />
+    <MESSAGE value="Testing construct" />
     <MESSAGE value="Fixing construct" />
     <option name="LAST_COMMIT_MESSAGE" value="Fixing construct" />
   </component>
