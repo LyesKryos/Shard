@@ -1027,7 +1027,10 @@ class CNC(commands.Cog):
                                                        f"(ID: {prov_info['owner_id']}).")
         # check if the province has enough space
         development = prov_info['development']
-        structures_num = len(prov_info['structures'])
+        if prov_info['structures'] is not None:
+            structures_num = len(prov_info['structures'])
+        else:
+            structures_num = 0
         # to build, the development of the province must be x>1 where x is defined as (development/10) - number of structures
         if (development/10)-structures_num < 1:
             return await interaction.followup.send(f"{prov_info['name']} is not developed enough to support another structure.\n"
