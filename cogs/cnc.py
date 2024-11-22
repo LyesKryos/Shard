@@ -1021,9 +1021,10 @@ class CNC(commands.Cog):
         if prov_info['owner_id'] != interaction.user.id:
             return await interaction.followup.send("You do not own that province.")
         # check if structure is already built
-        if structure in prov_info['structures']:
-            return await interaction.followup.send(f"A {structure} already exists in {prov_info['name']} "
-                                                   f"(ID: {prov_info['owner_id']}).")
+        if prov_info['structures'] is not None:
+            if structure in prov_info['structures']:
+                return await interaction.followup.send(f"A {structure} already exists in {prov_info['name']} "
+                                                       f"(ID: {prov_info['owner_id']}).")
         # check if the province has enough space
         development = prov_info['development']
         structures_num = len(prov_info['structures'])
