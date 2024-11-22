@@ -1065,7 +1065,7 @@ class CNC(commands.Cog):
                                                        f"{structure_info['cost'] - user_info['econ_auth']} authority.")
         # check terrain requirements
         if structure_info['terrain'] is not None:
-            if prov_info['terrain'] == structure_info['terrain']:
+            if prov_info['terrain'] != structure_info['terrain']:
                 return await interaction.followup.send(f"You cannot build a {structure} in "
                                                        f"{prov_info['name']}'s improper terrain.")
         # check unique requirements
@@ -1084,7 +1084,7 @@ class CNC(commands.Cog):
         # if all checks are met, construct and bill cost
         try:
             await conn.execute('''UPDATE cnc_provinces SET structures = structures || $1 WHERE id = $2;''',
-                               structure, province_id)
+                               [structure], province_id)
             if structure_info['authority'] == "Military":
                 await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - $1 WHERE user_id = $2;''',
                                    structure_info['cost'], interaction.user.id)
