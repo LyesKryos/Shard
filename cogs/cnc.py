@@ -1145,19 +1145,21 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # check for user
         user_info = self.user_db_info(user.id)
+        # set authority
+        authority = authority.lower()
         if user_info is None:
             return await ctx.send("No such user registered.")
         # otherwise, carry on
-        if authority not in ['Economic', 'Military', 'Political']:
+        if authority not in ['economic', 'military', 'political']:
             return await ctx.send("That this not a valid authority name.")
         # commit authority
-        if authority == "Economic":
+        if authority == "economic":
             await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth + $1 WHERE user_id = $2;''',
                                amount, user.id)
-        if authority == "Military":
+        if authority == "military":
             await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth + $1 WHERE user_id = $2;''',
                                amount, user.id)
-        if authority == "Political":
+        if authority == "political":
             await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth + $1 WHERE user_id = $2;''',
                                amount, user.id)
         return await ctx.send(f"{amount} {authority} authority granted to {user.display_name}.")
