@@ -1044,7 +1044,8 @@ class CNC(commands.Cog):
                                        f"Unlocks {structure} structure")
         # if the user does not have the required tech
         if req_tech['name'] not in user_info['tech']:
-            return await interaction.followup.send(f"{req_tech['name']} must be researched to construct a {structure}.")
+            return await interaction.followup.send(f"The **{req_tech['name']}** tech must be researched before "
+                                                   f"constructing a {structure}.")
         # check if the user has enough authority of that type to expend
         structure_info = await conn.fetchrow('''SELECT * FROM cnc_structures WHERE name = $1;''', structure)
         # check if the user has enough military authority
