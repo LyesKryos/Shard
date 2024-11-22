@@ -956,8 +956,8 @@ class CNC(commands.Cog):
         if tech.lower() in [t.lower() for t in techs]:
             return await ctx.send("That user already researched that tech.")
         # otherwise, carry on
-        # add the tech to their list
         try:
+            # add the tech to their list
             await conn.execute('''UPDATE cnc_users SET tech = tech || $1 WHERE user_id = $2;''', [tech], user.id)
             # execute tech db call
             await conn.execute(tech_info['db_call'], user.id)
@@ -1065,7 +1065,7 @@ class CNC(commands.Cog):
                                                        f"{structure_info['cost'] - user_info['econ_auth']} authority.")
         # check terrain requirements
         if structure_info['terrain'] is not None:
-            if prov_info['terrain'] not in structure_info['terrain']:
+            if prov_info['terrain'] == structure_info['terrain']:
                 return await interaction.followup.send(f"You cannot build a {structure} in "
                                                        f"{prov_info['name']}'s improper terrain.")
         # check unique requirements
