@@ -1,4 +1,5 @@
 import functools
+import typing
 
 from discord import app_commands
 from discord.ext.commands import Context
@@ -112,7 +113,6 @@ class MapButtons(View):
             button.disabled = True
         # update the view so all the buttons are disabled
         await interaction.response.edit_message(view=self)
-
 
 class CNC(commands.Cog):
 
@@ -579,7 +579,7 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Military Upkeep Cost",
                              value=f"{user_info['mil_upkeep']} Economic Authority per turn")
         # populate unrest, stability, overextension
-        user_embed.add_field(name="=====================GOVERNMENT====================",
+        user_embed.add_field(name="=====================GOVERNMENT===================",
                              value="Information known about your nation's government.", inline=False)
         user_embed.add_field(name="National Unrest", value=f"{user_info['unrest']}")
         user_embed.add_field(name="Stability", value=f"{user_info['stability']}")
@@ -768,7 +768,6 @@ class CNC(commands.Cog):
                                                               f"**Location**: {location}\n"
                                                               f"**General**: {general}")
         return await interaction.followup.send(embed=armies_embed)
-
 
 
     # === Tech Commands === #
@@ -995,6 +994,97 @@ class CNC(commands.Cog):
         return await ctx.send(
             f"{tech_info['name']} has been forgotten for {user_info['name']} ({user.display_name}).")
 
+    # === Province Commands ===
+    @cnc.command(name="construct", description="Uses Authority to construct buildings in a province.")
+    @app_commands.describe(province_id="The ID of the province in which you would like to construct.",
+                           building="The name of the structure you would like to construct.")
+    @app_commands.guild_only()
+    async def construct(self, interaction: discord.Interaction, province_id: int,
+                        structure: typing.Literal['Farm', 'Trading Post', 'Quarry', 'Lumber Mill', 'Mine', 'Fishery',
+                        'City', 'Fort', 'Road', 'Manufactory', 'Port', 'Bridge', 'University', 'Temple']):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull user data
+        user_info = await self.user_db_info(interaction.user.id)
+        # check if the user exists
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # otherwise, carry on
+        # pull province data
+        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+        # check if province exists
+        if prov_info is None:
+            return await interaction.followup.send("That is not a valid province ID.")
+        # check if user owns province
+        if prov_info['owner_id'] != interaction.user.id:
+            return await interaction.followup.send("You do not own that province.")
+        # check if structure is already built
+        if structure in prov_info['structures']:
+            return await interaction.followup.send(f"A {structure} already exists in {prov_info['name']} "
+                                                   f"(ID: {prov_info['owner_id']}).")
+        # check if the province has enough space
+        development = prov_info['development']
+        structures_num = len(prov_info['structures'])
+        # to build, the development of the province must be x>1 where x is defined as (development/10) - number of structures
+        if (development/10)-structures_num < 1:
+            return await interaction.followup.send(f"{prov_info['name']} is not developed enough to support another structure.\n"
+                                                   f"The province will need an additional "
+                                                   f"{math.ceil(development-(structures_num*10))} to "
+                                                   f"build another structure.")
+        # search for required tech
+        req_tech = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE description = $1;''',
+                                       f"Unlocks {structure} structure.")
+        # if the user does not have the required tech
+        if req_tech['name'] not in user_info['tech']:
+            return await interaction.followup.send(f"{req_tech['name']} must be researched to construct a {structure}.")
+        # check if the user has enough authority of that type to expend
+        structure_info = await conn.fetchrow('''SELECT * FROM cnc_structures WHERE name = $1;''', structure)
+        # check if the user has enough military authority
+        if structure_info['authority'] == "Military":
+            if user_info['mil_auth'] < structure_info['cost']:
+                return await interaction.followup.send("You do not have enough "
+                                                       "Military Authority to build that structure. You are lacking "
+                                                       f"{structure_info['cost'] - user_info['mil_auth']} authority.")
+        # check if the user has enough economic authority
+        elif structure_info['authority'] == "Economic":
+            if user_info['econ_auth'] < structure_info['cost']:
+                return await interaction.followup.send("You do not have enough "
+                                                       "Economic Authority to build that structure. You are lacking "
+                                                       f"{structure_info['cost'] - user_info['econ_auth']} authority.")
+        # check terrain requirements
+        if structure_info['terrain'] is not None:
+            if prov_info['terrain'] not in structure_info['terrain']:
+                return await interaction.followup.send(f"You cannot build a {structure} in "
+                                                       f"{prov_info['name']}'s improper terrain.")
+        # check unique requirements
+        if structure == "Port":
+            if prov_info['coast'] is False:
+                return await interaction.followup.send(f"You cannot build a {structure} in "
+                                                       f"{prov_info['name']}'s improper terrain.")
+        if structure == "Bridge":
+            if prov_info['river'] is False:
+                return await interaction.followup.send(f"You cannot build a {structure} in "
+                                                       f"{prov_info['name']}'s improper terrain.")
+        if structure == "University":
+            if "City" not in prov_info['structures']:
+                return await interaction.followup.send(f"You must construct a City in {prov_info['name']} "
+                                                       f"before constructing a University.")
+        # if all checks are met, construct and bill cost
+        try:
+            await conn.execute('''UPDATE cnc_provinces SET structures = structures || $1 WHERE id = $2;''',
+                               structure, province_id)
+            if structure_info['authority'] == "Military":
+                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - $1 WHERE user_id = $2;''',
+                                   structure_info['cost'], interaction.user.id)
+            elif structure_info['authority'] == "Economic":
+                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $1 WHERE user_id = $2;''',
+                                   structure_info['cost'], interaction.user.id)
+        except Exception as error:
+            raise error
+        return await interaction.followup.send(f"{structure} successfully constructed in {prov_info['name']}.")
+
     # === Administrator Commands ===
     @commands.command()
     @commands.is_owner()
@@ -1033,6 +1123,8 @@ class CNC(commands.Cog):
         await delete_confirm.delete()
         return await ctx.send(f"Permanent deletion of {self.bot.get_user(user_id).name} "
                               "from the Command and Conquest System completed.")
+
+
 
 
 async def setup(bot: Shard):
