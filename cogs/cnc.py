@@ -1040,9 +1040,8 @@ class CNC(commands.Cog):
                                                        f"{math.ceil(development-((structures_num-1)*10))} to "
                                                        f"build another structure.")
         # search for required tech
-        req_tech = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE description = $1;''',
+        req_tech = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE effect = $1;''',
                                        f"Unlocks {structure} structure.")
-        await interaction.followup.send(req_tech)
         # if the user does not have the required tech
         if req_tech['name'] not in user_info['tech']:
             return await interaction.followup.send(f"{req_tech['name']} must be researched to construct a {structure}.")
