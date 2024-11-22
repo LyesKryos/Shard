@@ -957,9 +957,12 @@ class CNC(commands.Cog):
             return await ctx.send("That user already researched that tech.")
         # otherwise, carry on
         # add the tech to their list
-        await conn.execute('''UPDATE cnc_users SET tech = tech || $1 WHERE user_id = $2;''', [tech], user.id)
-        # execute tech db call
-        await conn.execute(tech_info['db_call'], user.id)
+        try:
+            await conn.execute('''UPDATE cnc_users SET tech = tech || $1 WHERE user_id = $2;''', tech, user.id)
+            # execute tech db call
+            await conn.execute(tech_info['db_call'], user.id)
+        except Exception as error:
+            raise error
         # send confirmation
         return await ctx.send(f"{tech_info['name']} has been researched for {user_info['name']} ({user.display_name}).")
 
