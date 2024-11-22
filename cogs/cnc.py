@@ -960,7 +960,8 @@ class CNC(commands.Cog):
             # add the tech to their list
             await conn.execute('''UPDATE cnc_users SET tech = tech || $1 WHERE user_id = $2;''', [tech], user.id)
             # execute tech db call
-            await conn.execute(tech_info['db_call'], user.id)
+            if tech_info['db_call'] is not None:
+                await conn.execute(tech_info['db_call'], user.id)
         except Exception as error:
             raise error
         # send confirmation
