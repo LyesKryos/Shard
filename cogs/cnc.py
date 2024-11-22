@@ -997,7 +997,7 @@ class CNC(commands.Cog):
     # === Province Commands ===
     @cnc.command(name="construct", description="Uses Authority to construct buildings in a province.")
     @app_commands.describe(province_id="The ID of the province in which you would like to construct.",
-                           building="The name of the structure you would like to construct.")
+                           structure="The name of the structure you would like to construct.")
     @app_commands.guild_only()
     async def construct(self, interaction: discord.Interaction, province_id: int,
                         structure: typing.Literal['Farm', 'Trading Post', 'Quarry', 'Lumber Mill', 'Mine', 'Fishery',
