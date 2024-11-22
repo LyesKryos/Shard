@@ -1106,9 +1106,9 @@ class CNC(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def permanent_delete_user(self, ctx, user_id: int):
+    async def cnc_permanent_delete_user(self, ctx, user: discord.Member):
         # sent a confirmation message
-        delete_confirm = await ctx.send(f"Are you certain you would like to delete {self.bot.get_user(user_id).name} "
+        delete_confirm = await ctx.send(f"Are you certain you would like to delete {user.name} "
                                         f"from the Command and Conquest System?")
 
         # wait for a confirmation message
@@ -1120,20 +1120,48 @@ class CNC(commands.Cog):
             if str(reaction.emoji) != "\U00002705":
                 return await ctx.send("Must confirm deletion with: \U00002705")
         except asyncio.TimeoutError:
-            return await delete_confirm.edit(content=f"Permanent deletion of {self.bot.get_user(user_id).name} "
+            return await delete_confirm.edit(content=f"Permanent deletion of {user.name} "
                                                      f"from the Command and Conquest System aborted.")
         conn = self.bot.pool
-        user = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', user_id)
+        user = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', user.id)
         if user is None:
             return await ctx.send("No such user in the CNC system.")
-        await conn.execute('''DELETE FROM cnc_users WHERE user_id = $1;''', user_id)
-        await conn.execute('''DELETE FROM cnc_armies WHERE owner_id = $1;''', user_id)
-        await conn.execute('''UPDATE cnc_provinces SET owner_id = 0, occupier_id = 0 
-        WHERE owner_id = $1 AND occupier_id = $1;''', user_id)
-        await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user_id)
-        await delete_confirm.delete()
-        return await ctx.send(f"Permanent deletion of {self.bot.get_user(user_id).name} "
+        try:
+            await conn.execute('''DELETE FROM cnc_users WHERE user_id = $1;''', user.id)
+            await conn.execute('''DELETE FROM cnc_armies WHERE owner_id = $1;''', user.id)
+            await conn.execute('''UPDATE cnc_provinces SET owner_id = 0, occupier_id = 0 
+            WHERE owner_id = $1 AND occupier_id = $1;''', user.id)
+            await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user.id)
+            await delete_confirm.delete()
+        except Exception as error:
+            raise error
+        return await ctx.send(f"Permanent deletion of {user.id.name} "
                               "from the Command and Conquest System completed.")
+
+    @commands.command()
+    @commands.is_owner()
+    async def cnc_give_authority(self, ctx, user: discord.Member, authority: str, amount: int):
+        # establish connection
+        conn = self.bot.pool
+        # check for user
+        user_info = self.user_db_info(user.id)
+        if user_info is None:
+            return await ctx.send("No such user registered.")
+        # otherwise, carry on
+        if authority not in ['Economic', 'Military', 'Political']:
+            return await ctx.send("That this not a valid authority name.")
+        # commit authority
+        if authority == "Economic":
+            await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth + $1 WHERE user_id = $2;''',
+                               amount, user.id)
+        if authority == "Military":
+            await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth + $1 WHERE user_id = $2;''',
+                               amount, user.id)
+        if authority == "Political":
+            await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth + $1 WHERE user_id = $2;''',
+                               amount, user.id)
+        return await ctx.send(f"{amount} {authority} authority granted to {user.display_name}.")
+
 
 
 
