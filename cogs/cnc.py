@@ -677,6 +677,11 @@ class CNC(commands.Cog):
             troop_count = 0
         else:
             troop_count = f"{troop_count['sum']:,}"
+        # parse structures
+        if prov_info['structures'] is None:
+            structures = "None"
+        else:
+            structures = ",".join(p for p in prov_info['structures'])
         army_list = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE location = $1''', prov_info['id'])
         # build embed for province and populate name and ID
         prov_embed = discord.Embed(title=f"Province of {prov_info['name']}", description=f"Province #{prov_info['id']}",
@@ -693,6 +698,7 @@ class CNC(commands.Cog):
         prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
         prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
         prov_embed.add_field(name="Production (last turn)", value=f"{prov_info['production']:,.3}")
+        prov_embed.add_field(name="Structures", value=f"{structures}")
         return await interaction.followup.send(embed=prov_embed)
 
     @cnc.command(name="army_view", description="Displays information about a specific army.")
