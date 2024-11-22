@@ -1032,11 +1032,13 @@ class CNC(commands.Cog):
         else:
             structures_num = 0
         # to build, the development of the province must be x>1 where x is defined as (development/10) - number of structures
-        if (development/10)-structures_num < 1:
-            return await interaction.followup.send(f"{prov_info['name']} is not developed enough to support another structure.\n"
-                                                   f"The province will need an additional "
-                                                   f"{math.ceil(development-(structures_num*10))} to "
-                                                   f"build another structure.")
+        # accepting that each province can host a minimum of 1 structure
+        if structures_num > 0:
+            if (development/10)-structures_num + 1 < 1:
+                return await interaction.followup.send(f"{prov_info['name']} is not developed enough to support another structure.\n"
+                                                       f"The province will need an additional "
+                                                       f"{math.ceil(development-((structures_num-1)*10))} to "
+                                                       f"build another structure.")
         # search for required tech
         req_tech = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE description = $1;''',
                                        f"Unlocks {structure} structure.")
