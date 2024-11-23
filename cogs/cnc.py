@@ -1131,7 +1131,7 @@ class CNC(commands.Cog):
             return await interaction.followup.send("No such structure exists in that province.")
         # otherwise cary on
         # remove the structure from the province
-        await conn.execute('''UPDATE cnc_provinces SET structres = array_remove(structures, $1) WHERE id = $2;''',
+        await conn.execute('''UPDATE cnc_provinces SET structures = array_remove(structures, $1) WHERE id = $2;''',
                            structure, province_id)
         return await interaction.followup.send(f"The {structure} has been deconstructed in "
                                                f"{prov_info['name']} (ID: {province_id}).")
