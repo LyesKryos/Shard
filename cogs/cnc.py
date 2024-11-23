@@ -680,6 +680,8 @@ class CNC(commands.Cog):
         # parse structures
         if prov_info['structures'] is None:
             structures = "None"
+        elif not prov_info['structures']:
+            structures = "None"
         else:
             structures = ",".join(p for p in prov_info['structures'])
         army_list = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE location = $1''', prov_info['id'])
