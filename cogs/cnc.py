@@ -526,7 +526,7 @@ class CNC(commands.Cog):
         # if the user does not exist
         if user_info is None:
             # return error message
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
+            return await interaction.followup.send("You are not a registered member of the CNC system`.")
         # pull province data
         province_list = await self.nation_provinces_db_info(user_id)
         province_list = [p['id'] for p in province_list]
@@ -697,7 +697,7 @@ class CNC(commands.Cog):
         prov_embed.add_field(name="Terrain", value=f"{await self.terrain_name(prov_info['terrain'])}"+river)
         prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
         prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
-        prov_embed.add_field(name="Production (last turn)", value=f"{prov_info['production']:,.3}")
+        prov_embed.add_field(name="Production\n(last turn)", value=f"{prov_info['production']:,.3}")
         prov_embed.add_field(name="Structures", value=f"{structures}")
         return await interaction.followup.send(embed=prov_embed)
 
@@ -1034,7 +1034,7 @@ class CNC(commands.Cog):
         if prov_info['structures'] is not None:
             if structure in prov_info['structures']:
                 return await interaction.followup.send(f"A {structure} already exists in {prov_info['name']} "
-                                                       f"(ID: {prov_info['owner_id']}).")
+                                                       f"(ID: {prov_info['id']}).")
         # check if the province has enough space
         development = prov_info['development']
         if prov_info['structures'] is not None:
@@ -1101,6 +1101,42 @@ class CNC(commands.Cog):
         except Exception as error:
             raise error
         return await interaction.followup.send(f"{structure} successfully constructed in {prov_info['name']}.")
+
+    @cnc.command(name="deconstruct", description="Deconstructs a structure in a province.")
+    async def deconstruct(self, interaction: discord.Interaction, province_id: int,
+                          structure: typing.Literal['Farm', 'Trading Post', 'Quarry', 'Lumber Mill', 'Mine', 'Fishery',
+                          'City', 'Fort', 'Road', 'Manufactory', 'Port', 'Bridge', 'University', 'Temple']):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull userinfo
+        user_info = await self.user_db_info(interaction.user.id)
+        # check for registration
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # pull province info
+        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+        # check if province exists
+        if prov_info is None:
+            return await interaction.followup.send("That is not a valid province ID.")
+        # check if user owns province
+        if prov_info['owner_id'] != interaction.user.id:
+            return await interaction.followup.send("You do not own that province.")
+        # check if structure is already built
+        if prov_info['structures'] is not None:
+            if structure not in prov_info['structures']:
+                return await interaction.followup.send("No such structure exists in that province.")
+        else:
+            return await interaction.followup.send("No such structure exists in that province.")
+        # otherwise cary on
+        # remove the structure from the province
+        await conn.execute('''UPDATE cnc_provinces SET structres = array_remove(structures, $1) WHERE id = $2;''',
+                           structure, province_id)
+        return await interaction.followup.send(f"The {structure} has been deconstructed in "
+                                               f"{prov_info['name']} (ID: {province_id}).")
+
+
 
     # === Administrator Commands ===
     @commands.command()
