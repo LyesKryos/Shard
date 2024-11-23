@@ -1,5 +1,6 @@
 import functools
 import typing
+from random import randrange
 
 from discord import app_commands
 from discord.ext.commands import Context
@@ -1140,6 +1141,7 @@ class CNC(commands.Cog):
 
 
 
+
     # === Administrator Commands ===
     @commands.command()
     @commands.is_owner()
@@ -1207,6 +1209,38 @@ class CNC(commands.Cog):
             await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth + $1 WHERE user_id = $2;''',
                                amount, user.id)
         return await ctx.send(f"{amount} {authority} authority granted to {user.display_name}.")
+
+    @commands.command()
+    @commands.is_owner()
+    async def cnc_roll_development(self, ctx):
+        # establish connection
+        conn = self.bot.pool
+        # pull terrain data
+        terrain_rolls = await conn.fetch('''SELECT * FROM cnc_terrains WHERE base_development IS NOT NULL;''')
+        # create terrain dict
+        terrain_info = {}
+        for t in terrain_rolls:
+            terrain_info.update({t['id']: t['base_development']})
+        # pull provinces
+        all_provinces = await conn.fetch('''SELECT * FROM cnc_provinces;''')
+        # for every province, set the development = (bd + 1d6) + 1d2 (river) + 1d3 (coast)
+        total_p = 0
+        for p in all_provinces:
+            # define the bd as per the terrain
+            bd = terrain_info[p['terrain']]
+            # add 1d2 if river
+            if p['river']:
+                bd += randrange(1,2)
+            # add 1d3 if coastal
+            if p['coast']:
+                bd += randrange(1,3)
+            # generate number
+            rng = randrange(1,6)
+            total_dev = bd + rng
+            await conn.execute('''UPDATE cnc_provinces SET development = $1 WHERE id = $2;''', total_dev, p.id)
+            total_p += 1
+        return await ctx.send(f"{total_p} provinces have been set.")
+
 
 
 
