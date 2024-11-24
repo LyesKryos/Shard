@@ -27,7 +27,7 @@ class ShardErrorHandler(commands.Cog):
     async def on_command_error(self, ctx, error: commands.CommandError):
         # parses the error
         if isinstance(error, commands.CommandInvokeError):
-            error = traceback.format_exception(type(error), error, error.__traceback__)
+            error = traceback.format_exc()
         # load/unload/reload errors
         if isinstance(error, commands.ExtensionNotFound):
             await ctx.send("There is no such extension, idjit.")
