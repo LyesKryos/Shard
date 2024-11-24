@@ -27,7 +27,7 @@ class ShardErrorHandler(commands.Cog):
     async def on_command_error(self, ctx, error: commands.CommandError):
         # parses the error
         if isinstance(error, commands.CommandInvokeError):
-            error = error.original
+            error = error.__traceback__
         # load/unload/reload errors
         if isinstance(error, commands.ExtensionNotFound):
             await ctx.send("There is no such extension, idjit.")
@@ -76,6 +76,7 @@ class ShardErrorHandler(commands.Cog):
             await ctx.send("I cannot complete that action.")
         else:
             self.bot.logger.exception(msg=error)
+            await ctx.send("An error occured, check the logs.")
 
     @commands.Cog.listener()
     async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
