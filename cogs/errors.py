@@ -1,3 +1,4 @@
+import sys
 import traceback
 
 import discord.errors
@@ -72,7 +73,8 @@ class ShardErrorHandler(commands.Cog):
         elif isinstance(error, discord.errors.Forbidden):
             await ctx.send("I cannot complete that action.")
         else:
-            self.bot.logger.exception(msg=error)
+            tb = sys.exception().__traceback__
+            self.bot.logger.exception(msg=error.with_traceback(tb))
             await ctx.send("An error occured, check the logs.")
 
     @commands.Cog.listener()
