@@ -1248,7 +1248,8 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # set population = base dev * a random number between 500 and 1500
-        await conn.execute('''UPDATE cnc_provinces SET citizens = development * (RAND()*(1500-500)+500);''')
+        with ctx.typing():
+            await conn.execute('''UPDATE cnc_provinces SET citizens = development * (RANDOM()*(1500-500)+500);''')
         return await ctx.send("World populated.")
 
 
