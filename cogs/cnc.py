@@ -1237,7 +1237,7 @@ class CNC(commands.Cog):
             # generate number
             rng = randrange(1,6)
             total_dev = bd + rng
-            await conn.execute('''UPDATE cnc_provinces SET development = $1 WHERE id = $2;''', total_dev, p.id)
+            await conn.execute('''UPDATE cnc_provinces SET development = $1 WHERE id = $2;''', total_dev, p['id'])
             total_p += 1
         return await ctx.send(f"{total_p} provinces have been set.")
 
