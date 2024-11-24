@@ -701,6 +701,7 @@ class CNC(commands.Cog):
         prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
         prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
         prov_embed.add_field(name="Production\n(last turn)", value=f"{prov_info['production']:,.3}")
+        prov_embed.add_field(name="Development", value=f"{prov_info['development']}")
         prov_embed.add_field(name="Structures", value=f"{structures}")
         return await interaction.followup.send(embed=prov_embed)
 
