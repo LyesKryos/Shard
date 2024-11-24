@@ -1242,6 +1242,17 @@ class CNC(commands.Cog):
             total_p += 1
         return await ctx.send(f"{total_p} provinces have been set.")
 
+    @commands.command()
+    @commands.is_owner()
+    async def cnc_populate_world(self, ctx):
+        # establish connection
+        conn = self.bot.pool
+        # set population = base dev * a random number between 500 and 1500
+        await conn.execute('''UPDATE cnc_provinces SET citizens = development * (RAND()*(1500-500)+500);''')
+        return await ctx.send("World populated.")
+
+
+
 
 
 
