@@ -73,9 +73,8 @@ class ShardErrorHandler(commands.Cog):
         elif isinstance(error, discord.errors.Forbidden):
             await ctx.send("I cannot complete that action.")
         else:
-            tb = sys.exception().__traceback__
-            self.bot.logger.exception(msg=error.with_traceback(tb))
-            await ctx.send("An error occured, check the logs.")
+            self.bot.logger.exception(msg=error.__traceback__)
+            await ctx.send("An error occurred, check the logs.")
 
     @commands.Cog.listener()
     async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
