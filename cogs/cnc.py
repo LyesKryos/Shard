@@ -1231,6 +1231,22 @@ class CNC(commands.Cog):
         # otherwise, blacklist
         await conn.execute('''UPDATE cnc_users SET blacklisted = True WHERE user_id = $1;''',
                            user.id)
+        return await ctx.send(f"{user.display_name} has been blacklisted.")
+
+    @commands.command()
+    @commands.has_role(928889638888812586)
+    async def cnc_whitelist(self, ctx, user: discord.Member):
+        # establish connection
+        conn = self.bot.pool
+        # pull userinfo
+        user_info = self.user_db_info(user.id)
+        # check for user
+        if user_info is None:
+            return await ctx.send("No such user registered.")
+        # otherwise, blacklist
+        await conn.execute('''UPDATE cnc_users SET blacklisted = FALSE WHERE user_id = $1;''',
+                           user.id)
+        return await ctx.send(f"{user.display_name} has been whitelisted.")
 
 
     # === Administrator Commands ===
