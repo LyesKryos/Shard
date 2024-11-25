@@ -877,12 +877,21 @@ class CNC(commands.Cog):
         # set base research time as four turns
         research_time = 4
         # pull development score
-        total_dev = await conn.fetchrow('''SELECT sum(development) FROM cnc_provinces WHERE owner_id = $1;''', user_id)
-        total_dev = total_dev['sum']
+        total_dev = await conn.fetchrow('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1;''', user_id)
+        total_dev = total_dev['avg']
         # pull research time
         research_buff = user_info['research_time']
         # calculate total research time
         research_time += (total_dev//10) + research_buff
+        # if the government subtype is Technocratic, reduce time by one
+        if user_info['govt_subtype'] == "Technocratic":
+            research_time -= 1
+        # if the government type is Equalism, reduce time by one
+        if user_info['govt_type'] == "Equalism":
+            research_time -= 1
+        # ensure the research time is at least 4
+        if research_time < 4:
+            research_time = 4
         # add to researching database
         await conn.execute('''INSERT INTO cnc_researching VALUES($1,$2,$3);''',
                            user_id, tech_info['name'], research_time)
@@ -1045,6 +1054,9 @@ class CNC(commands.Cog):
             structures_num = len(prov_info['structures'])
         else:
             structures_num = 0
+        # if the Engineering tech has been researched, increase building slots by 1
+        if "Engineering" in user_info['tech']:
+            structures_num -= 1
         # to build, the development of the province must be x>1 where x is defined as (development/10) - number of structures
         # accepting that each province can host a minimum of 1 structure
         if structures_num > 0:
@@ -1062,18 +1074,52 @@ class CNC(commands.Cog):
                                                    f"constructing a {structure}.")
         # check if the user has enough authority of that type to expend
         structure_info = await conn.fetchrow('''SELECT * FROM cnc_structures WHERE name = $1;''', structure)
+        structure_cost = structure_info['cost']
+        # GOVERNMENT AND TECH MODIFICATIONS
+        # if the structure is a Fort
+        if structure == "Fort":
+            # if Siegeworks is researched, add 2 to the cost
+            if "Siegeworks" in user_info['tech']:
+                structure_cost += 2
+            # if the government is absolute monarchy, reduce cost by 1
+            if user_info['govt_subtype'] == "Absolute":
+                structure_cost -= 1
+        # if Machines is researched, subtract 1 from the cost, minimum 1
+        if "Machines" in user_info['tech']:
+            structure_cost -= 1
+        # if the structure is a temple and the government subtype is Theocratic, reduce by 2
+        if (structure == "Temples") and (user_info['govt_subtype'] == "Theocratic"):
+            structure_cost -= 2
+        # if the structure is a city and the government subtype is Patrician, reduce by 1
+        if (structure == "City") and (user_info['govt_subtype'] == "Patrician"):
+            structure_cost -= 2
+        # if the structure is a port and the government subtype is Merchant, reduce by 1
+        if (structure == "Port") and (user_info['govt_subtype'] == "Merchant"):
+            structure_cost -= 1
+        # if the structure is a port or a bridge and the government subtype is Populist, reduce by 50%
+        if (structure == "Port" or structure == "Bridge") and (user_info['govt_subtype'] == "Populist"):
+            structure_cost *= .5
+        # structures must cost at least one power
+        if structure_cost < 0:
+            structure_cost = 1
+        # if the user is Tusail, only use political authority
+        if user_info['govt_type'] == "Tusail":
+            if user_info['pol_auth'] < structure_cost:
+                return await interaction.followup.send("You do not have enough "
+                                                       "Political Authority to build that structure. You are lacking "
+                                                       f"{structure_cost - user_info['pol_auth']} authority.")
         # check if the user has enough military authority
-        if structure_info['authority'] == "Military":
-            if user_info['mil_auth'] < structure_info['cost']:
+        elif structure_info['authority'] == "Military":
+            if user_info['mil_auth'] < structure_cost:
                 return await interaction.followup.send("You do not have enough "
                                                        "Military Authority to build that structure. You are lacking "
-                                                       f"{structure_info['cost'] - user_info['mil_auth']} authority.")
+                                                       f"{structure_cost - user_info['mil_auth']} authority.")
         # check if the user has enough economic authority
         elif structure_info['authority'] == "Economic":
-            if user_info['econ_auth'] < structure_info['cost']:
+            if user_info['econ_auth'] < structure_cost:
                 return await interaction.followup.send("You do not have enough "
                                                        "Economic Authority to build that structure. You are lacking "
-                                                       f"{structure_info['cost'] - user_info['econ_auth']} authority.")
+                                                       f"{structure_cost - user_info['econ_auth']} authority.")
         # check terrain requirements
         if structure_info['terrain'] is not None:
             if prov_info['terrain'] != structure_info['terrain']:
@@ -1102,6 +1148,9 @@ class CNC(commands.Cog):
             elif structure_info['authority'] == "Economic":
                 await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $1 WHERE user_id = $2;''',
                                    structure_info['cost'], interaction.user.id)
+            if structure == "Fort":
+                await conn.execute('''UPDATE cnc_provincea SET fort_level = $1 WHERE id = $2;''',
+                                   user_info['fort_level'], interaction.user.id)
         except Exception as error:
             raise error
         return await interaction.followup.send(f"{structure} successfully constructed in {prov_info['name']}.")
@@ -1141,6 +1190,47 @@ class CNC(commands.Cog):
                                                f"{prov_info['name']} (ID: {province_id}).")
 
 
+
+    # === Moderator Commands ===
+    @commands.command()
+    @commands.has_role(928889638888812586)
+    async def cnc_give_authority(self, ctx, user: discord.Member, authority: str, amount: int):
+        # establish connection
+        conn = self.bot.pool
+        # check for user
+        user_info = self.user_db_info(user.id)
+        # set authority
+        authority = authority.lower()
+        if user_info is None:
+            return await ctx.send("No such user registered.")
+        # otherwise, carry on
+        if authority not in ['economic', 'military', 'political']:
+            return await ctx.send("That this not a valid authority name.")
+        # commit authority
+        if authority == "economic":
+            await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth + $1 WHERE user_id = $2;''',
+                               amount, user.id)
+        if authority == "military":
+            await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth + $1 WHERE user_id = $2;''',
+                               amount, user.id)
+        if authority == "political":
+            await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth + $1 WHERE user_id = $2;''',
+                               amount, user.id)
+        return await ctx.send(f"{amount} {authority} authority granted to {user.display_name}.")
+
+    @commands.command()
+    @commands.has_role(928889638888812586)
+    async def cnc_blacklist(self, ctx, user: discord.Member):
+        # establish connection
+        conn = self.bot.pool
+        # pull userinfo
+        user_info = self.user_db_info(user.id)
+        # check for user
+        if user_info is None:
+            return await ctx.send("No such user registered.")
+        # otherwise, blacklist
+        await conn.execute('''UPDATE cnc_users SET blacklisted = True WHERE user_id = $1;''',
+                           user.id)
 
 
     # === Administrator Commands ===
@@ -1184,32 +1274,6 @@ class CNC(commands.Cog):
             raise error
         return await ctx.send(f"Permanent deletion of {user.id.name} "
                               "from the Command and Conquest System completed.")
-
-    @commands.command()
-    @commands.is_owner()
-    async def cnc_give_authority(self, ctx, user: discord.Member, authority: str, amount: int):
-        # establish connection
-        conn = self.bot.pool
-        # check for user
-        user_info = self.user_db_info(user.id)
-        # set authority
-        authority = authority.lower()
-        if user_info is None:
-            return await ctx.send("No such user registered.")
-        # otherwise, carry on
-        if authority not in ['economic', 'military', 'political']:
-            return await ctx.send("That this not a valid authority name.")
-        # commit authority
-        if authority == "economic":
-            await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth + $1 WHERE user_id = $2;''',
-                               amount, user.id)
-        if authority == "military":
-            await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth + $1 WHERE user_id = $2;''',
-                               amount, user.id)
-        if authority == "political":
-            await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth + $1 WHERE user_id = $2;''',
-                               amount, user.id)
-        return await ctx.send(f"{amount} {authority} authority granted to {user.display_name}.")
 
     @commands.command()
     @commands.is_owner()
