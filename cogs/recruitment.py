@@ -53,6 +53,7 @@ class Recruitment(commands.Cog):
         self.bot = bot
         self.db_error = False
         self.verbose_mode = False
+        self.retentioing = False
 
         # if not self.autogrammer.is_running():
         #     self.autogrammer.start()
@@ -118,37 +119,22 @@ class Recruitment(commands.Cog):
                 continue
 
         async def retention(bot):
-            # wait for the bot to be ready
-            await bot.wait_until_ready()
-            # define channels
-            recruitment_channel = bot.get_channel(674342850296807454)
-            crashchannel = bot.get_channel(835579413625569322)
-            thegye_server = bot.get_guild(674259612580446230)
-            notifrole = thegye_server.get_role(950950836006187018)
-            # let the crash channel know
-            self.bot.system_message += "From recruitment.py: Starting retention loop.\n"
-            # connect to the API
-            async with aiohttp.ClientSession() as session:
-                headers = {"User-Agent": "Bassiliya"}
-                params = {'q': 'nations',
-                          'region': 'thegye'}
-                async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
-                                       headers=headers, params=params) as recruitsresp:
-                    nations = await recruitsresp.text()
-                    # ratelimiter
-                    while True:
-                        # see if there are enough available calls. if so, break the loop
-                        try:
-                            await self.rate_limit.call()
-                            break
-                        # if there are not enough available calls, continue the loop
-                        except TooManyRequests as error:
-                            await asyncio.sleep(int(str(error)))
-                            continue
-                # parse out current nations and set
-                citizen_soup = BeautifulSoup(nations, 'lxml')
-                self.all_nations = set(citizen_soup.nations.text.split(':'))
-                while True:
+            try:
+                # wait for the bot to be ready
+                await bot.wait_until_ready()
+                self.retentioing = True
+                # define channels
+                recruitment_channel = bot.get_channel(674342850296807454)
+                crashchannel = bot.get_channel(835579413625569322)
+                thegye_server = bot.get_guild(674259612580446230)
+                notifrole = thegye_server.get_role(950950836006187018)
+                # let the crash channel know
+                self.bot.system_message += "From recruitment.py: Starting retention loop.\n"
+                # connect to the API
+                async with aiohttp.ClientSession() as session:
+                    headers = {"User-Agent": "Bassiliya"}
+                    params = {'q': 'nations',
+                              'region': 'thegye'}
                     async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
                                            headers=headers, params=params) as recruitsresp:
                         nations = await recruitsresp.text()
@@ -162,73 +148,92 @@ class Recruitment(commands.Cog):
                             except TooManyRequests as error:
                                 await asyncio.sleep(int(str(error)))
                                 continue
-                    # parse out new recruits
-                    new_nations_soup = BeautifulSoup(nations, 'lxml')
-                    # if the site is down, continue after 15 minutes
-                    try:
-                        crashcheck = new_nations_soup.nations.text
-                    except AttributeError:
-                        await crashchannel.send(f"Database error. Retrying in 15 minutes.")
-                        await asyncio.sleep(900)
-                        continue
-                    # the new nations are set and parsed
-                    self.new_nations = set(new_nations_soup.nations.text.split(':')).difference(
-                        self.all_nations)
-                    # parses departed nations
-                    departed_nations = self.all_nations.difference(set(new_nations_soup.nations.text.split(':')))
-                    # for every new nation, send a notification
-                    if self.new_nations:
-                        for n in self.new_nations:
-                            # define welcome text
-                            welcome_tg = ("[i]A courtier greets you as you enter the gates of Thegye.[/i]\n"
-                                          f"Greetings, {n}! Welcome to Thegye!\n"
-                                          "We are so glad you decided to join our region! Here in Thegye, we focus "
-                                          "heavily on having great roleplays and a fun community. A good place to get "
-                                          "started is by taking a trip to our Regional Message Board and saying hello. "
-                                          "We also have a Discord server, on which we are always active. "
-                                          "That's where you can get involved with games and events. Let us know if you "
-                                          "have any questions!\nThanks and, again, welcome!\n"
-                                          "P.S. If you want to stop all that pesky recruitment spam, "
-                                          "head to this link: https://www.nationstates.net/page=tgsettings and select "
-                                          "\"Block All\" under Recruitment. Instant relief!")
-                            welcome_link = f"https://www.nationstates.net/page=compose_telegram?tgto={n};message={welcome_tg}"
-                            notif = await recruitment_channel.send(
-                                f"A new nation has arrived, {notifrole.mention}!", view=RetentionButton(welcome_link))
-                            await notif.add_reaction("\U0001f4ec")
-                    # for every nation in departed nations, send notification
-                    if departed_nations:
-                        for n in departed_nations:
-                            async with session.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={n}",
-                                                   headers=headers) as exist:
-                                # ratelimiter
-                                while True:
-                                    # see if there are enough available calls. if so, break the loop
-                                    try:
-                                        await self.rate_limit.call()
-                                        break
-                                    # if there are not enough available calls, continue the loop
-                                    except TooManyRequests as error:
-                                        await asyncio.sleep(int(str(error)))
-                                        continue
+                    # parse out current nations and set
+                    citizen_soup = BeautifulSoup(nations, 'lxml')
+                    self.all_nations = set(citizen_soup.nations.text.split(':'))
+                    while True:
+                        async with session.get('https://www.nationstates.net/cgi-bin/api.cgi?',
+                                               headers=headers, params=params) as recruitsresp:
+                            nations = await recruitsresp.text()
+                            # ratelimiter
+                            while True:
+                                # see if there are enough available calls. if so, break the loop
                                 try:
-                                    exist.raise_for_status()
-                                except Exception:
+                                    await self.rate_limit.call()
+                                    break
+                                # if there are not enough available calls, continue the loop
+                                except TooManyRequests as error:
+                                    await asyncio.sleep(int(str(error)))
                                     continue
-                            # create exit text
-                            exit_text = ("[i]A falcon lands beside you as you travel away from Thegye's gates.[/i]\n"
-                                         f"We are sad to see you go, {n}. We wish you luck in your journeys in far off "
-                                         f"lands. Should you decide to return, our gates are always open to you. May the"
-                                         f" Gods bless your travels! Before you leave, tell us: "
-                                         f"for what reason have you decided to travel on?")
-                            tg_link = f"https://www.nationstates.net/page=compose_telegram?tgto={n};message={exit_text}"
-                            # define and send notification
-                            notif = await recruitment_channel.send(f"A nation has departed, {notifrole.mention}!",
-                                                                   view=RetentionButton(link=tg_link))
-                            await notif.add_reaction("\U0001f4ec")
-                    # set all nations to the new nations and sleep 5 minutes
-                    self.all_nations = set(new_nations_soup.nations.text.split(':'))
-                    await asyncio.sleep(300)
-                    continue
+                        # parse out new recruits
+                        new_nations_soup = BeautifulSoup(nations, 'lxml')
+                        # if the site is down, continue after 15 minutes
+                        try:
+                            crashcheck = new_nations_soup.nations.text
+                        except AttributeError:
+                            await crashchannel.send(f"Database error. Retrying in 15 minutes.")
+                            await asyncio.sleep(900)
+                            continue
+                        # the new nations are set and parsed
+                        self.new_nations = set(new_nations_soup.nations.text.split(':')).difference(
+                            self.all_nations)
+                        # parses departed nations
+                        departed_nations = self.all_nations.difference(set(new_nations_soup.nations.text.split(':')))
+                        # for every new nation, send a notification
+                        if self.new_nations:
+                            for n in self.new_nations:
+                                # define welcome text
+                                welcome_tg = ("[i]A courtier greets you as you enter the gates of Thegye.[/i]\n"
+                                              f"Greetings, {n}! Welcome to Thegye!\n"
+                                              "We are so glad you decided to join our region! Here in Thegye, we focus "
+                                              "heavily on having great roleplays and a fun community. A good place to get "
+                                              "started is by taking a trip to our Regional Message Board and saying hello. "
+                                              "We also have a Discord server, on which we are always active. "
+                                              "That's where you can get involved with games and events. Let us know if you "
+                                              "have any questions!\nThanks and, again, welcome!\n"
+                                              "P.S. If you want to stop all that pesky recruitment spam, "
+                                              "head to this link: https://www.nationstates.net/page=tgsettings and select "
+                                              "\"Block All\" under Recruitment. Instant relief!")
+                                welcome_link = f"https://www.nationstates.net/page=compose_telegram?tgto={n};message={welcome_tg}"
+                                notif = await recruitment_channel.send(
+                                    f"A new nation has arrived, {notifrole.mention}!", view=RetentionButton(welcome_link))
+                                await notif.add_reaction("\U0001f4ec")
+                        # for every nation in departed nations, send notification
+                        if departed_nations:
+                            for n in departed_nations:
+                                async with session.get(f"https://www.nationstates.net/cgi-bin/api.cgi?nation={n}",
+                                                       headers=headers) as exist:
+                                    # ratelimiter
+                                    while True:
+                                        # see if there are enough available calls. if so, break the loop
+                                        try:
+                                            await self.rate_limit.call()
+                                            break
+                                        # if there are not enough available calls, continue the loop
+                                        except TooManyRequests as error:
+                                            await asyncio.sleep(int(str(error)))
+                                            continue
+                                    try:
+                                        exist.raise_for_status()
+                                    except Exception:
+                                        continue
+                                # create exit text
+                                exit_text = ("[i]A falcon lands beside you as you travel away from Thegye's gates.[/i]\n"
+                                             f"We are sad to see you go, {n}. We wish you luck in your journeys in far off "
+                                             f"lands. Should you decide to return, our gates are always open to you. May the"
+                                             f" Gods bless your travels! Before you leave, tell us: "
+                                             f"for what reason have you decided to travel on?")
+                                tg_link = f"https://www.nationstates.net/page=compose_telegram?tgto={n};message={exit_text}"
+                                # define and send notification
+                                notif = await recruitment_channel.send(f"A nation has departed, {notifrole.mention}!",
+                                                                       view=RetentionButton(link=tg_link))
+                                await notif.add_reaction("\U0001f4ec")
+                        # set all nations to the new nations and sleep 5 minutes
+                        self.all_nations = set(new_nations_soup.nations.text.split(':'))
+                        await asyncio.sleep(300)
+                        continue
+            except Exception as error:
+                self.bot.logger.exception(msg=error, exc_info=error)
 
         async def world_assembly_notification(bot):
             # wait until the bot is ready
@@ -717,6 +722,10 @@ class Recruitment(commands.Cog):
             message += f"Autogrammer is running. Next iteration: {self.autogrammer.next_iteration.strftime('%H:%M:%S')}"
         elif not self.autogrammer.is_running():
             message += "Autogrammer is not running."
+        if self.retentioing is True:
+            message += "\nRetention is running."
+        elif self.retentioing is False:
+            message += "\nRetention is not runnning."
         else:
             message = "Something is wrong."
         await ctx.send(message)

@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding whitelist command">
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating retention to button interaction">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
@@ -414,7 +413,7 @@
       <workItem from="1732213300088" duration="6280000" />
       <workItem from="1732297987299" duration="25171000" />
       <workItem from="1732557724176" duration="4006000" />
-      <workItem from="1732644057128" duration="1190000" />
+      <workItem from="1732644057128" duration="2508000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -759,7 +758,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1054" />
+    <option name="localTasksCounter" value="1055" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -777,7 +776,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding cog custom check" />
     <MESSAGE value="Fixing cog custom check" />
     <MESSAGE value="Making the nation command visually interesting" />
     <MESSAGE value="Making the dossier command more visually interesting" />
@@ -802,7 +800,8 @@
     <MESSAGE value="Fixing populate command" />
     <MESSAGE value="Updating research and construct command with gov't type and tech considerations.&#10;Adding blacklist mod command" />
     <MESSAGE value="Adding whitelist command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding whitelist command" />
+    <MESSAGE value="Updating retention to button interaction" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updating retention to button interaction" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$resources_updating_cnc.coverage" NAME="resources_updating_cnc Coverage Results" MODIFIED="1661216424601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
