@@ -1226,7 +1226,7 @@ class CNC(commands.Cog):
     @cnc.command(name="development_boost", description="Utilizes Authority to boost province development.")
     @app_commands.guild_only()
     async def dev_boost(self, interaction: discord.Interaction, province_id: int,
-                        authority_type = typing.Literal['Economic', 'Political', 'Military']):
+                        authority_type: typing.Literal['Economic', 'Political', 'Military']):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establish connection
