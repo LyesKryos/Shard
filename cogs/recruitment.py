@@ -1,6 +1,7 @@
 # recruitment 1.1
 # recruitment 1.1
 import math
+import urllib
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from discord import app_commands
@@ -195,6 +196,7 @@ class Recruitment(commands.Cog):
                                               "P.S. If you want to stop all that pesky recruitment spam, "
                                               "head to this link: https://www.nationstates.net/page=tgsettings and select "
                                               "\"Block All\" under Recruitment. Instant relief!")
+                                welcome_tg = urllib.parse.quote(welcome_tg)
                                 welcome_link = f"https://www.nationstates.net/page=compose_telegram?tgto={n};message={welcome_tg}"
                                 welcome_link = pyshorteners.Shortener().tinyurl.short(welcome_link)
                                 notif = await recruitment_channel.send(
@@ -226,8 +228,9 @@ class Recruitment(commands.Cog):
                                              f"lands. Should you decide to return, our gates are always open to you. May the"
                                              f" Gods bless your travels! Before you leave, tell us: "
                                              f"for what reason have you decided to travel on?")
+                                exit_text = urllib.parse.quote(exit_text)
                                 tg_link = f"https://www.nationstates.net/page=compose_telegram?tgto={n};message={exit_text}"
-                                exit_link = pyshorteners.Shortener().tinyurl.short(exit_text)
+                                exit_link = pyshorteners.Shortener().tinyurl.short(tg_link)
                                 # define and send notification
                                 notif = await recruitment_channel.send(f"A nation has departed, {notifrole.mention}!",
                                                                        view=RetentionButton(link=exit_link))
