@@ -321,6 +321,17 @@ class CNC(commands.Cog):
         terrain_name = await conn.fetchrow('''SELECT name FROM cnc_terrains WHERE id = $1;''', terrain_id)
         return str(terrain_name['name'])
 
+    def hex_to_rgb(self, hex_color):
+        """Converts a hex color code to RGB values."""
+        hex_color = hex_color.lstrip('#')
+        return tuple(int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
+
+    def color_difference(self, color1, color2):
+        """Calculates the Euclidean distance between two RGB colors."""
+        rgb1 = self.hex_to_rgb(color1)
+        rgb2 = self.hex_to_rgb(color2)
+        return sum((c1 - c2) ** 2 for c1, c2 in zip(rgb1, rgb2)) ** 0.5
+
     # the CnC command group
     cnc = app_commands.Group(name="cnc", description="...")
 
@@ -350,9 +361,21 @@ class CNC(commands.Cog):
             if check_color_taken is not None:
                 return await interaction.followup.send("That color is already taken. "
                                                        "Please register with a different color.")
+            # pull all colors
+            pull_all_colors = await conn.fetch('''SELECT name, color FROM cnc_users;''')
+            # check each color
+            for c in pull_all_colors:
+                color_check = c['color']
+                if self.color_difference(c['color'], color_check) < 50:
+                    return await interaction.followup.send(f"Your selected color, {color}, is too similar to an "
+                                                           f"existing color, registered to {c['name']} ({c['color']}).")
+
             if color in self.banned_colors:
                 return await interaction.followup.send("That color is a restricted color. "
                                                        "Please register with a different color.")
+            for c in self.banned_colors:
+                if self.color_difference(c, color) < 50:
+                    return await interaction.followup.send(f"That color is too similar to a banned color, {c}.")
             # try and get the color from the hex code
             try:
                 ImageColor.getrgb(color)
@@ -1138,6 +1161,14 @@ class CNC(commands.Cog):
             if "City" not in prov_info['structures']:
                 return await interaction.followup.send(f"You must construct a City in {prov_info['name']} "
                                                        f"before constructing a University.")
+        # if the government type is Free City, only one city per nation allowed
+        if (structure == "City") and (user_info['govt_subtype'] == "Free City"):
+            provs_with_cities = await conn.fetchrow('''SELECT * FROM cnc_provinces 
+            WHERE owner_id = $1 AND 'City' = ANY(structures)''', interaction.user.id)
+            if provs_with_cities is not None:
+                return await interaction.followup.send(f"Free Cities can construct only one City. "
+                                                       f"{user_info['name']} maintains City {provs_with_cities['name']} "
+                                                       f"(ID: {provs_with_cities['id']}).")
         # if all checks are met, construct and bill cost
         try:
             await conn.execute('''UPDATE cnc_provinces SET structures = structures || $1 WHERE id = $2;''',
@@ -1156,6 +1187,9 @@ class CNC(commands.Cog):
         return await interaction.followup.send(f"{structure} successfully constructed in {prov_info['name']}.")
 
     @cnc.command(name="deconstruct", description="Deconstructs a structure in a province.")
+    @app_commands.describe(province_id="The ID of the province in which you would like to deconstruct.",
+                           structure="The name of the structure you would like to deconstruct.")
+    @app_commands.guild_only()
     async def deconstruct(self, interaction: discord.Interaction, province_id: int,
                           structure: typing.Literal['Farm', 'Trading Post', 'Quarry', 'Lumber Mill', 'Mine', 'Fishery',
                           'City', 'Fort', 'Road', 'Manufactory', 'Port', 'Bridge', 'University', 'Temple']):
@@ -1188,6 +1222,50 @@ class CNC(commands.Cog):
                            structure, province_id)
         return await interaction.followup.send(f"The {structure} has been deconstructed in "
                                                f"{prov_info['name']} (ID: {province_id}).")
+
+    @cnc.command(name="development_boost", description="Utilizes Authority to boost province development.")
+    @app_commands.guild_only()
+    async def dev_boost(self, interaction: discord.Interaction, province_id: int,
+                        authority_type = typing.Literal['Economic', 'Political', 'Military']):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull userinfo
+        user_info = await self.user_db_info(interaction.user.id)
+        # check for registration
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # pull province info
+        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+        # check if province exists
+        if prov_info is None:
+            return await interaction.followup.send("That is not a valid province ID.")
+        # check if user owns province
+        if prov_info['owner_id'] != interaction.user.id:
+            return await interaction.followup.send("You do not own that province.")
+        # calculate dev boosting cost. base cost = current development * .75
+        boost_cost = prov_info['development'] * .75
+        # add modifiers from tech
+        if authority_type == 'Economic':
+            boost_cost += user_info['econ_boost_cost']
+        elif authority_type == 'Political':
+            boost_cost += user_info['pol_boost_cost']
+        elif authority_type == 'Military':
+            boost_cost += user_info['mil_boost_cost']
+        # add modifiers from govt type
+        govt_info = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1 AND govt_subtype = $2;''',
+                                        user_info['govt_type'], user_info['govt_subtype'])
+        govt_mod = govt_info['dev_cost']
+        boost_cost *= govt_mod
+        # add modifiers from structures
+        if "Lumber Mill" in prov_info['structures']:
+            boost_cost *= .85
+
+
+
+
+
 
 
 

@@ -185,14 +185,14 @@ class Recruitment(commands.Cog):
                         if self.new_nations:
                             for n in self.new_nations:
                                 # define welcome text
-                                welcome_tg = ("[i]A courtier greets you as you enter the gates of Thegye.[/i]\n"
-                                              f"Greetings, {n}! Welcome to Thegye!\n"
+                                welcome_tg = ("[i]A courtier greets you as you enter the gates of Thegye.[/i]\n\n"
+                                              f"Greetings, {n.title()}! Welcome to Thegye!\n\n"
                                               "We are so glad you decided to join our region! Here in Thegye, we focus "
                                               "heavily on having great roleplays and a fun community. A good place to get "
                                               "started is by taking a trip to our Regional Message Board and saying hello. "
                                               "We also have a Discord server, on which we are always active. "
                                               "That's where you can get involved with games and events. Let us know if you "
-                                              "have any questions!\nThanks and, again, welcome!\n"
+                                              "have any questions!\n\nThanks and, again, welcome!\n\n"
                                               "P.S. If you want to stop all that pesky recruitment spam, "
                                               "head to this link: https://www.nationstates.net/page=tgsettings and select "
                                               "\"Block All\" under Recruitment. Instant relief!")
@@ -200,7 +200,7 @@ class Recruitment(commands.Cog):
                                 welcome_link = f"https://www.nationstates.net/page=compose_telegram?tgto={n};message={welcome_tg}"
                                 welcome_link = pyshorteners.Shortener().tinyurl.short(welcome_link)
                                 notif = await recruitment_channel.send(
-                                    f"A new nation has arrived, {notifrole.mention}!",
+                                    f"{n.title()} has arrived, {notifrole.mention}!",
                                     view=RetentionButton(welcome_link))
                                 await notif.add_reaction("\U0001f4ec")
                         # for every nation in departed nations, send notification
@@ -223,8 +223,8 @@ class Recruitment(commands.Cog):
                                     except Exception:
                                         continue
                                 # create exit text
-                                exit_text = ("[i]A falcon lands beside you as you travel away from Thegye's gates.[/i]\n"
-                                             f"We are sad to see you go, {n}. We wish you luck in your journeys in far off "
+                                exit_text = ("[i]A falcon lands beside you as you travel away from Thegye's gates.[/i]\n\n"
+                                             f"We are sad to see you go, {n.title()}. We wish you luck in your journeys in far off "
                                              f"lands. Should you decide to return, our gates are always open to you. May the"
                                              f" Gods bless your travels! Before you leave, tell us: "
                                              f"for what reason have you decided to travel on?")
@@ -232,7 +232,7 @@ class Recruitment(commands.Cog):
                                 tg_link = f"https://www.nationstates.net/page=compose_telegram?tgto={n};message={exit_text}"
                                 exit_link = pyshorteners.Shortener().tinyurl.short(tg_link)
                                 # define and send notification
-                                notif = await recruitment_channel.send(f"A nation has departed, {notifrole.mention}!",
+                                notif = await recruitment_channel.send(f"{n.title()} has departed, {notifrole.mention}!",
                                                                        view=RetentionButton(link=exit_link))
                                 await notif.add_reaction("\U0001f4ec")
                         # set all nations to the new nations and sleep 5 minutes
