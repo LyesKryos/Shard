@@ -1246,7 +1246,7 @@ class CNC(commands.Cog):
             return await interaction.followup.send("You do not own that province.")
         # calculate dev boosting cost. base cost = current development * .75
         boost_cost = prov_info['development'] * .75
-        # add modifiers from tech
+        # add modifiers from tech and define type for later
         if authority_type == 'Economic':
             boost_cost += user_info['econ_boost_cost']
         elif authority_type == 'Political':
@@ -1261,13 +1261,35 @@ class CNC(commands.Cog):
         # add modifiers from structures
         if "Lumber Mill" in prov_info['structures']:
             boost_cost *= .85
-
-
-
-
-
-
-
+        # round boost cost up
+        boost_cost = math.ceil(boost_cost)
+        # check if user has sufficient authority
+        type = None
+        if authority_type == 'Economic':
+            type = "econ_auth"
+            if user_info['econ_auth'] < boost_cost:
+                return await interaction.followup.send(f"You do not have sufficient Economic authority to boost in this "
+                                                       f"province. You are missing {boost_cost-user_info['econ_auth']} "
+                                                       f"Economic authority.")
+        elif authority_type == 'Political':
+            type = "poli_auth"
+            if user_info['pol_auth'] < boost_cost:
+                return await interaction.followup.send(f"You do not have sufficient Political authority to boost in this "
+                                                       f"province. You are missing {boost_cost-user_info['pol_auth']} "
+                                                       f"Political authority.")
+        elif authority_type == 'Military':
+            type = "mil_auth"
+            if user_info['mil_auth'] < boost_cost:
+                return await interaction.followup.send(
+                    f"You do not have sufficient Military authority to boost in this "
+                    f"province. You are missing {boost_cost - user_info['mil_auth']} "
+                    f"Political authority.")
+        # execute orders
+        await conn.execute('''UPDATE cnc_users SET $1 = $1 - $2 WHERE user_id = $3;''', type, boost_cost,
+                           interaction.user.id)
+        await conn.execute('''UPDATE cnc_provinces SET development = development + 1 WHERE id = $2;''', province_id)
+        return await interaction.followup.send(f"Successfully boosted Development! The total development of the province"
+                                               f" is now **{prov_info['development']+1}**.")
 
     # === Moderator Commands ===
     @commands.command()
