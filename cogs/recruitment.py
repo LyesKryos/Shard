@@ -24,7 +24,7 @@ from ratelimiter import Ratelimiter
 
 
 class RecruitmentButton(discord.ui.View):
-    def __init__(self, link: str):
+    def __init__(self, link: str, message: discord.Message):
         super().__init__(timeout=600)
         self.link_button = discord.ui.Button(label="Click here to open recruitment link",
                                              style=discord.ButtonStyle.url, url=link)
