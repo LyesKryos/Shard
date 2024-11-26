@@ -201,9 +201,6 @@
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
       <option name="IS_MODULE_SDK" value="false" />
@@ -413,7 +410,7 @@
       <workItem from="1732213300088" duration="6280000" />
       <workItem from="1732297987299" duration="25171000" />
       <workItem from="1732557724176" duration="4006000" />
-      <workItem from="1732644057128" duration="2508000" />
+      <workItem from="1732644057128" duration="3574000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -758,7 +755,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1055" />
+    <option name="localTasksCounter" value="1056" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

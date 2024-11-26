@@ -16,6 +16,7 @@ import aiohttp
 from time import perf_counter, strftime
 from PIL import ImageColor
 from customchecks import RecruitmentCheck, TooManyRequests
+import pyshorteners
 
 
 from ratelimiter import Ratelimiter
@@ -195,8 +196,10 @@ class Recruitment(commands.Cog):
                                               "head to this link: https://www.nationstates.net/page=tgsettings and select "
                                               "\"Block All\" under Recruitment. Instant relief!")
                                 welcome_link = f"https://www.nationstates.net/page=compose_telegram?tgto={n};message={welcome_tg}"
+                                welcome_link = pyshorteners.Shortener().tinyurl.short(welcome_link)
                                 notif = await recruitment_channel.send(
-                                    f"A new nation has arrived, {notifrole.mention}!", view=RetentionButton(welcome_link))
+                                    f"A new nation has arrived, {notifrole.mention}!",
+                                    view=RetentionButton(welcome_link))
                                 await notif.add_reaction("\U0001f4ec")
                         # for every nation in departed nations, send notification
                         if departed_nations:
@@ -224,9 +227,10 @@ class Recruitment(commands.Cog):
                                              f" Gods bless your travels! Before you leave, tell us: "
                                              f"for what reason have you decided to travel on?")
                                 tg_link = f"https://www.nationstates.net/page=compose_telegram?tgto={n};message={exit_text}"
+                                exit_link = pyshorteners.Shortener().tinyurl.short(exit_text)
                                 # define and send notification
                                 notif = await recruitment_channel.send(f"A nation has departed, {notifrole.mention}!",
-                                                                       view=RetentionButton(link=tg_link))
+                                                                       view=RetentionButton(link=exit_link))
                                 await notif.add_reaction("\U0001f4ec")
                         # set all nations to the new nations and sleep 5 minutes
                         self.all_nations = set(new_nations_soup.nations.text.split(':'))
