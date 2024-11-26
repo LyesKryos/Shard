@@ -16,16 +16,14 @@ import aiohttp
 from time import perf_counter, strftime
 from PIL import ImageColor
 from customchecks import RecruitmentCheck, TooManyRequests
-import traceback
-import os
+
 
 from ratelimiter import Ratelimiter
 
 
 class RecruitmentButton(discord.ui.View):
-    def __init__(self, link: str, message):
+    def __init__(self, link: str):
         super().__init__(timeout=600)
-        self.message = message
         self.link_button = discord.ui.Button(label="Click here to open recruitment link",
                                              style=discord.ButtonStyle.url, url=link)
         self.add_item(self.link_button)
@@ -41,6 +39,12 @@ class RecruitmentButton(discord.ui.View):
         self.link_button.disabled = True
         return await self.message.edit(view=self)
 
+class RetentionButton(discord.ui.View):
+    def __init__(self, link: str):
+        super().__init__()
+        self.link_button = discord.ui.Button(label="Click here to send a telegram",
+                                             style=discord.ButtonStyle.url, url=link)
+        self.add_item(self.link_button)
 
 class Recruitment(commands.Cog):
 
@@ -175,9 +179,21 @@ class Recruitment(commands.Cog):
                     # for every new nation, send a notification
                     if self.new_nations:
                         for n in self.new_nations:
+                            # define welcome text
+                            welcome_tg = ("[i]A courtier greets you as you enter the gates of Thegye.[/i]\n"
+                                          f"Greetings, {n}! Welcome to Thegye!\n"
+                                          "We are so glad you decided to join our region! Here in Thegye, we focus "
+                                          "heavily on having great roleplays and a fun community. A good place to get "
+                                          "started is by taking a trip to our Regional Message Board and saying hello. "
+                                          "We also have a Discord server, on which we are always active. "
+                                          "That's where you can get involved with games and events. Let us know if you "
+                                          "have any questions!\nThanks and, again, welcome!\n"
+                                          "P.S. If you want to stop all that pesky recruitment spam, "
+                                          "head to this link: https://www.nationstates.net/page=tgsettings and select "
+                                          "\"Block All\" under Recruitment. Instant relief!")
+                            welcome_link = f"https://www.nationstates.net/page=compose_telegram?tgto={n};message={welcome_tg}"
                             notif = await recruitment_channel.send(
-                                f"A new nation has arrived, {notifrole.mention}!"
-                                f"\nhttps://www.nationstates.net/nation={n}")
+                                f"A new nation has arrived, {notifrole.mention}!", view=RetentionButton(welcome_link))
                             await notif.add_reaction("\U0001f4ec")
                     # for every nation in departed nations, send notification
                     if departed_nations:
@@ -198,9 +214,16 @@ class Recruitment(commands.Cog):
                                     exist.raise_for_status()
                                 except Exception:
                                     continue
+                            # create exit text
+                            exit_text = ("[i]A falcon lands beside you as you travel away from Thegye's gates.[/i]\n"
+                                         f"We are sad to see you go, {n}. We wish you luck in your journeys in far off "
+                                         f"lands. Should you decide to return, our gates are always open to you. May the"
+                                         f" Gods bless your travels! Before you leave, tell us: "
+                                         f"for what reason have you decided to travel on?")
+                            tg_link = f"https://www.nationstates.net/page=compose_telegram?tgto={n};message={exit_text}"
                             # define and send notification
-                            notif = await recruitment_channel.send(f"A nation has departed, {notifrole.mention}!"
-                                                                   f"\nhttps://www.nationstates.net/nation={n}")
+                            notif = await recruitment_channel.send(f"A nation has departed, {notifrole.mention}!",
+                                                                   view=RetentionButton(link=tg_link))
                             await notif.add_reaction("\U0001f4ec")
                     # set all nations to the new nations and sleep 5 minutes
                     self.all_nations = set(new_nations_soup.nations.text.split(':'))
@@ -333,7 +356,6 @@ class Recruitment(commands.Cog):
         # stop the running tasks
         self.monthly_recruiter.cancel()
         self.retention.cancel()
-        self.world_assembly_notification.cancel()
         self.autogrammer.cancel()
 
     # cog variables

@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating province command">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding whitelist command">
+      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,7 +104,7 @@
       <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.cnc">
+  <component name="RunManager" selected="Python.scratch_1">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="Shard" />
       <option name="ENV_FILES" value="" />
@@ -195,6 +197,29 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="scratch_1" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Shard" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$APPLICATION_CONFIG_DIR$/scratches/scratch_1.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="scratch" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Shard" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -264,12 +289,14 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.scratch_1" />
       <item itemvalue="Python.cnc" />
       <item itemvalue="Python.scratch" />
       <item itemvalue="Python.verification" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.scratch_1" />
         <item itemvalue="Python.scratch" />
         <item itemvalue="Python.cnc" />
         <item itemvalue="Python.verification" />
@@ -385,7 +412,9 @@
       <workItem from="1731969946288" duration="9228000" />
       <workItem from="1732040103795" duration="6826000" />
       <workItem from="1732213300088" duration="6280000" />
-      <workItem from="1732297987299" duration="8326000" />
+      <workItem from="1732297987299" duration="25171000" />
+      <workItem from="1732557724176" duration="4006000" />
+      <workItem from="1732644057128" duration="1190000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -730,7 +759,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1032" />
+    <option name="localTasksCounter" value="1054" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -748,18 +777,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing the army display in provinces" />
-    <MESSAGE value="Adding army_view command" />
-    <MESSAGE value="Editing army_view command" />
-    <MESSAGE value="Adding army_report command" />
-    <MESSAGE value="Editing army_report command" />
-    <MESSAGE value="Adding owner command cnc_research_tech" />
-    <MESSAGE value="Editing owner command cnc_research_tech" />
-    <MESSAGE value="Fixing error logging" />
-    <MESSAGE value="Fixing cnc_research_tech" />
-    <MESSAGE value="Adding cnc_forget_tech" />
-    <MESSAGE value="Fixing cnc_forget_tech" />
-    <MESSAGE value="Cleaning up cnc_forget_tech" />
     <MESSAGE value="Adding cog custom check" />
     <MESSAGE value="Fixing cog custom check" />
     <MESSAGE value="Making the nation command visually interesting" />
@@ -773,7 +790,19 @@
     <MESSAGE value="Fixing construct" />
     <MESSAGE value="Adding give authority command" />
     <MESSAGE value="Updating province command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating province command" />
+    <MESSAGE value="Fixing deconstruct command" />
+    <MESSAGE value="Fixing province" />
+    <MESSAGE value="Creating command for setting development" />
+    <MESSAGE value="Fixing dev roll" />
+    <MESSAGE value="Updating province viewer" />
+    <MESSAGE value="Creating populate_world command" />
+    <MESSAGE value="Fixing populate_world command" />
+    <MESSAGE value="Fixxing error logging for text commands" />
+    <MESSAGE value="Fixing error logging for text commands" />
+    <MESSAGE value="Fixing populate command" />
+    <MESSAGE value="Updating research and construct command with gov't type and tech considerations.&#10;Adding blacklist mod command" />
+    <MESSAGE value="Adding whitelist command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding whitelist command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$resources_updating_cnc.coverage" NAME="resources_updating_cnc Coverage Results" MODIFIED="1661216424601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
