@@ -1287,7 +1287,7 @@ class CNC(commands.Cog):
                     f"province. You are missing {boost_cost - user_info['mil_auth']} "
                     f"Political authority.")
         # execute orders
-        await conn.execute('''UPDATE cnc_users SET "$1" = "$1" - $2 WHERE user_id = $3;''', type, boost_cost,
+        await conn.execute('''UPDATE cnc_users SET col($1) = col($1) - $2 WHERE user_id = $3;''', type, boost_cost,
                            interaction.user.id)
         await conn.execute('''UPDATE cnc_provinces SET development = development + 1 WHERE id = $2;''', province_id)
         return await interaction.followup.send(f"Successfully boosted Development! The total development of the province"
