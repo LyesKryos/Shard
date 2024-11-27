@@ -1289,7 +1289,8 @@ class CNC(commands.Cog):
         # execute orders
         await conn.execute(call, int(boost_cost), interaction.user.id)
         await conn.execute('''UPDATE cnc_provinces SET development = development + 1 WHERE id = $1;''', province_id)
-        return await interaction.followup.send(f"Successfully boosted Development! The total development of the province"
+        return await interaction.followup.send(f"Successfully boosted Development! The total development of "
+                                               f"{prov_info['name']} (ID: {province_id}"
                                                f" is now **{prov_info['development']+1}**.")
 
     # === Moderator Commands ===
