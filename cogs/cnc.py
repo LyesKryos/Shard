@@ -1268,27 +1268,26 @@ class CNC(commands.Cog):
         # check if user has sufficient authority
         call = None
         if authority_type == 'Economic':
-            call = "UPDATE cnc_users SET econ_auth = econ_auth - $1 WHERE user_id = $2;"
+            call = '''UPDATE cnc_users SET econ_auth = econ_auth - $1 WHERE user_id = $2;'''
             if user_info['econ_auth'] < boost_cost:
                 return await interaction.followup.send(f"You do not have sufficient Economic authority to boost in this "
                                                        f"province. You are missing {boost_cost-user_info['econ_auth']} "
                                                        f"Economic authority.")
         elif authority_type == 'Political':
-            call = "UPDATE cnc_users SET pol_auth = pol_auth - $1 WHERE user_id = $2;"
+            call = '''UPDATE cnc_users SET pol_auth = pol_auth - $1 WHERE user_id = $2;'''
             if user_info['pol_auth'] < boost_cost:
                 return await interaction.followup.send(f"You do not have sufficient Political authority to boost in this "
                                                        f"province. You are missing {boost_cost-user_info['pol_auth']} "
                                                        f"Political authority.")
         elif authority_type == 'Military':
-            call = "UPDATE cnc_users SET mil_auth = mil_auth - $1 WHERE user_id = $2;"
+            call = '''UPDATE cnc_users SET mil_auth = mil_auth - $1 WHERE user_id = $2;'''
             if user_info['mil_auth'] < boost_cost:
                 return await interaction.followup.send(
                     f"You do not have sufficient Military authority to boost in this "
                     f"province. You are missing {boost_cost - user_info['mil_auth']} "
                     f"Political authority.")
         # execute orders
-        await conn.execute(call, int(boost_cost),
-                           interaction.user.id)
+        await conn.execute(call, int(boost_cost), interaction.user.id)
         await conn.execute('''UPDATE cnc_provinces SET development = development + 1 WHERE id = $2;''', province_id)
         return await interaction.followup.send(f"Successfully boosted Development! The total development of the province"
                                                f" is now **{prov_info['development']+1}**.")
