@@ -1323,9 +1323,12 @@ class CNC(commands.Cog):
                                                    "sufficient development to be appropriated.")
         # ensure that buildings are still supported. each structure (minus 1) needs 10 development
         structures = len(prov_info['structures']) - 1
-        if ((prov_info['development']-1)/10) / structures <= 1:
-            return await interaction.followup.send("Existing Structures in this province "
-                                                   "prevent development appropriation.")
+        # if there are any structures (more than 2)
+        if structures > 1:
+            # if the amount of development, after appropriation, is insufficient to support the structures, deny
+            if ((prov_info['development']-1)/10) / structures <= 1:
+                return await interaction.followup.send("Existing Structures in this province "
+                                                       "prevent development appropriation.")
         # otherwise, carry on
         development = prov_info['development']
         auth_return = development // 3.5
