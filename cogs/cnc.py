@@ -1318,7 +1318,7 @@ class CNC(commands.Cog):
         if prov_info['owner_id'] != interaction.user.id:
             return await interaction.followup.send("You do not own that province.")
         # check if development is sufficient
-        if prov_info['development'] >=5 :
+        if prov_info['development'] <=5 :
             return await interaction.followup.send("That province does not have "
                                                    "sufficient development to be appropriated.")
         # ensure that buildings are still supported. each structure (minus 1) needs 10 development
@@ -1344,6 +1344,7 @@ class CNC(commands.Cog):
         return await interaction.followup.send(f"{auth_return} authority appropriated from the development of "
                                                f"{prov_info['name']} (ID: {province_id}).")
 
+    # @cnc.command(name="colonize")
 
     # === Moderator Commands ===
     @commands.command()
