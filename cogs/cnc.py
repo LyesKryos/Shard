@@ -1223,7 +1223,7 @@ class CNC(commands.Cog):
         return await interaction.followup.send(f"The {structure} has been deconstructed in "
                                                f"{prov_info['name']} (ID: {province_id}).")
 
-    @cnc.command(name="development_boost", description="Utilizes Authority to boost province development.")
+    @cnc.command(name="boost_development", description="Utilizes Authority to boost province development.")
     @app_commands.describe(province_id="The ID of the province which you would like to boost.",
                            authority_type="The type of authority to boost with.")
     @app_commands.guild_only()
@@ -1293,6 +1293,57 @@ class CNC(commands.Cog):
                                                f"{boost_cost} {authority_type} authority! "
                                                f"The total development of {prov_info['name']} (ID: {province_id} "
                                                f"is now **{prov_info['development']+1}**.")
+
+    @cnc.command(name="appropriate_development", description="Appropriates province development to gain authority.")
+    @app_commands.describe(province_id="The ID of the province which you would like to appropriate development from.",
+                           authority_type="The type of authority to gain.")
+    @app_commands.guild_only()
+    async def dev_appropriate(self, interaction: discord.Interaction, province_id: int,
+                              authority_type: typing.Literal['Economic', 'Political', 'Military']):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull userinfo
+        user_info = await self.user_db_info(interaction.user.id)
+        # check for registration
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # pull province info
+        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+        # check if province exists
+        if prov_info is None:
+            return await interaction.followup.send("That is not a valid province ID.")
+        # check if user owns province
+        if prov_info['owner_id'] != interaction.user.id:
+            return await interaction.followup.send("You do not own that province.")
+        # check if development is sufficient
+        if prov_info['development'] >=5 :
+            return await interaction.followup.send("That province does not have "
+                                                   "sufficient development to be appropriated.")
+        # ensure that buildings are still supported. each structure (minus 1) needs 10 development
+        structures = len(prov_info['structures']) - 1
+        if ((prov_info['development']-1)/10) / structures <= 1:
+            return await interaction.followup.send("Existing Structures in this province "
+                                                   "prevent development appropriation.")
+        # otherwise, carry on
+        development = prov_info['development']
+        auth_return = development // 3.5
+        # execute
+        await conn.execute('''UPDATE cnc_provinces SET development = development - 1 WHERE id = $1;''', province_id)
+        # if the authority type is economic
+        if authority_type == 'Economic':
+            await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth + $1 WHERE user_id = $2;''',
+                               auth_return, interaction.user.id)
+        elif authority_type == 'Political':
+            await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth + $1 WHERE user_id = $2;''',
+                               auth_return, interaction.user.id)
+        elif authority_type == 'Military':
+            await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth + $1 WHERE user_id = $2;''',
+                               auth_return, interaction.user.id)
+        return await interaction.followup.send(f"{auth_return} authority appropriated from the development of "
+                                               f"{prov_info['name']} (ID: {province_id}).")
+
 
     # === Moderator Commands ===
     @commands.command()
