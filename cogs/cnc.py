@@ -1331,7 +1331,7 @@ class CNC(commands.Cog):
                                                        "prevent development appropriation.")
         # otherwise, carry on
         development = prov_info['development']
-        auth_return = development // 3.5
+        auth_return = int(development // 3.5)
         # execute
         await conn.execute('''UPDATE cnc_provinces SET development = development - 1 WHERE id = $1;''', province_id)
         # if the authority type is economic
@@ -1344,8 +1344,8 @@ class CNC(commands.Cog):
         elif authority_type == 'Military':
             await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth + $1 WHERE user_id = $2;''',
                                auth_return, interaction.user.id)
-        return await interaction.followup.send(f"{auth_return} authority appropriated from the development of "
-                                               f"{prov_info['name']} (ID: {province_id}).")
+        return await interaction.followup.send(f"{auth_return} {authority_type} authority appropriated from the "
+                                               f"development of {prov_info['name']} (ID: {province_id}).")
 
     # @cnc.command(name="colonize")
 
