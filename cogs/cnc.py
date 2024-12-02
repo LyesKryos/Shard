@@ -976,70 +976,6 @@ class CNC(commands.Cog):
             await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user_id)
             return await interaction.followup.send(f"Scientists are no longer researching {researching['tech']}.")
 
-    @commands.command()
-    @commands.is_owner()
-    async def cnc_research_tech(self, ctx, user: discord.Member, tech: str):
-        # establish connection
-        conn = self.bot.pool
-        # call user info
-        user_info = await self.user_db_info(user.id)
-        # check if such a user exists
-        if user_info is None:
-            return await ctx.send("No such user.")
-        # otherwise, carry on
-        # search for tech
-        tech_info = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE lower(name) = $1;''', tech.lower())
-        # if the tech name is wrong
-        if tech_info is None:
-            return await ctx.send("No such tech.")
-        # otherwise, carry on
-        techs = user_info['tech']
-        # if the user already has the tech, return denial
-        if tech.lower() in [t.lower() for t in techs]:
-            return await ctx.send("That user already researched that tech.")
-        # otherwise, carry on
-        try:
-            # add the tech to their list
-            await conn.execute('''UPDATE cnc_users SET tech = tech || $1 WHERE user_id = $2;''', [tech], user.id)
-            # execute tech db call
-            if tech_info['db_call'] is not None:
-                await conn.execute(tech_info['db_call'], user.id)
-        except Exception as error:
-            raise error
-        # send confirmation
-        return await ctx.send(f"{tech_info['name']} has been researched for {user_info['name']} ({user.display_name}).")
-
-    @commands.command()
-    @commands.is_owner()
-    async def cnc_forget_tech(self, ctx, user: discord.Member, tech: str):
-        # establish connection
-        conn = self.bot.pool
-        # call user info
-        user_info = await self.user_db_info(user.id)
-        # check if such a user exists
-        if user_info is None:
-            return await ctx.send("No such user.")
-        # otherwise, carry on
-        # search for tech
-        tech_info = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE lower(name) = $1;''', tech.lower())
-        # if the tech name is wrong
-        if tech_info is None:
-            return await ctx.send("No such tech.")
-        # otherwise, carry on
-        techs = user_info['tech']
-        # if the user already has the tech, return denial
-        if tech.lower() not in [t.lower() for t in techs]:
-            return await ctx.send("That user has not yet researched that tech.")
-        # otherwise, carry on
-        # remove the tech from their list
-        await conn.execute('''UPDATE cnc_users SET tech = array_remove(tech, $1) WHERE user_id = $2;''', tech, user.id)
-        # execute tech db call, replacing the pluses with minuses and the minuses with pluses
-        db_call = "".join("+" if c == "-" else "-" if c == "+" else c for c in tech_info['db_call'])
-        await conn.execute(db_call, user.id)
-        # send confirmation
-        return await ctx.send(
-            f"{tech_info['name']} has been forgotten for {user_info['name']} ({user.display_name}).")
-
     # === Province Commands ===
     @cnc.command(name="construct", description="Uses Authority to construct buildings in a province.")
     @app_commands.describe(province_id="The ID of the province in which you would like to construct.",
@@ -1419,6 +1355,70 @@ class CNC(commands.Cog):
                                                f"has been successfully colonized.")
 
     # === Moderator Commands ===
+    @commands.command()
+    @commands.is_owner()
+    async def cnc_research_tech(self, ctx, user: discord.Member, tech: str):
+        # establish connection
+        conn = self.bot.pool
+        # call user info
+        user_info = await self.user_db_info(user.id)
+        # check if such a user exists
+        if user_info is None:
+            return await ctx.send("No such user.")
+        # otherwise, carry on
+        # search for tech
+        tech_info = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE lower(name) = $1;''', tech.lower())
+        # if the tech name is wrong
+        if tech_info is None:
+            return await ctx.send("No such tech.")
+        # otherwise, carry on
+        techs = user_info['tech']
+        # if the user already has the tech, return denial
+        if tech.lower() in [t.lower() for t in techs]:
+            return await ctx.send("That user already researched that tech.")
+        # otherwise, carry on
+        try:
+            # add the tech to their list
+            await conn.execute('''UPDATE cnc_users SET tech = tech || $1 WHERE user_id = $2;''', [tech], user.id)
+            # execute tech db call
+            if tech_info['db_call'] != 'NULL':
+                await conn.execute(tech_info['db_call'], user.id)
+        except Exception as error:
+            raise error
+        # send confirmation
+        return await ctx.send(f"{tech_info['name']} has been researched for {user_info['name']} ({user.display_name}).")
+
+    @commands.command()
+    @commands.is_owner()
+    async def cnc_forget_tech(self, ctx, user: discord.Member, tech: str):
+        # establish connection
+        conn = self.bot.pool
+        # call user info
+        user_info = await self.user_db_info(user.id)
+        # check if such a user exists
+        if user_info is None:
+            return await ctx.send("No such user.")
+        # otherwise, carry on
+        # search for tech
+        tech_info = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE lower(name) = $1;''', tech.lower())
+        # if the tech name is wrong
+        if tech_info is None:
+            return await ctx.send("No such tech.")
+        # otherwise, carry on
+        techs = user_info['tech']
+        # if the user already has the tech, return denial
+        if tech.lower() not in [t.lower() for t in techs]:
+            return await ctx.send("That user has not yet researched that tech.")
+        # otherwise, carry on
+        # remove the tech from their list
+        await conn.execute('''UPDATE cnc_users SET tech = array_remove(tech, $1) WHERE user_id = $2;''', tech, user.id)
+        # execute tech db call, replacing the pluses with minuses and the minuses with pluses
+        db_call = "".join("+" if c == "-" else "-" if c == "+" else c for c in tech_info['db_call'])
+        await conn.execute(db_call, user.id)
+        # send confirmation
+        return await ctx.send(
+            f"{tech_info['name']} has been forgotten for {user_info['name']} ({user.display_name}).")
+
     @commands.command()
     @commands.has_role(928889638888812586)
     async def cnc_give_authority(self, ctx, user: discord.Member, authority: str, amount: int):
