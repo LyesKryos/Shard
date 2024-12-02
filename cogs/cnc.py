@@ -1347,7 +1347,70 @@ class CNC(commands.Cog):
         return await interaction.followup.send(f"{auth_return} {authority_type} authority appropriated from the "
                                                f"development of {prov_info['name']} (ID: {province_id}).")
 
-    # @cnc.command(name="colonize")
+    @cnc.command(name="colonize", description="Claims and colonizes an unowned province.")
+    @app_commands.describe(province_id="The ID of the province you would like to colonize.")
+    @app_commands.guild_only()
+    async def colonize(self, interaction: discord.Interaction, province_id: int):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull userinfo
+        user_info = await self.user_db_info(interaction.user.id)
+        # check for registration
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # pull province info
+        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+        # check if province exists
+        if prov_info is None:
+            return await interaction.followup.send("That is not a valid province ID.")
+        # ensure the user has researched the "Colonialism" tech
+        if "Colonialism" not in user_info['tech']:
+            return await interaction.followup.send("Colonization requires the Colonialism tech to be researched.")
+        # check if the province is owned
+        if prov_info['owner_id'] != 0:
+            return await interaction.followup.send("You cannot colonize a province owned by any other nation.")
+        # check if the user has more than 15 provinces
+        prov_owned_count = await conn.fetchrow('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1;''',
+                                              interaction.user.id)
+        if prov_owned_count['count'] <= 15:
+            return await interaction.followup.send("You cannot colonize until you own at least 15 provinces.")
+        # calculate cost
+        cost = 1
+        # cost of colonization = (5 + provinces count) - 25, minimum 1, maximum 10
+        cost += (5 + prov_owned_count) - 25
+        # if the user has the "Manifest Destiny" tech, reduce cost by 2
+        if "Manifest Destiny" in user_info['tech']:
+            cost -= 2
+        # enforce minimum
+        if cost < 1:
+            cost = 1
+        # enforce maximum
+        if cost > 10:
+            cost = 10
+        # if the nation is overextended, increase cost by 50%
+        if prov_owned_count > user_info['overextend_limit']:
+            cost *= 1.5
+        # if the nation is a puppet, increase cost by 15%
+        if user_info['overlord'] is not None:
+            cost *= 1.15
+        # check for enough authority
+        if (user_info['econ_auth'] < cost) and (user_info['mil_auth'] < cost) and (user_info['pol_auth'] < cost):
+            return await interaction.followup.send("You do not have enough authority to colonize that province. "
+                                                   f"The cost of colonizing a province is currently {cost} authority.")
+        # define dev
+        dev = 3
+        # if the user has Predatory Ethnology, add 2 to dev
+        if 'Predatory Ethnology' in user_info['tech']:
+            dev += 2
+        # if all the checks pass, execute the operations
+        await conn.execute('''UPDATE cnc_users SET econ_auth = $1, mil_auth = $1, pol_auth = $1 WHERE user_id = $1;''',
+                           cost, interaction.user.id)
+        await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1, development = $3 
+        WHERE id = $2;''', interaction.user.id, province_id, dev)
+        return await interaction.followup.send(f"{prov_info['name']} (ID: {province_id}) "
+                                               f"has been successfully colonized.")
 
     # === Moderator Commands ===
     @commands.command()
