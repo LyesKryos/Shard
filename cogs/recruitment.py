@@ -448,6 +448,7 @@ class Recruitment(commands.Cog):
                         await crashchannel.send(f"Bad response for API\n"
                                                 f"```{tg_response}```")
         except asyncio.exceptions.CancelledError:
+            self.autogrammer.stop()
             await crashchannel.send("Autogramming aborted.")
         except Exception as error:
             self.bot.logger.exception(error)
