@@ -1376,6 +1376,12 @@ class CNC(commands.Cog):
                                               interaction.user.id)
         if prov_owned_count['count'] <= 15:
             return await interaction.followup.send("You cannot colonize until you own at least 15 provinces.")
+        # check if the province is on the coast or bordering a province owned by the nation
+        bordering_check = await conn.fetch('''SELECT * FROM cnc_provinces 
+        WHERE $1 = ANY(bordering) and owner_id = $2;''', province_id, interaction.user.id)
+        if (len(bordering_check) == 0) and (prov_info['coast'] is None):
+            return await interaction.followup.send("You cannot cannot colonize a province that you do not border "
+                                                   "or is not a costal province.")
         # calculate cost
         cost = 1
         # cost of colonization = (5 + provinces count) - 25, minimum 1, maximum 10
