@@ -2,6 +2,7 @@ import functools
 import typing
 from random import randrange
 
+import asyncpg
 from discord import app_commands
 from discord.ext.commands import Context
 from discord.ext.commands._types import BotT
@@ -1353,6 +1354,47 @@ class CNC(commands.Cog):
         WHERE id = $2;''', interaction.user.id, province_id, dev)
         return await interaction.followup.send(f"{prov_info['name']} (ID: {province_id}) "
                                                f"has been successfully colonized.")
+
+    @cnc.command(name="abandon_province", description="Revokes a nation's claim and ownership of a province.")
+    @app_commands.describe(province_id="The ID of the province you would like to abandon.")
+    @app_commands.guild_only()
+    async def abandon_province(self, interaction: discord.Interaction, province_id: int):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull userinfo
+        user_info = await self.user_db_info(interaction.user.id)
+        # check for registration
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # pull province info
+        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+        # check if province exists
+        if prov_info is None:
+            return await interaction.followup.send("That is not a valid province ID.")
+        # check if user owns province
+        if prov_info['owner_id'] != interaction.user.id:
+            return await interaction.followup.send("You do not own that province.")
+        # check if the user is at war. abandoning is not legal when at war
+        war_check = await conn.fetchrow('''SELECT * FROM cnc_wars WHERE $1 = ANY(members);''', user_info['name'])
+        if war_check is not None:
+            return await interaction.followup.send("You cannot abandon provinces while at war.")
+        # check to make sure that the user will have > 1 province after
+        prov_owned_count = await conn.fetchrow('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1;''',
+                                               interaction.user.id)
+        if prov_owned_count['count'] - 1 < 1:
+            return await interaction.followup.send("You cannot abandon your last province.")
+        # release the province
+        try:
+            await conn.execute('''UPDATE cnc_users SET unrest = unrest + 1 WHERE user_id = $1;''', interaction.user.id)
+            await conn.execute('''UPDATE cnc_provinces SET user_id = 0, occupier_id = 0, 
+            development = floor((random()*9)+1), citizens = floor((random()*10000)+1000), structres = [],
+            fort_leve = 0 WHERE province_id = $1;''', province_id)
+        except asyncpg.PostgresError as e:
+            raise e
+        return await interaction.followup.send(f"{user_info['name']} has abandoned "
+                                               f"{prov_info['name']} (ID: {province_id}).")
 
     # === Moderator Commands ===
     @commands.command()
