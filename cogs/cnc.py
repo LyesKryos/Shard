@@ -1561,27 +1561,27 @@ class CNC(commands.Cog):
             map.save(fr"{self.map_directory}wargame_provinces.png")
             conn = self.bot.pool
             loop = self.bot.loop
-            users = await conn.fetch('''SELECT name, color FROM cnc_users;''')
+            users = await conn.fetch('''SELECT user_id, color FROM cnc_users;''')
             usersncolors = dict()
             for u in users:
-                usersncolors.update({u['username']: u['usercolor']})
+                usersncolors.update({u['user_id']: u['color']})
             provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id != 0;''')
             for p in provinces:
                 p_id = p['id']
                 p_cord = p['cord'][0:2]
-                p_owner = p['owner']
+                p_owner = p['owner_id']
                 if p_owner != '':
                     color = usersncolors[p_owner]
                 else:
                     color = "#808080"
-                if p_owner == p['occupier']:
+                if p_owner == p['occupier_id']:
                     await loop.run_in_executor(None, self.map_color, p_id, p_cord,
                                                color)
-                if p_owner != p['occupier']:
-                    if p['occupier'] == '':
+                if p_owner != p['occupier_id']:
+                    if p['occupier_id'] == '':
                         occupier_color = "#000000"
                     else:
-                        occupier_color = usersncolors[p['occupier']]
+                        occupier_color = usersncolors[p['occupier_id']]
                     await loop.run_in_executor(None, self.occupy_color, p_id, occupier_color, color)
         await ctx.send("All owned provinces checked and colored.")
 
