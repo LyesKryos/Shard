@@ -1417,7 +1417,7 @@ class CNC(commands.Cog):
             return await ctx.send("You cannot give a province that someone owns.")
         # otherwise, carry on
         try:
-            await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1 WHERE province_id = $2;''',
+            await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1 WHERE id = $2;''',
                                user.id, province_id)
         except asyncpg.PostgresError as e:
             raise e
