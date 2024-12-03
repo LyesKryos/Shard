@@ -1399,6 +1399,33 @@ class CNC(commands.Cog):
     # === Moderator Commands ===
     @commands.command()
     @commands.is_owner()
+    async def cnc_give_province(self, ctx, user: discord.Member, province_id: int):
+        # establish connection
+        conn = self.bot.pool
+        # call user info
+        user_info = await self.user_db_info(user.id)
+        # check if such a user exists
+        if user_info is None:
+            return await ctx.send("No such user.")
+        # pull province info
+        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+        # check if province exists
+        if prov_info is None:
+            return await ctx.send("That is not a valid province ID.")
+        # if someone owns the province, deny
+        if prov_info['owner_id'] != 0:
+            return await ctx.send("You cannot give a province that someone owns.")
+        # otherwise, carry on
+        try:
+            await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1 WHERE province_id = $2;''',
+                               user.id, province_id)
+        except asyncpg.PostgresError as e:
+            raise e
+        return await ctx.send(f"{user_info['name']} granted ownership of {prov_info['name']} (ID: {province_id}).")
+
+
+    @commands.command()
+    @commands.is_owner()
     async def cnc_research_tech(self, ctx, user: discord.Member, tech: str):
         # establish connection
         conn = self.bot.pool
@@ -1600,13 +1627,6 @@ class CNC(commands.Cog):
         async with ctx.typing():
             await conn.execute('''UPDATE cnc_provinces SET citizens = development * (RANDOM()*(1500-500)+500);''')
         return await ctx.send("World populated.")
-
-
-
-
-
-
-
 
 async def setup(bot: Shard):
     # define the cog and add the cog
