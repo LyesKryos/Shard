@@ -186,7 +186,7 @@ class CNC(commands.Cog):
         map.paste(prov, box=cord, mask=prov)
         map.save(fr"{self.map_directory}wargame_provinces.png")
 
-    async def occupy_color(self, province: int, occupy_color, owner_color):
+    async def occupy_color(self, province: int, occupy_color: str, owner_color: str):
         # establish connection
         conn = self.bot.pool
         # pull province information
@@ -1552,6 +1552,38 @@ class CNC(commands.Cog):
         map_image = Image.open(fr"{self.map_directory}wargame_blank_save.png").convert("RGBA")
         map_image.save(fr"{self.map_directory}wargame_provinces.png")
         await ctx.send("Map reset.")
+
+    @commands.command()
+    @commands.is_owner()
+    async def cnc_map_check(self, ctx):
+        async with ctx.typing():
+            map = Image.open(fr"{self.map_directory}wargame_blank_save.png").convert("RGBA")
+            map.save(fr"{self.map_directory}wargame_provinces.png")
+            conn = self.bot.pool
+            loop = self.bot.loop
+            users = await conn.fetch('''SELECT name, color FROM cnc_users;''')
+            usersncolors = dict()
+            for u in users:
+                usersncolors.update({u['username']: u['usercolor']})
+            provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id != 0;''')
+            for p in provinces:
+                p_id = p['id']
+                p_cord = p['cord'][0:2]
+                p_owner = p['owner']
+                if p_owner != '':
+                    color = usersncolors[p_owner]
+                else:
+                    color = "#808080"
+                if p_owner == p['occupier']:
+                    await loop.run_in_executor(None, self.map_color, p_id, p_cord,
+                                               color)
+                if p_owner != p['occupier']:
+                    if p['occupier'] == '':
+                        occupier_color = "#000000"
+                    else:
+                        occupier_color = usersncolors[p['occupier']]
+                    await loop.run_in_executor(None, self.occupy_color, p_id, occupier_color, color)
+        await ctx.send("All owned provinces checked and colored.")
 
     @commands.command()
     @commands.is_owner()
