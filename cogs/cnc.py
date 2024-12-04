@@ -1389,8 +1389,8 @@ class CNC(commands.Cog):
         # release the province
         try:
             await conn.execute('''UPDATE cnc_users SET unrest = unrest + 1 WHERE user_id = $1;''', interaction.user.id)
-            await conn.execute('''UPDATE cnc_provinces SET user_id = 0, occupier_id = 0, 
-            development = floor((random()*9)+1), citizens = floor((random()*10000)+1000), structres = [],
+            await conn.execute('''UPDATE cnc_provinces SET owner_id = 0, occupier_id = 0, 
+            development = floor((random()*9)+1), citizens = floor((random()*10000)+1000), structures = '{}',
             fort_level = 0 WHERE province_id = $1;''', province_id)
         except asyncpg.PostgresError as e:
             raise e
@@ -1614,8 +1614,8 @@ class CNC(commands.Cog):
         try:
             await conn.execute('''DELETE FROM cnc_users WHERE user_id = $1;''', user.id)
             await conn.execute('''DELETE FROM cnc_armies WHERE owner_id = $1;''', user.id)
-            await conn.execute('''UPDATE cnc_provinces SET user_id = 0, occupier_id = 0, 
-            development = floor((random()*9)+1), citizens = floor((random()*10000)+1000), structres = {},
+            await conn.execute('''UPDATE cnc_provinces SET owner_id = 0, occupier_id = 0, 
+            development = floor((random()*9)+1), citizens = floor((random()*10000)+1000), structures = text[],
             fort_level = 0 WHERE owner_id = $1 AND occupier_id = $1;''', user.id)
             await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user.id)
             await delete_confirm.delete()
