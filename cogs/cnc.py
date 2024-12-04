@@ -1391,7 +1391,7 @@ class CNC(commands.Cog):
             await conn.execute('''UPDATE cnc_users SET unrest = unrest + 1 WHERE user_id = $1;''', interaction.user.id)
             await conn.execute('''UPDATE cnc_provinces SET user_id = 0, occupier_id = 0, 
             development = floor((random()*9)+1), citizens = floor((random()*10000)+1000), structres = [],
-            fort_leve = 0 WHERE province_id = $1;''', province_id)
+            fort_level = 0 WHERE province_id = $1;''', province_id)
         except asyncpg.PostgresError as e:
             raise e
         return await interaction.followup.send(f"{user_info['name']} has abandoned "
@@ -1587,7 +1587,7 @@ class CNC(commands.Cog):
                     await loop.run_in_executor(None, self.occupy_color, p_id, occupier_color, color)
             end = perf_counter() - start
         await ctx.send("All owned provinces checked and colored.\n"
-                       f"{end} seconds elapsed.")
+                       f"{round(end,2)} seconds elapsed.")
 
     @commands.command()
     @commands.is_owner()
@@ -1608,19 +1608,20 @@ class CNC(commands.Cog):
             return await delete_confirm.edit(content=f"Permanent deletion of {user.name} "
                                                      f"from the Command and Conquest System aborted.")
         conn = self.bot.pool
-        user = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', user.id)
-        if user is None:
+        usercheck = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', user.id)
+        if usercheck is None:
             return await ctx.send("No such user in the CNC system.")
         try:
             await conn.execute('''DELETE FROM cnc_users WHERE user_id = $1;''', user.id)
             await conn.execute('''DELETE FROM cnc_armies WHERE owner_id = $1;''', user.id)
-            await conn.execute('''UPDATE cnc_provinces SET owner_id = 0, occupier_id = 0 
-            WHERE owner_id = $1 AND occupier_id = $1;''', user.id)
+            await conn.execute('''UPDATE cnc_provinces SET user_id = 0, occupier_id = 0, 
+            development = floor((random()*9)+1), citizens = floor((random()*10000)+1000), structres = [],
+            fort_level = 0 WHERE owner_id = $1 AND occupier_id = $1;''', user.id)
             await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user.id)
             await delete_confirm.delete()
         except Exception as error:
             raise error
-        return await ctx.send(f"Permanent deletion of {user.id.name} "
+        return await ctx.send(f"Permanent deletion of {user.name} "
                               "from the Command and Conquest System completed.")
 
     @commands.command()
