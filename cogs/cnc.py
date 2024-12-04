@@ -1,6 +1,7 @@
 import functools
 import typing
 from random import randrange
+from time import perf_counter
 
 import asyncpg
 from discord import app_commands
@@ -1557,6 +1558,7 @@ class CNC(commands.Cog):
     @commands.is_owner()
     async def cnc_map_check(self, ctx):
         async with ctx.typing():
+            start = perf_counter()
             map = Image.open(fr"{self.map_directory}wargame_blank_save.png").convert("RGBA")
             map.save(fr"{self.map_directory}wargame_provinces.png")
             conn = self.bot.pool
@@ -1583,7 +1585,9 @@ class CNC(commands.Cog):
                     else:
                         occupier_color = usersncolors[p['occupier_id']]
                     await loop.run_in_executor(None, self.occupy_color, p_id, occupier_color, color)
-        await ctx.send("All owned provinces checked and colored.")
+            end = perf_counter() - start
+        await ctx.send("All owned provinces checked and colored.\n"
+                       f"{end} seconds elapsed.")
 
     @commands.command()
     @commands.is_owner()
