@@ -1571,6 +1571,7 @@ class CNC(commands.Cog):
                     p_id = p['id']
                     if p['occupier_id'] == u['user_id']:
                         await loop.run_in_executor(None, self.map_color, p_id, color, False)
+                        await ctx.send(f"{p['name']} colored.")
                     elif p['occupier_id'] == 0:
                         await loop.run_in_executor(None, self.occupy_color, p_id, '#000000', color)
                     elif p['occupier_id'] != u['user_id']:
