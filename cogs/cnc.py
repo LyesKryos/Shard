@@ -1570,14 +1570,14 @@ class CNC(commands.Cog):
                 for p in owned_provinces:
                     p_id = p['id']
                     if p['occupier_id'] == u['user_id']:
-                        await loop.run_in_executor(None, self.map_color, p_id, color, False)
+                        await self.map_color(p_id, color, False)
                         await ctx.send(f"{p['name']} colored.")
                     elif p['occupier_id'] == 0:
-                        await loop.run_in_executor(None, self.occupy_color, p_id, '#000000', color)
+                        await self.occupy_color(p_id, '#000000', color)
                     elif p['occupier_id'] != u['user_id']:
                         occupier_color = await conn.fetchrow('''SELECT color FROM cnc_users WHERE user_id = $1;''',
                                                        p['occupier_id'])
-                        await loop.run_in_executor(None, self.occupy_color, p_id, occupier_color, color)
+                        await self.occupy_color(p_id, occupier_color, color)
             return await ctx.send("All provinces checked and colored.")
 
 
