@@ -1564,27 +1564,42 @@ class CNC(commands.Cog):
             conn = self.bot.pool
             loop = self.bot.loop
             users = await conn.fetch('''SELECT user_id, color FROM cnc_users;''')
-            usersncolors = dict()
             for u in users:
-                usersncolors.update({u['user_id']: u['color']})
-            provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id != 0;''')
-            for p in provinces:
-                p_id = p['id']
-                p_cord = p['cord'][0:2]
-                p_owner = p['owner_id']
-                if p_owner != '':
-                    color = usersncolors[p_owner]
-                else:
-                    color = "#808080"
-                if p_owner == p['occupier_id']:
-                    await loop.run_in_executor(None, self.map_color, p_id, p_cord,
-                                               color)
-                if p_owner != p['occupier_id']:
-                    if p['occupier_id'] == '':
-                        occupier_color = "#000000"
-                    else:
-                        occupier_color = usersncolors[p['occupier_id']]
-                    await loop.run_in_executor(None, self.occupy_color, p_id, occupier_color, color)
+                color = u['color']
+                owned_provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id = $1;''', u['user_id'])
+                for p in owned_provinces:
+                    p_id = p['id']
+                    if p['occupier_id'] == u['user_id']:
+                        await loop.run_in_executor(None, self.map_color, p_id, color, False)
+                    elif p['occupier_id'] == 0:
+                        await loop.run_in_executor(None, self.occupy_color, p_id, '#000000', color)
+                    elif p['occupier_id'] != u['user_id']:
+                        occupier_color = await conn.fetchrow('''SELECT color FROM cnc_users WHERE user_id = $1;''',
+                                                       p['occupier_id'])
+                        await loop.run_in_executor(None, self.occupy_color, p_id, occupier_color, color)
+            return await ctx.send("All provinces checked and colored.")
+
+
+            #     usersncolors.update({u['user_id']: u['color']})
+            # provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id != 0;''')
+            # for p in provinces:
+            #     p_id = p['id']
+            #     p_cord = p['cord'][0:2]
+            #     p_owner = p['owner_id']
+            #     p_occupier = p['occupier_id']
+            #     if p_owner != '':
+            #         color = usersncolors[p_owner]
+            #     else:
+            #         color = "#808080"
+            #     if p_owner == p_occupier:
+            #         await loop.run_in_executor(None, self.map_color, p_id, p_cord,
+            #                                    color)
+            #     if p_owner != p_occupier:
+            #         if p_occupier == '':
+            #             occupier_color = "#000000"
+            #         else:
+            #             occupier_color = usersncolors[p_occupier]
+            #         await loop.run_in_executor(None, self.occupy_color, p_id, occupier_color, color)
             end = perf_counter() - start
         await ctx.send("All owned provinces checked and colored.\n"
                        f"{round(end,2)} seconds elapsed.")
