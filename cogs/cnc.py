@@ -1353,6 +1353,7 @@ class CNC(commands.Cog):
                            cost, interaction.user.id)
         await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1, development = $3 
         WHERE id = $2;''', interaction.user.id, province_id, dev)
+        await self.map_color(province_id, user_info['color'])
         return await interaction.followup.send(f"{prov_info['name']} (ID: {province_id}) "
                                                f"has been successfully colonized.")
 
