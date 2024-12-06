@@ -1334,7 +1334,7 @@ class CNC(commands.Cog):
         if cost > 10:
             cost = 10
         # if the nation is overextended, increase cost by 50%
-        if prov_owned_count > user_info['overextend_limit']:
+        if prov_owned_count['count'] > user_info['overextend_limit']:
             cost *= 1.5
         # if the nation is a puppet, increase cost by 15%
         if user_info['overlord'] is not None:
