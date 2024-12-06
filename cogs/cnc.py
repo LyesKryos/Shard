@@ -420,6 +420,65 @@ class CNC(commands.Cog):
                                             f"**\"I came, I saw, I conquered.\" -Julius Caesar**")
             return
 
+    @cnc.command(name="change_color", description="Changes your nation's color on the map.")
+    @app_commands.guild_only()
+    @app_commands.checks.cooldown(1, 30)
+    @app_commands.describe(color="The hex code of your new map color. Include the '#'.")
+    async def recolor(self, interaction: discord.Interaction, color: str):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull userinfo
+        user_info = await self.user_db_info(interaction.user.id)
+        # check for registration
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # check if the color is taken, banned, or even a color
+        check_color_taken = await conn.fetchrow('''SELECT * FROM cnc_users WHERE color = $1;''', color)
+        if check_color_taken is not None:
+            return await interaction.followup.send("That color is already taken. "
+                                                   "Please select a different color.")
+        # pull all colors
+        pull_all_colors = await conn.fetch('''SELECT name, color FROM cnc_users;''')
+        # check each color
+        for c in pull_all_colors:
+            color_check = c['color']
+            if self.color_difference(c['color'], color_check) < 50:
+                return await interaction.followup.send(f"Your selected color, {color}, is too similar to an "
+                                                       f"existing color, registered to {c['name']} ({c['color']}).")
+
+        if color in self.banned_colors:
+            return await interaction.followup.send("That color is a restricted color. "
+                                                   "Please select a different color.")
+        for c in self.banned_colors:
+            if self.color_difference(c, color) < 50:
+                return await interaction.followup.send(f"That color is too similar to a banned color, {c}.")
+        # try and get the color from the hex code
+        try:
+            ImageColor.getrgb(color)
+        except ValueError:
+            # if the color isn't a real hex code, return that they need to get the right hex code
+            return await interaction.followup.send(
+                "That doesn't appear to be a valid hex color code. Include the `#` symbol.")
+        # if the color is valid, update the database
+        await conn.execute('''UPDATE cnc_users SET color = $1 WHERE user_id = $2;''', color, interaction.user.id)
+        # get all provinces
+        all_provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id = $1;''')
+        for p in all_provinces:
+            p_id = p['id']
+            if p['occupier_id'] == user_info['user_id']:
+                await self.map_color(p_id, color, False)
+            elif p['occupier_id'] == 0:
+                await self.occupy_color(p_id, '#000000', color)
+            elif p['occupier_id'] != user_info['user_id']:
+                occupier_color = await conn.fetchrow('''SELECT color FROM cnc_users WHERE user_id = $1;''',
+                                                     p['occupier_id'])
+                await self.occupy_color(p_id, occupier_color, color)
+        return await interaction.followup.send(f"Color successfully changed to {color}!")
+
+
+
     @cnc.command(name="map", description="Opens the map for viewing.")
     @app_commands.guild_only()
     async def map(self, interaction: discord.Interaction):
