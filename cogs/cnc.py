@@ -1323,7 +1323,7 @@ class CNC(commands.Cog):
         # calculate cost
         cost = 1
         # cost of colonization = (5 + provinces count) - 25, minimum 1, maximum 10
-        cost += (5 + prov_owned_count) - 25
+        cost += (5 + prov_owned_count['count']) - 25
         # if the user has the "Manifest Destiny" tech, reduce cost by 2
         if "Manifest Destiny" in user_info['tech']:
             cost -= 2
