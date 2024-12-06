@@ -1392,7 +1392,7 @@ class CNC(commands.Cog):
             await conn.execute('''UPDATE cnc_users SET unrest = unrest + 1 WHERE user_id = $1;''', interaction.user.id)
             await conn.execute('''UPDATE cnc_provinces SET owner_id = 0, occupier_id = 0, 
             development = floor((random()*9)+1), citizens = floor((random()*10000)+1000), structures = '{}',
-            fort_level = 0 WHERE province_id = $1;''', province_id)
+            fort_level = 0 WHERE id = $1;''', province_id)
         except asyncpg.PostgresError as e:
             raise e
         return await interaction.followup.send(f"{user_info['name']} has abandoned "
