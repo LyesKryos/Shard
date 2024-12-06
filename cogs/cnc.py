@@ -125,7 +125,7 @@ class CNC(commands.Cog):
         self.interaction_directory = r"/root/Shard/CNC/Interaction Files/"
         self.tech_directory = r"/root/Shard/CNC/Tech Tree/"
         self.bot = bot
-        self.banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2", "#999999"]
+        self.banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2", "#999999", "#FF0000"]
         self.version = "version 4.0 New Horizons"
         self.version_notes = ""
 
@@ -1420,6 +1420,7 @@ class CNC(commands.Cog):
         try:
             await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1 WHERE id = $2;''',
                                user.id, province_id)
+            await self.map_color(province_id, user_info['color'])
         except asyncpg.PostgresError as e:
             raise e
         return await ctx.send(f"{user_info['name']} granted ownership of {prov_info['name']} (ID: {province_id}).")
