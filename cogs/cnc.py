@@ -1312,7 +1312,7 @@ class CNC(commands.Cog):
         # check if the user has more than 15 provinces
         prov_owned_count = await conn.fetchrow('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1;''',
                                               interaction.user.id)
-        if prov_owned_count['count'] <= 15:
+        if prov_owned_count['count'] < 15:
             return await interaction.followup.send("You cannot colonize until you own at least 15 provinces.")
         # check if the province is on the coast or bordering a province owned by the nation
         bordering_check = await conn.fetch('''SELECT * FROM cnc_provinces 
