@@ -444,7 +444,7 @@ class CNC(commands.Cog):
         # check each color
         for c in pull_all_colors:
             color_check = c['color']
-            if self.color_difference(c['color'], color_check) < 50:
+            if self.color_difference(color_check, color) < 50:
                 return await interaction.followup.send(f"Your selected color, {color}, is too similar to an "
                                                        f"existing color, registered to {c['name']} ({c['color']}).")
 
