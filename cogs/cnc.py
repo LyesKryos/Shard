@@ -464,7 +464,7 @@ class CNC(commands.Cog):
         # if the color is valid, update the database
         await conn.execute('''UPDATE cnc_users SET color = $1 WHERE user_id = $2;''', color, interaction.user.id)
         # get all provinces
-        all_provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id = $1;''')
+        all_provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id = $1;''', interaction.user.id)
         for p in all_provinces:
             p_id = p['id']
             if p['occupier_id'] == user_info['user_id']:
