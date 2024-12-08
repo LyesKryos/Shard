@@ -1374,7 +1374,7 @@ class CNC(commands.Cog):
         # check if the province is on the coast or bordering a province owned by the nation
         bordering_check = await conn.fetch('''SELECT * FROM cnc_provinces 
         WHERE $1 = ANY(bordering) and owner_id = $2;''', province_id, interaction.user.id)
-        if (not bordering_check) and (prov_info['coast'] is None):
+        if (not bordering_check) and (prov_info['coast'] is False):
             return await interaction.followup.send("You cannot cannot colonize a province that you do not border "
                                                    "or is not a costal province.")
         # calculate cost
