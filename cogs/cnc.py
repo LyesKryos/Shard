@@ -1483,17 +1483,17 @@ class CNC(commands.Cog):
         max_tax = (govt_tax['tax_level']*100) + 20
         # check that the requested rate is not above the max tax rate
         if rate > max_tax:
-            return await interaction.followup.send(f"You cannot set a tax rate greater than {max_tax}%.")
+            return await interaction.followup.send(f"You cannot set a tax rate greater than {round(max_tax)}%.")
         # otherwise, carry on
         # update the tax level
         await conn.execute('''UPDATE cnc_users SET tax_level = $1 WHERE user_id = $2;''', rate/100, interaction.user.id)
         # if the tax level increases, add a random amount of unrest
-        if rate > user_info['tax_rate']:
+        if rate > user_info['tax_level']:
             unrest_gain = randint(1, rate)
             await conn.followup.send('''UPDATE cnc_users SET unrest = unrest + $1 WHERE user_id = $2;''',
                                      unrest_gain, interaction.user.id)
         # send confirmation
-        return await interaction.followup.send(f"The tax rate of {user_info['name']} has been set to {rate}%.")
+        return await interaction.followup.send(f"The tax rate of {user_info['name']} has been set to {round(rate)}%.")
 
     # === Moderator Commands ===
     @commands.command()
