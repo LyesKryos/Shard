@@ -1490,7 +1490,7 @@ class CNC(commands.Cog):
         # if the tax level increases, add a random amount of unrest
         if rate > user_info['tax_level']:
             unrest_gain = randint(1, rate)
-            await conn.followup.send('''UPDATE cnc_users SET unrest = unrest + $1 WHERE user_id = $2;''',
+            await conn.execute('''UPDATE cnc_users SET unrest = unrest + $1 WHERE user_id = $2;''',
                                      unrest_gain, interaction.user.id)
         # send confirmation
         return await interaction.followup.send(f"The tax rate of {user_info['name']} has been set to {round(rate)}%.")
