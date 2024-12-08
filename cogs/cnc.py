@@ -650,7 +650,7 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Manpower \n(Manpower Access)", value=f"{user_info['manpower']:,} "
                                                                         f"({user_info['manpower_access']}%)")
         user_embed.add_field(name="Manpower Regen",
-                             value=f"{math.floor(total_manpower['sum'] * (user_info['manpower_regen'] / 100))} "
+                             value=f"{math.floor(total_manpower['sum'] * (user_info['manpower_regen'] / 100)):,} "
                                    f"({user_info['manpower_regen']}%)")
         user_embed.add_field(name="Total Manpower", value=f"{total_manpower['sum']:,}")
         # populate tax and spending stats
