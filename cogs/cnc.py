@@ -1406,8 +1406,8 @@ class CNC(commands.Cog):
         if 'Predatory Ethnology' in user_info['tech']:
             dev += 2
         # if all the checks pass, execute the operations
-        await conn.execute('''UPDATE cnc_users SET econ_auth = $1, mil_auth = $1, pol_auth = $1 WHERE user_id = $2;''',
-                           cost, interaction.user.id)
+        await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $1, mil_auth = mil_auth - $1, 
+        pol_auth = pol_auth - $1 WHERE user_id = $2;''', cost, interaction.user.id)
         await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1, development = $3 
         WHERE id = $2;''', interaction.user.id, province_id, dev)
         await self.map_color(province_id, user_info['color'])
