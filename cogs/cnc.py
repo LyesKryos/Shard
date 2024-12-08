@@ -1,6 +1,6 @@
 import functools
 import typing
-from random import randrange
+from random import randrange, randint
 from time import perf_counter
 
 import asyncpg
@@ -1036,6 +1036,7 @@ class CNC(commands.Cog):
             return await interaction.followup.send(f"Scientists are no longer researching {researching['tech']}.")
 
     # === Province Commands ===
+
     @cnc.command(name="construct", description="Uses Authority to construct buildings in a province.")
     @app_commands.describe(province_id="The ID of the province in which you would like to construct.",
                            structure="The name of the structure you would like to construct.")
@@ -1456,6 +1457,43 @@ class CNC(commands.Cog):
             raise e
         return await interaction.followup.send(f"{user_info['name']} has abandoned "
                                                f"{prov_info['name']} (ID: {province_id}).")
+
+    # === Government Commands ===
+
+    @cnc.command(name="set_taxation", description="Sets the level of taxation for your government.")
+    @app_commands.describe(rate="The tax rate you wish to set.")
+    @app_commands.guild_only()
+    async def set_taxation(self, interaction: discord.Interaction, rate: int):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull userinfo
+        user_info = await self.user_db_info(interaction.user.id)
+        # check for registration
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # ensure rate is positive
+        if rate < 0:
+            return await interaction.followup.send("You cannot set a negative tax rate.")
+        # pull the government type information
+        govt_tax = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1 AND govt_subtype = $2;''',
+                                       user_info['govt_type'], user_info['govt_subtype'])
+        # calculate max tax rate = govt type tax rate plus 20%
+        max_tax = (govt_tax['tax_rate']*100) + 20
+        # check that the requested rate is not above the max tax rate
+        if rate > max_tax:
+            return await interaction.followup.send(f"You cannot set a tax rate greater than {max_tax}%.")
+        # otherwise, carry on
+        # update the tax level
+        await conn.execute('''UPDATE cnc_users SET tax_level = $1 WHERE user_id = $2;''', rate/100, interaction.user.id)
+        # if the tax level increases, add a random amount of unrest
+        if rate > user_info['tax_rate']:
+            unrest_gain = randint(1, rate)
+            await conn.followup.send('''UPDATE cnc_users SET unrest = unrest + $1 WHERE user_id = $2;''',
+                                     unrest_gain, interaction.user.id)
+        # send confirmation
+        return await interaction.followup.send(f"The tax rate of {user_info['name']} has been set to {rate}%.")
 
     # === Moderator Commands ===
     @commands.command()
