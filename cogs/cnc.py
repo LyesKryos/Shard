@@ -1480,7 +1480,7 @@ class CNC(commands.Cog):
         govt_tax = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1 AND govt_subtype = $2;''',
                                        user_info['govt_type'], user_info['govt_subtype'])
         # calculate max tax rate = govt type tax rate plus 20%
-        max_tax = (govt_tax['tax_rate']*100) + 20
+        max_tax = (govt_tax['tax_level']*100) + 20
         # check that the requested rate is not above the max tax rate
         if rate > max_tax:
             return await interaction.followup.send(f"You cannot set a tax rate greater than {max_tax}%.")
