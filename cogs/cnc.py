@@ -1584,12 +1584,51 @@ class CNC(commands.Cog):
         # pay pol auth
         await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth - $1 WHERE user_id = $2;''',
                            boost, interaction.user.id)
-        # boost stability
+        # boost stability = boost ^ 1.35
         stab_boost = round(boost ** 1.35)
         await conn.execute('''UPDATE cnc_users SET stability = stability + $1 WHERE user_id = $2;''',
                            stab_boost, interaction.user.id)
         return await interaction.followup.send(f"The stability of {user_info['name']} has been boosted using "
                                                f"{boost} Political authority.")
+
+    @cnc.command(name="designate_capital", description="Designates a province as the national capital.")
+    @app_commands.describe(province_id="The province to be designated as the capital.")
+    @app_commands.guild_only()
+    async def designate_capital(self, interaction: discord.Interaction, province_id: int):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull userinfo
+        user_info = await self.user_db_info(interaction.user.id)
+        # check for registration
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # pull province info
+        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+        # check if province exists
+        if prov_info is None:
+            return await interaction.followup.send("That is not a valid province ID.")
+        # check if user owns province
+        if prov_info['owner_id'] != interaction.user.id:
+            return await interaction.followup.send("You do not own that province.")
+        # check if the user has sufficient Political authority
+        if user_info['pol_auth'] < 7:
+            return await interaction.followup.send("You do not have sufficient Political "
+                                                   "authority to designate a new capital.")
+        # check if the user is at war
+        war_check = await conn.fetchrow('''SELECT * FROM cnc_wars WHERE $1 = ANY(members);''', user_info['name'])
+        if war_check is not None:
+            return await interaction.followup.send("You cannot designate a new Capital while at war.")
+        # otherwise, carry on
+        # designate new capital and reduce pol_auth
+        await conn.execute('''UPDATE cnc_users SET capital = $1, pol_auth = pol_auth - 7 WHERE user_id = $2;''',
+                           province_id, interaction.user.id)
+        # if this is the users first capital, reduce unrest by 5 points
+        if user_info['capital'] is None:
+            await conn.execute('''UPDATE cnc_users SET unrest = unrest - 5 WHERE user_id = $1;''', interaction.user.id)
+        # send confirmation
+        return await interaction.followup.send(f"{prov_info['name']} is now the Capital of {user_info['name']}.")
 
     # === Moderator Commands ===
     @commands.command()
