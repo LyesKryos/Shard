@@ -1547,6 +1547,50 @@ class CNC(commands.Cog):
         return await interaction.followup.send(f"{user_info['name']} now has a Military Upkeep budget of "
                                                f"{budget} Economic authority.")
 
+    @cnc.command(name="boost_stability", description="Utilizes Political authority to boost national stability.")
+    @app_commands.describe(boost="The amount of Political authority to expend on boosting national stability.")
+    @app_commands.guild_only()
+    async def boost_stability(self, interaction: discord.Interaction, boost: int):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull userinfo
+        user_info = await self.user_db_info(interaction.user.id)
+        # check for registration
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # ensure that the budget is positive
+        if boost < 0:
+            return await interaction.followup.send("You cannot set a negative boost amount.")
+        # pull user boost limit
+        stab_boost_limit = user_info['stability_limit']
+        # check if user has used their stability limit
+        if stab_boost_limit <= 0:
+            return await interaction.followup.send("You cannot expend more than 10 Political authority on "
+                                                   "Stability boosting each turn.")
+        # check if the boost amount will overdraw boosting
+        if boost > stab_boost_limit:
+            return await interaction.followup.send(f"You cannot boost that amount. The maximum boost amount this turn is"
+                                                   f" currently {stab_boost_limit} Political authority.")
+        # check if the user has a sufficient amount of political authority
+        if user_info['pol_auth'] < boost:
+            return await interaction.followup.send("You do not have sufficient Political "
+                                                   "authority to boost that amount.")
+        # otherwise carry on
+        # reduce stab limit
+        await conn.execute('''UPDATE cnc_users SET stability_limit = stability_limit - $1 WHERE user_id = $2;''',
+                           boost, interaction.user.id)
+        # pay pol auth
+        await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth - $1 WHERE user_id = $2;''',
+                           boost, interaction.user.id)
+        # boost stability
+        stab_boost = round(boost ** 1.35)
+        await conn.execute('''UPDATE cnc_users SET stability = stability + $1 WHERE user_id = $2;''',
+                           stab_boost, interaction.user.id)
+        return await interaction.followup.send(f"The stability of {user_info['name']} has been boosted using "
+                                               f"{boost} Political authority.")
+
     # === Moderator Commands ===
     @commands.command()
     @commands.is_owner()
