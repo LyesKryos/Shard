@@ -1521,6 +1521,32 @@ class CNC(commands.Cog):
         return await interaction.followup.send(f"{user_info['name']} now has a Public Spending budget of "
                                                f"{budget} Economic authority.")
 
+    @cnc.command(name="set_military_upkeep", description="Sets the level of military upkeep for your government.")
+    @app_commands.describe(budget="The amount of Economic authority to budget for Military upKeeping.")
+    @app_commands.guild_only()
+    async def set_military_upkeep(self, interaction: discord.Interaction, budget: int):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull userinfo
+        user_info = await self.user_db_info(interaction.user.id)
+        # check for registration
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # ensure that the budget is positive
+        if budget < 0:
+            return await interaction.followup.send("You cannot set a negative budget.")
+        # ensure the budget is less than 10
+        if budget > 25:
+            return await interaction.followup.send("You cannot set a budget above 25 Economic authority.")
+        # otherwise, carry on
+        # update military upkeep level
+        await conn.execute('''UPDATE cnc_users SET mil_upkeep = $1 WHERE user_id = $2;''',
+                           budget, interaction.user.id)
+        return await interaction.followup.send(f"{user_info['name']} now has a Military Upkeep budget of "
+                                               f"{budget} Economic authority.")
+
     # === Moderator Commands ===
     @commands.command()
     @commands.is_owner()
