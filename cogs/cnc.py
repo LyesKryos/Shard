@@ -1495,6 +1495,32 @@ class CNC(commands.Cog):
         # send confirmation
         return await interaction.followup.send(f"The tax rate of {user_info['name']} has been set to {round(rate)}%.")
 
+    @cnc.command(name="set_public_spending", description="Sets the level of public spending for your government.")
+    @app_commands.describe(budget="The amount of Economic authority to budget for Public Spending.")
+    @app_commands.guild_only()
+    async def set_public_spending(self, interaction: discord.Interaction, budget: int):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull userinfo
+        user_info = await self.user_db_info(interaction.user.id)
+        # check for registration
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # ensure that the budget is positive
+        if budget < 0:
+            return await interaction.followup.send("You cannot set a negative budget.")
+        # ensure the budget is less than 10
+        if budget > 10:
+            return await interaction.followup.send("You cannot set a budget above 10 Economic authority.")
+        # otherwise, carry on
+        # update public spending level
+        await conn.execute('''UPDATE cnc_users SET public_spend = $1 WHERE user_id = $2;''',
+                           budget, interaction.user.id)
+        return await interaction.followup.send(f"{user_info['name']} now has a Public Spending budget of "
+                                               f"{budget} Economic authority.")
+
     # === Moderator Commands ===
     @commands.command()
     @commands.is_owner()
@@ -1657,11 +1683,9 @@ class CNC(commands.Cog):
     @commands.is_owner()
     async def cnc_map_check(self, ctx):
         async with ctx.typing():
-            start = perf_counter()
             map = Image.open(fr"{self.map_directory}wargame_blank_save.png").convert("RGBA")
             map.save(fr"{self.map_directory}wargame_provinces.png")
             conn = self.bot.pool
-            loop = self.bot.loop
             users = await conn.fetch('''SELECT user_id, color FROM cnc_users;''')
             for u in users:
                 color = u['color']
@@ -1678,31 +1702,6 @@ class CNC(commands.Cog):
                                                        p['occupier_id'])
                         await self.occupy_color(p_id, occupier_color, color)
             return await ctx.send("All provinces checked and colored.")
-
-
-            #     usersncolors.update({u['user_id']: u['color']})
-            # provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id != 0;''')
-            # for p in provinces:
-            #     p_id = p['id']
-            #     p_cord = p['cord'][0:2]
-            #     p_owner = p['owner_id']
-            #     p_occupier = p['occupier_id']
-            #     if p_owner != '':
-            #         color = usersncolors[p_owner]
-            #     else:
-            #         color = "#808080"
-            #     if p_owner == p_occupier:
-            #         await loop.run_in_executor(None, self.map_color, p_id, p_cord,
-            #                                    color)
-            #     if p_owner != p_occupier:
-            #         if p_occupier == '':
-            #             occupier_color = "#000000"
-            #         else:
-            #             occupier_color = usersncolors[p_occupier]
-            #         await loop.run_in_executor(None, self.occupy_color, p_id, occupier_color, color)
-            end = perf_counter() - start
-        await ctx.send("All owned provinces checked and colored.\n"
-                       f"{round(end,2)} seconds elapsed.")
 
     @commands.command()
     @commands.is_owner()
