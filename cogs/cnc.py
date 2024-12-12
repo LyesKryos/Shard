@@ -117,6 +117,193 @@ class MapButtons(View):
         # update the view so all the buttons are disabled
         await interaction.response.edit_message(view=self)
 
+# create the construct select menu
+class ConstructDropdown(discord.ui.Select):
+
+    def __init__(self, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
+        self.prov_info = province_db
+        self.pool = pool
+        self.user_info = user_info
+
+        # define options
+        options = [
+            discord.SelectOption(label='Farm'),
+            discord.SelectOption(label='Trading Post'),
+            discord.SelectOption(label='Lumber Mill'),
+            discord.SelectOption(label='Mine'),
+            discord.SelectOption(label='Fishery'),
+            discord.SelectOption(label='City'),
+            discord.SelectOption(label='Fort'),
+            discord.SelectOption(label='Road'),
+            discord.SelectOption(label='Manufactory'),
+            discord.SelectOption(label='Port'),
+            discord.SelectOption(label='Bridge'),
+            discord.SelectOption(label='University'),
+            discord.SelectOption(label='Temple')]
+        # define the super
+        super().__init__(placeholder="Choose a structure to build...", min_values=1, max_values=1, options=options)
+
+    # set callback
+    async def callback(self, interaction: discord.Interaction):
+        structure = self.values[0]
+        prov_info = self.prov_info
+        user_info = self.user_info
+        conn = self.pool
+        # check if structure is already built
+        if prov_info['structures'] is not None:
+            if structure in prov_info['structures']:
+                return await interaction.followup.send(f"A {structure} already exists in {prov_info['name']} "
+                                                       f"(ID: {prov_info['id']}).")
+        # check if the province has enough space
+        development = prov_info['development']
+        if prov_info['structures'] is not None:
+            structures_num = len(prov_info['structures'])
+        else:
+            structures_num = 0
+        # if the Engineering tech has been researched, increase building slots by 1
+        if "Engineering" in user_info['tech']:
+            structures_num -= 1
+        # to build, the development of the province must be x>1 where x is defined as (development/10) - number of structures
+        # accepting that each province can host a minimum of 1 structure
+        if structures_num > 0:
+            if (development / 10) - structures_num + 1 < 1:
+                return await interaction.followup.send(
+                    f"{prov_info['name']} is not developed enough to support another structure.\n"
+                    f"The province will need an additional "
+                    f"{math.ceil(development - ((structures_num - 1) * 10))} to "
+                    f"build another structure.")
+        # search for required tech
+        req_tech = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE effect = $1;''',
+                                       f"Unlocks {structure} structure.")
+        # if the user does not have the required tech
+        if req_tech['name'] not in user_info['tech']:
+            return await interaction.followup.send(f"The **{req_tech['name']}** tech must be researched before "
+                                                   f"constructing a {structure}.")
+        # check if the user has enough authority of that type to expend
+        structure_info = await conn.fetchrow('''SELECT * FROM cnc_structures WHERE name = $1;''', structure)
+        structure_cost = structure_info['cost']
+        # GOVERNMENT AND TECH MODIFICATIONS
+        # if the structure is a Fort
+        if structure == "Fort":
+            # if Siegeworks is researched, add 2 to the cost
+            if "Siegeworks" in user_info['tech']:
+                structure_cost += 2
+            # if the government is absolute monarchy, reduce cost by 1
+            if user_info['govt_subtype'] == "Absolute":
+                structure_cost -= 1
+        # if Machines is researched, subtract 1 from the cost, minimum 1
+        if "Machines" in user_info['tech']:
+            structure_cost -= 1
+        # if the structure is a temple and the government subtype is Theocratic, reduce by 2
+        if (structure == "Temples") and (user_info['govt_subtype'] == "Theocratic"):
+            structure_cost -= 2
+        # if the structure is a city and the government subtype is Patrician, reduce by 1
+        if (structure == "City") and (user_info['govt_subtype'] == "Patrician"):
+            structure_cost -= 2
+        # if the structure is a port and the government subtype is Merchant, reduce by 1
+        if (structure == "Port") and (user_info['govt_subtype'] == "Merchant"):
+            structure_cost -= 1
+        # if the structure is a port or a bridge and the government subtype is Populist, reduce by 50%
+        if (structure == "Port" or structure == "Bridge") and (user_info['govt_subtype'] == "Populist"):
+            structure_cost *= .5
+        # structures must cost at least one power
+        if structure_cost < 0:
+            structure_cost = 1
+        # if the user is Tusail, only use political authority
+        if user_info['govt_type'] == "Tusail":
+            if user_info['pol_auth'] < structure_cost:
+                return await interaction.followup.send("You do not have enough "
+                                                       "Political Authority to build that structure. You are lacking "
+                                                       f"{structure_cost - user_info['pol_auth']} authority.")
+        # check if the user has enough military authority
+        elif structure_info['authority'] == "Military":
+            if user_info['mil_auth'] < structure_cost:
+                return await interaction.followup.send("You do not have enough "
+                                                       "Military Authority to build that structure. You are lacking "
+                                                       f"{structure_cost - user_info['mil_auth']} authority.")
+        # check if the user has enough economic authority
+        elif structure_info['authority'] == "Economic":
+            if user_info['econ_auth'] < structure_cost:
+                return await interaction.followup.send("You do not have enough "
+                                                       "Economic Authority to build that structure. You are lacking "
+                                                       f"{structure_cost - user_info['econ_auth']} authority.")
+        # check terrain requirements
+        if structure_info['terrain'] is not None:
+            if prov_info['terrain'] != structure_info['terrain']:
+                return await interaction.followup.send(f"You cannot build a {structure} in "
+                                                       f"{prov_info['name']}'s improper terrain.")
+        # check unique requirements
+        if structure == "Port":
+            if prov_info['coast'] is False:
+                return await interaction.followup.send(f"You cannot build a {structure} in "
+                                                       f"{prov_info['name']}'s improper terrain.")
+        if structure == "Bridge":
+            if prov_info['river'] is False:
+                return await interaction.followup.send(f"You cannot build a {structure} in "
+                                                       f"{prov_info['name']}'s improper terrain.")
+        if structure == "University":
+            if "City" not in prov_info['structures']:
+                return await interaction.followup.send(f"You must construct a City in {prov_info['name']} "
+                                                       f"before constructing a University.")
+        # if the government type is Free City, only one city per nation allowed
+        if (structure == "City") and (user_info['govt_subtype'] == "Free City"):
+            provs_with_cities = await conn.fetchrow('''SELECT * FROM cnc_provinces 
+                    WHERE owner_id = $1 AND 'City' = ANY(structures)''', interaction.user.id)
+            if provs_with_cities is not None:
+                return await interaction.followup.send(f"Free Cities can construct only one City. "
+                                                       f"{user_info['name']} maintains City {provs_with_cities['name']} "
+                                                       f"(ID: {provs_with_cities['id']}).")
+        # if all checks are met, construct and bill cost
+        try:
+            await conn.execute('''UPDATE cnc_provinces SET structures = structures || $1 WHERE id = $2;''',
+                               [structure], prov_info['id'])
+            if structure_info['authority'] == "Military":
+                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - $1 WHERE user_id = $2;''',
+                                   structure_info['cost'], interaction.user.id)
+            elif structure_info['authority'] == "Economic":
+                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $1 WHERE user_id = $2;''',
+                                   structure_info['cost'], interaction.user.id)
+            if structure == "Fort":
+                await conn.execute('''UPDATE cnc_provincea SET fort_level = $1 WHERE id = $2;''',
+                                   user_info['fort_level'], interaction.user.id)
+        except Exception as error:
+            raise error
+        return await interaction.followup.send(f"{structure} successfully constructed in {prov_info['name']}.")
+
+class ConstructView(View):
+    def __init__(self, author, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
+        super().__init__(timeout=120)
+        self.author = author
+        # Adds the dropdown to our view object.
+        self.add_item(ConstructDropdown(province_db, user_info, pool))
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        # ensures that the person using the interaction is the original author
+        return interaction.user.id == self.author.id
+
+
+class OwnedProvinceModifiation(View):
+    """Accepts the province record from a DB call."""
+
+    def __init__(self, author, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
+        super().__init__(timeout=120)
+        self.prov_info = province_db
+        self.user_info = user_info
+        self.pool = pool
+        self.author = author
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.author.id
+
+    @discord.ui.button(label="Construct", emoji="\U00002692", style=discord.ButtonStyle.blurple)
+    async def construct(self, interaction: discord.Interaction, button: discord.Button):
+        # define the dropdown view
+        construct_view = ConstructView(self.author, self.prov_info, self.user_info, self.pool)
+        # set view to the construction dropdown
+        await interaction.response.edit_message(view=construct_view)
+
+
+
 class CNC(commands.Cog):
 
     def __init__(self, bot: Shard):
@@ -737,55 +924,60 @@ class CNC(commands.Cog):
         # if the province doesn't exist
         if prov_info is None:
             return await interaction.followup.send("That province does not appear to exist.")
-        # owner and occupier info
-        if prov_info['owner_id'] != 0:
-            owner = await self.user_db_info(prov_info['owner_id'])
-            owner = owner['name']
-        else:
-            owner = "Natives"
-        if prov_info['occupier_id'] != 0:
-            occupier = await self.user_db_info(prov_info['occupier_id'])
-            occupier = occupier['name']
-        else:
-            occupier = "Natives"
-        if prov_info['river'] is True:
-            river = ", River"
-        else:
-            river = ""
-        # troops and armies
-        troop_count = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE location = $1;''',
-                                          prov_info['id'])
-        # parse out troop count
-        if troop_count['sum'] is None:
-            troop_count = 0
-        else:
-            troop_count = f"{troop_count['sum']:,}"
-        # parse structures
-        if prov_info['structures'] is None:
-            structures = "None"
-        elif not prov_info['structures']:
-            structures = "None"
-        else:
-            structures = ",".join(p for p in prov_info['structures'])
-        army_list = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE location = $1''', prov_info['id'])
-        # build embed for province and populate name and ID
-        prov_embed = discord.Embed(title=f"Province of {prov_info['name']}", description=f"Province #{prov_info['id']}",
-                                   color=discord.Color.red())
-        # populate bordering
-        prov_embed.add_field(name="Bordering Provinces",
-                             value=f"{', '.join([str(b) for b in prov_info['bordering']])}",
-                             inline=False)
-        prov_embed.add_field(name="Core Owner", value=owner)
-        prov_embed.add_field(name="Occupier", value=occupier)
-        prov_embed.add_field(name="Troops and Armies", value=f"{troop_count} troops "
-                                                             f"in {army_list['count']} armies.")
-        prov_embed.add_field(name="Terrain", value=f"{await self.terrain_name(prov_info['terrain'])}"+river)
-        prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
-        prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
-        prov_embed.add_field(name="Production\n(last turn)", value=f"{prov_info['production']:,.3}")
-        prov_embed.add_field(name="Development", value=f"{prov_info['development']}")
-        prov_embed.add_field(name="Structures", value=f"{structures}")
-        return await interaction.followup.send(embed=prov_embed)
+        # if the user owns the province, open the ownership view
+        if prov_info['owner_id'] == interaction.user.id:
+            user_info = await self.user_db_info(interaction.user.id)
+            author = interaction.user
+            await interaction.response.edit_message(view=OwnedProvinceModifiation(author, prov_info, user_info, conn))
+        # # owner and occupier info
+        # if prov_info['owner_id'] != 0:
+        #     owner = await self.user_db_info(prov_info['owner_id'])
+        #     owner = owner['name']
+        # else:
+        #     owner = "Natives"
+        # if prov_info['occupier_id'] != 0:
+        #     occupier = await self.user_db_info(prov_info['occupier_id'])
+        #     occupier = occupier['name']
+        # else:
+        #     occupier = "Natives"
+        # if prov_info['river'] is True:
+        #     river = ", River"
+        # else:
+        #     river = ""
+        # # troops and armies
+        # troop_count = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE location = $1;''',
+        #                                   prov_info['id'])
+        # # parse out troop count
+        # if troop_count['sum'] is None:
+        #     troop_count = 0
+        # else:
+        #     troop_count = f"{troop_count['sum']:,}"
+        # # parse structures
+        # if prov_info['structures'] is None:
+        #     structures = "None"
+        # elif not prov_info['structures']:
+        #     structures = "None"
+        # else:
+        #     structures = ",".join(p for p in prov_info['structures'])
+        # army_list = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE location = $1''', prov_info['id'])
+        # # build embed for province and populate name and ID
+        # prov_embed = discord.Embed(title=f"Province of {prov_info['name']}", description=f"Province #{prov_info['id']}",
+        #                            color=discord.Color.red())
+        # # populate bordering
+        # prov_embed.add_field(name="Bordering Provinces",
+        #                      value=f"{', '.join([str(b) for b in prov_info['bordering']])}",
+        #                      inline=False)
+        # prov_embed.add_field(name="Core Owner", value=owner)
+        # prov_embed.add_field(name="Occupier", value=occupier)
+        # prov_embed.add_field(name="Troops and Armies", value=f"{troop_count} troops "
+        #                                                      f"in {army_list['count']} armies.")
+        # prov_embed.add_field(name="Terrain", value=f"{await self.terrain_name(prov_info['terrain'])}"+river)
+        # prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
+        # prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
+        # prov_embed.add_field(name="Production\n(last turn)", value=f"{prov_info['production']:,.3}")
+        # prov_embed.add_field(name="Development", value=f"{prov_info['development']}")
+        # prov_embed.add_field(name="Structures", value=f"{structures}")
+        # return await interaction.followup.send(embed=prov_embed)
 
     @cnc.command(name="army_view", description="Displays information about a specific army.")
     @app_commands.describe(army_id="The ID of the army")
@@ -1062,125 +1254,7 @@ class CNC(commands.Cog):
         # check if user owns province
         if prov_info['owner_id'] != interaction.user.id:
             return await interaction.followup.send("You do not own that province.")
-        # check if structure is already built
-        if prov_info['structures'] is not None:
-            if structure in prov_info['structures']:
-                return await interaction.followup.send(f"A {structure} already exists in {prov_info['name']} "
-                                                       f"(ID: {prov_info['id']}).")
-        # check if the province has enough space
-        development = prov_info['development']
-        if prov_info['structures'] is not None:
-            structures_num = len(prov_info['structures'])
-        else:
-            structures_num = 0
-        # if the Engineering tech has been researched, increase building slots by 1
-        if "Engineering" in user_info['tech']:
-            structures_num -= 1
-        # to build, the development of the province must be x>1 where x is defined as (development/10) - number of structures
-        # accepting that each province can host a minimum of 1 structure
-        if structures_num > 0:
-            if (development/10)-structures_num + 1 < 1:
-                return await interaction.followup.send(f"{prov_info['name']} is not developed enough to support another structure.\n"
-                                                       f"The province will need an additional "
-                                                       f"{math.ceil(development-((structures_num-1)*10))} to "
-                                                       f"build another structure.")
-        # search for required tech
-        req_tech = await conn.fetchrow('''SELECT * FROM cnc_tech WHERE effect = $1;''',
-                                       f"Unlocks {structure} structure.")
-        # if the user does not have the required tech
-        if req_tech['name'] not in user_info['tech']:
-            return await interaction.followup.send(f"The **{req_tech['name']}** tech must be researched before "
-                                                   f"constructing a {structure}.")
-        # check if the user has enough authority of that type to expend
-        structure_info = await conn.fetchrow('''SELECT * FROM cnc_structures WHERE name = $1;''', structure)
-        structure_cost = structure_info['cost']
-        # GOVERNMENT AND TECH MODIFICATIONS
-        # if the structure is a Fort
-        if structure == "Fort":
-            # if Siegeworks is researched, add 2 to the cost
-            if "Siegeworks" in user_info['tech']:
-                structure_cost += 2
-            # if the government is absolute monarchy, reduce cost by 1
-            if user_info['govt_subtype'] == "Absolute":
-                structure_cost -= 1
-        # if Machines is researched, subtract 1 from the cost, minimum 1
-        if "Machines" in user_info['tech']:
-            structure_cost -= 1
-        # if the structure is a temple and the government subtype is Theocratic, reduce by 2
-        if (structure == "Temples") and (user_info['govt_subtype'] == "Theocratic"):
-            structure_cost -= 2
-        # if the structure is a city and the government subtype is Patrician, reduce by 1
-        if (structure == "City") and (user_info['govt_subtype'] == "Patrician"):
-            structure_cost -= 2
-        # if the structure is a port and the government subtype is Merchant, reduce by 1
-        if (structure == "Port") and (user_info['govt_subtype'] == "Merchant"):
-            structure_cost -= 1
-        # if the structure is a port or a bridge and the government subtype is Populist, reduce by 50%
-        if (structure == "Port" or structure == "Bridge") and (user_info['govt_subtype'] == "Populist"):
-            structure_cost *= .5
-        # structures must cost at least one power
-        if structure_cost < 0:
-            structure_cost = 1
-        # if the user is Tusail, only use political authority
-        if user_info['govt_type'] == "Tusail":
-            if user_info['pol_auth'] < structure_cost:
-                return await interaction.followup.send("You do not have enough "
-                                                       "Political Authority to build that structure. You are lacking "
-                                                       f"{structure_cost - user_info['pol_auth']} authority.")
-        # check if the user has enough military authority
-        elif structure_info['authority'] == "Military":
-            if user_info['mil_auth'] < structure_cost:
-                return await interaction.followup.send("You do not have enough "
-                                                       "Military Authority to build that structure. You are lacking "
-                                                       f"{structure_cost - user_info['mil_auth']} authority.")
-        # check if the user has enough economic authority
-        elif structure_info['authority'] == "Economic":
-            if user_info['econ_auth'] < structure_cost:
-                return await interaction.followup.send("You do not have enough "
-                                                       "Economic Authority to build that structure. You are lacking "
-                                                       f"{structure_cost - user_info['econ_auth']} authority.")
-        # check terrain requirements
-        if structure_info['terrain'] is not None:
-            if prov_info['terrain'] != structure_info['terrain']:
-                return await interaction.followup.send(f"You cannot build a {structure} in "
-                                                       f"{prov_info['name']}'s improper terrain.")
-        # check unique requirements
-        if structure == "Port":
-            if prov_info['coast'] is False:
-                return await interaction.followup.send(f"You cannot build a {structure} in "
-                                                       f"{prov_info['name']}'s improper terrain.")
-        if structure == "Bridge":
-            if prov_info['river'] is False:
-                return await interaction.followup.send(f"You cannot build a {structure} in "
-                                                       f"{prov_info['name']}'s improper terrain.")
-        if structure == "University":
-            if "City" not in prov_info['structures']:
-                return await interaction.followup.send(f"You must construct a City in {prov_info['name']} "
-                                                       f"before constructing a University.")
-        # if the government type is Free City, only one city per nation allowed
-        if (structure == "City") and (user_info['govt_subtype'] == "Free City"):
-            provs_with_cities = await conn.fetchrow('''SELECT * FROM cnc_provinces 
-            WHERE owner_id = $1 AND 'City' = ANY(structures)''', interaction.user.id)
-            if provs_with_cities is not None:
-                return await interaction.followup.send(f"Free Cities can construct only one City. "
-                                                       f"{user_info['name']} maintains City {provs_with_cities['name']} "
-                                                       f"(ID: {provs_with_cities['id']}).")
-        # if all checks are met, construct and bill cost
-        try:
-            await conn.execute('''UPDATE cnc_provinces SET structures = structures || $1 WHERE id = $2;''',
-                               [structure], province_id)
-            if structure_info['authority'] == "Military":
-                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - $1 WHERE user_id = $2;''',
-                                   structure_info['cost'], interaction.user.id)
-            elif structure_info['authority'] == "Economic":
-                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $1 WHERE user_id = $2;''',
-                                   structure_info['cost'], interaction.user.id)
-            if structure == "Fort":
-                await conn.execute('''UPDATE cnc_provincea SET fort_level = $1 WHERE id = $2;''',
-                                   user_info['fort_level'], interaction.user.id)
-        except Exception as error:
-            raise error
-        return await interaction.followup.send(f"{structure} successfully constructed in {prov_info['name']}.")
+
 
     @cnc.command(name="deconstruct", description="Deconstructs a structure in a province.")
     @app_commands.describe(province_id="The ID of the province in which you would like to deconstruct.",
