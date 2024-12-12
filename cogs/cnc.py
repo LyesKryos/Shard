@@ -152,7 +152,7 @@ class ConstructDropdown(discord.ui.Select):
         # check if structure is already built
         if prov_info['structures'] is not None:
             if structure in prov_info['structures']:
-                return await interaction.edit_original_response(f"A {structure} already exists in {prov_info['name']} "
+                return await interaction.edit_original_response(content=f"A {structure} already exists in {prov_info['name']} "
                                                        f"(ID: {prov_info['id']}).")
         # check if the province has enough space
         development = prov_info['development']
@@ -167,8 +167,7 @@ class ConstructDropdown(discord.ui.Select):
         # accepting that each province can host a minimum of 1 structure
         if structures_num > 0:
             if (development / 10) - structures_num + 1 < 1:
-                return await interaction.edit_original_response(
-                    f"{prov_info['name']} is not developed enough to support another structure.\n"
+                return await interaction.edit_original_response(content=f"{prov_info['name']} is not developed enough to support another structure.\n"
                     f"The province will need an additional "
                     f"{math.ceil(development - ((structures_num - 1) * 10))} to "
                     f"build another structure.")
@@ -177,7 +176,7 @@ class ConstructDropdown(discord.ui.Select):
                                        f"Unlocks {structure} structure.")
         # if the user does not have the required tech
         if req_tech['name'] not in user_info['tech']:
-            return await interaction.edit_original_response(f"The **{req_tech['name']}** tech must be researched before "
+            return await interaction.edit_original_response(content=f"The **{req_tech['name']}** tech must be researched before "
                                                    f"constructing a {structure}.")
         # check if the user has enough authority of that type to expend
         structure_info = await conn.fetchrow('''SELECT * FROM cnc_structures WHERE name = $1;''', structure)
@@ -212,45 +211,45 @@ class ConstructDropdown(discord.ui.Select):
         # if the user is Tusail, only use political authority
         if user_info['govt_type'] == "Tusail":
             if user_info['pol_auth'] < structure_cost:
-                return await interaction.edit_original_response("You do not have enough "
+                return await interaction.edit_original_response(content="You do not have enough "
                                                        "Political Authority to build that structure. You are lacking "
                                                        f"{structure_cost - user_info['pol_auth']} authority.")
         # check if the user has enough military authority
         elif structure_info['authority'] == "Military":
             if user_info['mil_auth'] < structure_cost:
-                return await interaction.edit_original_response("You do not have enough "
+                return await interaction.edit_original_response(content="You do not have enough "
                                                        "Military Authority to build that structure. You are lacking "
                                                        f"{structure_cost - user_info['mil_auth']} authority.")
         # check if the user has enough economic authority
         elif structure_info['authority'] == "Economic":
             if user_info['econ_auth'] < structure_cost:
-                return await interaction.edit_original_response("You do not have enough "
+                return await interaction.edit_original_response(content="You do not have enough "
                                                        "Economic Authority to build that structure. You are lacking "
                                                        f"{structure_cost - user_info['econ_auth']} authority.")
         # check terrain requirements
         if structure_info['terrain'] is not None:
             if prov_info['terrain'] != structure_info['terrain']:
-                return await interaction.edit_original_response(f"You cannot build a {structure} in "
+                return await interaction.edit_original_response(content=f"You cannot build a {structure} in "
                                                        f"{prov_info['name']}'s improper terrain.")
         # check unique requirements
         if structure == "Port":
             if prov_info['coast'] is False:
-                return await interaction.edit_original_response(f"You cannot build a {structure} in "
+                return await interaction.edit_original_response(content=f"You cannot build a {structure} in "
                                                        f"{prov_info['name']}'s improper terrain.")
         if structure == "Bridge":
             if prov_info['river'] is False:
-                return await interaction.edit_original_response(f"You cannot build a {structure} in "
+                return await interaction.edit_original_response(content=f"You cannot build a {structure} in "
                                                        f"{prov_info['name']}'s improper terrain.")
         if structure == "University":
             if "City" not in prov_info['structures']:
-                return await interaction.edit_original_response(f"You must construct a City in {prov_info['name']} "
+                return await interaction.edit_original_response(content=f"You must construct a City in {prov_info['name']} "
                                                        f"before constructing a University.")
         # if the government type is Free City, only one city per nation allowed
         if (structure == "City") and (user_info['govt_subtype'] == "Free City"):
             provs_with_cities = await conn.fetchrow('''SELECT * FROM cnc_provinces 
                     WHERE owner_id = $1 AND 'City' = ANY(structures)''', interaction.user.id)
             if provs_with_cities is not None:
-                return await interaction.edit_original_response(f"Free Cities can construct only one City. "
+                return await interaction.edit_original_response(content=f"Free Cities can construct only one City. "
                                                        f"{user_info['name']} maintains City {provs_with_cities['name']} "
                                                        f"(ID: {provs_with_cities['id']}).")
         # if all checks are met, construct and bill cost
@@ -268,7 +267,8 @@ class ConstructDropdown(discord.ui.Select):
                                    user_info['fort_level'], interaction.user.id)
         except Exception as error:
             raise error
-        return await interaction.edit_original_response(f"{structure} successfully constructed in {prov_info['name']}.")
+        return await interaction.edit_original_response(content=f"{structure} successfully constructed in "
+                                                                f"{prov_info['name']}.")
 
 class ConstructView(View):
     def __init__(self, author, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
