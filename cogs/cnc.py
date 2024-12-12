@@ -928,7 +928,7 @@ class CNC(commands.Cog):
         if prov_info['owner_id'] == interaction.user.id:
             user_info = await self.user_db_info(interaction.user.id)
             author = interaction.user
-            await interaction.response.edit_message(view=OwnedProvinceModifiation(author, prov_info, user_info, conn))
+            await interaction.edit_original_response(view=OwnedProvinceModifiation(author, prov_info, user_info, conn))
         # # owner and occupier info
         # if prov_info['owner_id'] != 0:
         #     owner = await self.user_db_info(prov_info['owner_id'])
