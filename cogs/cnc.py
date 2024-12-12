@@ -1229,31 +1229,31 @@ class CNC(commands.Cog):
 
     # === Province Commands ===
 
-    @cnc.command(name="construct", description="Uses Authority to construct buildings in a province.")
-    @app_commands.describe(province_id="The ID of the province in which you would like to construct.",
-                           structure="The name of the structure you would like to construct.")
-    @app_commands.guild_only()
-    async def construct(self, interaction: discord.Interaction, province_id: int,
-                        structure: typing.Literal['Farm', 'Trading Post', 'Quarry', 'Lumber Mill', 'Mine', 'Fishery',
-                        'City', 'Fort', 'Road', 'Manufactory', 'Port', 'Bridge', 'University', 'Temple']):
-        # defer interaction
-        await interaction.response.defer(thinking=True)
-        # establish connection
-        conn = self.bot.pool
-        # pull user data
-        user_info = await self.user_db_info(interaction.user.id)
-        # check if the user exists
-        if user_info is None:
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
-        # otherwise, carry on
-        # pull province data
-        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
-        # check if province exists
-        if prov_info is None:
-            return await interaction.followup.send("That is not a valid province ID.")
-        # check if user owns province
-        if prov_info['owner_id'] != interaction.user.id:
-            return await interaction.followup.send("You do not own that province.")
+    # @cnc.command(name="construct", description="Uses Authority to construct buildings in a province.")
+    # @app_commands.describe(province_id="The ID of the province in which you would like to construct.",
+    #                        structure="The name of the structure you would like to construct.")
+    # @app_commands.guild_only()
+    # async def construct(self, interaction: discord.Interaction, province_id: int,
+    #                     structure: typing.Literal['Farm', 'Trading Post', 'Quarry', 'Lumber Mill', 'Mine', 'Fishery',
+    #                     'City', 'Fort', 'Road', 'Manufactory', 'Port', 'Bridge', 'University', 'Temple']):
+    #     # defer interaction
+    #     await interaction.response.defer(thinking=True)
+    #     # establish connection
+    #     conn = self.bot.pool
+    #     # pull user data
+    #     user_info = await self.user_db_info(interaction.user.id)
+    #     # check if the user exists
+    #     if user_info is None:
+    #         return await interaction.followup.send("You are not a registered member of the CNC system.")
+    #     # otherwise, carry on
+    #     # pull province data
+    #     prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+    #     # check if province exists
+    #     if prov_info is None:
+    #         return await interaction.followup.send("That is not a valid province ID.")
+    #     # check if user owns province
+    #     if prov_info['owner_id'] != interaction.user.id:
+    #         return await interaction.followup.send("You do not own that province.")
 
 
     @cnc.command(name="deconstruct", description="Deconstructs a structure in a province.")
