@@ -145,6 +145,8 @@ class ConstructDropdown(discord.ui.Select):
 
     # set callback
     async def callback(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
         structure = self.values[0]
         prov_info = self.prov_info
         user_info = self.user_info
