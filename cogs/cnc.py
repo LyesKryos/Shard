@@ -152,8 +152,8 @@ class ConstructDropdown(discord.ui.Select):
         # check if structure is already built
         if prov_info['structures'] is not None:
             if structure in prov_info['structures']:
-                return await interaction.edit_original_response(content=f"A {structure} already exists in {prov_info['name']} "
-                                                       f"(ID: {prov_info['id']}).")
+                return await interaction.response.send_message(content=f"A {structure} already exists in "
+                                                                       f"{prov_info['name']} (ID: {prov_info['id']}).")
         # check if the province has enough space
         development = prov_info['development']
         if prov_info['structures'] is not None:
