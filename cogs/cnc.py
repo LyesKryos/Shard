@@ -285,12 +285,12 @@ class ConstructView(View):
         return interaction.user.id == self.author.id
 
     @discord.ui.button(label="Back", emoji="\U000023ea", style=discord.ButtonStyle.blurple)
-    async def back(self, interaction: discord.Interaction):
+    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.edit_original_response(view=OwnedProvinceModifiation(self.author, self.province_db,
                                                                                self.user_info,self.pool))
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger)
-    async def cancel(self, interaction: discord.Interaction):
+    async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.clear_items()
 
     async def on_timeout(self):
