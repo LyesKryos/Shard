@@ -314,7 +314,7 @@ class DeconstructDropdown(discord.ui.Select):
         # define options based on the existing structures
         options = []
         for structure in province_db['structures']:
-            options.append(discord.SelectOption(label=structure['name']))
+            options.append(discord.SelectOption(label=structure))
 
         # define the super
         super().__init__(placeholder="Choose a structure to deconstruct...", min_values=1, max_values=1,
