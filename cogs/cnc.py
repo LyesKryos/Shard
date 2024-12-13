@@ -286,7 +286,7 @@ class ConstructView(View):
 
     @discord.ui.button(label="Back", emoji="\U000023ea", style=discord.ButtonStyle.blurple)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.edit_original_response(view=OwnedProvinceModifiation(self.author, self.province_db,
+        await interaction.response.edit_message(view=OwnedProvinceModifiation(self.author, self.province_db,
                                                                                self.user_info,self.pool))
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger)
