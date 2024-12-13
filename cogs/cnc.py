@@ -167,7 +167,8 @@ class ConstructDropdown(discord.ui.Select):
         # accepting that each province can host a minimum of 1 structure
         if structures_num > 0:
             if (development / 10) - structures_num + 1 < 1:
-                return await interaction.response.send_message(content=f"{prov_info['name']} is not developed enough to support another structure.\n"
+                return await interaction.response.send_message(content=f"{prov_info['name']} is not developed "
+                                                                       f"enough to support another structure.\n"
                     f"The province will need an additional "
                     f"{math.ceil(development - ((structures_num - 1) * 10))} to "
                     f"build another structure.")
@@ -176,8 +177,8 @@ class ConstructDropdown(discord.ui.Select):
                                        f"Unlocks {structure} structure.")
         # if the user does not have the required tech
         if req_tech['name'] not in user_info['tech']:
-            return await interaction.response.send_message(content=f"The **{req_tech['name']}** tech must be researched before "
-                                                   f"constructing a {structure}.")
+            return await interaction.response.send_message(content=f"The **{req_tech['name']}** tech must be "
+                                                                   f"researched before constructing a {structure}.")
         # check if the user has enough authority of that type to expend
         structure_info = await conn.fetchrow('''SELECT * FROM cnc_structures WHERE name = $1;''', structure)
         structure_cost = structure_info['cost']
@@ -242,16 +243,17 @@ class ConstructDropdown(discord.ui.Select):
                                                        f"{prov_info['name']}'s improper terrain.")
         if structure == "University":
             if "City" not in prov_info['structures']:
-                return await interaction.response.send_message(content=f"You must construct a City in {prov_info['name']} "
-                                                       f"before constructing a University.")
+                return await interaction.response.send_message(content=f"You must construct a City in "
+                                                                       f"{prov_info['name']} before constructing a "
+                                                                       f"University.")
         # if the government type is Free City, only one city per nation allowed
         if (structure == "City") and (user_info['govt_subtype'] == "Free City"):
             provs_with_cities = await conn.fetchrow('''SELECT * FROM cnc_provinces 
                     WHERE owner_id = $1 AND 'City' = ANY(structures)''', interaction.user.id)
             if provs_with_cities is not None:
                 return await interaction.response.send_message(content=f"Free Cities can construct only one City. "
-                                                       f"{user_info['name']} maintains City {provs_with_cities['name']} "
-                                                       f"(ID: {provs_with_cities['id']}).")
+                                                       f"{user_info['name']} maintains City {provs_with_cities['name']}"
+                                                       f" (ID: {provs_with_cities['id']}).")
         # if all checks are met, construct and bill cost
         try:
             await conn.execute('''UPDATE cnc_provinces SET structures = structures || $1 WHERE id = $2;''',
@@ -264,7 +266,7 @@ class ConstructDropdown(discord.ui.Select):
                                    structure_info['cost'], interaction.user.id)
             if structure == "Fort":
                 await conn.execute('''UPDATE cnc_provinces SET fort_level = $1 WHERE id = $2;''',
-                                   user_info['fort_level'], interaction.user.id)
+                                   user_info['fort_level'], prov_info['id'])
         except Exception as error:
             raise error
         return await interaction.response.send_message(content=f"{structure} successfully constructed in "
