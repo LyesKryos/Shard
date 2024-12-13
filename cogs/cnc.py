@@ -263,7 +263,7 @@ class ConstructDropdown(discord.ui.Select):
                 await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $1 WHERE user_id = $2;''',
                                    structure_info['cost'], interaction.user.id)
             if structure == "Fort":
-                await conn.execute('''UPDATE cnc_provincea SET fort_level = $1 WHERE id = $2;''',
+                await conn.execute('''UPDATE cnc_provinces SET fort_level = $1 WHERE id = $2;''',
                                    user_info['fort_level'], interaction.user.id)
         except Exception as error:
             raise error
