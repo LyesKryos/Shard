@@ -274,12 +274,27 @@ class ConstructView(View):
     def __init__(self, author, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
         super().__init__(timeout=120)
         self.author = author
+        self.province_db = province_db
+        self.user_info = user_info
+        self.pool = pool
         # Adds the dropdown to our view object.
         self.add_item(ConstructDropdown(province_db, user_info, pool))
 
     async def interaction_check(self, interaction: discord.Interaction):
         # ensures that the person using the interaction is the original author
         return interaction.user.id == self.author.id
+
+    @discord.ui.button(label="Back", emoji="\U000023ea", style=discord.ButtonStyle.blurple)
+    async def back(self, interaction: discord.Interaction):
+        await interaction.edit_original_response(view=OwnedProvinceModifiation(self.author, self.province_db,
+                                                                               self.user_info,self.pool))
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger)
+    async def cancel(self, interaction: discord.Interaction):
+        self.clear_items()
+
+    async def on_timeout(self):
+        self.clear_items()
 
 
 class OwnedProvinceModifiation(View):
