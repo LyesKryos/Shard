@@ -341,7 +341,7 @@ class DeconstructView(View):
         self.user_info = user_info
         self.pool = pool
         # Adds the dropdown to our view object.
-        self.add_item(ConstructDropdown(province_db, user_info, pool))
+        self.add_item(DeconstructDropdown(province_db, user_info, pool))
 
     async def on_timeout(self) -> None:
         # disable all the children
