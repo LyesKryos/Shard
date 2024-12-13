@@ -304,6 +304,38 @@ class ConstructView(View):
             child.disabled = True
         await interaction.response.edit_message(view=self)
 
+class DeconstructDropdown(discord.ui.Select):
+
+    def __init__(self, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
+        self.prov_info = province_db
+        self.pool = pool
+        self.user_info = user_info
+
+        # define options based on the existing structures
+        options = []
+        for structure in province_db['structures']:
+            options.append(discord.SelectOption(label=structure['name']))
+
+        # define the super
+        super().__init__(placeholder="Choose a structure to deconstruct...", min_values=1, max_values=1,
+                         options=options)
+
+    # define callback
+    async def callback(self, interaction: discord.Interaction):
+        structure = self.values[0]
+        prov_info = self.prov_info
+        province_id = prov_info['id']
+        conn = self.pool
+        # otherwise cary on
+        # remove the structure from the province
+        await conn.execute('''UPDATE cnc_provinces SET structures = array_remove(structures, $1) WHERE id = $2;''',
+                           structure, province_id)
+        return await interaction.response.send_message(f"The {structure} has been deconstructed in "
+                                               f"{prov_info['name']} (ID: {province_id}).")
+
+
+
+
 
 class OwnedProvinceModifiation(View):
     """Accepts the province record from a DB call."""
@@ -325,6 +357,13 @@ class OwnedProvinceModifiation(View):
         # set view to the construction dropdown
         construct_view.interaction = interaction
         await interaction.response.edit_message(view=construct_view)
+
+    @discord.ui.button(label="Deconstruct", style=discord.ButtonStyle.blurple)
+    async def deconstruct(self, interaction: discord.Interaction, button: discord.Button):
+        # if the province has no structures, disable the button and update the view
+        if not self.prov_info['structures']:
+            return button.disabled
+        # otherwise, carry on
 
 
 class CNC(commands.Cog):
@@ -1279,42 +1318,42 @@ class CNC(commands.Cog):
     #         return await interaction.followup.send("You do not own that province.")
 
 
-    @cnc.command(name="deconstruct", description="Deconstructs a structure in a province.")
-    @app_commands.describe(province_id="The ID of the province in which you would like to deconstruct.",
-                           structure="The name of the structure you would like to deconstruct.")
-    @app_commands.guild_only()
-    async def deconstruct(self, interaction: discord.Interaction, province_id: int,
-                          structure: typing.Literal['Farm', 'Trading Post', 'Quarry', 'Lumber Mill', 'Mine', 'Fishery',
-                          'City', 'Fort', 'Road', 'Manufactory', 'Port', 'Bridge', 'University', 'Temple']):
-        # defer interaction
-        await interaction.response.defer(thinking=True)
-        # establish connection
-        conn = self.bot.pool
-        # pull userinfo
-        user_info = await self.user_db_info(interaction.user.id)
-        # check for registration
-        if user_info is None:
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
-        # pull province info
-        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
-        # check if province exists
-        if prov_info is None:
-            return await interaction.followup.send("That is not a valid province ID.")
-        # check if user owns province
-        if prov_info['owner_id'] != interaction.user.id:
-            return await interaction.followup.send("You do not own that province.")
-        # check if structure is already built
-        if prov_info['structures'] is not None:
-            if structure not in prov_info['structures']:
-                return await interaction.followup.send("No such structure exists in that province.")
-        else:
-            return await interaction.followup.send("No such structure exists in that province.")
-        # otherwise cary on
-        # remove the structure from the province
-        await conn.execute('''UPDATE cnc_provinces SET structures = array_remove(structures, $1) WHERE id = $2;''',
-                           structure, province_id)
-        return await interaction.followup.send(f"The {structure} has been deconstructed in "
-                                               f"{prov_info['name']} (ID: {province_id}).")
+    # @cnc.command(name="deconstruct", description="Deconstructs a structure in a province.")
+    # @app_commands.describe(province_id="The ID of the province in which you would like to deconstruct.",
+    #                        structure="The name of the structure you would like to deconstruct.")
+    # @app_commands.guild_only()
+    # async def deconstruct(self, interaction: discord.Interaction, province_id: int,
+    #                       structure: typing.Literal['Farm', 'Trading Post', 'Quarry', 'Lumber Mill', 'Mine', 'Fishery',
+    #                       'City', 'Fort', 'Road', 'Manufactory', 'Port', 'Bridge', 'University', 'Temple']):
+    #     # defer interaction
+    #     await interaction.response.defer(thinking=True)
+    #     # establish connection
+    #     conn = self.bot.pool
+    #     # pull userinfo
+    #     user_info = await self.user_db_info(interaction.user.id)
+    #     # check for registration
+    #     if user_info is None:
+    #         return await interaction.followup.send("You are not a registered member of the CNC system.")
+    #     # pull province info
+    #     prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+    #     # check if province exists
+    #     if prov_info is None:
+    #         return await interaction.followup.send("That is not a valid province ID.")
+    #     # check if user owns province
+    #     if prov_info['owner_id'] != interaction.user.id:
+    #         return await interaction.followup.send("You do not own that province.")
+    #     # check if structure is already built
+    #     if prov_info['structures'] is not None:
+    #         if structure not in prov_info['structures']:
+    #             return await interaction.followup.send("No such structure exists in that province.")
+    #     else:
+    #         return await interaction.followup.send("No such structure exists in that province.")
+    #     # otherwise cary on
+    #     # remove the structure from the province
+    #     await conn.execute('''UPDATE cnc_provinces SET structures = array_remove(structures, $1) WHERE id = $2;''',
+    #                        structure, province_id)
+    #     return await interaction.followup.send(f"The {structure} has been deconstructed in "
+    #                                            f"{prov_info['name']} (ID: {province_id}).")
 
     @cnc.command(name="boost_development", description="Utilizes Authority to boost province development.")
     @app_commands.describe(province_id="The ID of the province which you would like to boost.",
