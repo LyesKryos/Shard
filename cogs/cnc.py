@@ -282,6 +282,13 @@ class ConstructView(View):
         # Adds the dropdown to our view object.
         self.add_item(ConstructDropdown(province_db, user_info, pool))
 
+    async def on_timeout(self) -> None:
+        # disable all of the children
+        for child in self.children:
+            child.disabled = True
+        # update the view
+        await self.interaction.edit_message(view=self)
+
     async def interaction_check(self, interaction: discord.Interaction):
         # ensures that the person using the interaction is the original author
         return interaction.user.id == self.author.id
@@ -296,11 +303,6 @@ class ConstructView(View):
         for child in self.children:
             child.disabled = True
         await interaction.response.edit_message(view=self)
-
-    async def on_timeout(self) -> None:
-        for child in self.children:
-            child.disabled = True
-        await self.message.edit_message(view=self)
 
 
 class OwnedProvinceModifiation(View):
@@ -321,7 +323,8 @@ class OwnedProvinceModifiation(View):
         # define the dropdown view
         construct_view = ConstructView(self.author, self.prov_info, self.user_info, self.pool)
         # set view to the construction dropdown
-        construct_view.message =  await interaction.response.edit_message(view=construct_view)
+        construct_view.interaction = interaction
+        await interaction.response.edit_message(view=construct_view)
 
 
 
