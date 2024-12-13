@@ -274,7 +274,7 @@ class ConstructDropdown(discord.ui.Select):
 
 class ConstructView(View):
     def __init__(self, author, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
-        super().__init__(timeout=120)
+        super().__init__(timeout=10)
         self.author = author
         self.province_db = province_db
         self.user_info = user_info
@@ -300,7 +300,7 @@ class ConstructView(View):
     async def on_timeout(self) -> None:
         for child in self.children:
             child.disabled = True
-        await self.message.edit(view=self)
+        await self.message.edit_message(view=self)
 
 
 class OwnedProvinceModifiation(View):
