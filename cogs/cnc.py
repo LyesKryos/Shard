@@ -334,9 +334,6 @@ class DeconstructDropdown(discord.ui.Select):
                                                f"{prov_info['name']} (ID: {province_id}).")
 
 
-
-
-
 class OwnedProvinceModifiation(View):
     """Accepts the province record from a DB call."""
 
@@ -358,12 +355,15 @@ class OwnedProvinceModifiation(View):
         construct_view.interaction = interaction
         await interaction.response.edit_message(view=construct_view)
 
-    @discord.ui.button(label="Deconstruct", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="Deconstruct", emoji="\U0001f3da", style=discord.ButtonStyle.blurple)
     async def deconstruct(self, interaction: discord.Interaction, button: discord.Button):
         # if the province has no structures, disable the button and update the view
         if not self.prov_info['structures']:
-            return button.disabled
+            button.disabled = True
+            return await interaction.response.edit_message(view=self)
         # otherwise, carry on
+
+
 
 
 class CNC(commands.Cog):
