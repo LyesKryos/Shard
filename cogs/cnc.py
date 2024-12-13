@@ -292,9 +292,11 @@ class ConstructView(View):
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger)
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.clear_items()
+        await interaction.response.edit_message(view=self)
 
-    async def on_timeout(self):
+    async def on_timeout(self) -> None:
         self.clear_items()
+        await self.message.edit(view=self)
 
 
 class OwnedProvinceModifiation(View):
@@ -315,7 +317,7 @@ class OwnedProvinceModifiation(View):
         # define the dropdown view
         construct_view = ConstructView(self.author, self.prov_info, self.user_info, self.pool)
         # set view to the construction dropdown
-        await interaction.response.edit_message(view=construct_view)
+        construct_view.message =  await interaction.response.edit_message(view=construct_view)
 
 
 
