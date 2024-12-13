@@ -287,7 +287,7 @@ class ConstructView(View):
         for child in self.children:
             child.disabled = True
         # update the view
-        await self.interaction.edit_message(view=self)
+        await self.interaction.edit_original_message(view=self)
 
     async def interaction_check(self, interaction: discord.Interaction):
         # ensures that the person using the interaction is the original author
