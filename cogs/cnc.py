@@ -295,7 +295,8 @@ class ConstructView(View):
         await interaction.response.edit_message(content="Closed.", view=self, delete_after=10)
 
     async def on_timeout(self) -> None:
-        self.clear_items()
+        for child in self.children:
+            child.disabled = True
         await self.message.edit(view=self)
 
 
