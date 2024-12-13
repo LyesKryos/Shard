@@ -287,7 +287,7 @@ class ConstructView(View):
         for child in self.children:
             child.disabled = True
         # update the view
-        await self.interaction.edit_original_message(view=self)
+        await self.interaction.edit_original_response(view=self)
 
     async def interaction_check(self, interaction: discord.Interaction):
         # ensures that the person using the interaction is the original author
@@ -323,7 +323,7 @@ class OwnedProvinceModifiation(View):
         # define the dropdown view
         construct_view = ConstructView(self.author, self.prov_info, self.user_info, self.pool)
         # set view to the construction dropdown
-        construct_view.interaction = interaction.response
+        construct_view.interaction = interaction
         await interaction.response.edit_message(view=construct_view)
 
 
