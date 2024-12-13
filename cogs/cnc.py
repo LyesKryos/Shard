@@ -323,7 +323,7 @@ class OwnedProvinceModifiation(View):
         # define the dropdown view
         construct_view = ConstructView(self.author, self.prov_info, self.user_info, self.pool)
         # set view to the construction dropdown
-        construct_view.interaction = interaction
+        construct_view.interaction = interaction.response
         await interaction.response.edit_message(view=construct_view)
 
 
