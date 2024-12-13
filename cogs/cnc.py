@@ -291,8 +291,9 @@ class ConstructView(View):
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger)
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.clear_items()
-        await interaction.response.edit_message(content="Closed.", view=self, delete_after=10)
+        for child in self.children:
+            child.disabled = True
+        await interaction.response.edit_message(view=self)
 
     async def on_timeout(self) -> None:
         for child in self.children:
