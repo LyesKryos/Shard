@@ -348,7 +348,7 @@ class DeconstructView(View):
         for child in self.children:
             child.disabled = True
         # update the view
-        await self.interaction.edit_original_response(view=self)
+        return await self.interaction.edit_original_response(view=self)
 
     async def interaction_check(self, interaction: discord.Interaction):
         # ensures that the person using the interaction is the original author
@@ -375,6 +375,11 @@ class OwnedProvinceModifiation(View):
         self.user_info = user_info
         self.pool = pool
         self.author = author
+
+    async def on_timeout(self) -> None:
+        for child in self.children:
+            child.disabled = True
+        return await self.interaction.edit_original_response(view=self)
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.author.id
@@ -1026,7 +1031,9 @@ class CNC(commands.Cog):
         if prov_info['owner_id'] == interaction.user.id:
             user_info = await self.user_db_info(interaction.user.id)
             author = interaction.user
-            await interaction.edit_original_response(view=OwnedProvinceModifiation(author, prov_info, user_info, conn))
+            owned_province_view = OwnedProvinceModifiation(author, prov_info, user_info, conn)
+            owned_province_view.interaction = interaction
+            await interaction.edit_original_response(view=owned_province_view)
         # # owner and occupier info
         # if prov_info['owner_id'] != 0:
         #     owner = await self.user_db_info(prov_info['owner_id'])
