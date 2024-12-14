@@ -409,11 +409,10 @@ class DevelopmentBoostView(View):
         boost_cost = math.ceil(boost_cost)
         # check if user has sufficient authority
         if user_info['econ_auth'] < boost_cost:
-            await interaction.response.send_message(
+            return await interaction.response.send_message(
                 f"You do not have sufficient Economic authority to boost in this "
                 f"province. You are missing {boost_cost - user_info['econ_auth']} "
                 f"Economic authority.")
-            return await self.interaction.edit_message(view=self)
         # execute orders
         await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $1 WHERE user_id = $2;''',
                            int(boost_cost), interaction.user.id)
