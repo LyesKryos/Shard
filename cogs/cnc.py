@@ -451,7 +451,9 @@ class OwnedProvinceModifiation(View):
         dev_boost_view = DevelopmentBoostView(interaction.user, prov_info, user_info, conn)
         # send boost option view
         dev_boost_view.interaction = interaction
-        await interaction.response.edit_message(view=dev_boost_view)
+        await interaction.response.edit_message(content="**Select the type of authority to "
+                                                        "spend using the buttons below.**",
+                                                view=dev_boost_view)
         # define authority type
         authority_type = dev_boost_view.authority_type
         # calculate dev boosting cost. base cost = current development * .75
