@@ -688,7 +688,7 @@ class OwnedProvinceModifiation(View):
         # otherwise, appropriate
         dev_appropriate_view = DevelopmentAppropriateView(interaction.user, prov_info, user_info, conn)
         dev_appropriate_view.interaction = interaction
-        await interaction.response.send_message(view=dev_appropriate_view, content="**Select the type of authority to "
+        await interaction.response.edit_message(view=dev_appropriate_view, content="**Select the type of authority to "
                                                                                    "gain using the buttons below.**")
 
 
