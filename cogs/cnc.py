@@ -373,6 +373,9 @@ class DevelopmentBoostView(View):
         self.user_info = user_info
         self.pool = pool
         self.authority_type = None
+        # define OG view
+        self.prov_owned_view = OwnedProvinceModifiation(author, province_db,
+                                 user_info, pool)
 
     async def interaction_check(self, interaction: discord.Interaction):
         # ensures that the person using the interaction is the original author
@@ -406,10 +409,11 @@ class DevelopmentBoostView(View):
         boost_cost = math.ceil(boost_cost)
         # check if user has sufficient authority
         if user_info['econ_auth'] < boost_cost:
-            return await interaction.response.send_message(
+            await interaction.response.send_message(
                 f"You do not have sufficient Economic authority to boost in this "
                 f"province. You are missing {boost_cost - user_info['econ_auth']} "
                 f"Economic authority.")
+            return await interaction.edit_original_response(view=self)
         # execute orders
         await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $1 WHERE user_id = $2;''',
                            int(boost_cost), interaction.user.id)
@@ -417,8 +421,7 @@ class DevelopmentBoostView(View):
                            province_id)
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
-                                                 view=OwnedProvinceModifiation(self.author, self.province_db,
-                                                                               self.user_info, self.pool))
+                                                 view=self.prov_owned_view)
         return await interaction.followup.send(f"Successfully boosted Development at a cost of "
                                                f"{boost_cost} Economic authority! "
                                                f"The total development of {prov_info['name']} (ID: {province_id} "
