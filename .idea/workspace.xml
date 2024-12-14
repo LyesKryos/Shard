@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Finishing dev boosting button reactions" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Cleaning up">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -430,7 +433,7 @@
       <workItem from="1733833064965" duration="160000" />
       <workItem from="1733941354203" duration="4510000" />
       <workItem from="1734026657340" duration="8400000" />
-      <workItem from="1734198352710" duration="6368000" />
+      <workItem from="1734198352710" duration="7163000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -775,7 +778,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1162" />
+    <option name="localTasksCounter" value="1165" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -793,7 +796,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing the colonization command to reduce authority" />
     <MESSAGE value="Troubleshooting bordering check for colonization" />
     <MESSAGE value="Fixing bordering check for colonization" />
     <MESSAGE value="Adding tax level change command" />
@@ -818,7 +820,8 @@
     <MESSAGE value="Editing the look of dev boosting" />
     <MESSAGE value="Fixing dev boosting" />
     <MESSAGE value="Finishing dev boosting button reactions" />
-    <option name="LAST_COMMIT_MESSAGE" value="Finishing dev boosting button reactions" />
+    <MESSAGE value="Cleaning up" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleaning up" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$resources_updating_cnc.coverage" NAME="resources_updating_cnc Coverage Results" MODIFIED="1661216424601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

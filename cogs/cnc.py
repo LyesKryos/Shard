@@ -520,6 +520,101 @@ class DevelopmentBoostView(View):
             child.disabled = True
         await interaction.response.edit_message(view=self)
 
+class DevelopmentAppropriateView(View):
+    def __init__(self, author, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
+        super().__init__(timeout=120)
+        self.author = author
+        self.province_db = province_db
+        self.user_info = user_info
+        self.pool = pool
+        self.authority_type = None
+        # define OG view
+        self.prov_owned_view = OwnedProvinceModifiation(author, province_db,
+                                 user_info, pool)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        # ensures that the person using the interaction is the original author
+        return interaction.user.id == self.author.id
+
+    async def on_timeout(self) -> None:
+        # disable all the children
+        for child in self.children:
+            child.disabled = True
+        # update the view
+        return await self.interaction.edit_original_response(view=self.prov_owned_view, content=None)
+
+    @discord.ui.button(label="Economic", style=discord.ButtonStyle.blurple)
+    async def economic(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # define stuff
+        prov_info = self.province_db
+        user_info = self.user_info
+        conn = self.pool
+        province_id = prov_info['id']
+        development = prov_info['development']
+        auth_return = int(development // 3.5)
+        # execute
+        await conn.execute('''UPDATE cnc_provinces SET development = development - 1 WHERE id = $1;''',
+                           province_id)
+        await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth + $1 WHERE user_id = $2;''',
+                           auth_return, user_info['user_id'])
+        # define and reset to owned province
+        await interaction.response.edit_message(content=None,
+                                                 view=self.prov_owned_view)
+        return await interaction.followup.send(f"{auth_return} Economic authority appropriated from the "
+                                               f"development of {prov_info['name']} (ID: {province_id}).")
+
+    @discord.ui.button(label="Political", style=discord.ButtonStyle.blurple)
+    async def political(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # define stuff
+        prov_info = self.province_db
+        user_info = self.user_info
+        conn = self.pool
+        province_id = prov_info['id']
+        development = prov_info['development']
+        auth_return = int(development // 3.5)
+        # execute
+        await conn.execute('''UPDATE cnc_provinces SET development = development - 1 WHERE id = $1;''',
+                           province_id)
+        await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth + $1 WHERE user_id = $2;''',
+                           auth_return, user_info['user_id'])
+        # define and reset to owned province
+        await interaction.response.edit_message(content=None,
+                                                view=self.prov_owned_view)
+        return await interaction.followup.send(f"{auth_return} Political authority appropriated from the "
+                                               f"development of {prov_info['name']} (ID: {province_id}).")
+
+    @discord.ui.button(label="Military", style=discord.ButtonStyle.blurple)
+    async def military(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # define stuff
+        prov_info = self.province_db
+        user_info = self.user_info
+        conn = self.pool
+        province_id = prov_info['id']
+        development = prov_info['development']
+        auth_return = int(development // 3.5)
+        # execute
+        await conn.execute('''UPDATE cnc_provinces SET development = development - 1 WHERE id = $1;''',
+                           province_id)
+        await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth + $1 WHERE user_id = $2;''',
+                           auth_return, user_info['user_id'])
+        # define and reset to owned province
+        await interaction.response.edit_message(content=None,
+                                                view=self.prov_owned_view)
+        return await interaction.followup.send(f"{auth_return} Military authority appropriated from the "
+                                               f"development of {prov_info['name']} (ID: {province_id}).")
+
+    @discord.ui.button(label="Back", emoji="\U000023ea", style=discord.ButtonStyle.blurple)
+    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.edit_message(content=None,
+                                                view=OwnedProvinceModifiation(self.author, self.province_db,
+                                                                              self.user_info, self.pool))
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger)
+    async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+        for child in self.children:
+            child.disabled = True
+        await interaction.response.edit_message(view=self)
+
 class OwnedProvinceModifiation(View):
     """Accepts the province record from a DB call."""
 
@@ -571,6 +666,32 @@ class OwnedProvinceModifiation(View):
         await interaction.response.edit_message(content="**Select the type of authority to "
                                                         "spend using the buttons below.**",
                                                 view=dev_boost_view)
+
+    @discord.ui.button(label="Appropriate Development", emoji="\U0001f4c9", style=discord.ButtonStyle.blurple)
+    async def appropriate_dev(self, interaction: discord.Interaction, button: discord.Button):
+        # define everything
+        conn = self.pool
+        user_info = self.user_info
+        prov_info = self.prov_info
+        # check if development is sufficient
+        if prov_info['development'] <= 5:
+            return await interaction.response.send_message("This province does not have "
+                                                   "sufficient development to be appropriated.")
+        # ensure that buildings are still supported. each structure (minus 1) needs 10 development
+        structures = len(prov_info['structures']) - 1
+        # if there are any structures (more than 2)
+        if structures > 1:
+            # if the amount of development, after appropriation, is insufficient to support the structures, deny
+            if ((prov_info['development'] - 1) / 10) / structures <= 1:
+                return await interaction.response.send_message("Existing Structures in this province "
+                                                       "prevent development appropriation.")
+        # otherwise, appropriate
+        dev_appropriate_view = DevelopmentAppropriateView(interaction.user, prov_info, user_info, conn)
+        dev_appropriate_view.interaction = interaction
+        await interaction.response.send_message(view=dev_appropriate_view, content="**Select the type of authority to "
+                                                                                   "gain using the buttons below.**")
+
+
 
 
 class CNC(commands.Cog):
@@ -1563,77 +1684,77 @@ class CNC(commands.Cog):
     #                        structure, province_id)
     #     return await interaction.followup.send(f"The {structure} has been deconstructed in "
     #                                            f"{prov_info['name']} (ID: {province_id}).")
-
-    @cnc.command(name="boost_development", description="Utilizes Authority to boost province development.")
-    @app_commands.describe(province_id="The ID of the province which you would like to boost.",
-                           authority_type="The type of authority to boost with.")
-    @app_commands.guild_only()
-    async def dev_boost(self, interaction: discord.Interaction, province_id: int,
-                        authority_type: typing.Literal['Economic', 'Political', 'Military']):
-        # defer interaction
-        await interaction.response.defer(thinking=True)
-        # establish connection
-        conn = self.bot.pool
-        # pull userinfo
-        user_info = await self.user_db_info(interaction.user.id)
-        # check for registration
-        if user_info is None:
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
-        # pull province info
-        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
-        # check if province exists
-        if prov_info is None:
-            return await interaction.followup.send("That is not a valid province ID.")
-        # check if user owns province
-        if prov_info['owner_id'] != interaction.user.id:
-            return await interaction.followup.send("You do not own that province.")
-        # calculate dev boosting cost. base cost = current development * .75
-        boost_cost = prov_info['development'] * .75
-        # add modifiers from tech and define type for later
-        if authority_type == 'Economic':
-            boost_cost += user_info['econ_boost_cost']
-        elif authority_type == 'Political':
-            boost_cost += user_info['pol_boost_cost']
-        elif authority_type == 'Military':
-            boost_cost += user_info['mil_boost_cost']
-        # add modifiers from govt type
-        govt_info = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1 AND govt_subtype = $2;''',
-                                        user_info['govt_type'], user_info['govt_subtype'])
-        govt_mod = govt_info['dev_cost']
-        boost_cost *= govt_mod
-        # add modifiers from structures
-        if "Lumber Mill" in prov_info['structures']:
-            boost_cost *= .85
-        # round boost cost up
-        boost_cost = math.ceil(boost_cost)
-        # check if user has sufficient authority
-        call = None
-        if authority_type == 'Economic':
-            call = '''UPDATE cnc_users SET econ_auth = econ_auth - $1 WHERE user_id = $2;'''
-            if user_info['econ_auth'] < boost_cost:
-                return await interaction.followup.send(f"You do not have sufficient Economic authority to boost in this "
-                                                       f"province. You are missing {boost_cost-user_info['econ_auth']} "
-                                                       f"Economic authority.")
-        elif authority_type == 'Political':
-            call = '''UPDATE cnc_users SET pol_auth = pol_auth - $1 WHERE user_id = $2;'''
-            if user_info['pol_auth'] < boost_cost:
-                return await interaction.followup.send(f"You do not have sufficient Political authority to boost in this "
-                                                       f"province. You are missing {boost_cost-user_info['pol_auth']} "
-                                                       f"Political authority.")
-        elif authority_type == 'Military':
-            call = '''UPDATE cnc_users SET mil_auth = mil_auth - $1 WHERE user_id = $2;'''
-            if user_info['mil_auth'] < boost_cost:
-                return await interaction.followup.send(
-                    f"You do not have sufficient Military authority to boost in this "
-                    f"province. You are missing {boost_cost - user_info['mil_auth']} "
-                    f"Political authority.")
-        # execute orders
-        await conn.execute(call, int(boost_cost), interaction.user.id)
-        await conn.execute('''UPDATE cnc_provinces SET development = development + 1 WHERE id = $1;''', province_id)
-        return await interaction.followup.send(f"Successfully boosted Development at a cost of "
-                                               f"{boost_cost} {authority_type} authority! "
-                                               f"The total development of {prov_info['name']} (ID: {province_id} "
-                                               f"is now **{prov_info['development']+1}**.")
+    #
+    # @cnc.command(name="boost_development", description="Utilizes Authority to boost province development.")
+    # @app_commands.describe(province_id="The ID of the province which you would like to boost.",
+    #                        authority_type="The type of authority to boost with.")
+    # @app_commands.guild_only()
+    # async def dev_boost(self, interaction: discord.Interaction, province_id: int,
+    #                     authority_type: typing.Literal['Economic', 'Political', 'Military']):
+    #     # defer interaction
+    #     await interaction.response.defer(thinking=True)
+    #     # establish connection
+    #     conn = self.bot.pool
+    #     # pull userinfo
+    #     user_info = await self.user_db_info(interaction.user.id)
+    #     # check for registration
+    #     if user_info is None:
+    #         return await interaction.followup.send("You are not a registered member of the CNC system.")
+    #     # pull province info
+    #     prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+    #     # check if province exists
+    #     if prov_info is None:
+    #         return await interaction.followup.send("That is not a valid province ID.")
+    #     # check if user owns province
+    #     if prov_info['owner_id'] != interaction.user.id:
+    #         return await interaction.followup.send("You do not own that province.")
+    #     # calculate dev boosting cost. base cost = current development * .75
+    #     boost_cost = prov_info['development'] * .75
+    #     # add modifiers from tech and define type for later
+    #     if authority_type == 'Economic':
+    #         boost_cost += user_info['econ_boost_cost']
+    #     elif authority_type == 'Political':
+    #         boost_cost += user_info['pol_boost_cost']
+    #     elif authority_type == 'Military':
+    #         boost_cost += user_info['mil_boost_cost']
+    #     # add modifiers from govt type
+    #     govt_info = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1 AND govt_subtype = $2;''',
+    #                                     user_info['govt_type'], user_info['govt_subtype'])
+    #     govt_mod = govt_info['dev_cost']
+    #     boost_cost *= govt_mod
+    #     # add modifiers from structures
+    #     if "Lumber Mill" in prov_info['structures']:
+    #         boost_cost *= .85
+    #     # round boost cost up
+    #     boost_cost = math.ceil(boost_cost)
+    #     # check if user has sufficient authority
+    #     call = None
+    #     if authority_type == 'Economic':
+    #         call = '''UPDATE cnc_users SET econ_auth = econ_auth - $1 WHERE user_id = $2;'''
+    #         if user_info['econ_auth'] < boost_cost:
+    #             return await interaction.followup.send(f"You do not have sufficient Economic authority to boost in this "
+    #                                                    f"province. You are missing {boost_cost-user_info['econ_auth']} "
+    #                                                    f"Economic authority.")
+    #     elif authority_type == 'Political':
+    #         call = '''UPDATE cnc_users SET pol_auth = pol_auth - $1 WHERE user_id = $2;'''
+    #         if user_info['pol_auth'] < boost_cost:
+    #             return await interaction.followup.send(f"You do not have sufficient Political authority to boost in this "
+    #                                                    f"province. You are missing {boost_cost-user_info['pol_auth']} "
+    #                                                    f"Political authority.")
+    #     elif authority_type == 'Military':
+    #         call = '''UPDATE cnc_users SET mil_auth = mil_auth - $1 WHERE user_id = $2;'''
+    #         if user_info['mil_auth'] < boost_cost:
+    #             return await interaction.followup.send(
+    #                 f"You do not have sufficient Military authority to boost in this "
+    #                 f"province. You are missing {boost_cost - user_info['mil_auth']} "
+    #                 f"Political authority.")
+    #     # execute orders
+    #     await conn.execute(call, int(boost_cost), interaction.user.id)
+    #     await conn.execute('''UPDATE cnc_provinces SET development = development + 1 WHERE id = $1;''', province_id)
+    #     return await interaction.followup.send(f"Successfully boosted Development at a cost of "
+    #                                            f"{boost_cost} {authority_type} authority! "
+    #                                            f"The total development of {prov_info['name']} (ID: {province_id} "
+    #                                            f"is now **{prov_info['development']+1}**.")
 
     @cnc.command(name="appropriate_development", description="Appropriates province development to gain authority.")
     @app_commands.describe(province_id="The ID of the province which you would like to appropriate development from.",
