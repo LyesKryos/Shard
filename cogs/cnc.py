@@ -423,20 +423,84 @@ class DevelopmentBoostView(View):
                                                  view=self.prov_owned_view)
         return await interaction.followup.send(f"Successfully boosted Development at a cost of "
                                                f"{boost_cost} Economic authority! "
-                                               f"The total development of {prov_info['name']} (ID: {province_id} "
+                                               f"The total development of {prov_info['name']} (ID: {province_id}) "
                                                f"is now **{prov_info['development'] + 1}**.")
 
     @discord.ui.button(label="Political", style=discord.ButtonStyle.blurple)
     async def political(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message("Confirming...", ephemeral=True, delete_after=5)
-        self.authority_type = 'Political'
-        self.stop()
+        # define stuff
+        prov_info = self.province_db
+        user_info = self.user_info
+        conn = self.pool
+        province_id = prov_info['id']
+        # calculate dev boosting cost. base cost = current development * .75
+        boost_cost = prov_info['development'] * .75
+        # add modifiers from govt type
+        govt_info = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1 AND govt_subtype = $2;''',
+                                        user_info['govt_type'], user_info['govt_subtype'])
+        govt_mod = govt_info['dev_cost']
+        boost_cost *= govt_mod
+        # add modifiers from structures
+        if "Lumber Mill" in prov_info['structures']:
+            boost_cost *= .85
+        # round boost cost up
+        boost_cost = math.ceil(boost_cost)
+        # check if user has sufficient authority
+        if user_info['pol_auth'] < boost_cost:
+            return await interaction.response.send_message(
+                f"You do not have sufficient Political authority to boost in this "
+                f"province. You are missing {boost_cost - user_info['econ_auth']} "
+                f"Political authority.")
+        # execute orders
+        await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth - $1 WHERE user_id = $2;''',
+                           int(boost_cost), interaction.user.id)
+        await conn.execute('''UPDATE cnc_provinces SET development = development + 1 WHERE id = $1;''',
+                           province_id)
+        # define and reset to owned province
+        await interaction.response.edit_message(content=None,
+                                                view=self.prov_owned_view)
+        return await interaction.followup.send(f"Successfully boosted Development at a cost of "
+                                               f"{boost_cost} Political authority! "
+                                               f"The total development of {prov_info['name']} (ID: {province_id}) "
+                                               f"is now **{prov_info['development'] + 1}**.")
 
     @discord.ui.button(label="Military", style=discord.ButtonStyle.blurple)
     async def military(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message("Confirming...", ephemeral=True, delete_after=5)
-        self.authority_type = 'Military'
-        self.stop()
+        # define stuff
+        prov_info = self.province_db
+        user_info = self.user_info
+        conn = self.pool
+        province_id = prov_info['id']
+        # calculate dev boosting cost. base cost = current development * .75
+        boost_cost = prov_info['development'] * .75
+        # add modifiers from govt type
+        govt_info = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1 AND govt_subtype = $2;''',
+                                        user_info['govt_type'], user_info['govt_subtype'])
+        govt_mod = govt_info['dev_cost']
+        boost_cost *= govt_mod
+        # add modifiers from structures
+        if "Lumber Mill" in prov_info['structures']:
+            boost_cost *= .85
+        # round boost cost up
+        boost_cost = math.ceil(boost_cost)
+        # check if user has sufficient authority
+        if user_info['mil_auth'] < boost_cost:
+            return await interaction.response.send_message(
+                f"You do not have sufficient Military authority to boost in this "
+                f"province. You are missing {boost_cost - user_info['econ_auth']} "
+                f"Military authority.")
+        # execute orders
+        await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - $1 WHERE user_id = $2;''',
+                           int(boost_cost), interaction.user.id)
+        await conn.execute('''UPDATE cnc_provinces SET development = development + 1 WHERE id = $1;''',
+                           province_id)
+        # define and reset to owned province
+        await interaction.response.edit_message(content=None,
+                                                view=self.prov_owned_view)
+        return await interaction.followup.send(f"Successfully boosted Development at a cost of "
+                                               f"{boost_cost} Military authority! "
+                                               f"The total development of {prov_info['name']} (ID: {province_id}) "
+                                               f"is now **{prov_info['development'] + 1}**.")
 
     @discord.ui.button(label="Back", emoji="\U000023ea", style=discord.ButtonStyle.blurple)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
