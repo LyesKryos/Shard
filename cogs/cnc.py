@@ -413,7 +413,7 @@ class DevelopmentBoostView(View):
                 f"You do not have sufficient Economic authority to boost in this "
                 f"province. You are missing {boost_cost - user_info['econ_auth']} "
                 f"Economic authority.")
-            return await interaction.edit_original_response(view=self)
+            return await self.interaction.edit_message(view=self)
         # execute orders
         await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $1 WHERE user_id = $2;''',
                            int(boost_cost), interaction.user.id)
