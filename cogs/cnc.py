@@ -385,7 +385,7 @@ class DevelopmentBoostView(View):
         self.stop()
 
     @discord.ui.button(label="Military", style=discord.ButtonStyle.blurple)
-    async def political(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def military(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.authority_type = 'Military'
         self.stop()
 
@@ -451,8 +451,8 @@ class OwnedProvinceModifiation(View):
         # define boost view
         dev_boost_view = DevelopmentBoostView(interaction.user, prov_info, user_info, conn)
         # send boost option view
-        dev_boost_view.interaction = await interaction.followup.send("Select the type of authority to use below.",
-                                                                     view=dev_boost_view)
+        dev_boost_view.interaction = await interaction.edit_original_response(
+            content="Select the type of authority to use below.", view=dev_boost_view)
         # define authority type
         authority_type = dev_boost_view.authority_type
         # calculate dev boosting cost. base cost = current development * .75
