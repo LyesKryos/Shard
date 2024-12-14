@@ -281,13 +281,16 @@ class ConstructView(View):
         self.pool = pool
         # Adds the dropdown to our view object.
         self.add_item(ConstructDropdown(province_db, user_info, pool))
+        # define OG view
+        self.prov_owned_view = OwnedProvinceModifiation(author, province_db,
+                                 user_info, pool)
 
     async def on_timeout(self) -> None:
         # disable all the children
         for child in self.children:
             child.disabled = True
         # update the view
-        await self.interaction.edit_original_response(view=self)
+        await self.interaction.edit_original_response(view=self.prov_owned_view)
 
     async def interaction_check(self, interaction: discord.Interaction):
         # ensures that the person using the interaction is the original author
@@ -342,13 +345,16 @@ class DeconstructView(View):
         self.pool = pool
         # Adds the dropdown to our view object.
         self.add_item(DeconstructDropdown(province_db, user_info, pool))
+        # define OG view
+        self.prov_owned_view = OwnedProvinceModifiation(author, province_db,
+                                 user_info, pool)
 
     async def on_timeout(self) -> None:
         # disable all the children
         for child in self.children:
             child.disabled = True
         # update the view
-        return await self.interaction.edit_original_response(view=self)
+        return await self.interaction.edit_original_response(view=self.prov_owned_view)
 
     async def interaction_check(self, interaction: discord.Interaction):
         # ensures that the person using the interaction is the original author
