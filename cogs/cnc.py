@@ -459,6 +459,7 @@ class OwnedProvinceModifiation(View):
                                                 view=dev_boost_view)
         # define authority type
         authority_type = dev_boost_view.authority_type
+        await interaction.followup.send(authority_type)
         # calculate dev boosting cost. base cost = current development * .75
         boost_cost = prov_info['development'] * .75
         # add modifiers from tech and define type for later
