@@ -391,7 +391,8 @@ class DevelopmentBoostView(View):
 
     @discord.ui.button(label="Back", emoji="\U000023ea", style=discord.ButtonStyle.blurple)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.edit_message(view=OwnedProvinceModifiation(self.author, self.province_db,
+        await interaction.response.edit_message(content=None,
+                                                view=OwnedProvinceModifiation(self.author, self.province_db,
                                                                               self.user_info, self.pool))
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger)
@@ -450,8 +451,7 @@ class OwnedProvinceModifiation(View):
         dev_boost_view = DevelopmentBoostView(interaction.user, prov_info, user_info, conn)
         # send boost option view
         dev_boost_view.interaction = interaction
-        await interaction.response.edit_message(
-            content="Select the type of authority to use below.", view=dev_boost_view)
+        await interaction.response.edit_message(view=dev_boost_view)
         # define authority type
         authority_type = dev_boost_view.authority_type
         # calculate dev boosting cost. base cost = current development * .75
@@ -500,7 +500,8 @@ class OwnedProvinceModifiation(View):
         await conn.execute(call, int(boost_cost), interaction.user.id)
         await conn.execute('''UPDATE cnc_provinces SET development = development + 1 WHERE id = $1;''', province_id)
         # define and reset to owned province
-        await interaction.edit_original_response(view=OwnedProvinceModifiation(self.author, self.province_db,
+        await interaction.edit_original_response(content=None,
+                                                 view=OwnedProvinceModifiation(self.author, self.province_db,
                                                                               self.user_info, self.pool))
         return await interaction.followup.send(f"Successfully boosted Development at a cost of "
                                                f"{boost_cost} {authority_type} authority! "
