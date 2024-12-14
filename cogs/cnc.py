@@ -376,16 +376,19 @@ class DevelopmentBoostView(View):
 
     @discord.ui.button(label="Economic", style=discord.ButtonStyle.blurple)
     async def economic(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("Confirming...", ephemeral=True, delete_after=5)
         self.authority_type = 'Economic'
         self.stop()
 
     @discord.ui.button(label="Political", style=discord.ButtonStyle.blurple)
     async def political(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("Confirming...", ephemeral=True, delete_after=5)
         self.authority_type = 'Political'
         self.stop()
 
     @discord.ui.button(label="Military", style=discord.ButtonStyle.blurple)
     async def military(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("Confirming...", ephemeral=True, delete_after=5)
         self.authority_type = 'Military'
         self.stop()
 
