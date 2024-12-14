@@ -441,8 +441,6 @@ class OwnedProvinceModifiation(View):
 
     @discord.ui.button(label="Boost Development", emoji="\U0001f4c8", style=discord.ButtonStyle.blurple)
     async def boost_dev(self, interaction: discord.Interaction, button: discord.Button):
-        # defer interaction
-        await interaction.response.defer(thinking=True)
         # define everything
         conn = self.pool
         user_info = self.user_info
