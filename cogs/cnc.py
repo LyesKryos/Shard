@@ -386,7 +386,7 @@ class DevelopmentBoostView(View):
         for child in self.children:
             child.disabled = True
         # update the view
-        return await self.interaction.edit_original_response(view=self)
+        return await self.interaction.edit_original_response(view=self.prov_owned_view, content=None)
 
     @discord.ui.button(label="Economic", style=discord.ButtonStyle.blurple)
     async def economic(self, interaction: discord.Interaction, button: discord.ui.Button):
