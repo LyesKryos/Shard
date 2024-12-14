@@ -449,7 +449,8 @@ class OwnedProvinceModifiation(View):
         # define boost view
         dev_boost_view = DevelopmentBoostView(interaction.user, prov_info, user_info, conn)
         # send boost option view
-        dev_boost_view.interaction = await interaction.edit_original_response(
+        dev_boost_view.interaction = interaction
+        await interaction.response.edit_message(
             content="Select the type of authority to use below.", view=dev_boost_view)
         # define authority type
         authority_type = dev_boost_view.authority_type
