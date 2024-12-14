@@ -1027,62 +1027,62 @@ class CNC(commands.Cog):
         # if the province doesn't exist
         if prov_info is None:
             return await interaction.followup.send("That province does not appear to exist.")
+            # owner and occupier info
+            if prov_info['owner_id'] != 0:
+                owner = await self.user_db_info(prov_info['owner_id'])
+                owner = owner['name']
+            else:
+                owner = "Natives"
+            if prov_info['occupier_id'] != 0:
+                occupier = await self.user_db_info(prov_info['occupier_id'])
+                occupier = occupier['name']
+            else:
+                occupier = "Natives"
+            if prov_info['river'] is True:
+                river = ", River"
+            else:
+                river = ""
+            # troops and armies
+            troop_count = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE location = $1;''',
+                                              prov_info['id'])
+            # parse out troop count
+            if troop_count['sum'] is None:
+                troop_count = 0
+            else:
+                troop_count = f"{troop_count['sum']:,}"
+            # parse structures
+            if prov_info['structures'] is None:
+                structures = "None"
+            elif not prov_info['structures']:
+                structures = "None"
+            else:
+                structures = ",".join(p for p in prov_info['structures'])
+            army_list = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE location = $1''', prov_info['id'])
+            # build embed for province and populate name and ID
+            prov_embed = discord.Embed(title=f"Province of {prov_info['name']}",
+                                       description=f"Province #{prov_info['id']}",
+                                       color=discord.Color.red())
+            # populate bordering
+            prov_embed.add_field(name="Bordering Provinces",
+                                 value=f"{', '.join([str(b) for b in prov_info['bordering']])}",
+                                 inline=False)
+            prov_embed.add_field(name="Core Owner", value=owner)
+            prov_embed.add_field(name="Occupier", value=occupier)
+            prov_embed.add_field(name="Troops and Armies", value=f"{troop_count} troops "
+                                                                 f"in {army_list['count']} armies.")
+            prov_embed.add_field(name="Terrain", value=f"{await self.terrain_name(prov_info['terrain'])}" + river)
+            prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
+            prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
+            prov_embed.add_field(name="Production\n(last turn)", value=f"{prov_info['production']:,.3}")
+            prov_embed.add_field(name="Development", value=f"{prov_info['development']}")
+            prov_embed.add_field(name="Structures", value=f"{structures}")
         # if the user owns the province, open the ownership view
         if prov_info['owner_id'] == interaction.user.id:
             user_info = await self.user_db_info(interaction.user.id)
             author = interaction.user
             owned_province_view = OwnedProvinceModifiation(author, prov_info, user_info, conn)
             owned_province_view.interaction = interaction
-            await interaction.edit_original_response(view=owned_province_view)
-        # # owner and occupier info
-        # if prov_info['owner_id'] != 0:
-        #     owner = await self.user_db_info(prov_info['owner_id'])
-        #     owner = owner['name']
-        # else:
-        #     owner = "Natives"
-        # if prov_info['occupier_id'] != 0:
-        #     occupier = await self.user_db_info(prov_info['occupier_id'])
-        #     occupier = occupier['name']
-        # else:
-        #     occupier = "Natives"
-        # if prov_info['river'] is True:
-        #     river = ", River"
-        # else:
-        #     river = ""
-        # # troops and armies
-        # troop_count = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE location = $1;''',
-        #                                   prov_info['id'])
-        # # parse out troop count
-        # if troop_count['sum'] is None:
-        #     troop_count = 0
-        # else:
-        #     troop_count = f"{troop_count['sum']:,}"
-        # # parse structures
-        # if prov_info['structures'] is None:
-        #     structures = "None"
-        # elif not prov_info['structures']:
-        #     structures = "None"
-        # else:
-        #     structures = ",".join(p for p in prov_info['structures'])
-        # army_list = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE location = $1''', prov_info['id'])
-        # # build embed for province and populate name and ID
-        # prov_embed = discord.Embed(title=f"Province of {prov_info['name']}", description=f"Province #{prov_info['id']}",
-        #                            color=discord.Color.red())
-        # # populate bordering
-        # prov_embed.add_field(name="Bordering Provinces",
-        #                      value=f"{', '.join([str(b) for b in prov_info['bordering']])}",
-        #                      inline=False)
-        # prov_embed.add_field(name="Core Owner", value=owner)
-        # prov_embed.add_field(name="Occupier", value=occupier)
-        # prov_embed.add_field(name="Troops and Armies", value=f"{troop_count} troops "
-        #                                                      f"in {army_list['count']} armies.")
-        # prov_embed.add_field(name="Terrain", value=f"{await self.terrain_name(prov_info['terrain'])}"+river)
-        # prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
-        # prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
-        # prov_embed.add_field(name="Production\n(last turn)", value=f"{prov_info['production']:,.3}")
-        # prov_embed.add_field(name="Development", value=f"{prov_info['development']}")
-        # prov_embed.add_field(name="Structures", value=f"{structures}")
-        # return await interaction.followup.send(embed=prov_embed)
+            await interaction.edit_original_response(view=owned_province_view, embed=prov_embed)
 
     @cnc.command(name="army_view", description="Displays information about a specific army.")
     @app_commands.describe(army_id="The ID of the army")
