@@ -406,7 +406,7 @@ class DevelopmentBoostView(View):
         boost_cost = math.ceil(boost_cost)
         # check if user has sufficient authority
         if user_info['econ_auth'] < boost_cost:
-            return await interaction.followup.send(
+            return await interaction.response.send_message(
                 f"You do not have sufficient Economic authority to boost in this "
                 f"province. You are missing {boost_cost - user_info['econ_auth']} "
                 f"Economic authority.")
@@ -416,7 +416,7 @@ class DevelopmentBoostView(View):
         await conn.execute('''UPDATE cnc_provinces SET development = development + 1 WHERE id = $1;''',
                            province_id)
         # define and reset to owned province
-        await interaction.edit_original_response(content=None,
+        await interaction.response.edit_message(content=None,
                                                  view=OwnedProvinceModifiation(self.author, self.province_db,
                                                                                self.user_info, self.pool))
         return await interaction.followup.send(f"Successfully boosted Development at a cost of "
