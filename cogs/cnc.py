@@ -741,7 +741,7 @@ class AbandonConfirm(View):
         # color the province
         await map_color(province_id, "#808080", self.pool)
         await interaction.response.edit_message(content=f"{self.prov_info['name']} (ID: {province_id}) "
-                                                        f"has been successfully abandoned.")
+                                                        f"has been successfully abandoned.", view=None)
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
     async def abandon_province_cancelled(self, interaction: discord.Interaction, button: discord.ui.Button):
