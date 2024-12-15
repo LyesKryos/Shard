@@ -2,9 +2,11 @@ import functools
 import typing
 from random import randrange, randint
 from time import perf_counter
+from typing import Any
+from venv import logger
 
 import asyncpg
-from discord import app_commands
+from discord import app_commands, Interaction
 from discord.ext.commands import Context
 from discord.ext.commands._types import BotT
 
@@ -15,7 +17,7 @@ import asyncio
 from PIL import Image, ImageColor, ImageDraw
 from base64 import b64encode
 import requests
-from discord.ui import View, Select
+from discord.ui import View, Select, Item
 import math
 
 from customchecks import SilentFail
@@ -180,7 +182,6 @@ class MapButtons(View):
         # update the view so all the buttons are disabled
         await interaction.response.edit_message(view=self)
 
-# create the construct select menu
 class ConstructDropdown(discord.ui.Select):
 
     def __init__(self, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
@@ -353,7 +354,7 @@ class ConstructView(View):
         for child in self.children:
             child.disabled = True
         # update the view
-        await self.interaction.edit_original_response(view=self.prov_owned_view)
+        await self.interaction.edit_original_response(view=self)
 
     async def interaction_check(self, interaction: discord.Interaction):
         # ensures that the person using the interaction is the original author
@@ -417,7 +418,7 @@ class DeconstructView(View):
         for child in self.children:
             child.disabled = True
         # update the view
-        return await self.interaction.edit_original_response(view=self.prov_owned_view)
+        return await self.interaction.edit_original_response(view=self)
 
     async def interaction_check(self, interaction: discord.Interaction):
         # ensures that the person using the interaction is the original author
@@ -455,7 +456,7 @@ class DevelopmentBoostView(View):
         for child in self.children:
             child.disabled = True
         # update the view
-        return await self.interaction.edit_original_response(view=self.prov_owned_view, content=None)
+        return await self.interaction.edit_original_response(view=self, content=None)
 
     @discord.ui.button(label="Economic", style=discord.ButtonStyle.blurple)
     async def economic(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -607,7 +608,7 @@ class DevelopmentAppropriateView(View):
         for child in self.children:
             child.disabled = True
         # update the view
-        return await self.interaction.edit_original_response(view=self.prov_owned_view, content=None)
+        return await self.interaction.edit_original_response(view=self, content=None)
 
     @discord.ui.button(label="Economic", style=discord.ButtonStyle.blurple)
     async def economic(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -627,8 +628,9 @@ class DevelopmentAppropriateView(View):
         await interaction.response.edit_message(content=None,
                                                  view=self.prov_owned_view,
                                                 embed=await create_prov_embed(prov_info, conn))
-        return await interaction.followup.send(f"{auth_return} Economic authority appropriated from the "
+        await interaction.followup.send(f"{auth_return} Economic authority appropriated from the "
                                                f"development of {prov_info['name']} (ID: {province_id}).")
+        self.stop()
 
     @discord.ui.button(label="Political", style=discord.ButtonStyle.blurple)
     async def political(self, interaction: discord.Interaction, button: discord.ui.Button):
