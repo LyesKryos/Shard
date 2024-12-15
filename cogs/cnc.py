@@ -30,6 +30,69 @@ def plus_minus(number: int) -> str:
     elif number < 0:
         return str(f"-{number}")
 
+async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> discord.Embed:
+        # owner and occupier info
+        if prov_info['owner_id'] != 0:
+            owner = await user_db_info(prov_info['owner_id'], conn)
+            owner = owner['name']
+        else:
+            owner = "Natives"
+        if prov_info['occupier_id'] != 0:
+            occupier = await user_db_info(prov_info['occupier_id'], conn)
+            occupier = occupier['name']
+        else:
+            occupier = "Natives"
+        if prov_info['river'] is True:
+            river = ", River"
+        else:
+            river = ""
+        # troops and armies
+        troop_count = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE location = $1;''',
+                                          prov_info['id'])
+        # parse out troop count
+        if troop_count['sum'] is None:
+            troop_count = 0
+        else:
+            troop_count = f"{troop_count['sum']:,}"
+        # parse structures
+        if prov_info['structures'] is None:
+            structures = "None"
+        elif not prov_info['structures']:
+            structures = "None"
+        else:
+            structures = ",".join(p for p in prov_info['structures'])
+        army_list = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE location = $1''', prov_info['id'])
+        # build embed for province and populate name and ID
+        prov_embed = discord.Embed(title=f"Province of {prov_info['name']}",
+                                   description=f"Province #{prov_info['id']}",
+                                   color=discord.Color.red())
+        # populate bordering
+        prov_embed.add_field(name="Bordering Provinces",
+                             value=f"{', '.join([str(b) for b in prov_info['bordering']])}",
+                             inline=False)
+        prov_embed.add_field(name="Core Owner", value=owner)
+        prov_embed.add_field(name="Occupier", value=occupier)
+        prov_embed.add_field(name="Troops and Armies", value=f"{troop_count} troops "
+                                                             f"in {army_list['count']} armies.")
+        prov_embed.add_field(name="Terrain", value=f"{await terrain_name(prov_info['terrain'], conn)}" + river)
+        prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
+        prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
+        prov_embed.add_field(name="Production\n(last turn)", value=f"{prov_info['production']:,.3}")
+        prov_embed.add_field(name="Development", value=f"{prov_info['development']}")
+        prov_embed.add_field(name="Structures", value=f"{structures}")
+        return prov_embed
+        
+async def user_db_info(user_id: int, conn: asyncpg.Pool) -> asyncpg.Record:
+        """Pulls user info from the database using Discord user ID."""
+        # pull the user data
+        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', user_id)
+        return user_info
+
+async def terrain_name(terrain_id: int, conn: asyncpg.Pool) -> str:
+        # make terrain db call
+        terrain_name = await conn.fetchrow('''SELECT name FROM cnc_terrains WHERE id = $1;''', terrain_id)
+        # return name string
+        return str(terrain_name['name'])
 
 class MapButtons(View):
 
@@ -426,7 +489,8 @@ class DevelopmentBoostView(View):
                            province_id)
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
-                                                 view=self.prov_owned_view)
+                                                 view=self.prov_owned_view,
+                                                embed=create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"Successfully boosted Development at a cost of "
                                                f"{boost_cost} Economic authority! "
                                                f"The total development of {prov_info['name']} (ID: {province_id}) "
@@ -464,7 +528,8 @@ class DevelopmentBoostView(View):
                            province_id)
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
-                                                view=self.prov_owned_view)
+                                                view=self.prov_owned_view,
+                                                embed=create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"Successfully boosted Development at a cost of "
                                                f"{boost_cost} Political authority! "
                                                f"The total development of {prov_info['name']} (ID: {province_id}) "
@@ -502,7 +567,8 @@ class DevelopmentBoostView(View):
                            province_id)
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
-                                                view=self.prov_owned_view)
+                                                view=self.prov_owned_view,
+                                                embed=create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"Successfully boosted Development at a cost of "
                                                f"{boost_cost} Military authority! "
                                                f"The total development of {prov_info['name']} (ID: {province_id}) "
@@ -559,7 +625,7 @@ class DevelopmentAppropriateView(View):
                            auth_return, user_info['user_id'])
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
-                                                 view=self.prov_owned_view)
+                                                 view=self.prov_owned_view, embed=create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"{auth_return} Economic authority appropriated from the "
                                                f"development of {prov_info['name']} (ID: {province_id}).")
 
@@ -579,7 +645,8 @@ class DevelopmentAppropriateView(View):
                            auth_return, user_info['user_id'])
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
-                                                view=self.prov_owned_view)
+                                                view=self.prov_owned_view,
+                                                embed=create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"{auth_return} Political authority appropriated from the "
                                                f"development of {prov_info['name']} (ID: {province_id}).")
 
@@ -599,7 +666,8 @@ class DevelopmentAppropriateView(View):
                            auth_return, user_info['user_id'])
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
-                                                view=self.prov_owned_view)
+                                                view=self.prov_owned_view,
+                                                embed=create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"{auth_return} Military authority appropriated from the "
                                                f"development of {prov_info['name']} (ID: {province_id}).")
 
@@ -690,8 +758,6 @@ class OwnedProvinceModifiation(View):
         dev_appropriate_view.interaction = interaction
         await interaction.response.edit_message(view=dev_appropriate_view, content="**Select the type of authority to "
                                                                                    "gain using the buttons below.**")
-
-
 
 
 class CNC(commands.Cog):
@@ -840,14 +906,6 @@ class CNC(commands.Cog):
         response = upload.json()
         return response['data']['url']
 
-    async def user_db_info(self, user_id: int):
-        """Pulls user info from the database using Discord user ID."""
-        # establish connection
-        conn = self.bot.pool
-        # pull the user data
-        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', user_id)
-        return user_info
-
     async def nation_db_info(self, nation_name: str):
         """Pulls user info from the database using the nation name."""
         # estbalish connection
@@ -894,12 +952,6 @@ class CNC(commands.Cog):
             raise TypeError
         return province
 
-    async def terrain_name(self, terrain_id: int) -> str:
-        # define connection
-        conn = self.bot.pool
-        terrain_name = await conn.fetchrow('''SELECT name FROM cnc_terrains WHERE id = $1;''', terrain_id)
-        return str(terrain_name['name'])
-
     def hex_to_rgb(self, hex_color):
         """Converts a hex color code to RGB values."""
         hex_color = hex_color.lstrip('#')
@@ -928,7 +980,7 @@ class CNC(commands.Cog):
         # define user
         user = interaction.user
         # check if the user already exists
-        check_call = await self.user_db_info(user.id)
+        check_call = await user_db_info(user.id, conn)
         if check_call is not None:
             return await interaction.followup.send(
                 f"You are already a registered player of the Command and Conquest system. "
@@ -1007,7 +1059,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull userinfo
-        user_info = await self.user_db_info(interaction.user.id)
+        user_info = await user_db_info(interaction.user.id)
         # check for registration
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -1099,7 +1151,7 @@ class CNC(commands.Cog):
             if user_info is None:
                 return await interaction.followup.send(f"`{nation.title()}` not found.", ephemeral=True)
         elif user is not None:
-            user_info = await self.user_db_info(user.id)
+            user_info = await user_db_info(user.id, conn)
             if user_info is None:
                 return await interaction.followup.send(f"That user is not a registered player of the CNC system.",
                                                        ephemeral=True)
@@ -1182,7 +1234,7 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # fetch user information
         user_id = interaction.user.id
-        user_info = await self.user_db_info(user_id)
+        user_info = await user_db_info(user_id)
         # if the user does not exist
         if user_info is None:
             # return error message
@@ -1261,7 +1313,7 @@ class CNC(commands.Cog):
         await interaction.response.defer(thinking=True, ephemeral=True)
         # pull user information
         user_id = interaction.user.id
-        user_info = await self.user_db_info(user_id)
+        user_info = await user_db_info(user_id)
         # check if the user exists
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -1283,7 +1335,7 @@ class CNC(commands.Cog):
             count = 0
         for p in provinces:
             sv_embed.add_field(name=f"{p['name']} ({p['id']})",
-                               value=f"Terrain: {await self.terrain_name(p['terrain'])}\n"
+                               value=f"Terrain: {await terrain_name(p['terrain'], self.bot.pool)}\n"
                                      f"Citizens: {p['citizens']:,}\n"
                                      f"Trade Good: {p['trade_good']}\n"
                                      f"Production: {p['production']:,.3}\n"
@@ -1314,58 +1366,10 @@ class CNC(commands.Cog):
         # if the province doesn't exist
         if prov_info is None:
             return await interaction.followup.send("That province does not appear to exist.")
-        # owner and occupier info
-        if prov_info['owner_id'] != 0:
-            owner = await self.user_db_info(prov_info['owner_id'])
-            owner = owner['name']
-        else:
-            owner = "Natives"
-        if prov_info['occupier_id'] != 0:
-            occupier = await self.user_db_info(prov_info['occupier_id'])
-            occupier = occupier['name']
-        else:
-            occupier = "Natives"
-        if prov_info['river'] is True:
-            river = ", River"
-        else:
-            river = ""
-        # troops and armies
-        troop_count = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE location = $1;''',
-                                          prov_info['id'])
-        # parse out troop count
-        if troop_count['sum'] is None:
-            troop_count = 0
-        else:
-            troop_count = f"{troop_count['sum']:,}"
-        # parse structures
-        if prov_info['structures'] is None:
-            structures = "None"
-        elif not prov_info['structures']:
-            structures = "None"
-        else:
-            structures = ",".join(p for p in prov_info['structures'])
-        army_list = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE location = $1''', prov_info['id'])
-        # build embed for province and populate name and ID
-        prov_embed = discord.Embed(title=f"Province of {prov_info['name']}",
-                                   description=f"Province #{prov_info['id']}",
-                                   color=discord.Color.red())
-        # populate bordering
-        prov_embed.add_field(name="Bordering Provinces",
-                             value=f"{', '.join([str(b) for b in prov_info['bordering']])}",
-                             inline=False)
-        prov_embed.add_field(name="Core Owner", value=owner)
-        prov_embed.add_field(name="Occupier", value=occupier)
-        prov_embed.add_field(name="Troops and Armies", value=f"{troop_count} troops "
-                                                             f"in {army_list['count']} armies.")
-        prov_embed.add_field(name="Terrain", value=f"{await self.terrain_name(prov_info['terrain'])}" + river)
-        prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
-        prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
-        prov_embed.add_field(name="Production\n(last turn)", value=f"{prov_info['production']:,.3}")
-        prov_embed.add_field(name="Development", value=f"{prov_info['development']}")
-        prov_embed.add_field(name="Structures", value=f"{structures}")
+
         # if the user owns the province, open the ownership view
         if prov_info['owner_id'] == interaction.user.id:
-            user_info = await self.user_db_info(interaction.user.id)
+            user_info = await user_db_info(interaction.user.id)
             author = interaction.user
             owned_province_view = OwnedProvinceModifiation(author, prov_info, user_info, conn)
             owned_province_view.interaction = interaction
@@ -1397,7 +1401,7 @@ class CNC(commands.Cog):
             general = f"{general_info['name']} (ID: {general_info['general_id']})"
         movement = army_info['movement']
         # pull userinfo
-        userinfo = await self.user_db_info(owner_id)
+        userinfo = await user_db_info(owner_id)
         user = self.bot.get_user(owner_id)
         # build embed
         army_embed = discord.Embed(title=f"{army_name}", description=f"Information about an army (ID {army_id}).",
@@ -1417,7 +1421,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull user info
-        userinfo = await self.user_db_info(interaction.user.id)
+        userinfo = await user_db_info(interaction.user.id)
         # if the user isn't a player, deny
         if userinfo is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -1516,7 +1520,7 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # pull user info
         user_id = interaction.user.id
-        user_info = await self.user_db_info(user_id=user_id)
+        user_info = await user_db_info(user_id=user_id)
         # if the user does not exist
         if user_info is None:
             # return a message
@@ -1576,7 +1580,7 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # check if the user exists
         user_id = interaction.user.id
-        user_info = await self.user_db_info(user_id)
+        user_info = await user_db_info(user_id)
         # if the user doesn't exist
         if user_info is None:
             # return denial
@@ -1602,7 +1606,7 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # check if the user exist
         user_id = interaction.user.id
-        user_info = await self.user_db_info(user_id)
+        user_info = await user_db_info(user_id)
         # if the user doesn't exist
         if user_info is None:
             # return denial
@@ -1633,7 +1637,7 @@ class CNC(commands.Cog):
     #     # establish connection
     #     conn = self.bot.pool
     #     # pull user data
-    #     user_info = await self.user_db_info(interaction.user.id)
+    #     user_info = await user_db_info(interaction.user.id)
     #     # check if the user exists
     #     if user_info is None:
     #         return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -1660,7 +1664,7 @@ class CNC(commands.Cog):
     #     # establish connection
     #     conn = self.bot.pool
     #     # pull userinfo
-    #     user_info = await self.user_db_info(interaction.user.id)
+    #     user_info = await user_db_info(interaction.user.id)
     #     # check for registration
     #     if user_info is None:
     #         return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -1696,7 +1700,7 @@ class CNC(commands.Cog):
     #     # establish connection
     #     conn = self.bot.pool
     #     # pull userinfo
-    #     user_info = await self.user_db_info(interaction.user.id)
+    #     user_info = await user_db_info(interaction.user.id)
     #     # check for registration
     #     if user_info is None:
     #         return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -1767,7 +1771,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull userinfo
-        user_info = await self.user_db_info(interaction.user.id)
+        user_info = await user_db_info(interaction.user.id)
         # check for registration
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -1818,7 +1822,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull userinfo
-        user_info = await self.user_db_info(interaction.user.id)
+        user_info = await user_db_info(interaction.user.id)
         # check for registration
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -1890,7 +1894,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull userinfo
-        user_info = await self.user_db_info(interaction.user.id)
+        user_info = await user_db_info(interaction.user.id)
         # check for registration
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -1935,7 +1939,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull userinfo
-        user_info = await self.user_db_info(interaction.user.id)
+        user_info = await user_db_info(interaction.user.id)
         # check for registration
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -1970,7 +1974,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull userinfo
-        user_info = await self.user_db_info(interaction.user.id)
+        user_info = await user_db_info(interaction.user.id)
         # check for registration
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -1996,7 +2000,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull userinfo
-        user_info = await self.user_db_info(interaction.user.id)
+        user_info = await user_db_info(interaction.user.id)
         # check for registration
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -2022,7 +2026,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull userinfo
-        user_info = await self.user_db_info(interaction.user.id)
+        user_info = await user_db_info(interaction.user.id)
         # check for registration
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -2066,7 +2070,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull userinfo
-        user_info = await self.user_db_info(interaction.user.id)
+        user_info = await user_db_info(interaction.user.id)
         # check for registration
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -2103,7 +2107,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # call user info
-        user_info = await self.user_db_info(user.id)
+        user_info = await user_db_info(user.id, conn)
         # check if such a user exists
         if user_info is None:
             return await ctx.send("No such user.")
@@ -2131,7 +2135,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # call user info
-        user_info = await self.user_db_info(user.id)
+        user_info = await user_db_info(user.id, conn)
         # check if such a user exists
         if user_info is None:
             return await ctx.send("No such user.")
@@ -2164,7 +2168,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # call user info
-        user_info = await self.user_db_info(user.id)
+        user_info = await user_db_info(user.id, conn)
         # check if such a user exists
         if user_info is None:
             return await ctx.send("No such user.")
@@ -2195,7 +2199,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # check for user
-        user_info = self.user_db_info(user.id)
+        user_info = user_db_info(user.id, conn)
         # set authority
         authority = authority.lower()
         if user_info is None:
@@ -2221,7 +2225,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull userinfo
-        user_info = self.user_db_info(user.id)
+        user_info = user_db_info(user.id, conn)
         # check for user
         if user_info is None:
             return await ctx.send("No such user registered.")
@@ -2236,7 +2240,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull userinfo
-        user_info = self.user_db_info(user.id)
+        user_info = user_db_info(user.id, conn)
         # check for user
         if user_info is None:
             return await ctx.send("No such user registered.")
