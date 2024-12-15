@@ -740,11 +740,13 @@ class AbandonConfirm(View):
                    fort_level = 0 WHERE id = $1;''', province_id)
         # color the province
         await map_color(province_id, "#808080", self.pool)
+        await interaction.response.edit_message(content=f"{self.prov_info['name']} (ID: {province_id}) "
+                                                        f"has been successfully abandoned.")
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
     async def abandon_province_cancelled(self, interaction: discord.Interaction, button: discord.ui.Button):
         # go back
-        await interaction.response.edit_message(content=None, embed=create_prov_embed(self.prov_info, self.pool),
+        await interaction.response.edit_message(content=None, embed=await create_prov_embed(self.prov_info, self.pool),
                                                 view=OwnedProvinceModifiation(self.author, self.prov_info,
                                                                               self.user_info, self.pool))
 
