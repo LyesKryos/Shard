@@ -686,6 +686,36 @@ class DevelopmentAppropriateView(View):
             child.disabled = True
         await interaction.response.edit_message(view=self)
 
+class AbandonConfirm(View)
+    def __init__(self, author, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
+        super().__init__(timeout=120)
+        self.prov_info = province_db
+        self.user_info = user_info
+        self.pool = pool
+        self.author = author
+
+    @discord.ui.button(label="Abandon Province", style=discord.ButtonStyle.danger)
+    async def abandon_province_confirmed(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # define everything
+        conn = self.pool
+        province_id = self.prov_info['id']
+        # abandon province
+        await conn.execute('''UPDATE cnc_users SET unrest = unrest + 1 WHERE user_id = $1;''',
+                           interaction.user.id)
+        await conn.execute('''UPDATE cnc_provinces SET owner_id = 0, occupier_id = 0, 
+                   development = floor((random()*9)+1), citizens = floor((random()*10000)+1000), structures = '{}',
+                   fort_level = 0 WHERE id = $1;''', province_id)
+        # color the province
+        await interaction.client.map_color(province_id, "#808080", release=True)
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
+    async def abandon_province_cancelled(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # go back
+        await interaction.response.edit_message(content=None, embed=create_prov_embed(self.prov_info, self.pool),
+                                                view=OwnedProvinceModifiation(self.author, self.prov_info,
+                                                                              self.user_info, self.pool))
+
+
 class OwnedProvinceModifiation(View):
     """Accepts the province record from a DB call."""
 
@@ -704,7 +734,7 @@ class OwnedProvinceModifiation(View):
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.author.id
 
-    @discord.ui.button(label="Construct", emoji="\U00002692", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="Construct", emoji="\U00002692", style=discord.ButtonStyle.blurple, row=1)
     async def construct(self, interaction: discord.Interaction, button: discord.Button):
         # define the dropdown view
         construct_view = ConstructView(self.author, self.prov_info, self.user_info, self.pool)
@@ -712,7 +742,7 @@ class OwnedProvinceModifiation(View):
         construct_view.interaction = interaction
         await interaction.response.edit_message(view=construct_view)
 
-    @discord.ui.button(label="Deconstruct", emoji="\U0001f3da", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="Deconstruct", emoji="\U0001f3da", style=discord.ButtonStyle.blurple, row=1)
     async def deconstruct(self, interaction: discord.Interaction, button: discord.Button):
         # if the province has no structures, disable the button and update the view
         if not self.prov_info['structures']:
@@ -724,7 +754,7 @@ class OwnedProvinceModifiation(View):
         deconstruct_view.interaction = interaction
         await interaction.response.edit_message(view=deconstruct_view)
 
-    @discord.ui.button(label="Boost Development", emoji="\U0001f4c8", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="Boost Development", emoji="\U0001f4c8", style=discord.ButtonStyle.blurple, row=2)
     async def boost_dev(self, interaction: discord.Interaction, button: discord.Button):
         # define everything
         conn = self.pool
@@ -738,7 +768,7 @@ class OwnedProvinceModifiation(View):
                                                         "spend using the buttons below.**",
                                                 view=dev_boost_view)
 
-    @discord.ui.button(label="Appropriate Development", emoji="\U0001f4c9", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="Appropriate Development", emoji="\U0001f4c9", style=discord.ButtonStyle.blurple, row=2)
     async def appropriate_dev(self, interaction: discord.Interaction, button: discord.Button):
         # define everything
         conn = self.pool
@@ -761,6 +791,27 @@ class OwnedProvinceModifiation(View):
         dev_appropriate_view.interaction = interaction
         await interaction.response.edit_message(view=dev_appropriate_view, content="**Select the type of authority to "
                                                                                    "gain using the buttons below.**")
+
+    @discord.ui.button(label="Abandon Province", emoji="\U0001f6ab", style=discord.ButtonStyle.danger, row=3)
+    async def abandon_province(self, interaction: discord.Interaction, button: discord.Button):
+        # define everything
+        conn = self.pool
+        user_info = self.user_info
+        prov_info = self.prov_info
+        # check if the user is at war. abandoning is not legal when at war
+        war_check = await conn.fetchrow('''SELECT * FROM cnc_wars WHERE $1 = ANY(members);''', user_info['name'])
+        if war_check is not None:
+            return await interaction.response.send_message("You cannot abandon provinces while at war.")
+        # check to make sure that the user will have > 1 province after
+        prov_owned_count = await conn.fetchrow('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1;''',
+                                               interaction.user.id)
+        if prov_owned_count['count'] - 1 < 1:
+            return await interaction.response.send_message("You cannot abandon your last province.")
+        # otherwise, carry on
+        abandon_province_view = AbandonConfirm(interaction.user, prov_info, user_info, conn)
+        abandon_province_view.interaction = interaction
+        await interaction.response.edit_message(view=abandon_province_view, embed=None, content="**Confirm below.**")
+
 
 
 class CNC(commands.Cog):
@@ -790,7 +841,7 @@ class CNC(commands.Cog):
         else:
             return True
 
-    async def map_color(self, province: int, hexcode, release: bool = False):
+    async def map_color(self, province: int, hexcode: str, release: bool = False):
         # establish connection
         conn = self.bot.pool
         # pull province information
@@ -1764,58 +1815,58 @@ class CNC(commands.Cog):
     #                                            f"The total development of {prov_info['name']} (ID: {province_id} "
     #                                            f"is now **{prov_info['development']+1}**.")
 
-    @cnc.command(name="appropriate_development", description="Appropriates province development to gain authority.")
-    @app_commands.describe(province_id="The ID of the province which you would like to appropriate development from.",
-                           authority_type="The type of authority to gain.")
-    @app_commands.guild_only()
-    async def dev_appropriate(self, interaction: discord.Interaction, province_id: int,
-                              authority_type: typing.Literal['Economic', 'Political', 'Military']):
-        # defer interaction
-        await interaction.response.defer(thinking=True)
-        # establish connection
-        conn = self.bot.pool
-        # pull userinfo
-        user_info = await user_db_info(interaction.user.id)
-        # check for registration
-        if user_info is None:
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
-        # pull province info
-        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
-        # check if province exists
-        if prov_info is None:
-            return await interaction.followup.send("That is not a valid province ID.")
-        # check if user owns province
-        if prov_info['owner_id'] != interaction.user.id:
-            return await interaction.followup.send("You do not own that province.")
-        # check if development is sufficient
-        if prov_info['development'] <=5 :
-            return await interaction.followup.send("That province does not have "
-                                                   "sufficient development to be appropriated.")
-        # ensure that buildings are still supported. each structure (minus 1) needs 10 development
-        structures = len(prov_info['structures']) - 1
-        # if there are any structures (more than 2)
-        if structures > 1:
-            # if the amount of development, after appropriation, is insufficient to support the structures, deny
-            if ((prov_info['development']-1)/10) / structures <= 1:
-                return await interaction.followup.send("Existing Structures in this province "
-                                                       "prevent development appropriation.")
-        # otherwise, carry on
-        development = prov_info['development']
-        auth_return = int(development // 3.5)
-        # execute
-        await conn.execute('''UPDATE cnc_provinces SET development = development - 1 WHERE id = $1;''', province_id)
-        # if the authority type is economic
-        if authority_type == 'Economic':
-            await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth + $1 WHERE user_id = $2;''',
-                               auth_return, interaction.user.id)
-        elif authority_type == 'Political':
-            await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth + $1 WHERE user_id = $2;''',
-                               auth_return, interaction.user.id)
-        elif authority_type == 'Military':
-            await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth + $1 WHERE user_id = $2;''',
-                               auth_return, interaction.user.id)
-        return await interaction.followup.send(f"{auth_return} {authority_type} authority appropriated from the "
-                                               f"development of {prov_info['name']} (ID: {province_id}).")
+    # @cnc.command(name="appropriate_development", description="Appropriates province development to gain authority.")
+    # @app_commands.describe(province_id="The ID of the province which you would like to appropriate development from.",
+    #                        authority_type="The type of authority to gain.")
+    # @app_commands.guild_only()
+    # async def dev_appropriate(self, interaction: discord.Interaction, province_id: int,
+    #                           authority_type: typing.Literal['Economic', 'Political', 'Military']):
+    #     # defer interaction
+    #     await interaction.response.defer(thinking=True)
+    #     # establish connection
+    #     conn = self.bot.pool
+    #     # pull userinfo
+    #     user_info = await user_db_info(interaction.user.id)
+    #     # check for registration
+    #     if user_info is None:
+    #         return await interaction.followup.send("You are not a registered member of the CNC system.")
+    #     # pull province info
+    #     prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+    #     # check if province exists
+    #     if prov_info is None:
+    #         return await interaction.followup.send("That is not a valid province ID.")
+    #     # check if user owns province
+    #     if prov_info['owner_id'] != interaction.user.id:
+    #         return await interaction.followup.send("You do not own that province.")
+    #     # check if development is sufficient
+    #     if prov_info['development'] <=5 :
+    #         return await interaction.followup.send("That province does not have "
+    #                                                "sufficient development to be appropriated.")
+    #     # ensure that buildings are still supported. each structure (minus 1) needs 10 development
+    #     structures = len(prov_info['structures']) - 1
+    #     # if there are any structures (more than 2)
+    #     if structures > 1:
+    #         # if the amount of development, after appropriation, is insufficient to support the structures, deny
+    #         if ((prov_info['development']-1)/10) / structures <= 1:
+    #             return await interaction.followup.send("Existing Structures in this province "
+    #                                                    "prevent development appropriation.")
+    #     # otherwise, carry on
+    #     development = prov_info['development']
+    #     auth_return = int(development // 3.5)
+    #     # execute
+    #     await conn.execute('''UPDATE cnc_provinces SET development = development - 1 WHERE id = $1;''', province_id)
+    #     # if the authority type is economic
+    #     if authority_type == 'Economic':
+    #         await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth + $1 WHERE user_id = $2;''',
+    #                            auth_return, interaction.user.id)
+    #     elif authority_type == 'Political':
+    #         await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth + $1 WHERE user_id = $2;''',
+    #                            auth_return, interaction.user.id)
+    #     elif authority_type == 'Military':
+    #         await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth + $1 WHERE user_id = $2;''',
+    #                            auth_return, interaction.user.id)
+    #     return await interaction.followup.send(f"{auth_return} {authority_type} authority appropriated from the "
+    #                                            f"development of {prov_info['name']} (ID: {province_id}).")
 
     @cnc.command(name="colonize", description="Claims and colonizes an unowned province.")
     @app_commands.describe(province_id="The ID of the province you would like to colonize.")
