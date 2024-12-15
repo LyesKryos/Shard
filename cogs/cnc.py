@@ -706,7 +706,7 @@ class AbandonConfirm(View):
                    development = floor((random()*9)+1), citizens = floor((random()*10000)+1000), structures = '{}',
                    fort_level = 0 WHERE id = $1;''', province_id)
         # color the province
-        await interaction.client.map_color(province_id, "#808080", release=True)
+        await interaction.client.bot.map_color(province_id, "#808080", release=True)
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
     async def abandon_province_cancelled(self, interaction: discord.Interaction, button: discord.ui.Button):
