@@ -1151,7 +1151,7 @@ class CNC(commands.Cog):
             if user_info is None:
                 return await interaction.followup.send(f"`{nation.title()}` not found.", ephemeral=True)
         elif user is not None:
-            user_info = await user_db_info(user.id, conn)
+            user_info = await user_db_info(user.id, self.bot.pool)
             if user_info is None:
                 return await interaction.followup.send(f"That user is not a registered player of the CNC system.",
                                                        ephemeral=True)
@@ -1234,7 +1234,7 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # fetch user information
         user_id = interaction.user.id
-        user_info = await user_db_info(user_id)
+        user_info = await user_db_info(user_id, self.bot.pool)
         # if the user does not exist
         if user_info is None:
             # return error message
@@ -1313,7 +1313,7 @@ class CNC(commands.Cog):
         await interaction.response.defer(thinking=True, ephemeral=True)
         # pull user information
         user_id = interaction.user.id
-        user_info = await user_db_info(user_id)
+        user_info = await user_db_info(user_id, self.bot.pool)
         # check if the user exists
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -1580,7 +1580,7 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # check if the user exists
         user_id = interaction.user.id
-        user_info = await user_db_info(user_id)
+        user_info = await user_db_info(user_id, self.bot.pool)
         # if the user doesn't exist
         if user_info is None:
             # return denial
@@ -1606,7 +1606,7 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # check if the user exist
         user_id = interaction.user.id
-        user_info = await user_db_info(user_id)
+        user_info = await user_db_info(user_id, self.bot.pool)
         # if the user doesn't exist
         if user_info is None:
             # return denial
