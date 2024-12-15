@@ -490,7 +490,7 @@ class DevelopmentBoostView(View):
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
                                                  view=self.prov_owned_view,
-                                                embed=create_prov_embed(prov_info, conn))
+                                                embed=await create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"Successfully boosted Development at a cost of "
                                                f"{boost_cost} Economic authority! "
                                                f"The total development of {prov_info['name']} (ID: {province_id}) "
@@ -529,7 +529,7 @@ class DevelopmentBoostView(View):
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
                                                 view=self.prov_owned_view,
-                                                embed=create_prov_embed(prov_info, conn))
+                                                embed= await create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"Successfully boosted Development at a cost of "
                                                f"{boost_cost} Political authority! "
                                                f"The total development of {prov_info['name']} (ID: {province_id}) "
@@ -568,7 +568,7 @@ class DevelopmentBoostView(View):
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
                                                 view=self.prov_owned_view,
-                                                embed=create_prov_embed(prov_info, conn))
+                                                embed=await create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"Successfully boosted Development at a cost of "
                                                f"{boost_cost} Military authority! "
                                                f"The total development of {prov_info['name']} (ID: {province_id}) "
@@ -625,7 +625,8 @@ class DevelopmentAppropriateView(View):
                            auth_return, user_info['user_id'])
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
-                                                 view=self.prov_owned_view, embed=create_prov_embed(prov_info, conn))
+                                                 view=self.prov_owned_view,
+                                                embed=await create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"{auth_return} Economic authority appropriated from the "
                                                f"development of {prov_info['name']} (ID: {province_id}).")
 
@@ -646,7 +647,7 @@ class DevelopmentAppropriateView(View):
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
                                                 view=self.prov_owned_view,
-                                                embed=create_prov_embed(prov_info, conn))
+                                                embed=await create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"{auth_return} Political authority appropriated from the "
                                                f"development of {prov_info['name']} (ID: {province_id}).")
 
@@ -667,7 +668,7 @@ class DevelopmentAppropriateView(View):
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
                                                 view=self.prov_owned_view,
-                                                embed=create_prov_embed(prov_info, conn))
+                                                embed=await create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"{auth_return} Military authority appropriated from the "
                                                f"development of {prov_info['name']} (ID: {province_id}).")
 
