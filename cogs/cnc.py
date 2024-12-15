@@ -215,6 +215,8 @@ class MapButtons(View):
         # update the view so all the buttons are disabled
         await interaction.response.edit_message(view=self)
 
+# === Province Views ===
+
 class ConstructDropdown(discord.ui.Select):
 
     def __init__(self, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
@@ -750,9 +752,7 @@ class AbandonConfirm(View):
                                                 view=OwnedProvinceModifiation(self.author, self.prov_info,
                                                                               self.user_info, self.pool))
 
-
 class OwnedProvinceModifiation(View):
-    """Accepts the province record from a DB call."""
 
     def __init__(self, author, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
         super().__init__(timeout=120)
@@ -846,6 +846,84 @@ class OwnedProvinceModifiation(View):
         abandon_province_view = AbandonConfirm(interaction.user, prov_info, user_info, conn)
         abandon_province_view.interaction = interaction
         await interaction.response.edit_message(view=abandon_province_view, embed=None, content="**Confirm below.**")
+
+
+class UnownedProvince(View):
+
+    def __init__(self, author, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
+        super().__init__(timeout=120)
+        self.prov_info = province_db
+        self.user_info = user_info
+        self.pool = pool
+        self.author = author
+
+    @discord.ui.button(label="Colonize", style=discord.ButtonStyle.blurple, emoji="\U0001f3d5")
+    async def colonize(self, interaction: discord.Interaction, button: discord.Button):
+        # define everything
+        conn = self.pool
+        user_info = self.user_info
+        prov_info = self.prov_info
+        province_id = prov_info['id']
+        user_id = user_info['id']
+        # define OG view
+        prov_owned_view = OwnedProvinceModifiation(self.author, prov_info,
+                                                        user_info, conn)
+        # ensure the user has researched the "Colonialism" tech
+        if "Colonialism" not in user_info['tech']:
+            return await interaction.followup.send("Colonization requires the Colonialism tech to be researched.")
+        # check if the province is owned
+        if prov_info['owner_id'] != 0:
+            return await interaction.response.send_message("You cannot colonize a province owned by any other nation.")
+        # check if the user has more than 15 provinces
+        prov_owned_count = await conn.fetchrow('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1;''',
+                                              user_id)
+        if prov_owned_count['count'] < 15:
+            return await interaction.response.send_message("You cannot colonize until you own at least 15 provinces.")
+        # check if the province is on the coast or bordering a province owned by the nation
+        bordering_check = await conn.fetch('''SELECT * FROM cnc_provinces 
+        WHERE $1 = ANY(bordering) and owner_id = $2;''', province_id, user_id)
+        if (not bordering_check) and (prov_info['coast'] is False):
+            return await interaction.response.send_message("You cannot cannot colonize a province that you do not "
+                                                           "border or that is not a costal province.")
+        # calculate cost
+        cost = 1
+        # cost of colonization = (5 + provinces count) - 25, minimum 1, maximum 10
+        cost += (5 + prov_owned_count['count']) - 25
+        # if the user has the "Manifest Destiny" tech, reduce cost by 2
+        if "Manifest Destiny" in user_info['tech']:
+            cost -= 2
+        # enforce minimum
+        if cost < 1:
+            cost = 1
+        # enforce maximum
+        if cost > 10:
+            cost = 10
+        # if the nation is overextended, increase cost by 50%
+        if prov_owned_count['count'] > user_info['overextend_limit']:
+            cost *= 1.5
+        # if the nation is a puppet, increase cost by 15%
+        if user_info['overlord'] is not None:
+            cost *= 1.15
+        # check for enough authority
+        if (user_info['econ_auth'] < cost) and (user_info['mil_auth'] < cost) and (user_info['pol_auth'] < cost):
+            return await interaction.followup.send("You do not have enough authority to colonize that province. "
+                                                   f"The cost of colonizing a province is currently {cost} authority.")
+        # define dev
+        dev = 3
+        # if the user has Predatory Ethnology, add 2 to dev
+        if 'Predatory Ethnology' in user_info['tech']:
+            dev += 2
+        # if all the checks pass, execute the operations
+        await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $1, mil_auth = mil_auth - $1, 
+        pol_auth = pol_auth - $1 WHERE user_id = $2;''', cost, interaction.user.id)
+        await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1, development = $3 
+        WHERE id = $2;''', interaction.user.id, province_id, dev)
+        await map_color(province_id, user_info['color'])
+        await interaction.response.edit_message(content=None,
+                                                view=prov_owned_view,
+                                                embed=await create_prov_embed(prov_info, conn))
+        return await interaction.followup.send(f"{prov_info['name']} (ID: {province_id}) "
+                                                       f"has been successfully colonized.")
 
 
 
@@ -1928,52 +2006,52 @@ class CNC(commands.Cog):
         pol_auth = pol_auth - $1 WHERE user_id = $2;''', cost, interaction.user.id)
         await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1, development = $3 
         WHERE id = $2;''', interaction.user.id, province_id, dev)
-        await self.map_color(province_id, user_info['color'])
+        await map_color(province_id, user_info['color'])
         return await interaction.followup.send(f"{prov_info['name']} (ID: {province_id}) "
                                                f"has been successfully colonized.")
 
-    @cnc.command(name="abandon_province", description="Revokes a nation's claim and ownership of a province.")
-    @app_commands.describe(province_id="The ID of the province you would like to abandon.")
-    @app_commands.guild_only()
-    async def abandon_province(self, interaction: discord.Interaction, province_id: int):
-        # defer interaction
-        await interaction.response.defer(thinking=True)
-        # establish connection
-        conn = self.bot.pool
-        # pull userinfo
-        user_info = await user_db_info(interaction.user.id)
-        # check for registration
-        if user_info is None:
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
-        # pull province info
-        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
-        # check if province exists
-        if prov_info is None:
-            return await interaction.followup.send("That is not a valid province ID.")
-        # check if user owns province
-        if prov_info['owner_id'] != interaction.user.id:
-            return await interaction.followup.send("You do not own that province.")
-        # check if the user is at war. abandoning is not legal when at war
-        war_check = await conn.fetchrow('''SELECT * FROM cnc_wars WHERE $1 = ANY(members);''', user_info['name'])
-        if war_check is not None:
-            return await interaction.followup.send("You cannot abandon provinces while at war.")
-        # check to make sure that the user will have > 1 province after
-        prov_owned_count = await conn.fetchrow('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1;''',
-                                               interaction.user.id)
-        if prov_owned_count['count'] - 1 < 1:
-            return await interaction.followup.send("You cannot abandon your last province.")
-        # release the province
-        try:
-            await conn.execute('''UPDATE cnc_users SET unrest = unrest + 1 WHERE user_id = $1;''', interaction.user.id)
-            await conn.execute('''UPDATE cnc_provinces SET owner_id = 0, occupier_id = 0, 
-            development = floor((random()*9)+1), citizens = floor((random()*10000)+1000), structures = '{}',
-            fort_level = 0 WHERE id = $1;''', province_id)
-            # color the province
-            await self.map_color(province_id, "#808080")
-        except asyncpg.PostgresError as e:
-            raise e
-        return await interaction.followup.send(f"{user_info['name']} has abandoned "
-                                               f"{prov_info['name']} (ID: {province_id}).")
+    # @cnc.command(name="abandon_province", description="Revokes a nation's claim and ownership of a province.")
+    # @app_commands.describe(province_id="The ID of the province you would like to abandon.")
+    # @app_commands.guild_only()
+    # async def abandon_province(self, interaction: discord.Interaction, province_id: int):
+    #     # defer interaction
+    #     await interaction.response.defer(thinking=True)
+    #     # establish connection
+    #     conn = self.bot.pool
+    #     # pull userinfo
+    #     user_info = await user_db_info(interaction.user.id)
+    #     # check for registration
+    #     if user_info is None:
+    #         return await interaction.followup.send("You are not a registered member of the CNC system.")
+    #     # pull province info
+    #     prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province_id)
+    #     # check if province exists
+    #     if prov_info is None:
+    #         return await interaction.followup.send("That is not a valid province ID.")
+    #     # check if user owns province
+    #     if prov_info['owner_id'] != interaction.user.id:
+    #         return await interaction.followup.send("You do not own that province.")
+    #     # check if the user is at war. abandoning is not legal when at war
+    #     war_check = await conn.fetchrow('''SELECT * FROM cnc_wars WHERE $1 = ANY(members);''', user_info['name'])
+    #     if war_check is not None:
+    #         return await interaction.followup.send("You cannot abandon provinces while at war.")
+    #     # check to make sure that the user will have > 1 province after
+    #     prov_owned_count = await conn.fetchrow('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1;''',
+    #                                            interaction.user.id)
+    #     if prov_owned_count['count'] - 1 < 1:
+    #         return await interaction.followup.send("You cannot abandon your last province.")
+    #     # release the province
+    #     try:
+    #         await conn.execute('''UPDATE cnc_users SET unrest = unrest + 1 WHERE user_id = $1;''', interaction.user.id)
+    #         await conn.execute('''UPDATE cnc_provinces SET owner_id = 0, occupier_id = 0,
+    #         development = floor((random()*9)+1), citizens = floor((random()*10000)+1000), structures = '{}',
+    #         fort_level = 0 WHERE id = $1;''', province_id)
+    #         # color the province
+    #         await self.map_color(province_id, "#808080")
+    #     except asyncpg.PostgresError as e:
+    #         raise e
+    #     return await interaction.followup.send(f"{user_info['name']} has abandoned "
+    #                                            f"{prov_info['name']} (ID: {province_id}).")
 
     # === Government Commands ===
 
