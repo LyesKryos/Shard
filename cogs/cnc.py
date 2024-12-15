@@ -1369,11 +1369,12 @@ class CNC(commands.Cog):
 
         # if the user owns the province, open the ownership view
         if prov_info['owner_id'] == interaction.user.id:
-            user_info = await user_db_info(interaction.user.id)
+            user_info = await user_db_info(interaction.user.id, conn)
             author = interaction.user
             owned_province_view = OwnedProvinceModifiation(author, prov_info, user_info, conn)
             owned_province_view.interaction = interaction
-            await interaction.edit_original_response(view=owned_province_view, embed=prov_embed)
+            await interaction.edit_original_response(view=owned_province_view,
+                                                     embed= await create_prov_embed(prov_info, conn))
 
     @cnc.command(name="army_view", description="Displays information about a specific army.")
     @app_commands.describe(army_id="The ID of the army")
