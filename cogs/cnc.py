@@ -96,6 +96,39 @@ async def terrain_name(terrain_id: int, conn: asyncpg.Pool) -> str:
         # return name string
         return str(terrain_name['name'])
 
+async def map_color(province: int, hexcode: str, conn: asyncpg.Pool):
+    map_directory = r"/root/Shard/CNC/Map Files/Maps/"
+    province_directory = r"/root/Shard/CNC/Map Files/Province Layers/"
+    # pull province information
+    province_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province)
+    province_cord = province_info['cord']
+    # obtain the coordinate information
+    province_cord = ((int(province_cord[0])), (int(province_cord[1])))
+    # get color
+    try:
+        color = ImageColor.getrgb(hexcode)
+    except ValueError:
+        return ValueError("Hex code issue")
+    # open the map and the province images
+    map = Image.open(fr"{map_directory}wargame_provinces.png").convert("RGBA")
+    prov = Image.open(fr"{province_directory}{province}.png").convert("RGBA")
+    # obtain size and coordinate information
+    width = prov.size[0]
+    height = prov.size[1]
+    cord = (province_cord[0], province_cord[1])
+    # for every pixel, change the color to the owners
+    for x in range(0, width):
+        for y in range(0, height):
+            data = prov.getpixel((x, y))
+            if data != color:
+                if data != (0, 0, 0, 0):
+                    if data != (255, 255, 255, 0):
+                        prov.putpixel((x, y), color)
+    # convert, paste, and save the image
+    prov = prov.convert("RGBA")
+    map.paste(prov, box=cord, mask=prov)
+    map.save(fr"{map_directory}wargame_provinces.png")
+
 class MapButtons(View):
 
     def __init__(self, message: discord.InteractionMessage, author):
@@ -706,7 +739,7 @@ class AbandonConfirm(View):
                    development = floor((random()*9)+1), citizens = floor((random()*10000)+1000), structures = '{}',
                    fort_level = 0 WHERE id = $1;''', province_id)
         # color the province
-        await interaction.client.bot.map_color(province_id, "#808080", release=True)
+        await map_color(province_id, "#808080", self.pool)
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
     async def abandon_province_cancelled(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -840,49 +873,6 @@ class CNC(commands.Cog):
         # otherwise, return true
         else:
             return True
-
-    async def map_color(self, province: int, hexcode: str, release: bool = False):
-        # establish connection
-        conn = self.bot.pool
-        # pull province information
-        province_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', province)
-        province_cord = province_info['cord']
-        # obtain the coordinate information
-        province_cord = ((int(province_cord[0])), (int(province_cord[1])))
-        # get color
-        try:
-            color = ImageColor.getrgb(hexcode)
-        except ValueError:
-            return ValueError("Hex code issue")
-        # open the map and the province images
-        map = Image.open(fr"{self.map_directory}wargame_provinces.png").convert("RGBA")
-        prov = Image.open(fr"{self.province_directory}{province}.png").convert("RGBA")
-        # obtain size and coordinate information
-        width = prov.size[0]
-        height = prov.size[1]
-        cord = (province_cord[0], province_cord[1])
-        # for every pixel, change the color to the owners
-        for x in range(0, width):
-            for y in range(0, height):
-                data = prov.getpixel((x, y))
-                if data != color:
-                    if data != (0, 0, 0, 0):
-                        if data != (255, 255, 255, 0):
-                            prov.putpixel((x, y), color)
-        # if this is a release, change every color to neutral grey
-        if release is True:
-            color = ImageColor.getrgb("#808080")
-            for x in range(0, prov.size[0]):
-                for y in range(0, prov.size[1]):
-                    data = prov.getpixel((x, y))
-                    if data != color:
-                        if data != (0, 0, 0, 0):
-                            if data != (255, 255, 255, 0):
-                                prov.putpixel((x, y), color)
-        # convert, paste, and save the image
-        prov = prov.convert("RGBA")
-        map.paste(prov, box=cord, mask=prov)
-        map.save(fr"{self.map_directory}wargame_provinces.png")
 
     async def occupy_color(self, province: int, occupy_color: str, owner_color: str):
         # establish connection
