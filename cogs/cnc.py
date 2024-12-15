@@ -686,7 +686,7 @@ class DevelopmentAppropriateView(View):
             child.disabled = True
         await interaction.response.edit_message(view=self)
 
-class AbandonConfirm(View)
+class AbandonConfirm(View):
     def __init__(self, author, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
         super().__init__(timeout=120)
         self.prov_info = province_db
