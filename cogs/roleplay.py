@@ -260,6 +260,7 @@ class Roleplay(commands.Cog):
             return await interaction.followup.send(f"{party_name.name} has been removed from the Grand Senate.")
 
     @senate.command(name="alter_leader", description="Alter the party leader for a given party.")
+    @app_commands.checks.has_any_role(674260151506698251, 1110374275740868628)
     @app_commands.guild_only()
     @app_commands.describe(party_name="The name of the party that needs a new leader.",
                            new_leader="The player that is the new leader of the party.")
