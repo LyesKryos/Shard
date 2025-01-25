@@ -37,23 +37,10 @@ class Games(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def minecraft(self, ctx):
-        # establish pool
-        conn = self.bot.pool
-        # check for an existing entry
-        user_info = await conn.fetchrow('''SELECT * FROM games WHERE game = 'Minecraft' AND user_id = $1;''',
-                                        ctx.author.id)
-        # fetch game information
-        minecraft_info = await conn.fetchrow('''SELECT * FROM games_info WHERE game_name = 'Minecraft';''')
-        if user_info is not None:
-            # if the user already exists and is not banned, send them the port and password
-            if user_info['banned'] is False:
-                return await ctx.author.send(f"Server Name: {minecraft_info['server_name']}\n"
-                                             f"Server Port: {minecraft_info['server_port']}\n"
-                                             f"Server Rules: https://www.nationstates.net/page=dispatch/id=1840173\n\n"
-                                             f"**Remember that sharing server access information with others is against "
-                                             f"the rules and can lead to a permanent ban.**")
-            elif user_info['banned'] is True:
-                return await ctx.send("You are banned from playing Minecraft in the Thegye server.")
+        # send information
+        return await ctx.author.send(f"Server IP: `71.206.132.216`\n"
+                                     f"Server port: `:25565`\n"
+                                     f"Server Rules: https://www.nationstates.net/page=dispatch/id=1840173")
 
 async def setup(bot: Shard):
     # define the cog and add the cog
