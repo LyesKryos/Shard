@@ -37,6 +37,7 @@ class Games(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def minecraft(self, ctx):
+        await ctx.send("Sending you a DM!")
         # send information
         return await ctx.author.send(f"Server IP: `71.206.132.216`\n"
                                      f"Server port: `:25565`\n"
