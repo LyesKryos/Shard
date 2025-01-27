@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing colonize">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding proper timeout for UnowedProvince">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -436,7 +436,7 @@
       <workItem from="1734290835625" duration="7349000" />
       <workItem from="1734459001866" duration="1337000" />
       <workItem from="1735773453629" duration="631000" />
-      <workItem from="1737944586496" duration="313000" />
+      <workItem from="1737944586496" duration="640000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -781,7 +781,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1182" />
+    <option name="localTasksCounter" value="1183" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -799,7 +799,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Altering construction select menu callback" />
     <MESSAGE value="Adding back and cancel buttons to the construction view" />
     <MESSAGE value="Fixing back and cancel buttons to the construction view" />
     <MESSAGE value="Fixing construction callback" />
@@ -824,7 +823,8 @@
     <MESSAGE value="Adding colonize stuff" />
     <MESSAGE value="Adding role restrictions for alter_leader" />
     <MESSAGE value="Fixing colonize" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing colonize" />
+    <MESSAGE value="Adding proper timeout for UnowedProvince" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding proper timeout for UnowedProvince" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$resources_updating_cnc.coverage" NAME="resources_updating_cnc Coverage Results" MODIFIED="1661216424601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

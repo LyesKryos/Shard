@@ -934,7 +934,6 @@ class UnownedProvince(View):
                                                        f"has been successfully colonized.")
 
 
-
 class CNC(commands.Cog):
 
     def __init__(self, bot: Shard):
@@ -1508,7 +1507,7 @@ class CNC(commands.Cog):
             await interaction.edit_original_response(view=owned_province_view,
                                                      embed= await create_prov_embed(prov_info, conn))
 
-        # if the user does not own the province, and it is unowned, create the embed
+        # if the user does not own the province, and it is unowned, open the unowned view
         elif prov_info['owner_id'] == 0:
             # if the user is a player, check if they have the colonialism tech
             user_info = await user_db_info(interaction.user.id, conn)
@@ -1520,6 +1519,11 @@ class CNC(commands.Cog):
                                                              embed=await create_prov_embed(prov_info, conn))
             else:
                 return await interaction.edit_original_response(embed=await create_prov_embed(prov_info, conn))
+
+        # if the user does not own the province, and it is owned by another player, send the embed
+        elif prov_info['owner_id'] != 0:
+            await interaction.edit_original_response(embed=await create_prov_embed(prov_info, conn))
+
 
 
     @cnc.command(name="army_view", description="Displays information about a specific army.")
