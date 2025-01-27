@@ -867,7 +867,7 @@ class UnownedProvince(View):
         user_info = self.user_info
         prov_info = self.prov_info
         province_id = prov_info['id']
-        user_id = user_info['id']
+        user_id = user_info['user_id']
         # define OG view
         prov_owned_view = OwnedProvinceModifiation(self.author, prov_info,
                                                         user_info, conn)

@@ -293,8 +293,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.scratch_1" />
       <item itemvalue="Python.cnc" />
+      <item itemvalue="Python.scratch_1" />
       <item itemvalue="Python.scratch" />
       <item itemvalue="Python.verification" />
     </list>
