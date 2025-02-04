@@ -336,27 +336,29 @@ class Roleplay(commands.Cog):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # define the rates
+        USD_PPP = 2.2
+        GBP_PPP = .45
         Thaler = 1
-        PPP = 2.2
-        USD1880_out = Thaler * .2 * PPP
-        USD1880_in = (Thaler / .2) / PPP
-        GBP1880_out = Thaler * .2 * PPP
-        GBP1880_in = (Thaler / .2) / PPP
-        USD2024_out = USD1880_out * 30.62
-        USD2024_in = USD1880_in * .03
-        GBP2024_out = GBP1880_out * 150.76
-        GBP2024_in = GBP1880_in * .01
+        USD1885_out = Thaler * .5 * USD_PPP
+        USD1885_in = (Thaler / .5) / USD_PPP
+        GBP1885_out = Thaler * .11 * GBP_PPP
+        GBP1885_in = (Thaler / .11) / GBP_PPP
+        USD2025_out = USD1885_out * 32.53
+        USD2025_in = USD1885_in * .03
+        GBP2025_out = GBP1885_out * 164.21
+        GBP2025_in = GBP1885_in * .006
+
         # select the option for from_currency
         if from_currency == "Thaler":
             from_currency_calc = Thaler
         elif from_currency == "1880 USD":
-            from_currency_calc = USD1880_in
+            from_currency_calc = USD1885_in
         elif from_currency == "1880 GBP":
-            from_currency_calc = GBP1880_in
+            from_currency_calc = GBP1885_in
         elif from_currency == "2024 USD":
-            from_currency_calc = USD2024_in
+            from_currency_calc = USD2025_in
         elif from_currency == "2024 GBP":
-            from_currency_calc = GBP2024_in
+            from_currency_calc = GBP2025_in
         else:
             symbol = None
             return await interaction.followup.send("Please select a listed option.")
@@ -365,16 +367,16 @@ class Roleplay(commands.Cog):
             to_currency_calc = Thaler
             symbol = "\u20B8"
         elif to_currency == "1880 USD":
-            to_currency_calc = USD1880_out
+            to_currency_calc = USD1885_out
             symbol = "\u0024"
         elif to_currency == "1880 GBP":
-            to_currency_calc = GBP1880_out
+            to_currency_calc = GBP1885_out
             symbol = "\u00A3"
         elif to_currency == "2024 USD":
-            to_currency_calc = USD2024_out
+            to_currency_calc = USD2025_out
             symbol = "\u0024"
         elif to_currency == "2024 GBP":
-            to_currency_calc = GBP2024_out
+            to_currency_calc = GBP2025_out
             symbol = "\u00A3"
         else:
             return await interaction.followup.send("Please select a listed option.")
