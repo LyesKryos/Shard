@@ -356,13 +356,13 @@ class Roleplay(commands.Cog):
         # select the option for from_currency
         if from_currency == "Thaler":
             from_currency_calc = Thaler
-        elif from_currency == "1880 USD":
+        elif from_currency == "1885 USD":
             from_currency_calc = USD1885_in
-        elif from_currency == "1880 GBP":
+        elif from_currency == "1885 GBP":
             from_currency_calc = GBP1885_in
-        elif from_currency == "2024 USD":
+        elif from_currency == "2025 USD":
             from_currency_calc = USD2025_in
-        elif from_currency == "2024 GBP":
+        elif from_currency == "2025 GBP":
             from_currency_calc = GBP2025_in
         else:
             symbol = None
@@ -371,16 +371,16 @@ class Roleplay(commands.Cog):
         if to_currency == "Thaler":
             to_currency_calc = Thaler
             symbol = "\u20B8"
-        elif to_currency == "1880 USD":
+        elif to_currency == "1885 USD":
             to_currency_calc = USD1885_out
             symbol = "\u0024"
-        elif to_currency == "1880 GBP":
+        elif to_currency == "1885 GBP":
             to_currency_calc = GBP1885_out
             symbol = "\u00A3"
-        elif to_currency == "2024 USD":
+        elif to_currency == "2025 USD":
             to_currency_calc = USD2025_out
             symbol = "\u0024"
-        elif to_currency == "2024 GBP":
+        elif to_currency == "2025 GBP":
             to_currency_calc = GBP2025_out
             symbol = "\u00A3"
         else:
