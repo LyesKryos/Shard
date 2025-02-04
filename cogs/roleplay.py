@@ -332,17 +332,22 @@ class Roleplay(commands.Cog):
     @app_commands.guild_only()
     async def convert_thaler(self, interaction: discord.Interaction, amount_in: float, from_currency:
     typing.Literal ['Thaler', '1885 USD', '1885 GBP', '2025 USD', '2025 GBP'], to_currency:
-    typing.Literal ['Thaler', '1885 USD', '1885 GBP', '2025 USD', '2025 GBP']):
+    typing.Literal ['Thaler', '1885 USD', '1885 GBP', '2025 USD', '2025 GBP'], consider_ppp: bool = False):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # define the rates
         USD_PPP = 2.2
         GBP_PPP = .45
         Thaler = 1
-        USD1885_out = Thaler * .5 * USD_PPP
-        USD1885_in = (Thaler / .5) / USD_PPP
-        GBP1885_out = Thaler * .11 * GBP_PPP
-        GBP1885_in = (Thaler / .11) / GBP_PPP
+        USD1885_out = Thaler * .5
+        USD1885_in = (Thaler / .5)
+        GBP1885_out = Thaler * .11
+        GBP1885_in = (Thaler / .11)
+        if consider_ppp:
+            USD1885_out *= USD_PPP
+            USD1885_in /= USD_PPP
+            GBP1885_out *= GBP_PPP
+            GBP1885_in /= GBP_PPP
         USD2025_out = USD1885_out * 32.53
         USD2025_in = USD1885_in * .03
         GBP2025_out = GBP1885_out * 164.21
