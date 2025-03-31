@@ -500,7 +500,7 @@ class DevelopmentBoostView(View):
         user_info = self.user_info
         conn = self.pool
         province_id = prov_info['id']
-        structures = list(prov_info['structures'])
+        structures = [] if prov_info['structures'] is None else list(prov_info['structures'])
         # calculate dev boosting cost. base cost = current development * .75
         boost_cost = prov_info['development'] * .75
         # add modifiers from govt type
@@ -540,7 +540,7 @@ class DevelopmentBoostView(View):
         user_info = self.user_info
         conn = self.pool
         province_id = prov_info['id']
-        structures = list(prov_info['structures'])
+        structures = [] if prov_info['structures'] is None else list(prov_info['structures'])
         # calculate dev boosting cost. base cost = current development * .75
         boost_cost = prov_info['development'] * .75
         # add modifiers from govt type
@@ -580,7 +580,7 @@ class DevelopmentBoostView(View):
         user_info = self.user_info
         conn = self.pool
         province_id = prov_info['id']
-        structures = list(prov_info['structures'])
+        structures = [] if prov_info['structures'] is None else list(prov_info['structures'])
         # calculate dev boosting cost. base cost = current development * .75
         boost_cost = prov_info['development'] * .75
         # add modifiers from govt type
