@@ -495,11 +495,12 @@ class DevelopmentBoostView(View):
 
     @discord.ui.button(label="Economic", style=discord.ButtonStyle.blurple)
     async def economic(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # define stuff
+        # define province variables
         prov_info = self.province_db
         user_info = self.user_info
         conn = self.pool
         province_id = prov_info['id']
+        structures = list(prov_info['structures'])
         # calculate dev boosting cost. base cost = current development * .75
         boost_cost = prov_info['development'] * .75
         # add modifiers from govt type
@@ -508,7 +509,7 @@ class DevelopmentBoostView(View):
         govt_mod = govt_info['dev_cost']
         boost_cost *= govt_mod
         # add modifiers from structures
-        if "Lumber Mill" in prov_info['structures']:
+        if "Lumber Mill" in structures:
             boost_cost *= .85
         # round boost cost up
         boost_cost = math.ceil(boost_cost)
@@ -534,11 +535,12 @@ class DevelopmentBoostView(View):
 
     @discord.ui.button(label="Political", style=discord.ButtonStyle.blurple)
     async def political(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # define stuff
+        # define province variables
         prov_info = self.province_db
         user_info = self.user_info
         conn = self.pool
         province_id = prov_info['id']
+        structures = list(prov_info['structures'])
         # calculate dev boosting cost. base cost = current development * .75
         boost_cost = prov_info['development'] * .75
         # add modifiers from govt type
@@ -547,7 +549,7 @@ class DevelopmentBoostView(View):
         govt_mod = govt_info['dev_cost']
         boost_cost *= govt_mod
         # add modifiers from structures
-        if "Lumber Mill" in prov_info['structures']:
+        if "Lumber Mill" in structures:
             boost_cost *= .85
         # round boost cost up
         boost_cost = math.ceil(boost_cost)
@@ -573,11 +575,12 @@ class DevelopmentBoostView(View):
 
     @discord.ui.button(label="Military", style=discord.ButtonStyle.blurple)
     async def military(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # define stuff
+        # define province variables
         prov_info = self.province_db
         user_info = self.user_info
         conn = self.pool
         province_id = prov_info['id']
+        structures = list(prov_info['structures'])
         # calculate dev boosting cost. base cost = current development * .75
         boost_cost = prov_info['development'] * .75
         # add modifiers from govt type
@@ -586,7 +589,7 @@ class DevelopmentBoostView(View):
         govt_mod = govt_info['dev_cost']
         boost_cost *= govt_mod
         # add modifiers from structures
-        if "Lumber Mill" in prov_info['structures']:
+        if "Lumber Mill" in structures:
             boost_cost *= .85
         # round boost cost up
         boost_cost = math.ceil(boost_cost)
@@ -1524,8 +1527,6 @@ class CNC(commands.Cog):
         elif prov_info['owner_id'] != 0:
             await interaction.edit_original_response(embed=await create_prov_embed(prov_info, conn))
 
-
-
     @cnc.command(name="army_view", description="Displays information about a specific army.")
     @app_commands.describe(army_id="The ID of the army")
     async def army_view(self, interaction: discord.Interaction, army_id: int):
@@ -1603,7 +1604,17 @@ class CNC(commands.Cog):
 
     # === Tech Commands === #
 
-    @cnc.command(name="tech", description="Displays information about a specified technology.")
+    @cnc.command(name="technology", description="Opens the technology menu.")
+    @app_commands.guild_only()
+    async def technology(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        #
+
+
+    @cnc.command(name="tech", description="Opens the technology and research menu.")
     @app_commands.guild_only()
     @app_commands.describe(tech="The tech to search.")
     async def tech(self, interaction: discord.Interaction, tech: str):
