@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing appropriating development structure calculation" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Creating no-argument entry for nation calling command" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -437,7 +437,7 @@
       <workItem from="1737944586496" duration="1433000" />
       <workItem from="1743384267850" duration="461000" />
       <workItem from="1743469880341" duration="1242000" />
-      <workItem from="1743543455116" duration="847000" />
+      <workItem from="1743543455116" duration="1168000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -782,7 +782,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1194" />
+    <option name="localTasksCounter" value="1195" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -800,7 +800,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Cleaning up construction timeout" />
     <MESSAGE value="Testing deconstruct" />
     <MESSAGE value="Adding the embed to the province command" />
     <MESSAGE value="Fixing adding the embed to the province command" />
@@ -825,7 +824,8 @@
     <MESSAGE value="Fixing boost development structure bug" />
     <MESSAGE value="Fixing deconstruct no response." />
     <MESSAGE value="Fixing appropriating development structure calculation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing appropriating development structure calculation" />
+    <MESSAGE value="Creating no-argument entry for nation calling command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Creating no-argument entry for nation calling command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$resources_updating_cnc.coverage" NAME="resources_updating_cnc Coverage Results" MODIFIED="1661216424601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
