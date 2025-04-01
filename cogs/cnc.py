@@ -1461,6 +1461,7 @@ class CNC(commands.Cog):
         # populate overlord, if applicable
         if user_info['overlord']:
             user_embed.add_field(name="Overlord", value=f"{user_info['overlord']}")
+        # populate relations
         user_embed.add_field(name="=====================RELATIONS=====================",
                              value="Information known about your nation's international relationships.", inline=False)
         user_embed.add_field(name="Allies", value=f"{allies}")
@@ -1472,7 +1473,7 @@ class CNC(commands.Cog):
             await interaction.followup.send("Sent you a DM!")
             return await interaction.user.send(embed=user_embed)
         else:
-            return await interaction.followup.send(embed=user_embed)
+            return await interaction.followup.send(embed=user_embed, content=(allies, wars, trade_pacts, military_access))
 
     @cnc.command(name="strategic_view", description="Displays information about every province owned.")
     @app_commands.describe(direct_message="Optional: select True to send a private DM.")
