@@ -1435,6 +1435,12 @@ class CNC(commands.Cog):
         # populate overlord, if applicable
         if user_info['overlord']:
             user_embed.add_field(name="Overlord", value=f"{user_info['overlord']}")
+        user_embed.add_field(name="=====================RELATIONS=====================",
+                             value="Information known about your nation's international relationships.", inline=False)
+        user_embed.add_field(name="Allies", value=f"{user_info['allies']}")
+        user_embed.add_field(name="Wars", value=f"{user_info['wars']}")
+        user_embed.add_field(name="Trade Pacts", value=f"{user_info['trade_pacts']}")
+        user_embed.add_field(name="Military Access", value=f"{user_info['mil_access']}")
         # send to direct message if required
         if direct_message is True:
             await interaction.followup.send("Sent you a DM!")
