@@ -1467,13 +1467,13 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Allies", value=f"{allies}")
         user_embed.add_field(name="Wars", value=f"{wars}")
         user_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
-        user_embed.add_field(name="Military Access", value=f"{military_access}")
+        # user_embed.add_field(name="Military Access", value=f"{military_access}")
         # send to direct message if required
         if direct_message is True:
             await interaction.followup.send("Sent you a DM!")
             return await interaction.user.send(embed=user_embed)
         else:
-            return await interaction.followup.send(embed=user_embed)
+            return await interaction.followup.send(embed=user_embed, content=military_access)
 
     @cnc.command(name="strategic_view", description="Displays information about every province owned.")
     @app_commands.describe(direct_message="Optional: select True to send a private DM.")
