@@ -1422,6 +1422,14 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}")
         # populate territory and count on its own line
         user_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}", inline=False)
+        # send start and clear for authority
+        if direct_message is True:
+            await interaction.followup.send("Sent you a DM!")
+            await interaction.user.send(embed=user_embed)
+        else:
+            # send start and clear for authority
+            await interaction.followup.send(embed=user_embed)
+            user_embed.clear_fields()
         # populate authority and gains
         user_embed.add_field(name="=====================AUTHORITY=====================",
                              value="Information known about your nation's authority.", inline=False)
@@ -1431,6 +1439,14 @@ class CNC(commands.Cog):
                              value=f"{user_info['mil_auth']} ({plus_minus(user_info['last_mil_auth_gain'])})")
         user_embed.add_field(name="Economic Authority (Change Last Turn)",
                              value=f"{user_info['econ_auth']} ({plus_minus(user_info['last_econ_auth_gain'])})")
+        # send start and clear for military
+        if direct_message is True:
+            await interaction.followup.send("Sent you a DM!")
+            await interaction.user.send(embed=user_embed)
+        else:
+            # send start and clear for authority
+            await interaction.followup.send(embed=user_embed)
+            user_embed.clear_fields()
         # populate troops and armies
         user_embed.add_field(name="=======================MILITARY======================",
                              value="Information about your nation's military.", inline=False)
@@ -1444,6 +1460,14 @@ class CNC(commands.Cog):
                              value=f"{math.floor(total_manpower['sum'] * (user_info['manpower_regen'] / 100)):,} "
                                    f"({user_info['manpower_regen']}%)")
         user_embed.add_field(name="Total Manpower", value=f"{total_manpower['sum']:,}")
+        # send start and clear for economy
+        if direct_message is True:
+            await interaction.followup.send("Sent you a DM!")
+            await interaction.user.send(embed=user_embed)
+        else:
+            # send start and clear for authority
+            await interaction.followup.send(embed=user_embed)
+            user_embed.clear_fields()
         # populate tax and spending stats
         user_embed.add_field(name="======================ECONOMY======================",
                              value="Information about your nation's economy.", inline=False)
@@ -1452,6 +1476,14 @@ class CNC(commands.Cog):
                              value=f"{user_info['public_spend']} Economic Authority per turn")
         user_embed.add_field(name="Military Upkeep Cost",
                              value=f"{user_info['mil_upkeep']} Economic Authority per turn")
+        # send start and clear for government
+        if direct_message is True:
+            await interaction.followup.send("Sent you a DM!")
+            await interaction.user.send(embed=user_embed)
+        else:
+            # send start and clear for authority
+            await interaction.followup.send(embed=user_embed)
+            user_embed.clear_fields()
         # populate unrest, stability, overextension
         user_embed.add_field(name="=====================GOVERNMENT===================",
                              value="Information about your nation's government.", inline=False)
@@ -1461,6 +1493,14 @@ class CNC(commands.Cog):
         # populate overlord, if applicable
         if user_info['overlord']:
             user_embed.add_field(name="Overlord", value=f"{user_info['overlord']}")
+        # send start and clear for authority
+        if direct_message is True:
+            await interaction.followup.send("Sent you a DM!")
+            await interaction.user.send(embed=user_embed)
+        else:
+            # send start and clear for authority
+            await interaction.followup.send(embed=user_embed)
+            user_embed.clear_fields()
         # populate relations
         user_embed.add_field(name="=====================RELATIONS=====================",
                              value="Information about your nation's diplomatic relationships.", inline=False)
@@ -1473,6 +1513,7 @@ class CNC(commands.Cog):
             await interaction.followup.send("Sent you a DM!")
             return await interaction.user.send(embed=user_embed)
         else:
+            # send start and clear for authority
             return await interaction.followup.send(embed=user_embed)
 
     @cnc.command(name="strategic_view", description="Displays information about every province owned.")
