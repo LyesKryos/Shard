@@ -785,7 +785,7 @@ class OwnedProvinceModifiation(View):
         # if the province has no structures, disable the button and update the view
         if not self.prov_info['structures']:
             button.disabled = True
-            await interaction.response.sent_message(content="There are no structures to deconstruct.")
+            await interaction.response.send_message(content="There are no structures to deconstruct.")
             return await interaction.response.edit_message(view=self)
         # otherwise, carry on
         # define the dropdown view
