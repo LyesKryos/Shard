@@ -1274,6 +1274,9 @@ class CNC(commands.Cog):
         # if neither argument is submitted, return error message
         if (nation is None) and (user is None):
             user_info = await user_db_info(interaction.user.id, self.bot.pool)
+            if user_info is None:
+                return await interaction.followup.send(f"That user is not a registered player of the CNC system.",
+                                                       ephemeral=True)
         # if both are submitted, return error message
         if (nation is not None) and (user is not None):
             return await interaction.response.send_message("This command can take only one argument.", ephemeral=True)
