@@ -1273,7 +1273,7 @@ class CNC(commands.Cog):
     async def nation(self, interaction: discord.Interaction, user: discord.Member = None, nation: str = None):
         # if neither argument is submitted, return error message
         if (nation is None) and (user is None):
-            return await interaction.response.send_message("This command requires at least one input.", ephemeral=True)
+            user_info = await self.user_db_info(user.id, self.bot.pool)
         # if both are submitted, return error message
         if (nation is not None) and (user is not None):
             return await interaction.response.send_message("This command can take only one argument.", ephemeral=True)
