@@ -785,7 +785,7 @@ class OwnedProvinceModifiation(View):
         # if the province has no structures, disable the button and update the view
         if not self.prov_info['structures']:
             button.disabled = True
-            await interaction.response.edit_message(view=self, ephemeral=True)
+            await interaction.response.edit_message(view=self)
             return await interaction.followup.send("There are no structures to deconstruct in this province.")
         # otherwise, carry on
         # define the dropdown view
@@ -818,7 +818,7 @@ class OwnedProvinceModifiation(View):
             return await interaction.response.send_message("This province does not have "
                                                    "sufficient development to be appropriated.")
         # ensure that buildings are still supported. each structure (minus 1) needs 10 development
-        structures = len(prov_info['structures']) - 1
+        structures = len([] if prov_info['structures'] is None else list(prov_info['structures'])) - 1
         # if there are any structures (more than 2)
         if structures > 1:
             # if the amount of development, after appropriation, is insufficient to support the structures, deny
