@@ -1394,13 +1394,13 @@ class CNC(commands.Cog):
                                 user_info['name'])
         trade_pacts = await conn.fetch('''SELECT * FROM cnc_trade_pacts WHERE $1 = ANY(members);''',
                                        user_info['name'])
-        military_access = await conn.fetch('''SELECT * FROM cnc_military_access 
-        WHERE $1 = ANY(members);''', user_info['name'])
+        military_access = await conn.fetch('''SELECT * FROM cnc_military_access WHERE $1 = ANY(members);''',
+                                           user_info['name'])
 
         def parse_relations(relations):
             if not relations:
                 output = "None"
-                return output
+                return str(output)
             else:
                 output = ""
                 for relation in relations:
