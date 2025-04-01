@@ -1386,6 +1386,32 @@ class CNC(commands.Cog):
         generals = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_generals WHERE owner_id = $1;''', user_id)
         total_manpower = await conn.fetchrow('''SELECT SUM(citizens) FROM cnc_provinces WHERE owner_id = $1;''',
                                              user_id)
+        # pull information for the international relations and diplomacy
+        # pull relations information
+        alliances = await conn.fetch('''SELECT * FROM cnc_alliances WHERE $1 = ANY(members);''',
+                                     user_info['name'])
+        wars = await conn.fetch('''SELECT * FROM cnc_wars WHERE $1 = ANY(members);''',
+                                user_info['name'])
+        trade_pacts = await conn.fetch('''SELECT * FROM cnc_trade_pacts WHERE $1 = ANY(members);''',
+                                       user_info['name'])
+        military_access = await conn.fetch('''SELECT * FROM cnc_military_access 
+        WHERE $1 = ANY(members);''', user_info['name'])
+
+        def parse_relations(relations):
+            if not relations:
+                output = "None"
+                return output
+            else:
+                output = ""
+                for relation in relations:
+                    buffer_output = ", ".join([r for r in relation['members'] if r != user_info['name']])
+                    output += buffer_output
+                return output
+
+        allies = parse_relations(alliances)
+        wars = parse_relations(wars)
+        trade_pacts = parse_relations(trade_pacts)
+        military_access = parse_relations(military_access)
         # build embed, populate title with pretitle and nation name, set color to user color,
         # and set description to Discord user.
         user_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
@@ -1437,10 +1463,10 @@ class CNC(commands.Cog):
             user_embed.add_field(name="Overlord", value=f"{user_info['overlord']}")
         user_embed.add_field(name="=====================RELATIONS=====================",
                              value="Information known about your nation's international relationships.", inline=False)
-        user_embed.add_field(name="Allies", value=f"{user_info['allies']}")
-        user_embed.add_field(name="Wars", value=f"{user_info['wars']}")
-        user_embed.add_field(name="Trade Pacts", value=f"{user_info['trade_pacts']}")
-        user_embed.add_field(name="Military Access", value=f"{user_info['mil_access']}")
+        user_embed.add_field(name="Allies", value=f"{allies}")
+        user_embed.add_field(name="Wars", value=f"{wars}")
+        user_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
+        user_embed.add_field(name="Military Access", value=f"{military_access}")
         # send to direct message if required
         if direct_message is True:
             await interaction.followup.send("Sent you a DM!")
