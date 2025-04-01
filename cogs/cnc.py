@@ -1293,8 +1293,6 @@ class CNC(commands.Cog):
             if user_info is None:
                 return await interaction.followup.send(f"That user is not a registered player of the CNC system.",
                                                        ephemeral=True)
-        else:
-            return
         # define connection
         conn = self.bot.pool
         # pull province data
