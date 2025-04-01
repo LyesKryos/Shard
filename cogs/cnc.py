@@ -1433,7 +1433,7 @@ class CNC(commands.Cog):
                              value=f"{user_info['econ_auth']} ({plus_minus(user_info['last_econ_auth_gain'])})")
         # populate troops and armies
         user_embed.add_field(name="=======================MILITARY======================",
-                             value="Information known about your nation's military.", inline=False)
+                             value="Information about your nation's military.", inline=False)
         user_embed.add_field(name="Troops", value=f"{troops['sum']:,}")
         user_embed.add_field(name="Armies", value=f"{armies['count']}")
         user_embed.add_field(name="Generals", value=f"{generals['count']}")
@@ -1446,7 +1446,7 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Total Manpower", value=f"{total_manpower['sum']:,}")
         # populate tax and spending stats
         user_embed.add_field(name="======================ECONOMY======================",
-                             value="Information known about your nation's economy.", inline=False)
+                             value="Information about your nation's economy.", inline=False)
         user_embed.add_field(name="Taxation Level", value=f"{user_info['tax_level']}%")
         user_embed.add_field(name="Public Spending Cost",
                              value=f"{user_info['public_spend']} Economic Authority per turn")
@@ -1454,7 +1454,7 @@ class CNC(commands.Cog):
                              value=f"{user_info['mil_upkeep']} Economic Authority per turn")
         # populate unrest, stability, overextension
         user_embed.add_field(name="=====================GOVERNMENT===================",
-                             value="Information known about your nation's government.", inline=False)
+                             value="Information about your nation's government.", inline=False)
         user_embed.add_field(name="National Unrest", value=f"{user_info['unrest']}")
         user_embed.add_field(name="Stability", value=f"{user_info['stability']}")
         user_embed.add_field(name="Overextension Limit", value=f"{user_info['overextend_limit']}")
@@ -1463,7 +1463,7 @@ class CNC(commands.Cog):
             user_embed.add_field(name="Overlord", value=f"{user_info['overlord']}")
         # populate relations
         user_embed.add_field(name="=====================RELATIONS=====================",
-                             value="Information known about your nation's international relationships.", inline=False)
+                             value="Information  bout your nation's diplomatic relationships.", inline=False)
         user_embed.add_field(name="Allies", value=f"{allies}")
         user_embed.add_field(name="Wars", value=f"{wars}")
         user_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
