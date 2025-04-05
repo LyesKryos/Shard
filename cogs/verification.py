@@ -680,6 +680,9 @@ class Verification(commands.Cog):
                         await asyncio.sleep(.6)
                         if nation_info.status == 404:
                             await member.add_roles(cte_role)
+                            return await interaction.followup.send("Your nation is CTE'd. "
+                                                                   "If you would like to remove NS verification from "
+                                                                   "your account, use `/unverify`.")
                         nation_info_raw = await nation_info.text()
                         nation_info_soup = BeautifulSoup(nation_info_raw, 'lxml')
                         region = nation_info_soup.region.text
