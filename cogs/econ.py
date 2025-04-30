@@ -3056,8 +3056,8 @@ class Economy(commands.Cog):
         await interaction.followup.send(embed=item_embed)
 
     @market.command(name="buy", description="Buys an item from the marketplace.")
-    @app_commands.describe(item_id="The ID number of the item you want to buy.")
-    async def buy(self, interaction: discord.Interaction, item_id: int):
+    @app_commands.describe(item_id="The ID number of the item you want to buy.", amount="The amount of that item you wish to by. Default: 1")
+    async def buy(self, interaction: discord.Interaction, item_id: int, amount: int = 1):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establish connection
@@ -3078,10 +3078,17 @@ class Economy(commands.Cog):
         value = item_info['value']
         # if the item is the wallet expansion, multiply accordingly
         if item_info['notes'] == "wallet_expansion":
-            value = (user_info['wallet'] / 100) * 1000
+            if amount > 1:
+                value = 0
+                wallet = user_info['wallet']
+                for a in range(amount):
+                    value += (wallet / 100) * 1000
+                    wallet += 100
+            else:
+                value = (user_info['wallet'] / 100) * 1000
         # ensure the user can afford item
         if value > user_info['funds']:
-            return await interaction.followup.send(f"You do not have enough thaler to purchase {item_info['name']}.")
+            return await interaction.followup.send(f"You do not have enough Thaler to purchase {item_info['name']}.")
         # remove funds from user
         await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
                            value, user.id)
@@ -3097,7 +3104,8 @@ class Economy(commands.Cog):
                                               f"{item_info['market']} for {self.thaler}{value:,}.")
         # if the user bought a wallet expansion, upgrade wallet
         if item_info['name'] == "Wallet Expansion":
-            await conn.execute('''UPDATE rbt_users SET wallet = wallet + 100 WHERE user_id = $1;''', user.id)
+            await conn.execute('''UPDATE rbt_users SET wallet = wallet + $2 WHERE user_id = $1;''', user.id,
+                               (amount * 100))
         # if the item is a role, parse out the role
         if item_info['notes'] == "role":
             role = get_role_name(item_info['name'], self.bot)
