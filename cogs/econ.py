@@ -3112,7 +3112,7 @@ class Economy(commands.Cog):
             thegye = self.bot.get_guild(674259612580446230)
             user = thegye.get_member(user.id)
             await user.add_roles(role)
-        return await interaction.followup.send(f"You have successfully purchased {item_info['name']} for "
+        return await interaction.followup.send(f"You have successfully purchased {amount} {item_info['name']}(s) for "
                                                f"{self.thaler}{value:,}.")
 
     @commands.command()
