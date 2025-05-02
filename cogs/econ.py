@@ -2571,11 +2571,11 @@ class Economy(commands.Cog):
                                    f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
                     ledger_string += stock_string
                     stock_value += float(shares['amount']) * float(stock['value'])
-                    total_value = float(rbt_member['funds']) + float(stock_value)
-                    if investment is not None:
-                        total_value += float(investment['amount'])
-                    if loan is not None:
-                        total_value -= float(loan['amount'])
+                total_value = float(rbt_member['funds']) + float(stock_value)
+                if investment is not None:
+                    total_value += float(investment['amount'])
+                if loan is not None:
+                    total_value -= float(loan['amount'])
                 portfolio_embed.add_field(name="Stock Value", value=f"{self.thaler}{stock_value:,.2f}")
                 portfolio_embed.add_field(name="Net Worth",
                                           value=f"{self.thaler}"
