@@ -276,7 +276,6 @@ class Pageinate(View):
             return await self.interaction.edit_original_response(view=self)
         else:
             self.page -= 1
-            await interaction.response.defer()
             if self.page <= 1:
                 back_button.disabled = True
                 self.forward.disabled = False
