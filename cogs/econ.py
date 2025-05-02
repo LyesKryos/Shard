@@ -2433,7 +2433,7 @@ class Economy(commands.Cog):
         # if the amount is not all, check to make sure they own the requested amount
         if amount != "max":
             if shares['amount'] < amount:
-                return await interaction.followup.send(f"You do not own {amount} shares of {stock['name']}")
+                return await interaction.followup.send(f"You do not own {amount:,} shares of {stock['name']}")
         # if the amount is all, set amount to the number of owned shares
         elif amount == "max":
             amount = shares['amount']
@@ -2457,9 +2457,9 @@ class Economy(commands.Cog):
                            amount, stock['stock_id'])
         # log sale
         await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                           user.id, 'exchange', f'Sold {amount} {stock["name"]} (id: {stock["stock_id"]}) @ '
+                           user.id, 'exchange', f'Sold {amount:,} {stock["name"]} (id: {stock["stock_id"]}) @ '
                                                 f'{self.thaler}{stock["value"]} for {self.thaler}{transaction}.')
-        return await interaction.followup.send(f"You have successfully sold {amount} shares of {stock['name']} for "
+        return await interaction.followup.send(f"You have successfully sold {amount:,} shares of {stock['name']} for "
                                                f"{self.thaler}{transaction:,.2f} at "
                                                f"{self.thaler}{float(stock['value'])} per share.\n"
                                                f"{self.thaler}{float(stock['value']):,.2f} * {amount} - "
