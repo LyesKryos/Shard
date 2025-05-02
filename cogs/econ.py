@@ -277,7 +277,7 @@ class Pageinate(View):
             self.page -= 1
             ledger_string = await portfolio(self.ledger_info, self.bot.pool, "\u20B8", self.page)
             port_embed = self.embed.set_field_at(index=-1, name="Stocks and Shares", value=ledger_string)
-            port_embed.set_footer(f"Page {self.page} of {self.max_page}")
+            port_embed.set_footer(text=f"Page {self.page} of {self.max_page}")
             return await self.interaction.edit_original_response(view=self, embed=port_embed)
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
@@ -304,7 +304,7 @@ class Pageinate(View):
             if self.page >= self.max_page:
                 forward_button.disabled = True
             self.back.disabled = False
-            port_embed.set_footer(f"Page {self.page} of {self.max_page}")
+            port_embed.set_footer(text=f"Page {self.page} of {self.max_page}")
             return await self.interaction.edit_original_response(view=self, embed=port_embed)
 
 
