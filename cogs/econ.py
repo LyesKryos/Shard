@@ -276,6 +276,10 @@ class Pageinate(View):
             return await self.interaction.edit_original_response(view=self)
         else:
             self.page -= 1
+            await interaction.response.defer()
+            if self.page <= 1:
+                back_button.disabled = True
+                self.forward.disabled = False
             ledger_string = await portfolio(self.ledger_info, self.bot.pool, "\u20B8", self.page)
             port_embed = self.embed.set_field_at(index=-1, name="Stocks and Shares", value=ledger_string)
             port_embed.set_footer(text=f"Page {self.page} of {self.max_page}")
