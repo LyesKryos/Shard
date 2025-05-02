@@ -2576,11 +2576,11 @@ class Economy(commands.Cog):
                         total_value += float(investment['amount'])
                     if loan is not None:
                         total_value -= float(loan['amount'])
-                    portfolio_embed.add_field(name="Stock Value", value=f"{self.thaler}{stock_value:,.2f}")
-                    portfolio_embed.add_field(name="Net Worth",
-                                              value=f"{self.thaler}"
-                                                    f"{round(total_value, 2):,.2f}")
-                    portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
+                portfolio_embed.add_field(name="Stock Value", value=f"{self.thaler}{stock_value:,.2f}")
+                portfolio_embed.add_field(name="Net Worth",
+                                          value=f"{self.thaler}"
+                                                f"{round(total_value, 2):,.2f}")
+                portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
                 await interaction.followup.send(embed=portfolio_embed, view=page_view)
 
     @exchange.command(name="graph_value", description="Displays a graph of a stock's price.")
