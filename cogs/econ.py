@@ -269,13 +269,13 @@ class Pageinate(View):
     async def back(self, interaction: discord.Interaction, back_button: discord.Button):
         # defer
         await interaction.response.defer()
+        back_button.disabled = False
         if self.page <= 1:
             back_button.disabled = True
             # edit view
             return await self.interaction.edit_original_response(view=self)
         else:
             self.page -= 1
-            back_button.disabled = False
             ledger_string = await portfolio(self.ledger_info, self.bot.pool, "\u20B8", self.page)
             port_embed = self.embed.set_field_at(index=-1, name="Stocks and Shares", value=ledger_string)
             return await self.interaction.edit_original_response(view=self, embed=port_embed)
@@ -293,6 +293,7 @@ class Pageinate(View):
     async def forward(self, interaction: discord.Interaction, forward_button: discord.Button):
         # defer
         await interaction.response.defer()
+        forward_button.disabled = False
         if self.page >= self.max_page:
             forward_button.disabled = True
             # edit view
@@ -301,7 +302,6 @@ class Pageinate(View):
             self.page += 1
             ledger_string = await portfolio(self.ledger_info, self.bot.pool, "\u20B8", self.page)
             port_embed = self.embed.set_field_at(index=-1, name="Stocks and Shares", value=ledger_string)
-            forward_button.disabled = False
             if self.page >= self.max_page:
                 forward_button.disabled = True
             return await self.interaction.edit_original_response(view=self, embed=port_embed)
