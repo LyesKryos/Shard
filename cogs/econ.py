@@ -211,7 +211,7 @@ class FeedView(View):
 
 class Pageinate(View):
 
-    def __init__(self, bot: Shard, interaction: discord.Interaction, max_page):
+    def __init__(self, bot: Shard, interaction: discord.Interaction, max_page, embed: discord.Embed):
         super().__init__(timeout=120)
         # define bot
         self.bot = bot
@@ -227,6 +227,8 @@ class Pageinate(View):
         self.persist = True
         # interaction
         self.interaction = interaction
+        # embed
+        self.embed = embed
 
     async def on_timeout(self) -> None:
         # disable all buttons
@@ -244,6 +246,7 @@ class Pageinate(View):
             await self.interaction.edit_original_response(view=self)
         else:
             self.page -= 1
+            self.embed.clear_fields()
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
     async def close(self, interaction: discord.Interaction, close: discord.Button):
@@ -262,6 +265,7 @@ class Pageinate(View):
             await self.interaction.edit_original_response(view=self)
         else:
             self.page += 1
+            self.embed.clear_fields()
 
 
 class BlackjackView(View):
@@ -2548,7 +2552,6 @@ class Economy(commands.Cog):
                     await interaction.followup.send(embed=portfolio_embed)
             # if there are more than five stocks, pageinate
             elif len(ledger_info) > 5:
-                page_view = Pageinate(self.bot, interaction, max_page=len(ledger_info)/5)
                 for shares in ledger_info[0:4]:
                     stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
                     risk = ""
@@ -2581,6 +2584,7 @@ class Economy(commands.Cog):
                                           value=f"{self.thaler}"
                                                 f"{round(total_value, 2):,.2f}")
                 portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
+                page_view = Pageinate(self.bot, interaction, max_page=len(ledger_info) / 5, embed=portfolio_embed)
                 await interaction.followup.send(embed=portfolio_embed, view=page_view)
 
     @exchange.command(name="graph_value", description="Displays a graph of a stock's price.")
