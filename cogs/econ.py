@@ -2571,7 +2571,7 @@ class Economy(commands.Cog):
                     if stock['risk'] == 3:
                         risk = "V"
                     stock_string = f"{shares['name']} (#{shares['stock_id']}, {risk}): " \
-                                  f"{shares['amount']} @ {self.thaler}{stock['value']:,.2f}"
+                                  f"{shares['amount']:,} @ {self.thaler}{stock['value']:,.2f}"
                     if stock['trending'] == "up":
                         stock_string += " :chart_with_upwards_trend: "
                     else:
