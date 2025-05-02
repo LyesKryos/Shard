@@ -2629,7 +2629,7 @@ class Economy(commands.Cog):
                                           value=f"{self.thaler}"
                                                 f"{round(total_value, 2):,.2f}")
                 portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
-                page_view = Pageinate(self.bot, interaction, max_page=len(ledger_info) / 5,
+                page_view = Pageinate(self.bot, interaction, max_page=math.ceil(len(ledger_info) / 5),
                                       ledger_info=ledger_info, embed=portfolio_embed)
                 await interaction.followup.send(embed=portfolio_embed, view=page_view)
 
