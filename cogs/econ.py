@@ -21,7 +21,7 @@ from customchecks import SilentFail
 
 async def portfolio(ledger_info, conn, thaler, page):
     ledger_string = ""
-    for shares in ledger_info[(page*5)-5:(page*5)+5]:
+    for shares in ledger_info[(page*5)-5 : page*5]:
         stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
         risk = ""
         if stock['risk'] == 1:
@@ -31,7 +31,7 @@ async def portfolio(ledger_info, conn, thaler, page):
         if stock['risk'] == 3:
             risk = "V"
         stock_string = f"{shares['name']} (#{shares['stock_id']}, {risk}): " \
-                       f"{shares['amount']} @ {thaler}{stock['value']:,.2f}"
+                       f"{shares['amount']:,} @ {thaler}{stock['value']:,.2f}"
         if stock['trending'] == "up":
             stock_string += " :chart_with_upwards_trend: "
         else:
@@ -277,6 +277,7 @@ class Pageinate(View):
             self.page -= 1
             ledger_string = await portfolio(self.ledger_info, self.bot.pool, "\u20B8", self.page)
             port_embed = self.embed.set_field_at(index=-1, name="Stocks and Shares", value=ledger_string)
+            port_embed.set_footer(f"Page {self.page} of {self.max_page}")
             return await self.interaction.edit_original_response(view=self, embed=port_embed)
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
@@ -303,6 +304,7 @@ class Pageinate(View):
             if self.page >= self.max_page:
                 forward_button.disabled = True
             self.back.disabled = False
+            port_embed.set_footer(f"Page {self.page} of {self.max_page}")
             return await self.interaction.edit_original_response(view=self, embed=port_embed)
 
 
