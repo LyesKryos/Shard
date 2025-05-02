@@ -42,7 +42,7 @@ async def portfolio(ledger_info, conn, thaler, page):
                         f"> Sale value: {thaler}" \
                         f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
         ledger_string += stock_string
-        return ledger_string
+    return ledger_string
 
 
 class RegisterView(View):
