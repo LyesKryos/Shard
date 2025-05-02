@@ -2549,8 +2549,7 @@ class Economy(commands.Cog):
             # if there are more than five stocks, pageinate
             elif len(ledger_info) > 5:
                 page_view = Pageinate(self.bot, interaction, max_page=len(ledger_info)/5)
-                page_number = page_view.page
-                for shares in ledger_info[page_number-1:page_number+3]:
+                for shares in ledger_info[0:4]:
                     stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
                     risk = ""
                     if stock['risk'] == 1:
