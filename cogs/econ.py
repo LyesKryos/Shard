@@ -290,6 +290,8 @@ class Pageinate(View):
 
     @discord.ui.button(label="Next", style=discord.ButtonStyle.blurple, emoji="\u23e9")
     async def forward(self, interaction: discord.Interaction, forward_button: discord.Button):
+        # defer
+        await interaction.response.defer()
         if self.page >= self.max_page:
             forward_button.disabled = True
             # edit view
@@ -298,6 +300,8 @@ class Pageinate(View):
             self.page += 1
             ledger_string = await portfolio(self.ledger_info, self.bot.pool, "\u20B8", self.page)
             port_embed = self.embed.set_field_at(index=-1, name="Stocks and Shares", value=ledger_string)
+            if self.page >= self.max_page:
+                forward_button.disabled = True
             return await self.interaction.edit_original_response(view=self, embed=port_embed)
 
 
