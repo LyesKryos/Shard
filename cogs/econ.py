@@ -209,6 +209,61 @@ class FeedView(View):
         feed_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
         await self.message.edit(embed=feed_embed, view=self)
 
+class Pageinate(View):
+
+    def __init__(self, bot: Shard, interaction: discord.Interaction, max_page):
+        super().__init__(timeout=120)
+        # define bot
+        self.bot = bot
+        # define page
+        self.page = 1
+        # define max page
+        self.max_page = max_page
+        # define thaler
+        self.thaler = "\u20B8"
+        # define space
+        self.space = "\u200b"
+        # persist
+        self.persist = True
+        # interaction
+        self.interaction = interaction
+
+    async def on_timeout(self) -> None:
+        # disable all buttons
+        for button in self.children:
+            button.disabled = True
+        self.persist = False
+        # edit view
+        await self.interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.blurple, disabled=True, emoji="\u23ea")
+    async def back(self, interaction: discord.Interaction, back_button: discord.Button):
+        if self.page <= 1:
+            back_button.disabled = True
+            # edit view
+            await self.interaction.edit_original_response(view=self)
+        else:
+            self.page -= 1
+
+    @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
+    async def close(self, interaction: discord.Interaction, close: discord.Button):
+        # disable all buttons
+        for button in self.children:
+            button.disabled = True
+        self.persist = False
+        # edit view
+        await self.interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Next", style=discord.ButtonStyle.blurple, emoji="\u23e9")
+    async def forward(self, interaction: discord.Interaction, forward_button: discord.Button):
+        if self.page >= self.max_page:
+            forward_button.disabled = True
+            # edit view
+            await self.interaction.edit_original_response(view=self)
+        else:
+            self.page += 1
+
+
 class BlackjackView(View):
 
     def __init__(self, author, bot: Shard, m, dealer_hand, player_hand, bet):
@@ -2456,39 +2511,78 @@ class Economy(commands.Cog):
                                            user.id)
             ledger_string = ""
             stock_value = 0
-            for shares in ledger_info:
-                stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
-                risk = ""
-                if stock['risk'] == 1:
-                    risk = "S"
-                if stock['risk'] == 2:
-                    risk = "M"
-                if stock['risk'] == 3:
-                    risk = "V"
-                this_string = f"{shares['name']} (#{shares['stock_id']}, {risk}): " \
-                              f"{shares['amount']} @ {self.thaler}{stock['value']:,.2f}"
-                if stock['trending'] == "up":
-                    this_string += " :chart_with_upwards_trend: "
-                else:
-                    this_string += " :chart_with_downwards_trend: "
-                if stock['change'] > 0:
-                    this_string += "+"
-                this_string += f"{(stock['change'] * 100):.2f}%\n" \
-                               f"> Sale value: {self.thaler}" \
-                               f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
-                ledger_string += this_string
-                stock_value += float(shares['amount']) * float(stock['value'])
-            total_value = float(rbt_member['funds']) + float(stock_value)
-            if investment is not None:
-                total_value += float(investment['amount'])
-            if loan is not None:
-                total_value -= float(loan['amount'])
-            portfolio_embed.add_field(name="Stock Value", value=f"{self.thaler}{stock_value:,.2f}")
-            portfolio_embed.add_field(name="Net Worth",
-                                      value=f"{self.thaler}"
-                                            f"{round(total_value, 2):,.2f}")
-            portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
-            await interaction.followup.send(embed=portfolio_embed)
+            # if there are fewer than five stocks, no page
+            if len(ledger_info) <= 5:
+                for shares in ledger_info:
+                    stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
+                    risk = ""
+                    if stock['risk'] == 1:
+                        risk = "S"
+                    if stock['risk'] == 2:
+                        risk = "M"
+                    if stock['risk'] == 3:
+                        risk = "V"
+                    stock_string = f"{shares['name']} (#{shares['stock_id']}, {risk}): " \
+                                  f"{shares['amount']} @ {self.thaler}{stock['value']:,.2f}"
+                    if stock['trending'] == "up":
+                        stock_string += " :chart_with_upwards_trend: "
+                    else:
+                        stock_string += " :chart_with_downwards_trend: "
+                    if stock['change'] > 0:
+                        stock_string += "+"
+                    stock_string += f"{(stock['change'] * 100):.2f}%\n" \
+                                   f"> Sale value: {self.thaler}" \
+                                   f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
+                    ledger_string += stock_string
+                    stock_value += float(shares['amount']) * float(stock['value'])
+                    total_value = float(rbt_member['funds']) + float(stock_value)
+                    if investment is not None:
+                        total_value += float(investment['amount'])
+                    if loan is not None:
+                        total_value -= float(loan['amount'])
+                    portfolio_embed.add_field(name="Stock Value", value=f"{self.thaler}{stock_value:,.2f}")
+                    portfolio_embed.add_field(name="Net Worth",
+                                              value=f"{self.thaler}"
+                                                    f"{round(total_value, 2):,.2f}")
+                    portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
+                    await interaction.followup.send(embed=portfolio_embed)
+            # if there are more than five stocks, pageinate
+            elif len(ledger_info) > 5:
+                page_view = Pageinate(self.bot, interaction, max_page=len(ledger_info)/5)
+                page_number = page_view.page
+                for shares in ledger_info[page_number-1:page_number+3]:
+                    stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
+                    risk = ""
+                    if stock['risk'] == 1:
+                        risk = "S"
+                    if stock['risk'] == 2:
+                        risk = "M"
+                    if stock['risk'] == 3:
+                        risk = "V"
+                    stock_string = f"{shares['name']} (#{shares['stock_id']}, {risk}): " \
+                                  f"{shares['amount']} @ {self.thaler}{stock['value']:,.2f}"
+                    if stock['trending'] == "up":
+                        stock_string += " :chart_with_upwards_trend: "
+                    else:
+                        stock_string += " :chart_with_downwards_trend: "
+                    if stock['change'] > 0:
+                        stock_string += "+"
+                    stock_string += f"{(stock['change'] * 100):.2f}%\n" \
+                                   f"> Sale value: {self.thaler}" \
+                                   f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
+                    ledger_string += stock_string
+                    stock_value += float(shares['amount']) * float(stock['value'])
+                    total_value = float(rbt_member['funds']) + float(stock_value)
+                    if investment is not None:
+                        total_value += float(investment['amount'])
+                    if loan is not None:
+                        total_value -= float(loan['amount'])
+                    portfolio_embed.add_field(name="Stock Value", value=f"{self.thaler}{stock_value:,.2f}")
+                    portfolio_embed.add_field(name="Net Worth",
+                                              value=f"{self.thaler}"
+                                                    f"{round(total_value, 2):,.2f}")
+                    portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
+                await interaction.followup.send(embed=portfolio_embed, view=page_view)
 
     @exchange.command(name="graph_value", description="Displays a graph of a stock's price.")
     @app_commands.describe(stock_id="Input the name or ID of the stock.",
