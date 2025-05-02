@@ -19,6 +19,30 @@ from pytz import timezone
 from ShardBot import Shard
 from customchecks import SilentFail
 
+async def portfolio(ledger_info, conn, thaler, page):
+    ledger_string = ""
+    for shares in ledger_info[(page*5)-5,page*5]:
+        stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
+        risk = ""
+        if stock['risk'] == 1:
+            risk = "S"
+        if stock['risk'] == 2:
+            risk = "M"
+        if stock['risk'] == 3:
+            risk = "V"
+        stock_string = f"{shares['name']} (#{shares['stock_id']}, {risk}): " \
+                       f"{shares['amount']} @ {thaler}{stock['value']:,.2f}"
+        if stock['trending'] == "up":
+            stock_string += " :chart_with_upwards_trend: "
+        else:
+            stock_string += " :chart_with_downwards_trend: "
+        if stock['change'] > 0:
+            stock_string += "+"
+        stock_string += f"{(stock['change'] * 100):.2f}%\n" \
+                        f"> Sale value: {thaler}" \
+                        f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
+        return ledger_string += stock_string
+
 
 class RegisterView(View):
 
@@ -211,7 +235,7 @@ class FeedView(View):
 
 class Pageinate(View):
 
-    def __init__(self, bot: Shard, interaction: discord.Interaction, max_page, embed: discord.Embed):
+    def __init__(self, bot: Shard, interaction: discord.Interaction, max_page, ledger_info, embed: discord.Embed):
         super().__init__(timeout=120)
         # define bot
         self.bot = bot
@@ -227,6 +251,8 @@ class Pageinate(View):
         self.persist = True
         # interaction
         self.interaction = interaction
+        # ledger
+        self.ledger_info = ledger_info
         # embed
         self.embed = embed
 
@@ -240,13 +266,17 @@ class Pageinate(View):
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.blurple, disabled=True, emoji="\u23ea")
     async def back(self, interaction: discord.Interaction, back_button: discord.Button):
+        # defer
+        await interaction.response.defer()
         if self.page <= 1:
             back_button.disabled = True
             # edit view
             await self.interaction.edit_original_response(view=self)
         else:
             self.page -= 1
-            self.embed.clear_fields()
+            ledger_string = await portfolio(self.ledger_info, self.bot.pool, "\u20B8", self.page)
+            port_embed = self.embed.set_field_at(index=-1, name="Stocks and Shares", value=ledger_string)
+            await self.interaction.edit_original_response(view=self, embed=port_embed)
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
     async def close(self, interaction: discord.Interaction, close: discord.Button):
@@ -265,7 +295,9 @@ class Pageinate(View):
             await self.interaction.edit_original_response(view=self)
         else:
             self.page += 1
-            self.embed.clear_fields()
+            ledger_string = await portfolio(self.ledger_info, self.bot.pool, "\u20B8", self.page)
+            port_embed = self.embed.set_field_at(index=-1, name="Stocks and Shares", value=ledger_string)
+            await self.interaction.edit_original_response(view=self, embed=port_embed)
 
 
 class BlackjackView(View):
@@ -2539,17 +2571,17 @@ class Economy(commands.Cog):
                                    f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
                     ledger_string += stock_string
                     stock_value += float(shares['amount']) * float(stock['value'])
-                    total_value = float(rbt_member['funds']) + float(stock_value)
-                    if investment is not None:
-                        total_value += float(investment['amount'])
-                    if loan is not None:
-                        total_value -= float(loan['amount'])
-                    portfolio_embed.add_field(name="Stock Value", value=f"{self.thaler}{stock_value:,.2f}")
-                    portfolio_embed.add_field(name="Net Worth",
-                                              value=f"{self.thaler}"
-                                                    f"{round(total_value, 2):,.2f}")
-                    portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
-                    await interaction.followup.send(embed=portfolio_embed)
+                total_value = float(rbt_member['funds']) + float(stock_value)
+                if investment is not None:
+                    total_value += float(investment['amount'])
+                if loan is not None:
+                    total_value -= float(loan['amount'])
+                portfolio_embed.add_field(name="Stock Value", value=f"{self.thaler}{stock_value:,.2f}")
+                portfolio_embed.add_field(name="Net Worth",
+                                          value=f"{self.thaler}"
+                                                f"{round(total_value, 2):,.2f}")
+                portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
+                await interaction.followup.send(embed=portfolio_embed)
             # if there are more than five stocks, pageinate
             elif len(ledger_info) > 5:
                 for shares in ledger_info[0:4]:
@@ -2584,7 +2616,8 @@ class Economy(commands.Cog):
                                           value=f"{self.thaler}"
                                                 f"{round(total_value, 2):,.2f}")
                 portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
-                page_view = Pageinate(self.bot, interaction, max_page=len(ledger_info) / 5, embed=portfolio_embed)
+                page_view = Pageinate(self.bot, interaction, max_page=len(ledger_info) / 5,
+                                      ledger_info=ledger_info, embed=portfolio_embed)
                 await interaction.followup.send(embed=portfolio_embed, view=page_view)
 
     @exchange.command(name="graph_value", description="Displays a graph of a stock's price.")
