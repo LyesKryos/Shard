@@ -2387,28 +2387,28 @@ class Economy(commands.Cog):
             return await interaction.followup.send(
                 f"You have successfully purchased {amount:,} shares of {stock['name']} for "
                 f"{self.thaler}{transaction:,.2f} at {self.thaler}{float(stock['value']):,.2f} per share.\n"
-                f"{self.thaler}{stock['value']:,.2f} * {amount} + {self.thaler}{tax:,.2f} (transaction fee) = "
+                f"{self.thaler}{stock['value']:,.2f} * {amount:,} + {self.thaler}{tax:,.2f} (transaction fee) = "
                 f"{self.thaler}{transaction:,.2f}")
 
     @exchange.command(description="Sells a specified amount of a stock's shares.",
                       name="sell")
-    @app_commands.describe(stock_id="The name or ID of the stock", amount="A whole number amount")
+    @app_commands.describe(stock_id="The name or ID of the stock", amount="A whole number amount. Also accepts 'max'.")
     async def sell(self, interaction: discord.Interaction, stock_id: str, amount: str):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establishes connection
         conn = self.bot.pool
-        if amount.lower() != "all":
+        if amount.lower() != "max":
             try:
                 amount = int(amount)
             except ValueError:
                 return await interaction.followup.send(f"The command only accepts "
-                                                       f"whole numbers and \"all\" as arguments.")
+                                                       f"whole numbers and \"max\" as arguments.")
             # if the amount is less than 0
             if amount <= 0:
                 return await interaction.followup.send(f"Positive whole numbers only!")
         else:
-            amount = "all"
+            amount = "max"
         # fetches stock information
         stock = await conn.fetchrow('''SELECT * FROM stocks WHERE lower(name) = $1;''', stock_id.lower())
         # if stock does not exist, return message
@@ -2431,11 +2431,11 @@ class Economy(commands.Cog):
         if shares is None:
             return await interaction.followup.send(f"You do not own any shares of {stock['name']}.")
         # if the amount is not all, check to make sure they own the requested amount
-        if amount != "all":
+        if amount != "max":
             if shares['amount'] < amount:
                 return await interaction.followup.send(f"You do not own {amount} shares of {stock['name']}")
         # if the amount is all, set amount to the number of owned shares
-        elif amount == "all":
+        elif amount == "max":
             amount = shares['amount']
         # calculate transaction
         base_price = round(float(stock['value']) * amount, 2)
