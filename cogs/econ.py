@@ -21,7 +21,7 @@ from customchecks import SilentFail
 
 async def portfolio(ledger_info, conn, thaler, page):
     ledger_string = ""
-    for shares in ledger_info[(page*5)-5:page*5]:
+    for shares in ledger_info[(page*5)-5:(page*5)+5]:
         stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
         risk = ""
         if stock['risk'] == 1:
