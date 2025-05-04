@@ -331,35 +331,35 @@ class Roleplay(commands.Cog):
                            to_currency="The currency to be converted to.")
     @app_commands.guild_only()
     async def convert_thaler(self, interaction: discord.Interaction, amount_in: float, from_currency:
-    typing.Literal ['Thaler', '1885 USD', '1885 GBP', '2025 USD', '2025 GBP'], to_currency:
-    typing.Literal ['Thaler', '1885 USD', '1885 GBP', '2025 USD', '2025 GBP'], consider_ppp: bool = False):
+    typing.Literal ['Thaler', '1890 USD', '1890 GBP', '2025 USD', '2025 GBP'], to_currency:
+    typing.Literal ['Thaler', '1890 USD', '1890 GBP', '2025 USD', '2025 GBP'], consider_ppp: bool = False):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # define the rates
         USD_PPP = 2.2
         GBP_PPP = .45
         Thaler = 1
-        USD1885_out = Thaler * .5
-        USD1885_in = (Thaler / .5)
-        GBP1885_out = Thaler * .11
-        GBP1885_in = (Thaler / .11)
+        pastUSD_out = Thaler * .22
+        pastUSD_in = (Thaler / .22)
+        pastGBP_out = Thaler * .047
+        pastGBP_in = (Thaler / .047)
         if consider_ppp:
-            USD1885_out *= USD_PPP
-            USD1885_in /= USD_PPP
-            GBP1885_out *= GBP_PPP
-            GBP1885_in /= GBP_PPP
-        USD2025_out = USD1885_out * 32.53
-        USD2025_in = USD1885_in * .03
-        GBP2025_out = GBP1885_out * 164.21
-        GBP2025_in = GBP1885_in * .006
+            pastUSD_out *= USD_PPP
+            pastUSD_in /= USD_PPP
+            pastGBP_out *= GBP_PPP
+            pastGBP_in /= GBP_PPP
+        USD2025_out = pastUSD_out * 35.14
+        USD2025_in = pastUSD_in * .03
+        GBP2025_out = pastGBP_out * 164.21
+        GBP2025_in = pastGBP_in * .01
 
         # select the option for from_currency
         if from_currency == "Thaler":
             from_currency_calc = Thaler
         elif from_currency == "1885 USD":
-            from_currency_calc = USD1885_in
+            from_currency_calc = pastUSD_in
         elif from_currency == "1885 GBP":
-            from_currency_calc = GBP1885_in
+            from_currency_calc = pastGBP_in
         elif from_currency == "2025 USD":
             from_currency_calc = USD2025_in
         elif from_currency == "2025 GBP":
@@ -372,10 +372,10 @@ class Roleplay(commands.Cog):
             to_currency_calc = Thaler
             symbol = "\u20B8"
         elif to_currency == "1885 USD":
-            to_currency_calc = USD1885_out
+            to_currency_calc = pastUSD_out
             symbol = "\u0024"
         elif to_currency == "1885 GBP":
-            to_currency_calc = GBP1885_out
+            to_currency_calc = pastGBP_out
             symbol = "\u00A3"
         elif to_currency == "2025 USD":
             to_currency_calc = USD2025_out
