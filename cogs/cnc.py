@@ -1514,7 +1514,6 @@ class CNC(commands.Cog):
         return await interaction.followup.send(embed=user_embed)
 
     @cnc.command(name="dossier", description="Displays detailed information about your nation.")
-    @app_commands.describe(direct_message="Optional: select True to send a private DM.")
     async def dossier(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer(thinking=True, ephemeral=True)
