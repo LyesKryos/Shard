@@ -945,6 +945,8 @@ class DossierView(View):
         self.conn = conn
         self.author = author
 
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.author.id
 
     async def on_timeout(self) -> None:
         for child in self.children:
