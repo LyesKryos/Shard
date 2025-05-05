@@ -939,7 +939,7 @@ class UnownedProvince(View):
 class DossierView(View):
 
     def __init__(self, embed: discord.Embed, user_info, conn: asyncpg.Pool):
-        super().__init__(timeout=120)
+        super().__init__(timeout=3)
         self.doss_embed = embed
         self.user_info = user_info
         self.conn = conn
@@ -1535,7 +1535,6 @@ class CNC(commands.Cog):
         # send and include view
         await interaction.followup.send(embed=user_embed, view=doss_view)
 
-
     @cnc.command(name="strategic_view", description="Displays information about every province owned.")
     @app_commands.describe(direct_message="Optional: select True to send a private DM.")
     async def strategic_view(self, interaction: discord.Interaction, direct_message: bool = None):
@@ -1697,7 +1696,6 @@ class CNC(commands.Cog):
                                                               f"**Location**: {location}\n"
                                                               f"**General**: {general}")
         return await interaction.followup.send(embed=armies_embed)
-
 
     # === Tech Commands === #
 
