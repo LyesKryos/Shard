@@ -938,15 +938,12 @@ class UnownedProvince(View):
 
 class DossierView(View):
 
-    def __init__(self, author, embed: discord.Embed, user_info, conn: asyncpg.Pool):
+    def __init__(self, interaction, embed: discord.Embed, user_info, conn: asyncpg.Pool):
         super().__init__(timeout=3)
         self.doss_embed = embed
         self.user_info = user_info
         self.conn = conn
-        self.author = author
-
-    async def interaction_check(self, interaction: discord.Interaction):
-        return interaction.user.id == self.author.id
+        self.interaction = interaction
 
     async def on_timeout(self) -> None:
         for child in self.children:
@@ -1542,7 +1539,7 @@ class CNC(commands.Cog):
         # populate territory and count on its own line
         user_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}", inline=False)
         # create dossier view
-        doss_view = DossierView(interaction.user, user_embed, user_info, conn)
+        doss_view = DossierView(interaction, user_embed, user_info, conn)
         # send and include view
         await interaction.followup.send(embed=user_embed, view=doss_view)
 
