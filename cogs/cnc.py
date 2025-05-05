@@ -854,7 +854,7 @@ class OwnedProvinceModifiation(View):
 class UnownedProvince(View):
 
     def __init__(self, author: discord.User, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
-        super().__init__(timeout=120)
+        super().__init__(timeout=3)
         self.prov_info = province_db
         self.user_info = user_info
         self.pool = pool
@@ -1076,6 +1076,14 @@ class DossierView(View):
         self.doss_embed.add_field(name="Military Access", value=f"{military_access}")
         # update
         await interaction.edit_original_response(embed=self.doss_embed)
+
+    @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
+    async def close(self, interaction: discord.Interaction, button: discord.Button):
+        # disable all buttons
+        for button in self.children:
+            button.disabled = True
+        # update view
+        return await interaction.edit_original_response(view=self)
 
 
 class CNC(commands.Cog):
