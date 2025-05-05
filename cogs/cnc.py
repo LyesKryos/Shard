@@ -938,14 +938,13 @@ class UnownedProvince(View):
 
 class DossierView(View):
 
-    def __init__(self, embed: discord.Embed, user_info, conn: asyncpg.Pool):
+    def __init__(self, author, embed: discord.Embed, user_info, conn: asyncpg.Pool):
         super().__init__(timeout=3)
         self.doss_embed = embed
         self.user_info = user_info
         self.conn = conn
+        self.author = author
 
-    async def interaction_check(self, interaction: discord.Interaction):
-        return interaction.user.id == self.author.id
 
     async def on_timeout(self) -> None:
         for child in self.children:
@@ -1514,7 +1513,7 @@ class CNC(commands.Cog):
 
     @cnc.command(name="dossier", description="Displays detailed information about your nation.")
     @app_commands.describe(direct_message="Optional: select True to send a private DM.")
-    async def dossier(self, interaction: discord.Interaction, direct_message: bool = None):
+    async def dossier(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer(thinking=True, ephemeral=True)
         # establish connection
@@ -1542,7 +1541,7 @@ class CNC(commands.Cog):
         # populate territory and count on its own line
         user_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}", inline=False)
         # create dossier view
-        doss_view = DossierView(user_embed, user_info, conn)
+        doss_view = DossierView(interaction.user, user_embed, user_info, conn)
         # send and include view
         await interaction.followup.send(embed=user_embed, view=doss_view)
 
