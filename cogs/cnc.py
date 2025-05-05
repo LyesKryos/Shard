@@ -854,7 +854,7 @@ class OwnedProvinceModifiation(View):
 class UnownedProvince(View):
 
     def __init__(self, author: discord.User, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
-        super().__init__(timeout=3)
+        super().__init__(timeout=150)
         self.prov_info = province_db
         self.user_info = user_info
         self.pool = pool
@@ -939,7 +939,7 @@ class UnownedProvince(View):
 class DossierView(View):
 
     def __init__(self, interaction, embed: discord.Embed, user_info, conn: asyncpg.Pool):
-        super().__init__(timeout=3)
+        super().__init__(timeout=150)
         self.doss_embed = embed
         self.user_info = user_info
         self.conn = conn
