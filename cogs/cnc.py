@@ -947,7 +947,7 @@ class DossierView(View):
     async def on_timeout(self) -> None:
         for child in self.children:
             child.disabled = True
-        return await interaction.edit_original_response(view=self)
+        return await self.interaction.edit_original_response(view=self)
 
     @discord.ui.button(label="Authority", style=discord.ButtonStyle.blurple)
     async def authority(self, interaction: discord.Interaction, button: discord.Button):
