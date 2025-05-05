@@ -1665,6 +1665,7 @@ class CNC(commands.Cog):
         # for each of the entries, make a field
         for army in army_info:
             army_name = army['army_name']
+            army_id = army['army_id']
             troops = army['troops']
             location = army['location']
             general = army['general']
@@ -1672,7 +1673,7 @@ class CNC(commands.Cog):
                 general = "No"
             else:
                 general = "Yes"
-            armies_embed.add_field(name=f"{army_name}", value=f"**Troops**: {troops}\n"
+            armies_embed.add_field(name=f"{army_name} (ID: {army_id})", value=f"**Troops**: {troops}\n"
                                                               f"**Location**: {location}\n"
                                                               f"**General**: {general}")
         return await interaction.followup.send(embed=armies_embed)
