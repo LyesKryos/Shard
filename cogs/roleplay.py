@@ -336,8 +336,8 @@ class Roleplay(commands.Cog):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # define the rates
-        USD_PPP = 2.2
-        GBP_PPP = .45
+        USD_PPP = 2.58
+        GBP_PPP = 12.54
         Thaler = 1
         pastUSD_out = Thaler * .22
         pastUSD_in = (Thaler / .22)
