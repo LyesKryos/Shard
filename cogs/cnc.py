@@ -944,8 +944,13 @@ class DossierView(View):
         self.user_info = user_info
         self.conn = conn
 
+    async def on_timeout(self) -> None:
+        for child in self.children:
+            child.disabled = True
+        return await self.interaction.edit_original_response(view=self)
+
     @discord.ui.button(label="Authority", style=discord.ButtonStyle.blurple)
-    async def authority(self, interaction: discord.Interaction):
+    async def authority(self, interaction: discord.Interaction, button: discord.Button):
         # defer interaction
         await interaction.response.defer()
         # clear emebed
@@ -962,7 +967,7 @@ class DossierView(View):
         await interaction.edit_original_response(embed=self.doss_embed)
 
     @discord.ui.button(label="Military", style=discord.ButtonStyle.blurple)
-    async def military(self, interaction: discord.Interaction):
+    async def military(self, interaction: discord.Interaction, button: discord.Button):
         # defer interaction
         await interaction.response.defer()
         # clear emebed
@@ -994,7 +999,7 @@ class DossierView(View):
         await interaction.edit_original_response(embed=self.doss_embed)
 
     @discord.ui.button(label="Economy", style=discord.ButtonStyle.blurple)
-    async def economy(self, interaction: discord.Interaction):
+    async def economy(self, interaction: discord.Interaction, button: discord.Button):
         # defer interaction
         await interaction.response.defer()
         # clear emebed
@@ -1011,7 +1016,7 @@ class DossierView(View):
         await interaction.edit_original_response(embed=self.doss_embed)
 
     @discord.ui.button(label="Government", style=discord.ButtonStyle.blurple)
-    async def government(self, interaction: discord.Interaction):
+    async def government(self, interaction: discord.Interaction, button: discord.Button):
         # defer interaction
         await interaction.response.defer()
         # clear emebed
@@ -1029,7 +1034,7 @@ class DossierView(View):
         await interaction.edit_original_response(embed=self.doss_embed)
 
     @discord.ui.button(label="Relations", style=discord.ButtonStyle.blurple)
-    async def relations(self, interaction: discord.Interaction):
+    async def relations(self, interaction: discord.Interaction, button: discord.Button):
         # defer interaction
         await interaction.response.defer()
         # clear emebed
@@ -1515,8 +1520,6 @@ class CNC(commands.Cog):
         province_list = [p['id'] for p in province_list]
         province_count = len(province_list)
         province_list = ", ".join(str(p) for p in province_list)
-
-
         # build embed, populate title with pretitle and nation name, set color to user color,
         # and set description to Discord user.
         user_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
