@@ -851,7 +851,6 @@ class OwnedProvinceModifiation(View):
         abandon_province_view.interaction = interaction
         await interaction.response.edit_message(view=abandon_province_view, embed=None, content="**Confirm below.**")
 
-
 class UnownedProvince(View):
 
     def __init__(self, author: discord.User, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
@@ -936,6 +935,142 @@ class UnownedProvince(View):
                                                 embed=await create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"{prov_info['name']} (ID: {province_id}) "
                                                        f"has been successfully colonized.")
+
+class DossierView(View):
+
+    def __init__(self, embed: discord.Embed, user_info, conn: asyncpg.Pool):
+        super().__init__(timeout=120)
+        self.doss_embed = embed
+        self.user_info = user_info
+        self.conn = conn
+
+    @discord.ui.button(label="Authority", style=discord.ButtonStyle.blurple)
+    async def authority(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer()
+        # clear emebed
+        self.doss_embed.clear_fields()
+        # populate authority and gains
+        self.doss_embed.add_field(name="=====================AUTHORITY=====================",
+                                  value="Information known about your nation's authority.", inline=False)
+        self.doss_embed.add_field(name="Political Authority (Change Last Turn)",
+                                  value=f"{self.user_info['pol_auth']} ({plus_minus(self.user_info['last_pol_auth_gain'])})")
+        self.doss_embed.add_field(name="Military Authority (Change Last Turn)",
+                                  value=f"{self.user_info['mil_auth']} ({plus_minus(self.user_info['last_mil_auth_gain'])})")
+        self.doss_embed.add_field(name="Economic Authority (Change Last Turn)",
+                                  value=f"{self.user_info['econ_auth']} ({plus_minus(self.user_info['last_econ_auth_gain'])})")
+        await interaction.edit_original_response(embed=self.doss_embed)
+
+    @discord.ui.button(label="Military", style=discord.ButtonStyle.blurple)
+    async def military(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer()
+        # clear emebed
+        self.doss_embed.clear_fields()
+        # establish conn
+        conn = self.conn
+        # establish user_id
+        user_id = interaction.user.id
+        # pull troop and army data
+        troops = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE owner_id = $1;''', user_id)
+        armies = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE owner_id = $1;''', user_id)
+        generals = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_generals WHERE owner_id = $1;''', user_id)
+        total_manpower = await conn.fetchrow('''SELECT SUM(citizens) FROM cnc_provinces WHERE owner_id = $1;''',
+                                             user_id)
+        # populate troops and armies
+        self.doss_embed.add_field(name="=======================MILITARY======================",
+                             value="Information about your nation's military.", inline=False)
+        self.doss_embed.add_field(name="Troops", value=f"{troops['sum']:,}")
+        self.doss_embed.add_field(name="Armies", value=f"{armies['count']}")
+        self.doss_embed.add_field(name="Generals", value=f"{generals['count']}")
+        # populate manpower
+        self.doss_embed.add_field(name="Manpower \n(Manpower Access)", value=f"{self.user_info['manpower']:,} "
+                                                                        f"({self.user_info['manpower_access']}%)")
+        self.doss_embed.add_field(name="Manpower Regen",
+                             value=f"{math.floor(total_manpower['sum'] * (self.user_info['manpower_regen'] / 100)):,} "
+                                   f"({self.user_info['manpower_regen']}%)")
+        self.doss_embed.add_field(name="Total Manpower", value=f"{total_manpower['sum']:,}")
+        # update
+        await interaction.edit_original_response(embed=self.doss_embed)
+
+    @discord.ui.button(label="Economy", style=discord.ButtonStyle.blurple)
+    async def economy(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer()
+        # clear emebed
+        self.doss_embed.clear_fields()
+        # populate tax and spending stats
+        self.doss_embed.add_field(name="======================ECONOMY======================",
+                             value="Information about your nation's economy.", inline=False)
+        self.doss_embed.add_field(name="Taxation Level", value=f"{self.user_info['tax_level']}%")
+        self.doss_embed.add_field(name="Public Spending Cost",
+                             value=f"{self.user_info['public_spend']} Economic Authority per turn")
+        self.doss_embed.add_field(name="Military Upkeep Cost",
+                             value=f"{self.user_info['mil_upkeep']} Economic Authority per turn")
+        # update
+        await interaction.edit_original_response(embed=self.doss_embed)
+
+    @discord.ui.button(label="Government", style=discord.ButtonStyle.blurple)
+    async def government(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer()
+        # clear emebed
+        self.doss_embed.clear_fields()
+        # populate unrest, stability, overextension
+        self.doss_embed.add_field(name="=====================GOVERNMENT===================",
+                             value="Information about your nation's government.", inline=False)
+        self.doss_embed.add_field(name="National Unrest", value=f"{self.user_info['unrest']}")
+        self.doss_embed.add_field(name="Stability", value=f"{self.user_info['stability']}")
+        self.doss_embed.add_field(name="Overextension Limit", value=f"{self.user_info['overextend_limit']}")
+        # populate overlord, if applicable
+        if self.user_info['overlord']:
+            self.doss_embed.add_field(name="Overlord", value=f"{self.user_info['overlord']}")
+        # update
+        await interaction.edit_original_response(embed=self.doss_embed)
+
+    @discord.ui.button(label="Relations", style=discord.ButtonStyle.blurple)
+    async def relations(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer()
+        # clear emebed
+        self.doss_embed.clear_fields()
+        # establish conn
+        conn = self.conn
+        # pull information for the international relations and diplomacy
+        # pull relations information
+        alliances = await conn.fetch('''SELECT * FROM cnc_alliances WHERE $1 = ANY(members);''',
+                                     self.user_info['name'])
+        wars = await conn.fetch('''SELECT * FROM cnc_wars WHERE $1 = ANY(members);''',
+                                self.user_info['name'])
+        trade_pacts = await conn.fetch('''SELECT * FROM cnc_trade_pacts WHERE $1 = ANY(members);''',
+                                       self.user_info['name'])
+        military_access = await conn.fetch('''SELECT * FROM cnc_military_access WHERE $1 = ANY(members);''',
+                                           self.user_info['name'])
+
+        def parse_relations(relations):
+            if not relations:
+                output = "None"
+                return str(output)
+            else:
+                output = ""
+                for relation in relations:
+                    buffer_output = ", ".join([r for r in relation['members'] if r != self.user_info['name']])
+                    output += buffer_output
+                return str(output)
+
+        allies = parse_relations(alliances)
+        wars = parse_relations(wars)
+        trade_pacts = parse_relations(trade_pacts)
+        military_access = parse_relations(military_access)
+        # populate relations
+        self.doss_embed.add_field(name="=====================RELATIONS=====================",
+                             value="Information about your nation's diplomatic relationships.", inline=False)
+        self.doss_embed.add_field(name="Allies", value=f"{allies}")
+        self.doss_embed.add_field(name="Wars", value=f"{wars}")
+        self.doss_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
+        self.doss_embed.add_field(name="Military Access", value=f"{military_access}")
+        # update
+        await interaction.edit_original_response(embed=self.doss_embed)
 
 
 class CNC(commands.Cog):
@@ -1380,38 +1515,8 @@ class CNC(commands.Cog):
         province_list = [p['id'] for p in province_list]
         province_count = len(province_list)
         province_list = ", ".join(str(p) for p in province_list)
-        # pull troop and army data
-        troops = await conn.fetchrow('''SELECT SUM(troops) FROM cnc_armies WHERE owner_id = $1;''', user_id)
-        armies = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_armies WHERE owner_id = $1;''', user_id)
-        generals = await conn.fetchrow('''SELECT COUNT(*) FROM cnc_generals WHERE owner_id = $1;''', user_id)
-        total_manpower = await conn.fetchrow('''SELECT SUM(citizens) FROM cnc_provinces WHERE owner_id = $1;''',
-                                             user_id)
-        # pull information for the international relations and diplomacy
-        # pull relations information
-        alliances = await conn.fetch('''SELECT * FROM cnc_alliances WHERE $1 = ANY(members);''',
-                                     user_info['name'])
-        wars = await conn.fetch('''SELECT * FROM cnc_wars WHERE $1 = ANY(members);''',
-                                user_info['name'])
-        trade_pacts = await conn.fetch('''SELECT * FROM cnc_trade_pacts WHERE $1 = ANY(members);''',
-                                       user_info['name'])
-        military_access = await conn.fetch('''SELECT * FROM cnc_military_access WHERE $1 = ANY(members);''',
-                                           user_info['name'])
 
-        def parse_relations(relations):
-            if not relations:
-                output = "None"
-                return str(output)
-            else:
-                output = ""
-                for relation in relations:
-                    buffer_output = ", ".join([r for r in relation['members'] if r != user_info['name']])
-                    output += buffer_output
-                return str(output)
 
-        allies = parse_relations(alliances)
-        wars = parse_relations(wars)
-        trade_pacts = parse_relations(trade_pacts)
-        military_access = parse_relations(military_access)
         # build embed, populate title with pretitle and nation name, set color to user color,
         # and set description to Discord user.
         user_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
@@ -1422,99 +1527,11 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}")
         # populate territory and count on its own line
         user_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}", inline=False)
-        # send start and clear for authority
-        if direct_message is True:
-            await interaction.followup.send("Sent you a DM!")
-            await interaction.user.send(embed=user_embed)
-        else:
-            # send start and clear for authority
-            await interaction.followup.send(embed=user_embed)
-            user_embed.clear_fields()
-        # populate authority and gains
-        user_embed.add_field(name="=====================AUTHORITY=====================",
-                             value="Information known about your nation's authority.", inline=False)
-        user_embed.add_field(name="Political Authority (Change Last Turn)",
-                             value=f"{user_info['pol_auth']} ({plus_minus(user_info['last_pol_auth_gain'])})")
-        user_embed.add_field(name="Military Authority (Change Last Turn)",
-                             value=f"{user_info['mil_auth']} ({plus_minus(user_info['last_mil_auth_gain'])})")
-        user_embed.add_field(name="Economic Authority (Change Last Turn)",
-                             value=f"{user_info['econ_auth']} ({plus_minus(user_info['last_econ_auth_gain'])})")
-        # send start and clear for military
-        if direct_message is True:
-            await interaction.followup.send("Sent you a DM!")
-            await interaction.user.send(embed=user_embed)
-        else:
-            # send start and clear for authority
-            await interaction.followup.send(embed=user_embed)
-            user_embed.clear_fields()
-        # populate troops and armies
-        user_embed.add_field(name="=======================MILITARY======================",
-                             value="Information about your nation's military.", inline=False)
-        user_embed.add_field(name="Troops", value=f"{troops['sum']:,}")
-        user_embed.add_field(name="Armies", value=f"{armies['count']}")
-        user_embed.add_field(name="Generals", value=f"{generals['count']}")
-        # populate manpower
-        user_embed.add_field(name="Manpower \n(Manpower Access)", value=f"{user_info['manpower']:,} "
-                                                                        f"({user_info['manpower_access']}%)")
-        user_embed.add_field(name="Manpower Regen",
-                             value=f"{math.floor(total_manpower['sum'] * (user_info['manpower_regen'] / 100)):,} "
-                                   f"({user_info['manpower_regen']}%)")
-        user_embed.add_field(name="Total Manpower", value=f"{total_manpower['sum']:,}")
-        # send start and clear for economy
-        if direct_message is True:
-            await interaction.followup.send("Sent you a DM!")
-            await interaction.user.send(embed=user_embed)
-        else:
-            # send start and clear for authority
-            await interaction.followup.send(embed=user_embed)
-            user_embed.clear_fields()
-        # populate tax and spending stats
-        user_embed.add_field(name="======================ECONOMY======================",
-                             value="Information about your nation's economy.", inline=False)
-        user_embed.add_field(name="Taxation Level", value=f"{user_info['tax_level']}%")
-        user_embed.add_field(name="Public Spending Cost",
-                             value=f"{user_info['public_spend']} Economic Authority per turn")
-        user_embed.add_field(name="Military Upkeep Cost",
-                             value=f"{user_info['mil_upkeep']} Economic Authority per turn")
-        # send start and clear for government
-        if direct_message is True:
-            await interaction.followup.send("Sent you a DM!")
-            await interaction.user.send(embed=user_embed)
-        else:
-            # send start and clear for authority
-            await interaction.followup.send(embed=user_embed)
-            user_embed.clear_fields()
-        # populate unrest, stability, overextension
-        user_embed.add_field(name="=====================GOVERNMENT===================",
-                             value="Information about your nation's government.", inline=False)
-        user_embed.add_field(name="National Unrest", value=f"{user_info['unrest']}")
-        user_embed.add_field(name="Stability", value=f"{user_info['stability']}")
-        user_embed.add_field(name="Overextension Limit", value=f"{user_info['overextend_limit']}")
-        # populate overlord, if applicable
-        if user_info['overlord']:
-            user_embed.add_field(name="Overlord", value=f"{user_info['overlord']}")
-        # send start and clear for authority
-        if direct_message is True:
-            await interaction.followup.send("Sent you a DM!")
-            await interaction.user.send(embed=user_embed)
-        else:
-            # send start and clear for authority
-            await interaction.followup.send(embed=user_embed)
-            user_embed.clear_fields()
-        # populate relations
-        user_embed.add_field(name="=====================RELATIONS=====================",
-                             value="Information about your nation's diplomatic relationships.", inline=False)
-        user_embed.add_field(name="Allies", value=f"{allies}")
-        user_embed.add_field(name="Wars", value=f"{wars}")
-        user_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
-        user_embed.add_field(name="Military Access", value=f"{military_access}")
-        # send to direct message if required
-        if direct_message is True:
-            await interaction.followup.send("Sent you a DM!")
-            return await interaction.user.send(embed=user_embed)
-        else:
-            # send start and clear for authority
-            return await interaction.followup.send(embed=user_embed)
+        # create dossier view
+        doss_view = DossierView(user_embed, user_info, conn)
+        # send and include view
+        await interaction.followup.send(embed=user_embed, view=doss_view)
+
 
     @cnc.command(name="strategic_view", description="Displays information about every province owned.")
     @app_commands.describe(direct_message="Optional: select True to send a private DM.")
@@ -1690,7 +1707,6 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         #
 
-
     @cnc.command(name="tech", description="Opens the technology and research menu.")
     @app_commands.guild_only()
     @app_commands.describe(tech="The tech to search.")
@@ -1862,6 +1878,22 @@ class CNC(commands.Cog):
             await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user_id)
             return await interaction.followup.send(f"Scientists are no longer researching {researching['tech']}.")
 
+    # === Government Commands ===
+
+    @cnc.command(name="government", description="Opens the Government menu.")
+    @app_commands.guild_only()
+    async def manage_government(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.bot.pool
+        # pull userinfo
+        user_info = await user_db_info(interaction.user.id, conn)
+        # check for registration
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+
+
     @cnc.command(name="set_taxation", description="Sets the level of taxation for your government.")
     @app_commands.describe(rate="The tax rate you wish to set.")
     @app_commands.guild_only()
@@ -1871,7 +1903,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull userinfo
-        user_info = await user_db_info(interaction.user.id)
+        user_info = await user_db_info(interaction.user.id, conn)
         # check for registration
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
@@ -2033,6 +2065,7 @@ class CNC(commands.Cog):
         return await interaction.followup.send(f"{prov_info['name']} is now the Capital of {user_info['name']}.")
 
     # === Moderator Commands ===
+
     @commands.command()
     @commands.is_owner()
     async def cnc_give_province(self, ctx, user: discord.Member, province_id: int):
@@ -2059,7 +2092,6 @@ class CNC(commands.Cog):
         except asyncpg.PostgresError as e:
             raise e
         return await ctx.send(f"{user_info['name']} granted ownership of {prov_info['name']} (ID: {province_id}).")
-
 
     @commands.command()
     @commands.is_owner()
