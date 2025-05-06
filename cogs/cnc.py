@@ -1150,6 +1150,8 @@ class TaxManageView(View):
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
         # return to menu
         gov_menu = GovernmentModView(self.author, self.interaction, self.conn, self.user_info, self.govt_info, )
         await interaction.edit_original_response(view=gov_menu)
