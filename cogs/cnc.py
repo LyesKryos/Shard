@@ -1107,6 +1107,14 @@ class GovernmentModView(View):
         # send secondary view
         await interaction.edit_original_response(view=tax_menu)
 
+    @discord.ui.button(label="Public Spending", style=discord.ButtonStyle.blurple, emoji="\U00002696")
+    async def pub_spend(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # establish secondary view
+        ps_menu = PublicSpendingView(self.author, self.interaction, self.conn, self.govt_info, self.govt_embed)
+        # send secondary view
+        await interaction.edit_original_response(view=ps_menu)
 
 class TaxManageView(View):
 
@@ -1149,10 +1157,9 @@ class TaxManageView(View):
             # send confirmation
             await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level']-.01:.0%}!")
             # update embed
-            self.govt_embed.set_field_at(-1, name="Current Tax Level", value=f"{self.user_info['tax_level']-.01:.0%}")
-            # return to menu
-            gov_menu = GovernmentModView(self.author, self.interaction, conn, self.govt_info, self.govt_embed)
-            await interaction.edit_original_response(view=gov_menu, embed=self.govt_embed)
+            self.govt_embed.set_field_at(-4, name="Current Tax Level", value=f"{self.user_info['tax_level']-.01:.0%}")
+            # update embed
+            await interaction.edit_original_response(embed=self.govt_embed)
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.Button):
@@ -1184,11 +1191,86 @@ class TaxManageView(View):
             # send confirmation
             await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level']+.01:.0%}!")
             # update embed
-            self.govt_embed.set_field_at(-1, name="Current Tax Level", value=f"{self.user_info['tax_level']+.01:.0%}")
-            # return to menu
-            gov_menu = GovernmentModView(self.author, self.interaction, conn,
-                                         self.govt_info, self.govt_embed)
-            await interaction.edit_original_response(view=gov_menu, embed=self.govt_embed)
+            self.govt_embed.set_field_at(-4, name="Current Tax Level", value=f"{self.user_info['tax_level']+.01:.0%}")
+            # update embed
+            await interaction.edit_original_response(embed=self.govt_embed)
+
+class PublicSpendingView(View):
+
+    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool,
+                 govt_info: asyncpg.Record, govt_embed: discord.Embed):
+        super().__init__(timeout=120)
+        self.user_info = None
+        self.govt_info = govt_info
+        self.conn = conn
+        self.interaction = interaction
+        self.author = author
+        self.govt_embed = govt_embed
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.author.id
+
+    async def on_timeout(self) -> None:
+        for child in self.children:
+            child.disabled = True
+        return await self.interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Decrease Public Spending", style=discord.ButtonStyle.blurple, emoji="\U0001f4c9")
+    async def decrease(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # establish connection
+        conn = self.conn
+        # pull user info
+        self.user_info = await user_db_info(self.author.id, conn)
+        # if the user is going to decrease below 0 spending, stop them
+        if self.user_info['public_spend'] - 1 > 0:
+            button.disabled = True
+            await interaction.followup.send(f"You cannot decrease your public spending "
+                                                   f"below 0 Economic Authority.")
+            await interaction.edit_original_response(view=self)
+        else:
+            # update public spending level
+            await conn.execute('''UPDATE cnc_users SET public_spend = public_spend + 1 WHERE user_id = $1;''',
+                               self.author.id)
+            # update embed
+            self.govt_embed.set_field_at(-2, name="Public Spending",
+                                         value=f"{self.user_info['public_spend']-1} Economic Authority")
+            # update embed
+            await interaction.edit_original_response(embed=self.govt_embed)
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
+    async def back(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # return to menu
+        gov_menu = GovernmentModView(self.author, self.interaction, self.conn, self.govt_info, self.govt_embed)
+        await interaction.edit_original_response(view=gov_menu)
+
+    @discord.ui.button(label="Increase Public Spending", style=discord.ButtonStyle.blurple, emoji="\U0001f4c8")
+    async def increase(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # establish connection
+        conn = self.conn
+        # pull user info
+        self.user_info = await user_db_info(self.author.id, conn)
+        # if the user is going to decrease below 0 spending, stop them
+        if self.user_info['public_spend'] + 1 < 10:
+            button.disabled = True
+            await interaction.followup.send(f"You cannot increase your public spending "
+                                                   f"above 10 Economic Authority.")
+            await interaction.edit_original_response(view=self)
+        else:
+            # update public spending level
+            await conn.execute('''UPDATE cnc_users SET public_spend = public_spend + 1 WHERE user_id = $1;''',
+                               self.author.id)
+            # update embed
+            self.govt_embed.set_field_at(-2, name="Public Spending",
+                                         value=f"{self.user_info['public_spend']+1} Economic Authority")
+            # update embed
+            await interaction.edit_original_response(embed=self.govt_embed)
+
 
 
 class CNC(commands.Cog):
