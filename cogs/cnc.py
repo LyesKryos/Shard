@@ -1104,7 +1104,7 @@ class GovernmentModView(View):
         await interaction.response.defer()
         # establish secondary view
         tax_menu = TaxManageView(self.author, self.interaction, self.conn,
-                                 self.user_info, self.govt_info, self.govt_info)
+                                 self.user_info, self.govt_info, self.govt_embed)
         # send secondary view
         await interaction.edit_original_response(view=tax_menu)
 
