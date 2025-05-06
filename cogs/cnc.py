@@ -1100,7 +1100,7 @@ class GovernmentModView(View):
     @discord.ui.button(label="Taxation", style=discord.ButtonStyle.blurple)
     async def taxation(self, interaction: discord.Interaction, button: discord.Button):
         # defer
-        await interaction.reponse.defer()
+        await interaction.response.defer()
         # establish secondary view
         tax_menu = TaxManageView(self.author, self.interaction, self.conn, self.user_info, self.govt_info)
         # send secondary view
