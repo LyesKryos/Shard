@@ -1098,7 +1098,7 @@ class GovernmentModView(View):
             child.disabled = True
         return await self.interaction.edit_original_response(view=self)
 
-    @discord.ui.button(label="Taxation", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="Taxation", style=discord.ButtonStyle.blurple, emoji="\U0001f4b0")
     async def taxation(self, interaction: discord.Interaction, button: discord.Button):
         # defer
         await interaction.response.defer()
@@ -2031,9 +2031,15 @@ class CNC(commands.Cog):
         # development cost
         govt_embed.add_field(name="Base Development Cost", value=f"{govt_info['dev_cost']:.0%}")
         # base taxation
-        govt_embed.add_field(name="Base Tax Level", value=f"{govt_info['tax_level']:.0%}")
+        govt_embed.add_field(name="Base Taxation", value=f"{govt_info['tax_level']:.0%}")
         # current tax level
-        govt_embed.add_field(name="Current Tax Level", value=f"{user_info['tax_level']:.0%}")
+        govt_embed.add_field(name="Current Taxation", value=f"{user_info['tax_level']:.0%}")
+        # max tax level
+        govt_embed.add_field(name="Maximum Taxation", value=f"{govt_info['tax_level']+.2:.0%}")
+        # public spending
+        govt_embed.add_field(name="Public Spending", value=f"{user_info['public_spend']} Economic Authority")
+        # military upkeep
+        govt_embed.add_field(name="Military Upkeep", value=f"{user_info['mil_upkeep']} Military Authority")
         # establish government modification view
         govt_view = GovernmentModView(interaction.user, interaction, conn, govt_info, govt_embed)
         # send embed and view
