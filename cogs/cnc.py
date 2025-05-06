@@ -1089,6 +1089,7 @@ class GovernmentModView(View):
         self.interaction = interaction
         self.author = author
         self.govt_info = govt_info
+        self.govt_embed = govt_embed
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.author.id
