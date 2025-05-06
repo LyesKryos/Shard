@@ -1160,7 +1160,8 @@ class TaxManageView(View):
         # defer interaction
         await interaction.response.defer()
         # return to menu
-        gov_menu = GovernmentModView(self.author, self.interaction, self.conn, self.user_info, self.govt_info, )
+        gov_menu = GovernmentModView(self.author, self.interaction, self.conn,
+                                     self.user_info, self.govt_info, self.govt_embed)
         await interaction.edit_original_response(view=gov_menu)
 
     @discord.ui.button(label="Increase Tax", style=discord.ButtonStyle.blurple, emoji="\U0001f4c8")
