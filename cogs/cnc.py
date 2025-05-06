@@ -1186,7 +1186,7 @@ class TaxManageView(View):
             # update embed
             self.govt_embed.set_field_at(-1, name="Current Tax Level", value=f"{self.user_info['tax_level']+.01:.0%}")
             # return to menu
-            gov_menu = GovernmentModView(self.author, self.interaction, conn, self.user_info,
+            gov_menu = GovernmentModView(self.author, self.interaction, conn,
                                          self.govt_info, self.govt_embed)
             await interaction.edit_original_response(view=gov_menu, embed=self.govt_embed)
 
