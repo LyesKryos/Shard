@@ -1224,7 +1224,7 @@ class PublicSpendingView(View):
         # pull user info
         self.user_info = await user_db_info(self.author.id, conn)
         # if the user is going to decrease below 0 spending, stop them
-        if self.user_info['public_spend'] - 1 > 0:
+        if self.user_info['public_spend'] - 1 < 0:
             button.disabled = True
             await interaction.followup.send(f"You cannot decrease your public spending "
                                                    f"below 0 Economic Authority.")
@@ -1256,7 +1256,7 @@ class PublicSpendingView(View):
         # pull user info
         self.user_info = await user_db_info(self.author.id, conn)
         # if the user is going to decrease below 0 spending, stop them
-        if self.user_info['public_spend'] + 1 < 10:
+        if self.user_info['public_spend'] + 1 > 10:
             button.disabled = True
             await interaction.followup.send(f"You cannot increase your public spending "
                                                    f"above 10 Economic Authority.")
