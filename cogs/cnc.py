@@ -1148,6 +1148,7 @@ class TaxManageView(View):
                                self.author.id)
             # send confirmation
             await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level']-.01:.0%}!")
+            # update embed
             self.govt_embed.set_field_at(-1, name="Current Tax Level", value=f"{self.user_info['tax_level']-.01:.0%}")
             # return to menu
             gov_menu = GovernmentModView(self.author, self.interaction, conn, self.user_info,
@@ -1180,6 +1181,8 @@ class TaxManageView(View):
             await conn.execute('''UPDATE cnc_users SET tax_level = tax_level + .01 WHERE user_id = $1;''',
                                self.author.id)
             # send confirmation
+            await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level']+.01:.0%}!")
+            # update embed
             self.govt_embed.set_field_at(-1, name="Current Tax Level", value=f"{self.user_info['tax_level']+.01:.0%}")
             # return to menu
             gov_menu = GovernmentModView(self.author, self.interaction, conn, self.user_info,
