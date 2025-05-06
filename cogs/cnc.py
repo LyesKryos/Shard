@@ -1084,7 +1084,7 @@ class DossierView(View):
         for button in self.children:
             button.disabled = True
         # update view
-        return await interaction.edit_original_response(view=self)
+        await interaction.edit_original_response(view=self)
 
 
 class CNC(commands.Cog):
@@ -1913,6 +1913,10 @@ class CNC(commands.Cog):
         # populate government type and subtype
         govt_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}",
                              inline=False)
+        # populate basic info
+        govt_embed.add_field(name="National Unrest", value=f"{user_info['unrest']}")
+        govt_embed.add_field(name="Stability", value=f"{user_info['stability']}")
+        govt_embed.add_field(name="Overextension Limit", value=f"{user_info['overextend_limit']}")
         # populate base authority gains
         govt_embed.add_field(name="Base Economic Authority Gain", value=govt_info['econ_auth'])
         govt_embed.add_field(name="Base Military Authority Gain", value=govt_info['mil_auth'])
