@@ -1158,8 +1158,10 @@ class TaxManageView(View):
             await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level']-.01:.0%}!")
             # update embed
             self.govt_embed.set_field_at(-4, name="Current Tax Level", value=f"{self.user_info['tax_level']-.01:.0%}")
+            # enable increase button
+            self.increase.disabled = False
             # update embed
-            await interaction.edit_original_response(embed=self.govt_embed)
+            await interaction.edit_original_response(embed=self.govt_embed, view=self)
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.Button):
@@ -1192,8 +1194,10 @@ class TaxManageView(View):
             await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level']+.01:.0%}!")
             # update embed
             self.govt_embed.set_field_at(-4, name="Current Tax Level", value=f"{self.user_info['tax_level']+.01:.0%}")
+            # enable decrease button
+            self.decrease.disabled = False
             # update embed
-            await interaction.edit_original_response(embed=self.govt_embed)
+            await interaction.edit_original_response(embed=self.govt_embed, view=self)
 
 class PublicSpendingView(View):
 
@@ -1236,8 +1240,10 @@ class PublicSpendingView(View):
             # update embed
             self.govt_embed.set_field_at(-2, name="Public Spending",
                                          value=f"{self.user_info['public_spend']-1} Economic Authority")
+            # enable increase button
+            self.increase.disabled = False
             # update embed
-            await interaction.edit_original_response(embed=self.govt_embed)
+            await interaction.edit_original_response(view=self, embed=self.govt_embed)
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.Button):
@@ -1268,8 +1274,10 @@ class PublicSpendingView(View):
             # update embed
             self.govt_embed.set_field_at(-2, name="Public Spending",
                                          value=f"{self.user_info['public_spend']+1} Economic Authority")
+            # enable decrease button
+            self.decrease.disabled = False
             # update embed
-            await interaction.edit_original_response(embed=self.govt_embed)
+            await interaction.edit_original_response(embed=self.govt_embed, view=self)
 
 
 
