@@ -1081,13 +1081,14 @@ class DossierView(View):
 class GovernmentModView(View):
 
     def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool, user_info: asyncpg.Record,
-                 govt_info: asyncpg.Record):
+                 govt_info: asyncpg.Record, govt_embed: discord.Embed):
         super().__init__(timeout=120)
         self.user_info = user_info
         self.govt_info = govt_info
         self.conn = conn
         self.interaction = interaction
         self.author = author
+        self.govt_info = govt_info
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.author.id
@@ -1102,7 +1103,8 @@ class GovernmentModView(View):
         # defer
         await interaction.response.defer()
         # establish secondary view
-        tax_menu = TaxManageView(self.author, self.interaction, self.conn, self.user_info, self.govt_info)
+        tax_menu = TaxManageView(self.author, self.interaction, self.conn,
+                                 self.user_info, self.govt_info, self.govt_info)
         # send secondary view
         await interaction.edit_original_response(view=tax_menu)
 
@@ -1110,13 +1112,14 @@ class GovernmentModView(View):
 class TaxManageView(View):
 
     def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool, user_info: asyncpg.Record,
-                 govt_info: asyncpg.Record):
+                 govt_info: asyncpg.Record, govt_embed: discord.Embed):
         super().__init__(timeout=120)
         self.user_info = user_info
         self.govt_info = govt_info
         self.conn = conn
         self.interaction = interaction
         self.author = author
+        self.govt_embed = govt_embed
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.author.id
@@ -1143,10 +1146,12 @@ class TaxManageView(View):
             await conn.execute('''UPDATE cnc_users SET tax_level = tax_level - .01 WHERE user_id = $1;''',
                                self.author.id)
             # send confirmation
-            await interaction.followup.send(f"Your tax rate is now f{self.user_info['tax_level']-.01:.0%}!")
+            await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level']-.01:.0%}!")
+            self.govt_embed.set_field_at(-1, name="Current Tax Level", value=f"{self.user_info['tax_level']-.01:.0%}")
             # return to menu
-            gov_menu = GovernmentModView(self.author, self.interaction, conn, self.user_info, self.govt_info,)
-            await interaction.edit_original_response(view=gov_menu)
+            gov_menu = GovernmentModView(self.author, self.interaction, conn, self.user_info,
+                                         self.govt_info, self.govt_embed)
+            await interaction.edit_original_response(view=gov_menu, embed=self.govt_embed)
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.Button):
@@ -1174,10 +1179,11 @@ class TaxManageView(View):
             await conn.execute('''UPDATE cnc_users SET tax_level = tax_level + .01 WHERE user_id = $1;''',
                                self.author.id)
             # send confirmation
-            await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level'] + .01:.0%}!")
+            self.govt_embed.set_field_at(-1, name="Current Tax Level", value=f"{self.user_info['tax_level']+.01:.0%}")
             # return to menu
-            gov_menu = GovernmentModView(self.author, self.interaction, conn, self.user_info, self.govt_info, )
-            await interaction.edit_original_response(view=gov_menu)
+            gov_menu = GovernmentModView(self.author, self.interaction, conn, self.user_info,
+                                         self.govt_info, self.govt_embed)
+            await interaction.edit_original_response(view=gov_menu, embed=self.govt_embed)
 
 
 class CNC(commands.Cog):
@@ -2025,7 +2031,7 @@ class CNC(commands.Cog):
         # current tax level
         govt_embed.add_field(name="Current Tax Level", value=f"{user_info['tax_level']:.0%}")
         # establish government modification view
-        govt_view = GovernmentModView(interaction.user, interaction, conn, user_info, govt_info)
+        govt_view = GovernmentModView(interaction.user, interaction, conn, user_info, govt_info, govt_embed)
         # send embed and view
         await interaction.followup.send(embed=govt_embed, view=govt_view)
 
