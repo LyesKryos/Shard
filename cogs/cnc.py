@@ -1154,7 +1154,7 @@ class TaxManageView(View):
         gov_menu = GovernmentModView(self.author, self.interaction, self.conn, self.user_info, self.govt_info, )
         await interaction.edit_original_response(view=gov_menu)
 
-    @discord.ui.button(label="Increase", style=discord.ButtonStyle.blurple, emoji="\U0001f4c8")
+    @discord.ui.button(label="Increase Tax", style=discord.ButtonStyle.blurple, emoji="\U0001f4c8")
     async def increase(self, interaction: discord.Interaction, button: discord.Button):
         # defer interaction
         await interaction.response.defer()
@@ -1172,7 +1172,7 @@ class TaxManageView(View):
             await conn.execute('''UPDATE cnc_users SET tax_level = tax_level + .01 WHERE user_id = $1;''',
                                self.author.id)
             # send confirmation
-            await interaction.followup.send(f"Your tax rate is now f{self.user_info['tax_level'] + .01:.0%}!")
+            await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level'] + .01:.0%}!")
             # return to menu
             gov_menu = GovernmentModView(self.author, self.interaction, conn, self.user_info, self.govt_info, )
             await interaction.edit_original_response(view=gov_menu)
@@ -2018,6 +2018,10 @@ class CNC(commands.Cog):
         govt_embed.add_field(name="Base Manpower Access", value=f"{govt_info['manpower']:.0%}")
         # development cost
         govt_embed.add_field(name="Base Development Cost", value=f"{govt_info['dev_cost']:.0%}")
+        # base taxation
+        govt_embed.add_field(name="Base Tax Level", value=f"{govt_info['tax_level']:.0%}")
+        # current tax level
+        govt_embed.add_field(name="Current Tax Level", value=f"{user_info['tax_level']:.0%}")
         # establish government modification view
         govt_view = GovernmentModView(interaction.user, interaction, conn, user_info, govt_info)
         # send embed and view
