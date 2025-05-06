@@ -1231,7 +1231,7 @@ class PublicSpendingView(View):
             await interaction.edit_original_response(view=self)
         else:
             # update public spending level
-            await conn.execute('''UPDATE cnc_users SET public_spend = public_spend + 1 WHERE user_id = $1;''',
+            await conn.execute('''UPDATE cnc_users SET public_spend = public_spend - 1 WHERE user_id = $1;''',
                                self.author.id)
             # update embed
             self.govt_embed.set_field_at(-2, name="Public Spending",
