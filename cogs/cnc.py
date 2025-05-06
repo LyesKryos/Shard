@@ -1918,11 +1918,11 @@ class CNC(commands.Cog):
         govt_embed.add_field(name="Base Military Authority Gain", value=govt_info['mil_auth'])
         govt_embed.add_field(name="Base Political Authority Gain", value=govt_info['pol_auth'])
         # unrest modifier
-        govt_embed.add_field(name="Base Unrest Gain", value=f"{govt_info['unrest_mod']:0%}")
+        govt_embed.add_field(name="Base Unrest Gain", value=f"{govt_info['unrest_mod']:.0%}")
         # manpower modifier
-        govt_embed.add_field(name="Base Manpower Access", value=f"{govt_info['manpower']:0%}")
+        govt_embed.add_field(name="Base Manpower Access", value=f"{govt_info['manpower']:.0%}")
         # development cost
-        govt_embed.add_field(name="Base Development Cost", value=f"{govt_info['dev_cost']:0%}")
+        govt_embed.add_field(name="Base Development Cost", value=f"{govt_info['dev_cost']:.0%}")
         # send embed
         await interaction.followup.send(embed=govt_embed)
         
