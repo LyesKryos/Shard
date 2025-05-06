@@ -1080,10 +1080,9 @@ class DossierView(View):
 
 class GovernmentModView(View):
 
-    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool, user_info: asyncpg.Record,
+    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool,
                  govt_info: asyncpg.Record, govt_embed: discord.Embed):
         super().__init__(timeout=120)
-        self.user_info = user_info
         self.govt_info = govt_info
         self.conn = conn
         self.interaction = interaction
@@ -1104,18 +1103,17 @@ class GovernmentModView(View):
         # defer
         await interaction.response.defer()
         # establish secondary view
-        tax_menu = TaxManageView(self.author, self.interaction, self.conn,
-                                 self.user_info, self.govt_info, self.govt_embed)
+        tax_menu = TaxManageView(self.author, self.interaction, self.conn, self.govt_info, self.govt_embed)
         # send secondary view
         await interaction.edit_original_response(view=tax_menu)
 
 
 class TaxManageView(View):
 
-    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool, user_info: asyncpg.Record,
+    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool,
                  govt_info: asyncpg.Record, govt_embed: discord.Embed):
         super().__init__(timeout=120)
-        self.user_info = user_info
+        self.user_info = None
         self.govt_info = govt_info
         self.conn = conn
         self.interaction = interaction
@@ -1136,6 +1134,8 @@ class TaxManageView(View):
         await interaction.response.defer()
         # establish connection
         conn = self.conn
+        # pull user info
+        self.user_info = await user_db_info(self.author.id, conn)
         # if the user would decrease their tax below 0, stop them
         if self.user_info['tax_level'] - .01 <= 0:
             await interaction.followup.send("You cannot decrease your taxation below 0%.")
@@ -1151,8 +1151,7 @@ class TaxManageView(View):
             # update embed
             self.govt_embed.set_field_at(-1, name="Current Tax Level", value=f"{self.user_info['tax_level']-.01:.0%}")
             # return to menu
-            gov_menu = GovernmentModView(self.author, self.interaction, conn, self.user_info,
-                                         self.govt_info, self.govt_embed)
+            gov_menu = GovernmentModView(self.author, self.interaction, conn, self.govt_info, self.govt_embed)
             await interaction.edit_original_response(view=gov_menu, embed=self.govt_embed)
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
@@ -1160,8 +1159,7 @@ class TaxManageView(View):
         # defer interaction
         await interaction.response.defer()
         # return to menu
-        gov_menu = GovernmentModView(self.author, self.interaction, self.conn,
-                                     self.user_info, self.govt_info, self.govt_embed)
+        gov_menu = GovernmentModView(self.author, self.interaction, self.conn, self.govt_info, self.govt_embed)
         await interaction.edit_original_response(view=gov_menu)
 
     @discord.ui.button(label="Increase Tax", style=discord.ButtonStyle.blurple, emoji="\U0001f4c8")
@@ -1170,6 +1168,8 @@ class TaxManageView(View):
         await interaction.response.defer()
         # establish connection
         conn = self.conn
+        # pull user info
+        self.user_info = await user_db_info(self.author.id, conn)
         # if the user would decrease their tax below 0, stop them
         if self.user_info['tax_level'] + .01 >= 20:
             await interaction.followup.send(f"You cannot increase your taxation above "
@@ -2036,7 +2036,7 @@ class CNC(commands.Cog):
         # current tax level
         govt_embed.add_field(name="Current Tax Level", value=f"{user_info['tax_level']:.0%}")
         # establish government modification view
-        govt_view = GovernmentModView(interaction.user, interaction, conn, user_info, govt_info, govt_embed)
+        govt_view = GovernmentModView(interaction.user, interaction, conn, govt_info, govt_embed)
         # send embed and view
         await interaction.followup.send(embed=govt_embed, view=govt_view)
 
