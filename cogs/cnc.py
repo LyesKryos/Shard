@@ -1078,14 +1078,6 @@ class DossierView(View):
         # update
         await interaction.edit_original_response(embed=self.doss_embed)
 
-    @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
-    async def close(self, interaction: discord.Interaction, button: discord.Button):
-        # disable all buttons
-        for button in self.children:
-            button.disabled = True
-        # update view
-        await interaction.edit_original_response(view=self)
-
 
 class CNC(commands.Cog):
 
