@@ -1994,7 +1994,6 @@ class CNC(commands.Cog):
     # === Government Commands ===
 
     @cnc.command(name="government", description="Opens the Government menu.")
-    @app_commands.guild_only()
     async def manage_government(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer(thinking=True)
