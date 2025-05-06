@@ -17,7 +17,7 @@ import asyncio
 from PIL import Image, ImageColor, ImageDraw
 from base64 import b64encode
 import requests
-from discord.ui import View, Select, Item
+from discord.ui import View, Select, Item, button
 import math
 
 from customchecks import SilentFail
@@ -854,7 +854,7 @@ class OwnedProvinceModifiation(View):
 class UnownedProvince(View):
 
     def __init__(self, author: discord.User, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
-        super().__init__(timeout=150)
+        super().__init__(timeout=120)
         self.prov_info = province_db
         self.user_info = user_info
         self.pool = pool
@@ -939,7 +939,7 @@ class UnownedProvince(View):
 class DossierView(View):
 
     def __init__(self, interaction, embed: discord.Embed, user_info, conn: asyncpg.Pool):
-        super().__init__(timeout=150)
+        super().__init__(timeout=120)
         self.doss_embed = embed
         self.user_info = user_info
         self.conn = conn
@@ -1077,6 +1077,103 @@ class DossierView(View):
         self.doss_embed.add_field(name="Military Access", value=f"{military_access}")
         # update
         await interaction.edit_original_response(embed=self.doss_embed)
+
+class GovernmentModView(View):
+
+    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool, user_info: asyncpg.Record,
+                 govt_info: asyncpg.Record):
+        super().__init__(timeout=120)
+        self.user_info = user_info
+        self.govt_info = govt_info
+        self.conn = conn
+        self.interaction = interaction
+        self.author = author
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.author.id
+
+    async def on_timeout(self) -> None:
+        for child in self.children:
+            child.disabled = True
+        return await self.interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Taxation", style=discord.ButtonStyle.blurple)
+    async def taxation(self, interaction: discord.Interaction, button: discord.Button):
+        # establish secondary view
+        tax_menu = TaxManageView(self.author, self.interaction, self.conn, self.user_info, self.govt_info)
+        # send secondary view
+        await interaction.edit_original_response(view=tax_menu)
+
+
+class TaxManageView(View):
+
+    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool, user_info: asyncpg.Record,
+                 govt_info: asyncpg.Record):
+        super().__init__(timeout=120)
+        self.user_info = user_info
+        self.govt_info = govt_info
+        self.conn = conn
+        self.interaction = interaction
+        self.author = author
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.author.id
+
+    async def on_timeout(self) -> None:
+        for child in self.children:
+            child.disabled = True
+        return await self.interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Decrease Tax", style=discord.ButtonStyle.blurple, emoji="\U0001f4c9")
+    async def decrease(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # establish connection
+        conn = self.conn
+        # if the user would decrease their tax below 0, stop them
+        if self.user_info['tax_level'] - .01 <= 0:
+            await interaction.followup.send("You cannot decrease your taxation below 0%.")
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+        # otherwise, carry on
+        else:
+            # update tax level
+            await conn.execute('''UPDATE cnc_users SET tax_level = tax_level - .01 WHERE user_id = $1;''',
+                               self.author.id)
+            # send confirmation
+            await interaction.followup.send(f"Your tax rate is now f{self.user_info['tax_level']-.01:.0%}!")
+            # return to menu
+            gov_menu = GovernmentModView(self.author, self.interaction, conn, self.user_info, self.govt_info,)
+            await interaction.edit_original_response(view=gov_menu)
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
+    async def back(self, interaction: discord.Interaction, button: discord.Button):
+        # return to menu
+        gov_menu = GovernmentModView(self.author, self.interaction, self.conn, self.user_info, self.govt_info, )
+        await interaction.edit_original_response(view=gov_menu)
+
+    @discord.ui.button(label="Increase", style=discord.ButtonStyle.blurple, emoji="\U0001f4c8")
+    async def increase(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # establish connection
+        conn = self.conn
+        # if the user would decrease their tax below 0, stop them
+        if self.user_info['tax_level'] + .01 >= 20:
+            await interaction.followup.send(f"You cannot increase your taxation above "
+                                            f"{self.govt_info['tax_level'] + self.user_info['tax_level']:.0%}.")
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+        # otherwise, carry on
+        else:
+            # update tax level
+            await conn.execute('''UPDATE cnc_users SET tax_level = tax_level + .01 WHERE user_id = $1;''',
+                               self.author.id)
+            # send confirmation
+            await interaction.followup.send(f"Your tax rate is now f{self.user_info['tax_level'] + .01:.0%}!")
+            # return to menu
+            gov_menu = GovernmentModView(self.author, self.interaction, conn, self.user_info, self.govt_info, )
+            await interaction.edit_original_response(view=gov_menu)
 
 
 class CNC(commands.Cog):
@@ -1921,11 +2018,6 @@ class CNC(commands.Cog):
         govt_embed.add_field(name="Base Development Cost", value=f"{govt_info['dev_cost']:.0%}")
         # send embed
         await interaction.followup.send(embed=govt_embed)
-        
-
-
-
-
 
     @cnc.command(name="set_taxation", description="Sets the level of taxation for your government.")
     @app_commands.describe(rate="The tax rate you wish to set.")
