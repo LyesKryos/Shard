@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Timeout for dossier fixing" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Cleaning up debugging">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -445,7 +448,7 @@
       <workItem from="1746292901570" duration="666000" />
       <workItem from="1746385075282" duration="1233000" />
       <workItem from="1746406659891" duration="2833000" />
-      <workItem from="1746482214157" duration="2022000" />
+      <workItem from="1746482214157" duration="3393000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -790,7 +793,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1258" />
+    <option name="localTasksCounter" value="1261" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,7 +811,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding colonize stuff" />
     <MESSAGE value="Adding role restrictions for alter_leader" />
     <MESSAGE value="Fixing colonize" />
     <MESSAGE value="Adding proper timeout for UnowedProvince" />
@@ -833,7 +835,8 @@
     <MESSAGE value="Timeout for dossier command" />
     <MESSAGE value="Adding close command for dossier view" />
     <MESSAGE value="Timeout for dossier fixing" />
-    <option name="LAST_COMMIT_MESSAGE" value="Timeout for dossier fixing" />
+    <MESSAGE value="Cleaning up debugging" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleaning up debugging" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$resources_updating_cnc.coverage" NAME="resources_updating_cnc Coverage Results" MODIFIED="1661216424601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

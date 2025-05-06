@@ -1901,6 +1901,34 @@ class CNC(commands.Cog):
         # check for registration
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # pull government info
+        govt_info = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1 AND govt_subtype = $2;''',
+                                        user_info['govt_type'], user_info['govt_subtype'])
+        # build embed, populate title with pretitle and nation name, set color to user color,
+        # and set description to Discord user.
+        govt_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
+                                   color=discord.Color(int(user_info["color"].lstrip('#'), 16), ),
+                                   description=f"Registered nation of "
+                                               f"{(self.bot.get_user(user_info['user_id'])).mention}.")
+        # populate government type and subtype
+        govt_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}",
+                             inline=False)
+        # populate base authority gains
+        govt_embed.add_field(name="Base Economic Authority Gain", value=govt_info['econ_auth'])
+        govt_embed.add_field(name="Base Military Authority Gain", value=govt_info['mil_auth'])
+        govt_embed.add_field(name="Base Political Authority Gain", value=govt_info['pol_auth'])
+        # unrest modifier
+        govt_embed.add_field(name="Base Unrest Gain", value=f"{govt_info['unrest_mod']:%}")
+        # manpower modifier
+        govt_embed.add_field(name="Base Manpower Access", value=f"{govt_info['manpower']:%}")
+        # development cost
+        govt_embed.add_field(name="Base Development Cost", value=f"{govt_info['dev_cost']:%}")
+        # send embed
+        await interaction.followup.send(embed=govt_embed)
+        
+
+
+
 
 
     @cnc.command(name="set_taxation", description="Sets the level of taxation for your government.")
