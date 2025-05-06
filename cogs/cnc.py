@@ -2016,8 +2016,10 @@ class CNC(commands.Cog):
         govt_embed.add_field(name="Base Manpower Access", value=f"{govt_info['manpower']:.0%}")
         # development cost
         govt_embed.add_field(name="Base Development Cost", value=f"{govt_info['dev_cost']:.0%}")
-        # send embed
-        await interaction.followup.send(embed=govt_embed)
+        # establish government modification view
+        govt_view = GovernmentModView(interaction.user, interaction, conn, user_info, govt_info)
+        # send embed and view
+        await interaction.followup.send(embed=govt_embed, view=govt_view)
 
     @cnc.command(name="set_taxation", description="Sets the level of taxation for your government.")
     @app_commands.describe(rate="The tax rate you wish to set.")
