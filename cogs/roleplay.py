@@ -371,10 +371,10 @@ class Roleplay(commands.Cog):
         if to_currency == "Thaler":
             to_currency_calc = Thaler
             symbol = "\u20B8"
-        elif to_currency == "1885 USD":
+        elif to_currency == "1890 USD":
             to_currency_calc = pastUSD_out
             symbol = "\u0024"
-        elif to_currency == "1885 GBP":
+        elif to_currency == "1890 GBP":
             to_currency_calc = pastGBP_out
             symbol = "\u00A3"
         elif to_currency == "2025 USD":
