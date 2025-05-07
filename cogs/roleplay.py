@@ -356,9 +356,9 @@ class Roleplay(commands.Cog):
         # select the option for from_currency
         if from_currency == "Thaler":
             from_currency_calc = Thaler
-        elif from_currency == "1885 USD":
+        elif from_currency == "1890 USD":
             from_currency_calc = pastUSD_in
-        elif from_currency == "1885 GBP":
+        elif from_currency == "1890 GBP":
             from_currency_calc = pastGBP_in
         elif from_currency == "2025 USD":
             from_currency_calc = USD2025_in
