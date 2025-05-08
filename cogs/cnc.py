@@ -1125,6 +1125,15 @@ class GovernmentModView(View):
         # send secondary view
         await interaction.edit_original_response(view=mu_menu)
 
+    @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
+    async def close(self, interaction: discord.Interaction, button: discord.Button):
+        # defer response
+        await interaction.response.defer()
+        # disable all buttons and update view
+        for child in self.children:
+            child.disabled = True
+        await interaction.edit_original_response(view=self)
+
 class TaxManageView(View):
 
     def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool,
