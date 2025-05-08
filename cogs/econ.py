@@ -1311,7 +1311,7 @@ class Economy(commands.Cog):
                         value = floor
                     # if the outstanding shares is between 0 and 500 shares away from the total issued shares,
                     # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
-                    if stock['issued'] - stock['outstanding'] < randint(0, 500):
+                    if stock['issued'] - stock['outstanding'] <= randint(0, 500):
                         # royal bonds are immune to automatic dilution
                         if stock['stock_id'] != 1:
                             new_shares = stock['issued'] / 5
