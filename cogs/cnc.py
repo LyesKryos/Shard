@@ -7,7 +7,7 @@ from venv import logger
 
 import asyncpg
 from discord import app_commands, Interaction
-from discord.ext.commands import Context
+from discord.ext.commands import Context, guild_only
 from discord.ext.commands._types import BotT
 
 from ShardBot import Shard
@@ -1544,7 +1544,7 @@ class CNC(commands.Cog):
     # === User Commands and View Commands === #
 
     @cnc.command(name="register", description="Registers a new player nation.")
-    @app_commands.guild_only()
+    @app_commands.allowed_contexts(dms=False)
     @app_commands.describe(nation_name="The name of your new nation.",
                            color="The hex code of your new nation. Include the '#'.")
     async def register(self, interaction: discord.Interaction, nation_name: str, color: str):
@@ -1625,7 +1625,7 @@ class CNC(commands.Cog):
             return
 
     @cnc.command(name="change_color", description="Changes your nation's color on the map.")
-    @app_commands.guild_only()
+    @app_commands.allowed_contexts(dms=False)
     @app_commands.checks.cooldown(1, 30)
     @app_commands.describe(color="The hex code of your new map color. Include the '#'.")
     async def recolor(self, interaction: discord.Interaction, color: str):
@@ -1682,7 +1682,7 @@ class CNC(commands.Cog):
         return await interaction.followup.send(f"Color successfully changed to {color}!")
 
     @cnc.command(name="map", description="Opens the map for viewing.")
-    @app_commands.guild_only()
+    @app_commands.allowed_contexts(dms=False)
     async def map(self, interaction: discord.Interaction):
         # defer the interaction
         await interaction.response.defer(thinking=True)
@@ -1693,7 +1693,7 @@ class CNC(commands.Cog):
 
     @cnc.command(name="locate_province", description="Highlights a province on the map.")
     @app_commands.describe(province="The ID of the province to locate.")
-    @app_commands.guild_only()
+    @app_commands.allowed_contexts(dms=False)
     async def locate_province(self, interaction: discord.Interaction, province: int):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -1708,7 +1708,7 @@ class CNC(commands.Cog):
         return await interaction.followup.send(url)
 
     @cnc.command(name="nation", description="Displays nation information for specified nation or player.")
-    @app_commands.guild_only()
+    @app_commands.allowed_contexts(dms=False)
     @app_commands.describe(nation="The name of the nation you wish to query.", user="The user you wish to query.")
     async def nation(self, interaction: discord.Interaction, user: discord.Member = None, nation: str = None):
         # if neither argument is submitted, return error message
@@ -1999,7 +1999,6 @@ class CNC(commands.Cog):
     # === Tech Commands === #
 
     @cnc.command(name="technology", description="Opens the technology menu.")
-    @app_commands.guild_only()
     async def technology(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -2008,7 +2007,6 @@ class CNC(commands.Cog):
         #
 
     @cnc.command(name="tech", description="Opens the technology and research menu.")
-    @app_commands.guild_only()
     @app_commands.describe(tech="The tech to search.")
     async def tech(self, interaction: discord.Interaction, tech: str):
         # defer interaction
@@ -2040,7 +2038,6 @@ class CNC(commands.Cog):
         return await interaction.followup.send(embed=tech_embed)
 
     @cnc.command(name="view_tech_tree", description="Displays researched techs.")
-    @app_commands.guild_only()
     async def view_tech_tree(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -2066,7 +2063,6 @@ class CNC(commands.Cog):
         await interaction.followup.send(file=discord.File(fr"{self.tech_directory}CNC Tech Map Rendered.png"))
 
     @cnc.command(name="research", description="Begins researching a specified tech.")
-    @app_commands.guild_only()
     @app_commands.describe(tech="The tech to research.")
     async def research(self, interaction: discord.Interaction, tech: str):
         # defer interaction
@@ -2127,7 +2123,6 @@ class CNC(commands.Cog):
                                         f" {research_buff} (national research time) + 4 (base research time)||")
 
     @cnc.command(name="researching", description="Displays which tech is being researched.")
-    @app_commands.guild_only()
     async def researching(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -2153,7 +2148,6 @@ class CNC(commands.Cog):
                                                    f"tech. Research will be complete in {researching['turns']} turns.")
 
     @cnc.command(name="cancel_research", description="Cancels the tech currently being researched.")
-    @app_commands.guild_only()
     async def cancel_research(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -2231,93 +2225,6 @@ class CNC(commands.Cog):
         govt_view = GovernmentModView(interaction.user, interaction, conn, govt_info, govt_embed)
         # send embed and view
         await interaction.followup.send(embed=govt_embed, view=govt_view)
-
-    @cnc.command(name="set_taxation", description="Sets the level of taxation for your government.")
-    @app_commands.describe(rate="The tax rate you wish to set.")
-    @app_commands.guild_only()
-    async def set_taxation(self, interaction: discord.Interaction, rate: int):
-        # defer interaction
-        await interaction.response.defer(thinking=True)
-        # establish connection
-        conn = self.bot.pool
-        # pull userinfo
-        user_info = await user_db_info(interaction.user.id, conn)
-        # check for registration
-        if user_info is None:
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
-        # ensure rate is positive
-        if rate < 0:
-            return await interaction.followup.send("You cannot set a negative tax rate.")
-        # pull the government type information
-        govt_tax = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1 AND govt_subtype = $2;''',
-                                       user_info['govt_type'], user_info['govt_subtype'])
-        # calculate max tax rate = govt type tax rate plus 20%
-        max_tax = (govt_tax['tax_level']*100) + 20
-        # check that the requested rate is not above the max tax rate
-        if rate > max_tax:
-            return await interaction.followup.send(f"You cannot set a tax rate greater than {round(max_tax)}%.")
-        # otherwise, carry on
-        # update the tax level
-        await conn.execute('''UPDATE cnc_users SET tax_level = $1 WHERE user_id = $2;''', rate/100, interaction.user.id)
-        # if the tax level increases, add a random amount of unrest
-        if rate > user_info['tax_level']:
-            unrest_gain = randint(1, rate)
-            await conn.execute('''UPDATE cnc_users SET unrest = unrest + $1 WHERE user_id = $2;''',
-                                     unrest_gain, interaction.user.id)
-        # send confirmation
-        return await interaction.followup.send(f"The tax rate of {user_info['name']} has been set to {round(rate)}%.")
-
-    @cnc.command(name="set_public_spending", description="Sets the level of public spending for your government.")
-    @app_commands.describe(budget="The amount of Economic authority to budget for Public Spending.")
-    @app_commands.guild_only()
-    async def set_public_spending(self, interaction: discord.Interaction, budget: int):
-        # defer interaction
-        await interaction.response.defer(thinking=True)
-        # establish connection
-        conn = self.bot.pool
-        # pull userinfo
-        user_info = await user_db_info(interaction.user.id)
-        # check for registration
-        if user_info is None:
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
-        # ensure that the budget is positive
-        if budget < 0:
-            return await interaction.followup.send("You cannot set a negative budget.")
-        # ensure the budget is less than 10
-        if budget > 10:
-            return await interaction.followup.send("You cannot set a budget above 10 Economic authority.")
-        # otherwise, carry on
-        # update public spending level
-        await conn.execute('''UPDATE cnc_users SET public_spend = $1 WHERE user_id = $2;''',
-                           budget, interaction.user.id)
-        return await interaction.followup.send(f"{user_info['name']} now has a Public Spending budget of "
-                                               f"{budget} Economic authority.")
-
-    @cnc.command(name="set_military_upkeep", description="Sets the level of military upkeep for your government.")
-    @app_commands.describe(budget="The amount of Economic authority to budget for Military upKeeping.")
-    @app_commands.guild_only()
-    async def set_military_upkeep(self, interaction: discord.Interaction, budget: int):
-        # defer interaction
-        await interaction.response.defer(thinking=True)
-        # establish connection
-        conn = self.bot.pool
-        # pull userinfo
-        user_info = await user_db_info(interaction.user.id)
-        # check for registration
-        if user_info is None:
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
-        # ensure that the budget is positive
-        if budget < 0:
-            return await interaction.followup.send("You cannot set a negative budget.")
-        # ensure the budget is less than 10
-        if budget > 25:
-            return await interaction.followup.send("You cannot set a budget above 25 Economic authority.")
-        # otherwise, carry on
-        # update military upkeep level
-        await conn.execute('''UPDATE cnc_users SET mil_upkeep = $1 WHERE user_id = $2;''',
-                           budget, interaction.user.id)
-        return await interaction.followup.send(f"{user_info['name']} now has a Military Upkeep budget of "
-                                               f"{budget} Economic authority.")
 
     @cnc.command(name="boost_stability", description="Utilizes Political authority to boost national stability.")
     @app_commands.describe(boost="The amount of Political authority to expend on boosting national stability.")
