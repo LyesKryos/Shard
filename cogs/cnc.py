@@ -1117,7 +1117,7 @@ class GovernmentModView(View):
         await interaction.edit_original_response(view=ps_menu)
 
     @discord.ui.button(label="Military Upkeep", style=discord.ButtonStyle.blurple, emoji="\U0001f6e1")
-    async def pub_spend(self, interaction: discord.Interaction, button: discord.Button):
+    async def mil_upkeep(self, interaction: discord.Interaction, button: discord.Button):
         # defer interaction
         await interaction.response.defer()
         # establish secondary view
