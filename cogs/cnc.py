@@ -1361,7 +1361,7 @@ class MilUpkeepView(View):
             await conn.execute('''UPDATE cnc_users SET mil_upkeep = mil_upkeep + 1 WHERE user_id = $1;''',
                                self.author.id)
             # update embed
-            self.govt_embed.set_field_at(-1, name="Military Spending",
+            self.govt_embed.set_field_at(-1, name="Military Upkeep",
                                          value=f"{self.user_info['mil_upkeep'] + 1} Military Authority")
             # enable decrease button
             self.decrease.disabled = False
