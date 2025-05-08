@@ -1279,6 +1279,88 @@ class PublicSpendingView(View):
             # update embed
             await interaction.edit_original_response(embed=self.govt_embed, view=self)
 
+class MilUpkeepView(View):
+
+    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool,
+                 govt_info: asyncpg.Record, govt_embed: discord.Embed):
+        super().__init__(timeout=120)
+        self.user_info = None
+        self.govt_info = govt_info
+        self.conn = conn
+        self.interaction = interaction
+        self.author = author
+        self.govt_embed = govt_embed
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.author.id
+
+    async def on_timeout(self) -> None:
+        for child in self.children:
+            child.disabled = True
+        return await self.interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Decrease Military Upkeep", style=discord.ButtonStyle.blurple, emoji="\U0001f4c9")
+    async def decrease(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # establish connection
+        conn = self.conn
+        # pull user info
+        self.user_info = await user_db_info(self.author.id, conn)
+        # if the user is going to decrease below 0 spending, stop them
+        if self.user_info['mil_upkeep'] - 1 < 0:
+            button.disabled = True
+            await interaction.followup.send(f"You cannot decrease your military upkeep "
+                                            f"below 0 Military Authority.")
+            await interaction.edit_original_response(view=self)
+        else:
+            # update public spending level
+            await conn.execute('''UPDATE cnc_users SET mil_upkeep = mil_upkeep - 1 WHERE user_id = $1;''',
+                               self.author.id)
+            # update embed
+            self.govt_embed.set_field_at(-1, name="Military Upkeep",
+                                         value=f"{self.user_info['mil_upkeep'] - 1} Military Authority")
+            # enable increase button
+            self.increase.disabled = False
+            # update embed
+            await interaction.edit_original_response(view=self, embed=self.govt_embed)
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
+    async def back(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # return to menu
+        gov_menu = GovernmentModView(self.author, self.interaction, self.conn, self.govt_info, self.govt_embed)
+        await interaction.edit_original_response(view=gov_menu)
+
+    @discord.ui.button(label="Increase Military Upkeep", style=discord.ButtonStyle.blurple, emoji="\U0001f4c8")
+    async def increase(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # establish connection
+        conn = self.conn
+        # pull user info
+        self.user_info = await user_db_info(self.author.id, conn)
+        # if the user is going to decrease below 0 spending, stop them
+        if self.user_info['mil_upkeep'] + 1 > 10:
+            button.disabled = True
+            await interaction.followup.send(f"You cannot increase your Military Upkeep "
+                                            f"above 10 Military Authority.")
+            await interaction.edit_original_response(view=self)
+        else:
+            # update public spending level
+            await conn.execute('''UPDATE cnc_users SET mil_upkeep = mil_upkeep + 1 WHERE user_id = $1;''',
+                               self.author.id)
+            # update embed
+            self.govt_embed.set_field_at(-2, name="Military Spending",
+                                         value=f"{self.user_info['mil_upkeep'] + 1} Military Authority")
+            # enable decrease button
+            self.decrease.disabled = False
+            # update embed
+            await interaction.edit_original_response(embed=self.govt_embed, view=self)
+
+
+
 
 
 class CNC(commands.Cog):
