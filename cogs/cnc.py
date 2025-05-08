@@ -1116,6 +1116,15 @@ class GovernmentModView(View):
         # send secondary view
         await interaction.edit_original_response(view=ps_menu)
 
+    @discord.ui.button(label="Military Upkeep", style=discord.ButtonStyle.blurple, emoji="\U0001f6e1")
+    async def pub_spend(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # establish secondary view
+        mu_menu = MilUpkeepView(self.author, self.interaction, self.conn, self.govt_info, self.govt_embed)
+        # send secondary view
+        await interaction.edit_original_response(view=mu_menu)
+
 class TaxManageView(View):
 
     def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool,
