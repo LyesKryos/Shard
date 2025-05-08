@@ -1360,9 +1360,6 @@ class MilUpkeepView(View):
             await interaction.edit_original_response(embed=self.govt_embed, view=self)
 
 
-
-
-
 class CNC(commands.Cog):
 
     def __init__(self, bot: Shard):
