@@ -1107,7 +1107,7 @@ class GovernmentModView(View):
         # send secondary view
         await interaction.edit_original_response(view=tax_menu)
 
-    @discord.ui.button(label="Public Spending", style=discord.ButtonStyle.blurple, emoji="\U00002696")
+    @discord.ui.button(label="Public Spending", style=discord.ButtonStyle.blurple, emoji="\U0001f6e0")
     async def pub_spend(self, interaction: discord.Interaction, button: discord.Button):
         # defer interaction
         await interaction.response.defer()
@@ -1116,7 +1116,7 @@ class GovernmentModView(View):
         # send secondary view
         await interaction.edit_original_response(view=ps_menu)
 
-    @discord.ui.button(label="Military Upkeep", style=discord.ButtonStyle.blurple, emoji="\U0001f6e1")
+    @discord.ui.button(label="Military Upkeep", style=discord.ButtonStyle.blurple, emoji="")
     async def mil_upkeep(self, interaction: discord.Interaction, button: discord.Button):
         # defer interaction
         await interaction.response.defer()
@@ -1124,6 +1124,43 @@ class GovernmentModView(View):
         mu_menu = MilUpkeepView(self.author, self.interaction, self.conn, self.govt_info, self.govt_embed)
         # send secondary view
         await interaction.edit_original_response(view=mu_menu)
+
+    @ discord.ui.button(label="Boost Stability", style=discord.ButtonStyle.blurple, emoji="\U00002696")
+    async def boost_stability(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # establish connection
+        conn = self.conn
+        # pull userinfo
+        user_info = await user_db_info(interaction.user.id, conn)
+        # pull user boost limit
+        stab_boost_limit = user_info['stability_limit']
+        # pull current stability
+        stability = user_info['stability']
+        # check if user has used their stability limit
+        if stab_boost_limit <= 0:
+            return await interaction.followup.send("You cannot expend more than 10 Political authority on "
+                                                   "Stability boosting each turn.")
+        # check if the boost amount will overdraw boosting
+        if stab_boost_limit - 1 > 0:
+            return await interaction.followup.send(
+                f"You cannot boost that amount. The maximum boost amount this turn is"
+                f" currently {stab_boost_limit} Political authority.")
+        # check if the user has a sufficient amount of political authority
+        if user_info['pol_auth'] < 1:
+            return await interaction.followup.send("You do not have sufficient Political "
+                                                   "authority to boost that amount.")
+        # otherwise carry on
+        # reduce stab limit
+        await conn.execute('''UPDATE cnc_users SET stability_limit = stability_limit - 1 WHERE user_id = $1;''',
+                           interaction.user.id)
+        # pay pol auth
+        await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth - 1 WHERE user_id = $1;''',
+                           interaction.user.id)
+        await conn.execute('''UPDATE cnc_users SET stability = stability + $1 WHERE user_id = $2;''',
+                           math.floor((-stability ^ .05) + 10), interaction.user.id)
+        return await interaction.followup.send(f"The stability of {user_info['name']} has been boosted.")
+
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
     async def close(self, interaction: discord.Interaction, button: discord.Button):
