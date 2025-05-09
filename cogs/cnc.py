@@ -1160,6 +1160,7 @@ class GovernmentModView(View):
         await conn.execute('''UPDATE cnc_users SET stability = stability + $1 WHERE user_id = $2;''',
                            math.floor((-stability ** .05) + 10), interaction.user.id)
         self.govt_embed.set_field_at(2, name="Stability", value=stability + math.floor((-stability ** .05) + 10))
+        await interaction.edit_original_response(embed=self.govt_embed)
         return await interaction.followup.send(f"The stability of {user_info['name']} has been boosted.")
 
 
