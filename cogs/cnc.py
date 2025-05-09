@@ -1136,7 +1136,7 @@ class GovernmentModView(View):
         # pull user boost limit
         stab_boost_limit = user_info['stability_limit']
         # pull current stability
-        stability = user_info['stability']
+        stability = int(user_info['stability'])
         # check if user has used their stability limit
         if stab_boost_limit <= 0:
             return await interaction.followup.send("You cannot expend more than 10 Political authority on "
