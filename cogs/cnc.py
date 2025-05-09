@@ -1142,7 +1142,7 @@ class GovernmentModView(View):
             return await interaction.followup.send("You cannot expend more than 10 Political authority on "
                                                    "Stability boosting each turn.")
         # check if the boost amount will overdraw boosting
-        if stab_boost_limit - 1 > 0:
+        if stab_boost_limit - 1 < 0:
             return await interaction.followup.send(
                 f"You cannot boost that amount. The maximum boost amount this turn is"
                 f" currently {stab_boost_limit} Political authority.")
