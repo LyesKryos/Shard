@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing stability boosting." />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding embed updating">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -450,7 +452,7 @@
       <workItem from="1746662898380" duration="583000" />
       <workItem from="1746711682200" duration="1739000" />
       <workItem from="1746716504126" duration="2708000" />
-      <workItem from="1746808903635" duration="2386000" />
+      <workItem from="1746808903635" duration="2789000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -795,7 +797,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1298" />
+    <option name="localTasksCounter" value="1304" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -813,9 +815,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Making govt modification command" />
-    <MESSAGE value="Updating percentage for govt command" />
-    <MESSAGE value="Fixing close button" />
     <MESSAGE value="Removing close button in dossier" />
     <MESSAGE value="Taxation button" />
     <MESSAGE value="Adding tax level to government embed" />
@@ -838,7 +837,10 @@
     <MESSAGE value="Correcting guild_only bug" />
     <MESSAGE value="Correcting dilution issue" />
     <MESSAGE value="Fixing stability boosting." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing stability boosting." />
+    <MESSAGE value="Fixing button emoji" />
+    <MESSAGE value="Fixing stability boosting" />
+    <MESSAGE value="Adding embed updating" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding embed updating" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$resources_updating_cnc.coverage" NAME="resources_updating_cnc Coverage Results" MODIFIED="1661216424601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

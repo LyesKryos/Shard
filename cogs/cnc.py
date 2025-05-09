@@ -1146,6 +1146,9 @@ class GovernmentModView(View):
             return await interaction.followup.send(
                 f"You cannot boost that amount. The maximum boost amount this turn is"
                 f" currently {stab_boost_limit} Political authority.")
+        # check to ensure that boosting will not boost beyond 80
+        if stability >= 80:
+            return await interaction.followup.send("You cannot boost stability beyond 80.")
         # check if the user has a sufficient amount of political authority
         if user_info['pol_auth'] < 1:
             return await interaction.followup.send("You do not have sufficient Political "
