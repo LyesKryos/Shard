@@ -1136,7 +1136,7 @@ class GovernmentModView(View):
         # pull user boost limit
         stab_boost_limit = user_info['stability_limit']
         # pull current stability
-        stability = int(user_info['stability'])
+        stability = user_info['stability']
         # check if user has used their stability limit
         if stab_boost_limit <= 0:
             return await interaction.followup.send("You cannot expend more than 10 Political authority on "
@@ -1158,7 +1158,7 @@ class GovernmentModView(View):
         await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth - 1 WHERE user_id = $1;''',
                            interaction.user.id)
         await conn.execute('''UPDATE cnc_users SET stability = stability + $1 WHERE user_id = $2;''',
-                           math.floor((-stability ^ .05) + 10), interaction.user.id)
+                           math.floor((-stability ** .05) + 10), interaction.user.id)
         return await interaction.followup.send(f"The stability of {user_info['name']} has been boosted.")
 
 
