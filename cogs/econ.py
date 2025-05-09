@@ -1313,7 +1313,7 @@ class Economy(commands.Cog):
                     # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
                     if stock['issued'] - stock['outstanding'] <= randint(0, 500):
                         # royal bonds are immune to automatic dilution
-                        if stock['stock_id'] != 1:
+                        if stock['stock_id'] != 9:
                             new_shares = stock['issued'] / 5
                             dilution = round(uniform(5 * stock['risk'], 10 * stock['risk']), 2)
                             value = round(value * (clip(dilution, 0, 23) / 100), 2)
