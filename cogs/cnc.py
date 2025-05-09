@@ -1148,6 +1148,8 @@ class GovernmentModView(View):
                 f" currently {stab_boost_limit} Political authority.")
         # check to ensure that boosting will not boost beyond 80
         if stability >= 80:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
             return await interaction.followup.send("You cannot boost stability beyond 80.")
         # check if the user has a sufficient amount of political authority
         if user_info['pol_auth'] < 1:
