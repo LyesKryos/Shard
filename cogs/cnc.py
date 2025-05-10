@@ -1,15 +1,6 @@
-import functools
-import typing
 from random import randrange, randint
-from time import perf_counter
-from typing import Any
-from venv import logger
-
 import asyncpg
 from discord import app_commands, Interaction
-from discord.ext.commands import Context, guild_only
-from discord.ext.commands._types import BotT
-
 from ShardBot import Shard
 import discord
 from discord.ext import commands, tasks
@@ -17,9 +8,8 @@ import asyncio
 from PIL import Image, ImageColor, ImageDraw
 from base64 import b64encode
 import requests
-from discord.ui import View, Select, Item, button
+from discord.ui import View
 import math
-
 from customchecks import SilentFail
 
 
@@ -1588,12 +1578,14 @@ class CNC(commands.Cog):
     # === User Commands and View Commands === #
 
     @cnc.command(name="register", description="Registers a new player nation.")
-    @app_commands.allowed_contexts(dms=False)
     @app_commands.describe(nation_name="The name of your new nation.",
                            color="The hex code of your new nation. Include the '#'.")
     async def register(self, interaction: discord.Interaction, nation_name: str, color: str):
         # defer the interaction
         await interaction.response.defer(thinking=True)
+        # deny access if in DMs
+        if not interaction.guild:
+            return commands.NoPrivateMessage
         # establish connection
         conn = self.bot.pool
         # define user
@@ -1669,12 +1661,14 @@ class CNC(commands.Cog):
             return
 
     @cnc.command(name="change_color", description="Changes your nation's color on the map.")
-    @app_commands.allowed_contexts(dms=False)
     @app_commands.checks.cooldown(1, 30)
     @app_commands.describe(color="The hex code of your new map color. Include the '#'.")
     async def recolor(self, interaction: discord.Interaction, color: str):
         # defer interaction
         await interaction.response.defer(thinking=True)
+        # deny access if in DMs
+        if not interaction.guild:
+            return commands.NoPrivateMessage
         # establish connection
         conn = self.bot.pool
         # pull userinfo
@@ -1726,10 +1720,12 @@ class CNC(commands.Cog):
         return await interaction.followup.send(f"Color successfully changed to {color}!")
 
     @cnc.command(name="map", description="Opens the map for viewing.")
-    @app_commands.allowed_contexts(dms=False)
     async def map(self, interaction: discord.Interaction):
         # defer the interaction
         await interaction.response.defer(thinking=True)
+        # deny access if in DMs
+        if not interaction.guild:
+            return commands.NoPrivateMessage
         # send the map
         map = await interaction.followup.send("https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
         map_buttons = MapButtons(map, author=interaction.user)
@@ -1737,10 +1733,12 @@ class CNC(commands.Cog):
 
     @cnc.command(name="locate_province", description="Highlights a province on the map.")
     @app_commands.describe(province="The ID of the province to locate.")
-    @app_commands.allowed_contexts(dms=False)
     async def locate_province(self, interaction: discord.Interaction, province: int):
         # defer interaction
         await interaction.response.defer(thinking=True)
+        # deny access if in DMs
+        if not interaction.guild:
+            return commands.NoPrivateMessage
         # gather province info
         prov_info = await self.province_db_info(province)
         # if the province doesn't exist
@@ -1752,7 +1750,6 @@ class CNC(commands.Cog):
         return await interaction.followup.send(url)
 
     @cnc.command(name="nation", description="Displays nation information for specified nation or player.")
-    @app_commands.allowed_contexts(dms=False)
     @app_commands.describe(nation="The name of the nation you wish to query.", user="The user you wish to query.")
     async def nation(self, interaction: discord.Interaction, user: discord.Member = None, nation: str = None):
         # if neither argument is submitted, return error message
@@ -2270,60 +2267,15 @@ class CNC(commands.Cog):
         # send embed and view
         await interaction.followup.send(embed=govt_embed, view=govt_view)
 
-    @cnc.command(name="boost_stability", description="Utilizes Political authority to boost national stability.")
-    @app_commands.describe(boost="The amount of Political authority to expend on boosting national stability.")
-    @app_commands.guild_only()
-    async def boost_stability(self, interaction: discord.Interaction, boost: int):
-        # defer interaction
-        await interaction.response.defer(thinking=True)
-        # establish connection
-        conn = self.bot.pool
-        # pull userinfo
-        user_info = await user_db_info(interaction.user.id)
-        # check for registration
-        if user_info is None:
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
-        # ensure that the budget is positive
-        if boost < 0:
-            return await interaction.followup.send("You cannot set a negative boost amount.")
-        # pull user boost limit
-        stab_boost_limit = user_info['stability_limit']
-        # check if user has used their stability limit
-        if stab_boost_limit <= 0:
-            return await interaction.followup.send("You cannot expend more than 10 Political authority on "
-                                                   "Stability boosting each turn.")
-        # check if the boost amount will overdraw boosting
-        if boost > stab_boost_limit:
-            return await interaction.followup.send(f"You cannot boost that amount. The maximum boost amount this turn is"
-                                                   f" currently {stab_boost_limit} Political authority.")
-        # check if the user has a sufficient amount of political authority
-        if user_info['pol_auth'] < boost:
-            return await interaction.followup.send("You do not have sufficient Political "
-                                                   "authority to boost that amount.")
-        # otherwise carry on
-        # reduce stab limit
-        await conn.execute('''UPDATE cnc_users SET stability_limit = stability_limit - $1 WHERE user_id = $2;''',
-                           boost, interaction.user.id)
-        # pay pol auth
-        await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth - $1 WHERE user_id = $2;''',
-                           boost, interaction.user.id)
-        # boost stability = boost ^ 1.35
-        stab_boost = round(boost ** 1.35)
-        await conn.execute('''UPDATE cnc_users SET stability = stability + $1 WHERE user_id = $2;''',
-                           stab_boost, interaction.user.id)
-        return await interaction.followup.send(f"The stability of {user_info['name']} has been boosted using "
-                                               f"{boost} Political authority.")
-
     @cnc.command(name="designate_capital", description="Designates a province as the national capital.")
     @app_commands.describe(province_id="The province to be designated as the capital.")
-    @app_commands.guild_only()
     async def designate_capital(self, interaction: discord.Interaction, province_id: int):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establish connection
         conn = self.bot.pool
         # pull userinfo
-        user_info = await user_db_info(interaction.user.id)
+        user_info = await user_db_info(interaction.user.id, conn)
         # check for registration
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")

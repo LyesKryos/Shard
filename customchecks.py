@@ -5,7 +5,6 @@ from discord.utils import get
 class SilentFail(commands.CommandError):
     pass
 
-
 class CNCFail(commands.CheckFailure):
     pass
 
