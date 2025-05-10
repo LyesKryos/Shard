@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding authorities levels to government embed" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding authority to government embed" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -451,7 +451,7 @@
       <workItem from="1746711682200" duration="1739000" />
       <workItem from="1746716504126" duration="2708000" />
       <workItem from="1746808903635" duration="4320000" />
-      <workItem from="1746884800611" duration="2628000" />
+      <workItem from="1746884800611" duration="2936000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -796,7 +796,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1309" />
+    <option name="localTasksCounter" value="1310" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -814,7 +814,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing tax updating government embed" />
     <MESSAGE value="Fixing tax back button" />
     <MESSAGE value="Fixing updating embed issue" />
     <MESSAGE value="Removing guild only from manage_government" />
@@ -839,7 +838,8 @@
     <MESSAGE value="Disabiling stability boost beyond 80" />
     <MESSAGE value="Fixing designate capital command" />
     <MESSAGE value="Adding authorities levels to government embed" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding authorities levels to government embed" />
+    <MESSAGE value="Adding authority to government embed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding authority to government embed" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$resources_updating_cnc.coverage" NAME="resources_updating_cnc Coverage Results" MODIFIED="1661216424601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
