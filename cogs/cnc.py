@@ -2267,6 +2267,65 @@ class CNC(commands.Cog):
         # send embed and view
         await interaction.followup.send(embed=govt_embed, view=govt_view)
 
+    @cnc.command(name="change_government", description="Opens the Government modification menu.")
+    async def modify_government(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer()
+        # establish connection
+        conn = self.pool
+        # pull userinfo
+        user_info = await user_db_info(interaction.user.id, conn)
+        # check for registration
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # define special notes for government types
+        monarchy_note = "Capital Province Fort gains two Defense Levels."
+        republic_note = "Cost of Diplomatic Relations reduced by two."
+        democracy_note = "Cost of Government Modification decreased by two."
+        equalism_note = "Technology takes one less turn to research, enemies can declare war for free."
+        anarchy_note = "Civil War chance reduced by 100%, Revolution chance increased by 25%."
+        # create government embed
+        # pull government info
+        govt_info = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1 AND govt_subtype = $2;''',
+                                        user_info['govt_type'], user_info['govt_subtype'])
+        # build embed, populate title with pretitle and nation name, set color to user color,
+        # and set description to Discord user.
+        govt_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
+                                   color=discord.Color(int(user_info["color"].lstrip('#'), 16), ),
+                                   description=f"Registered nation of "
+                                               f"{(self.bot.get_user(user_info['user_id'])).mention}.")
+        # populate government type and subtype
+        govt_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}",
+                             inline=False)
+        # populate basic info
+        govt_embed.add_field(name="National Unrest", value=f"{user_info['unrest']}")
+        govt_embed.add_field(name="Stability", value=f"{user_info['stability']}")
+        govt_embed.add_field(name="Overextension Limit", value=f"{user_info['overextend_limit']}")
+        # populate current authority levels
+        govt_embed.add_field(name="Economic Authority            Military Authority            Political Authority",
+                             value=f"{user_info['econ_auth']}            {user_info['mil_auth']}            {user_info['pol_auth']}", inline=False)
+        # populate base authority gains
+        govt_embed.add_field(name="Base Economic Authority Gain", value=govt_info['econ_auth'])
+        govt_embed.add_field(name="Base Military Authority Gain", value=govt_info['mil_auth'])
+        govt_embed.add_field(name="Base Political Authority Gain", value=govt_info['pol_auth'])
+        # unrest modifier
+        govt_embed.add_field(name="Base Unrest Gain", value=f"{govt_info['unrest_mod']:.0%}")
+        # manpower modifier
+        govt_embed.add_field(name="Base Manpower Access", value=f"{govt_info['manpower']:.0%}")
+        # development cost
+        govt_embed.add_field(name="Base Development Cost", value=f"{govt_info['dev_cost']:.0%}")
+        # base taxation
+        govt_embed.add_field(name="Base Taxation", value=f"{govt_info['tax_level']:.0%}")
+        # current tax level
+        govt_embed.add_field(name="Current Taxation", value=f"{user_info['tax_level']:.0%}")
+        # max tax level
+        govt_embed.add_field(name="Maximum Taxation", value=f"{govt_info['tax_level'] + .2:.0%}")
+        # public spending
+        govt_embed.add_field(name="Public Spending", value=f"{user_info['public_spend']} Economic Authority")
+        # military upkeep
+        govt_embed.add_field(name="Military Upkeep", value=f"{user_info['mil_upkeep']} Military Authority")
+        #
+
     @cnc.command(name="designate_capital", description="Designates a province as the national capital.")
     @app_commands.describe(province_id="The province to be designated as the capital.")
     async def designate_capital(self, interaction: discord.Interaction, province_id: int):

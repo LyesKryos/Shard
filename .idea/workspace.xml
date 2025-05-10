@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Disabiling stability boost beyond 80">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing designate capital command">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/customchecks.py" beforeDir="false" afterPath="$PROJECT_DIR$/customchecks.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -455,7 +454,7 @@
       <workItem from="1746711682200" duration="1739000" />
       <workItem from="1746716504126" duration="2708000" />
       <workItem from="1746808903635" duration="4320000" />
-      <workItem from="1746884800611" duration="918000" />
+      <workItem from="1746884800611" duration="1638000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -800,7 +799,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1306" />
+    <option name="localTasksCounter" value="1307" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -818,7 +817,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding tax level to government embed" />
     <MESSAGE value="Tax updating government embed" />
     <MESSAGE value="Fixing tax updating government embed" />
     <MESSAGE value="Fixing tax back button" />
@@ -843,7 +841,8 @@
     <MESSAGE value="Adding embed updating" />
     <MESSAGE value="Enforce stability boosting limits" />
     <MESSAGE value="Disabiling stability boost beyond 80" />
-    <option name="LAST_COMMIT_MESSAGE" value="Disabiling stability boost beyond 80" />
+    <MESSAGE value="Fixing designate capital command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing designate capital command" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$resources_updating_cnc.coverage" NAME="resources_updating_cnc Coverage Results" MODIFIED="1661216424601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
