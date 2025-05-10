@@ -2242,6 +2242,10 @@ class CNC(commands.Cog):
         govt_embed.add_field(name="National Unrest", value=f"{user_info['unrest']}")
         govt_embed.add_field(name="Stability", value=f"{user_info['stability']}")
         govt_embed.add_field(name="Overextension Limit", value=f"{user_info['overextend_limit']}")
+        # populate current authority levels
+        govt_embed.add_field(name="Economic Authority            Military Authority            Political Authority",
+                             value=f"{user_info['econ_auth']}            {user_info['mil_auth']}            {user_info['pol_auth']}",
+                             inline=False)
         # populate base authority gains
         govt_embed.add_field(name="Base Economic Authority Gain", value=govt_info['econ_auth'])
         govt_embed.add_field(name="Base Military Authority Gain", value=govt_info['mil_auth'])
