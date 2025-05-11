@@ -1496,8 +1496,6 @@ class GovernmentReformTypeDropdown(discord.ui.Select):
         # update message
         await interaction.edit_original_response(embed=type_embed)
 
-class
-
 class GovernmentReformSubtypeDropdown(discord.ui.Select):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, govt_subtypes: list):
