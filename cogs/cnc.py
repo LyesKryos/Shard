@@ -1463,7 +1463,7 @@ class GovernmentReformTypeDropdown(discord.ui.Select):
         # build embed
         type_embed = discord.Embed(title=f"{selected_type['govt_type']}",
                                       color=discord.Color.dark_red(), description=f"*{selected_type['type_quote']}*")
-        type_embed.add_field(name="Description", value=selected_type['description'])
+        type_embed.add_field(name="Description", value=selected_type['description'], inline=False)
         # authorities
         type_embed.add_field(name="Base Economic Authority", value=selected_type['econ_auth'])
         type_embed.add_field(name="Base Military Authority", value=selected_type['mil_auth'])
