@@ -1442,9 +1442,13 @@ class GovernmentReformTypeDropdown(discord.ui.Select):
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, govt_types: list):
         self.interaction = interaction
         self.conn = conn
+        # create the options
+        govt_options = []
+        for govt in govt_types:
+            govt_options.append(discord.SelectOption(label=govt))
         # define the super
         super().__init__(placeholder="Choose a Government Type...", min_values=1, max_values=1,
-                         options=govt_types)
+                         options=govt_options)
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.interaction.user.id
