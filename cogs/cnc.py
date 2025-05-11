@@ -232,6 +232,9 @@ class ConstructDropdown(discord.ui.Select):
         # define the super
         super().__init__(placeholder="Choose a structure to build...", min_values=1, max_values=1, options=options)
 
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.user_info['user_id']
+
     # set callback
     async def callback(self, interaction: discord.Interaction):
         structure = self.values[0]
@@ -412,8 +415,12 @@ class DeconstructDropdown(discord.ui.Select):
         super().__init__(placeholder="Choose a structure to deconstruct...", min_values=1, max_values=1,
                          options=options)
 
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.user_info['user_id']
+
     # define callback
     async def callback(self, interaction: discord.Interaction):
+        # define constants
         structure = self.values[0]
         prov_info = self.prov_info
         province_id = prov_info['id']
@@ -1411,6 +1418,73 @@ class MilUpkeepView(View):
             # update embed
             await interaction.edit_original_response(embed=self.govt_embed, view=self)
 
+class GovernmentReformView(View):
+
+    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool,
+                 govt_types: list):
+        super().__init__(timeout=120)
+        self.conn = conn
+        self.interaction = interaction
+        self.author = author
+        self.govt_types = govt_types
+        self.add_item(GovernmentReformTypeDropdown(self.interaction, self.conn, self.govt_types))
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.author.id
+
+    async def on_timeout(self) -> None:
+        for child in self.children:
+            child.disabled = True
+        return await self.interaction.edit_original_response(view=self)
+
+class GovernmentReformTypeDropdown(discord.ui.Select):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, govt_types: list):
+        self.interaction = interaction
+        self.conn = conn
+        # define the super
+        super().__init__(placeholder="Choose a Government Type...", min_values=1, max_values=1,
+                         options=govt_types)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.interaction.user.id
+
+    async def callback(self, interaction: discord.Interaction):
+        # define variables
+        type = self.options[0]
+        # pull subtype information
+        selected_type = await self.conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1;''', type)
+        # build embed
+        type_embed = discord.Embed(title=f"{selected_type['govt_type']}",
+                                      color=discord.Color.dark_red(), description=f"*{selected_type['type_quote']}*")
+        type_embed.add_field(name="Description", value=selected_type['description'])
+        # authorities
+        type_embed.add_field(name="Base Economic Authority", value=selected_type['econ_auth'])
+        type_embed.add_field(name="Base Military Authority", value=selected_type['mil_auth'])
+        type_embed.add_field(name="Base Political Authority", value=selected_type['pol_auth'])
+        # unrest modifier
+        type_embed.add_field(name="Base Unrest Gain", value=f"{selected_type['unrest_mod']:.0%}")
+        # manpower modifier
+        type_embed.add_field(name="Base Manpower Access", value=f"{selected_type['manpower']:.0%}")
+        # development cost
+        type_embed.add_field(name="Base Development Cost", value=f"{selected_type['dev_cost']:.0%}")
+        # base taxation
+        type_embed.add_field(name="Base Taxation", value=f"{selected_type['tax_level']:.0%}")
+        # special note
+        type_embed.add_field(name="Special Note", value=selected_type['type_note'], inline=False)
+        # update message
+        await interaction.edit_original_response(embed=type_embed)
+
+class GovernmentRestructureDropdown(discord.ui.Select):
+
+    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool, govt_type_info)
+        # define the super
+
+        super().__init__(placeholder="Choose a structure to deconstruct...", min_values=1, max_values=1,
+                         options=options)
+
+
+
 
 class CNC(commands.Cog):
 
@@ -2274,23 +2348,34 @@ class CNC(commands.Cog):
         # send embed and view
         await interaction.followup.send(embed=govt_embed, view=govt_view)
 
-    @cnc.command(name="change_government", description="Opens the Government modification menu.")
+    @cnc.command(name="change_government", description="Opens the Government reform menu.")
     async def modify_government(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer()
         # establish connection
-        conn = self.pool
+        conn = self.bot.pool
         # pull userinfo
         user_info = await user_db_info(interaction.user.id, conn)
         # check for registration
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
-        # define special notes for government types
-        monarchy_note = "Capital Province Fort gains two Defense Levels."
-        republic_note = "Cost of Diplomatic Relations reduced by two."
-        democracy_note = "Cost of Government Modification decreased by two."
-        equalism_note = "Technology takes one less turn to research, enemies can declare war for free."
-        anarchy_note = "Civil War chance reduced by 100%, Revolution chance increased by 25%."
+        # determine available government types
+        govt_types = []
+        # find monarchy
+        if "Divine Right" in user_info['tech']:
+            govt_types.append("Monarchy")
+        # find republic
+        if "Patrician Values" in user_info['tech']:
+            govt_types.append("Republic")
+        # find equalism
+        if "Revolutionary Ideals" in user_info['tech']:
+            govt_types.append("Equalism")
+        if "Democratic Ideals" in user_info['tech']:
+            govt_types.append("Democracy")
+        # if there are no government types available, return such
+        if len(govt_types) == 0:
+            return await interaction.followup.send(f"No government types are available to {user_info['name']}.\n"
+                                                   f"Govertnment types can be unlocked by researching technology.")
         # create government embed
         # pull government info
         govt_info = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1 AND govt_subtype = $2;''',
@@ -2335,7 +2420,8 @@ class CNC(commands.Cog):
         govt_embed.add_field(name="Public Spending", value=f"{user_info['public_spend']} Economic Authority")
         # military upkeep
         govt_embed.add_field(name="Military Upkeep", value=f"{user_info['mil_upkeep']} Military Authority")
-        #
+        # create view
+        await interaction.followup.send(embed=govt_embed, view=GovernmentReformView(interaction.user, interaction, conn))
 
     @cnc.command(name="designate_capital", description="Designates a province as the national capital.")
     @app_commands.describe(province_id="The province to be designated as the capital.")
