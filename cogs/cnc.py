@@ -2410,7 +2410,8 @@ class CNC(commands.Cog):
         # military upkeep
         govt_embed.add_field(name="Military Upkeep", value=f"{user_info['mil_upkeep']} Military Authority")
         # create view
-        await interaction.followup.send(embed=govt_embed, view=GovernmentReformView(interaction.user, interaction, conn))
+        await interaction.followup.send(embed=govt_embed,
+                                        view=GovernmentReformView(interaction.user, interaction, conn, govt_types))
 
     @cnc.command(name="designate_capital", description="Designates a province as the national capital.")
     @app_commands.describe(province_id="The province to be designated as the capital.")
