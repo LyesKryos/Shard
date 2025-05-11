@@ -1475,17 +1475,6 @@ class GovernmentReformTypeDropdown(discord.ui.Select):
         # update message
         await interaction.edit_original_response(embed=type_embed)
 
-class GovernmentRestructureDropdown(discord.ui.Select):
-
-    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool, govt_type_info)
-        # define the super
-
-        super().__init__(placeholder="Choose a structure to deconstruct...", min_values=1, max_values=1,
-                         options=options)
-
-
-
-
 class CNC(commands.Cog):
 
     def __init__(self, bot: Shard):
