@@ -1464,22 +1464,24 @@ class GovernmentReformTypeDropdown(discord.ui.Select):
         type_embed = discord.Embed(title=f"{selected_type['govt_type']}",
                                       color=discord.Color.dark_red(), description=f"*{selected_type['type_quote']}*")
         type_embed.add_field(name="Description", value=selected_type['type_description'], inline=False)
-        # authorities
-        type_embed.add_field(name="Base Economic Authority", value=selected_type['econ_auth'])
-        type_embed.add_field(name="Base Military Authority", value=selected_type['mil_auth'])
-        type_embed.add_field(name="Base Political Authority", value=selected_type['pol_auth'])
-        # unrest modifier
-        type_embed.add_field(name="Base Unrest Gain", value=f"{selected_type['unrest_mod']:.0%}")
-        # manpower modifier
-        type_embed.add_field(name="Base Manpower Access", value=f"{selected_type['manpower']:.0%}")
-        # development cost
-        type_embed.add_field(name="Base Development Cost", value=f"{selected_type['dev_cost']:.0%}")
-        # base taxation
-        type_embed.add_field(name="Base Taxation", value=f"{selected_type['tax_level']:.0%}")
         # special note
         type_embed.add_field(name="Special Note", value=selected_type['type_note'], inline=False)
         # update message
         await interaction.edit_original_response(embed=type_embed)
+
+        #
+        # # authorities
+        # type_embed.add_field(name="Base Economic Authority", value=selected_type['econ_auth'])
+        # type_embed.add_field(name="Base Military Authority", value=selected_type['mil_auth'])
+        # type_embed.add_field(name="Base Political Authority", value=selected_type['pol_auth'])
+        # # unrest modifier
+        # type_embed.add_field(name="Base Unrest Gain", value=f"{selected_type['unrest_mod']:.0%}")
+        # # manpower modifier
+        # type_embed.add_field(name="Base Manpower Access", value=f"{selected_type['manpower']:.0%}")
+        # # development cost
+        # type_embed.add_field(name="Base Development Cost", value=f"{selected_type['dev_cost']:.0%}")
+        # # base taxation
+        # type_embed.add_field(name="Base Taxation", value=f"{selected_type['tax_level']:.0%}")
 
 class CNC(commands.Cog):
 
