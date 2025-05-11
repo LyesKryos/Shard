@@ -1427,10 +1427,37 @@ class GovernmentReformView(View):
         self.interaction = interaction
         self.author = author
         self.govt_types = govt_types
-        self.add_item(GovernmentReformTypeDropdown(self.interaction, self.conn, self.govt_types))
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.author.id
+
+    async def on_timeout(self) -> None:
+        for child in self.children:
+            child.disabled = True
+        return await self.interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Government Type Reform", style=discord.ButtonStyle.blurple, emoji="\U0001f5ef")
+    async def govt_subtype_reform(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # clear view
+        await interaction.edit_original_response(view=None)
+        # create reform view dropdown
+        govt_type_dropdown = GovernemtnReformTypeView(self.interaction, self.conn, self.govt_types)
+        # update view
+        await interaction.edit_original_response(view=govt_type_dropdown)
+
+class GovernemtnReformTypeView(View):
+    def __init__(self, interaction, conn: asyncpg.Pool, govt_types: list):
+        super().__init__(timeout=120)
+        self.conn = conn
+        self.interaction = interaction
+        self.govt_types = govt_types
+        govt_type_dropdown = GovernmentReformTypeDropdown(self.interaction, self.conn, self.govt_types)
+        self.add_item(govt_type_dropdown)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.interaction.user.id
 
     async def on_timeout(self) -> None:
         for child in self.children:
@@ -1469,6 +1496,28 @@ class GovernmentReformTypeDropdown(discord.ui.Select):
         # update message
         await interaction.edit_original_response(embed=type_embed)
 
+class
+
+class GovernmentReformSubtypeDropdown(discord.ui.Select):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, govt_subtypes: list):
+        self.interaction = interaction
+        self.conn = conn
+        # create the options
+        govt_options = []
+        for govt in govt_subtypes:
+            govt_options.append(discord.SelectOption(label=govt['govt_subtype']))
+        # define the super
+        super().__init__(placeholder="Choose a Government Subtype...", min_values=1, max_values=1,
+                         options=govt_options)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.interaction.user.id
+
+    async def callback(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer()
+        # define variables
         #
         # # authorities
         # type_embed.add_field(name="Base Economic Authority", value=selected_type['econ_auth'])
