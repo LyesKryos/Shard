@@ -1454,6 +1454,8 @@ class GovernmentReformTypeDropdown(discord.ui.Select):
         return interaction.user.id == self.interaction.user.id
 
     async def callback(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer()
         # define variables
         type = self.options[0]
         # pull subtype information

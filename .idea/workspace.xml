@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing government reform">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -454,7 +455,7 @@
       <workItem from="1746716504126" duration="2708000" />
       <workItem from="1746808903635" duration="4320000" />
       <workItem from="1746884800611" duration="5828000" />
-      <workItem from="1746965596307" duration="2670000" />
+      <workItem from="1746965596307" duration="3101000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -799,7 +800,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1316" />
+    <option name="localTasksCounter" value="1317" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
