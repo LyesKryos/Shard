@@ -1583,7 +1583,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         WHERE user_id = $5;''', subtype['pretitle'], govt_info['govt_type'], subtype['govt_subtype'],
                            subtype['manpower'], self.interaction.user.id)
         # edit embed
-        govt_embed = self.interaction.message.embeds[0]
+        govt_embed = self.interaction.original_response().__getattribute__('embed')
         # update authority gains
         govt_embed.set_field_at(7, name="Base Economic Authority Gain", value=subtype['econ_auth'])
         govt_embed.set_field_at(8, name="Base Military Authority Gain", value=subtype['mil_auth'])
