@@ -1534,8 +1534,12 @@ class GovernmentReformTypeDropdown(discord.ui.Select):
         type_embed.add_field(name="Description", value=selected_type['type_description'], inline=False)
         # special note
         type_embed.add_field(name="Special Note", value=selected_type['type_note'], inline=False)
+        # pull user_info
+        user_info = await user_db_info(self.interaction.user.id, self.conn)
+        # create enacting view
+        govt_enact_view = GovernmentReformTypeEnact(self.interaction, self.conn, selected_type, user_info)
         # update message
-        await interaction.edit_original_response(embed=type_embed)
+        await interaction.edit_original_response(embed=type_embed, view=govt_enact_view)
 
 class GovernmentReformTypeEnact(discord.ui.View):
 
