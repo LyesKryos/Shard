@@ -1579,7 +1579,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         manpower_access = $4, 
         govt_type_countdown = 10,
         temp_unrest = '{10,8}',
-        unrest = unrest + 10,
+        unrest = unrest + 10
         WHERE user_id = $5;''', subtype['pretitle'], govt_info['govt_type'], subtype['govt_subtype'],
                            self.interaction.user.id)
         # edit embed
