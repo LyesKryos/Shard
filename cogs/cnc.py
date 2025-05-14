@@ -1420,13 +1420,11 @@ class MilUpkeepView(View):
 
 class GovernmentReformView(View):
 
-    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool,
-                 govt_types: list):
+    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool):
         super().__init__(timeout=120)
         self.conn = conn
         self.interaction = interaction
         self.author = author
-        self.govt_types = govt_types
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.author.id
@@ -1436,14 +1434,57 @@ class GovernmentReformView(View):
             child.disabled = True
         return await self.interaction.edit_original_response(view=self)
 
-    @discord.ui.button(label="Government Type Reform", style=discord.ButtonStyle.blurple, emoji="\U0001f5ef")
-    async def govt_subtype_reform(self, interaction: discord.Interaction, button: discord.Button):
+    @discord.ui.button(label="Reform Government Type", style=discord.ButtonStyle.blurple, emoji="\U0001f5ef")
+    async def govt_type_reform(self, interaction: discord.Interaction, button: discord.Button):
         # defer interaction
         await interaction.response.defer()
         # clear view
         await interaction.edit_original_response(view=None)
+        # if the user does not have enough political auth, deny
+        user_info = await user_db_info(self.author.id, self.conn)
+        # anarchist nations cannot change government type
+        if user_info['govt_type'] == "Anarchy":
+            return await interaction.followup.send("Anarchist governments cannot voluntarily change government type.")
+        # account for free government change at 50 development
+        if not user_info['free_govt_change']:
+            # calculate cost
+            province_dev = await self.conn.fetchrow('''SELECT SUM(development) FROM cnc_provinces WHERE owner_id = $1;''',
+                                                    self.author.id)
+            province_count = await self.conn.fetchrow('''SELECT COUNT(*) FROM cnc_provinces WHERE owner_id = $1;''',
+                                                      self.author.id)
+            mean_dev = math.ceil(province_dev['sum']/province_count['count'])
+            total_cost = math.ceil(mean_dev / 5)
+            # if the cost is greater than the 25-point limit, set it to 25
+            if total_cost > 25:
+                total_cost = 25
+            # deny if not enough political auth
+            if total_cost > user_info['pol_auth']:
+                return await interaction.followup.send("You do not have enough Political Authority to Reform your government.\n"
+                                                      f"To reform your government, you need a total of {total_cost} Political Authority.")
+        elif user_info['free_govt_change']:
+            await self.conn.execute('''UPDATE cnc_users SET free_govt_change = False WHERE user_id = $1;''',
+                                    self.author.id)
+        # determine available government types
+        govt_types = []
+        # find monarchy
+        if "Divine Right" in user_info['tech']:
+            govt_types.append("Monarchy")
+        # find republic
+        if "Patrician Values" in user_info['tech']:
+            govt_types.append("Republic")
+        # find equalism
+        if "Revolutionary Ideals" in user_info['tech']:
+            govt_types.append("Equalism")
+        if "Democratic Ideals" in user_info['tech']:
+            govt_types.append("Democracy")
+        # if there are no government types available, return such
+        if len(govt_types) == 0:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"No government types are available to {user_info['name']}.\n"
+                                                   f"Government types can be unlocked by researching technology.")
         # create reform view dropdown
-        govt_type_dropdown = GovernemtnReformTypeView(self.interaction, self.conn, self.govt_types)
+        govt_type_dropdown = GovernemtnReformTypeView(self.interaction, self.conn, govt_types)
         # update view
         await interaction.edit_original_response(view=govt_type_dropdown)
 
@@ -1495,6 +1536,72 @@ class GovernmentReformTypeDropdown(discord.ui.Select):
         type_embed.add_field(name="Special Note", value=selected_type['type_note'], inline=False)
         # update message
         await interaction.edit_original_response(embed=type_embed)
+
+class GovernmentReformTypeEnact(discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, govt_type: asyncpg.Record,
+                 user_info: asyncpg.Record):
+        super().__init__(timeout=120)
+        self.conn = conn
+        self.interaction = interaction
+        self.govt_type = govt_type
+        self.user_info = user_info
+
+    @discord.ui.button(label="Reform", style=discord.ButtonStyle.success)
+    async def reform_government(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # define connection
+        conn = self.conn
+        # determine if an anarchist rebellion will occur
+        if self.user_info['unrest'] > 25:
+            # calculate the anarchy chance based on current unrest
+            anarchy_chance = (self.user_info['unrest']**2)/100
+            # calculate the roll based on the 100 minus the current unrest
+            rebellion_roll = randrange((100-self.user_info['unrest']), 100)
+            # if the roll for a rebellion is less than the anarchy chance, rebellion occurs
+            if rebellion_roll < anarchy_chance:
+                await conn.execute('''UPDATE cnc_user SET anarchist_rebellion = TRUE WHERE user_id = $1;''',
+                                   self.interaction.user.id)
+        # enact government changes
+        govt_info = self.govt_type
+        # pull random subtype
+        subtype = await conn.fetchrow('''SELECT govt_subtype FROM cnc_govts WHERE govt_type = $1 ORDER BY random();''',
+                           govt_info['govt_type'])
+        await conn.execute('''UPDATE cnc_users SET 
+        pretitle = $1,
+        govt_type = $2,
+        govt_subtype = $3,
+        manpower_access = $4, 
+        govt_type_countdown = 10,
+        temp_unrest = '{10,8}',
+        unrest = unrest + 10,
+        WHERE user_id = $5;''', subtype['pretitle'], govt_info['govt_type'], subtype['govt_subtype'],
+                           self.interaction.user.id)
+        # edit embed
+        govt_embed = self.interaction.message.embeds[0]
+        # update authority gains
+        govt_embed.set_field_at(7, name="Base Economic Authority Gain", value=subtype['econ_auth'])
+        govt_embed.set_field_at(8, name="Base Military Authority Gain", value=subtype['mil_auth'])
+        govt_embed.set_field_at(9, name="Base Political Authority Gain", value=subtype['pol_auth'])
+        # update unrest
+        govt_embed.set_field_at(-8, name="Base Unrest Gain", value=f"{subtype['unrest_mod']:.0%}")
+        # update manpower
+        govt_embed.set_field_at(-7, name="Base Manpower Access", value=f"{subtype['manpower']:.0%}")
+        # update development
+        govt_embed.set_field_at(-6, name="Base Development Cost", value=f"{subtype['dev_cost']:.0%}")
+        # update taxation
+        govt_embed.set_field_at(-5, name="Base Taxation", value=f"{subtype['tax_level']:.0%}")
+        govt_embed.set_field_at(-3, name="Maximum Taxation", value=f"{subtype['tax_level'] + 20:.0%}")
+        # set up government view
+        govt_reform_view = GovernmentReformView(self.interaction.user, self.interaction, self.conn)
+        # send updates
+        await interaction.edit_original_response(embed=govt_embed, view=govt_reform_view)
+        # send confirmation message
+        return await interaction.followup.send(f"The government of {self.user_info['name']} has been reformed into a "
+                                               f"{subtype['govt_subtype']} {subtype['govt_type']}. Henceforth, the nation "
+                                               f"shall be known as the {subtype['pretitle']} of {self.user_info['name']}!\n"
+                                               f"*{subtype['type_quote']}*")
 
 class GovernmentReformSubtypeDropdown(discord.ui.Select):
 
@@ -2403,23 +2510,6 @@ class CNC(commands.Cog):
         # check for registration
         if user_info is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
-        # determine available government types
-        govt_types = []
-        # find monarchy
-        if "Divine Right" in user_info['tech']:
-            govt_types.append("Monarchy")
-        # find republic
-        if "Patrician Values" in user_info['tech']:
-            govt_types.append("Republic")
-        # find equalism
-        if "Revolutionary Ideals" in user_info['tech']:
-            govt_types.append("Equalism")
-        if "Democratic Ideals" in user_info['tech']:
-            govt_types.append("Democracy")
-        # if there are no government types available, return such
-        if len(govt_types) == 0:
-            return await interaction.followup.send(f"No government types are available to {user_info['name']}.\n"
-                                                   f"Govertnment types can be unlocked by researching technology.")
         # create government embed
         # pull government info
         govt_info = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1 AND govt_subtype = $2;''',
@@ -2466,7 +2556,7 @@ class CNC(commands.Cog):
         govt_embed.add_field(name="Military Upkeep", value=f"{user_info['mil_upkeep']} Military Authority")
         # create view
         await interaction.followup.send(embed=govt_embed,
-                                        view=GovernmentReformView(interaction.user, interaction, conn, govt_types))
+                                        view=GovernmentReformView(interaction.user, interaction, conn))
 
     @cnc.command(name="designate_capital", description="Designates a province as the national capital.")
     @app_commands.describe(province_id="The province to be designated as the capital.")
