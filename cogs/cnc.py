@@ -1570,7 +1570,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         # enact government changes
         govt_info = self.govt_type
         # pull random subtype
-        subtype = await conn.fetchrow('''SELECT govt_subtype FROM cnc_govts WHERE govt_type = $1 ORDER BY random();''',
+        subtype = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1 ORDER BY random();''',
                            govt_info['govt_type'])
         await conn.execute('''UPDATE cnc_users SET 
         pretitle = $1,
