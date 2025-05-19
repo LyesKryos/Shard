@@ -1496,7 +1496,7 @@ class GovernemtnReformTypeView(View):
         self.interaction = interaction
         self.govt_types = govt_types
         self.govt_embed = govt_embed
-        govt_type_dropdown = GovernmentReformTypeDropdown(self.interaction, self.conn, self.govt_types)
+        govt_type_dropdown = GovernmentReformTypeDropdown(self.interaction, self.conn, self.govt_types, self.govt_embed)
         self.add_item(govt_type_dropdown)
 
     async def interaction_check(self, interaction: discord.Interaction):

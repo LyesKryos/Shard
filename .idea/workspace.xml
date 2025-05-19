@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing government reform bug">
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -293,8 +293,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.cnc" />
       <item itemvalue="Python.scratch_1" />
+      <item itemvalue="Python.cnc" />
       <item itemvalue="Python.scratch" />
       <item itemvalue="Python.verification" />
     </list>
@@ -457,6 +457,7 @@
       <workItem from="1746965596307" duration="6296000" />
       <workItem from="1747174558628" duration="4328000" />
       <workItem from="1747263338734" duration="3860000" />
+      <workItem from="1747673787629" duration="356000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -801,7 +802,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1332" />
+    <option name="localTasksCounter" value="1333" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
