@@ -1420,11 +1420,12 @@ class MilUpkeepView(View):
 
 class GovernmentReformView(View):
 
-    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool):
+    def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool, govt_embed: discord.Embed):
         super().__init__(timeout=120)
         self.conn = conn
         self.interaction = interaction
         self.author = author
+        self.govt_embed = govt_embed
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.author.id
@@ -1484,16 +1485,17 @@ class GovernmentReformView(View):
             return await interaction.followup.send(f"No government types are available to {user_info['name']}.\n"
                                                    f"Government types can be unlocked by researching technology.")
         # create reform view dropdown
-        govt_type_dropdown = GovernemtnReformTypeView(self.interaction, self.conn, govt_types)
+        govt_type_dropdown = GovernemtnReformTypeView(self.interaction, self.conn, govt_types, self.govt_embed)
         # update view
         await interaction.edit_original_response(view=govt_type_dropdown)
 
 class GovernemtnReformTypeView(View):
-    def __init__(self, interaction, conn: asyncpg.Pool, govt_types: list):
+    def __init__(self, interaction, conn: asyncpg.Pool, govt_types: list, govt_embed: discord.Embed):
         super().__init__(timeout=120)
         self.conn = conn
         self.interaction = interaction
         self.govt_types = govt_types
+        self.govt_embed = govt_embed
         govt_type_dropdown = GovernmentReformTypeDropdown(self.interaction, self.conn, self.govt_types)
         self.add_item(govt_type_dropdown)
 
@@ -1507,9 +1509,10 @@ class GovernemtnReformTypeView(View):
 
 class GovernmentReformTypeDropdown(discord.ui.Select):
 
-    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, govt_types: list):
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, govt_types: list, govt_embed: discord.Embed):
         self.interaction = interaction
         self.conn = conn
+        self.govt_embed = govt_embed
         # create the options
         govt_options = []
         for govt in govt_types:
@@ -1537,19 +1540,21 @@ class GovernmentReformTypeDropdown(discord.ui.Select):
         # pull user_info
         user_info = await user_db_info(self.interaction.user.id, self.conn)
         # create enacting view
-        govt_enact_view = GovernmentReformTypeEnact(self.interaction, self.conn, selected_type, user_info)
+        govt_enact_view = GovernmentReformTypeEnact(self.interaction, self.conn, selected_type, user_info,
+                                                    self.govt_embed)
         # update message
         await interaction.edit_original_response(embed=type_embed, view=govt_enact_view)
 
 class GovernmentReformTypeEnact(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, govt_type: asyncpg.Record,
-                 user_info: asyncpg.Record):
+                 user_info: asyncpg.Record, govt_embed: discord.Embed):
         super().__init__(timeout=120)
         self.conn = conn
         self.interaction = interaction
         self.govt_type = govt_type
         self.user_info = user_info
+        self.govt_embed = govt_embed
 
     @discord.ui.button(label="Reform", style=discord.ButtonStyle.success)
     async def reform_government(self, interaction: discord.Interaction, button: discord.Button):
@@ -1583,7 +1588,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         WHERE user_id = $5;''', subtype['pretitle'], govt_info['govt_type'], subtype['govt_subtype'],
                            subtype['manpower'], self.interaction.user.id)
         # edit embed
-        govt_embed = interaction._original_response.embeds[0]
+        govt_embed = self.govt_embed
         # update authority gains
         govt_embed.set_field_at(7, name="Base Economic Authority Gain", value=subtype['econ_auth'])
         govt_embed.set_field_at(8, name="Base Military Authority Gain", value=subtype['mil_auth'])
@@ -1598,7 +1603,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         govt_embed.set_field_at(-5, name="Base Taxation", value=f"{subtype['tax_level']:.0%}")
         govt_embed.set_field_at(-3, name="Maximum Taxation", value=f"{subtype['tax_level'] + 20:.0%}")
         # set up government view
-        govt_reform_view = GovernmentReformView(self.interaction.user, self.interaction, self.conn)
+        govt_reform_view = GovernmentReformView(self.interaction.user, self.interaction, self.conn, self.govt_embed)
         # send updates
         await interaction.edit_original_response(embed=govt_embed, view=govt_reform_view)
         # send confirmation message
@@ -2560,7 +2565,7 @@ class CNC(commands.Cog):
         govt_embed.add_field(name="Military Upkeep", value=f"{user_info['mil_upkeep']} Military Authority")
         # create view
         await interaction.followup.send(embed=govt_embed,
-                                        view=GovernmentReformView(interaction.user, interaction, conn))
+                                        view=GovernmentReformView(interaction.user, interaction, conn, govt_embed))
 
     @cnc.command(name="designate_capital", description="Designates a province as the national capital.")
     @app_commands.describe(province_id="The province to be designated as the capital.")
