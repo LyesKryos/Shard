@@ -1587,6 +1587,9 @@ class GovernmentReformTypeEnact(discord.ui.View):
         unrest = unrest + 10
         WHERE user_id = $5;''', subtype['pretitle'], govt_info['govt_type'], subtype['govt_subtype'],
                            subtype['manpower'], self.interaction.user.id)
+        # testing
+        embed = interaction.message.embeds[0]
+        await interaction.followup.send(embed)
         # edit embed
         govt_embed = self.govt_embed
         # update authority gains
