@@ -1570,7 +1570,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
             rebellion_roll = randrange((100-self.user_info['unrest']), 100)
             # if the roll for a rebellion is less than the anarchy chance, rebellion occurs
             if rebellion_roll < anarchy_chance:
-                await conn.execute('''UPDATE cnc_user SET anarchist_rebellion = TRUE WHERE user_id = $1;''',
+                await conn.execute('''UPDATE cnc_users SET anarchist_rebellion = TRUE WHERE user_id = $1;''',
                                    self.interaction.user.id)
         # enact government changes
         govt_info = self.govt_type
