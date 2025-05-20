@@ -1476,6 +1476,7 @@ class GovernmentReformView(View):
         # find equalism
         if "Revolutionary Ideals" in user_info['tech']:
             govt_types.append("Equalism")
+        # find democracy
         if "Democratic Ideals" in user_info['tech']:
             govt_types.append("Democracy")
         # if there are no government types available, return such
@@ -1555,6 +1556,10 @@ class GovernmentReformTypeEnact(discord.ui.View):
         self.govt_type = govt_type
         self.user_info = user_info
         self.govt_embed = govt_embed
+        self.author = interaction.user
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.interaction.user.id
 
     @discord.ui.button(label="Reform", style=discord.ButtonStyle.success)
     async def reform_government(self, interaction: discord.Interaction, button: discord.Button):
@@ -1572,6 +1577,20 @@ class GovernmentReformTypeEnact(discord.ui.View):
             if rebellion_roll < anarchy_chance:
                 await conn.execute('''UPDATE cnc_users SET anarchist_rebellion = TRUE WHERE user_id = $1;''',
                                    self.interaction.user.id)
+        # if the government change isn't free
+        if not self.user_info['free_govt_change']:
+            # calculate cost
+            province_dev = await self.conn.fetchrow(
+                '''SELECT SUM(development) FROM cnc_provinces WHERE owner_id = $1;''',
+                self.author.id)
+            province_count = await self.conn.fetchrow(
+                '''SELECT COUNT(*) FROM cnc_provinces WHERE owner_id = $1;''',
+                self.author.id)
+            mean_dev = math.ceil(province_dev['sum'] / province_count['count'])
+            total_cost = math.ceil(mean_dev / 5)
+            # if the cost is greater than the 25-point limit, set it to 25
+            if total_cost > 25:
+                total_cost = 25
         # enact government changes
         govt_info = self.govt_type
         # pull random subtype
@@ -1584,12 +1603,12 @@ class GovernmentReformTypeEnact(discord.ui.View):
         manpower_access = $4, 
         govt_type_countdown = 10,
         temp_unrest = '{10,8}',
-        unrest = unrest + 10
-        WHERE user_id = $5;''', subtype['pretitle'], govt_info['govt_type'], subtype['govt_subtype'],
-                           subtype['manpower'], self.interaction.user.id)
-
-        # edit embed
-        govt_embed = interaction.message.embeds[0]
+        unrest = unrest + 10,
+        pol_auth = pol_auth - $5
+        WHERE user_id = $6;''', subtype['pretitle'], govt_info['govt_type'], subtype['govt_subtype'],
+                           subtype['manpower'], total_cost, self.author.id)
+        # define govt embed
+        govt_embed = self.govt_embed
         # update authority gains
         govt_embed.set_field_at(7, name="Base Economic Authority Gain", value=subtype['econ_auth'])
         govt_embed.set_field_at(8, name="Base Military Authority Gain", value=subtype['mil_auth'])
