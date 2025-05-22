@@ -1563,7 +1563,6 @@ class GovernmentReformTypeEnact(discord.ui.View):
             # if the cost is greater than the 25-point limit, set it to 25
             if total_cost > 25:
                 total_cost = 25
-            await interaction.followup.send(total_cost)
             # deny if not enough political auth
             if total_cost > self.user_info['pol_auth']:
                 main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, conn, self.govt_embed)
