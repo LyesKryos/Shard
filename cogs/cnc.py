@@ -1543,6 +1543,14 @@ class GovernmentReformTypeEnact(discord.ui.View):
         await interaction.response.defer()
         # define connection
         conn = self.conn
+        # if the user is already that government type, deny
+        if self.user_info['govt_type'] == self.govt_type:
+            main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, conn, self.govt_embed)
+            main_govt_menu.govt_type_reform.disabled = True
+            await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
+            return await interaction.followup.send(f"{self.user_info['name']} is already a {self.govt_type}.\n"
+                                                   f"To change government subtypes, select the Reform Government Subtype"
+                                                   f" button on the Government Reform menu.")
         # calculate cost
         if not self.user_info['free_govt_change']:
             # calculate cost
@@ -1560,7 +1568,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
             if total_cost > self.user_info['pol_auth']:
                 main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, conn, self.govt_embed)
                 main_govt_menu.govt_type_reform.disabled = True
-                await interaction.edit_original_response(view=main_govt_menu)
+                await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
                 return await interaction.followup.send("You do not have enough Political Authority to Reform your government.\n"
                                                       f"To reform your government, you need a total of {total_cost} Political Authority.")
         # if the user has the free government change, set the total cost = 0
@@ -1619,6 +1627,15 @@ class GovernmentReformTypeEnact(discord.ui.View):
                                                f"{subtype['govt_subtype']} {subtype['govt_type']}. Henceforth, the nation "
                                                f"shall be known as the {subtype['pretitle']} of {self.user_info['name']}!\n"
                                                f"*{subtype['type_quote']}*")
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
+    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # return to main menu
+        main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, self.conn, self.govt_embed)
+        main_govt_menu.govt_type_reform.disabled = True
+        return await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
 
 class GovernmentReformSubtypeDropdown(discord.ui.Select):
 
