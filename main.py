@@ -8,7 +8,7 @@ def main(bot: Shard):
                                            mode='a', maxBytes=1000000)
     handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
     handler.setLevel(logging.INFO)
-    bot.run("ODM0ODkyMDM3MjE1NjE3MDk0.YIHfzQ.-UBhOq3ukC7kz3VTvUmpUBtjqaM", log_handler=handler)
+    bot.run(log_handler=handler)
 
 
 main(Shard())

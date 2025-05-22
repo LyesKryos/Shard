@@ -5,9 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Re-establish government embed">
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ShardBot.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShardBot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -462,7 +464,8 @@
       <workItem from="1747174558628" duration="4328000" />
       <workItem from="1747263338734" duration="3860000" />
       <workItem from="1747673787629" duration="3586000" />
-      <workItem from="1747706007092" duration="218000" />
+      <workItem from="1747706007092" duration="608000" />
+      <workItem from="1747932015223" duration="1065000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -807,7 +810,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1338" />
+    <option name="localTasksCounter" value="1339" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -825,7 +828,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing decreasing spending for public spending" />
     <MESSAGE value="Fixing disabled/enabled buttons" />
     <MESSAGE value="Fixing the conversion options" />
     <MESSAGE value="Military upkeep buttons" />
@@ -849,6 +851,7 @@
     <MESSAGE value="Altering government reform" />
     <MESSAGE value="Adding government type reform actions" />
     <MESSAGE value="Fixing government reform bug" />
+    <MESSAGE value="Adding gitignore" />
     <MESSAGE value="Re-establish government embed" />
     <option name="LAST_COMMIT_MESSAGE" value="Re-establish government embed" />
   </component>
