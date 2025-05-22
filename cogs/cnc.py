@@ -1634,7 +1634,6 @@ class GovernmentReformTypeEnact(discord.ui.View):
         await interaction.response.defer()
         # return to main menu
         main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, self.conn, self.govt_embed)
-        main_govt_menu.govt_type_reform.disabled = True
         return await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
 
 class GovernmentReformSubtypeDropdown(discord.ui.Select):
