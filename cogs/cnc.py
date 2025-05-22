@@ -1446,26 +1446,6 @@ class GovernmentReformView(View):
         # anarchist nations cannot change government type
         if user_info['govt_type'] == "Anarchy":
             return await interaction.followup.send("Anarchist governments cannot voluntarily change government type.")
-        # account for free government change at 50 development
-        if not user_info['free_govt_change']:
-            # calculate cost
-            province_dev = await self.conn.fetchrow('''SELECT SUM(development) FROM cnc_provinces WHERE owner_id = $1;''',
-                                                    self.author.id)
-            province_count = await self.conn.fetchrow('''SELECT COUNT(*) FROM cnc_provinces WHERE owner_id = $1;''',
-                                                      self.author.id)
-            mean_dev = math.ceil(province_dev['sum']/province_count['count'])
-            total_cost = math.ceil(mean_dev / 5)
-            # if the cost is greater than the 25-point limit, set it to 25
-            if total_cost > 25:
-                total_cost = 25
-            await interaction.followup.send(total_cost)
-            # deny if not enough political auth
-            if total_cost > user_info['pol_auth']:
-                return await interaction.followup.send("You do not have enough Political Authority to Reform your government.\n"
-                                                      f"To reform your government, you need a total of {total_cost} Political Authority.")
-        elif user_info['free_govt_change']:
-            await self.conn.execute('''UPDATE cnc_users SET free_govt_change = False WHERE user_id = $1;''',
-                                    self.author.id)
         # determine available government types
         govt_types = []
         # find monarchy
@@ -1563,6 +1543,31 @@ class GovernmentReformTypeEnact(discord.ui.View):
         await interaction.response.defer()
         # define connection
         conn = self.conn
+        # calculate cost
+        if not self.user_info['free_govt_change']:
+            # calculate cost
+            province_dev = await self.conn.fetchrow('''SELECT SUM(development) FROM cnc_provinces WHERE owner_id = $1;''',
+                                                    self.interaction.user.id)
+            province_count = await self.conn.fetchrow('''SELECT COUNT(*) FROM cnc_provinces WHERE owner_id = $1;''',
+                                                      self.interaction.user.id)
+            mean_dev = math.ceil(province_dev['sum']/province_count['count'])
+            total_cost = math.ceil(mean_dev / 5)
+            # if the cost is greater than the 25-point limit, set it to 25
+            if total_cost > 25:
+                total_cost = 25
+            await interaction.followup.send(total_cost)
+            # deny if not enough political auth
+            if total_cost > self.user_info['pol_auth']:
+                main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, conn, self.govt_embed)
+                main_govt_menu.govt_type_reform.disabled = True
+                await interaction.edit_original_response(view=main_govt_menu)
+                return await interaction.followup.send("You do not have enough Political Authority to Reform your government.\n"
+                                                      f"To reform your government, you need a total of {total_cost} Political Authority.")
+        # if the user has the free government change, set the total cost = 0
+        else:
+            await self.conn.execute('''UPDATE cnc_users SET free_govt_change = False WHERE user_id = $1;''',
+                                    self.interaction.user.id)
+            total_cost = 0
         # determine if an anarchist rebellion will occur
         if self.user_info['unrest'] > 25:
             # calculate the anarchy chance based on current unrest
@@ -1578,6 +1583,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         # pull random subtype
         subtype = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1 ORDER BY random();''',
                            govt_info['govt_type'])
+        # update the user's government type, subtype, pretitle, government info, increase unrest, and reduce pol auth
         await conn.execute('''UPDATE cnc_users SET 
         pretitle = $1,
         govt_type = $2,
@@ -1585,9 +1591,10 @@ class GovernmentReformTypeEnact(discord.ui.View):
         manpower_access = $4, 
         govt_type_countdown = 10,
         temp_unrest = '{10,8}',
-        unrest = unrest + 10
-        WHERE user_id = $5;''', subtype['pretitle'], govt_info['govt_type'], subtype['govt_subtype'],
-                           subtype['manpower'], self.interaction.user.id)
+        unrest = unrest + 10,
+        pol_auth = pol_auth - $5
+        WHERE user_id = $6;''', subtype['pretitle'], govt_info['govt_type'], subtype['govt_subtype'],
+                           subtype['manpower'], total_cost, self.interaction.user.id)
         # edit embed
         govt_embed = self.govt_embed
         # update authority gains
