@@ -1446,6 +1446,15 @@ class GovernmentReformView(View):
         # anarchist nations cannot change government type
         if user_info['govt_type'] == "Anarchy":
             return await interaction.followup.send("Anarchist governments cannot voluntarily change government type.")
+        # get development
+        development = await self.conn.fetchrow('''SELECT SUM(development) FROM cnc_provinces WHERE owner_id = $1;''',
+                                           self.author.id)
+        # if the nation has less than 50 development, disallow
+        if development['sum'] < 50:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"{user_info['name']} does not have enough development "
+                                                   f"to change government types.")
         # determine available government types
         govt_types = []
         # find monarchy
