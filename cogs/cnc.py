@@ -1489,10 +1489,10 @@ class GovernmentReformView(View):
         # determine available government types
         govt_subtypes = await self.conn.fetch('''SELECT * FROM cnc_govts WHERE govt_type = $1;''', user_info['govt_type'])
         available_subtypes = [gs['govt_subtype'] for gs in govt_subtypes]
-        # create dropdown
-        govt_subtype_dropdown = GovernmentReformSubtypeDropdown(self.interaction, self.conn,
+        # create dropdown view
+        govt_subtype_view = GovernmentReformSubtypeView(self.interaction, self.conn,
                                                                 available_subtypes, self.govt_embed)
-        await interaction.edit_original_response(view=govt_subtype_dropdown)
+        await interaction.edit_original_response(view=govt_subtype_view)
 
 
 
@@ -1660,7 +1660,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, self.conn, self.govt_embed)
         return await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
 
-class GovernemtnReformSubypeView(discord.ui.View):
+class GovernmentReformSubtypeView(discord.ui.View):
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, govt_subtypes: list,
                  govt_embed: discord.Embed):
         super().__init__(timeout=120)
