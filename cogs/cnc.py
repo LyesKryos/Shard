@@ -1535,7 +1535,7 @@ class GovernmentReformTypeDropdown(discord.ui.Select):
         # defer interaction
         await interaction.response.defer()
         # define variables
-        type = self.options[0]
+        type = self.values[0]
         # pull subtype information
         selected_type = await self.conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1;''', type.label)
         # build embed
@@ -1702,7 +1702,7 @@ class GovernmentReformSubtypeDropdown(discord.ui.Select):
         # defer interaction
         await interaction.response.defer()
         # define variables
-        subtype = self.options[0]
+        subtype = self.values[0]
         # pull subtype information
         selected_subtype = await self.conn.fetchrow('''SELECT *
                                                     FROM cnc_govts
