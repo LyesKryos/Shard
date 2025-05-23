@@ -1701,14 +1701,12 @@ class GovernmentReformSubtypeDropdown(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer()
-        # defer interaction
-        await interaction.response.defer()
         # define variables
-        type = self.options[0]
+        subtype = self.options[0]
         # pull subtype information
         selected_subtype = await self.conn.fetchrow('''SELECT *
                                                     FROM cnc_govts
-                                                    WHERE govt_subtype = $1;''', type.label)
+                                                    WHERE govt_subtype = $1;''', subtype.label)
         # build embed
         subtype_embed = discord.Embed(title=f"{selected_subtype['govt_subtype']} {selected_subtype['govt_type']}",
                                    color=discord.Color.dark_red(), description=f"*{selected_subtype['type_quote']}*")
