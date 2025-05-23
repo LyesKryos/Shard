@@ -1441,7 +1441,7 @@ class GovernmentReformView(View):
         await interaction.response.defer()
         # clear view
         await interaction.edit_original_response(view=None)
-        # if the user does not have enough political auth, deny
+        # pull user info
         user_info = await user_db_info(self.author.id, self.conn)
         # anarchist nations cannot change government type
         if user_info['govt_type'] == "Anarchy":
@@ -1465,10 +1465,36 @@ class GovernmentReformView(View):
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"No government types are available to {user_info['name']}.\n"
                                                    f"Government types can be unlocked by researching technology.")
-        # create reform view dropdown
+        # create dropdown
         govt_type_dropdown = GovernemtnReformTypeView(self.interaction, self.conn, govt_types, self.govt_embed)
         # update view
         await interaction.edit_original_response(view=govt_type_dropdown)
+
+    @discord.ui.button(label="Reform Government Subtype", style=discord.ButtonStyle.blurple, emoji="\U0001f4dc")
+    async def govt_subtype_reform(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # clear view
+        await interaction.edit_original_response(view=None)
+        # pull user info
+        user_info = await user_db_info(self.author.id, self.conn)
+        # anarchist nations cannot change government type
+        if user_info['govt_type'] == "Anarchy":
+            return await interaction.followup.send("Anarchist governments cannot voluntarily change government type.")
+        # tribal government has no subtypes
+        if user_info['govt_type'] == "Tribal":
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("Tribal governments have no available subtypes.")
+        # determine available government types
+        govt_subtypes = await self.conn.fetch('''SELECT * FROM cnc_govts WHERE govt_type = $1;''', user_info['govt_type'])
+        available_subtypes = [gs['govt_subtype'] for gs in govt_subtypes]
+        # create dropdown
+        govt_subtype_dropdown = GovernmentReformSubtypeDropdown(self.interaction, self.conn,
+                                                                available_subtypes, self.govt_embed)
+        await interaction.edit_original_response(view=govt_subtype_dropdown)
+
+
 
 class GovernemtnReformTypeView(View):
     def __init__(self, interaction, conn: asyncpg.Pool, govt_types: list, govt_embed: discord.Embed):
@@ -1544,11 +1570,10 @@ class GovernmentReformTypeEnact(discord.ui.View):
         # define connection
         conn = self.conn
         # if the user is already that government type, deny
-        if self.user_info['govt_type'] == self.govt_type:
+        if self.user_info['govt_type'] == self.govt_type['govt_type']:
             main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, conn, self.govt_embed)
-            main_govt_menu.govt_type_reform.disabled = True
             await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
-            return await interaction.followup.send(f"{self.user_info['name']} is already a {self.govt_type}.\n"
+            return await interaction.followup.send(f"{self.user_info['name']} is already a {self.govt_type['govt_type']}.\n"
                                                    f"To change government subtypes, select the Reform Government Subtype"
                                                    f" button on the Government Reform menu.")
         # calculate cost
@@ -1578,7 +1603,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         # determine if an anarchist rebellion will occur
         if self.user_info['unrest'] > 25:
             # calculate the anarchy chance based on current unrest
-            anarchy_chance = (self.user_info['unrest']**2)/100
+            anarchy_chance = (self.user_info['unrest']**2)/75
             # calculate the roll based on the 100 minus the current unrest
             rebellion_roll = randrange((100-self.user_info['unrest']), 100)
             # if the roll for a rebellion is less than the anarchy chance, rebellion occurs
@@ -1624,7 +1649,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         # send confirmation message
         return await interaction.followup.send(f"The government of {self.user_info['name']} has been reformed into a "
                                                f"{subtype['govt_subtype']} {subtype['govt_type']}. Henceforth, the nation "
-                                               f"shall be known as the {subtype['pretitle']} of {self.user_info['name']}!\n"
+                                               f"shall be known as the {subtype['pretitle']} of {self.user_info['name']}!\n\n"
                                                f"*{subtype['type_quote']}*")
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
@@ -1635,11 +1660,33 @@ class GovernmentReformTypeEnact(discord.ui.View):
         main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, self.conn, self.govt_embed)
         return await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
 
+class GovernemtnReformSubypeView(View):
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, govt_subtypes: list,
+                 govt_embed: discord.Embed):
+        super().__init__(timeout=120)
+        self.conn = conn
+        self.interaction = interaction
+        self.govt_subtypes = govt_subtypes
+        self.govt_embed = govt_embed
+        govt_subtype_dropdown = GovernmentReformSubtypeDropdown(self.interaction, self.conn,
+                                                             self.govt_subtypes, self.govt_embed)
+        self.add_item(govt_subtype_dropdown)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.interaction.user.id
+
+    async def on_timeout(self):
+        for child in self.children:
+            child.disabled = True
+        return await self.interaction.edit_original_response(view=self)
+
 class GovernmentReformSubtypeDropdown(discord.ui.Select):
 
-    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, govt_subtypes: list):
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, govt_subtypes: list,
+                 govt_embed: discord.Embed):
         self.interaction = interaction
         self.conn = conn
+        self.govt_embed = govt_embed
         # create the options
         govt_options = []
         for govt in govt_subtypes:
@@ -1654,20 +1701,127 @@ class GovernmentReformSubtypeDropdown(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer()
+        # defer interaction
+        await interaction.response.defer()
         # define variables
-        #
-        # # authorities
-        # type_embed.add_field(name="Base Economic Authority", value=selected_type['econ_auth'])
-        # type_embed.add_field(name="Base Military Authority", value=selected_type['mil_auth'])
-        # type_embed.add_field(name="Base Political Authority", value=selected_type['pol_auth'])
-        # # unrest modifier
-        # type_embed.add_field(name="Base Unrest Gain", value=f"{selected_type['unrest_mod']:.0%}")
-        # # manpower modifier
-        # type_embed.add_field(name="Base Manpower Access", value=f"{selected_type['manpower']:.0%}")
-        # # development cost
-        # type_embed.add_field(name="Base Development Cost", value=f"{selected_type['dev_cost']:.0%}")
-        # # base taxation
-        # type_embed.add_field(name="Base Taxation", value=f"{selected_type['tax_level']:.0%}")
+        type = self.options[0]
+        # pull subtype information
+        selected_subtype = await self.conn.fetchrow('''SELECT *
+                                                    FROM cnc_govts
+                                                    WHERE govt_subtype = $1;''', type.label)
+        # build embed
+        subtype_embed = discord.Embed(title=f"{selected_subtype['govt_subtype']} {selected_subtype['govt_type']}",
+                                   color=discord.Color.dark_red(), description=f"*{selected_subtype['type_quote']}*")
+        subtype_embed.add_field(name="Description", value=selected_subtype['type_description'], inline=False)
+        # special note
+        subtype_embed.add_field(name="Special Note", value=selected_subtype['type_note'], inline=False)
+        # populate new authority gains
+        subtype_embed.add_field(name="Base Economic Authority", value=selected_subtype['econ_auth'])
+        subtype_embed.add_field(name="Base Military Authority", value=selected_subtype['mil_auth'])
+        subtype_embed.add_field(name="Base Political Authority", value=selected_subtype['pol_auth'])
+        # populate unrest
+        subtype_embed.add_field(name="Base Unrest Gain", value=selected_subtype['unrest_mod'])
+        # populate manpower
+        subtype_embed.add_field(name="Base Manpower Access", value=selected_subtype['manpower'])
+        # populate development
+        subtype_embed.add_field(name="Base Development Cost", value=selected_subtype['dev_cost'])
+        # populate tax level
+        subtype_embed.add_field(name="Base Taxation", value=selected_subtype['tax_level'])
+        # pull user_info
+        user_info = await user_db_info(self.interaction.user.id, self.conn)
+        # create enacting view
+        govt_enact_view = GovernmentReformSubtypeEnact(self.interaction, self.conn, selected_subtype, user_info,
+                                                    self.govt_embed)
+        # update message
+        await interaction.edit_original_response(embed=subtype_embed, view=govt_enact_view)
+
+class GovernmentReformSubtypeEnact(discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, govt_subtype: asyncpg.Record,
+                 user_info: asyncpg.Record, govt_embed: discord.Embed):
+        super().__init__(timeout=120)
+        self.conn = conn
+        self.interaction = interaction
+        self.govt_subtype = govt_subtype
+        self.user_info = user_info
+        self.govt_embed = govt_embed
+
+    @discord.ui.button(label="Reform", style=discord.ButtonStyle.success)
+    async def reform_government(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # define connection
+        conn = self.conn
+        # if the user is already that government type, deny
+        if self.user_info['govt_subtype'] == self.govt_subtype['govt_subtype']:
+            main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, conn, self.govt_embed)
+            await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
+            return await interaction.followup.send(f"{self.user_info['name']} is already a {self.govt_subtype['govt_subtype']} "
+                                                   f"{self.user_info['govt_type']}.")
+        # calculate cost
+        total_cost = 10
+        # deny if not enough political auth
+        if total_cost > self.user_info['pol_auth']:
+            main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, conn, self.govt_embed)
+            main_govt_menu.govt_type_reform.disabled = True
+            await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
+            return await interaction.followup.send("You do not have enough Political Authority to Reform your government.\n"
+                                                  f"To reform your government, you need a total of {total_cost} Political Authority.")
+        # determine if an anarchist rebellion will occur
+        if self.user_info['unrest'] > 25:
+            # calculate the anarchy chance based on current unrest
+            anarchy_chance = (self.user_info['unrest']**2)/100
+            # calculate the roll based on the 100 minus the current unrest
+            rebellion_roll = randrange((100-self.user_info['unrest']), 100)
+            # if the roll for a rebellion is less than the anarchy chance, rebellion occurs
+            if rebellion_roll < anarchy_chance:
+                await conn.execute('''UPDATE cnc_users SET anarchist_rebellion = TRUE WHERE user_id = $1;''',
+                                   self.interaction.user.id)
+        # enact government changes
+        subtype_info = self.govt_subtype
+        # update the user's government type, subtype, pretitle, government info, increase unrest, and reduce pol auth
+        await conn.execute('''UPDATE cnc_users SET 
+        pretitle = $1,
+        govt_subtype = $2,
+        manpower_access = $3, 
+        govt_type_countdown = 10,
+        temp_unrest = '{10,8}',
+        unrest = unrest + 10,
+        pol_auth = pol_auth - $4
+        WHERE user_id = $5;''', subtype_info['pretitle'], subtype_info['govt_type'], subtype_info['govt_subtype'],
+                           subtype_info['manpower'], total_cost, self.interaction.user.id)
+        # edit embed
+        govt_embed = self.govt_embed
+        # update authority gains
+        govt_embed.set_field_at(7, name="Base Economic Authority Gain", value=subtype_info['econ_auth'])
+        govt_embed.set_field_at(8, name="Base Military Authority Gain", value=subtype_info['mil_auth'])
+        govt_embed.set_field_at(9, name="Base Political Authority Gain", value=subtype_info['pol_auth'])
+        # update unrest
+        govt_embed.set_field_at(-8, name="Base Unrest Gain", value=f"{subtype_info['unrest_mod']:.0%}")
+        # update manpower
+        govt_embed.set_field_at(-7, name="Base Manpower Access", value=f"{subtype_info['manpower']:.0%}")
+        # update development
+        govt_embed.set_field_at(-6, name="Base Development Cost", value=f"{subtype_info['dev_cost']:.0%}")
+        # update taxation
+        govt_embed.set_field_at(-5, name="Base Taxation", value=f"{subtype_info['tax_level']:.0%}")
+        govt_embed.set_field_at(-3, name="Maximum Taxation", value=f"{subtype_info['tax_level'] + 20:.0%}")
+        # set up government view
+        govt_reform_view = GovernmentReformView(self.interaction.user, self.interaction, self.conn, self.govt_embed)
+        # send updates
+        await interaction.edit_original_response(embed=govt_embed, view=govt_reform_view)
+        # send confirmation message
+        return await interaction.followup.send(f"The government of {self.user_info['name']} has been reformed into a "
+                                               f"{subtype_info['govt_subtype']} {subtype_info['govt_type']}. Henceforth, the nation "
+                                               f"shall be known as the {subtype_info['pretitle']} of {self.user_info['name']}!\n\n"
+                                               f"*{subtype_info['type_quote']}*")
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
+    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # return to main menu
+        main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, self.conn, self.govt_embed)
+        return await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
 
 class CNC(commands.Cog):
 
@@ -2531,7 +2685,7 @@ class CNC(commands.Cog):
         # send embed and view
         await interaction.followup.send(embed=govt_embed, view=govt_view)
 
-    @cnc.command(name="change_government", description="Opens the Government reform menu.")
+    @cnc.command(name="reform_government", description="Opens the Government reform menu.")
     async def modify_government(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer()
