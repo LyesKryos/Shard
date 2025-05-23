@@ -1496,7 +1496,7 @@ class GovernmentReformView(View):
 
 
 
-class GovernemtnReformTypeView(View):
+class GovernemtnReformTypeView(discord.ui.View):
     def __init__(self, interaction, conn: asyncpg.Pool, govt_types: list, govt_embed: discord.Embed):
         super().__init__(timeout=120)
         self.conn = conn
@@ -1660,7 +1660,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, self.conn, self.govt_embed)
         return await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
 
-class GovernemtnReformSubypeView(View):
+class GovernemtnReformSubypeView(discord.ui.View):
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, govt_subtypes: list,
                  govt_embed: discord.Embed):
         super().__init__(timeout=120)
