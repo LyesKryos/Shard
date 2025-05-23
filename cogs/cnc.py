@@ -1718,13 +1718,13 @@ class GovernmentReformSubtypeDropdown(discord.ui.Select):
         subtype_embed.add_field(name="Base Military Authority", value=selected_subtype['mil_auth'])
         subtype_embed.add_field(name="Base Political Authority", value=selected_subtype['pol_auth'])
         # populate unrest
-        subtype_embed.add_field(name="Base Unrest Gain", value=selected_subtype['unrest_mod'])
+        subtype_embed.add_field(name="Base Unrest Gain", value=f"{selected_subtype['unrest_mod']:.0%}")
         # populate manpower
-        subtype_embed.add_field(name="Base Manpower Access", value=selected_subtype['manpower'])
+        subtype_embed.add_field(name="Base Manpower Access", value=f"{selected_subtype['manpower']:.0%}")
         # populate development
-        subtype_embed.add_field(name="Base Development Cost", value=selected_subtype['dev_cost'])
+        subtype_embed.add_field(name="Base Development Cost", value=f"{selected_subtype['dev_cost']:.0%}")
         # populate tax level
-        subtype_embed.add_field(name="Base Taxation", value=selected_subtype['tax_level'])
+        subtype_embed.add_field(name="Base Taxation", value=f"{selected_subtype['tax_level']:.0%}")
         # pull user_info
         user_info = await user_db_info(self.interaction.user.id, self.conn)
         # create enacting view
