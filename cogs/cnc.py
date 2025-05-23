@@ -1710,9 +1710,9 @@ class GovernmentReformSubtypeDropdown(discord.ui.Select):
         # build embed
         subtype_embed = discord.Embed(title=f"{selected_subtype['govt_subtype']} {selected_subtype['govt_type']}",
                                    color=discord.Color.dark_red(), description=f"*{selected_subtype['type_quote']}*")
-        subtype_embed.add_field(name="Description", value=selected_subtype['type_description'], inline=False)
+        subtype_embed.add_field(name="Description", value=selected_subtype['subtype_description'], inline=False)
         # special note
-        subtype_embed.add_field(name="Special Note", value=selected_subtype['type_note'], inline=False)
+        subtype_embed.add_field(name="Special Note", value=selected_subtype['subtype_note'], inline=False)
         # populate new authority gains
         subtype_embed.add_field(name="Base Economic Authority", value=selected_subtype['econ_auth'])
         subtype_embed.add_field(name="Base Military Authority", value=selected_subtype['mil_auth'])
