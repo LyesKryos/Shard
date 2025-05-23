@@ -1537,7 +1537,7 @@ class GovernmentReformTypeDropdown(discord.ui.Select):
         # define variables
         type = self.values[0]
         # pull subtype information
-        selected_type = await self.conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1;''', type.label)
+        selected_type = await self.conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1;''', type)
         # build embed
         type_embed = discord.Embed(title=f"{selected_type['govt_type']}",
                                       color=discord.Color.dark_red(), description=f"*{selected_type['type_quote']}*")
@@ -1706,7 +1706,7 @@ class GovernmentReformSubtypeDropdown(discord.ui.Select):
         # pull subtype information
         selected_subtype = await self.conn.fetchrow('''SELECT *
                                                     FROM cnc_govts
-                                                    WHERE govt_subtype = $1;''', subtype.label)
+                                                    WHERE govt_subtype = $1;''', subtype)
         # build embed
         subtype_embed = discord.Embed(title=f"{selected_subtype['govt_subtype']} {selected_subtype['govt_type']}",
                                    color=discord.Color.dark_red(), description=f"*{selected_subtype['type_quote']}*")
