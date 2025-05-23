@@ -1690,7 +1690,7 @@ class GovernmentReformSubtypeDropdown(discord.ui.Select):
         # create the options
         govt_options = []
         for govt in govt_subtypes:
-            govt_options.append(discord.SelectOption(label=govt['govt_subtype']))
+            govt_options.append(discord.SelectOption(label=govt))
         # define the super
         super().__init__(placeholder="Choose a Government Subtype...", min_values=1, max_values=1,
                          options=govt_options)
