@@ -1511,7 +1511,6 @@ class GovernmentReformView(View):
         govt_types = await self.conn.fetch('''SELECT DISTINCT govt_type FROM cnc_govts;''')
         # create list
         govt_types = [gt['govt_type'] for gt in govt_types]
-        await interaction.followup.send(govt_types)
         # dropdown view
         govt_types_dropdown = GovernmentTypesView(self.interaction, self.conn, govt_types, self.govt_embed)
         # execute view
@@ -1909,7 +1908,7 @@ class GovernmentTypesDropdown(discord.ui.Select):
 
 class GovernmentSubtypesView(discord.ui.View):
     def __init__(self, interaction, conn: asyncpg.Pool, subtypes_list: list, govt_embed: discord.Embed):
-        super().__init__(timeout=120)
+        super().__init__(timeout=300)
         self.conn = conn
         self.interaction = interaction
         self.subtypes_list = subtypes_list
@@ -1980,9 +1979,6 @@ class GovernmentSubtypesDropdown(discord.ui.Select):
         subtype_embed.add_field(name="Base Taxation", value=f"{selected_subtype['tax_level']:.0%}")
         # update message
         await interaction.edit_original_response(embed=subtype_embed)
-
-
-
 
 class CNC(commands.Cog):
 
