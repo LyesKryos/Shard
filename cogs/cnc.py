@@ -1888,9 +1888,10 @@ class GovernmentTypesDropdown(discord.ui.Select):
         # defer interaction
         await interaction.response.defer()
         # define variables
-        type = self.values[0]
+        govt_type = self.values[0]
         # pull subtype information
-        selected_type = await self.conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1;''', type)
+        selected_type = await self.conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_type = $1;''',
+                                                 govt_type)
         # build embed
         type_embed = discord.Embed(title=f"{selected_type['govt_type']}",
                                       color=discord.Color.dark_red(), description=f"*{selected_type['type_quote']}*")
@@ -1899,21 +1900,22 @@ class GovernmentTypesDropdown(discord.ui.Select):
         type_embed.add_field(name="Special Note", value=selected_type['type_note'], inline=False)
         # get subtypes list
         subtypes = await self.conn.fetch('''SELECT govt_subtype FROM cnc_govts WHERE govt_type = $1;''',
-                                         type)
+                                         govt_type)
         subtypes_list = [sub['govt_subtype'] for sub in subtypes]
         # create enacting view
-        govt_subtypes_dropdown = GovernmentSubtypesView(self.interaction, self.conn, subtypes_list, self.govt_embed)
+        govt_subtypes_dropdown = GovernmentSubtypesView(self.interaction, self.conn, subtypes_list, self.govt_embed,
+                                                        govt_type)
         # update message
         await interaction.edit_original_response(embed=type_embed, view=govt_subtypes_dropdown)
 
 class GovernmentSubtypesView(discord.ui.View):
-    def __init__(self, interaction, conn: asyncpg.Pool, subtypes_list: list, govt_embed: discord.Embed):
+    def __init__(self, interaction, conn: asyncpg.Pool, subtypes_list: list, govt_embed: discord.Embed, govt_type: str):
         super().__init__(timeout=300)
         self.conn = conn
         self.interaction = interaction
         self.subtypes_list = subtypes_list
         self.govt_embed = govt_embed
-        govt_type_dropdown = GovernmentSubtypesDropdown(self.interaction, self.conn, self.subtypes_list, self.govt_embed)
+        govt_type_dropdown = GovernmentSubtypesDropdown(interaction, conn, subtypes_list, govt_embed, govt_type)
         self.add_item(govt_type_dropdown)
 
     async def interaction_check(self, interaction: discord.Interaction):
@@ -1935,10 +1937,11 @@ class GovernmentSubtypesView(discord.ui.View):
 class GovernmentSubtypesDropdown(discord.ui.Select):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool,
-                 subtypes_list: list, govt_embed: discord.Embed):
+                 subtypes_list: list, govt_embed: discord.Embed, govt_type: str):
         self.interaction = interaction
         self.conn = conn
         self.govt_embed = govt_embed
+        self.govt_type = govt_type
         # create the options
         subtype_options = []
         for subtype in subtypes_list:
@@ -1958,7 +1961,8 @@ class GovernmentSubtypesDropdown(discord.ui.Select):
         # pull subtype information
         selected_subtype = await self.conn.fetchrow('''SELECT *
                                                     FROM cnc_govts
-                                                    WHERE govt_subtype = $1;''', subtype)
+                                                    WHERE govt_subtype = $1 AND govt_type = $2;''',
+                                                    subtype, self.govt_type)
         # build embed
         subtype_embed = discord.Embed(title=f"{selected_subtype['govt_subtype']} {selected_subtype['govt_type']}",
                                    color=discord.Color.dark_red())
