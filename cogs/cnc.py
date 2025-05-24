@@ -1508,7 +1508,7 @@ class GovernmentReformView(View):
         # defer interaction
         await interaction.response.defer()
         # pull all government types
-        govt_types = await self.conn.fetch('''SELECT govt_type FROM cnc_govts;''')
+        govt_types = await self.conn.fetch('''SELECT DESTINCT govt_type FROM cnc_govts;''')
         # create list
         govt_types = [gt['govt_type'] for gt in govt_types]
         await interaction.followup.send(govt_types)
