@@ -1962,7 +1962,7 @@ class GovernmentSubtypesDropdown(discord.ui.Select):
                                                     WHERE govt_subtype = $1;''', subtype)
         # build embed
         subtype_embed = discord.Embed(title=f"{selected_subtype['govt_subtype']} {selected_subtype['govt_type']}",
-                                   color=discord.Color.dark_red(), description=f"*{selected_subtype['type_quote']}*")
+                                   color=discord.Color.dark_red())
         subtype_embed.add_field(name="Description", value=selected_subtype['subtype_description'], inline=False)
         # special note
         subtype_embed.add_field(name="Special Note", value=selected_subtype['subtype_note'], inline=False)
