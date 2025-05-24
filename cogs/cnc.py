@@ -1511,9 +1511,9 @@ class GovernmentReformView(View):
         govt_types = await self.conn.fetch('''SELECT govt_type FROM cnc_govts;''')
         # create list
         govt_types = [gt['govt_type'] for gt in govt_types]
+        await interaction.followup.send(govt_types)
         # dropdown view
         govt_types_dropdown = GovernmentTypesView(self.interaction, self.conn, govt_types, self.govt_embed)
-        await interaction.followup.send(govt_types)
         # execute view
         await interaction.edit_original_response(view=govt_types_dropdown)
 
