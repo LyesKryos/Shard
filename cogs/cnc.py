@@ -1516,6 +1516,13 @@ class GovernmentReformView(View):
         # execute view
         await interaction.edit_original_response(view=govt_types_dropdown)
 
+    @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
+    async def close(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # close the view out
+        await interaction.edit_original_response(view=None)
+
 class GovernmentReformTypeView(discord.ui.View):
     def __init__(self, interaction, conn: asyncpg.Pool, govt_types: list, govt_embed: discord.Embed):
         super().__init__(timeout=120)
