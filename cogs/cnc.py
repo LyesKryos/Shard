@@ -2350,6 +2350,7 @@ class CNC(commands.Cog):
             user_info = await self.nation_db_info(nation.title())
             if user_info is None:
                 return await interaction.followup.send(f"`{nation.title()}` not found.", ephemeral=True)
+        # if the user is called
         elif user is not None:
             user_info = await user_db_info(user.id, self.bot.pool)
             if user_info is None:
@@ -2420,6 +2421,9 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Wars", value=f"{wars}")
         user_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
         user_embed.add_field(name="Military Access", value=f"{military_access}")
+        # if the user has called their own nation, add a footnote to show that relations are disabled with their own nation
+        if user_info['user_id'] == interaction.user.id:
+            user_embed.set_footer(text="*Diplomatic relations are disabled for your own nation.*")
         # send the embed
         return await interaction.followup.send(embed=user_embed)
 
