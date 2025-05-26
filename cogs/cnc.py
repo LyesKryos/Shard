@@ -2423,7 +2423,7 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Military Access", value=f"{military_access}")
         # if the user has called their own nation, add a footnote to show that relations are disabled with their own nation
         if user_info['user_id'] == interaction.user.id:
-            user_embed.set_footer(text="*Diplomatic relations are disabled for your own nation.*")
+            user_embed.set_footer(text="\033[3mDiplomatic relations are disabled for your own nation.\033[0m")
         # send the embed
         return await interaction.followup.send(embed=user_embed)
 
