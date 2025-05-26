@@ -1843,7 +1843,7 @@ class GovernmentReformSubtypeEnact(discord.ui.View):
 
 class GovernmentTypesView(discord.ui.View):
     def __init__(self, interaction, conn: asyncpg.Pool, govt_types: list, govt_embed: discord.Embed):
-        super().__init__(timeout=120)
+        super().__init__(timeout=600)
         self.conn = conn
         self.interaction = interaction
         self.govt_types = govt_types
@@ -1910,7 +1910,7 @@ class GovernmentTypesDropdown(discord.ui.Select):
 
 class GovernmentSubtypesView(discord.ui.View):
     def __init__(self, interaction, conn: asyncpg.Pool, subtypes_list: list, govt_embed: discord.Embed, govt_type: str):
-        super().__init__(timeout=300)
+        super().__init__()
         self.conn = conn
         self.interaction = interaction
         self.subtypes_list = subtypes_list
