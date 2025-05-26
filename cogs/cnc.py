@@ -1520,8 +1520,10 @@ class GovernmentReformView(View):
     async def close(self, interaction: discord.Interaction, button: discord.Button):
         # defer interaction
         await interaction.response.defer()
+        for child in self.children:
+            child.disabled = True
         # close the view out
-        await interaction.edit_original_response(view=None)
+        await interaction.edit_original_response(view=self)
 
 class GovernmentReformTypeView(discord.ui.View):
     def __init__(self, interaction, conn: asyncpg.Pool, govt_types: list, govt_embed: discord.Embed):
