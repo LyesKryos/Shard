@@ -2065,6 +2065,8 @@ class DiplomaticMenuView(discord.ui.View):
         button.disabled = True
         return await interaction.edit_original_response(view=self)
 
+    @discord.ui.button(label="Propose ")
+
 class DiplomaticRelationsRespondView(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, sender_info: asyncpg.Record,
@@ -2363,20 +2365,21 @@ class CNC(commands.Cog):
             await conn.execute('''INSERT INTO cnc_armies(owner_id, troops, location, army_name) 
             VALUES ($1, $2, $3, $4);''', user.id, 3000, starting_province['id'], f"Army of {starting_province['name']}")
             # send welcome message
-            await interaction.followup.send(f"Welcome to the Command and Conquest System, {user.mention}!\n\n"
-                                            f"Your nation, {nation_name.title()}, has risen from the mists of history "
-                                            f"to make a name for itself in the annals of time. Will your people prove "
-                                            f"they are masters of warfare? Will your merchants dominate the global "
-                                            f"market, earning untold wealth? Will your scientists unlock the mysteries "
-                                            f"of the world? Will your people flourish under your hand or cower under "
-                                            f"your iron fist? Only the future can tell.\n\n"
-                                            f"To get started, be sure to check out the "
-                                            f"[**Command and Conquest Manual**]"
-                                            f"(<https://1drv.ms/w/s!AtjcebV95AZNgWR1RbfSyx_0ln31?e=tD0eHa>). This "
-                                            f"document has all the information you need to get started, a new players' "
-                                            f"guide, and an overview of all commands.\n\n"
-                                            f"**\"I came, I saw, I conquered.\" -Julius Caesar**")
-            return
+            return await interaction.followup.send(
+                f"Welcome to the Command and Conquest System, {user.mention}!\n\n"
+                f"Your nation, {nation_name.title()}, has risen from the mists of history "
+                f"to make a name for itself in the annals of time. Will your people prove "
+                f"they are masters of warfare? Will your merchants dominate the global "
+                f"market, earning untold wealth? Will your scientists unlock the mysteries "
+                f"of the world? Will your people flourish under your hand or cower under "
+                f"your iron fist? Only the future can tell.\n\n"
+                f"To get started, be sure to check out the "
+                f"[**Command and Conquest Manual**]"
+                f"(<https://1drv.ms/w/s!AtjcebV95AZNgWR1RbfSyx_0ln31?e=tD0eHa>). This "
+                f"document has all the information you need to get started, a new players' "
+                f"guide, and an overview of all commands.\n\n"
+                f"**\"I came, I saw, I conquered.\" -Julius Caesar**"
+            )
 
     @cnc.command(name="change_color", description="Changes your nation's color on the map.")
     @app_commands.checks.cooldown(1, 30)
@@ -2512,6 +2515,8 @@ class CNC(commands.Cog):
                                        user_info['name'])
         military_access = await conn.fetch('''SELECT * FROM cnc_military_access 
         WHERE $1 = ANY(members);''', user_info['name'])
+        diplomatic_relations = await conn.fetch('''SELECT * FROM cnc_drs WHERE $1 = ANY(members);''',
+                                                user_info['name'])
 
         def parse_relations(relations):
             if not relations:
@@ -2528,6 +2533,7 @@ class CNC(commands.Cog):
         wars = parse_relations(wars)
         trade_pacts = parse_relations(trade_pacts)
         military_access = parse_relations(military_access)
+        diplomatic_relations = parse_relations(diplomatic_relations)
         # build embed, populate title with pretitle and nation name, set color to user color,
         # and set description to Discord user.
         user_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
@@ -2558,6 +2564,7 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Wars", value=f"{wars}")
         user_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
         user_embed.add_field(name="Military Access", value=f"{military_access}")
+        user_embed.add_field(name="Diplomatic Relations", value=diplomatic_relations)
         # if the user has called their own nation, add a footnote to show that relations are disabled with their own nation
         if user_info['user_id'] == interaction.user.id:
             user_embed.set_footer(text="Diplomatic relations are disabled for your own nation.")
