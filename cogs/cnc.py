@@ -926,7 +926,7 @@ class UnownedProvince(View):
         pol_auth = pol_auth - $1 WHERE user_id = $2;''', cost, interaction.user.id)
         await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1, development = $3 
         WHERE id = $2;''', interaction.user.id, province_id, dev)
-        await map_color(province_id, user_info['color'])
+        await map_color(province_id, user_info['color'], conn)
         await interaction.response.edit_message(content=None,
                                                 view=prov_owned_view,
                                                 embed=await create_prov_embed(prov_info, conn))
@@ -2264,8 +2264,7 @@ class CNC(commands.Cog):
                 color_check = c['color']
                 if self.color_difference(color, color_check) < 25:
                     return await interaction.followup.send(f"Your selected color, {color}, is too similar to an "
-                                                           f"existing color, registered to {c['name']} ({c['color']})."
-                                                           f"\nDebug: {self.color_difference(c['color'], color_check)}")
+                                                           f"existing color, registered to {c['name']} ({c['color']}).")
 
             if color in self.banned_colors:
                 return await interaction.followup.send("That color is a restricted color. "
@@ -2295,7 +2294,7 @@ class CNC(commands.Cog):
             await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1 WHERE id = $2;''',
                                user.id, starting_province['id'])
             # color the map using the province coordinates and the ID
-            await self.map_color(starting_province['id'], color)
+            await map_color(starting_province['id'], color, conn)
             # create an army of 3,000 troops in the starting province
             await conn.execute('''INSERT INTO cnc_armies(owner_id, troops, location, army_name) 
             VALUES ($1, $2, $3, $4);''', user.id, 3000, starting_province['id'], f"Army of {starting_province['name']}")
@@ -2365,7 +2364,7 @@ class CNC(commands.Cog):
         for p in all_provinces:
             p_id = p['id']
             if p['occupier_id'] == user_info['user_id']:
-                await self.map_color(p_id, color, False)
+                await map_color(p_id, color, conn)
             elif p['occupier_id'] == 0:
                 await self.occupy_color(p_id, '#000000', color)
             elif p['occupier_id'] != user_info['user_id']:
@@ -3058,7 +3057,7 @@ class CNC(commands.Cog):
         try:
             await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1 WHERE id = $2;''',
                                user.id, province_id)
-            await self.map_color(province_id, user_info['color'])
+            await map_color(province_id, user_info['color'], conn)
         except asyncpg.PostgresError as e:
             raise e
         return await ctx.send(f"{user_info['name']} granted ownership of {prov_info['name']} (ID: {province_id}).")
@@ -3206,7 +3205,7 @@ class CNC(commands.Cog):
                 for p in owned_provinces:
                     p_id = p['id']
                     if p['occupier_id'] == u['user_id']:
-                        await self.map_color(p_id, color, False)
+                        await map_color(p_id, color, conn)
                         await ctx.send(f"{p['name']} colored.")
                     elif p['occupier_id'] == 0:
                         await self.occupy_color(p_id, '#000000', color)
