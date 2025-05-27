@@ -227,7 +227,7 @@ class Accept(View):
         self.stop()
 
     # This one is similar to the confirmation button except sets the inner value to `False`
-    @discord.ui.button(label='Decline', style=discord.ButtonStyle.grey)
+    @discord.ui.button(label='Decline', style=discord.ButtonStyle.danger)
     async def decline(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.value = False
         self.stop()
@@ -2061,7 +2061,7 @@ class DiplomaticMenuView(discord.ui.View):
             button.disabled = True
             await interaction.edit_original_response(view=self)
             accept_view = Accept(interaction)
-            await interaction.followup.send(f"{self.nation_info['name']} has already established diplomatic "
+            remove_msg = await interaction.followup.send(f"{self.nation_info['name']} has already established diplomatic "
                                                    f"relations with {user_info['name']}."
                                             f"\nWould you like to revoke these diplomatic relations?", view=accept_view)
             # wait for the accept/deny response
@@ -2072,8 +2072,12 @@ class DiplomaticMenuView(discord.ui.View):
                 await self.conn.execute('''DELETE FROM cnc_drs 
                                            WHERE $1 = ANY(members) AND $2 = ANY(members) AND pending = False;''',
                                         user_info['name'], self.nation_info['name'])
+                await remove_msg.edit(view=None)
                 return await interaction.followup.send(f"{user_info['name']} has ended diplomatic relations with "
                                                        f"{self.nation_info['name']}.")
+            if not accept_view.value:
+                # remove buttons
+                return await remove_msg.edit(view=None)
         pending_check = await self.conn.fetchrow('''SELECT * FROM cnc_drs WHERE $1 = ANY(members) AND $2 = ANY(members) 
             AND pending = True;''', user_info['name'], self.nation_info['name'])
         if pending_check:
