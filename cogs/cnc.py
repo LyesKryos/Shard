@@ -2026,7 +2026,7 @@ class DiplomaticMenuView(discord.ui.View):
         # check if the nation already has diplomatic relations
         dp_check = await self.conn.fetchrow('''SELECT * FROM cnc_dps 
                                                WHERE $1 = ANY(members) AND $2 = ANY(members);''',
-                                            interaction.user.id, self.nation_info['user_id'])
+                                            user_info['name'], self.nation_info['name'])
         # if the user already has diplomatic relations with the nation, deny
         if dp_check:
             return await interaction.followup.send(f"{self.nation_info['name']} has already established diplomatic "
