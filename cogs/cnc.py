@@ -2497,11 +2497,12 @@ class CNC(commands.Cog):
         # if the user has called their own nation, add a footnote to show that relations are disabled with their own nation
         if user_info['user_id'] == interaction.user.id:
             user_embed.set_footer(text="Diplomatic relations are disabled for your own nation.")
-            diplomacy_view = None
+            # send the embed
+            return await interaction.followup.send(embed=user_embed)
         else:
             diplomacy_view = DiplomaticMenuView(interaction, conn, user_info)
-        # send the embed
-        return await interaction.followup.send(embed=user_embed, view=diplomacy_view)
+            # send the embed
+            return await interaction.followup.send(embed=user_embed, view=diplomacy_view)
 
     @cnc.command(name="dossier", description="Displays detailed information about your nation.")
     async def dossier(self, interaction: discord.Interaction):
