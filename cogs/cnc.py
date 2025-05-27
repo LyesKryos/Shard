@@ -2111,7 +2111,7 @@ class DiplomaticRelationsRespondView(discord.ui.View):
         # close out the buttons
         return await interaction.edit_original_response(view=None)
 
-    @discord.ui.button(label="Reject", sytle=discord.ButtonStyle.danger)
+    @discord.ui.button(label="Reject", style=discord.ButtonStyle.danger)
     async def reject_dps(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer()
