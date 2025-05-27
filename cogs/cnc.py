@@ -2077,6 +2077,9 @@ class DiplomaticMenuView(discord.ui.View):
                 await remove_msg.edit(view=None)
                 await recipient_user.send(f"{user_info['name']} has ended diplomatic relations with "
                                                        f"{self.nation_info['name']}.")
+                # renable button
+                button.disabled = False
+                await interaction.edit_original_response(view=self)
                 return await interaction.followup.send(f"{user_info['name']} has ended diplomatic relations with "
                                                        f"{self.nation_info['name']}.")
             if not accept_view.value:
