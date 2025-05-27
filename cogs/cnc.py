@@ -2076,7 +2076,10 @@ class DiplomaticMenuView(discord.ui.View):
                 return await interaction.followup.send(f"{user_info['name']} has ended diplomatic relations with "
                                                        f"{self.nation_info['name']}.")
             if not accept_view.value:
-                # remove buttons
+                # renable button
+                button.disabled = False
+                await interaction.edit_original_response(view=self)
+                # remove accept/deny buttons
                 return await remove_msg.edit(view=None)
         pending_check = await self.conn.fetchrow('''SELECT * FROM cnc_drs WHERE $1 = ANY(members) AND $2 = ANY(members) 
             AND pending = True;''', user_info['name'], self.nation_info['name'])
