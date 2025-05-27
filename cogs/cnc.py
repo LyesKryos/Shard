@@ -2262,15 +2262,16 @@ class CNC(commands.Cog):
             # check each color
             for c in pull_all_colors:
                 color_check = c['color']
-                if self.color_difference(c['color'], color_check) < 12.5:
+                if self.color_difference(c['color'], color_check) < 25:
                     return await interaction.followup.send(f"Your selected color, {color}, is too similar to an "
-                                                           f"existing color, registered to {c['name']} ({c['color']}).")
+                                                           f"existing color, registered to {c['name']} ({c['color']})."
+                                                           f"\nDebug: {self.color_difference(c['color'], color_check)}")
 
             if color in self.banned_colors:
                 return await interaction.followup.send("That color is a restricted color. "
                                                        "Please register with a different color.")
             for c in self.banned_colors:
-                if self.color_difference(c, color) < 12.5:
+                if self.color_difference(c, color) < 25:
                     return await interaction.followup.send(f"That color is too similar to a banned color, {c}.")
             # try and get the color from the hex code
             try:
