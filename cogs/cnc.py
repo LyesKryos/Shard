@@ -933,6 +933,8 @@ class UnownedProvince(View):
         return await interaction.followup.send(f"{prov_info['name']} (ID: {province_id}) "
                                                        f"has been successfully colonized.")
 
+# === Dossier View ===
+
 class DossierView(View):
 
     def __init__(self, interaction, embed: discord.Embed, user_info, conn: asyncpg.Pool):
@@ -1074,6 +1076,8 @@ class DossierView(View):
         self.doss_embed.add_field(name="Military Access", value=f"{military_access}")
         # update
         await interaction.edit_original_response(embed=self.doss_embed)
+
+# === Government Modification Views
 
 class GovernmentModView(View):
 
@@ -1418,7 +1422,9 @@ class MilUpkeepView(View):
             # update embed
             await interaction.edit_original_response(embed=self.govt_embed, view=self)
 
-class GovernmentReformView(View):
+# === Government Reform Views ===
+
+class GovernmentReformMenu(View):
 
     def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool, govt_embed: discord.Embed):
         super().__init__(timeout=120)
@@ -1430,7 +1436,7 @@ class GovernmentReformView(View):
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.author.id
 
-    async def on_timeout(self) -> None:
+    async def on_timeout(self):
         for child in self.children:
             child.disabled = True
         return await self.interaction.edit_original_response(view=self)
@@ -1600,7 +1606,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         conn = self.conn
         # if the user is already that government type, deny
         if self.user_info['govt_type'] == self.govt_type['govt_type']:
-            main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, conn, self.govt_embed)
+            main_govt_menu = GovernmentReformMenu(self.interaction.user, self.interaction, conn, self.govt_embed)
             await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
             return await interaction.followup.send(f"{self.user_info['name']} is already a {self.govt_type['govt_type']}.\n"
                                                    f"To change government subtypes, select the Reform Government Subtype"
@@ -1619,7 +1625,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
                 total_cost = 25
             # deny if not enough political auth
             if total_cost > self.user_info['pol_auth']:
-                main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, conn, self.govt_embed)
+                main_govt_menu = GovernmentReformMenu(self.interaction.user, self.interaction, conn, self.govt_embed)
                 main_govt_menu.govt_type_reform.disabled = True
                 await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
                 return await interaction.followup.send("You do not have enough Political Authority to Reform your government.\n"
@@ -1672,7 +1678,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         govt_embed.set_field_at(-5, name="Base Taxation", value=f"{subtype['tax_level']:.0%}")
         govt_embed.set_field_at(-3, name="Maximum Taxation", value=f"{subtype['tax_level'] + 20:.0%}")
         # set up government view
-        govt_reform_view = GovernmentReformView(self.interaction.user, self.interaction, self.conn, self.govt_embed)
+        govt_reform_view = GovernmentReformMenu(self.interaction.user, self.interaction, self.conn, self.govt_embed)
         # send updates
         await interaction.edit_original_response(embed=govt_embed, view=govt_reform_view)
         # send confirmation message
@@ -1686,7 +1692,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         # defer interaction
         await interaction.response.defer()
         # return to main menu
-        main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, self.conn, self.govt_embed)
+        main_govt_menu = GovernmentReformMenu(self.interaction.user, self.interaction, self.conn, self.govt_embed)
         return await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
 
 class GovernmentReformSubtypeView(discord.ui.View):
@@ -1781,7 +1787,7 @@ class GovernmentReformSubtypeEnact(discord.ui.View):
         conn = self.conn
         # if the user is already that government type, deny
         if self.user_info['govt_subtype'] == self.govt_subtype['govt_subtype']:
-            main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, conn, self.govt_embed)
+            main_govt_menu = GovernmentReformMenu(self.interaction.user, self.interaction, conn, self.govt_embed)
             await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
             return await interaction.followup.send(f"{self.user_info['name']} is already a {self.govt_subtype['govt_subtype']} "
                                                    f"{self.user_info['govt_type']}.")
@@ -1789,7 +1795,7 @@ class GovernmentReformSubtypeEnact(discord.ui.View):
         total_cost = 10
         # deny if not enough political auth
         if total_cost > self.user_info['pol_auth']:
-            main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, conn, self.govt_embed)
+            main_govt_menu = GovernmentReformMenu(self.interaction.user, self.interaction, conn, self.govt_embed)
             main_govt_menu.govt_type_reform.disabled = True
             await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
             return await interaction.followup.send("You do not have enough Political Authority to Reform your government.\n"
@@ -1833,7 +1839,7 @@ class GovernmentReformSubtypeEnact(discord.ui.View):
         govt_embed.set_field_at(-5, name="Base Taxation", value=f"{subtype_info['tax_level']:.0%}")
         govt_embed.set_field_at(-3, name="Maximum Taxation", value=f"{subtype_info['tax_level'] + 20:.0%}")
         # set up government view
-        govt_reform_view = GovernmentReformView(self.interaction.user, self.interaction, self.conn, self.govt_embed)
+        govt_reform_view = GovernmentReformMenu(self.interaction.user, self.interaction, self.conn, self.govt_embed)
         # send updates
         await interaction.edit_original_response(embed=govt_embed, view=govt_reform_view)
         # send confirmation message
@@ -1847,7 +1853,7 @@ class GovernmentReformSubtypeEnact(discord.ui.View):
         # defer interaction
         await interaction.response.defer()
         # return to main menu
-        main_govt_menu = GovernmentReformView(self.interaction.user, self.interaction, self.conn, self.govt_embed)
+        main_govt_menu = GovernmentReformMenu(self.interaction.user, self.interaction, self.conn, self.govt_embed)
         return await interaction.edit_original_response(view=main_govt_menu, embed=self.govt_embed)
 
 class GovernmentTypesView(discord.ui.View):
@@ -1873,7 +1879,7 @@ class GovernmentTypesView(discord.ui.View):
         # defer interaction
         await interaction.response.defer()
         # return to main menu
-        govt_menu = GovernmentReformView(self.interaction.user, self.interaction, self.conn, self.govt_embed)
+        govt_menu = GovernmentReformMenu(self.interaction.user, self.interaction, self.conn, self.govt_embed)
         return await interaction.edit_original_response(view=govt_menu, embed=self.govt_embed)
 
 class GovernmentTypesDropdown(discord.ui.Select):
@@ -1940,7 +1946,7 @@ class GovernmentSubtypesView(discord.ui.View):
         # defer interaction
         await interaction.response.defer()
         # return to main menu
-        govt_menu = GovernmentReformView(self.interaction.user, self.interaction, self.conn, self.govt_embed)
+        govt_menu = GovernmentReformMenu(self.interaction.user, self.interaction, self.conn, self.govt_embed)
         return await interaction.edit_original_response(view=govt_menu, embed=self.govt_embed)
 
 class GovernmentSubtypesDropdown(discord.ui.Select):
@@ -1992,6 +1998,73 @@ class GovernmentSubtypesDropdown(discord.ui.Select):
         subtype_embed.add_field(name="Base Taxation", value=f"{selected_subtype['tax_level']:.0%}")
         # update message
         await interaction.edit_original_response(embed=subtype_embed)
+
+# === Diplomacy Views ===
+
+class DiplomaticMenuView(discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, nation_info: asyncpg.Record):
+        super().__init__(timeout=120)
+        self.interaction = interaction
+        self.nation_info = nation_info
+        self.conn = conn
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.interaction.user.id
+
+    async def on_timeout(self):
+        for child in self.children:
+            child.disabled = True
+        await self.interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Propose Diplomatic Relations", style=discord.ButtonStyle.blurple, emoji="\U0001f38c")
+    async def diplomatic_relations(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # pull user info
+        user_info = await user_db_info(interaction.user.id, self.conn)
+        # check if the nation already has diplomatic relations
+        dp_check = await self.conn.fetchrow('''SELECT * FROM cnc_dps 
+                                               WHERE $1 = ANY(members) AND $2 = ANY(members);''',
+                                            interaction.user.id, self.nation_info['user_id'])
+        # if the user already has diplomatic relations with the nation, deny
+        if dp_check:
+            return await interaction.followup.send(f"{self.nation_info['name']} has already established diplomatic "
+                                                   f"relations with {user_info['name']}.")
+        # otherwise, send the message
+        recipient_dm = await discord.Member(self.nation_info['user_id']).send(content=f"The {user_info['pretitle']} of "
+                                                                              f"{user_info['name']} has issued a request"
+                                                                              f" to establish diplomatic relations with"
+                                                                              f" {self.nation_info['name']}. Please use"
+                                                                              f" the buttons below within 24 hours to "
+                                                                              f"respond to the request.")
+        # create the response view
+        dp_response = DiplomaticRelationsRespondView(interaction, self.conn, user_info, self.nation_info, recipient_dm)
+        return await recipient_dm.edit(view=dp_response)
+
+class DiplomaticRelationsRespondView(discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, sender_info: asyncpg.Record,
+                 recipient_info: asyncpg.Record, dm: discord.Message):
+        super().__init__(timeout=86400)
+        self.interaction = interaction
+        self.conn = conn
+        self.sender_info = sender_info
+        self.dm = dm
+        self.recipient_info = recipient_info
+
+    async def on_timeout(self):
+        # disable buttons and update view
+        for child in self.children:
+            child.disabled = True
+        await self.interaction.edit_original_response(view=self)
+        # send message that the user has failed to react in time
+        await self.dm.reply(content="You have failed to reply within 24 hours. The request has been auto-rejected.")
+        # send message to the sender that the request has been denied
+        return await discord.Member(self.sender_info['user_id']).send(
+            f"The {self.recipient_info['pretitle']} of "
+            f"{self.recipient_info['name']} has auto-rejected your "
+            f"diplomatic relations request.")
 
 class CNC(commands.Cog):
 
@@ -2423,9 +2496,12 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Military Access", value=f"{military_access}")
         # if the user has called their own nation, add a footnote to show that relations are disabled with their own nation
         if user_info['user_id'] == interaction.user.id:
-            user_embed.set_footer(text="\033[3mDiplomatic relations are disabled for your own nation.\033[0m")
+            user_embed.set_footer(text="Diplomatic relations are disabled for your own nation.")
+            diplomacy_view = None
+        else:
+            diplomacy_view = DiplomaticMenuView(interaction, conn, user_info)
         # send the embed
-        return await interaction.followup.send(embed=user_embed)
+        return await interaction.followup.send(embed=user_embed, view=diplomacy_view)
 
     @cnc.command(name="dossier", description="Displays detailed information about your nation.")
     async def dossier(self, interaction: discord.Interaction):
@@ -2916,7 +2992,7 @@ class CNC(commands.Cog):
         govt_embed.add_field(name="Military Upkeep", value=f"{user_info['mil_upkeep']} Military Authority")
         # create view
         await interaction.followup.send(embed=govt_embed,
-                                        view=GovernmentReformView(interaction.user, interaction, conn, govt_embed))
+                                        view=GovernmentReformMenu(interaction.user, interaction, conn, govt_embed))
 
     @cnc.command(name="designate_capital", description="Designates a province as the national capital.")
     @app_commands.describe(province_id="The province to be designated as the capital.")
