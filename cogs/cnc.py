@@ -2042,6 +2042,12 @@ class DiplomaticMenuView(discord.ui.View):
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"{self.nation_info['name']} is already considering an "
                                                    f"existing proposal from {user_info['name']}.")
+        # check to ensure that the sender has sufficient political authority
+        if user_info['pol_auth'] < 1:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("You do not have sufficient Political Authority to send that "
+                                                   "proposal.")
         # otherwise, send the message
         recipient_user = self.bot.get_user(self.nation_info['user_id'])
         recipient_dm = await recipient_user.send(content=f"The {user_info['pretitle']} of "
@@ -2061,11 +2067,12 @@ class DiplomaticMenuView(discord.ui.View):
         # update the db to show pending
         await self.conn.execute('''INSERT INTO cnc_drs VALUES($1, $2, TRUE);''', interaction.message.id,
                                 [self.nation_info['name'], user_info['name']])
+        # pre-emptively remove one political authoriy
+        await self.conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth - 1 WHERE user_id = $1;''',
+                                user_info['user_id'])
         # disable the button and update
         button.disabled = True
         return await interaction.edit_original_response(view=self)
-
-    @discord.ui.button(label="Propose ")
 
 class DiplomaticRelationsRespondView(discord.ui.View):
 
@@ -2099,9 +2106,15 @@ class DiplomaticRelationsRespondView(discord.ui.View):
     async def accept_dps(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer()
+        # ensure that the user has enough diplomatic authority
+        if self.recipient_info['pol_auth'] < 1:
+            return await interaction.followup.send("You do not have enough Political Authority to accept that request.")
         # change pending status
         await self.conn.execute('''UPDATE cnc_drs SET pending = False WHERE id = $1;''',
                                 self.interaction.message.id)
+        # subtract one diplomatic authority from recipient
+        await self.conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth - 1 WHERE user_id = $1;''',
+                                self.recipient_info['user_id'])
         # confirm with both parties
         await interaction.followup.send(f"{self.recipient_info['name']} has established diplomatic relations with "
                                         f"{self.sender_info['name']}!")
@@ -2121,6 +2134,9 @@ class DiplomaticRelationsRespondView(discord.ui.View):
         await self.conn.execute('''DELETE
                                    FROM cnc_drs
                                    WHERE id = $1;''', self.interaction.message.id)
+        # add political authority back to sender
+        await self.conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth + 1 WHERE user_id = $1;''',
+                                self.sender_info['user_id'])
         # notify recipient
         await interaction.followup.send(f"{self.recipient_info['name']} has rejected diplomatic relations with "
                                         f"{self.sender_info['name']}!")
@@ -2567,7 +2583,18 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Diplomatic Relations", value=diplomatic_relations)
         # if the user has called their own nation, add a footnote to show that relations are disabled with their own nation
         if user_info['user_id'] == interaction.user.id:
-            user_embed.set_footer(text="Diplomatic relations are disabled for your own nation.")
+            user_embed.set_footer(text="Diplomatic actions are disabled for your own nation.")
+            # send the embed
+            return await interaction.followup.send(embed=user_embed)
+        # check for other restriction options, such as government type
+        elif user_info['govt_subtype'] == "Parish":
+            user_embed.set_footer(text="Voluntary diplomatic actions are disabled for nations "
+                                       "with the Parish Equalism ideology.")
+            # send the embed
+            return await interaction.followup.send(embed=user_embed)
+        elif user_info['govt_subtype'] == "Radical":
+            user_embed.set_footer(text="Diplomatic actions are disabled for nations "
+                                       "with the Radical Anarchy ideology.")
             # send the embed
             return await interaction.followup.send(embed=user_embed)
         else:
