@@ -2270,7 +2270,7 @@ class CNC(commands.Cog):
                 return await interaction.followup.send("That color is a restricted color. "
                                                        "Please register with a different color.")
             for c in self.banned_colors:
-                if self.color_difference(c, color) > 25:
+                if self.color_difference(c, color) < 25:
                     return await interaction.followup.send(f"That color is too similar to a banned color, {c}.")
             # try and get the color from the hex code
             try:
