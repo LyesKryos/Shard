@@ -2003,11 +2003,13 @@ class GovernmentSubtypesDropdown(discord.ui.Select):
 
 class DiplomaticMenuView(discord.ui.View):
 
-    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, nation_info: asyncpg.Record):
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, nation_info: asyncpg.Record,
+                 bot: discord.Client):
         super().__init__(timeout=120)
         self.interaction = interaction
         self.nation_info = nation_info
         self.conn = conn
+        self.bot = bot
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.interaction.user.id
@@ -2032,7 +2034,8 @@ class DiplomaticMenuView(discord.ui.View):
             return await interaction.followup.send(f"{self.nation_info['name']} has already established diplomatic "
                                                    f"relations with {user_info['name']}.")
         # otherwise, send the message
-        recipient_dm = await discord.Member(self.nation_info['user_id']).send(content=f"The {user_info['pretitle']} of "
+        recipient_user = self.bot.get_user(self.nation_info['user_id'])
+        recipient_dm = await recipient_user.send(content=f"The {user_info['pretitle']} of "
                                                                               f"{user_info['name']} has issued a request"
                                                                               f" to establish diplomatic relations with"
                                                                               f" {self.nation_info['name']}. Please use"
@@ -2045,13 +2048,14 @@ class DiplomaticMenuView(discord.ui.View):
 class DiplomaticRelationsRespondView(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, sender_info: asyncpg.Record,
-                 recipient_info: asyncpg.Record, dm: discord.Message):
+                 recipient_info: asyncpg.Record, dm: discord.Message, bot: discord.Client):
         super().__init__(timeout=86400)
         self.interaction = interaction
         self.conn = conn
         self.sender_info = sender_info
         self.dm = dm
         self.recipient_info = recipient_info
+        self.bot = bot
 
     async def on_timeout(self):
         # disable buttons and update view
@@ -2061,7 +2065,8 @@ class DiplomaticRelationsRespondView(discord.ui.View):
         # send message that the user has failed to react in time
         await self.dm.reply(content="You have failed to reply within 24 hours. The request has been auto-rejected.")
         # send message to the sender that the request has been denied
-        return await discord.Member(self.sender_info['user_id']).send(
+        sender_user = self.bot.get_user(self.sender_info['user_id'])
+        return await sender_user.send(
             f"The {self.recipient_info['pretitle']} of "
             f"{self.recipient_info['name']} has auto-rejected your "
             f"diplomatic relations request.")
@@ -2500,7 +2505,7 @@ class CNC(commands.Cog):
             # send the embed
             return await interaction.followup.send(embed=user_embed)
         else:
-            diplomacy_view = DiplomaticMenuView(interaction, conn, user_info)
+            diplomacy_view = DiplomaticMenuView(interaction, conn, user_info, self.bot)
             # send the embed
             return await interaction.followup.send(embed=user_embed, view=diplomacy_view)
 
