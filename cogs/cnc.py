@@ -2052,6 +2052,8 @@ class DiplomaticMenuView(discord.ui.View):
         await interaction.response.defer()
         # pull user info
         user_info = await user_db_info(interaction.user.id, self.conn)
+        # create the recipient user
+        recipient_user = self.bot.get_user(self.nation_info['user_id'])
         # check if the nation already has diplomatic relations
         dp_check = await self.conn.fetchrow('''SELECT * FROM cnc_drs 
                                                WHERE $1 = ANY(members) AND $2 = ANY(members) AND pending = False;''',
@@ -2073,6 +2075,8 @@ class DiplomaticMenuView(discord.ui.View):
                                            WHERE $1 = ANY(members) AND $2 = ANY(members) AND pending = False;''',
                                         user_info['name'], self.nation_info['name'])
                 await remove_msg.edit(view=None)
+                await recipient_user.send(f"{user_info['name']} has ended diplomatic relations with "
+                                                       f"{self.nation_info['name']}.")
                 return await interaction.followup.send(f"{user_info['name']} has ended diplomatic relations with "
                                                        f"{self.nation_info['name']}.")
             if not accept_view.value:
@@ -2095,7 +2099,6 @@ class DiplomaticMenuView(discord.ui.View):
             return await interaction.followup.send("You do not have sufficient Political Authority to send that "
                                                    "proposal.")
         # otherwise, send the message
-        recipient_user = self.bot.get_user(self.nation_info['user_id'])
         recipient_dm = await recipient_user.send(content=f"The {user_info['pretitle']} of "
                                                                               f"{user_info['name']} has issued a request"
                                                                               f" to establish diplomatic relations with"
