@@ -205,6 +205,33 @@ class MapButtons(View):
         # update the view so all the buttons are disabled
         await interaction.response.edit_message(view=self)
 
+class Accept(View):
+    def __init__(self, interaction: discord.Interaction):
+        super().__init__(timeout=120)
+        self.value = None
+        self.interaction = interaction
+
+    async def on_timeout(self):
+        self.value = False
+        self.stop()
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.interaction.user.id
+
+    # When the confirm button is pressed, set the inner value to `True` and
+    # stop the View from listening to more input.
+    # We also send the user an ephemeral message that we're confirming their choice.
+    @discord.ui.button(label='Accept', style=discord.ButtonStyle.green)
+    async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.value = True
+        self.stop()
+
+    # This one is similar to the confirmation button except sets the inner value to `False`
+    @discord.ui.button(label='Decline', style=discord.ButtonStyle.grey)
+    async def decline(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.value = False
+        self.stop()
+
 # === Province Views ===
 
 class ConstructDropdown(discord.ui.Select):
@@ -2019,7 +2046,7 @@ class DiplomaticMenuView(discord.ui.View):
             child.disabled = True
         await self.interaction.edit_original_response(view=self)
 
-    @discord.ui.button(label="Propose Diplomatic Relations", style=discord.ButtonStyle.blurple, emoji="\U0001f38c")
+    @discord.ui.button(label="Diplomatic Relations", style=discord.ButtonStyle.blurple, emoji="\U0001f38c")
     async def diplomatic_relations(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer()
@@ -2033,8 +2060,20 @@ class DiplomaticMenuView(discord.ui.View):
         if dp_check:
             button.disabled = True
             await interaction.edit_original_response(view=self)
-            return await interaction.followup.send(f"{self.nation_info['name']} has already established diplomatic "
-                                                   f"relations with {user_info['name']}.")
+            accept_view = Accept(interaction)
+            await interaction.followup.send(f"{self.nation_info['name']} has already established diplomatic "
+                                                   f"relations with {user_info['name']}."
+                                            f"\nWould you like to revoke these diplomatic relations?", view=accept_view)
+            # wait for the accept/deny response
+            await accept_view.wait()
+            # if accept
+            if accept_view.value:
+                # remove diplomatic relations
+                await self.conn.execute('''DELETE FROM cnc_drs 
+                                           WHERE $1 = ANY(members) AND $2 = ANY(members) AND pending = False;''',
+                                        user_info['name'], self.nation_info['name'])
+                return await interaction.followup.send(f"{user_info['name']} has ended diplomatic relations with "
+                                                       f"{self.nation_info['name']}.")
         pending_check = await self.conn.fetchrow('''SELECT * FROM cnc_drs WHERE $1 = ANY(members) AND $2 = ANY(members) 
             AND pending = True;''', user_info['name'], self.nation_info['name'])
         if pending_check:
