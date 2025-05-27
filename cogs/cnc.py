@@ -2027,7 +2027,7 @@ class DiplomaticMenuView(discord.ui.View):
         user_info = await user_db_info(interaction.user.id, self.conn)
         # check if the nation already has diplomatic relations
         dp_check = await self.conn.fetchrow('''SELECT * FROM cnc_drs 
-                                               WHERE $1 = ANY(members) AND $2 = ANY(members) WHERE pending = False;''',
+                                               WHERE $1 = ANY(members) AND $2 = ANY(members) AND pending = False;''',
                                             user_info['name'], self.nation_info['name'])
         # if the user already has diplomatic relations with the nation, deny
         if dp_check:
@@ -2036,7 +2036,7 @@ class DiplomaticMenuView(discord.ui.View):
             return await interaction.followup.send(f"{self.nation_info['name']} has already established diplomatic "
                                                    f"relations with {user_info['name']}.")
         pending_check = await self.conn.fetchrow('''SELECT * FROM cnc_drs WHERE $1 = ANY(members) AND $2 = ANY(members) 
-            WHERE pending = True;''', user_info['name'], self.nation_info['name'])
+            AND pending = True;''', user_info['name'], self.nation_info['name'])
         if pending_check:
             button.disabled = True
             await interaction.edit_original_response(view=self)
