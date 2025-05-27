@@ -2026,13 +2026,22 @@ class DiplomaticMenuView(discord.ui.View):
         # pull user info
         user_info = await user_db_info(interaction.user.id, self.conn)
         # check if the nation already has diplomatic relations
-        dp_check = await self.conn.fetchrow('''SELECT * FROM cnc_dps 
-                                               WHERE $1 = ANY(members) AND $2 = ANY(members);''',
+        dp_check = await self.conn.fetchrow('''SELECT * FROM cnc_drs 
+                                               WHERE $1 = ANY(members) AND $2 = ANY(members) WHERE pending = False;''',
                                             user_info['name'], self.nation_info['name'])
         # if the user already has diplomatic relations with the nation, deny
         if dp_check:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"{self.nation_info['name']} has already established diplomatic "
                                                    f"relations with {user_info['name']}.")
+        pending_check = await self.conn.fetchrow('''SELECT * FROM cnc_drs WHERE $1 = ANY(members) AND $2 = ANY(members) 
+            WHERE pending = True;''', user_info['name'], self.nation_info['name'])
+        if pending_check:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"{self.nation_info['name']} is already considering an "
+                                                   f"existing proposal from {user_info['name']}.")
         # otherwise, send the message
         recipient_user = self.bot.get_user(self.nation_info['user_id'])
         recipient_dm = await recipient_user.send(content=f"The {user_info['pretitle']} of "
@@ -2042,8 +2051,19 @@ class DiplomaticMenuView(discord.ui.View):
                                                                               f" the buttons below within 24 hours to "
                                                                               f"respond to the request.")
         # create the response view
-        dp_response = DiplomaticRelationsRespondView(interaction, self.conn, user_info, self.nation_info, recipient_dm)
-        return await recipient_dm.edit(view=dp_response)
+        dp_response = DiplomaticRelationsRespondView(interaction, self.conn, user_info, self.nation_info, recipient_dm,
+                                                     self.bot)
+        # edit the DM with the buttons
+        await recipient_dm.edit(view=dp_response)
+        # let the user know that they have sent a request
+        await interaction.followup.send(f"{self.nation_info['name']} has received a request to "
+                                        f"establish diplomatic relations. ")
+        # update the db to show pending
+        await self.conn.execute('''INSERT INTO cnc_drs VALUES($1, $2, TRUE);''', interaction.message.id,
+                                [self.nation_info['name'], user_info['name']])
+        # disable the button and update
+        button.disabled = True
+        return await interaction.edit_original_response(view=self)
 
 class DiplomaticRelationsRespondView(discord.ui.View):
 
@@ -2066,10 +2086,49 @@ class DiplomaticRelationsRespondView(discord.ui.View):
         await self.dm.reply(content="You have failed to reply within 24 hours. The request has been auto-rejected.")
         # send message to the sender that the request has been denied
         sender_user = self.bot.get_user(self.sender_info['user_id'])
+        # delete pending request
+        await self.conn.execute('''DELETE FROM cnc_drs WHERE id = $1;''', self.interaction.message.id)
         return await sender_user.send(
             f"The {self.recipient_info['pretitle']} of "
             f"{self.recipient_info['name']} has auto-rejected your "
             f"diplomatic relations request.")
+
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
+    async def accept_dps(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # change pending status
+        await self.conn.execute('''UPDATE cnc_drs SET pending = False WHERE id = $1;''',
+                                self.interaction.message.id)
+        # confirm with both parties
+        await interaction.followup.send(f"{self.recipient_info['name']} has established diplomatic relations with "
+                                        f"{self.sender_info['name']}!")
+        # create sender dm
+        sender_user = self.bot.get_user(self.sender_info['user_id'])
+        # send sender confirmation
+        await sender_user.send(content=f"{self.recipient_info['name']} has accepted "
+                                       f"the request for diplomatic relations from {self.sender_info['name']}!")
+        # close out the buttons
+        return await interaction.edit_original_response(view=None)
+
+    @discord.ui.button(label="Reject", sytle=discord.ButtonStyle.danger)
+    async def reject_dps(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # delete pending request
+        await self.conn.execute('''DELETE
+                                   FROM cnc_drs
+                                   WHERE id = $1;''', self.interaction.message.id)
+        # notify recipient
+        await interaction.followup.send(f"{self.recipient_info['name']} has rejected diplomatic relations with "
+                                        f"{self.sender_info['name']}!")
+        # create sender dm
+        sender_user = self.bot.get_user(self.sender_info['user_id'])
+        # send sender confirmation
+        await sender_user.send(content=f"{self.recipient_info['name']} has rejected "
+                                       f"the request for diplomatic relations from {self.sender_info['name']}!")
+        # close out the buttons
+        return await interaction.edit_original_response(view=None)
 
 class CNC(commands.Cog):
 
