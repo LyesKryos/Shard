@@ -2030,13 +2030,12 @@ class GovernmentSubtypesDropdown(discord.ui.Select):
 
 class DiplomaticMenuView(discord.ui.View):
 
-    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, nation_info: asyncpg.Record,
-                 bot: discord.Client):
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, recipient_info: asyncpg.Record):
         super().__init__(timeout=120)
         self.interaction = interaction
-        self.nation_info = nation_info
+        self.recipient_info = recipient_info
         self.conn = conn
-        self.bot = bot
+        self.bot = interaction.client
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.interaction.user.id
@@ -2053,17 +2052,37 @@ class DiplomaticMenuView(discord.ui.View):
         # pull user info
         user_info = await user_db_info(interaction.user.id, self.conn)
         # create the recipient user
-        recipient_user = self.bot.get_user(self.nation_info['user_id'])
+        recipient_user = self.bot.get_user(self.recipient_info['user_id'])
+        # government type checks
+        if self.recipient_info['govt_subtype'] == "Parish":
+            return await interaction.followup.send("Voluntary diplomatic relations are disabled for nations with the"
+                                                   " Parish Equalism ideology.")
+        if ("Anarchic" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']] and
+                "Equalism" not in [self.recipient_info['govt_type'], user_info['govt_type']]):
+            return await interaction.followup.send(
+                "Nations with Anarchic Equalism cannot accept diplomatic relations with "
+                "non-Equalist nations.")
+        if (("Postcolonial" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']]) and
+                (any(idea not in ["Equalism", "Anarchy"]) for idea in [self.recipient_info['govt_type'], user_info['govt_type']])):
+            return await interaction.followup.send("Nations with Postcolonial Anarchy cannot accept diplomatic relations "
+                                                  "with any non-Equalist or non-Anarchic nations.")
+        elif self.recipient_info['govt_subtype'] in ["Primivitist", "Radical"]:
+            return await interaction.followup.send("Nations with Primitivist or Radical Anarchy cannot take "
+                                                   "any diplomatic actions.")
+        # if either nation is pacificistic, it cannot participate in anything but diplomatic relations
+        if "Pacifistic" in [self.recipient_info['govt_subtype'], self.recipient_info['govt_type']]:
+            return await interaction.followup.send("Nations with the Pacifistic Anarchy ideology cannot use any "
+                                                   "diplomatic action other than Diplomatic Relations.")
         # check if the nation already has diplomatic relations
         dp_check = await self.conn.fetchrow('''SELECT * FROM cnc_drs 
-                                               WHERE $1 = ANY(members) AND $2 = ANY(members) AND pending = False;''',
-                                            user_info['name'], self.nation_info['name'])
+                                               WHERE $1 = ANY(members) AND $2 = ANY(members);''',
+                                            user_info['name'], self.recipient_info['name'])
         # if the user already has diplomatic relations with the nation, deny
         if dp_check:
             button.disabled = True
             await interaction.edit_original_response(view=self)
             accept_view = Accept(interaction)
-            remove_msg = await interaction.followup.send(f"{self.nation_info['name']} has already established diplomatic "
+            remove_msg = await interaction.followup.send(f"{self.recipient_info['name']} has already established diplomatic "
                                                    f"relations with {user_info['name']}."
                                             f"\nWould you like to revoke these diplomatic relations?", view=accept_view)
             # wait for the accept/deny response
@@ -2073,27 +2092,28 @@ class DiplomaticMenuView(discord.ui.View):
                 # remove diplomatic relations
                 await self.conn.execute('''DELETE FROM cnc_drs 
                                            WHERE $1 = ANY(members) AND $2 = ANY(members) AND pending = False;''',
-                                        user_info['name'], self.nation_info['name'])
+                                        user_info['name'], self.recipient_info['name'])
                 await remove_msg.edit(view=None)
                 await recipient_user.send(f"{user_info['name']} has ended diplomatic relations with "
-                                                       f"{self.nation_info['name']}.")
+                                                       f"{self.recipient_info['name']}.")
                 # renable button
                 button.disabled = False
                 await interaction.edit_original_response(view=self)
                 return await interaction.followup.send(f"{user_info['name']} has ended diplomatic relations with "
-                                                       f"{self.nation_info['name']}.")
+                                                       f"{self.recipient_info['name']}.")
             if not accept_view.value:
                 # renable button
                 button.disabled = False
                 await interaction.edit_original_response(view=self)
                 # remove accept/deny buttons
                 return await remove_msg.edit(view=None)
-        pending_check = await self.conn.fetchrow('''SELECT * FROM cnc_drs WHERE $1 = ANY(members) AND $2 = ANY(members) 
-            AND pending = True;''', user_info['name'], self.nation_info['name'])
+        pending_check = await self.conn.fetchrow('''SELECT * FROM cnc_pending_requests WHERE $1 = ANY(members) 
+                                                                                         AND $2 = ANY(members) 
+            AND type = 'Diplomatic Relations';''', user_info['name'], self.recipient_info['name'])
         if pending_check:
             button.disabled = True
             await interaction.edit_original_response(view=self)
-            return await interaction.followup.send(f"{self.nation_info['name']} is already considering an "
+            return await interaction.followup.send(f"{self.recipient_info['name']} is already considering an "
                                                    f"existing proposal from {user_info['name']}.")
         # check to ensure that the sender has sufficient political authority
         if user_info['pol_auth'] < 1:
@@ -2105,23 +2125,153 @@ class DiplomaticMenuView(discord.ui.View):
         recipient_dm = await recipient_user.send(content=f"The {user_info['pretitle']} of "
                                                                               f"{user_info['name']} has issued a request"
                                                                               f" to establish diplomatic relations with"
-                                                                              f" {self.nation_info['name']}. Please use"
+                                                                              f" {self.recipient_info['name']}. Please use"
                                                                               f" the buttons below within 24 hours to "
                                                                               f"respond to the request.")
         # create the response view
-        dp_response = DiplomaticRelationsRespondView(interaction, self.conn, user_info, self.nation_info, recipient_dm,
+        dp_response = DiplomaticRelationsRespondView(interaction, self.conn, user_info, self.recipient_info, recipient_dm,
                                                      self.bot)
         # edit the DM with the buttons
         await recipient_dm.edit(view=dp_response)
         # let the user know that they have sent a request
-        await interaction.followup.send(f"{self.nation_info['name']} has received a request to "
+        await interaction.followup.send(f"{self.recipient_info['name']} has received a request to "
                                         f"establish diplomatic relations. ")
         # update the db to show pending
-        await self.conn.execute('''INSERT INTO cnc_drs VALUES($1, $2, TRUE);''', interaction.message.id,
-                                [self.nation_info['name'], user_info['name']])
+        await self.conn.execute('''INSERT INTO cnc_pending_requests VALUES($1, $2, TRUE);''', interaction.message.id,
+                                [self.recipient_info['name'], user_info['name']])
         # pre-emptively remove one political authoriy
         await self.conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth - 1 WHERE user_id = $1;''',
                                 user_info['user_id'])
+        # disable the button and update
+        button.disabled = True
+        return await interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Military Alliance", style=discord.ButtonStyle.blurple, emoji="\U0001f6e1")
+    async def military_alliance(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # pull user info
+        user_info = await user_db_info(interaction.user.id, self.conn)
+        # get recipient user
+        recipient_user = self.bot.get_user(self.recipient_info['user_id'])
+        # government type checks
+        if self.recipient_info['govt_subtype'] == "Parish":
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("Voluntary diplomatic relations are disabled for nations with the"
+                                                   " Parish Equalism ideology.")
+        if ("Anarchic" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']] and
+                "Equalism" not in [self.recipient_info['govt_type'], user_info['govt_type']]):
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(
+                "Nations with Anarchic Equalism cannot accept diplomatic relations with "
+                "non-Equalist nations.")
+        if (("Postcolonial" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']]) and
+                (any(idea not in ["Equalism", "Anarchy"]) for idea in [self.recipient_info['govt_type'], user_info['govt_type']])):
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("Nations with Postcolonial Anarchy cannot accept diplomatic relations "
+                                                  "with any non-Equalist or non-Anarchic nations.")
+        elif self.recipient_info['govt_subtype'] in ["Primivitist", "Radical"]:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("Nations with Primitivist or Radical Anarchy cannot take "
+                                                   "any diplomatic actions.")
+        # if either nation is pacificistic, it cannot participate in anything but diplomatic relations
+        if "Pacifistic" in [self.recipient_info['govt_subtype'], self.recipient_info['govt_type']]:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("Nations with the Pacifistic Anarchy ideology cannot use any "
+                                                   "diplomatic action other than Diplomatic Relations.")
+        # check if the user already has an alliance
+        existing_ma_check = await self.conn.fetchrow('''SELECT * FROM cnc_alliances 
+                                                     WHERE $1 = ANY(members) AND $2 = ANY(members);''',
+                                                  user_info['name'], self.recipient_info['name'])
+        if existing_ma_check is not None:
+            # disable button
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            # create the accept/reject view
+            accept_view = Accept(interaction)
+            # reject
+            remove_msg = await interaction.followup.send(f"{self.recipient_info['name']} already has a "
+                                                         f"military alliance with {user_info['name']}. "
+                                                         f"Would you like to leave the military alliance?",
+                                                         view=accept_view)
+            # wait for the interaction
+            await accept_view.wait()
+            # if yes, remove the user from the alliance
+            if accept_view:
+                # remove user from alliance
+                await self.conn.execute('''UPDATE cnc_alliances ARRAY_REMOVE(members, $1) 
+                WHERE $1 = ANY(members);''',
+                                        user_info['name'])
+                # if there are now alliances with only one user, delete them
+                await self.conn.execute('''DELETE FROM cnc_alliances WHERE cardinality(members) < 2;''')
+                # notify all other members of the alliance
+                for member in existing_ma_check['members']:
+                    # get info and user
+                    member_info = await self.conn.fetchrow('''SELECT * FROM cnc_users WHERE name = $1;''',
+                                                           member)
+                    member_user = self.bot.get_user(member_info['user_id'])
+                    # send dm
+                    await member_user.send(content=f"{user_info['name']} has left the military alliance with "
+                                                f"{member_info['name']}!")
+                # renable button
+                button.disabled = False
+                await interaction.edit_original_response(view=self)
+                # notify user
+                return await interaction.followup.send(f"{user_info['name']} has left the military alliance with "
+                                                f"{self.recipient_info['name']}!")
+            if not accept_view.value:
+                # renable button
+                button.disabled = False
+                await interaction.edit_original_response(view=self)
+                # remove accept/deny buttons
+                return await remove_msg.edit(view=None)
+        # check if the user is in another alliance
+        other_ma_check = await self.conn.fetchrow('''SELECT * FROM cnc_alliance 
+                                                     WHERE $1 != ANY(members) AND $2 = ANY(mambers);''',
+                                                  user_info['name'], self.recipient_info['name'])
+        if other_ma_check is not None:
+            # disable button
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            # reject
+            return await interaction.followup.send(f"{self.recipient_info['name']} is already a member of a military "
+                                                   f"alliance.")
+        # pending ma check
+        pending_ma_check = await self.conn.fetchrow('''SELECT * FROM cnc_pending_requests 
+                                                       WHERE $1 = ANY(members) AND $2 = ANY(members);''',
+                                                  user_info['name'], self.recipient_info['name'])
+        if pending_ma_check is not None:
+            # disable button
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"{self.recipient_info['name']} is already considering an "
+                                                   f"existing proposal from {user_info['name']}.")
+        # check to ensure that the sender has sufficient military authority
+        if user_info['mil_auth'] < 1:
+            # disable button
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("You do not have sufficient Military Authority.")
+        # otherwise, send the dm
+        recipient_dm = await recipient_user.send(f"The {user_info['pretitle']} of {user_info['name']} has proposed that"
+                                                 f" {self.recipient_info['name']} join their Military Alliance. Please"
+                                                 f" use the buttons below to respond to the request within 24 hours.")
+        # create the response view
+        ma_response = MilitaryAllianceRespondView(interaction, self.conn, user_info, self.recipient_info, recipient_dm,
+                                                  self.bot)
+        # edit the dm with the response
+        await recipient_dm.edit(view=ma_response)
+        # let the sender know the request has been successfully sent
+        await interaction.followup.send(f"{self.recipient_info['name']} has recieved a "
+                                        f"request to join the Military Alliance.")
+        # remove one military authority from sender
+        await self.conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 1 WHERE user_id = $1;''',
+                                interaction.user.id)
         # disable the button and update
         button.disabled = True
         return await interaction.edit_original_response(view=self)
@@ -2148,25 +2298,29 @@ class DiplomaticRelationsRespondView(discord.ui.View):
         # send message to the sender that the request has been denied
         sender_user = self.bot.get_user(self.sender_info['user_id'])
         # delete pending request
-        await self.conn.execute('''DELETE FROM cnc_drs WHERE id = $1;''', self.interaction.message.id)
+        await self.conn.execute('''DELETE FROM cnc_pending_requests WHERE id = $1;''', self.interaction.message.id)
         return await sender_user.send(
             f"The {self.recipient_info['pretitle']} of "
             f"{self.recipient_info['name']} has auto-rejected your "
             f"diplomatic relations request.")
 
     @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
-    async def accept_dps(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def accept_dr(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer()
         # ensure that the user has enough diplomatic authority
         if self.recipient_info['pol_auth'] < 1:
             return await interaction.followup.send("You do not have enough Political Authority to accept that request.")
         # change pending status
-        await self.conn.execute('''UPDATE cnc_drs SET pending = False WHERE id = $1;''',
-                                self.interaction.message.id)
+        await self.conn.execute('''INSERT INTO cnc_drs VALUES ($1, $2);''',
+                                self.interaction.message.id, [self.recipient_info['name'],
+                                                              self.sender_info['name']])
         # subtract one diplomatic authority from recipient
         await self.conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth - 1 WHERE user_id = $1;''',
                                 self.recipient_info['user_id'])
+        # delete the pending
+        await self.conn.execute('''DELETE FROM cnc_pending_requests WHERE id = $1;''',
+                                self.interaction.message.id)
         # confirm with both parties
         await interaction.followup.send(f"{self.recipient_info['name']} has established diplomatic relations with "
                                         f"{self.sender_info['name']}!")
@@ -2179,12 +2333,12 @@ class DiplomaticRelationsRespondView(discord.ui.View):
         return await interaction.edit_original_response(view=None)
 
     @discord.ui.button(label="Reject", style=discord.ButtonStyle.danger)
-    async def reject_dps(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def reject_dr(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer()
         # delete pending request
         await self.conn.execute('''DELETE
-                                   FROM cnc_drs
+                                   FROM cnc_pending_requests
                                    WHERE id = $1;''', self.interaction.message.id)
         # add political authority back to sender
         await self.conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth + 1 WHERE user_id = $1;''',
@@ -2199,6 +2353,86 @@ class DiplomaticRelationsRespondView(discord.ui.View):
                                        f"the request for diplomatic relations from {self.sender_info['name']}!")
         # close out the buttons
         return await interaction.edit_original_response(view=None)
+
+class MilitaryAllianceRespondView(discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, sender_info: asyncpg.Record,
+                 recipient_info: asyncpg.Record, dm: discord.Message, bot: discord.Client):
+        super().__init__(timeout=86400)
+        self.interaction = interaction
+        self.conn = conn
+        self.sender_info = sender_info
+        self.dm = dm
+        self.recipient_info = recipient_info
+        self.bot = bot
+
+    async def on_timeout(self):
+        # disable buttons and update view
+        for child in self.children:
+            child.disabled = True
+        await self.interaction.edit_original_response(view=self)
+        # send message that the user has failed to react in time
+        await self.dm.reply(content="You have failed to reply within 24 hours. The request has been auto-rejected.")
+        # send message to the sender that the request has been denied
+        sender_user = self.bot.get_user(self.sender_info['user_id'])
+        # delete pending request
+        await self.conn.execute('''DELETE FROM cnc_pending_requests WHERE id = $1;''', self.interaction.message.id)
+        return await sender_user.send(
+            f"The {self.recipient_info['pretitle']} of "
+            f"{self.recipient_info['name']} has auto-rejected your "
+            f"military alliance request.")
+
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
+    async def accept_alliance(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # ensure that the user has enough military authority
+        if self.recipient_info['mil_auth'] < 1:
+            return await interaction.followup.send("You do not have enough Military Authority to accept that request.")
+        # if the sender is already in a military alliance, add the recipient to that alliance
+        existing_alliance = await self.conn.execute('''UPDATE cnc_alliances SET members = members || $1 
+                                                       WHERE $2 = ANY(members);''',
+                                                    self.recipient_info['name'], self.sender_info['name'])
+        # if there is no exising alliance, indicated by an UPDATE 0, create a new alliance
+        if existing_alliance == "UPDATE 0":
+            await self.conn.execute('''INSERT INTO cnc_alliances VALUES ($1, $2);''',
+                                    self.interaction.message.id, [self.recipient_info['name'],
+                                                                  self.sender_info['name']])
+        # reduce recipient's military authority by one
+        await self.conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 1 WHERE user_id = $1;''',
+                                self.recipient_info['user_id'])
+        # notify recipient
+        await interaction.followup.send(f"{self.recipient_info['name']} is now in a military alliance with "
+                                        f"{self.sender_info['name']}! ")
+        # notify sender
+        sender_user = self.bot.get_user(self.sender_info['user_id'])
+        await sender_user.send(content=f"{self.recipient_info['name']} has accepted the request to join a "
+                                       f"military alliance with {self.sender_info['name']}!")
+        # close out buttons
+        return await interaction.edit_original_response(view=None)
+
+    @discord.ui.button(label="Reject", style=discord.ButtonStyle.danger)
+    async def reject_alliance(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # delete pending request
+        await self.conn.execute('''DELETE
+                                   FROM cnc_pending_requests
+                                   WHERE id = $1;''', self.interaction.message.id)
+        # add political authority back to sender
+        await self.conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth + 1 WHERE user_id = $1;''',
+                                self.sender_info['user_id'])
+        # notify recipient
+        await interaction.followup.send(f"{self.recipient_info['name']} has rejected a military alliance with "
+                                        f"{self.sender_info['name']}!")
+        # create sender dm
+        sender_user = self.bot.get_user(self.sender_info['user_id'])
+        # send sender confirmation
+        await sender_user.send(content=f"{self.recipient_info['name']} has rejected "
+                                       f"the request for a military alliance from {self.sender_info['name']}!")
+        # close out the buttons
+        return await interaction.edit_original_response(view=None)
+
 
 class CNC(commands.Cog):
 
@@ -2566,6 +2800,8 @@ class CNC(commands.Cog):
                                                        ephemeral=True)
         # define connection
         conn = self.bot.pool
+        # pull the caller's info to check their government type
+        caller_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
         # pull province data
         province_list, province_count = await self.nation_provinces_db_sort(user_info['user_id'])
         # pull the name of the capital
@@ -2639,14 +2875,14 @@ class CNC(commands.Cog):
             # send the embed
             return await interaction.followup.send(embed=user_embed)
         # check for other restriction options, such as government type
-        elif user_info['govt_subtype'] == "Parish":
+        elif caller_info['govt_subtype'] == "Parish":
             user_embed.set_footer(text="Voluntary diplomatic actions are disabled for nations "
                                        "with the Parish Equalism ideology.")
             # send the embed
             return await interaction.followup.send(embed=user_embed)
-        elif user_info['govt_subtype'] == "Radical":
+        elif caller_info['govt_subtype'] in ["Primivitist", "Radical"]:
             user_embed.set_footer(text="Diplomatic actions are disabled for nations "
-                                       "with the Radical Anarchy ideology.")
+                                       "with the Radical and Primitivist Anarchy ideologies.")
             # send the embed
             return await interaction.followup.send(embed=user_embed)
         else:
