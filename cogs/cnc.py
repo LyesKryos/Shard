@@ -2232,7 +2232,7 @@ class DiplomaticMenuView(discord.ui.View):
                 return await remove_msg.edit(view=None)
         # check if the user is in another alliance
         other_ma_check = await self.conn.fetchrow('''SELECT * FROM cnc_alliances 
-                                                     WHERE $1 != ANY(members) AND $2 = ANY(mambers);''',
+                                                     WHERE $1 != ANY(members) AND $2 = ANY(members);''',
                                                   user_info['name'], self.recipient_info['name'])
         if other_ma_check is not None:
             # disable button
