@@ -2886,7 +2886,7 @@ class CNC(commands.Cog):
             # send the embed
             return await interaction.followup.send(embed=user_embed)
         else:
-            diplomacy_view = DiplomaticMenuView(interaction, conn, user_info, self.bot)
+            diplomacy_view = DiplomaticMenuView(interaction, conn, user_info)
             # send the embed
             return await interaction.followup.send(embed=user_embed, view=diplomacy_view)
 
