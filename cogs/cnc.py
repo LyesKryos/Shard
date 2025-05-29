@@ -2392,7 +2392,7 @@ class MilitaryAllianceRespondView(discord.ui.View):
         # if the sender is already in a military alliance, add the recipient to that alliance
         existing_alliance = await self.conn.execute('''UPDATE cnc_alliances SET members = members || $1 
                                                        WHERE $2 = ANY(members);''',
-                                                    self.recipient_info['name'], self.sender_info['name'])
+                                                    [self.recipient_info['name']], self.sender_info['name'])
         # if there is no exising alliance, indicated by an UPDATE 0, create a new alliance
         if existing_alliance == "UPDATE 0":
             await self.conn.execute('''INSERT INTO cnc_alliances VALUES ($1, $2);''',
