@@ -2220,6 +2220,8 @@ class DiplomaticMenuView(discord.ui.View):
                 # renable button
                 button.disabled = False
                 await interaction.edit_original_response(view=self)
+                # remove accept/deny buttons
+                await remove_msg.edit(view=None)
                 # notify user
                 return await interaction.followup.send(f"{user_info['name']} has left the military alliance with "
                                                 f"{self.recipient_info['name']}!")
