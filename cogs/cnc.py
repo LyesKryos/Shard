@@ -2202,11 +2202,10 @@ class DiplomaticMenuView(discord.ui.View):
             # wait for the interaction
             await accept_view.wait()
             # if yes, remove the user from the alliance
-            if accept_view:
+            if accept_view.value:
                 # remove user from alliance
-                await self.conn.execute('''UPDATE cnc_alliances ARRAY_REMOVE(members, $1) 
-                WHERE $1 = ANY(members);''',
-                                        user_info['name'])
+                await self.conn.execute('''UPDATE cnc_alliances SET members = ARRAY_REMOVE(members, $1) 
+                WHERE $1 = ANY(members);''', user_info['name'])
                 # if there are now alliances with only one user, delete them
                 await self.conn.execute('''DELETE FROM cnc_alliances WHERE cardinality(members) < 2;''')
                 # notify all other members of the alliance
@@ -2224,7 +2223,7 @@ class DiplomaticMenuView(discord.ui.View):
                 # notify user
                 return await interaction.followup.send(f"{user_info['name']} has left the military alliance with "
                                                 f"{self.recipient_info['name']}!")
-            if not accept_view.value:
+            elif not accept_view.value:
                 # renable button
                 button.disabled = False
                 await interaction.edit_original_response(view=self)
