@@ -2213,6 +2213,8 @@ class DiplomaticMenuView(discord.ui.View):
                     # get info and user
                     member_info = await self.conn.fetchrow('''SELECT * FROM cnc_users WHERE name = $1;''',
                                                            member)
+                    if member_info['name'] == user_info['name']:
+                        continue
                     member_user = self.bot.get_user(member_info['user_id'])
                     # send dm
                     await member_user.send(content=f"{user_info['name']} has left the military alliance with "
