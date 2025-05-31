@@ -2044,6 +2044,40 @@ class DiplomaticMenuView(discord.ui.View):
             child.disabled = True
         await self.interaction.edit_original_response(view=self)
 
+    @discord.ui.button(label="Cooperative Relations", style=discord.ButtonStyle.success)
+    async def cooperative(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer response
+        await interaction.response.defer()
+        # add cooperative actions view
+        cooperative_actions = CooperativeDiplomaticActions(interaction, self.conn, self.recipient_info)
+        return await interaction.edit_original_response(view=cooperative_actions)
+
+    @discord.ui.button(label="Hostile Relations", style=discord.ButtonStyle.danger)
+    async def hostile(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer response
+        await interaction.response.defer()
+        # add hostile reactions
+        hostile_actions = HostileDiplomaticActions(interaction, self.conn, self.recipient_info)
+        return await interaction.edit_original_response(view=hostile_actions)
+
+
+class CooperativeDiplomaticActions(discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, recipient_info: asyncpg.Record):
+        super().__init__(timeout=120)
+        self.interaction = interaction
+        self.recipient_info = recipient_info
+        self.conn = conn
+        self.bot = interaction.client
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.interaction.user.id
+
+    async def on_timeout(self):
+        for child in self.children:
+            child.disabled = True
+        await self.interaction.edit_original_response(view=self)
+
     @discord.ui.button(label="Diplomatic Relations", style=discord.ButtonStyle.blurple, emoji="\U0001f38c")
     async def diplomatic_relations(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
@@ -2462,6 +2496,22 @@ class DiplomaticMenuView(discord.ui.View):
         return await interaction.edit_original_response(view=self)
 
 
+class HostileDiplomaticActions(discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, recipient_info: asyncpg.Record):
+        super().__init__(timeout=120)
+        self.interaction = interaction
+        self.recipient_info = recipient_info
+        self.conn = conn
+        self.bot = interaction.client
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.interaction.user.id
+
+    async def on_timeout(self):
+        for child in self.children:
+            child.disabled = True
+        await self.interaction.edit_original_response(view=self)
 
 class DiplomaticRelationsRespondView(discord.ui.View):
 
