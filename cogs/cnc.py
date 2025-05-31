@@ -220,7 +220,6 @@ class Accept(View):
 
     # When the confirm button is pressed, set the inner value to `True` and
     # stop the View from listening to more input.
-    # We also send the user an ephemeral message that we're confirming their choice.
     @discord.ui.button(label='Accept', style=discord.ButtonStyle.green)
     async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.value = True
@@ -2279,6 +2278,122 @@ class DiplomaticMenuView(discord.ui.View):
         button.disabled = True
         return await interaction.edit_original_response(view=self)
 
+    @discord.ui.button(label="Trade Pact", style=discord.ButtonStyle.blurple, emoji="\U0001fa99")
+    async def trade_pacts(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # pull user info
+        user_info = await user_db_info(interaction.user.id, self.conn)
+        # create the recipient user
+        recipient_user = self.bot.get_user(self.recipient_info['user_id'])
+        # government type checks
+        if self.recipient_info['govt_subtype'] == "Parish":
+            return await interaction.followup.send("Voluntary diplomatic actions are disabled for nations with the"
+                                                   " Parish Equalism ideology.")
+        if ("Anarchic" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']] and
+                "Equalism" not in [self.recipient_info['govt_type'], user_info['govt_type']]):
+            return await interaction.followup.send(
+                "Nations with Anarchic Equalism cannot accept diplomatic actions from "
+                "non-Equalist nations.")
+        if (("Postcolonial" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']]) and
+                (any(idea not in ["Equalism", "Anarchy"]) for idea in
+                 [self.recipient_info['govt_type'], user_info['govt_type']])):
+            return await interaction.followup.send(
+                "Nations with Postcolonial Anarchy cannot accept diplomatic actions "
+                "from any non-Equalist or non-Anarchic nations.")
+        elif self.recipient_info['govt_subtype'] in ["Primivitist", "Radical"]:
+            return await interaction.followup.send("Nations with Primitivist or Radical Anarchy cannot take "
+                                                   "any diplomatic actions.")
+        # if either nation is pacificistic, it cannot participate in anything but diplomatic relations
+        if "Pacifistic" in [self.recipient_info['govt_subtype'], self.recipient_info['govt_type']]:
+            return await interaction.followup.send("Nations with the Pacifistic Anarchy ideology cannot use any "
+                                                   "diplomatic action other than Diplomatic Relations.")
+        # check if the nation already has diplomatic relations
+        tp_check = await self.conn.fetchrow('''SELECT *
+                                               FROM cnc_trade_pacts
+                                               WHERE $1 = ANY (members)
+                                                 AND $2 = ANY (members);''',
+                                            user_info['name'], self.recipient_info['name'])
+        # if the user already has diplomatic relations with the nation, deny
+        if tp_check:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            accept_view = Accept(interaction)
+            remove_msg = await interaction.followup.send(
+                f"{self.recipient_info['name']} has already established a trade pact with {user_info['name']}."
+                f"\nWould you like to end the trade pact?", view=accept_view)
+            # wait for the accept/deny response
+            await accept_view.wait()
+            # if accept
+            if accept_view.value:
+                # remove diplomatic relations
+                await self.conn.execute('''DELETE
+                                           FROM cnc_trade_pacts
+                                           WHERE $1 = ANY (members)
+                                             AND $2 = ANY (members);''',
+                                        user_info['name'], self.recipient_info['name'])
+                await remove_msg.edit(view=None)
+                await recipient_user.send(f"{user_info['name']} has ended the trade pact with "
+                                          f"{self.recipient_info['name']}.")
+                # renable button
+                button.disabled = False
+                await interaction.edit_original_response(view=self)
+                return await interaction.followup.send(f"{user_info['name']} has ended the trade pact with "
+                                                       f"{self.recipient_info['name']}.")
+            if not accept_view.value:
+                # renable button
+                button.disabled = False
+                await interaction.edit_original_response(view=self)
+                # remove accept/deny buttons
+                return await remove_msg.edit(view=None)
+        pending_check = await self.conn.fetchrow('''SELECT *
+                                                    FROM cnc_pending_requests
+                                                    WHERE $1 = ANY (members)
+                                                      AND $2 = ANY (members)
+                                                      AND type = 'Trade Pact';''', user_info['name'],
+                                                 self.recipient_info['name'])
+        if pending_check:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"{self.recipient_info['name']} is already considering an "
+                                                   f"existing proposal from {user_info['name']}.")
+        # check to ensure that the sender has sufficient political authority
+        if user_info['pol_auth'] < 1:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("You do not have sufficient Political Authority to send that "
+                                                   "proposal.")
+        # otherwise, send the message
+        recipient_dm = await recipient_user.send(content=f"The {user_info['pretitle']} of "
+                                                         f"{user_info['name']} has issued a request"
+                                                         f" to establish a trade pact with"
+                                                         f" {self.recipient_info['name']}. Please use"
+                                                         f" the buttons below within 24 hours to "
+                                                         f"respond to the request.")
+        # create the response view
+        tp_response = TradePactRespondView(interaction, self.conn, user_info, self.recipient_info,
+                                                     recipient_dm,
+                                                     self.bot)
+        # edit the DM with the buttons
+        await recipient_dm.edit(view=tp_response)
+        # let the user know that they have sent a request
+        await interaction.followup.send(f"{self.recipient_info['name']} has received a request to "
+                                        f"establish a trade pact. ")
+        # update the db to show pending
+        await self.conn.execute('''INSERT INTO cnc_pending_requests
+                                   VALUES ($1, $2, TRUE);''', interaction.message.id,
+                                [self.recipient_info['name'], user_info['name']])
+        # pre-emptively remove one political authoriy
+        await self.conn.execute('''UPDATE cnc_users
+                                   SET pol_auth = pol_auth - 1
+                                   WHERE user_id = $1;''',
+                                user_info['user_id'])
+        # disable the button and update
+        button.disabled = True
+        return await interaction.edit_original_response(view=self)
+
+
+
 class DiplomaticRelationsRespondView(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, sender_info: asyncpg.Record,
@@ -2293,9 +2408,7 @@ class DiplomaticRelationsRespondView(discord.ui.View):
 
     async def on_timeout(self):
         # disable buttons and update view
-        for child in self.children:
-            child.disabled = True
-        await self.interaction.edit_original_response(view=self)
+        self.stop()
         # send message that the user has failed to react in time
         await self.dm.reply(content="You have failed to reply within 24 hours. The request has been auto-rejected.")
         # send message to the sender that the request has been denied
@@ -2371,9 +2484,7 @@ class MilitaryAllianceRespondView(discord.ui.View):
 
     async def on_timeout(self):
         # disable buttons and update view
-        for child in self.children:
-            child.disabled = True
-        await self.interaction.edit_original_response(view=self)
+        self.stop()
         # send message that the user has failed to react in time
         await self.dm.reply(content="You have failed to reply within 24 hours. The request has been auto-rejected.")
         # send message to the sender that the request has been denied
@@ -2433,6 +2544,82 @@ class MilitaryAllianceRespondView(discord.ui.View):
         # send sender confirmation
         await sender_user.send(content=f"{self.recipient_info['name']} has rejected "
                                        f"the request for a military alliance from {self.sender_info['name']}!")
+        # close out the buttons
+        return await interaction.edit_original_response(view=None)
+
+class TradePactRespondView(discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, sender_info: asyncpg.Record,
+                 recipient_info: asyncpg.Record, dm: discord.Message, bot: discord.Client):
+        super().__init__(timeout=86400)
+        self.interaction = interaction
+        self.conn = conn
+        self.sender_info = sender_info
+        self.dm = dm
+        self.recipient_info = recipient_info
+        self.bot = bot
+
+    async def on_timeout(self):
+        # disable buttons and update view
+        self.stop()
+        # send message that the user has failed to react in time
+        await self.dm.reply(content="You have failed to reply within 24 hours. The request has been auto-rejected.")
+        # send message to the sender that the request has been denied
+        sender_user = self.bot.get_user(self.sender_info['user_id'])
+        # delete pending request
+        await self.conn.execute('''DELETE FROM cnc_pending_requests WHERE id = $1;''', self.interaction.message.id)
+        return await sender_user.send(
+            f"The {self.recipient_info['pretitle']} of "
+            f"{self.recipient_info['name']} has auto-rejected your "
+            f"diplomatic relations request.")
+
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
+    async def accept_tp(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # ensure that the user has enough diplomatic authority
+        if self.recipient_info['pol_auth'] < 1:
+            return await interaction.followup.send("You do not have enough Political Authority to accept that request.")
+        # change pending status
+        await self.conn.execute('''INSERT INTO cnc_trade_pacts VALUES ($1, $2);''',
+                                self.interaction.message.id, [self.recipient_info['name'],
+                                                              self.sender_info['name']])
+        # subtract one diplomatic authority from recipient
+        await self.conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth - 1 WHERE user_id = $1;''',
+                                self.recipient_info['user_id'])
+        # delete the pending
+        await self.conn.execute('''DELETE FROM cnc_pending_requests WHERE id = $1;''',
+                                self.interaction.message.id)
+        # confirm with both parties
+        await interaction.followup.send(f"{self.recipient_info['name']} has established diplomatic relations with "
+                                        f"{self.sender_info['name']}!")
+        # create sender dm
+        sender_user = self.bot.get_user(self.sender_info['user_id'])
+        # send sender confirmation
+        await sender_user.send(content=f"{self.recipient_info['name']} has accepted "
+                                       f"the request for diplomatic relations from {self.sender_info['name']}!")
+        # close out the buttons
+        return await interaction.edit_original_response(view=None)
+
+    @discord.ui.button(label="Reject", style=discord.ButtonStyle.danger)
+    async def reject_tp(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # delete pending request
+        await self.conn.execute('''DELETE
+                                   FROM cnc_pending_requests
+                                   WHERE id = $1;''', self.interaction.message.id)
+        # add political authority back to sender
+        await self.conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth + 1 WHERE user_id = $1;''',
+                                self.sender_info['user_id'])
+        # notify recipient
+        await interaction.followup.send(f"{self.recipient_info['name']} has rejected the trade pact offer from "
+                                        f"{self.sender_info['name']}!")
+        # create sender dm
+        sender_user = self.bot.get_user(self.sender_info['user_id'])
+        # send sender confirmation
+        await sender_user.send(content=f"{self.recipient_info['name']} has rejected "
+                                       f"the offer for a trade pact from {self.sender_info['name']}!")
         # close out the buttons
         return await interaction.edit_original_response(view=None)
 
