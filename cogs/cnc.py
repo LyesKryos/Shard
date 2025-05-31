@@ -2114,6 +2114,31 @@ class DiplomaticMenuView(discord.ui.View):
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"{self.recipient_info['name']} is already considering an "
                                                    f"existing proposal from {user_info['name']}.")
+        # check if the user has any hostile actions
+        # check wars
+        wars = await self.conn.fetchrow('''SELECT *
+                                           FROM cnc_wars
+                                           WHERE active = True
+                                             AND ($1 = ANY (array_cat(attackers, defenders))
+                                               AND $2 = ANY (array_cat(attackers, defenders));''',
+                                        user_info['name'], self.recipient_info['name'])
+        if wars is not None:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(
+                "Cooperative diplomatic actions are disabled for hostile nations.")
+        # check embargoes
+        embargoes = await self.conn.fetchrow('''SELECT *
+                                                FROM cnc_embargoes
+                                                WHERE $1 = ANY (sender)
+                                                  AND $2 = ANY (target);''',
+                                             user_info['name'], self.recipient_info['name'])
+        if embargoes is not None:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(
+                "Cooperative diplomatic actions are disabled for hostile nations.\n"
+                "*Embargoes are considered hostile actions.*")
         # check to ensure that the sender has sufficient political authority
         if user_info['pol_auth'] < 1:
             button.disabled = True
@@ -2183,6 +2208,12 @@ class DiplomaticMenuView(discord.ui.View):
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send("Nations with the Pacifistic Anarchy ideology cannot use any "
                                                    "diplomatic action other than Diplomatic Relations.")
+        # if the user is a puppet, disallow
+        if user_info['overlord'] is not None:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("Puppeted nations are permitted only to join the military alliance"
+                                                   " of their overlord.")
         # check if the user already has an alliance
         existing_ma_check = await self.conn.fetchrow('''SELECT * FROM cnc_alliances 
                                                      WHERE $1 = ANY(members) AND $2 = ANY(members);''',
@@ -2253,6 +2284,25 @@ class DiplomaticMenuView(discord.ui.View):
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"{self.recipient_info['name']} is already considering an "
                                                    f"existing proposal from {user_info['name']}.")
+        # check if the user has any hostile actions
+        # check wars
+        wars = await self.conn.fetchrow('''SELECT * FROM cnc_wars 
+                                           WHERE active = True AND ($1 = ANY(array_cat(attackers, defenders)) 
+                                               AND $2 = ANY(array_cat(attackers, defenders));''',
+                                        user_info['name'], self.recipient_info['name'])
+        if wars is not None:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.")
+        # check embargoes
+        embargoes = await self.conn.fetchrow('''SELECT * FROM cnc_embargoes 
+                                                WHERE $1 = ANY(sender) AND $2 = ANY(target);''',
+                                             user_info['name'], self.recipient_info['name'])
+        if embargoes is not None:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.\n"
+                                                   "*Embargoes are considered hostile actions.*")
         # check to ensure that the sender has sufficient military authority
         if user_info['mil_auth'] < 1:
             # disable button
@@ -2357,6 +2407,25 @@ class DiplomaticMenuView(discord.ui.View):
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"{self.recipient_info['name']} is already considering an "
                                                    f"existing proposal from {user_info['name']}.")
+        # check if the user has any hostile actions
+        # check wars
+        wars = await self.conn.fetchrow('''SELECT * FROM cnc_wars 
+                                           WHERE active = True AND ($1 = ANY(array_cat(attackers, defenders)) 
+                                               AND $2 = ANY(array_cat(attackers, defenders));''',
+                                        user_info['name'], self.recipient_info['name'])
+        if wars is not None:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.")
+        # check embargoes
+        embargoes = await self.conn.fetchrow('''SELECT * FROM cnc_embargoes 
+                                                WHERE $1 = ANY(sender) AND $2 = ANY(target);''',
+                                             user_info['name'], self.recipient_info['name'])
+        if embargoes is not None:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.\n"
+                                                   "*Embargoes are considered hostile actions.*")
         # check to ensure that the sender has sufficient political authority
         if user_info['pol_auth'] < 1:
             button.disabled = True
@@ -2571,7 +2640,7 @@ class TradePactRespondView(discord.ui.View):
         return await sender_user.send(
             f"The {self.recipient_info['pretitle']} of "
             f"{self.recipient_info['name']} has auto-rejected your "
-            f"diplomatic relations request.")
+            f"trade pact offer.")
 
     @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
     async def accept_tp(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -2591,13 +2660,13 @@ class TradePactRespondView(discord.ui.View):
         await self.conn.execute('''DELETE FROM cnc_pending_requests WHERE id = $1;''',
                                 self.interaction.message.id)
         # confirm with both parties
-        await interaction.followup.send(f"{self.recipient_info['name']} has established diplomatic relations with "
+        await interaction.followup.send(f"{self.recipient_info['name']} has established a trade pact with "
                                         f"{self.sender_info['name']}!")
         # create sender dm
         sender_user = self.bot.get_user(self.sender_info['user_id'])
         # send sender confirmation
         await sender_user.send(content=f"{self.recipient_info['name']} has accepted "
-                                       f"the request for diplomatic relations from {self.sender_info['name']}!")
+                                       f"the offer of a trade pact with {self.sender_info['name']}!")
         # close out the buttons
         return await interaction.edit_original_response(view=None)
 
