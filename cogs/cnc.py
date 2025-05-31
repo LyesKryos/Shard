@@ -3011,6 +3011,8 @@ class CNC(commands.Cog):
         WHERE $1 = ANY(members);''', user_info['name'])
         diplomatic_relations = await conn.fetch('''SELECT * FROM cnc_drs WHERE $1 = ANY(members);''',
                                                 user_info['name'])
+        embargoes = await conn.fetch('''SELECT * FROM cnc_embargoes WHERE sender = $1;''',
+                                     user_info['name'])
 
         def parse_relations(relations):
             if not relations:
@@ -3028,6 +3030,9 @@ class CNC(commands.Cog):
         trade_pacts = parse_relations(trade_pacts)
         military_access = parse_relations(military_access)
         diplomatic_relations = parse_relations(diplomatic_relations)
+        embargoes = "".join([e for e in embargoes['target'] if e != user_info['name']])
+        if embargoes == "":
+            embargoes = "None"
         # build embed, populate title with pretitle and nation name, set color to user color,
         # and set description to Discord user.
         user_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
@@ -3056,9 +3061,10 @@ class CNC(commands.Cog):
                              value="Information known about the nation's international relationships.", inline=False)
         user_embed.add_field(name="Allies", value=f"{allies}")
         user_embed.add_field(name="Wars", value=f"{wars}")
-        user_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
         user_embed.add_field(name="Military Access", value=f"{military_access}")
         user_embed.add_field(name="Diplomatic Relations", value=diplomatic_relations)
+        user_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
+        user_embed.add_field(name="Embargoes", value=embargoes)
         # if the user has called their own nation, add a footnote to show that relations are disabled with their own nation
         if user_info['user_id'] == interaction.user.id:
             user_embed.set_footer(text="Diplomatic actions are disabled for your own nation.")
