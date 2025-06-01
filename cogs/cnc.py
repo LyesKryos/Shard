@@ -2583,10 +2583,10 @@ class HostileDiplomaticActions(discord.ui.View):
                                                 WHERE $1 = ANY(members) AND $2 = ANY(members);''',
                                              user_info['name'], self.recipient_info['name'])
         trade_pacts = await self.conn.fetchrow('''SELECT * FROM cnc_trade_pacts 
-                                               WHERE $1 = ANY(members) AND $2 = ANY(memvers);''',
+                                               WHERE $1 = ANY(members) AND $2 = ANY(members);''',
                                                user_info['name'], self.recipient_info['name'])
         diplomatic_relations = await self.conn.fetchrow('''SELECT * FROM cnc_drs 
-                                               WHERE $1 = ANY(members) AND $2 = ANY(memvers);''',
+                                               WHERE $1 = ANY(members) AND $2 = ANY(members);''',
                                                user_info['name'], self.recipient_info['name'])
         pending_cooperation = await self.conn.fetchrow('''SELECT * FROM cnc_pending_requests WHERE 
                                                        $1 = ANY(members) AND $2 = ANY(members) AND type = ANY($3);''',
