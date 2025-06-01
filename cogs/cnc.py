@@ -3221,7 +3221,9 @@ class CNC(commands.Cog):
         # pull relations information
         alliances = await conn.fetch('''SELECT * FROM cnc_alliances WHERE $1 = ANY(members);''',
                                      user_info['name'])
-        wars = await conn.fetch('''SELECT * FROM cnc_wars WHERE $1 = ANY(members);''',
+        defensive_wars = await conn.fetch('''SELECT * FROM cnc_wars WHERE $1 = ANY(defenders);''',
+                                user_info['name'])
+        offensive_wars = await conn.fetch('''SELECT * FROM cnc_wars WHERE $1 = ANY(attackers);''',
                                 user_info['name'])
         trade_pacts = await conn.fetch('''SELECT * FROM cnc_trade_pacts WHERE $1 = ANY(members);''',
                                        user_info['name'])
@@ -3244,7 +3246,6 @@ class CNC(commands.Cog):
                 return output
 
         allies = parse_relations(alliances)
-        wars = parse_relations(wars)
         trade_pacts = parse_relations(trade_pacts)
         military_access = parse_relations(military_access)
         diplomatic_relations = parse_relations(diplomatic_relations)
@@ -3252,6 +3253,10 @@ class CNC(commands.Cog):
             embargoes = "None"
         else:
             embargoes = ", ".join([e for e in embargoes['target']])
+        if (not offensive_wars) and (not defensive_wars):
+            wars = "None"
+        else:
+            wars = ", ".join([w for w in defensive_wars['defenders']]+[w for w in offensive_wars['attackers']])
         # build embed, populate title with pretitle and nation name, set color to user color,
         # and set description to Discord user.
         user_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
