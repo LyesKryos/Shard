@@ -2129,9 +2129,9 @@ class CooperativeDiplomaticActions(discord.ui.View):
                 await remove_msg.edit(view=None)
                 await recipient_user.send(f"{user_info['name']} has ended diplomatic relations with "
                                                        f"{self.recipient_info['name']}.")
-                # renable button
-                button.disabled = False
-                await interaction.edit_original_response(view=self)
+                # return to menu
+                diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+                await interaction.edit_original_response(view=diplo_menu)
                 return await interaction.followup.send(f"{user_info['name']} has ended diplomatic relations with "
                                                        f"{self.recipient_info['name']}.")
             if not accept_view.value:
@@ -2283,9 +2283,9 @@ class CooperativeDiplomaticActions(discord.ui.View):
                     # send dm
                     await member_user.send(content=f"{user_info['name']} has left the military alliance with "
                                                 f"{member_info['name']}!")
-                # renable button
-                button.disabled = False
-                await interaction.edit_original_response(view=self)
+                # return to menu
+                diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+                await interaction.edit_original_response(view=diplo_menu)
                 # remove accept/deny buttons
                 await remove_msg.edit(view=None)
                 # notify user
@@ -2419,9 +2419,9 @@ class CooperativeDiplomaticActions(discord.ui.View):
                 await remove_msg.edit(view=None)
                 await recipient_user.send(f"{user_info['name']} has ended the trade pact with "
                                           f"{self.recipient_info['name']}.")
-                # renable button
-                button.disabled = False
-                await interaction.edit_original_response(view=self)
+                # return to menu
+                diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+                await interaction.edit_original_response(view=diplo_menu)
                 return await interaction.followup.send(f"{user_info['name']} has ended the trade pact with "
                                                        f"{self.recipient_info['name']}.")
             if not accept_view.value:
@@ -2495,6 +2495,14 @@ class CooperativeDiplomaticActions(discord.ui.View):
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=diplo_menu)
 
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
+    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # return to menu
+        diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+        await interaction.edit_original_response(view=diplo_menu)
+
 
 class HostileDiplomaticActions(discord.ui.View):
 
@@ -2567,9 +2575,9 @@ class HostileDiplomaticActions(discord.ui.View):
                 await remove_msg.edit(view=None)
                 await recipient_user.send(f"{user_info['name']} has ended the embargo against "
                                           f"{self.recipient_info['name']}.")
-                # renable button
-                button.disabled = False
-                await interaction.edit_original_response(view=self)
+                # return to menu
+                diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+                await interaction.edit_original_response(view=diplo_menu)
                 return await interaction.followup.send(f"{user_info['name']} has ended the embargo against "
                                                        f"{self.recipient_info['name']}.")
             if not accept_view.value:
@@ -2609,6 +2617,14 @@ class HostileDiplomaticActions(discord.ui.View):
         # return to menu
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=diplo_menu)
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
+    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # return to menu
+        diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+        await interaction.edit_original_response(view=diplo_menu)
 
 
 
