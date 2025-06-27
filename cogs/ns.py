@@ -24,7 +24,7 @@ def parse_rmb_message(message: str) -> dict:
     # establish the dict of the data
     message_data = {"message": "", "quoted_nation": None, "quote_id": None, "quoted_message": None}
     # define the quote pattern
-    quote_pattern = f"{re.escape(r"]")}(.*){re.escape(r"[/quote]")}"
+    quote_pattern = f"\\](.*){re.escape(r"[/quote]")}"
     # search for if there is a quote
     quote_match = re.search(quote_pattern, message, flags=re.DOTALL)
     # if there is a quote detected, parse out the information
