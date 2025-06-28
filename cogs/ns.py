@@ -300,7 +300,6 @@ class NationStates(commands.Cog):
                     continue
             # if the last post ID isn't defined, get the most recent post ID and use that as the post ID
             if last_post_id == 0:
-                await crash_channel.send("Post ID not defined")
                 # add limit 1 to the parameter
                 params.update({"limit": "1"})
                 # call the messages
@@ -343,6 +342,7 @@ class NationStates(commands.Cog):
                         message = post.find(".//MESSAGE").text
                         # update dict
                         post_buffer.update({post_id: [nation, message]})
+            await crash_channel.send(post_buffer)
             # create and send embed for each post
             for post in post_buffer:
                 # get the key
