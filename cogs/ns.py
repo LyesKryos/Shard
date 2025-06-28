@@ -275,9 +275,10 @@ class NationStates(commands.Cog):
     @tasks.loop(minutes=1)
     async def rmb_proxy(self):
         crash_channel = self.bot.get_channel(835579413625569322)
-        with shelve.open("rmb_post_id") as rmb_post_id:
-            last_post_id = rmb_post_id['last_post_id']
-        if last_post_id is None:
+        try:
+            with shelve.open("rmb_post_id") as rmb_post_id:
+                last_post_id = rmb_post_id['last_post_id']
+        except KeyError:
             last_post_id = 0
         post_buffer = {}
         try:
