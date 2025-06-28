@@ -300,6 +300,7 @@ class NationStates(commands.Cog):
                     continue
             # if the last post ID isn't defined, get the most recent post ID and use that as the post ID
             if last_post_id == 0:
+                await crash_channel.send("Post ID not defined")
                 # add limit 1 to the parameter
                 params.update({"limit": "1"})
                 # call the messages
