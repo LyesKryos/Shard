@@ -51,6 +51,11 @@ def parse_rmb_message(message: str) -> dict:
     # send the message data back
     return message_data
 
+def sanitize_raw(userinput: str) -> str:
+    # replaces user input with proper, url-friendly code
+    to_regex = userinput.replace("_", " ")
+    return re.sub(r"[^a-zA-Z0-9_-]", ' ', to_regex)
+
 
 class NationStates(commands.Cog):
 
@@ -346,6 +351,9 @@ class NationStates(commands.Cog):
             for post in post_buffer:
                 # get the key
                 post_id = post
+                # define the new last id
+                with shelve.open("rmb_post_id") as rmb_post_id:
+                    rmb_post_id['last_post_id'] = post_id
                 await crash_channel.send(post_id)
                 # get the nation and message, which are first and second in the list, respectively
                 nation = post_buffer[post_id][0]
@@ -355,12 +363,13 @@ class NationStates(commands.Cog):
                 # parse the message info
                 message_info = parse_rmb_message(message)
                 # create the embed object
-                post_embed = discord.Embed(title="posted")
-                post_embed.set_author(name=f"{nation}", url=f"https://www.nationstates.net/nation/{nation}",
+                post_embed = discord.Embed(title="Regional Message Board Post")
+                post_embed.set_author(name=f"{sanitize_raw(nation).title()}",
+                                      url=f"https://www.nationstates.net/nation/{nation}",
                                       icon_url=f"{nation_info['flag_link']}")
                 # if the message has a quote, include the quote
                 if message_info['quoted_nation'] is not None:
-                    post_embed.add_field(name="\u200B",
+                    post_embed.add_field(name=f"*{sanitize_raw(nation).title()} posted...*",
                                          value=f"[{message_info['quoted_nation']} wrote...] "
                                                f"(https://www.nationstates.net/page=rmb/postid="
                                                f"{message_info['quote_id']})\n"
