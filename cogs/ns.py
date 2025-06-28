@@ -345,7 +345,7 @@ class NationStates(commands.Cog):
             # create and send embed for each post
             for post in post_buffer:
                 # get the key
-                post_id = [*post][0]
+                post_id = post
                 await crash_channel.send(post_id)
                 # get the nation and message, which are first and second in the list, respectively
                 nation = post_buffer[post_id][0]
