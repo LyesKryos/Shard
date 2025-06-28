@@ -24,7 +24,7 @@ def parse_rmb_message(message: str) -> dict:
     # establish the dict of the data
     message_data = {"message": "", "quoted_nation": None, "quote_id": None, "quoted_message": None}
     # define the quote pattern
-    quote_pattern = r"](.*)[/quote]"
+    quote_pattern = "\\](.*)\\[/quote\\]"
     # search for if there is a quote
     quote_match = re.search(quote_pattern, message, flags=re.DOTALL)
     # if there is a quote detected, parse out the information
@@ -34,7 +34,7 @@ def parse_rmb_message(message: str) -> dict:
         # parse the nation quoted and define it
         quoted_nation_pattern = "\\[quote=(.*);"
         quoted_nation_match = re.search(quoted_nation_pattern, message)
-        message_data["quoted_nation"] = quoted_nation_match.group(1)
+        message_data["quoted_nation"] = sanitize_raw(quoted_nation_match.group(1))
         # parse the quote id and parse it
         quote_id_pattern = f"{quoted_nation_match.group(1)};(.*?)\\]"
         quote_id_match = re.search(quote_id_pattern, message)
@@ -374,7 +374,7 @@ class NationStates(commands.Cog):
                 # if the message has a quote, include the quote
                 if message_info['quoted_nation'] is not None:
                     post_embed.add_field(name=f"*{sanitize_raw(nation).title()} posted...*",
-                                         value=f"[{message_info['quoted_nation']} wrote...]"
+                                         value=f"*[{message_info['quoted_nation']} wrote...]*"
                                                f"(https://www.nationstates.net/page=rmb/postid={message_info['quote_id']})\n"
                                                f"{message_info['quoted_message']}\n"
                                                f"{message_info['message']}")
