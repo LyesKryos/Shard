@@ -38,7 +38,7 @@ def parse_rmb_message(message: str) -> dict:
         # parse the quote id and parse it
         quote_id_pattern = f"{quoted_nation_match.group(1)};(.*?)\\]"
         quote_id_match = re.search(quote_id_pattern, message)
-        message_data["quote_id"] = f"> {quote_id_match.group(1).replace("\\n", "\\n> ")}"
+        message_data["quote_id"] = f"> {quote_id_match.group(1).replace("\n", "\n> ")}"
         # parse the quote content
         quote_content_pattern = re.escape("[quote=") + r'(.*)' + re.escape("[/quote]")
         # define the host message content of the quote
