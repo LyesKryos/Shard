@@ -342,11 +342,11 @@ class NationStates(commands.Cog):
                         message = post.find(".//MESSAGE").text
                         # update dict
                         post_buffer.update({post_id: [nation, message]})
-            await crash_channel.send(post_buffer)
             # create and send embed for each post
             for post in post_buffer:
                 # get the key
                 post_id = [*post][0]
+                await crash_channel.send(post_id)
                 # get the nation and message, which are first and second in the list, respectively
                 nation = post_buffer[post_id][0]
                 message = post_buffer[post_id][1]
