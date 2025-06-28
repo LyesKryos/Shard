@@ -32,7 +32,7 @@ def parse_rmb_message(message: str) -> dict:
         # define the quote content
         message_data["quoted_nation"] = quote_match.group(1)
         # parse the nation quoted and define it
-        quoted_nation_pattern = "\\[quote=(.*);}"
+        quoted_nation_pattern = "\\[quote=(.*);"
         quoted_nation_match = re.search(quoted_nation_pattern, message)
         message_data["quoted_nation"] = quoted_nation_match.group(1)
         # parse the quote id and parse it
@@ -354,7 +354,6 @@ class NationStates(commands.Cog):
                 # define the new last id
                 with shelve.open("rmb_post_id") as rmb_post_id:
                     rmb_post_id['last_post_id'] = post_id
-                await crash_channel.send(post_id)
                 # get the nation and message, which are first and second in the list, respectively
                 nation = post_buffer[post_id][0]
                 message = post_buffer[post_id][1]
@@ -376,7 +375,7 @@ class NationStates(commands.Cog):
                                                f"{message_info['quoted_message']}\n\n"
                                                f"{message_info['message']}")
                 else:
-                    post_embed.add_field(name="\u200B", value=f"{message}")
+                    post_embed.add_field(name=f"*{sanitize_raw(nation).title()} posted...*", value=f"{message}")
                 post_embed.set_footer(text="Posted on the Thegye Regional Message Board",
                                         icon_url="https://i.ibb.co/YTVtf5q6/j-Fd-Wa-Fb-400x400.jpg")
                 await crash_channel.send(embed=post_embed)
