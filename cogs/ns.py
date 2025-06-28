@@ -372,8 +372,9 @@ class NationStates(commands.Cog):
                 # if the message has a quote, include the quote
                 if message_info['quoted_nation'] is not None:
                     post_embed.add_field(name=f"*{sanitize_raw(nation).title()} posted...*",
-                                         value=f"[{message_info['quoted_nation']} wrote...](https://www.nationstates.net/page=rmb/postid={message_info['quote_id']})\n"
-                                               f"{message_info['quoted_message']}\n\n"
+                                         value=f"[{message_info['quoted_nation']} wrote...]"
+                                               f"(https://www.nationstates.net/page=rmb/postid={message_info['quote_id']})"
+                                               f"{message_info['quoted_message']}"
                                                f"{message_info['message']}")
                 else:
                     post_embed.add_field(name=f"*{sanitize_raw(nation).title()} posted...*", value=f"{message}")
