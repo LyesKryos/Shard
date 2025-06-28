@@ -321,7 +321,9 @@ class NationStates(commands.Cog):
                     post = messages_root.find(".//POST")
                     # pull post id and add it to the list of posts
                     last_post_id = post.get("id")
-                    post_buffer.update({last_post_id: [post.find(".//NATION").text, post.find('.//MESSAGE').text]})
+                    # if the status is not 0, do not add to buffer
+                    if post.find(".//STATUS").text == "0":
+                        post_buffer.update({last_post_id: [post.find(".//NATION").text, post.find('.//MESSAGE').text]})
                     # set the last post id as the saved post id
                     with shelve.open("rmb_post_id") as rmb_post_id:
                         rmb_post_id['last_post_id'] = last_post_id
@@ -345,8 +347,9 @@ class NationStates(commands.Cog):
                         post_id = post.get("id")
                         nation = post.find(".//NATION").text
                         message = post.find(".//MESSAGE").text
+                        status = post.find(".//STATUS").text
                         # update dict
-                        post_buffer.update({post_id: [nation, message]})
+                        post_buffer.update({post_id: [nation, message, status]})
             # create and send embed for each post
             for post in post_buffer:
                 # get the key
@@ -378,6 +381,9 @@ class NationStates(commands.Cog):
                     post_embed.add_field(name=f"*{sanitize_raw(nation).title()} posted...*", value=f"{message}")
                 post_embed.set_footer(text="Posted on the Thegye Regional Message Board",
                                         icon_url="https://i.ibb.co/YTVtf5q6/j-Fd-Wa-Fb-400x400.jpg")
+                # if the status is 0, do not post
+                if post_buffer[post][2] != "0":
+                    continue
                 await crash_channel.send(embed=post_embed)
 
 
