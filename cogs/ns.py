@@ -322,7 +322,7 @@ class NationStates(commands.Cog):
                         rmb_post_id['last_post_id'] = last_post_id
             else:
                 # pull all posts after the last post id
-                params.update({"fromid": str(last_post_id+1)})
+                params.update({"fromid": str(int(last_post_id)+1)})
                 # call the messages
                 async with rmb_session.get("https://www.nationstates.net/cgi-bin/api.cgi",
                                            headers=headers, params=params) as all_recent_messages:
