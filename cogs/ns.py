@@ -281,99 +281,95 @@ class NationStates(commands.Cog):
         except KeyError:
             last_post_id = 0
         post_buffer = {}
-        try:
-            # define session
-            async with aiohttp.ClientSession() as rmb_session:
-                # define user agent
-                headers = {"User-Agent": "Bassiliya @Lies Kryos#1734 on Discord"}
-                # define parameters
-                params = {"region": "project_chaos",
-                          "q": "messages"}
-                # ratelimiter
-                while True:
-                    # see if there are enough available calls. if so, break the loop
+        # define session
+        async with aiohttp.ClientSession() as rmb_session:
+            # define user agent
+            headers = {"User-Agent": "Bassiliya @Lies Kryos#1734 on Discord"}
+            # define parameters
+            params = {"region": "project_chaos",
+                      "q": "messages"}
+            # ratelimiter
+            while True:
+                # see if there are enough available calls. if so, break the loop
+                try:
+                    await self.rate_limit.call()
+                    break
+                # if there are not enough available calls, continue the loop
+                except TooManyRequests as error:
+                    await asyncio.sleep(int(str(error)))
+                    continue
+            # if the last post ID isn't defined, get the most recent post ID and use that as the post ID
+            if last_post_id == 0:
+                # add limit 1 to the parameter
+                params.update({"limit": "1"})
+                # call the messages
+                async with rmb_session.get("https://www.nationstates.net/cgi-bin/api.cgi",
+                                           headers=headers, params=params) as most_recent_message:
+                    # parse data
+                    message_raw = await most_recent_message.text()
                     try:
-                        await self.rate_limit.call()
-                        break
-                    # if there are not enough available calls, continue the loop
-                    except TooManyRequests as error:
-                        await asyncio.sleep(int(str(error)))
-                        continue
-                # if the last post ID isn't defined, get the most recent post ID and use that as the post ID
-                if last_post_id == 0:
-                    # add limit 1 to the parameter
-                    params.update({"limit": "1"})
-                    # call the messages
-                    async with rmb_session.get("https://www.nationstates.net/cgi-bin/api.cgi",
-                                               headers=headers, params=params) as most_recent_message:
-                        # parse data
-                        message_raw = await most_recent_message.text()
-                        try:
-                            messages_root = ET.fromstring(message_raw)
-                        except ET.ParseError as e:
-                            self.bot.logger.error(f"Error parsing XML: {e}")
-                            await crash_channel.send("RMB posting error. Check the logs.")
-                        # pull all message information
-                        post = messages_root.find(".//POST")
-                        # pull post id and add it to the list of posts
-                        last_post_id = post.get("id")
-                        post_buffer.update({last_post_id: [post.find(".//NATION").text, post.find('.//MESSAGE').text]})
-                        # set the last post id as the saved post id
-                        with shelve.open("rmb_post_id") as rmb_post_id:
-                            rmb_post_id['last_post_id'] = last_post_id
+                        messages_root = ET.fromstring(message_raw)
+                    except ET.ParseError as e:
+                        self.bot.logger.error(f"Error parsing XML: {e}")
+                        await crash_channel.send("RMB posting error. Check the logs.")
+                    # pull all message information
+                    post = messages_root.find(".//POST")
+                    # pull post id and add it to the list of posts
+                    last_post_id = post.get("id")
+                    post_buffer.update({last_post_id: [post.find(".//NATION").text, post.find('.//MESSAGE').text]})
+                    # set the last post id as the saved post id
+                    with shelve.open("rmb_post_id") as rmb_post_id:
+                        rmb_post_id['last_post_id'] = last_post_id
+            else:
+                # pull all posts after the last post id
+                params.update({"fromid": str(last_post_id+1)})
+                # call the messages
+                async with rmb_session.get("https://www.nationstates.net/cgi-bin/api.cgi",
+                                           headers=headers, params=params) as all_recent_messages:
+                    # parse data
+                    messages_raw = await all_recent_messages.text()
+                    try:
+                        messages_root = ET.fromstring(messages_raw)
+                    except ET.ParseError as e:
+                        self.bot.logger.error(f"Error parsing XML: {e}")
+                        await crash_channel.send("RMB posting error. Check the logs.")
+                    # pull all message information
+                    posts = messages_root.findall(".//POST")
+                    # add the information from each post to the post_buffer
+                    for post in posts:
+                        post_id = post.get("id")
+                        nation = post.find(".//NATION").text
+                        message = post.find(".//MESSAGE").text
+                        # update dict
+                        post_buffer.update({post_id: [nation, message]})
+            # create and send embed for each post
+            for post in post_buffer:
+                # get the key
+                post_id = [*post][0]
+                # get the nation and message, which are first and second in the list, respectively
+                nation = post_buffer[post_id][0]
+                message = post_buffer[post_id][1]
+                # pull nation info
+                nation_info = await self.get_nation(nation=nation, data_only=True)
+                # parse the message info
+                message_info = parse_rmb_message(message)
+                # create the embed object
+                post_embed = discord.Embed(title="posted")
+                post_embed.set_author(name=f"{nation}", url=f"https://www.nationstates.net/nation/{nation}",
+                                      icon_url=f"{nation_info['flag_link']}")
+                # if the message has a quote, include the quote
+                if message_info['quoted_nation'] is not None:
+                    post_embed.add_field(name="\u200B",
+                                         value=f"[{message_info['quoted_nation']} wrote...] "
+                                               f"(https://www.nationstates.net/page=rmb/postid="
+                                               f"{message_info['quote_id']})\n"
+                                               f"{message_info['quoted_message']}\n\n"
+                                               f"{message_info['message']}")
                 else:
-                    # pull all posts after the last post id
-                    params.update({"fromid": str(last_post_id+1)})
-                    # call the messages
-                    async with rmb_session.get("https://www.nationstates.net/cgi-bin/api.cgi",
-                                               headers=headers, params=params) as all_recent_messages:
-                        # parse data
-                        messages_raw = await all_recent_messages.text()
-                        try:
-                            messages_root = ET.fromstring(messages_raw)
-                        except ET.ParseError as e:
-                            self.bot.logger.error(f"Error parsing XML: {e}")
-                            await crash_channel.send("RMB posting error. Check the logs.")
-                        # pull all message information
-                        posts = messages_root.findall(".//POST")
-                        # add the information from each post to the post_buffer
-                        for post in posts:
-                            post_id = post.get("id")
-                            nation = post.find(".//NATION").text
-                            message = post.find(".//MESSAGE").text
-                            # update dict
-                            post_buffer.update({post_id: [nation, message]})
-                # create and send embed for each post
-                for post in post_buffer:
-                    # get the key
-                    post_id = [*post][0]
-                    # get the nation and message, which are first and second in the list, respectively
-                    nation = post_buffer[post_id][0]
-                    message = post_buffer[post_id][1]
-                    # pull nation info
-                    nation_info = await self.get_nation(nation=nation, data_only=True)
-                    # parse the message info
-                    message_info = parse_rmb_message(message)
-                    # create the embed object
-                    post_embed = discord.Embed(title="posted")
-                    post_embed.set_author(name=f"{nation}", url=f"https://www.nationstates.net/nation/{nation}",
-                                          icon_url=f"{nation_info['flag_link']}")
-                    # if the message has a quote, include the quote
-                    if message_info['quoted_nation'] is not None:
-                        post_embed.add_field(name="\u200B",
-                                             value=f"[{message_info['quoted_nation']} wrote...] "
-                                                   f"(https://www.nationstates.net/page=rmb/postid="
-                                                   f"{message_info['quote_id']})\n"
-                                                   f"{message_info['quoted_message']}\n\n"
-                                                   f"{message_info['message']}")
-                    else:
-                        post_embed.add_field(name="\u200B", value=f"{message}")
-                    post_embed.set_footer(text="Posted on the Thegye Regional Message Board",
-                                            icon_url="https://i.ibb.co/YTVtf5q6/j-Fd-Wa-Fb-400x400.jpg")
-                    await crash_channel.send(embed=post_embed)
-        except Exception as error:
-            self.bot.logger.error(f"Error: {error}")
-            await crash_channel.send("RMB error. Check the logs.")
+                    post_embed.add_field(name="\u200B", value=f"{message}")
+                post_embed.set_footer(text="Posted on the Thegye Regional Message Board",
+                                        icon_url="https://i.ibb.co/YTVtf5q6/j-Fd-Wa-Fb-400x400.jpg")
+                await crash_channel.send(embed=post_embed)
 
 
     ns = app_commands.Group(name="ns", description="...")
