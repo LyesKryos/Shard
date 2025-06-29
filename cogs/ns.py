@@ -29,8 +29,6 @@ def parse_rmb_message(message: str) -> dict:
     quote_match = re.search(quote_pattern, message, flags=re.DOTALL)
     # if there is a quote detected, parse out the information
     if quote_match:
-        # define the quote content
-        message_data["quoted_nation"] = quote_match.group(1)
         # parse the nation quoted and define it
         quoted_nation_pattern = "\\[quote=(.*);"
         quoted_nation_match = re.search(quoted_nation_pattern, message)
