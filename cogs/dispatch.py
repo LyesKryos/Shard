@@ -204,11 +204,9 @@ class Dispatch(commands.Cog):
                 # start the updating
                 self.dispatch_updating_object.start()
                 thegyeupdate = self.dispatch_updating_object.get_job("thegye_update")
-                karmaupdate = self.dispatch_updating_object.get_job("karma_update")
                 # post the next update time for each of the runs and set the updating to true
                 self.bot.system_message += "From dispatch.py: \n"\
-                                            f"Thegye update: {thegyeupdate.next_run_time}\n"\
-                                            f"Karma update: {karmaupdate.next_run_time}\n"
+                                            f"Thegye update: {thegyeupdate.next_run_time}\n"
                 Dispatch.dispatch_updating = True
             except Exception as error:
                 await crashchannel.send(error)
