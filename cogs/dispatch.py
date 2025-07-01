@@ -18,8 +18,9 @@ class Dispatch(commands.Cog):
         async def waupdate(bot):
             crashchannel = bot.get_channel(835579413625569322)
             try:
+                password = self.bot.config['dispatch_pass']
                 headers = {"User-Agent": "Bassiliya @Lies Kryos#1734 on Discord",
-                           "X-Password": "Kingsfoil4",
+                           "X-Password": password,
                            "X-Pin": ""}
                 # all API call parameters
                 params = {"nation": "royal_clerk_of_thegye",
