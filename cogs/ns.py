@@ -280,6 +280,7 @@ class NationStates(commands.Cog):
     @tasks.loop(minutes=1)
     async def rmb_proxy(self):
         crash_channel = self.bot.get_channel(835579413625569322)
+        proxy_channel = self.bot.get_channel(1389687046532108331)
         try:
             with shelve.open("rmb_post_id") as rmb_post_id:
                 last_post_id = rmb_post_id['last_post_id']
@@ -291,7 +292,7 @@ class NationStates(commands.Cog):
             # define user agent
             headers = {"User-Agent": "Bassiliya @Lies Kryos#1734 on Discord"}
             # define parameters
-            params = {"region": "project_chaos",
+            params = {"region": "thegye",
                       "q": "messages"}
             # ratelimiter
             while True:
@@ -386,7 +387,7 @@ class NationStates(commands.Cog):
                 # if the status is 0, do not post
                 if post_buffer[post][2] != "0":
                     continue
-                await crash_channel.send(embed=post_embed)
+                await proxy_channel.send(embed=post_embed)
 
 
     ns = app_commands.Group(name="ns", description="...")
