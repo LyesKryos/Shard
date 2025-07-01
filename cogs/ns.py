@@ -371,15 +371,17 @@ class NationStates(commands.Cog):
                                       icon_url=f"{nation_info['flag_link']}")
                 # if the message has a quote, include the quote
                 if message_info['quoted_nation'] is not None:
-                    post_embed.add_field(name=f"*{sanitize_raw(nation).title()} posted...*",
+                    post_embed.add_field(name=f"*{sanitize_raw(nation).title()} "
+                                              f"[posted](https://www.nationstates.net/page=rmb/postid={post_id}...*",
                                          value=f"[*{message_info['quoted_nation'].title()} wrote...*]"
                                                f"(https://www.nationstates.net/page=rmb/postid={message_info['quote_id']})\n"
                                                f"{message_info['quoted_message']}\n"
                                                f"{message_info['message']}")
                 else:
-                    post_embed.add_field(name=f"*{sanitize_raw(nation).title()} posted...*", value=f"{message}")
-                post_embed.set_footer(text="Posted on the [Thegye Regional Message Board]"
-                                           "(https://www.nationstates.net/page=display_region_rmb/region=thegye)",
+                    post_embed.add_field(name=f"*{sanitize_raw(nation).title()} "
+                                              f"[posted](https://www.nationstates.net/page=rmb/postid={post_id}...*",
+                                         value=f"{message}")
+                post_embed.set_footer(text="Posted on the Thegye Regional Message Board",
                                         icon_url="https://i.ibb.co/YTVtf5q6/j-Fd-Wa-Fb-400x400.jpg")
                 # if the status is 0, do not post
                 if post_buffer[post][2] != "0":
