@@ -118,6 +118,9 @@ class Roleplay(commands.Cog):
             dice_type = int(dice_type_data[1])
         except ValueError:
             return await interaction.response.send_message(f"I do not recognize `{dice}`.")
+        # modifier catching
+        if modifiers is None:
+            modifiers = 0
         # roll dice until number is met
         rolls = 0
         outcome = 0
