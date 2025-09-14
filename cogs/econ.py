@@ -19,6 +19,31 @@ from pytz import timezone
 from ShardBot import Shard
 from customchecks import SilentFail
 
+async def portfolio(ledger_info, conn, thaler, page):
+    ledger_string = ""
+    for shares in ledger_info[(page*5)-5 : page*5]:
+        stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
+        risk = ""
+        if stock['risk'] == 1:
+            risk = "S"
+        if stock['risk'] == 2:
+            risk = "M"
+        if stock['risk'] == 3:
+            risk = "V"
+        stock_string = f"{shares['name']} (#{shares['stock_id']}, {risk}): " \
+                       f"{shares['amount']:,} @ {thaler}{stock['value']:,.2f}"
+        if stock['trending'] == "up":
+            stock_string += " :chart_with_upwards_trend: "
+        else:
+            stock_string += " :chart_with_downwards_trend: "
+        if stock['change'] > 0:
+            stock_string += "+"
+        stock_string += f"{(stock['change'] * 100):.2f}%\n" \
+                        f"> Sale value: {thaler}" \
+                        f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
+        ledger_string += stock_string
+    return ledger_string
+
 
 class RegisterView(View):
 
@@ -208,6 +233,84 @@ class FeedView(View):
         feed_embed = discord.Embed(title="Stocks by Share Price", description=stock_string)
         feed_embed.set_thumbnail(url="https://i.ibb.co/BKFyd2G/RBT-logo.png")
         await self.message.edit(embed=feed_embed, view=self)
+
+class Pageinate(View):
+
+    def __init__(self, bot: Shard, interaction: discord.Interaction, max_page, ledger_info, embed: discord.Embed):
+        super().__init__(timeout=120)
+        # define bot
+        self.bot = bot
+        # define page
+        self.page = 1
+        # define max page
+        self.max_page = max_page
+        # define thaler
+        self.thaler = "\u20B8"
+        # define space
+        self.space = "\u200b"
+        # persist
+        self.persist = True
+        # interaction
+        self.interaction = interaction
+        # ledger
+        self.ledger_info = ledger_info
+        # embed
+        self.embed = embed
+
+    async def on_timeout(self) -> None:
+        # disable all buttons
+        for button in self.children:
+            button.disabled = True
+        self.persist = False
+        # edit view
+        await self.interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.blurple, disabled=True, emoji="\u23ea")
+    async def back(self, interaction: discord.Interaction, back_button: discord.Button):
+        # defer
+        await interaction.response.defer()
+        if self.page <= 1:
+            back_button.disabled = True
+            self.forward.disabled = False
+            # edit view
+            return await self.interaction.edit_original_response(view=self)
+        else:
+            self.page -= 1
+            if self.page <= 1:
+                back_button.disabled = True
+                self.forward.disabled = False
+            ledger_string = await portfolio(self.ledger_info, self.bot.pool, "\u20B8", self.page)
+            port_embed = self.embed.set_field_at(index=-1, name="Stocks and Shares", value=ledger_string)
+            port_embed.set_footer(text=f"Page {self.page} of {self.max_page}")
+            return await self.interaction.edit_original_response(view=self, embed=port_embed)
+
+    @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
+    async def close(self, interaction: discord.Interaction, close: discord.Button):
+        # disable all buttons
+        for button in self.children:
+            button.disabled = True
+        self.persist = False
+        # edit view
+        return await self.interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Next", style=discord.ButtonStyle.blurple, emoji="\u23e9")
+    async def forward(self, interaction: discord.Interaction, forward_button: discord.Button):
+        # defer
+        await interaction.response.defer()
+        if self.page >= self.max_page:
+            forward_button.disabled = True
+            # edit view
+            return await self.interaction.edit_original_response(view=self)
+        else:
+            self.page += 1
+            ledger_string = await portfolio(self.ledger_info, self.bot.pool, "\u20B8", self.page)
+            port_embed = self.embed.set_field_at(index=-1, name="Stocks and Shares", value=ledger_string)
+            if self.page >= self.max_page:
+                forward_button.disabled = True
+            self.back.disabled = False
+            port_embed.set_footer(text=f"Page {self.page} of {self.max_page}")
+            return await self.interaction.edit_original_response(view=self, embed=port_embed)
+
 
 class BlackjackView(View):
 
@@ -1208,9 +1311,9 @@ class Economy(commands.Cog):
                         value = floor
                     # if the outstanding shares is between 0 and 500 shares away from the total issued shares,
                     # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
-                    if stock['issued'] - stock['outstanding'] < randint(0, 500):
+                    if stock['issued'] - stock['outstanding'] <= randint(0, 500):
                         # royal bonds are immune to automatic dilution
-                        if stock['stock_id'] != 1:
+                        if stock['stock_id'] != 9:
                             new_shares = stock['issued'] / 5
                             dilution = round(uniform(5 * stock['risk'], 10 * stock['risk']), 2)
                             value = round(value * (clip(dilution, 0, 23) / 100), 2)
@@ -2284,28 +2387,28 @@ class Economy(commands.Cog):
             return await interaction.followup.send(
                 f"You have successfully purchased {amount:,} shares of {stock['name']} for "
                 f"{self.thaler}{transaction:,.2f} at {self.thaler}{float(stock['value']):,.2f} per share.\n"
-                f"{self.thaler}{stock['value']:,.2f} * {amount} + {self.thaler}{tax:,.2f} (transaction fee) = "
+                f"{self.thaler}{stock['value']:,.2f} * {amount:,} + {self.thaler}{tax:,.2f} (transaction fee) = "
                 f"{self.thaler}{transaction:,.2f}")
 
     @exchange.command(description="Sells a specified amount of a stock's shares.",
                       name="sell")
-    @app_commands.describe(stock_id="The name or ID of the stock", amount="A whole number amount")
+    @app_commands.describe(stock_id="The name or ID of the stock", amount="A whole number amount. Also accepts 'max'.")
     async def sell(self, interaction: discord.Interaction, stock_id: str, amount: str):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establishes connection
         conn = self.bot.pool
-        if amount.lower() != "all":
+        if amount.lower() != "max":
             try:
                 amount = int(amount)
             except ValueError:
                 return await interaction.followup.send(f"The command only accepts "
-                                                       f"whole numbers and \"all\" as arguments.")
+                                                       f"whole numbers and \"max\" as arguments.")
             # if the amount is less than 0
             if amount <= 0:
                 return await interaction.followup.send(f"Positive whole numbers only!")
         else:
-            amount = "all"
+            amount = "max"
         # fetches stock information
         stock = await conn.fetchrow('''SELECT * FROM stocks WHERE lower(name) = $1;''', stock_id.lower())
         # if stock does not exist, return message
@@ -2328,11 +2431,11 @@ class Economy(commands.Cog):
         if shares is None:
             return await interaction.followup.send(f"You do not own any shares of {stock['name']}.")
         # if the amount is not all, check to make sure they own the requested amount
-        if amount != "all":
+        if amount != "max":
             if shares['amount'] < amount:
-                return await interaction.followup.send(f"You do not own {amount} shares of {stock['name']}")
+                return await interaction.followup.send(f"You do not own {amount:,} shares of {stock['name']}")
         # if the amount is all, set amount to the number of owned shares
-        elif amount == "all":
+        elif amount == "max":
             amount = shares['amount']
         # calculate transaction
         base_price = round(float(stock['value']) * amount, 2)
@@ -2354,9 +2457,9 @@ class Economy(commands.Cog):
                            amount, stock['stock_id'])
         # log sale
         await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                           user.id, 'exchange', f'Sold {amount} {stock["name"]} (id: {stock["stock_id"]}) @ '
+                           user.id, 'exchange', f'Sold {amount:,} {stock["name"]} (id: {stock["stock_id"]}) @ '
                                                 f'{self.thaler}{stock["value"]} for {self.thaler}{transaction}.')
-        return await interaction.followup.send(f"You have successfully sold {amount} shares of {stock['name']} for "
+        return await interaction.followup.send(f"You have successfully sold {amount:,} shares of {stock['name']} for "
                                                f"{self.thaler}{transaction:,.2f} at "
                                                f"{self.thaler}{float(stock['value'])} per share.\n"
                                                f"{self.thaler}{float(stock['value']):,.2f} * {amount} - "
@@ -2456,39 +2559,79 @@ class Economy(commands.Cog):
                                            user.id)
             ledger_string = ""
             stock_value = 0
-            for shares in ledger_info:
-                stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
-                risk = ""
-                if stock['risk'] == 1:
-                    risk = "S"
-                if stock['risk'] == 2:
-                    risk = "M"
-                if stock['risk'] == 3:
-                    risk = "V"
-                this_string = f"{shares['name']} (#{shares['stock_id']}, {risk}): " \
-                              f"{shares['amount']} @ {self.thaler}{stock['value']:,.2f}"
-                if stock['trending'] == "up":
-                    this_string += " :chart_with_upwards_trend: "
-                else:
-                    this_string += " :chart_with_downwards_trend: "
-                if stock['change'] > 0:
-                    this_string += "+"
-                this_string += f"{(stock['change'] * 100):.2f}%\n" \
-                               f"> Sale value: {self.thaler}" \
-                               f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
-                ledger_string += this_string
-                stock_value += float(shares['amount']) * float(stock['value'])
-            total_value = float(rbt_member['funds']) + float(stock_value)
-            if investment is not None:
-                total_value += float(investment['amount'])
-            if loan is not None:
-                total_value -= float(loan['amount'])
-            portfolio_embed.add_field(name="Stock Value", value=f"{self.thaler}{stock_value:,.2f}")
-            portfolio_embed.add_field(name="Net Worth",
-                                      value=f"{self.thaler}"
-                                            f"{round(total_value, 2):,.2f}")
-            portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
-            await interaction.followup.send(embed=portfolio_embed)
+            # if there are fewer than five stocks, no page
+            if len(ledger_info) <= 5:
+                for shares in ledger_info:
+                    stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
+                    risk = ""
+                    if stock['risk'] == 1:
+                        risk = "S"
+                    if stock['risk'] == 2:
+                        risk = "M"
+                    if stock['risk'] == 3:
+                        risk = "V"
+                    stock_string = f"{shares['name']} (#{shares['stock_id']}, {risk}): " \
+                                  f"{shares['amount']:,} @ {self.thaler}{stock['value']:,.2f}"
+                    if stock['trending'] == "up":
+                        stock_string += " :chart_with_upwards_trend: "
+                    else:
+                        stock_string += " :chart_with_downwards_trend: "
+                    if stock['change'] > 0:
+                        stock_string += "+"
+                    stock_string += f"{(stock['change'] * 100):.2f}%\n" \
+                                   f"> Sale value: {self.thaler}" \
+                                   f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
+                    ledger_string += stock_string
+                    stock_value += float(shares['amount']) * float(stock['value'])
+                total_value = float(rbt_member['funds']) + float(stock_value)
+                if investment is not None:
+                    total_value += float(investment['amount'])
+                if loan is not None:
+                    total_value -= float(loan['amount'])
+                portfolio_embed.add_field(name="Stock Value", value=f"{self.thaler}{stock_value:,.2f}")
+                portfolio_embed.add_field(name="Net Worth",
+                                          value=f"{self.thaler}"
+                                                f"{round(total_value, 2):,.2f}")
+                portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
+                await interaction.followup.send(embed=portfolio_embed)
+            # if there are more than five stocks, pageinate
+            elif len(ledger_info) > 5:
+                for shares in ledger_info[0:4]:
+                    stock = await conn.fetchrow('''SELECT * FROM stocks WHERE stock_id = $1;''', shares['stock_id'])
+                    risk = ""
+                    if stock['risk'] == 1:
+                        risk = "S"
+                    if stock['risk'] == 2:
+                        risk = "M"
+                    if stock['risk'] == 3:
+                        risk = "V"
+                    stock_string = f"{shares['name']} (#{shares['stock_id']}, {risk}): " \
+                                  f"{shares['amount']} @ {self.thaler}{stock['value']:,.2f}"
+                    if stock['trending'] == "up":
+                        stock_string += " :chart_with_upwards_trend: "
+                    else:
+                        stock_string += " :chart_with_downwards_trend: "
+                    if stock['change'] > 0:
+                        stock_string += "+"
+                    stock_string += f"{(stock['change'] * 100):.2f}%\n" \
+                                   f"> Sale value: {self.thaler}" \
+                                   f"{round(float(shares['amount']) * float(stock['value']), 2):,.2f}\n"
+                    ledger_string += stock_string
+                    stock_value += float(shares['amount']) * float(stock['value'])
+                total_value = float(rbt_member['funds']) + float(stock_value)
+                if investment is not None:
+                    total_value += float(investment['amount'])
+                if loan is not None:
+                    total_value -= float(loan['amount'])
+                portfolio_embed.add_field(name="Stock Value", value=f"{self.thaler}{stock_value:,.2f}")
+                portfolio_embed.add_field(name="Net Worth",
+                                          value=f"{self.thaler}"
+                                                f"{round(total_value, 2):,.2f}")
+                portfolio_embed.add_field(name=f"Stocks and Shares", value=ledger_string)
+                portfolio_embed.set_footer(text=f"Page 1 of {math.ceil(len(ledger_info) / 5)}")
+                page_view = Pageinate(self.bot, interaction, max_page=math.ceil(len(ledger_info) / 5),
+                                      ledger_info=ledger_info, embed=portfolio_embed)
+                await interaction.followup.send(embed=portfolio_embed, view=page_view)
 
     @exchange.command(name="graph_value", description="Displays a graph of a stock's price.")
     @app_commands.describe(stock_id="Input the name or ID of the stock.",
@@ -3056,8 +3199,8 @@ class Economy(commands.Cog):
         await interaction.followup.send(embed=item_embed)
 
     @market.command(name="buy", description="Buys an item from the marketplace.")
-    @app_commands.describe(item_id="The ID number of the item you want to buy.")
-    async def buy(self, interaction: discord.Interaction, item_id: int):
+    @app_commands.describe(item_id="The ID number of the item you want to buy.", amount="The amount of that item you wish to by. Default: 1")
+    async def buy(self, interaction: discord.Interaction, item_id: int, amount: int = 1):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establish connection
@@ -3078,10 +3221,17 @@ class Economy(commands.Cog):
         value = item_info['value']
         # if the item is the wallet expansion, multiply accordingly
         if item_info['notes'] == "wallet_expansion":
-            value = (user_info['wallet'] / 100) * 1000
+            if amount > 1:
+                value = 0
+                wallet = user_info['wallet']
+                for a in range(amount):
+                    value += (wallet / 100) * 1000
+                    wallet += 100
+            else:
+                value = (user_info['wallet'] / 100) * 1000
         # ensure the user can afford item
         if value > user_info['funds']:
-            return await interaction.followup.send(f"You do not have enough thaler to purchase {item_info['name']}.")
+            return await interaction.followup.send(f"You do not have enough Thaler to purchase {item_info['name']}.")
         # remove funds from user
         await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
                            value, user.id)
@@ -3097,14 +3247,15 @@ class Economy(commands.Cog):
                                               f"{item_info['market']} for {self.thaler}{value:,}.")
         # if the user bought a wallet expansion, upgrade wallet
         if item_info['name'] == "Wallet Expansion":
-            await conn.execute('''UPDATE rbt_users SET wallet = wallet + 100 WHERE user_id = $1;''', user.id)
+            await conn.execute('''UPDATE rbt_users SET wallet = wallet + $2 WHERE user_id = $1;''', user.id,
+                               (amount * 100))
         # if the item is a role, parse out the role
         if item_info['notes'] == "role":
             role = get_role_name(item_info['name'], self.bot)
             thegye = self.bot.get_guild(674259612580446230)
             user = thegye.get_member(user.id)
             await user.add_roles(role)
-        return await interaction.followup.send(f"You have successfully purchased {item_info['name']} for "
+        return await interaction.followup.send(f"You have successfully purchased {amount} {item_info['name']}(s) for "
                                                f"{self.thaler}{value:,}.")
 
     @commands.command()
