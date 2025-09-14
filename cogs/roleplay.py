@@ -106,6 +106,8 @@ class Roleplay(commands.Cog):
     @app_commands.describe(dice="Type of dice. For example: 1d6, 10d12, d20.",
                            modifiers="Modifiers to add to each roll. For example: +1, -5, 2.")
     async def roll_dice(self, interaction: discord.Interaction, dice: str, modifiers: int = None):
+        # defer
+        await interaction.response.defer(thinking=True)
         # check the dice amount and type
         dice_type_data = dice.split("d")
         try:
@@ -117,7 +119,7 @@ class Roleplay(commands.Cog):
             # dice type
             dice_type = int(dice_type_data[1])
         except ValueError:
-            return await interaction.response.send_message(f"I do not recognize `{dice}`.")
+            return await interaction.followup.send(f"I do not recognize `{dice}`.")
         # modifier catching
         if modifiers is None:
             modifiers = 0
@@ -127,7 +129,7 @@ class Roleplay(commands.Cog):
         while rolls < dice_amount:
             outcome += randint(1,dice_type) + modifiers
         # when done rolling, send outcome
-        return await interaction.response.send_messsage(f"{interaction.user.name} rolled "
+        return await interaction.followup.send(f"{interaction.user.name} rolled "
                                                         f"{dice_amount}d{dice_type}: **{outcome}**")
 
 
