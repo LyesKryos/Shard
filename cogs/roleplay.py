@@ -138,7 +138,7 @@ class Roleplay(commands.Cog):
             if modifiers > 0:
                 modifier_string = f"+{modifiers}"
             else:
-                modifier_string = f"-{modifiers}"
+                modifier_string = f"{modifiers}"
             return await interaction.followup.send(f"{interaction.user.name} rolled "
                                                    f"{dice_amount}d{dice_type}{modifier_string}: **{outcome}**")
 
