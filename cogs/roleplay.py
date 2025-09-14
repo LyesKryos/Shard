@@ -128,6 +128,7 @@ class Roleplay(commands.Cog):
         outcome = 0
         while rolls < dice_amount:
             outcome += randint(1,dice_type) + modifiers
+            rolls += 1
         # when done rolling, send outcome
         return await interaction.followup.send(f"{interaction.user.name} rolled "
                                                         f"{dice_amount}d{dice_type}: **{outcome}**")
