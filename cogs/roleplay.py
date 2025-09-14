@@ -130,8 +130,17 @@ class Roleplay(commands.Cog):
             outcome += randint(1,dice_type) + modifiers
             rolls += 1
         # when done rolling, send outcome
-        return await interaction.followup.send(f"{interaction.user.name} rolled "
+        if modifiers == 0:
+            return await interaction.followup.send(f"{interaction.user.name} rolled "
                                                         f"{dice_amount}d{dice_type}: **{outcome}**")
+        else:
+            # modifier setting
+            if modifiers > 0:
+                modifier_string = f"+{modifiers}"
+            else:
+                modifier_string = f"-{modifiers}"
+            return await interaction.followup.send(f"{interaction.user.name} rolled "
+                                                   f"{dice_amount}d{dice_type}{modifier_string}: **{outcome}**")
 
 
     senate = app_commands.Group(name="senate", description="...")
