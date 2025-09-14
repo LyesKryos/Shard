@@ -1,3 +1,4 @@
+import random
 import re
 import typing
 
@@ -55,7 +56,6 @@ class Roleplay(commands.Cog):
         return await ctx.send(f"Total: {total}/**1300** points\n"
                               f"Total Percentages: {percents_total-20}/**300** percentage points")
 
-
     @app_commands.command(name="roleplay_intro", description="Sends information concerning the roleplay to new RPers.")
     @app_commands.describe(user="The user being introduced")
     async def roleplay_intro(self, interaction: discord.Interaction, user: discord.Member):
@@ -102,6 +102,34 @@ class Roleplay(commands.Cog):
         # updates link
         await conn.execute('''UPDATE roleplay SET link = $1 WHERE name = 'map';''', link)
         return await ctx.send("Map updated!")
+
+    @app_commands.command(brief="Rolls a dice as specified.")
+    @app_commands.describe(dice="The type of dice to be rolled. For example: 1d6 or d10 or 10d20.",
+                           modifier="The modifier to be added to the outcome. For example: +1, -4.")
+    async def roll(self, interaction: discord.Interaction,  dice: str, modifier: int = None):
+        # parse dice
+        dice_data = dice.split("d")
+        # check the amount of dice
+        if dice_data[0] == "":
+            dice_amount = 1
+        else:
+            dice_amount = int(dice_data[0])
+        # check type of dice
+        try:
+            dice_type = int(dice_data[1])
+        except ValueError:
+           return await interaction.response.send_message(f"I do not know what kind of dice a {dice_data[1]} is!")
+        # calculate the dice
+        rolls = 0
+        outcome = 0
+        while rolls < dice_amount:
+            outcome = random.randint(1, dice_type) + modifier
+            rolls += 1
+        return await interaction.response.send_message(f"Roll: {outcome}")
+
+
+
+    # === SENATE COMMANDS ===
 
     senate = app_commands.Group(name="senate", description="...")
 
@@ -432,6 +460,8 @@ class Roleplay(commands.Cog):
         message += "\n*Note: these numbers are provisional and are not official.*"
         # send message
         return await interaction.followup.send(message)
+
+
 
 
 
