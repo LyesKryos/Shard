@@ -1,6 +1,5 @@
 import re
-import typing
-
+from random import randint
 import requests
 from bs4 import BeautifulSoup
 from discord import app_commands, utils
@@ -102,6 +101,32 @@ class Roleplay(commands.Cog):
         # updates link
         await conn.execute('''UPDATE roleplay SET link = $1 WHERE name = 'map';''', link)
         return await ctx.send("Map updated!")
+
+    @app_commands.command(brief="Rolls dice as requested.")
+    @app_commands.dscribe(dice="Type of dice. For example: 1d6, 10d12, d20.",
+                           modifiers="Modifiers to add to each roll. For example: +1, -5, 2.")
+    async def roll_dice(self, interaction: discord.Interaction, dice: str, modifiers: int = None):
+        # check the dice amount and type
+        dice_type_data = dice.split("d")
+        try:
+            # if the user does not specify a dice number
+            if dice_type_data[0] == "":
+                dice_amount = 1
+            else:
+                dice_amount = int(dice_type_data[0])
+            # dice type
+            dice_type = int(dice_type_data[1])
+        except ValueError:
+            return await interaction.response.send_message(f"I do not recognize `{dice}`.")
+        # roll dice until number is met
+        rolls = 0
+        outcome = 0
+        while rolls < dice_amount:
+            outcome += randint(1,dice_type) + modifiers
+        # when done rolling, send outcome
+        return await interaction.response.send_messsage(f"{interaction.user.name} rolled "
+                                                        f"{dice_amount}d{dice_type}: **{outcome}**")
+
 
     senate = app_commands.Group(name="senate", description="...")
 
