@@ -108,8 +108,11 @@ class Roleplay(commands.Cog):
     async def roll_dice(self, interaction: discord.Interaction, dice: str, modifiers: int = None):
         # defer
         await interaction.response.defer(thinking=True)
+        if "d" not in dice.lower():
+            return await interaction.followup.send(f"I do not recognize `{dice}`.")
         # check the dice amount and type
         dice_type_data = dice.split("d")
+        # if "d" was not included, return an error
         try:
             # if the user does not specify a dice number
             if dice_type_data[0] == "":
