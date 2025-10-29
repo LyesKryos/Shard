@@ -3,8 +3,10 @@ import logging
 import logging.handlers as handlers
 import asyncio
 import json
+import discord
 
-def main(bot: Shard):
+def main(bot: Shard):'
+    print(discord.__version__)
     # read config file
     token_raw = json.load(open("config.json"))
     token = token_raw["token"]
