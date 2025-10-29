@@ -1,12 +1,10 @@
-import sys
-import traceback
-
 import discord.errors
 from discord import app_commands
 from ShardBot import Shard
 from discord.ext import commands
 from customchecks import SilentFail
-
+from pkgutil import iter_modules
+EXTENSIONS = [module.name for module in iter_modules(__path__, f'{__package__}.')]
 
 class ShardErrorHandler(commands.Cog):
 

@@ -1,7 +1,6 @@
 import random
 import re
 import typing
-
 import requests
 from bs4 import BeautifulSoup
 from discord import app_commands, utils
@@ -13,7 +12,8 @@ from customchecks import TooManyRequests
 import asyncio
 import typing
 import math
-
+from pkgutil import iter_modules
+EXTENSIONS = [module.name for module in iter_modules(__path__, f'{__package__}.')]
 
 class Roleplay(commands.Cog):
     def __init__(self, bot: Shard):

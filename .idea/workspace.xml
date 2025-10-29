@@ -5,7 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Troubleshooting bot non-functioning">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ShardBot.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShardBot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/currency.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/currency.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/dispatch.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/dispatch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/errors.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/errors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/games.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/games.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/moderation.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/moderation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/ns.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/ns.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/roleplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/roleplay.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -441,7 +452,7 @@
       <workItem from="1735773453629" duration="631000" />
       <workItem from="1737944586496" duration="1433000" />
       <workItem from="1761609081016" duration="4822000" />
-      <workItem from="1761697849464" duration="1170000" />
+      <workItem from="1761697849464" duration="2491000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -786,7 +797,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1190" />
+    <option name="localTasksCounter" value="1191" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

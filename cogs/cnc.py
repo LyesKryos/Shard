@@ -1,15 +1,6 @@
-import functools
-import typing
 from random import randrange, randint
-from time import perf_counter
-from typing import Any
-from venv import logger
-
 import asyncpg
-from discord import app_commands, Interaction
-from discord.ext.commands import Context
-from discord.ext.commands._types import BotT
-
+from discord import app_commands
 from ShardBot import Shard
 import discord
 from discord.ext import commands, tasks
@@ -19,9 +10,8 @@ from base64 import b64encode
 import requests
 from discord.ui import View, Select, Item
 import math
-
-from customchecks import SilentFail
-
+from pkgutil import iter_modules
+EXTENSIONS = [module.name for module in iter_modules(__path__, f'{__package__}.')]
 
 def plus_minus(number: int) -> str:
     """Adds a plus and minus to a number, turning it into a string."""

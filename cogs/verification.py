@@ -15,7 +15,8 @@ import aiohttp
 from typing import Optional
 from customchecks import TooManyRequests
 from ratelimiter import Ratelimiter
-
+from pkgutil import iter_modules
+EXTENSIONS = [module.name for module in iter_modules(__path__, f'{__package__}.')]
 
 class VerificationView(View):
     def __init__(self, member, message, bot):
