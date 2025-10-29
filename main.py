@@ -13,6 +13,6 @@ def main(bot: Shard):
                                            mode='a', maxBytes=50000, backupCount=3)
     handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
     handler.setLevel(logging.INFO)
-    bot.run(log_handler=handler, token=token)
+    bot.run(token, log_handler=handler)
 
 main(Shard())
