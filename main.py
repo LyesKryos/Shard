@@ -11,4 +11,4 @@ async def main(bot: Shard):
     handler.setLevel(logging.INFO)
     bot.run(log_handler=handler)
 
-asyncio.run(main(Shard()))
+main(Shard())
