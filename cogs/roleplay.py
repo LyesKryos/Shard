@@ -102,7 +102,7 @@ class Roleplay(commands.Cog):
         await conn.execute('''UPDATE roleplay SET link = $1 WHERE name = 'map';''', link)
         return await ctx.send("Map updated!")
 
-    @app_commands.command(brief="Rolls a dice as specified.")
+    @app_commands.command(name="roll", brief="Rolls a dice as specified.")
     @app_commands.describe(dice="The type of dice to be rolled. For example: 1d6 or d10 or 10d20.",
                            modifier="The modifier to be added to the outcome. For example: +1, -4.")
     async def roll(self, interaction: discord.Interaction,  dice: str, modifier: int = None):
