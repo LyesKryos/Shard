@@ -31,7 +31,7 @@ class Shard(commands.Bot):
     async def setup_hook(self) -> None:
         for extension in EXTENSIONS:
             await self.load_extension(extension)
-            print(extension)
+        print(EXTENSIONS)
         # creates connection pool
         self.pool: asyncpg.Pool = await asyncpg.create_pool(self.config["dsn"])
 
