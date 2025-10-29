@@ -15,11 +15,6 @@ class Shard(commands.Bot):
         self.prefix = "$"
         super().__init__(command_prefix=self.prefix, intents=discord.Intents.all(),
                          activity=discord.Game(f"{self.prefix}help for commands"))
-        # setup logger
-        logging.basicConfig(filename="botlogs.log", format='%(asctime)s %(levelname)s: %(message)s',
-                            datefmt="%Y-%m-%d %H:%M:%S")
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.INFO)
         # sets up time, version, and mentions
         self.time = dt.now().strftime("%Y-%m-%d %H:%M:%S")
         self.version = "Shard Version 1.6"
@@ -33,7 +28,7 @@ class Shard(commands.Bot):
         self.system_message = ""
         self.config = json.load(open("config.json"))
 
-    async def setup_hook(self):
+    async def setup_hook(self) -> None:
         for extension in EXTENSIONS:
             await self.load_extension(extension)
             print(extension)
