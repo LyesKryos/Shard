@@ -3,7 +3,7 @@ import logging
 import logging.handlers as handlers
 import asyncio
 
-async def main(bot: Shard):
+def main(bot: Shard):
     # setup logger
     handler = handlers.RotatingFileHandler("botlogs.log", encoding="utf-8",
                                            mode='a', maxBytes=50000, backupCount=3)
