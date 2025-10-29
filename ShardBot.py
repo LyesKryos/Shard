@@ -26,11 +26,11 @@ class Shard(commands.Bot):
         )
         self.system_message = ""
         self.config = json.load(open("config.json"))
+        self.initial_extensions = [item for item in os.listdir("./cogs")]
 
     async def setup_hook(self):
-        for filename in os.listdir("./cogs"):
-            if filename.endswith(".py"):
-                await self.load_extension(f"cogs.{filename[:-3]}")
+        for extension in self.config["extensions"]:
+            await self.load_extension(extension)
         # creates connection pool
         self.pool: asyncpg.Pool = await asyncpg.create_pool(self.config["dsn"])
 

@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Troubleshooting bot non-functioning">
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ShardBot.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShardBot.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -441,7 +441,7 @@
       <workItem from="1735773453629" duration="631000" />
       <workItem from="1737944586496" duration="1433000" />
       <workItem from="1761609081016" duration="4822000" />
-      <workItem from="1761697849464" duration="872000" />
+      <workItem from="1761697849464" duration="1170000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -786,7 +786,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1188" />
+    <option name="localTasksCounter" value="1190" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
