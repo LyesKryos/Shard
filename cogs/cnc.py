@@ -10,9 +10,9 @@ from base64 import b64encode
 import requests
 from discord.ui import View, Select, Item
 import math
+import CNC.Modules as cnc_modules
 
-
-def plus_minus(number: int) -> str:
+def plus_minus(number: int) -> str | None:
     """Adds a plus and minus to a number, turning it into a string."""
     if not isinstance(number, int):
         raise TypeError

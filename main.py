@@ -1,7 +1,6 @@
 from ShardBot import Shard
 import logging
 import logging.handlers as handlers
-import asyncio
 import json
 import discord
 

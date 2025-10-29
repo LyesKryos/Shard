@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Troubleshooting bot non-functioning" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Troubleshooting bot non-functioning">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ShardBot.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShardBot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cnc_events.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/Modules/cnc_events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cnc_research.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/Modules/cnc_research.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/province_naming.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/Modules/province_naming.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources_updating_cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/Modules/resources_updating_cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -104,6 +113,7 @@
       <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\CNC\Tech Tree" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\jaedo\PycharmProjects\Shard\CNC\Modules" />
       <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\Retired Versions" />
       <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\cogs" />
       <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard" />
@@ -439,7 +449,8 @@
       <workItem from="1735773453629" duration="631000" />
       <workItem from="1737944586496" duration="1433000" />
       <workItem from="1761609081016" duration="4822000" />
-      <workItem from="1761697849464" duration="3147000" />
+      <workItem from="1761697849464" duration="3380000" />
+      <workItem from="1761754802895" duration="2815000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -784,7 +795,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1194" />
+    <option name="localTasksCounter" value="1195" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
