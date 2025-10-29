@@ -1,14 +1,14 @@
 from ShardBot import Shard
 import logging
 import logging.handlers as handlers
+import asyncio
 
-
-def main(bot: Shard):
+async def main(bot: Shard):
+    # setup logger
     handler = handlers.RotatingFileHandler("botlogs.log", encoding="utf-8",
-                                           mode='a', maxBytes=1000000)
+                                           mode='a', maxBytes=50000, backupCount=3)
     handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
     handler.setLevel(logging.INFO)
     bot.run(log_handler=handler)
 
-
-main(Shard())
+asyncio.run(main(Shard()))
