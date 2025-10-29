@@ -38,6 +38,3 @@ class Shard(commands.Bot):
 
     async def close(self):
         await super().close()
-
-    def run(self, *args, **kwargs):
-        super().run(self.config["token"])
