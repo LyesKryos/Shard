@@ -29,6 +29,7 @@ class Shard(commands.Bot):
         self.config = json.load(open("config.json"))
 
     async def setup_hook(self) -> None:
+        print("WORK, DAMMIT")
         for extension in EXTENSIONS:
             await self.load_extension(extension)
         print(EXTENSIONS)
