@@ -8,8 +8,6 @@ import re
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
-from pkgutil import iter_modules
-EXTENSIONS = [module.name for module in iter_modules(__path__, f'{__package__}.')]
 
 class Dispatch(commands.Cog):
 

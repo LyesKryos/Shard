@@ -18,8 +18,7 @@ from numpy import clip
 from pytz import timezone
 from ShardBot import Shard
 from customchecks import SilentFail
-from pkgutil import iter_modules
-EXTENSIONS = [module.name for module in iter_modules(__path__, f'{__package__}.')]
+
 
 async def portfolio(ledger_info, conn, thaler, page):
     ledger_string = ""

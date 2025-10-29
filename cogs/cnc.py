@@ -10,8 +10,7 @@ from base64 import b64encode
 import requests
 from discord.ui import View, Select, Item
 import math
-from pkgutil import iter_modules
-EXTENSIONS = [module.name for module in iter_modules(__path__, f'{__package__}.')]
+
 
 def plus_minus(number: int) -> str:
     """Adds a plus and minus to a number, turning it into a string."""

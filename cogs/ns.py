@@ -18,9 +18,6 @@ from pytz import timezone
 from PIL import Image
 from ratelimiter import Ratelimiter
 from customchecks import TooManyRequests
-from pkgutil import iter_modules
-EXTENSIONS = [module.name for module in iter_modules(__path__, f'{__package__}.')]
-
 
 def parse_rmb_message(message: str) -> dict:
     # establish the dict of the data

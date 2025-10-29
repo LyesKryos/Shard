@@ -8,8 +8,7 @@ import re
 from pytz import timezone
 from ratelimiter import Ratelimiter
 from customchecks import SilentFail
-from pkgutil import iter_modules
-EXTENSIONS = [module.name for module in iter_modules(__path__, f'{__package__}.')]
+
 
 class Moderation(commands.Cog):
 

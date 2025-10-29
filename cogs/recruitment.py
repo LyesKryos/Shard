@@ -16,8 +16,7 @@ from time import perf_counter, strftime
 from PIL import ImageColor
 from customchecks import RecruitmentCheck, TooManyRequests
 import pyshorteners
-from pkgutil import iter_modules
-EXTENSIONS = [module.name for module in iter_modules(__path__, f'{__package__}.')]
+
 
 
 from ratelimiter import Ratelimiter

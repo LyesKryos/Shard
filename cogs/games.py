@@ -3,8 +3,7 @@ import discord.errors
 from ShardBot import Shard
 from discord.ext import commands
 from customchecks import SilentFail
-from pkgutil import iter_modules
-EXTENSIONS = [module.name for module in iter_modules(__path__, f'{__package__}.')]
+
 
 class Games(commands.Cog):
 
