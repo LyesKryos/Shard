@@ -1,4 +1,6 @@
 import json
+import logging
+
 import asyncpg
 import discord
 from discord.ext import commands
@@ -27,11 +29,14 @@ class Shard(commands.Bot):
         self.config = json.load(open("config.json"))
 
     async def setup_hook(self) -> None:
-        # load the cogs
-        for extension in EXTENSIONS:
-            await self.load_extension(extension)
-        # creates connection pool
-        self.pool: asyncpg.Pool = await asyncpg.create_pool(self.config["dsn"])
+        try:
+            # load the cogs
+            for extension in EXTENSIONS:
+                await self.load_extension(extension)
+            # creates connection pool
+            self.pool: asyncpg.Pool = await asyncpg.create_pool(self.config["dsn"])
+        except Exception:
+            logging.getLogger(__name__).exception("Cog loading error")
 
     async def close(self):
         await super().close()
