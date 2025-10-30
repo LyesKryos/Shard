@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import re
 import traceback
 from typing import Optional
@@ -70,7 +71,7 @@ class BaseCommands(commands.Cog):
                 channel = self.bot.get_channel(channel_id)
                 await channel.send(args)
             except Exception as error:
-                raise error
+                logging.getLogger(__name__).exception("Global announcement error")
 
     @commands.command(brief="Loads cog")
     @commands.is_owner()

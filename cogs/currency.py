@@ -1,4 +1,6 @@
 # currency v.1.01
+import logging
+
 from ShardBot import Shard
 from discord.ext import commands
 import discord
@@ -101,9 +103,9 @@ class Currency(commands.Cog):
         try:
             await conn.execute('''DELETE FROM currency WHERE lower(name) = $1;''', currencyname.lower())
             await ctx.send(f"{currencyname} successfully removed from the ledger.")
-        except Exception as error:
+        except Exception:
             await ctx.send("An error occurred. Check the logs.")
-            raise error
+            logging.getLogger(__name__).exception("Remove currency error")
 
     @commands.command(usage="[currency name]", brief="Displays information about a specified currency")
     @commands.guild_only()
@@ -135,9 +137,9 @@ class Currency(commands.Cog):
             await ctx.send(
                 f"The {currencydata['name']}{symbol} is worth {currencydata['worth']} grams of gold per unit (AUG). "
                 f"{backed} {nation}")
-        except Exception as error:
+        except Exception:
             await ctx.send("An error occurred. Check the logs.")
-            raise error
+            logging.getLogger(__name__).exception("Currency error")
 
     @commands.command(usage="[currency] [currency] [amount]", brief="Calculates an exchange between two currencies")
     @commands.guild_only()
@@ -227,7 +229,7 @@ class Currency(commands.Cog):
             await ctx.send(f"{user.display_name}{user.discriminator} blacklisted from the Currency Exchange.")
         except Exception as error:
             await ctx.send(f"Error: {error}")
-            raise error
+            logging.getLogger(__name__).exception("Currency blacklisting error")
 
 
 async def setup(bot):

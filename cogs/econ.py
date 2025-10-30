@@ -776,8 +776,8 @@ class SubMarketView(View):
                                        value=f"Price: {m['value']:,}")
             market_embed.set_footer(text=f"Page #{self.page}")
             await self.message.edit(embed=market_embed, view=self)
-        except Exception as error:
-            raise error
+        except Exception:
+            logging.getLogger(__name__).exception("Submarket view error")
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
     async def close(self, interaction: discord.Interaction, close: discord.Button):
@@ -790,9 +790,9 @@ class SubMarketView(View):
             for item in self.children:
                 self.remove_item(item)
             return await self.message.edit(content="Market closed.", view=self)
-        except Exception as error:
+        except Exception:
             await interaction.followup.send("An error occurred. Check the logs.")
-            raise error
+            logging.getLogger(__name__).exception("Submarket view error")
 
 
     @discord.ui.button(label="Next", style=discord.ButtonStyle.blurple, emoji="\u23e9")
@@ -825,9 +825,9 @@ class SubMarketView(View):
                 market_embed.add_field(name="\u200b", value="\u200b")
             market_embed.set_footer(text=f"Page #{self.page}")
             await self.message.edit(embed=market_embed, view=self)
-        except Exception as error:
+        except Exception:
             await interaction.followup.send("An error occurred. Check the logs.")
-            raise error
+            logging.getLogger(__name__).exception("Submarket view error")
 
 
 class MarketView(View):

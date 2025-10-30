@@ -1,4 +1,5 @@
 # Shard Verification 0.1b
+import logging
 from datetime import datetime, timedelta
 import discord.channel
 from discord import app_commands
@@ -298,8 +299,8 @@ class VerificationDropdown(discord.ui.Select):
             open_square = thegye_server.get_channel(674335095628365855)
             await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
                                    f"and introduce yourself!")
-        except Exception as error:
-           raise error
+        except Exception:
+           logging.getLogger(__name__).exception("Verification dropdown error")
 
 
 class Verification(commands.Cog):
@@ -407,7 +408,7 @@ class Verification(commands.Cog):
                 await admin_channel.send(f"{thegye_server.member_count} users checked and roles updated.")
                 continue
         except Exception as error:
-            raise error
+            logging.getLogger(__name__).exception("Daily verification check error")
 
     def cog_unload(self):
         self.daily_verification.cancel()

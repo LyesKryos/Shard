@@ -1,5 +1,6 @@
 # dispatch cog v 1.4
 import datetime
+import logging
 import shelve
 import typing
 from io import BytesIO
@@ -20,35 +21,38 @@ from ratelimiter import Ratelimiter
 from customchecks import TooManyRequests
 
 def parse_rmb_message(message: str) -> dict:
-    # establish the dict of the data
-    message_data = {"message": "", "quoted_nation": None, "quote_id": None, "quoted_message": None}
-    # define the quote pattern
-    quote_pattern = "\\](.*)\\[/quote\\]"
-    # search for if there is a quote
-    quote_match = re.search(quote_pattern, message, flags=re.DOTALL)
-    # if there is a quote detected, parse out the information
-    if quote_match:
-        # parse the nation quoted and define it
-        quoted_nation_pattern = "\\[quote=(.*);"
-        quoted_nation_match = re.search(quoted_nation_pattern, message)
-        message_data["quoted_nation"] = sanitize_raw(quoted_nation_match.group(1))
-        # parse the quote id and parse it
-        quote_id_pattern = f"{quoted_nation_match.group(1)};(.*?)\\]"
-        quote_id_match = re.search(quote_id_pattern, message)
-        message_data['quote_id'] = quote_id_match.group(1)
-        # parse quote data and format it as a quote
-        quote_data = quote_match.group(1).replace("\n", "\n> ")
-        message_data["quoted_message"] = f"> {quote_data}"
-        # parse the quote content
-        quote_content_pattern = re.escape("[quote=") + r'(.*)' + re.escape("[/quote]")
-        # define the host message content of the quote
-        host_message = re.sub(pattern=quote_content_pattern, string=message, repl="", flags=re.DOTALL)[1:]
-        message_data["message"] = host_message
-    # if there is not a quote, make the message data just the message itself
-    else:
-        message_data['message'] = message
-    # send the message data back
-    return message_data
+    try:
+        # establish the dict of the data
+        message_data = {"message": "", "quoted_nation": None, "quote_id": None, "quoted_message": None}
+        # define the quote pattern
+        quote_pattern = "\\](.*)\\[/quote\\]"
+        # search for if there is a quote
+        quote_match = re.search(quote_pattern, message, flags=re.DOTALL)
+        # if there is a quote detected, parse out the information
+        if quote_match:
+            # parse the nation quoted and define it
+            quoted_nation_pattern = "\\[quote=(.*);"
+            quoted_nation_match = re.search(quoted_nation_pattern, message)
+            message_data["quoted_nation"] = sanitize_raw(quoted_nation_match.group(1))
+            # parse the quote id and parse it
+            quote_id_pattern = f"{quoted_nation_match.group(1)};(.*?)\\]"
+            quote_id_match = re.search(quote_id_pattern, message)
+            message_data['quote_id'] = quote_id_match.group(1)
+            # parse quote data and format it as a quote
+            quote_data = quote_match.group(1).replace("\n", "\n> ")
+            message_data["quoted_message"] = f"> {quote_data}"
+            # parse the quote content
+            quote_content_pattern = re.escape("[quote=") + r'(.*)' + re.escape("[/quote]")
+            # define the host message content of the quote
+            host_message = re.sub(pattern=quote_content_pattern, string=message, repl="", flags=re.DOTALL)[1:]
+            message_data["message"] = host_message
+        # if there is not a quote, make the message data just the message itself
+        else:
+            message_data['message'] = message
+        # send the message data back
+        return message_data
+    except Exception as error:
+            logging.getLogger(__name__).exception("RMB posting error")
 
 def sanitize_raw(userinput: str) -> str:
     # replaces user input with proper, url-friendly code

@@ -1,3 +1,4 @@
+import logging
 from random import randrange, randint
 import asyncpg
 from discord import app_commands
@@ -355,8 +356,8 @@ class ConstructDropdown(discord.ui.Select):
             if structure == "Fort":
                 await conn.execute('''UPDATE cnc_provinces SET fort_level = $1 WHERE id = $2;''',
                                    user_info['fort_level'], prov_info['id'])
-        except Exception as error:
-            raise error
+        except Exception:
+            logging.getLogger(__name__).exception("Construction dropdown error")
         return await interaction.response.send_message(content=f"{structure} successfully constructed in "
                                                                 f"{prov_info['name']}.")
 
@@ -2297,8 +2298,8 @@ class CNC(commands.Cog):
             # execute tech db call
             if tech_info['db_call'] != 'NULL':
                 await conn.execute(tech_info['db_call'], user.id)
-        except Exception as error:
-            raise error
+        except Exception:
+            logging.getLogger(__name__).exception("Researching tech error")
         # send confirmation
         return await ctx.send(f"{tech_info['name']} has been researched for {user_info['name']} ({user.display_name}).")
 
@@ -2452,8 +2453,8 @@ class CNC(commands.Cog):
             fort_level = 0 WHERE owner_id = $1 AND occupier_id = $1;''', user.id)
             await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', user.id)
             await delete_confirm.delete()
-        except asyncpg.PostgresError as error:
-            raise error
+        except asyncpg.PostgresError:
+            logging.getLogger(__name__).exception("Permanent deletion errored")
         return await ctx.send(f"Permanent deletion of {user.name} "
                               "from the Command and Conquest System completed.")
 

@@ -1,3 +1,4 @@
+import logging
 import math
 import urllib
 from datetime import datetime, timedelta
@@ -243,7 +244,7 @@ class Recruitment(commands.Cog):
                         await asyncio.sleep(300)
                         continue
             except Exception as error:
-                raise error
+                logging.getLogger(__name__).exception("Retention error")
 
         async def world_assembly_notification(bot):
             # wait until the bot is ready
@@ -450,7 +451,7 @@ class Recruitment(commands.Cog):
             self.autogrammer.stop()
             await crashchannel.send("Autogramming aborted.")
         except Exception as error:
-            raise error
+            logging.getLogger(__name__).exception("Autogrammer error")
 
     @autogrammer.before_loop
     async def before_autogrammer(self):
@@ -571,7 +572,7 @@ class Recruitment(commands.Cog):
             # restart the autogrammer
             self.autogrammer.start()
             self.user_sent = 0
-            raise error
+            logging.getLogger(__name__).exception("Recruitment error")
 
     async def still_recruiting_check(self, user, timer):
         try:
@@ -601,7 +602,7 @@ class Recruitment(commands.Cog):
                     self.autogrammer.start()
                     break
         except Exception as error:
-            raise error
+            logging.getLogger(__name__).exception("Autogrammer error")
 
     # creates recruitment group
     recruitment = app_commands.Group(name="recruitment", description="...")

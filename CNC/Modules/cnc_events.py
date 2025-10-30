@@ -1,3 +1,4 @@
+import logging
 import random
 import discord
 from discord.ext import commands
@@ -21,12 +22,12 @@ class Events:
             try:
                 self.pool: asyncpg.pool = self.ctx.bot.pool
             except Exception as error:
-                raise error
+                logging.getLogger(__name__).exception("Pool creation error from event")
         else:
             try:
                 self.pool: asyncpg.pool = self.bot.pool
             except Exception as error:
-                raise error
+                logging.getLogger(__name__).exception("Pool creation error from event")
 
     def space_replace(self, userinput: str) -> str:
         """Replaces spaces with underscores and lowers"""
