@@ -10,6 +10,8 @@ from discord import app_commands
 from ShardBot import Shard
 from discord.ext import commands
 import os
+
+from cogs import EXTENSIONS
 from customchecks import SilentFail
 
 
@@ -96,10 +98,10 @@ class BaseCommands(commands.Cog):
     @commands.is_owner()
     async def recycle(self, ctx):
         await ctx.send("Recycling!")
-        for filename in os.listdir("./cogs"):
-            if filename.endswith(".py"):
-                await self.bot.unload_extension(f"cogs.{filename[:-3]}")
-                await self.bot.load_extension(f"cogs.{filename[:-3]}")
+        # load the cogs
+        for extension in EXTENSIONS:
+            await self.bot.unload_extension(extension)
+            await self.bot.load_extension(extension)
         await ctx.send("Recycled all cogs.")
 
     @commands.command()
