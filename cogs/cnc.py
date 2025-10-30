@@ -1555,7 +1555,7 @@ class CNC(commands.Cog):
             general = f"{general_info['name']} (ID: {general_info['general_id']})"
         movement = army_info['movement']
         # pull userinfo
-        userinfo = await user_db_info(user_id=user_id, conn=conn)
+        userinfo = await user_db_info(user_id=owner_id, conn=conn)
         user = self.bot.get_user(owner_id)
         # build embed
         army_embed = discord.Embed(title=f"{army_name}", description=f"Information about an army (ID {army_id}).",
