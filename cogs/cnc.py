@@ -1524,7 +1524,7 @@ class CNC(commands.Cog):
                 return await interaction.edit_original_response(embed=await create_prov_embed(prov_info, conn))
 
         # if the user does not own the province, and it is owned by another player, send the embed
-        elif prov_info['owner_id'] != 0:
+        else:
             await interaction.edit_original_response(embed=await create_prov_embed(prov_info, conn))
 
 
@@ -1575,7 +1575,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull user info
-        userinfo = await user_db_info(interaction.user.id)
+        userinfo = await user_db_info(interaction.user.id, conn)
         # if the user isn't a player, deny
         if userinfo is None:
             return await interaction.followup.send("You are not a registered member of the CNC system.")
