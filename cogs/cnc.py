@@ -1298,12 +1298,21 @@ class CNC(commands.Cog):
         military_access = await conn.fetch('''SELECT * FROM cnc_military_access 
         WHERE $1 = ANY(members);''', user_info['name'])
 
-        def parse_relations(relations: asyncpg.Record) -> str:
+        def parse_relations(relations: asyncpg.Record, wars: bool = False) -> str:
             """
-            Parses out the names of nations within the input relations
+            Parses out the names of nations within the input relations.
+            ``wars``, if true, parses out attackers and defenders rather than "members".
             """
             if not relations:
                 output = "None"
+                return output
+            elif wars:
+                output = ""
+                # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
+                for relation in relations:
+                    buffer_output = ", ".join([r for r in relation['attackers'] if r != user_info['name']])
+                    buffer_output += ", ".join([r for r in relation['defenders'] if r != user_info['name']])
+                    output += buffer_output
                 return output
             else:
                 output = ""
@@ -1313,9 +1322,8 @@ class CNC(commands.Cog):
                     output += buffer_output
                 return output
 
-
         allies = parse_relations(alliances)
-        wars = "" + (", ".join([r for r in relation['members'] if r != user_info['name']]) for relation in wars)
+        wars = parse_relations(wars, True)
         trade_pacts = parse_relations(trade_pacts)
         military_access = parse_relations(military_access)
         # build embed, populate title with pretitle and nation name, set color to user color,
