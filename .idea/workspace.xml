@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting wars relation parsing issue.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting the same db error as the army_report, but for army_view." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -468,7 +465,7 @@
       <workItem from="1761609081016" duration="4822000" />
       <workItem from="1761697849464" duration="3380000" />
       <workItem from="1761754802895" duration="9280000" />
-      <workItem from="1761858147376" duration="3564000" />
+      <workItem from="1761858147376" duration="3870000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -813,7 +810,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1207" />
+    <option name="localTasksCounter" value="1210" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -831,9 +828,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding the embed updating for the province viewing command" />
-    <MESSAGE value="Fixing user db function" />
-    <MESSAGE value="Fixing embed function" />
     <MESSAGE value="Fixing timeouts" />
     <MESSAGE value="Adding abandon province button" />
     <MESSAGE value="Fixing abandon province button" />
@@ -856,7 +850,10 @@
     <MESSAGE value="Fixing the recycle command" />
     <MESSAGE value="Fixing logging." />
     <MESSAGE value="Correcting wars relation parsing issue." />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting wars relation parsing issue." />
+    <MESSAGE value="Correcting small issue with army_report." />
+    <MESSAGE value="Updating army_report to include the army ID of each army listed." />
+    <MESSAGE value="Correcting the same db error as the army_report, but for army_view." />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcting the same db error as the army_report, but for army_view." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
