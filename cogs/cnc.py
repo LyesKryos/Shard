@@ -1675,7 +1675,7 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # pull user info
         user_id = interaction.user.id
-        user_info = await user_db_info(user_id=user_id)
+        user_info = await user_db_info(user_id=user_id, conn=conn)
         # if the user does not exist
         if user_info is None:
             # return a message
