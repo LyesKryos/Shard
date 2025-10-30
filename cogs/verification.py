@@ -1,5 +1,4 @@
 # Shard Verification 0.1b
-import traceback
 from datetime import datetime, timedelta
 import discord.channel
 from discord import app_commands
@@ -300,11 +299,7 @@ class VerificationDropdown(discord.ui.Select):
             await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
                                    f"and introduce yourself!")
         except Exception as error:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
+           raise error
 
 
 class Verification(commands.Cog):
@@ -412,11 +407,7 @@ class Verification(commands.Cog):
                 await admin_channel.send(f"{thegye_server.member_count} users checked and roles updated.")
                 continue
         except Exception as error:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            self.bot.logger.warning(msg=f"{traceback_text}")
+            raise error
 
     def cog_unload(self):
         self.daily_verification.cancel()

@@ -1,8 +1,5 @@
-import asyncio
-import discord.errors
 from ShardBot import Shard
 from discord.ext import commands
-from customchecks import SilentFail
 
 
 class Games(commands.Cog):

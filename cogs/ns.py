@@ -314,9 +314,9 @@ class NationStates(commands.Cog):
                     message_raw = await most_recent_message.text()
                     try:
                         messages_root = ET.fromstring(message_raw)
-                    except ET.ParseError as e:
-                        self.bot.logger.error(f"Error parsing XML: {e}")
+                    except ET.ParseError as error:
                         await crash_channel.send("RMB posting error. Check the logs.")
+                        raise error
                     # pull all message information
                     post = messages_root.find(".//POST")
                     # pull post id and add it to the list of posts
@@ -337,9 +337,9 @@ class NationStates(commands.Cog):
                     messages_raw = await all_recent_messages.text()
                     try:
                         messages_root = ET.fromstring(messages_raw)
-                    except ET.ParseError as e:
-                        self.bot.logger.error(f"Error parsing XML: {e}")
+                    except ET.ParseError as error:
                         await crash_channel.send("RMB posting error. Check the logs.")
+                        raise error
                     # pull all message information
                     posts = messages_root.findall(".//POST")
                     # add the information from each post to the post_buffer

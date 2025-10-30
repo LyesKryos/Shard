@@ -2,10 +2,8 @@ from ShardBot import Shard
 import logging
 import logging.handlers as handlers
 import json
-import discord
 
 def main(bot: Shard):
-    print(discord.__version__)
     # read config file
     token_raw = json.load(open("config.json"))
     token = token_raw["token"]

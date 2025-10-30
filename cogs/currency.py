@@ -36,8 +36,8 @@ class Currency(commands.Cog):
                                currencyname, worth, author.id, symbol, backed, ctx.guild.id, nation_of_origin)
             await ctx.send(f"Added currency {currencyname.title()} to the ledger!")
         except Exception as error:
-            await ctx.send(error)
-            self.bot.logger.warning(error)
+            await ctx.send("An error occurred. Check the logs.")
+            raise error
 
     @commands.command(usage="[currency name] [worth] <symbol> <backed by> <nation>"
                             "\nRemember that multiple word names must be enclosed by quotation marks.",
@@ -73,8 +73,8 @@ class Currency(commands.Cog):
                 worth, symbol, currencyname.lower(), backed, nation_of_origin)
             await ctx.send(f"{currencyname} successfully updated!")
         except Exception as error:
-            await ctx.send(error)
-            self.bot.logger.warning(error)
+            await ctx.send("An error occurred. Check the logs.")
+            raise error
 
     @commands.command(usage="[currency name]", brief="Removes an existing currency from the ledger")
     @commands.guild_only()
@@ -102,8 +102,8 @@ class Currency(commands.Cog):
             await conn.execute('''DELETE FROM currency WHERE lower(name) = $1;''', currencyname.lower())
             await ctx.send(f"{currencyname} successfully removed from the ledger.")
         except Exception as error:
-            await ctx.send(error)
-            self.bot.logger.warning(error)
+            await ctx.send("An error occurred. Check the logs.")
+            raise error
 
     @commands.command(usage="[currency name]", brief="Displays information about a specified currency")
     @commands.guild_only()
@@ -136,8 +136,8 @@ class Currency(commands.Cog):
                 f"The {currencydata['name']}{symbol} is worth {currencydata['worth']} grams of gold per unit (AUG). "
                 f"{backed} {nation}")
         except Exception as error:
-            await ctx.send(error)
-            self.bot.logger.warning(error)
+            await ctx.send("An error occurred. Check the logs.")
+            raise error
 
     @commands.command(usage="[currency] [currency] [amount]", brief="Calculates an exchange between two currencies")
     @commands.guild_only()
@@ -227,7 +227,7 @@ class Currency(commands.Cog):
             await ctx.send(f"{user.display_name}{user.discriminator} blacklisted from the Currency Exchange.")
         except Exception as error:
             await ctx.send(f"Error: {error}")
-            self.bot.logger.warning(msg=error)
+            raise error
 
 
 async def setup(bot):

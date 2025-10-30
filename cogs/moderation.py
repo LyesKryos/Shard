@@ -2,11 +2,8 @@
 from datetime import datetime, timedelta
 import discord
 from ShardBot import Shard
-import asyncio
 from discord.ext import commands
-import re
 from pytz import timezone
-from ratelimiter import Ratelimiter
 from customchecks import SilentFail
 
 

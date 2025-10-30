@@ -2,8 +2,6 @@ import json
 import asyncpg
 import discord
 from discord.ext import commands
-import os
-import logging
 from datetime import datetime as dt
 from cogs import EXTENSIONS
 

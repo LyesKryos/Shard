@@ -243,7 +243,7 @@ class Recruitment(commands.Cog):
                         await asyncio.sleep(300)
                         continue
             except Exception as error:
-                self.bot.logger.exception(msg=error, exc_info=error)
+                raise error
 
         async def world_assembly_notification(bot):
             # wait until the bot is ready
@@ -450,7 +450,7 @@ class Recruitment(commands.Cog):
             self.autogrammer.stop()
             await crashchannel.send("Autogramming aborted.")
         except Exception as error:
-            self.bot.logger.exception(error)
+            raise error
 
     @autogrammer.before_loop
     async def before_autogrammer(self):
@@ -571,7 +571,7 @@ class Recruitment(commands.Cog):
             # restart the autogrammer
             self.autogrammer.start()
             self.user_sent = 0
-            self.bot.logger.exception(error)
+            raise error
 
     async def still_recruiting_check(self, user, timer):
         try:
@@ -601,7 +601,7 @@ class Recruitment(commands.Cog):
                     self.autogrammer.start()
                     break
         except Exception as error:
-            self.bot.logger.exception(error)
+            raise error
 
     # creates recruitment group
     recruitment = app_commands.Group(name="recruitment", description="...")

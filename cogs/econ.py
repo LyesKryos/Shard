@@ -2,7 +2,6 @@
 from __future__ import annotations
 import asyncio
 import math
-import traceback
 import typing
 from datetime import datetime, timedelta
 from random import randint, uniform, choice
@@ -780,11 +779,7 @@ class SubMarketView(View):
             market_embed.set_footer(text=f"Page #{self.page}")
             await self.message.edit(embed=market_embed, view=self)
         except Exception as error:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            bot.logger.warning(msg=f"{traceback_text}")
+            raise error
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
     async def close(self, interaction: discord.Interaction, close: discord.Button):
@@ -798,13 +793,11 @@ class SubMarketView(View):
                 self.remove_item(item)
             return await self.message.edit(content="Market closed.", view=self)
         except Exception as error:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            bot.logger.warning(msg=f"{traceback_text}")
+            await interaction.followup.send("An error occurred. Check the logs.")
+            raise error
 
-    @discord.ui.button(label="Next", style=discord.ButtonStyle.blurple, emoji="\u23e9")
+
+@discord.ui.button(label="Next", style=discord.ButtonStyle.blurple, emoji="\u23e9")
     async def forward(self, interaction: discord.Interaction, forward_button: discord.Button):
         bot = interaction.client
         try:
@@ -836,11 +829,8 @@ class SubMarketView(View):
             market_embed.set_footer(text=f"Page #{self.page}")
             await self.message.edit(embed=market_embed, view=self)
         except Exception as error:
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
-            bot.logger.warning(msg=f"{traceback_text}")
+            await interaction.followup.send("An error occurred. Check the logs.")
+            raise error
 
 
 class MarketView(View):

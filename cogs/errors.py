@@ -70,8 +70,9 @@ class ShardErrorHandler(commands.Cog):
         elif isinstance(error, discord.errors.Forbidden):
             await ctx.send("I cannot complete that action.")
         else:
-            self.bot.logger.exception(error, exc_info=error)
-            await ctx.send("An error occurred, check the logs.")
+            await ctx.send("An error occurred. Check the logs.")
+            raise error
+
 
     @commands.Cog.listener()
     async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
@@ -91,11 +92,8 @@ class ShardErrorHandler(commands.Cog):
             await interaction.response.send_message(content="You do not have the right permissions for this command "
                                                     "or are blocked from using this command.", ephemeral=True)
         else:
-            self.bot.logger.exception(error, exc_info=error)
-            if self.debug_mode is False:
-                return await interaction.channel.send("An error occurred, check the logs.")
-            elif self.debug_mode is True:
-                return await interaction.channel.send(f"Error:\n```{error}```")
+            await interaction.channel.send(f"An error occurred. Check the logs.")
+            raise error
 
 
 async def setup(bot: Shard):

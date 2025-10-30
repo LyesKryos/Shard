@@ -69,8 +69,8 @@ class BaseCommands(commands.Cog):
             try:
                 channel = self.bot.get_channel(channel_id)
                 await channel.send(args)
-            except Exception:
-                self.bot.logger.warning(msg=traceback.format_exc())
+            except Exception as error:
+                raise error
 
     @commands.command(brief="Loads cog")
     @commands.is_owner()

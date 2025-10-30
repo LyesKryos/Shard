@@ -2,7 +2,6 @@ import random
 import discord
 from discord.ext import commands
 import asyncpg
-import traceback
 import re
 
 
@@ -21,13 +20,13 @@ class Events:
         if self.ctx is not None:
             try:
                 self.pool: asyncpg.pool = self.ctx.bot.pool
-            except Exception:
-                self.ctx.bot.logger.warning(traceback.format_exc())
+            except Exception as error:
+                raise error
         else:
             try:
                 self.pool: asyncpg.pool = self.bot.pool
-            except Exception:
-                self.bot.logger.warning(traceback.format_exc())
+            except Exception as error:
+                raise error
 
     def space_replace(self, userinput: str) -> str:
         """Replaces spaces with underscores and lowers"""

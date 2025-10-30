@@ -1,6 +1,5 @@
 import random
 import re
-import typing
 import requests
 from bs4 import BeautifulSoup
 from discord import app_commands, utils
