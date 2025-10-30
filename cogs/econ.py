@@ -751,8 +751,6 @@ class SubMarketView(View):
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.blurple, disabled=True, emoji="\u23ea")
     async def back(self, interaction: discord.Interaction, back_button: discord.Button):
-        # define bot
-        bot = interaction.client
         try:
             # defer response
             await interaction.response.defer()
@@ -797,9 +795,8 @@ class SubMarketView(View):
             raise error
 
 
-@discord.ui.button(label="Next", style=discord.ButtonStyle.blurple, emoji="\u23e9")
+    @discord.ui.button(label="Next", style=discord.ButtonStyle.blurple, emoji="\u23e9")
     async def forward(self, interaction: discord.Interaction, forward_button: discord.Button):
-        bot = interaction.client
         try:
             # defer response
             await interaction.response.defer()
