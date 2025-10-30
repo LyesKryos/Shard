@@ -12,6 +12,8 @@ def main(bot: Shard):
                                            mode='a', maxBytes=50000, backupCount=3)
     handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
     handler.setLevel(logging.DEBUG)
+    # set up the configuration
+    logging.basicConfig(level=logging.DEBUG, handlers=[handler])
     bot.run(token, log_handler=handler)
 
 main(Shard())
