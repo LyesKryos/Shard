@@ -1,3 +1,5 @@
+import logging
+
 import discord.errors
 from discord import app_commands
 from ShardBot import Shard
@@ -9,6 +11,7 @@ class ShardErrorHandler(commands.Cog):
 
     def __init__(self, bot: Shard):
         self.bot = bot
+        self.logger = logging.getLogger(__name__)
         self.debug_mode = False
 
     def cog_load(self):
@@ -23,6 +26,11 @@ class ShardErrorHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error: commands.CommandError):
+        """
+        Handler for any text command errors.
+        """
+        # define command
+        command_name = ctx.command.qualified_name
         # load/unload/reload errors
         if isinstance(error, commands.ExtensionNotFound):
             await ctx.send("There is no such extension, idjit.")
@@ -32,7 +40,7 @@ class ShardErrorHandler(commands.Cog):
             await ctx.send("Fool, you already loaded it!")
         elif isinstance(error, commands.ExtensionError):
             await ctx.send(f"Extension error. Check logs.")
-            self.bot.logger.exception(msg=error)
+            self.logger.exception(msg=error)
         # if the command used does not exist
         elif isinstance(error, commands.CommandNotFound):
             await ctx.send(f"Command `{self.bot.prefix}{ctx.invoked_with}` not found.")
@@ -71,11 +79,16 @@ class ShardErrorHandler(commands.Cog):
             await ctx.send("I cannot complete that action.")
         else:
             await ctx.send("An error occurred. Check the logs.")
-            raise error
+            self.logger.exception(msg=f"Unhandled error in command: {command_name}")
 
 
     @commands.Cog.listener()
     async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        """
+        Handler for any app command errors.
+        """
+        # define command name
+        command_name = interaction.command.name if interaction.command else "Unknown Command"
         # unwrap error
         if isinstance(error, app_commands.CommandInvokeError):
             error = error.original
@@ -93,7 +106,15 @@ class ShardErrorHandler(commands.Cog):
                                                     "or are blocked from using this command.", ephemeral=True)
         else:
             await interaction.channel.send(f"An error occurred. Check the logs.")
-            raise error
+            self.logger.exception(msg=f"Unhandled error in command: {command_name}")
+
+    @commands.Cog.listener()
+    async def on_error(self, event: str, error: Exception):
+        """
+        Global handler for errors raised in event listeners.
+        This catches exceptions in events like on_message, on_member_join, etc.
+        """
+        self.logger.exception(msg=f"An error occurred in event `{event}`.", exc_info=True)
 
 
 async def setup(bot: Shard):

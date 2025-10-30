@@ -11,7 +11,7 @@ def main(bot: Shard):
     handler = handlers.RotatingFileHandler("botlogs.log", encoding="utf-8",
                                            mode='a', maxBytes=50000, backupCount=3)
     handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
-    handler.setLevel(logging.INFO)
+    handler.setLevel(logging.DEBUG)
     bot.run(token, log_handler=handler)
 
 main(Shard())

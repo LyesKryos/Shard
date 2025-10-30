@@ -4,21 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating CNC moduling system">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Removing debug printing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CNC/Modules/cnc_events.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/Modules/cnc_events.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ShardBot.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShardBot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/currency.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/currency.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/errors.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/errors.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/games.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/games.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/moderation.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/moderation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/ns.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/ns.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/recruitment.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/recruitment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/roleplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/roleplay.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -457,7 +445,7 @@
       <workItem from="1737944586496" duration="1433000" />
       <workItem from="1761609081016" duration="4822000" />
       <workItem from="1761697849464" duration="3380000" />
-      <workItem from="1761754802895" duration="7199000" />
+      <workItem from="1761754802895" duration="8590000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -802,7 +790,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1196" />
+    <option name="localTasksCounter" value="1199" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -820,9 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding the embed to the province command" />
-    <MESSAGE value="Fixing adding the embed to the province command" />
-    <MESSAGE value="Adding dev boosting to owned province view" />
     <MESSAGE value="Editing the look of dev boosting" />
     <MESSAGE value="Fixing dev boosting" />
     <MESSAGE value="Finishing dev boosting button reactions" />
@@ -845,7 +830,10 @@
     <MESSAGE value="Fixing error logging" />
     <MESSAGE value="Troubleshooting bot non-functioning" />
     <MESSAGE value="Updating CNC moduling system" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating CNC moduling system" />
+    <MESSAGE value="Updating error catching system and ensuring up to date importing" />
+    <MESSAGE value="Correcting indentation error" />
+    <MESSAGE value="Removing debug printing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Removing debug printing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
