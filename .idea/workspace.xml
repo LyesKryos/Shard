@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing logging.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting wars relation parsing issue." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -444,7 +442,7 @@
       <workItem from="1761609081016" duration="4822000" />
       <workItem from="1761697849464" duration="3380000" />
       <workItem from="1761754802895" duration="9280000" />
-      <workItem from="1761858147376" duration="2176000" />
+      <workItem from="1761858147376" duration="2601000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -789,7 +787,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1204" />
+    <option name="localTasksCounter" value="1205" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -807,7 +805,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding development appropriation" />
     <MESSAGE value="Adding the embed updating for the province viewing command" />
     <MESSAGE value="Fixing user db function" />
     <MESSAGE value="Fixing embed function" />
@@ -832,7 +829,8 @@
     <MESSAGE value="Adding error logging for unhandled exceptions." />
     <MESSAGE value="Fixing the recycle command" />
     <MESSAGE value="Fixing logging." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing logging." />
+    <MESSAGE value="Correcting wars relation parsing issue." />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcting wars relation parsing issue." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

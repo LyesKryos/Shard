@@ -1315,7 +1315,7 @@ class CNC(commands.Cog):
 
 
         allies = parse_relations(alliances)
-        wars = (", ".join([r for r in relation['members'] if r != user_info['name']]) for relation in wars)
+        wars = "" + (", ".join([r for r in relation['members'] if r != user_info['name']]) for relation in wars)
         trade_pacts = parse_relations(trade_pacts)
         military_access = parse_relations(military_access)
         # build embed, populate title with pretitle and nation name, set color to user color,
