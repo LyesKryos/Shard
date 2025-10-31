@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing tax level display on Dossier">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Error logging">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/errors.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/errors.py" afterDir="false" />
@@ -474,6 +474,7 @@
       <workItem from="1761754802895" duration="9280000" />
       <workItem from="1761858147376" duration="9674000" />
       <workItem from="1761910528623" duration="703000" />
+      <workItem from="1761947021964" duration="487000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -818,7 +819,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1217" />
+    <option name="localTasksCounter" value="1219" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -836,8 +837,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing colonize" />
-    <MESSAGE value="Adding proper timeout for UnowedProvince" />
     <MESSAGE value="Updating province for a foreign-owned province" />
     <MESSAGE value="Updating CNC" />
     <MESSAGE value="Error troubleshootings" />
@@ -861,7 +860,9 @@
     <MESSAGE value="Fixing war &quot;members&quot; issue that keeps popping up." />
     <MESSAGE value="Fixing syntax error" />
     <MESSAGE value="Fixing tax level display on Dossier" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing tax level display on Dossier" />
+    <MESSAGE value="Nation wars parse solution implementation." />
+    <MESSAGE value="Error logging" />
+    <option name="LAST_COMMIT_MESSAGE" value="Error logging" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />

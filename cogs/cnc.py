@@ -3551,7 +3551,7 @@ class CNC(commands.Cog):
         wars = await conn.fetch('''SELECT *
                                    FROM cnc_wars
                                    WHERE $1 = ANY (array_cat(attackers, defenders));''',
-                                self.user_info['name'])
+                                user_info['name'])
         trade_pacts = await conn.fetch('''SELECT *
                                           FROM cnc_trade_pacts
                                           WHERE $1 = ANY (members);''',
