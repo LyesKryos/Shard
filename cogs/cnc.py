@@ -3548,14 +3548,10 @@ class CNC(commands.Cog):
                                         FROM cnc_alliances
                                         WHERE $1 = ANY (members);''',
                                      user_info['name'])
-        defensive_wars = await conn.fetch('''SELECT *
-                                             FROM cnc_wars
-                                             WHERE $1 = ANY (defenders);''',
-                                          user_info['name'])
-        offensive_wars = await conn.fetch('''SELECT *
-                                             FROM cnc_wars
-                                             WHERE $1 = ANY (attackers);''',
-                                          user_info['name'])
+        wars = await conn.fetch('''SELECT *
+                                   FROM cnc_wars
+                                   WHERE $1 = ANY (array_cat(attackers, defenders));''',
+                                self.user_info['name'])
         trade_pacts = await conn.fetch('''SELECT *
                                           FROM cnc_trade_pacts
                                           WHERE $1 = ANY (members);''',
