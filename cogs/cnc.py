@@ -943,7 +943,7 @@ class OwnedProvinceModifiation(View):
         # check if the user is at war. abandoning is not legal when at war
         war_check = await conn.fetchrow('''SELECT *
                                            FROM cnc_wars
-                                           WHERE $1 = ANY (members);''', user_info['name'])
+                                           WHERE $1 = ANY (array_cat(attackers, defenders);''', user_info['name'])
         if war_check is not None:
             return await interaction.response.send_message("You cannot abandon provinces while at war.")
         # check to make sure that the user will have > 1 province after
@@ -1180,7 +1180,7 @@ class DossierView(View):
                                      self.user_info['name'])
         wars = await conn.fetch('''SELECT *
                                    FROM cnc_wars
-                                   WHERE $1 = ANY (members);''',
+                                   WHERE $1 = ANY (array_cat(attackers, defenders);''',
                                 self.user_info['name'])
         trade_pacts = await conn.fetch('''SELECT *
                                           FROM cnc_trade_pacts
@@ -1191,19 +1191,32 @@ class DossierView(View):
                                               WHERE $1 = ANY (members);''',
                                            self.user_info['name'])
 
-        def parse_relations(relations):
+        def parse_relations(relations: list, wars: bool = False) -> str:
+            """
+            Parses out the names of nations within the input relations.
+            ``wars``, if true, parses out attackers and defenders rather than "members".
+            """
             if not relations:
                 output = "None"
-                return str(output)
+                return output
+            elif wars:
+                output = ""
+                # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
+                for relation in relations:
+                    buffer_output = ", ".join([r for r in relation['attackers'] if r != user_info['name']])
+                    buffer_output += ", ".join([r for r in relation['defenders'] if r != user_info['name']])
+                    output += buffer_output
+                return output
             else:
                 output = ""
+                # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
                 for relation in relations:
-                    buffer_output = ", ".join([r for r in relation['members'] if r != self.user_info['name']])
+                    buffer_output = ", ".join([r for r in relation['members'] if r != user_info['name']])
                     output += buffer_output
-                return str(output)
+                return output
 
         allies = parse_relations(alliances)
-        wars = parse_relations(wars)
+        wars = parse_relations(wars, True)
         trade_pacts = parse_relations(trade_pacts)
         military_access = parse_relations(military_access)
         # populate relations
@@ -3559,12 +3572,25 @@ class CNC(commands.Cog):
                                         WHERE sender = $1;''',
                                      user_info['name'])
 
-        def parse_relations(relations):
+        def parse_relations(relations: list, wars: bool = False) -> str:
+            """
+            Parses out the names of nations within the input relations.
+            ``wars``, if true, parses out attackers and defenders rather than "members".
+            """
             if not relations:
                 output = "None"
                 return output
+            elif wars:
+                output = ""
+                # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
+                for relation in relations:
+                    buffer_output = ", ".join([r for r in relation['attackers'] if r != user_info['name']])
+                    buffer_output += ", ".join([r for r in relation['defenders'] if r != user_info['name']])
+                    output += buffer_output
+                return output
             else:
                 output = ""
+                # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
                 for relation in relations:
                     buffer_output = ", ".join([r for r in relation['members'] if r != user_info['name']])
                     output += buffer_output
@@ -3572,16 +3598,13 @@ class CNC(commands.Cog):
 
         allies = parse_relations(alliances)
         trade_pacts = parse_relations(trade_pacts)
+        wars = parse_relations(wars, True)
         military_access = parse_relations(military_access)
         diplomatic_relations = parse_relations(diplomatic_relations)
         if not embargoes:
             embargoes = "None"
         else:
             embargoes = ", ".join([e for e in embargoes['target']])
-        if (not offensive_wars) and (not defensive_wars):
-            wars = "None"
-        else:
-            wars = ", ".join([w for w in defensive_wars['defenders']] + [w for w in offensive_wars['attackers']])
         # build embed, populate title with pretitle and nation name, set color to user color,
         # and set description to Discord user.
         user_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
@@ -4178,7 +4201,7 @@ class CNC(commands.Cog):
         # check if the user is at war
         war_check = await conn.fetchrow('''SELECT *
                                            FROM cnc_wars
-                                           WHERE $1 = ANY (members);''', user_info['name'])
+                                           WHERE $1 = ANY (array_cat(attackers, defenders);''', user_info['name'])
         if war_check is not None:
             return await interaction.followup.send("You cannot designate a new Capital while at war.")
         # otherwise, carry on

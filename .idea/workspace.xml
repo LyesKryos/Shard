@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Crash logging and protection.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Crash protection and logging for asyncio loop crashes.&#10;Restoring lost cnc version.">
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/econ.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/econ.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -470,7 +468,7 @@
       <workItem from="1761609081016" duration="4822000" />
       <workItem from="1761697849464" duration="3380000" />
       <workItem from="1761754802895" duration="9280000" />
-      <workItem from="1761858147376" duration="8847000" />
+      <workItem from="1761858147376" duration="9229000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -815,7 +813,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1213" />
+    <option name="localTasksCounter" value="1214" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -833,7 +831,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixing abandon province button" />
     <MESSAGE value="Adding colonize button" />
     <MESSAGE value="Adding colonize stuff" />
     <MESSAGE value="Adding role restrictions for alter_leader" />
@@ -858,7 +855,8 @@
     <MESSAGE value="Correcting the same db error as the army_report, but for army_view." />
     <MESSAGE value="Correcting slight db issue" />
     <MESSAGE value="Crash logging and protection." />
-    <option name="LAST_COMMIT_MESSAGE" value="Crash logging and protection." />
+    <MESSAGE value="Crash protection and logging for asyncio loop crashes.&#10;Restoring lost cnc version." />
+    <option name="LAST_COMMIT_MESSAGE" value="Crash protection and logging for asyncio loop crashes.&#10;Restoring lost cnc version." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
