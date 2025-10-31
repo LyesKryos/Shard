@@ -20,6 +20,8 @@ def main(bot: Shard):
         logging.basicConfig(level=logging.DEBUG, handlers=[handler])
     # define the logger
     logger = logging.getLogger("bot")
+    # ensure the logger is initialized
+    logger.debug("Logging initialized successfully")
 
     # handle any uncaught exceptions
     def handle_exception(exc_type, exc_value, exc_traceback):
@@ -35,7 +37,7 @@ def main(bot: Shard):
 
     # handle any async exceptions
     # get the event loop
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     def handle_async_exception(loop, context):
         # from the context, get the exception
         msg = context.get("exception") or context.get("message", "No message provided")
