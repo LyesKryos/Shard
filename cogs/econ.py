@@ -1,6 +1,7 @@
 # Shard Economy v2a
 from __future__ import annotations
 import asyncio
+import logging
 import math
 import typing
 from datetime import datetime, timedelta
@@ -1236,7 +1237,7 @@ class Economy(commands.Cog):
                 await bankchannel.send("Royal Bank of Thegye updated.")
                 continue
         except Exception as error:
-            self.bot.logger.warning(error)
+            self.logger.exception(error)
 
     async def market_updating(self):
         try:
@@ -1387,8 +1388,8 @@ class Economy(commands.Cog):
                 self.announcement = \
                     "The Royal Exchange of Thegye has updated. Below is a summary of any important changes:\n"
                 continue
-        except Exception as error:
-            self.bot.logger.warning(error)
+        except Exception:
+            self.logger.exception("Market updating error")
 
     @rbt.command(name="register", description="Registers a new member of the Royal Bank of Thegye.")
     async def register(self, interaction: discord.Interaction):

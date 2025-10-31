@@ -29,8 +29,6 @@ class ShardErrorHandler(commands.Cog):
         """
         Handler for any text command errors.
         """
-        # define command
-        command_name = ctx.command.qualified_name
         # load/unload/reload errors
         if isinstance(error, commands.ExtensionNotFound):
             await ctx.send("There is no such extension, idjit.")
@@ -78,6 +76,8 @@ class ShardErrorHandler(commands.Cog):
         elif isinstance(error, discord.errors.Forbidden):
             await ctx.send("I cannot complete that action.")
         else:
+            # define command
+            command_name = ctx.command.qualified_name or "No command name recognized."
             await ctx.send("An error occurred. Check the logs.")
             self.logger.exception(msg=f"Unhandled error in command: {command_name}")
 
