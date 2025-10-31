@@ -1138,7 +1138,7 @@ class DossierView(View):
         # populate tax and spending stats
         self.doss_embed.add_field(name="======================ECONOMY======================",
                                   value="Information about your nation's economy.", inline=False)
-        self.doss_embed.add_field(name="Taxation Level", value=f"{self.user_info['tax_level']}%")
+        self.doss_embed.add_field(name="Taxation Level", value=f"{self.user_info['tax_level']*100}%")
         self.doss_embed.add_field(name="Public Spending Cost",
                                   value=f"{self.user_info['public_spend']} Economic Authority per turn")
         self.doss_embed.add_field(name="Military Upkeep Cost",
