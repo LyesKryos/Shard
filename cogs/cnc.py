@@ -943,7 +943,7 @@ class OwnedProvinceModifiation(View):
         # check if the user is at war. abandoning is not legal when at war
         war_check = await conn.fetchrow('''SELECT *
                                            FROM cnc_wars
-                                           WHERE $1 = ANY (array_cat(attackers, defenders);''', user_info['name'])
+                                           WHERE $1 = ANY (array_cat(attackers, defenders));''', user_info['name'])
         if war_check is not None:
             return await interaction.response.send_message("You cannot abandon provinces while at war.")
         # check to make sure that the user will have > 1 province after
@@ -1180,7 +1180,7 @@ class DossierView(View):
                                      self.user_info['name'])
         wars = await conn.fetch('''SELECT *
                                    FROM cnc_wars
-                                   WHERE $1 = ANY (array_cat(attackers, defenders);''',
+                                   WHERE $1 = ANY (array_cat(attackers, defenders));''',
                                 self.user_info['name'])
         trade_pacts = await conn.fetch('''SELECT *
                                           FROM cnc_trade_pacts
@@ -4201,7 +4201,7 @@ class CNC(commands.Cog):
         # check if the user is at war
         war_check = await conn.fetchrow('''SELECT *
                                            FROM cnc_wars
-                                           WHERE $1 = ANY (array_cat(attackers, defenders);''', user_info['name'])
+                                           WHERE $1 = ANY (array_cat(attackers, defenders));''', user_info['name'])
         if war_check is not None:
             return await interaction.followup.send("You cannot designate a new Capital while at war.")
         # otherwise, carry on
