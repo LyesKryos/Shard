@@ -3600,7 +3600,7 @@ class CNC(commands.Cog):
         if not embargoes:
             embargoes = "None"
         else:
-            embargoes = ", ".join([e for e in embargoes['target']])
+            embargoes = ", ".join([e['target'] for e in embargoes])
         # build embed, populate title with pretitle and nation name, set color to user color,
         # and set description to Discord user.
         user_embed = discord.Embed(title=f"The {user_info['pretitle']} of {user_info['name']}",
