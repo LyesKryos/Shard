@@ -14,6 +14,9 @@ import os
 from cogs import EXTENSIONS
 from customchecks import SilentFail
 
+class ProfileFlags(commands.FlagConverter):
+    member: discord.Member = commands.flag(description="The member to pull information about.")
+
 
 class BaseCommands(commands.Cog):
 
@@ -116,9 +119,10 @@ class BaseCommands(commands.Cog):
         msg = await ctx.send(f"Round trip {round(self.bot.latency * 1000, 2)}ms!")
         await msg.add_reaction("↔")
 
-    @commands.command(brief="Displays information about a user in the server.", aliases=['p'])
+    @commands.hybrid_command(name="profile", with_app_command=True,
+                             description="Pulls up Discord account information about a specified user.")
     @commands.guild_only()
-    async def profile(self, ctx, *, args=None):
+    async def profile(self, ctx, *, args=None, flags: ProfileFlags):
         # establishes connection
         conn = self.bot.pool
         # gets user
@@ -131,7 +135,7 @@ class BaseCommands(commands.Cog):
         if verified is None:
             user_nations = "*None*"
         else:
-            user_nations = (f", [{verified['main_nation']}](https://www.nationstates.net/nation="
+            user_nations = (f"[{verified['main_nation']}](https://www.nationstates.net/nation="
                             f"{self.sanitize_links_underscore(verified['main_nation'])})")
         # defines roles
         all_roles = user.roles[1:]
@@ -139,7 +143,7 @@ class BaseCommands(commands.Cog):
         user_roles = ', '.join(role_names[::-1])
         # creates embed
         user_embed = discord.Embed(title=f"{user.display_name}", description=f"Information about server member "
-                                                                             f"{user.name}#{user.discriminator}\n"
+                                                                             f"{user.name}\n"
                                                                              f"User ID: {user.id}.", color=user.color)
         user_embed.set_thumbnail(url=user.display_avatar.url)
         user_embed.add_field(name="Joined Discord", value=f"{user.created_at.strftime('%d %B %Y')}")
