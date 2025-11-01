@@ -79,7 +79,7 @@ class ShardErrorHandler(commands.Cog):
             # define command
             command_name = ctx.command.qualified_name or "No command name recognized."
             await ctx.send("An error occurred. Check the logs.")
-            self.logger.exception(msg=f"Unhandled error in command: {command_name}")
+            self.logger.exception(msg=f"Unhandled error in command: {command_name}", exc_info=error)
 
 
     @commands.Cog.listener()
@@ -106,7 +106,7 @@ class ShardErrorHandler(commands.Cog):
                                                     "or are blocked from using this command.", ephemeral=True)
         else:
             await interaction.channel.send(f"An error occurred. Check the logs.")
-            self.logger.exception(msg=f"Unhandled error in command: {command_name}")
+            self.logger.exception(msg=f"Unhandled error in command: {command_name}", exc_info=error)
 
     @commands.Cog.listener()
     async def on_error(self, event: str, error: Exception):
