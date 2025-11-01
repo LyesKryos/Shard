@@ -11,9 +11,6 @@ import os
 from cogs import EXTENSIONS
 from customchecks import SilentFail
 
-class ProfileFlags(commands.FlagConverter):
-    member: discord.Member = commands.flag(description="The member to pull information about.")
-
 
 class BaseCommands(commands.Cog):
 
@@ -119,7 +116,7 @@ class BaseCommands(commands.Cog):
     @commands.hybrid_command(name="profile", with_app_command=True,
                              description="Pulls up Discord account information about a specified user.")
     @commands.guild_only()
-    async def profile(self, ctx, *, user: Optional[discord.Member] = None, flags=ProfileFlags):
+    async def profile(self, ctx, *, user: Optional[discord.Member] = None):
         # establishes connection
         conn = self.bot.pool
         # gets user
