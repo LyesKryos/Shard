@@ -122,14 +122,11 @@ class BaseCommands(commands.Cog):
     @commands.hybrid_command(name="profile", with_app_command=True,
                              description="Pulls up Discord account information about a specified user.")
     @commands.guild_only()
-    async def profile(self, ctx, *, flags: ProfileFlags):
+    async def profile(self, ctx, *, user: typing.Optional[discord.Member] = None, flags: ProfileFlags):
         # establishes connection
         conn = self.bot.pool
         # gets user
-        if args is None:
-            user = ctx.author
-        else:
-            user = await commands.converter.MemberConverter().convert(ctx, args)
+        user = user or ctx.author
         # fetches nation information
         verified = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''', user.id)
         if verified is None:

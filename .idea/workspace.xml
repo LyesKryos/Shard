@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing embargo issue">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating profile command to hybrid">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/base.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
@@ -475,7 +475,8 @@
       <workItem from="1761858147376" duration="9674000" />
       <workItem from="1761910528623" duration="703000" />
       <workItem from="1761947021964" duration="4358000" />
-      <workItem from="1761996463047" duration="3102000" />
+      <workItem from="1761996463047" duration="3945000" />
+      <workItem from="1762024475737" duration="336000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -820,7 +821,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1221" />
+    <option name="localTasksCounter" value="1223" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -838,8 +839,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Error troubleshootings" />
-    <MESSAGE value="Fixing error logging" />
     <MESSAGE value="Troubleshooting bot non-functioning" />
     <MESSAGE value="Updating CNC moduling system" />
     <MESSAGE value="Updating error catching system and ensuring up to date importing" />
@@ -863,7 +862,9 @@
     <MESSAGE value="Error logging" />
     <MESSAGE value="War parsing solution" />
     <MESSAGE value="Fixing embargo issue" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing embargo issue" />
+    <MESSAGE value="Updating profile command" />
+    <MESSAGE value="Updating profile command to hybrid" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updating profile command to hybrid" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
