@@ -114,7 +114,8 @@ class BaseCommands(commands.Cog):
         await msg.add_reaction("↔")
 
     @commands.hybrid_command(name="profile", with_app_command=True,
-                             description="Pulls up Discord account information about a specified user.")
+                             description="Pulls up Discord account information about a specified user.",
+                             aliases=['p'])
     @commands.guild_only()
     async def profile(self, ctx, *, user: Optional[discord.Member] = None):
         # establishes connection
