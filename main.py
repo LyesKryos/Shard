@@ -37,7 +37,7 @@ def main(bot: Shard):
 
     # handle any async exceptions
     # get the event loop
-    loop = asyncio.get_running_loop()
+    loop = asyncio.get_event_loop()
     def handle_async_exception(loop, context):
         # from the context, get the exception
         msg = context.get("exception") or context.get("message", "No message provided")
