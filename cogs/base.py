@@ -3,14 +3,11 @@ import logging
 import re
 import traceback
 from typing import Optional
-
 import discord
 from discord import app_commands
-
 from ShardBot import Shard
 from discord.ext import commands
 import os
-
 from cogs import EXTENSIONS
 from customchecks import SilentFail
 
@@ -122,7 +119,7 @@ class BaseCommands(commands.Cog):
     @commands.hybrid_command(name="profile", with_app_command=True,
                              description="Pulls up Discord account information about a specified user.")
     @commands.guild_only()
-    async def profile(self, ctx, *, user: typing.Optional[discord.Member] = None, flags: ProfileFlags):
+    async def profile(self, ctx, *, user: Optional[discord.Member] = None, flags: ProfileFlags):
         # establishes connection
         conn = self.bot.pool
         # gets user
