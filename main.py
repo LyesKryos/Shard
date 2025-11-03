@@ -17,15 +17,19 @@ def main(bot: Shard):
     handler.setLevel(logging.DEBUG)
     # set up the configuration if there is not already a handler running
     if not logging.getLogger().handlers:
-        logging.basicConfig(level=logging.DEBUG, handlers=[handler])
+        logging.basicConfig(level=logging.DEBUG, handlers=[handler], force=True)
     # define the logger
     logger = logging.getLogger("bot")
+    # add a stream handler
+    stream = logging.StreamHandler(sys.stdout)
+    stream.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
+    logger.addHandler(stream)
     # ensure the logger is initialized
     logger.debug("Logging initialized successfully")
 
     # handle any uncaught exceptions
     def handle_exception(exc_type, exc_value, exc_traceback):
-        # catch the class of the rror, the value of the exception, and the traceback object
+        # catch the class of the error, the value of the exception, and the traceback object
         # if it is a normal interrupt, leave alone
         if issubclass(exc_type, KeyboardInterrupt):
             sys.__excepthook__(exc_type, exc_value, exc_traceback)
