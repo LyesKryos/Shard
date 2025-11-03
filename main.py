@@ -5,6 +5,7 @@ import atexit
 import logging
 import logging.handlers as handlers
 from ShardBot import Shard
+import time
 
 
 # --- GLOBAL LOGGER SETUP ---
@@ -49,13 +50,44 @@ def handle_async_exception(loop, context):
 
 asyncio.get_event_loop().set_exception_handler(handle_async_exception)
 
+async def watchdog_task(bot, interval=60):
+    """
+    A background watchdog that checks if the bot is still alive and responsive.
+    Logs any disconnections or slowdowns.
+    """
+    last_heartbeat = time.monotonic()
+
+    # Monkey-patch the bot's internal heartbeat event (for more precise tracking)
+    async def heartbeat_listener(latency):
+        nonlocal last_heartbeat
+        last_heartbeat = time.monotonic()
+
+    bot.add_listener(heartbeat_listener, "on_socket_response")
+
+    while True:
+        await asyncio.sleep(interval)
+        now = time.monotonic()
+
+        # Log if bot has gone silent for too long
+        silence = now - last_heartbeat
+        if bot.is_closed():
+            logger.critical(f"Watchdog: Bot appears disconnected (is_closed=True). Last heartbeat {silence:.0f}s ago.")
+        elif not bot.is_ready():
+            logger.warning(f"Watchdog: Bot not ready. Last heartbeat {silence:.0f}s ago.")
+        elif silence > interval * 3:
+            logger.error(f"Watchdog: No Discord heartbeat in {silence:.0f}s — possible freeze or lost connection.")
+        else:
+            continue
 
 # --- MAIN BOT EXECUTION ---
 
 def main(bot: Shard):
     try:
-        token_raw = json.load(open("config.json"))
+        with open("config.json") as f:
+            token_raw = json.load(f)
         token = token_raw["token"]
+        loop = asyncio.get_event_loop()
+        loop.create_task(watchdog_task(bot))
     except Exception:
         logger.exception("Failed to load token from config.json.")
         sys.exit(1)
