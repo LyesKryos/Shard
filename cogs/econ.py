@@ -1080,316 +1080,316 @@ class Economy(commands.Cog):
     # creates rbt command group
     rbt = app_commands.Group(name="rbt", description="...")
 
-    async def bank_updating(self):
-        try:
-            # wait for bot to be ready
-            await self.bot.wait_until_ready()
-            # define crash channel
-            crashchannel = self.bot.get_channel(835579413625569322)
-            # define bank channel
-            bankchannel = self.bot.get_channel(855155865023021066)
-            # set timezone
-            eastern = timezone('US/Eastern')
-            while True:
-                # define now
-                now = datetime.now(eastern)
-                # sets the time to be midnight the next day
-                next_run = now.replace(hour=0, minute=0, second=0)
-                next_run += timedelta(days=1)
-                # sends the next runtime
-                self.bot.system_message += (f"From econ.py: Bank update waiting until "
-                                        f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}\n")
-                # sleeps until runtime
-                await discord.utils.sleep_until(next_run)
-                # establish connection
-                conn = self.bot.pool
-                # GENERAL FUND CHECKS
-                # check general fund for minting/refund
-                general_fund = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'General Fund';''')
-                current_fund = float(general_fund['current_funds'])
-                fund_limit = float(general_fund['fund_limit'])
-                # if the general fund is near/overdrawn
-                if current_fund <= (.10 * fund_limit):
-                    # set new fund to 150% of old fund
-                    new_limit = fund_limit * 1.5
-                    additional_funds = fund_limit * .5
-                    # update all market items in the general and minecraft market to increase by 25%
-                    await conn.execute('''UPDATE rbt_market SET value = value * 1.25 
-                    WHERE market != 'open' AND name = 'Wallet Expansion';''')
-                    # update funds
-                    await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = current_funds + $2 
-                            WHERE name = 'General Fund';''', new_limit, additional_funds)
-                # if the general fund is overfunded
-                if current_fund > fund_limit:
-                    # ensure the general fund is more than 500,000 thaler
-                    if fund_limit > 500000:
-                        # set the new fund limit to 50%
-                        new_limit = fund_limit * .5
-                        # calculate refund and new current funds
-                        new_funds = fund_limit * .25
-                        refund = current_fund - fund_limit
-                        await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = $2 
-                                WHERE name = 'General Fund';''', new_limit, new_funds)
-                        # count the number of investors
-                        investor_count = await conn.fetchrow('''SELECT COUNT(user_id) 
-                                FROM bank_ledger WHERE type = 'investment';''')
-                        # calculate how much each investor will receive
-                        investor_cut = (refund * .25) / investor_count['count']
-                        # count the number of premium members
-                        premium_count = await conn.fetchrow('''SELECT COUNT(user_id) 
-                                FROM rbt_users WHERE premium_user = TRUE AND suspended = FALSE;''')
-                        # calculate how much each premium user will receive
-                        premium_cut = (refund * .25) / premium_count['count']
-                        # count the number of recruiters who have sent more than 100 TGs this month
-                        sender_count = await conn.fetchrow('''SELECT COUNT(user_id) 
-                                FROM recruitment WHERE sent_this_month > 100;''')
-                        # calculate sender cut
-                        sender_cut = (refund * .25) / sender_count['count']
-                        # count the number of registered members
-                        member_count = await conn.fetchrow('''SELECT COUNT(user_id) 
-                                FROM rbt_users WHERE suspended = FALSE;''')
-                        # calculate the member cut
-                        member_cut = (refund * .25) / member_count['count']
-                        # credit premium group
-                        await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
-                                WHERE premium_user = TRUE AND suspended = FALSE;''', premium_cut)
-                        # credit member group
-                        await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
-                                WHERE suspended = FALSE;''', member_cut)
-                        # credit investor group
-                        investors = await conn.fetch('''SELECT * FROM bank_ledger WHERE type = 'investment';''')
-                        for investor in investors:
-                            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2
-                                    AND suspended = FALSE;''', investor_cut, investor['user_id'])
-                        # credit sender group
-                        senders = await conn.fetch('''SELECT user_id FROM recruitment WHERE sent_this_month > 100;''')
-                        for sender in senders:
-                            await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2
-                                                    AND suspended = FALSE;''', sender_cut, sender['user_id'])
-                        self.announcement += "***The Royal Bank of Thegye has issued a general refund!***"
-                # INVESTMENT/LOAN UPDATES
-                # fetch sum of all investments
-                investment_sum_raw = await conn.fetchrow('''SELECT SUM(amount) FROM bank_ledger 
-                WHERE type = 'investment';''')
-                if investment_sum_raw['sum'] is None:
-                    investment_sum = 0
-                else:
-                    investment_sum = investment_sum_raw['sum']
-                # increase investments by 2% for investors
-                await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'investment';''')
-                # increase investment fund by 2%
-                await conn.execute(
-                    '''UPDATE funds SET current_funds = current_funds * 1.02 WHERE name = 'Investment Fund';''')
-                # pay 6% dividend to general fund
-                await conn.execute(
-                    '''UPDATE funds SET current_funds = current_funds + $1 WHERE name = 'General Fund';''',
-                    (investment_sum * .06))
-                # increase loan by interest rate
-                await conn.execute('''UPDATE bank_ledger SET amount = amount * (1+(interest/100)) 
-                WHERE type = 'loan';''')
-                # LOANS DUE
-                today = datetime.now()
-                loans_due = await conn.fetch('''SELECT * FROM bank_ledger WHERE due_date < $1 AND type = 'loan';''',
-                                             today)
-                # for all the loans in due, reposes thaler or default
-                for loan in loans_due:
-                    amount = loan['amount']
-                    borrower = loan['user_id']
-                    borrower_snowflake = self.bot.get_user(borrower)
-                    # fetch borrower information
-                    borrower_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', borrower)
-                    # if the user does not have enough thaler in their funds, increase loan by 35%
-                    if borrower_info['funds'] < amount:
-                        await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.35, due_date = $2 
-                        WHERE account_id = $1;''', loan['account_id'], today + timedelta(days=14))
-                        # create and send user a DM
-                        await borrower_snowflake.send(f"This is your official notice from the Royal Bank of Thegye "
-                                                      f"that you have defaulted on your loan account "
-                                                      f"(ID: {loan['account_id']}. This loan has been increased by 35% "
-                                                      f"in lieu of payment and will become due two weeks from today.")
-                        continue
-                    else:
-                        # remove funds from user
-                        await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
-                                           amount, borrower)
-                        # add funds to investment fund
-                        await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
-                        WHERE name = 'Investment Fund';''', amount)
-                        # remove loan account
-                        await conn.execute('''DELETE FROM bank_ledger WHERE account_id = $1;''', loan['account_id'])
-                        # log action
-                        await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                           borrower, 'bank', f"Loan account #{loan['account_id']} automatically "
-                                                             f"repaid by {borrower_snowflake.name}#"
-                                                             f"{borrower_snowflake.discriminator}.")
-                        continue
-                # payroll
-                thegye = self.bot.get_guild(674259612580446230)
-                official_role = thegye.get_role(674278988323225632)
-                for official in official_role.members:
-                    if datetime.now().weekday() <= 5:
-                        await conn.execute('''UPDATE rbt_users SET funds = funds + 20 WHERE user_id = $1;''',
-                                           official.id)
-                        await conn.execute(
-                            '''UPDATE funds SET current_funds = current_funds - 20 WHERE name = 'General Fund';''')
-                        await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
-                                           official.id, 'bank', f"Payroll {self.thaler}20.")
-                await bankchannel.send("Royal Bank of Thegye updated.")
-                continue
-        except Exception as error:
-            self.logger.exception(error)
+    # async def bank_updating(self):
+    #     try:
+    #         # wait for bot to be ready
+    #         await self.bot.wait_until_ready()
+    #         # define crash channel
+    #         crashchannel = self.bot.get_channel(835579413625569322)
+    #         # define bank channel
+    #         bankchannel = self.bot.get_channel(855155865023021066)
+    #         # set timezone
+    #         eastern = timezone('US/Eastern')
+    #         while True:
+    #             # define now
+    #             now = datetime.now(eastern)
+    #             # sets the time to be midnight the next day
+    #             next_run = now.replace(hour=0, minute=0, second=0)
+    #             next_run += timedelta(days=1)
+    #             # sends the next runtime
+    #             self.bot.system_message += (f"From econ.py: Bank update waiting until "
+    #                                     f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}\n")
+    #             # sleeps until runtime
+    #             await discord.utils.sleep_until(next_run)
+    #             # establish connection
+    #             conn = self.bot.pool
+    #             # GENERAL FUND CHECKS
+    #             # check general fund for minting/refund
+    #             general_fund = await conn.fetchrow('''SELECT * FROM funds WHERE name = 'General Fund';''')
+    #             current_fund = float(general_fund['current_funds'])
+    #             fund_limit = float(general_fund['fund_limit'])
+    #             # if the general fund is near/overdrawn
+    #             if current_fund <= (.10 * fund_limit):
+    #                 # set new fund to 150% of old fund
+    #                 new_limit = fund_limit * 1.5
+    #                 additional_funds = fund_limit * .5
+    #                 # update all market items in the general and minecraft market to increase by 25%
+    #                 await conn.execute('''UPDATE rbt_market SET value = value * 1.25 
+    #                 WHERE market != 'open' AND name = 'Wallet Expansion';''')
+    #                 # update funds
+    #                 await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = current_funds + $2 
+    #                         WHERE name = 'General Fund';''', new_limit, additional_funds)
+    #             # if the general fund is overfunded
+    #             if current_fund > fund_limit:
+    #                 # ensure the general fund is more than 500,000 thaler
+    #                 if fund_limit > 500000:
+    #                     # set the new fund limit to 50%
+    #                     new_limit = fund_limit * .5
+    #                     # calculate refund and new current funds
+    #                     new_funds = fund_limit * .25
+    #                     refund = current_fund - fund_limit
+    #                     await conn.execute('''UPDATE funds SET fund_limit = $1, current_funds = $2 
+    #                             WHERE name = 'General Fund';''', new_limit, new_funds)
+    #                     # count the number of investors
+    #                     investor_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+    #                             FROM bank_ledger WHERE type = 'investment';''')
+    #                     # calculate how much each investor will receive
+    #                     investor_cut = (refund * .25) / investor_count['count']
+    #                     # count the number of premium members
+    #                     premium_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+    #                             FROM rbt_users WHERE premium_user = TRUE AND suspended = FALSE;''')
+    #                     # calculate how much each premium user will receive
+    #                     premium_cut = (refund * .25) / premium_count['count']
+    #                     # count the number of recruiters who have sent more than 100 TGs this month
+    #                     sender_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+    #                             FROM recruitment WHERE sent_this_month > 100;''')
+    #                     # calculate sender cut
+    #                     sender_cut = (refund * .25) / sender_count['count']
+    #                     # count the number of registered members
+    #                     member_count = await conn.fetchrow('''SELECT COUNT(user_id) 
+    #                             FROM rbt_users WHERE suspended = FALSE;''')
+    #                     # calculate the member cut
+    #                     member_cut = (refund * .25) / member_count['count']
+    #                     # credit premium group
+    #                     await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
+    #                             WHERE premium_user = TRUE AND suspended = FALSE;''', premium_cut)
+    #                     # credit member group
+    #                     await conn.execute('''UPDATE rbt_users SET funds = funds + $1 
+    #                             WHERE suspended = FALSE;''', member_cut)
+    #                     # credit investor group
+    #                     investors = await conn.fetch('''SELECT * FROM bank_ledger WHERE type = 'investment';''')
+    #                     for investor in investors:
+    #                         await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2
+    #                                 AND suspended = FALSE;''', investor_cut, investor['user_id'])
+    #                     # credit sender group
+    #                     senders = await conn.fetch('''SELECT user_id FROM recruitment WHERE sent_this_month > 100;''')
+    #                     for sender in senders:
+    #                         await conn.execute('''UPDATE rbt_users SET funds = funds + $1 WHERE user_id = $2
+    #                                                 AND suspended = FALSE;''', sender_cut, sender['user_id'])
+    #                     self.announcement += "***The Royal Bank of Thegye has issued a general refund!***"
+    #             # INVESTMENT/LOAN UPDATES
+    #             # fetch sum of all investments
+    #             investment_sum_raw = await conn.fetchrow('''SELECT SUM(amount) FROM bank_ledger 
+    #             WHERE type = 'investment';''')
+    #             if investment_sum_raw['sum'] is None:
+    #                 investment_sum = 0
+    #             else:
+    #                 investment_sum = investment_sum_raw['sum']
+    #             # increase investments by 2% for investors
+    #             await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.02 WHERE type = 'investment';''')
+    #             # increase investment fund by 2%
+    #             await conn.execute(
+    #                 '''UPDATE funds SET current_funds = current_funds * 1.02 WHERE name = 'Investment Fund';''')
+    #             # pay 6% dividend to general fund
+    #             await conn.execute(
+    #                 '''UPDATE funds SET current_funds = current_funds + $1 WHERE name = 'General Fund';''',
+    #                 (investment_sum * .06))
+    #             # increase loan by interest rate
+    #             await conn.execute('''UPDATE bank_ledger SET amount = amount * (1+(interest/100)) 
+    #             WHERE type = 'loan';''')
+    #             # LOANS DUE
+    #             today = datetime.now()
+    #             loans_due = await conn.fetch('''SELECT * FROM bank_ledger WHERE due_date < $1 AND type = 'loan';''',
+    #                                          today)
+    #             # for all the loans in due, reposes thaler or default
+    #             for loan in loans_due:
+    #                 amount = loan['amount']
+    #                 borrower = loan['user_id']
+    #                 borrower_snowflake = self.bot.get_user(borrower)
+    #                 # fetch borrower information
+    #                 borrower_info = await conn.fetchrow('''SELECT * FROM rbt_users WHERE user_id = $1;''', borrower)
+    #                 # if the user does not have enough thaler in their funds, increase loan by 35%
+    #                 if borrower_info['funds'] < amount:
+    #                     await conn.execute('''UPDATE bank_ledger SET amount = amount * 1.35, due_date = $2 
+    #                     WHERE account_id = $1;''', loan['account_id'], today + timedelta(days=14))
+    #                     # create and send user a DM
+    #                     await borrower_snowflake.send(f"This is your official notice from the Royal Bank of Thegye "
+    #                                                   f"that you have defaulted on your loan account "
+    #                                                   f"(ID: {loan['account_id']}. This loan has been increased by 35% "
+    #                                                   f"in lieu of payment and will become due two weeks from today.")
+    #                     continue
+    #                 else:
+    #                     # remove funds from user
+    #                     await conn.execute('''UPDATE rbt_users SET funds = funds - $1 WHERE user_id = $2;''',
+    #                                        amount, borrower)
+    #                     # add funds to investment fund
+    #                     await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
+    #                     WHERE name = 'Investment Fund';''', amount)
+    #                     # remove loan account
+    #                     await conn.execute('''DELETE FROM bank_ledger WHERE account_id = $1;''', loan['account_id'])
+    #                     # log action
+    #                     await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+    #                                        borrower, 'bank', f"Loan account #{loan['account_id']} automatically "
+    #                                                          f"repaid by {borrower_snowflake.name}#"
+    #                                                          f"{borrower_snowflake.discriminator}.")
+    #                     continue
+    #             # payroll
+    #             thegye = self.bot.get_guild(674259612580446230)
+    #             official_role = thegye.get_role(674278988323225632)
+    #             for official in official_role.members:
+    #                 if datetime.now().weekday() <= 5:
+    #                     await conn.execute('''UPDATE rbt_users SET funds = funds + 20 WHERE user_id = $1;''',
+    #                                        official.id)
+    #                     await conn.execute(
+    #                         '''UPDATE funds SET current_funds = current_funds - 20 WHERE name = 'General Fund';''')
+    #                     await conn.execute('''INSERT INTO rbt_user_log VALUES($1,$2,$3);''',
+    #                                        official.id, 'bank', f"Payroll {self.thaler}20.")
+    #             await bankchannel.send("Royal Bank of Thegye updated.")
+    #             continue
+    #     except Exception as error:
+    #         self.logger.exception(error)
 
-    async def market_updating(self):
-        try:
-            # wait for bot to be ready
-            await self.bot.wait_until_ready()
-            # define crash channel
-            crashchannel = self.bot.get_channel(835579413625569322)
-            # define bank channel
-            bankchannel = self.bot.get_channel(855155865023021066)
-            # set timezone
-            eastern = timezone('US/Eastern')
-            while True:
-                # define now
-                now = datetime.now(eastern)
-                # set the run to be the next hour
-                next_run = now.replace(minute=0, second=0)
-                next_run += timedelta(hours=1)
-                # sends the next runtime
-                self.bot.system_message += (f"From econ.py: Stock market update waiting until "
-                                        f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}\n")
-                # sleep until then
-                await discord.utils.sleep_until(next_run)
-                # establish connection
-                conn = self.bot.pool
-                # define announcement string
-                new_shares = 0
-                # STOCK MARKET UPDATING
-                # fetch all stock info
-                stocks = await conn.fetch('''SELECT * FROM stocks;''')
-                # for each stock, update information
-                for stock in stocks:
-                    # define trending
-                    trending = "up"
-                    # define value
-                    value = float(stock['value'])
-                    # change chance
-                    change_chance = randint(1, 100)
-                    # calculate trending course if up
-                    if stock['trending'] == "up":
-                        if change_chance <= 25 + (5 * stock['risk']):
-                            trending = "down"
-                        else:
-                            trending = "up"
-                    # calculate trending course if down
-                    elif stock['trending'] == "down":
-                        if change_chance <= 25 + (5 * stock['risk']):
-                            trending = "up"
-                        else:
-                            trending = "down"
-                    # calculation: new_value = value + ((percentage increase + outstanding over issued / 10) * value)
-                    value_roll = uniform(0, 2 + stock['risk'])
-                    # if the trend is up, increase stock based on risk
-                    if trending == "up":
-                        value += round(value_roll + (stock['outstanding'] / stock['issued']), 2)
-                    else:
-                        value -= round(value_roll, 2)
-                        # if the value drops below the floor, set it to be 5 - risk
-                    floor = 15 - uniform(0, stock['risk'])
-                    if value < floor:
-                        value = floor
-                    # if the outstanding shares is between 0 and 500 shares away from the total issued shares,
-                    # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
-                    if stock['issued'] - stock['outstanding'] <= randint(0, 500):
-                        # royal bonds are immune to automatic dilution
-                        if stock['stock_id'] != 9:
-                            new_shares = stock['issued'] / 5
-                            dilution = round(uniform(5 * stock['risk'], 10 * stock['risk']), 2)
-                            value = round(value * (clip(dilution, 0, 23) / 100), 2)
-                            self.announcement += f"{stock['name']} has been diluted. Issued shares have increased to " \
-                                                 f"{new_shares:,.0f}, and the diluted value is now " \
-                                                 f"{self.thaler}{value:,.2f} per share.\n"
-                    # update stock information
-                    await conn.execute('''UPDATE stocks SET value = ROUND($1,2), issued = issued + $2, trending = $3, 
-                    change = ($1/value)-1 WHERE stock_id = $4;''', value, new_shares, trending, stock['stock_id'])
-                # calculate value of stocks
-                stock_sum = await conn.fetchrow('''SELECT SUM(value) FROM stocks;''')
-                # fetch stock count
-                stock_count = await conn.fetchrow('''SELECT COUNT(*) FROM stocks;''')
-                # fetch crash
-                crash = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_crash';''')
-                self.crash = crash['bool']
-                # calculate market crash chance
-                if self.crash is True:
-                    recovery_chance = uniform(1, 100)
-                    if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
-                        recovery_chance += float(stock_sum['sum']) / int(stock_count['count'])
-                    if recovery_chance <= 10:
-                        self.crash = False
-                        await conn.execute('''UPDATE info SET bool = FALSE WHERE name = 'rbt_crash';''')
-                        self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n"
-                    else:
-                        for s in range(1, stock_count['count']+1):
-                            random_down = uniform(1, 5)
-                            await conn.execute('''UPDATE stocks SET value = value - $1, 
-                            change = ((value - $1)/value) -1 , trending = 'down' WHERE stock_id = $2;''',
-                                               random_down, s)
-                        await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
-                        self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
-                                             "All stock values continue to decrease and trend down.\n"
-                else:
-                    crash_chance = uniform(1, 100)
-                    if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
-                        crash_chance -= float(stock_sum['sum']) / int(stock_count['count'])
-                    if crash_chance <= 1:
-                        if self.crash is False:
-                            for s in range(1, stock_count['count']+1):
-                                random_down = uniform(10, 25)
-                                await conn.execute('''UPDATE stocks SET value = value - $1, 
-                                change = ((value - $1)/value)-1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
-                            await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
-                            self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
-                                                 "All stock values are decreased and begun trending down.\n "
-                            await conn.execute('''UPDATE info SET bool = TRUE WHERE name = 'rbt_crash';''')
-                # update stocks' value tracker
-                await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
-                SELECT stock_id, value, trending FROM stocks;''')
-                # unpin old message
-                old_message = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_pinned_message';''')
-                old_message = await bankchannel.fetch_message(old_message['bigint'])
-                await old_message.unpin()
-                # remove users no longer in the server
-                users = await conn.fetch('''SELECT * FROM rbt_users;''')
-                thegye = self.bot.get_guild(674259612580446230)
-                # for every user
-                for u in users:
-                    user_id = u['user_id']
-                    # test to see if they are in the server
-                    try:
-                        thegye.get_member(user_id)
-                    # remove any user not in the server
-                    except AttributeError:
-                        await conn.execute('''DELETE FROM rbt_users WHERE user_id = $1;''', user_id)
-                        try:
-                            await crashchannel.send(f"{self.bot.get_user(user_id)} ({user_id}) has been removed from the "
-                                                    f"RBT system. They were previously worth {u['funds']} thaler.")
-                            await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
-                            WHERE name = 'General Fund';''', u['funds'])
-                        except AttributeError:
-                            await crashchannel.send(f"`deleted user` ({user_id}) has been removed from the "
-                                                    f"RBT system. They were previously worth {u['funds']} thaler.")
-                            await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
-                            WHERE name = 'General Fund';''', u['funds'])
-                # announce
-                new_announcement = await bankchannel.send(content=self.announcement)
-                await new_announcement.pin()
-                await conn.execute('''UPDATE info SET bigint = $1 WHERE name = 'rbt_pinned_message';''',
-                                   new_announcement.id)
-                self.announcement = \
-                    "The Royal Exchange of Thegye has updated. Below is a summary of any important changes:\n"
-                continue
-        except Exception:
-            self.logger.exception("Market updating error")
+    # async def market_updating(self):
+    #     try:
+    #         # wait for bot to be ready
+    #         await self.bot.wait_until_ready()
+    #         # define crash channel
+    #         crashchannel = self.bot.get_channel(835579413625569322)
+    #         # define bank channel
+    #         bankchannel = self.bot.get_channel(855155865023021066)
+    #         # set timezone
+    #         eastern = timezone('US/Eastern')
+    #         while True:
+    #             # define now
+    #             now = datetime.now(eastern)
+    #             # set the run to be the next hour
+    #             next_run = now.replace(minute=0, second=0)
+    #             next_run += timedelta(hours=1)
+    #             # sends the next runtime
+    #             self.bot.system_message += (f"From econ.py: Stock market update waiting until "
+    #                                     f"{next_run.strftime('%d %b %Y at %H:%M %Z%z')}\n")
+    #             # sleep until then
+    #             await discord.utils.sleep_until(next_run)
+    #             # establish connection
+    #             conn = self.bot.pool
+    #             # define announcement string
+    #             new_shares = 0
+    #             # STOCK MARKET UPDATING
+    #             # fetch all stock info
+    #             stocks = await conn.fetch('''SELECT * FROM stocks;''')
+    #             # for each stock, update information
+    #             for stock in stocks:
+    #                 # define trending
+    #                 trending = "up"
+    #                 # define value
+    #                 value = float(stock['value'])
+    #                 # change chance
+    #                 change_chance = randint(1, 100)
+    #                 # calculate trending course if up
+    #                 if stock['trending'] == "up":
+    #                     if change_chance <= 25 + (5 * stock['risk']):
+    #                         trending = "down"
+    #                     else:
+    #                         trending = "up"
+    #                 # calculate trending course if down
+    #                 elif stock['trending'] == "down":
+    #                     if change_chance <= 25 + (5 * stock['risk']):
+    #                         trending = "up"
+    #                     else:
+    #                         trending = "down"
+    #                 # calculation: new_value = value + ((percentage increase + outstanding over issued / 10) * value)
+    #                 value_roll = uniform(0, 2 + stock['risk'])
+    #                 # if the trend is up, increase stock based on risk
+    #                 if trending == "up":
+    #                     value += round(value_roll + (stock['outstanding'] / stock['issued']), 2)
+    #                 else:
+    #                     value -= round(value_roll, 2)
+    #                     # if the value drops below the floor, set it to be 5 - risk
+    #                 floor = 15 - uniform(0, stock['risk'])
+    #                 if value < floor:
+    #                     value = floor
+    #                 # if the outstanding shares is between 0 and 500 shares away from the total issued shares,
+    #                 # increase by half and dilute by (5 * risk to 10 * risk)% capped at 23%
+    #                 if stock['issued'] - stock['outstanding'] <= randint(0, 500):
+    #                     # royal bonds are immune to automatic dilution
+    #                     if stock['stock_id'] != 9:
+    #                         new_shares = stock['issued'] / 5
+    #                         dilution = round(uniform(5 * stock['risk'], 10 * stock['risk']), 2)
+    #                         value = round(value * (clip(dilution, 0, 23) / 100), 2)
+    #                         self.announcement += f"{stock['name']} has been diluted. Issued shares have increased to " \
+    #                                              f"{new_shares:,.0f}, and the diluted value is now " \
+    #                                              f"{self.thaler}{value:,.2f} per share.\n"
+    #                 # update stock information
+    #                 await conn.execute('''UPDATE stocks SET value = ROUND($1,2), issued = issued + $2, trending = $3, 
+    #                 change = ($1/value)-1 WHERE stock_id = $4;''', value, new_shares, trending, stock['stock_id'])
+    #             # calculate value of stocks
+    #             stock_sum = await conn.fetchrow('''SELECT SUM(value) FROM stocks;''')
+    #             # fetch stock count
+    #             stock_count = await conn.fetchrow('''SELECT COUNT(*) FROM stocks;''')
+    #             # fetch crash
+    #             crash = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_crash';''')
+    #             self.crash = crash['bool']
+    #             # calculate market crash chance
+    #             if self.crash is True:
+    #                 recovery_chance = uniform(1, 100)
+    #                 if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
+    #                     recovery_chance += float(stock_sum['sum']) / int(stock_count['count'])
+    #                 if recovery_chance <= 10:
+    #                     self.crash = False
+    #                     await conn.execute('''UPDATE info SET bool = FALSE WHERE name = 'rbt_crash';''')
+    #                     self.announcement += "The Royal Bank of Thegye announces the end of the **Exchange Crash**.\n"
+    #                 else:
+    #                     for s in range(1, stock_count['count']+1):
+    #                         random_down = uniform(1, 5)
+    #                         await conn.execute('''UPDATE stocks SET value = value - $1, 
+    #                         change = ((value - $1)/value) -1 , trending = 'down' WHERE stock_id = $2;''',
+    #                                            random_down, s)
+    #                     await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
+    #                     self.announcement += "The Royal Bank of Thegye is observing an **Exchange Crash**. " \
+    #                                          "All stock values continue to decrease and trend down.\n"
+    #             else:
+    #                 crash_chance = uniform(1, 100)
+    #                 if stock_sum['sum'] / stock_count['count'] > 15 + stock_count['count']:
+    #                     crash_chance -= float(stock_sum['sum']) / int(stock_count['count'])
+    #                 if crash_chance <= 1:
+    #                     if self.crash is False:
+    #                         for s in range(1, stock_count['count']+1):
+    #                             random_down = uniform(10, 25)
+    #                             await conn.execute('''UPDATE stocks SET value = value - $1, 
+    #                             change = ((value - $1)/value)-1, trending = 'down' WHERE stock_id = $2;''', random_down, s)
+    #                         await conn.execute('''UPDATE stocks SET value = (RANDOM()*(6-4)+4)-risk WHERE value < 6;''')
+    #                         self.announcement += "The Royal Bank of Thegye has observed an **Exchange Crash**. " \
+    #                                              "All stock values are decreased and begun trending down.\n "
+    #                         await conn.execute('''UPDATE info SET bool = TRUE WHERE name = 'rbt_crash';''')
+    #             # update stocks' value tracker
+    #             await conn.execute('''INSERT INTO exchange_log(stock_id, value, trend)
+    #             SELECT stock_id, value, trending FROM stocks;''')
+    #             # unpin old message
+    #             old_message = await conn.fetchrow('''SELECT * FROM info WHERE name = 'rbt_pinned_message';''')
+    #             old_message = await bankchannel.fetch_message(old_message['bigint'])
+    #             await old_message.unpin()
+    #             # remove users no longer in the server
+    #             users = await conn.fetch('''SELECT * FROM rbt_users;''')
+    #             thegye = self.bot.get_guild(674259612580446230)
+    #             # for every user
+    #             for u in users:
+    #                 user_id = u['user_id']
+    #                 # test to see if they are in the server
+    #                 try:
+    #                     thegye.get_member(user_id)
+    #                 # remove any user not in the server
+    #                 except AttributeError:
+    #                     await conn.execute('''DELETE FROM rbt_users WHERE user_id = $1;''', user_id)
+    #                     try:
+    #                         await crashchannel.send(f"{self.bot.get_user(user_id)} ({user_id}) has been removed from the "
+    #                                                 f"RBT system. They were previously worth {u['funds']} thaler.")
+    #                         await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
+    #                         WHERE name = 'General Fund';''', u['funds'])
+    #                     except AttributeError:
+    #                         await crashchannel.send(f"`deleted user` ({user_id}) has been removed from the "
+    #                                                 f"RBT system. They were previously worth {u['funds']} thaler.")
+    #                         await conn.execute('''UPDATE funds SET current_funds = current_funds + $1 
+    #                         WHERE name = 'General Fund';''', u['funds'])
+    #             # announce
+    #             new_announcement = await bankchannel.send(content=self.announcement)
+    #             await new_announcement.pin()
+    #             await conn.execute('''UPDATE info SET bigint = $1 WHERE name = 'rbt_pinned_message';''',
+    #                                new_announcement.id)
+    #             self.announcement = \
+    #                 "The Royal Exchange of Thegye has updated. Below is a summary of any important changes:\n"
+    #             continue
+    #     except Exception:
+    #         self.logger.exception("Market updating error")
 
     @rbt.command(name="register", description="Registers a new member of the Royal Bank of Thegye.")
     async def register(self, interaction: discord.Interaction):
