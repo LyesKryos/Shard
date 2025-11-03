@@ -87,7 +87,9 @@ def main(bot: Shard):
             token_raw = json.load(f)
         token = token_raw["token"]
         loop = asyncio.get_event_loop()
-        loop.create_task(watchdog_task(bot))
+        watchdog_main_task = loop.create_task(watchdog_task(bot))
+        watchdog_main_task.add_done_callback(lambda t: logger.exception("Watchdog task ended unexpectedly", exc_info=t.exception()))
+    
     except Exception:
         logger.exception("Failed to load token from config.json.")
         sys.exit(1)
