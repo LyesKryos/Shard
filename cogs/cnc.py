@@ -13,14 +13,53 @@ import math
 from customchecks import SilentFail
 
 
+async def safe_dm(bot: discord.Client, user_id: int, *, content: str | None = None,
+                  embed: discord.Embed | None = None, fallback_channel_id: int = 927288304301387816) -> bool:
+    """Attempt to DM a user. On failure, warn them in a public fallback channel.
+    Returns True if DM sent, False otherwise.
+    """
+    try:
+        user = bot.get_user(user_id) or await bot.fetch_user(user_id)
+    except Exception:
+        user = None
+    if user is None:
+        # cannot resolve user; warn in fallback
+        channel = bot.get_channel(fallback_channel_id)
+        if channel:
+            await channel.send(f"<@{user_id}>, I was unable to send you a DM (couldn't resolve your user). Please enable DMs and try again.")
+        return False
+    try:
+        if embed is not None and content is not None:
+            await user.send(content=content, embed=embed)
+        elif embed is not None:
+            await user.send(embed=embed)
+        else:
+            await user.send(content or "")
+        return True
+    except (discord.Forbidden, discord.HTTPException):
+        channel = bot.get_channel(fallback_channel_id)
+        if channel:
+            await channel.send(f"<@{user_id}>, I was unable to send an important Command & Conquest notification to you! Be sure you permit DMs from me.")
+        return False
+
+
 def plus_minus(number: int) -> str:
     """Adds a plus and minus to a number, turning it into a string."""
-    if not isinstance(number, int):
-        raise TypeError
     if number >= 0:
         return str(f"+{number}")
     elif number < 0:
         return str(f"-{number}")
+
+def ordinal_suffix(number: int) -> str:
+    """
+    Adds an ordinal suffix to an integer, turning it into a string.
+    """
+    # set the number differentiation
+    if 10 <= number % 100 <= 20:
+        suffix = "nth"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    return f"{number}{suffix}"
 
 
 async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> discord.Embed:
@@ -2773,9 +2812,10 @@ class HostileDiplomaticActions(discord.ui.View):
             return await interaction.followup.send(
                 "Nations with Postcolonial Anarchy cannot accept diplomatic relations "
                 "with any non-Equalist or non-Anarchic nations.")
-        elif self.recipient_info['govt_subtype'] in ["Primivitist", "Radical"]:
-            return await interaction.followup.send("Nations with Primitivist or Radical Anarchy cannot take "
-                                                   "any diplomatic actions.")
+        elif self.recipient_info['govt_subtype'] in ["Primivitist", "Radical", "Authoritarian"]:
+            return await interaction.followup.send(f"{self.recipient_info['govt_subtype']} "
+                                                   f"{self.recipient_info['govt_type']} nations cannot receive "
+                                                   f"diplomatic relations.")
         # if either nation is pacificistic, it cannot participate in anything but diplomatic relations
         if "Pacifistic" in [self.recipient_info['govt_subtype'], self.recipient_info['govt_type']]:
             return await interaction.followup.send("Nations with the Pacifistic Anarchy ideology cannot use any "
@@ -2845,7 +2885,7 @@ class HostileDiplomaticActions(discord.ui.View):
             button.disabled = True
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"Hostile actions cannot be performed while {user_info['name']} "
-                                                   f"maintains coooperative relations or awaits responses to "
+                                                   f"maintains cooperative relations or awaits responses to "
                                                    f"cooperative relations requests.")
         # if all the checks pass, add the embargo
         await self.conn.execute('''INSERT INTO cnc_embargoes
@@ -2859,6 +2899,79 @@ class HostileDiplomaticActions(discord.ui.View):
         # return to menu
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=diplo_menu)
+
+    @discord.ui.button(label="War", style=discord.ButtonStyle.grey, emoji="\U00002694")
+    async def war(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # pull user info
+        user_info = await user_db_info(interaction.user.id, self.conn)
+        # create the recipient user
+        recipient_user = self.bot.get_user(self.recipient_info['user_id'])
+        # government type checks
+        if user_info["govt_subtype"] in ["Populist", "Parish", "Radical", "Primitivist", "Pacifistic"]:
+            # if the government subtype disables declarations of war, disable the button and send a message
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"{user_info['govt_subtype']} {user_info['govt_type']} "
+                                                   f"nations may not declare war.")
+        # war declaration cost
+        if recipient_user['govt_type'] == "Equalism":
+            declaration_cost = 0
+        else:
+            declaration_cost = 2
+        # check if the user has enough military authority for the declaration
+        if user_info['mil_auth'] < declaration_cost:
+            # disable the button and send a message
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("You do not have enough Military Authority to declare war.")
+        # check to see if the two nations are already at war
+        war_check = await self.conn.fetchrow('''SELECT * FROM cnc_wars WHERE $1 = ANY(array_cat(attackers, defenders)) 
+                                                                         AND $2 = ANY(array_cat(attackers, defenders));''')
+        if war_check is not None:
+            # disable the button and return a message
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"You are already participating "
+                                                   f"in a war with {recipient_user['name']} and cannot declare war.")
+        # create a base list of CBs available
+        available_cbs = ["Conquest", "Subjugate", "Force Reparations"]
+        # check CBs available by tech
+        if "Ideological Crusade" in user_info['techs']:
+            available_cbs.append("Indoctrinate")
+        if "National Humiliation" in user_info['techs']:
+            available_cbs.append("Humiliate")
+        if "Subjugation" in user_info['techs']:
+            # calculate the average national developments of sender and receiver
+            sender_dev = await self.conn.fetchrow('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1;''',
+                                             user_info['id'])
+            recipient_dev = await self.conn.fetchrow('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1;''',
+                                                     self.recipient_info['id'])
+            # if 50% of the senders dev is larger than the recipient's dev, permit subjugation
+            if recipient_dev['avg'] < sender_dev['avg'] * .5:
+                available_cbs.append("Subjugate")
+        if "Total War" in user_info['techs']:
+            available_cbs.append("Total War")
+        # check to see if the recipient has any puppets
+        overlord_check = await conn.fetch('''SELECT * FROM cnc_users WHERE overlord = $1;''', recipient_user.id)
+        if overlord_check:
+            available_cbs.append("Force Independence")
+        # if the recipient is equalist and the sender is not equalist, add the suppress the revolution CB
+        if (self.recipient_info['govt_type'] == "Equalism") and (user_info['govt_type'] != "Equalism"):
+            available_cbs.append("Suppress the Revolution")
+        # if the recipient is not equalist and the sender is equalist, add the Spread the Revolution CB
+        if (self.recipient_info['govt_type'] != "Equalism") and (user_info['govt_type'] == "Equalism"):
+            available_cbs.append("Spread the Revolution")
+        # if the recipient is the sender's overlord, clear all other options and leave "Rebel Against Overlord"
+        if recipient_user.id == user_info['overlord']:
+            available_cbs.clear()
+            available_cbs = ['Rebel Against Overlord']
+        # add the war declaration view
+        war_view = WarDeclarationView(self.interaction, self.conn, self.user_info,
+                                      self.recipient_info, self.bot, available_cbs)
+        # change the view
+        return await self.interaction.edit_original_response(view=war_view)
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -2892,10 +3005,11 @@ class DiplomaticRelationsRespondView(discord.ui.View):
         await self.conn.execute('''DELETE
                                    FROM cnc_pending_requests
                                    WHERE id = $1;''', self.interaction.message.id)
-        return await sender_user.send(
+        await safe_dm(self.bot, self.sender_info['user_id'], content=(
             f"The {self.recipient_info['pretitle']} of "
             f"{self.recipient_info['name']} has auto-rejected your "
-            f"diplomatic relations request.")
+            f"diplomatic relations request."))
+        return
 
     @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
     async def accept_dr(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -2922,11 +3036,10 @@ class DiplomaticRelationsRespondView(discord.ui.View):
         # confirm with both parties
         await interaction.followup.send(f"{self.recipient_info['name']} has established diplomatic relations with "
                                         f"{self.sender_info['name']}!")
-        # create sender dm
-        sender_user = self.bot.get_user(self.sender_info['user_id'])
-        # send sender confirmation
-        await sender_user.send(content=f"{self.recipient_info['name']} has accepted "
-                                       f"the request for diplomatic relations from {self.sender_info['name']}!")
+        # notify sender via DM (with fallback on failure)
+        await safe_dm(self.bot, self.sender_info['user_id'], content=(
+            f"{self.recipient_info['name']} has accepted "
+            f"the request for diplomatic relations from {self.sender_info['name']}!"))
         # close out the buttons
         return await interaction.edit_original_response(view=None)
 
@@ -2946,14 +3059,12 @@ class DiplomaticRelationsRespondView(discord.ui.View):
         # notify recipient
         await interaction.followup.send(f"{self.recipient_info['name']} has rejected diplomatic relations with "
                                         f"{self.sender_info['name']}!")
-        # create sender dm
-        sender_user = self.bot.get_user(self.sender_info['user_id'])
-        # send sender confirmation
-        await sender_user.send(content=f"{self.recipient_info['name']} has rejected "
-                                       f"the request for diplomatic relations from {self.sender_info['name']}!")
+        # notify sender via DM (with fallback on failure)
+        await safe_dm(self.bot, self.sender_info['user_id'], content=(
+            f"{self.recipient_info['name']} has rejected "
+            f"the request for diplomatic relations from {self.sender_info['name']}!"))
         # close out the buttons
         return await interaction.edit_original_response(view=None)
-
 
 class MilitaryAllianceRespondView(discord.ui.View):
 
@@ -3040,7 +3151,6 @@ class MilitaryAllianceRespondView(discord.ui.View):
         # close out the buttons
         return await interaction.edit_original_response(view=None)
 
-
 class TradePactRespondView(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, sender_info: asyncpg.Record,
@@ -3064,10 +3174,11 @@ class TradePactRespondView(discord.ui.View):
         await self.conn.execute('''DELETE
                                    FROM cnc_pending_requests
                                    WHERE id = $1;''', self.interaction.message.id)
-        return await sender_user.send(
+        await safe_dm(self.bot, self.sender_info['user_id'], content=(
             f"The {self.recipient_info['pretitle']} of "
             f"{self.recipient_info['name']} has auto-rejected your "
-            f"trade pact offer.")
+            f"trade pact offer."))
+        return
 
     @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
     async def accept_tp(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -3094,11 +3205,10 @@ class TradePactRespondView(discord.ui.View):
         # confirm with both parties
         await interaction.followup.send(f"{self.recipient_info['name']} has established a trade pact with "
                                         f"{self.sender_info['name']}!")
-        # create sender dm
-        sender_user = self.bot.get_user(self.sender_info['user_id'])
-        # send sender confirmation
-        await sender_user.send(content=f"{self.recipient_info['name']} has accepted "
-                                       f"the offer of a trade pact with {self.sender_info['name']}!")
+        # notify sender via DM (with fallback on failure)
+        await safe_dm(self.bot, self.sender_info['user_id'], content=(
+            f"{self.recipient_info['name']} has accepted "
+            f"the offer of a trade pact with {self.sender_info['name']}!"))
         # close out the buttons
         return await interaction.edit_original_response(view=None)
 
@@ -3125,6 +3235,119 @@ class TradePactRespondView(discord.ui.View):
                                        f"the offer for a trade pact from {self.sender_info['name']}!")
         # close out the buttons
         return await interaction.edit_original_response(view=None)
+
+class WarDeclarationView(discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool,
+                 sender_info: asyncpg.Record, recipient_info: asyncpg.Record, bot: discord.Client, cbs: list):
+        super().__init__(timeout=180)
+        self.interaction = interaction
+        # add the dropdown
+        cb_options_dropdown = CasusBelliDropdown(interaction, cbs)
+        self.add_item(cb_options_dropdown)
+        # establish the view
+        self.cb_option = None
+        # establish the variables
+        self.conn = conn
+        self.sender_info = sender_info
+        self.recipient_info = recipient_info
+        self.bot = bot
+
+    async def on_timeout(self):
+        # disable the interaction
+        self.stop()
+        # update interaction
+        await self.interaction.followup.send(view=self)
+
+    @discord.ui.button(label="Declare War!", style=discord.ButtonStyle.danger, emoji="\U0001f525")
+    async def declare_war(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # get the cnc channel
+        cnc_channel = await self.bot.get_channel(927288304301387816)
+        # if no option has been selected, send message
+        if self.cb_option is None:
+            return await interaction.followup.send("You have not selected a Casus Belli!")
+        # if an option has been selected, declare the war
+        # pull information about the cb type
+        cb_info = await self.conn.fetchrow('''SELECT * FROM cnc_cbs WHERE name = $1;''', self.cb_option)
+        # define variables
+        cb_war_goals = cb_info['war_goal']
+        cb_prohib_pts = cb_info['prohibited_pts']
+        dynamic_war_name_raw = cb_info['dynamic_war_name']
+        # build simple attacker/defender name lists for storage
+        attackers_names = [self.sender_info['name']]
+        defenders_names = [self.recipient_info['name']]
+        # check if the user has already had a war with this nation with this CB and how many
+        historic_war_check = await self.conn.fetch('''SELECT * FROM cnc_wars 
+                                                      WHERE $1 = ANY(array_cat(attackers, defenders)) 
+                                                        AND $2 = ANY(array_cat(attackers, defenders)) 
+                                                        AND cb = $3;''',
+                                                   self.sender_info['name'],
+                                                   self.recipient_info['name'],
+                                                   self.cb_option)
+        # if there is a historic war, check the number of how many it's been
+        if historic_war_check:
+            # get the number of wars
+            number_of_wars = len(historic_war_check)
+            # pull the ordinal version
+            ordinal_war_number = ordinal_suffix(number_of_wars)
+            dynamic_war_name = dynamic_war_name_raw.replace("#", ordinal_war_number).replace("ATTACKER", self.sender_info['name']).replace("DEFENDER", self.recipient_info['name'])
+        # otherwise, it's the first war
+        else:
+            dynamic_war_name = dynamic_war_name_raw.replace("# ", "").replace("ATTACKER", self.sender_info['name']).replace("DEFENDER", self.recipient_info['name'])
+        # add the war to the db
+        await self.conn.execute('''INSERT INTO cnc_wars(id, attackers, defenders, cb) 
+                                   VALUES ($1, $2, $3, $4);''',
+                                self.interaction.message.id, attackers_names,
+                                defenders_names, self.cb_option)
+        # create the war embed
+        war_embed = discord.Embed(title=f"The {dynamic_war_name}",
+                                  description=f"The hounds of war have been released by "
+                                              f"{self.sender_info['name']} against {self.recipient_info['name']}!",
+                                  color=discord.Color.red())
+        war_embed.set_thumbnail(url="https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png")
+        war_embed.add_field(name="Casus Belli", value=self.cb_option, inline=False)
+        war_embed.add_field(name="War Goal(s)", value=cb_war_goals)
+        war_embed.add_field(name="Prohibited Peace Treaties", value=cb_prohib_pts)
+        war_embed.add_field(name="\u200b", value="\u200b")
+        # notify all parties
+        for uid in (self.sender_info['user_id'], self.recipient_info['user_id']):
+            await safe_dm(self.bot, uid, embed=war_embed)
+        # send the war embed in the public channel
+        await cnc_channel.send(embed=war_embed)
+        # disable the views
+        return await interaction.edit_original_response(view=None)
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
+    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # return to menu
+        diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+        await interaction.edit_original_response(view=diplo_menu)
+
+class CasusBelliDropdown(discord.ui.Select):
+
+    def __init__(self, interaction: discord.Interaction, cbs):
+        self.interaction = interaction
+        # create the options
+        cb_options = []
+        for cb in cbs:
+            cb_options.append(discord.SelectOption(label=cb))
+        # define the super
+        super().__init__(placeholder="Choose a Casus Belli...", min_values=1, max_values=1,
+                         options=cb_options)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.interaction.user.id
+
+    async def callback(self, interaction: discord.Interaction):
+        # pull the selected value
+        self.view.cb_option = self.value[0]
+        # disable and update view
+        self.disabled = True
+        await self.interaction.edit_original_response(view=self.view)
 
 
 class CNC(commands.Cog):
