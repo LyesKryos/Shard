@@ -2939,11 +2939,11 @@ class HostileDiplomaticActions(discord.ui.View):
         # create a base list of CBs available
         available_cbs = ["Conquest", "Subjugate", "Force Reparations"]
         # check CBs available by tech
-        if "Ideological Crusade" in sender_info['techs']:
+        if "Ideological Crusade" in sender_info['tech']:
             available_cbs.append("Indoctrinate")
-        if "National Humiliation" in sender_info['techs']:
+        if "National Humiliation" in sender_info['tech']:
             available_cbs.append("Humiliate")
-        if "Subjugation" in sender_info['techs']:
+        if "Subjugation" in sender_info['tech']:
             # calculate the average national developments of sender and receiver
             sender_dev = await self.conn.fetchrow('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1;''',
                                              sender_info['id'])
@@ -2952,7 +2952,7 @@ class HostileDiplomaticActions(discord.ui.View):
             # if 50% of the senders dev is larger than the recipient's dev, permit subjugation
             if recipient_dev['avg'] < sender_dev['avg'] * .5:
                 available_cbs.append("Subjugate")
-        if "Total War" in sender_info['techs']:
+        if "Total War" in sender_info['tech']:
             available_cbs.append("Total War")
         # check to see if the recipient has any puppets
         overlord_check = await conn.fetch('''SELECT * FROM cnc_users WHERE overlord = $1;''', recipient_user.id)
