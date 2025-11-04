@@ -302,7 +302,6 @@ class VerificationDropdown(discord.ui.Select):
         except Exception:
            logging.getLogger(__name__).exception("Verification dropdown error")
 
-
 class Verification(commands.Cog):
 
     def __init__(self, bot: Shard):
