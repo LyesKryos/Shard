@@ -3265,7 +3265,7 @@ class WarDeclarationView(discord.ui.View):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # get the cnc channel
-        cnc_channel = await self.bot.get_channel(927288304301387816)
+        cnc_channel = self.bot.get_channel(927288304301387816)
         # if no option has been selected, send message
         if self.cb_option is None:
             return await interaction.followup.send("You have not selected a Casus Belli!")
