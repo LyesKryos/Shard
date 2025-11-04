@@ -2916,7 +2916,7 @@ class HostileDiplomaticActions(discord.ui.View):
             return await interaction.followup.send(f"{user_info['govt_subtype']} {user_info['govt_type']} "
                                                    f"nations may not declare war.")
         # war declaration cost
-        if recipient_user['govt_type'] == "Equalism":
+        if self.recipient_info['govt_type'] == "Equalism":
             declaration_cost = 0
         else:
             declaration_cost = 2
