@@ -67,7 +67,6 @@ async def watchdog_task(bot, interval=60):
     while True:
         await asyncio.sleep(interval)
         now = time.monotonic()
-
         # Log if bot has gone silent for too long
         silence = now - last_heartbeat
         if bot.is_closed():
