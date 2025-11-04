@@ -2955,7 +2955,7 @@ class HostileDiplomaticActions(discord.ui.View):
         if "Total War" in sender_info['tech']:
             available_cbs.append("Total War")
         # check to see if the recipient has any puppets
-        overlord_check = await conn.fetch('''SELECT * FROM cnc_users WHERE overlord = $1;''', recipient_user.id)
+        overlord_check = await self.conn.fetch('''SELECT * FROM cnc_users WHERE overlord = $1;''', recipient_user.id)
         if overlord_check:
             available_cbs.append("Force Independence")
         # if the recipient is equalist and the sender is not equalist, add the suppress the revolution CB
