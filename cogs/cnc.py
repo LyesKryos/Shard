@@ -2924,7 +2924,7 @@ class HostileDiplomaticActions(discord.ui.View):
         if sender_info['mil_auth'] < declaration_cost:
             # disable the button and send a message
             button.disabled = True
-            await interaction.edit_original_response(view=self)
+            await self.interaction.edit_original_response(view=self)
             return await interaction.followup.send("You do not have enough Military Authority to declare war.")
         # check to see if the two nations are already at war
         war_check = await self.conn.fetchrow('''SELECT * FROM cnc_wars WHERE $1 = ANY(array_cat(attackers, defenders)) 
@@ -2933,7 +2933,7 @@ class HostileDiplomaticActions(discord.ui.View):
         if war_check is not None:
             # disable the button and return a message
             button.disabled = True
-            await interaction.edit_original_response(view=self)
+            await self.interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"You are already participating "
                                                    f"in a war with {recipient_user['name']} and cannot declare war.")
         # create a base list of CBs available
