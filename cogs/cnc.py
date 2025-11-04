@@ -2279,6 +2279,17 @@ class DiplomaticMenuView(discord.ui.View):
     async def cooperative(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer response
         await interaction.response.defer()
+        # pull the db info for the user
+        sender_info = await user_db_info(interaction.user.id, self.conn)
+        # check to see if the nations are at war
+        war_check = await self.conn.fetchrow('''SELECT * FROM cnc_wars WHERE $1 = ANY(array_cat(attackers, defenders)) 
+                                                                         AND $2 = ANY(array_cat(attackers, defenders));''',
+                                             sender_info['name'], self.recipient_info['name'])
+        # if the nations are at war, block the cooperative actions button
+        if war_check is not None:
+            button.disabled = True
+            await self.interaction.edit_original_response(view=self)
+            return await interaction.followup.send("Cooperative Relations are disabled while at war.")
         # add cooperative actions view
         cooperative_actions = CooperativeDiplomaticActions(interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=cooperative_actions)
@@ -2934,8 +2945,8 @@ class HostileDiplomaticActions(discord.ui.View):
             # disable the button and return a message
             button.disabled = True
             await self.interaction.edit_original_response(view=self)
-            return await interaction.followup.send(f"You are already participating in a war with "
-                                                   f"{self.recipient_info['name']} and cannot declare war.")
+            return await interaction.followup.send(f"You are already participating in a war against "
+                                                   f"{self.recipient_info['name']} and cannot declare another war.")
         # create a base list of CBs available
         available_cbs = ["Conquest", "Subjugate", "Force Reparations"]
         # check CBs available by tech
@@ -2981,7 +2992,6 @@ class HostileDiplomaticActions(discord.ui.View):
         # return to menu
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         await interaction.edit_original_response(view=diplo_menu)
-
 
 class DiplomaticRelationsRespondView(discord.ui.View):
 
