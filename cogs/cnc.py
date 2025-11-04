@@ -3317,8 +3317,9 @@ class WarDeclarationView(discord.ui.View):
             await safe_dm(self.bot, uid, embed=war_embed)
         # send the war embed in the public channel
         await cnc_channel.send(embed=war_embed)
+        await interaction.followup.send(embed=war_embed)
         # disable the views
-        return await interaction.edit_original_response(view=None)
+        return await self.interaction.edit_original_response(view=None)
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
