@@ -3349,6 +3349,7 @@ class CasusBelliDropdown(discord.ui.Select):
         # disable and update view
         self.disabled = True
         await self.interaction.edit_original_response(view=self.view)
+        return await interaction.response.send_message(f"{self.view.cb_option} selected.", ephemeral=True)
 
 
 class CNC(commands.Cog):
