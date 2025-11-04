@@ -2905,15 +2905,15 @@ class HostileDiplomaticActions(discord.ui.View):
         # defer interaction
         await interaction.response.defer()
         # pull user info
-        user_info = await user_db_info(interaction.user.id, self.conn)
+        sender_info = await user_db_info(interaction.user.id, self.conn)
         # create the recipient user
         recipient_user = self.bot.get_user(self.recipient_info['user_id'])
         # government type checks
-        if user_info["govt_subtype"] in ["Populist", "Parish", "Radical", "Primitivist", "Pacifistic"]:
+        if sender_info["govt_subtype"] in ["Populist", "Parish", "Radical", "Primitivist", "Pacifistic"]:
             # if the government subtype disables declarations of war, disable the button and send a message
             button.disabled = True
             await interaction.edit_original_response(view=self)
-            return await interaction.followup.send(f"{user_info['govt_subtype']} {user_info['govt_type']} "
+            return await interaction.followup.send(f"{sender_info['govt_subtype']} {sender_info['govt_type']} "
                                                    f"nations may not declare war.")
         # war declaration cost
         if self.recipient_info['govt_type'] == "Equalism":
@@ -2921,14 +2921,15 @@ class HostileDiplomaticActions(discord.ui.View):
         else:
             declaration_cost = 2
         # check if the user has enough military authority for the declaration
-        if user_info['mil_auth'] < declaration_cost:
+        if sender_info['mil_auth'] < declaration_cost:
             # disable the button and send a message
             button.disabled = True
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send("You do not have enough Military Authority to declare war.")
         # check to see if the two nations are already at war
         war_check = await self.conn.fetchrow('''SELECT * FROM cnc_wars WHERE $1 = ANY(array_cat(attackers, defenders)) 
-                                                                         AND $2 = ANY(array_cat(attackers, defenders));''')
+                                                                         AND $2 = ANY(array_cat(attackers, defenders));''',
+                                             sender_info['name'], self.recipient_info['name'])
         if war_check is not None:
             # disable the button and return a message
             button.disabled = True
@@ -2938,37 +2939,37 @@ class HostileDiplomaticActions(discord.ui.View):
         # create a base list of CBs available
         available_cbs = ["Conquest", "Subjugate", "Force Reparations"]
         # check CBs available by tech
-        if "Ideological Crusade" in user_info['techs']:
+        if "Ideological Crusade" in sender_info['techs']:
             available_cbs.append("Indoctrinate")
-        if "National Humiliation" in user_info['techs']:
+        if "National Humiliation" in sender_info['techs']:
             available_cbs.append("Humiliate")
-        if "Subjugation" in user_info['techs']:
+        if "Subjugation" in sender_info['techs']:
             # calculate the average national developments of sender and receiver
             sender_dev = await self.conn.fetchrow('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1;''',
-                                             user_info['id'])
+                                             sender_info['id'])
             recipient_dev = await self.conn.fetchrow('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1;''',
                                                      self.recipient_info['id'])
             # if 50% of the senders dev is larger than the recipient's dev, permit subjugation
             if recipient_dev['avg'] < sender_dev['avg'] * .5:
                 available_cbs.append("Subjugate")
-        if "Total War" in user_info['techs']:
+        if "Total War" in sender_info['techs']:
             available_cbs.append("Total War")
         # check to see if the recipient has any puppets
         overlord_check = await conn.fetch('''SELECT * FROM cnc_users WHERE overlord = $1;''', recipient_user.id)
         if overlord_check:
             available_cbs.append("Force Independence")
         # if the recipient is equalist and the sender is not equalist, add the suppress the revolution CB
-        if (self.recipient_info['govt_type'] == "Equalism") and (user_info['govt_type'] != "Equalism"):
+        if (self.recipient_info['govt_type'] == "Equalism") and (sender_info['govt_type'] != "Equalism"):
             available_cbs.append("Suppress the Revolution")
         # if the recipient is not equalist and the sender is equalist, add the Spread the Revolution CB
-        if (self.recipient_info['govt_type'] != "Equalism") and (user_info['govt_type'] == "Equalism"):
+        if (self.recipient_info['govt_type'] != "Equalism") and (sender_info['govt_type'] == "Equalism"):
             available_cbs.append("Spread the Revolution")
         # if the recipient is the sender's overlord, clear all other options and leave "Rebel Against Overlord"
-        if recipient_user.id == user_info['overlord']:
+        if recipient_user.id == sender_info['overlord']:
             available_cbs.clear()
             available_cbs = ['Rebel Against Overlord']
         # add the war declaration view
-        war_view = WarDeclarationView(self.interaction, self.conn, self.user_info,
+        war_view = WarDeclarationView(self.interaction, self.conn, sender_info,
                                       self.recipient_info, self.bot, available_cbs)
         # change the view
         return await self.interaction.edit_original_response(view=war_view)
