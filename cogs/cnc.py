@@ -3255,10 +3255,10 @@ class WarDeclarationView(discord.ui.View):
         self.bot = bot
 
     async def on_timeout(self):
-        # disable the interaction
-        self.stop()
-        # update interaction
-        await self.interaction.followup.send(view=self)
+        # disable the buttons and update the view
+        for child in self.children:
+            child.disabled = True
+        await self.interaction.edit_original_response(view=self)
 
     @discord.ui.button(label="Declare War!", style=discord.ButtonStyle.danger, emoji="\U0001f525")
     async def declare_war(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -3349,7 +3349,7 @@ class CasusBelliDropdown(discord.ui.Select):
         # disable and update view
         self.disabled = True
         await self.interaction.edit_original_response(view=self.view)
-        return await interaction.response.send_message(f"{self.view.cb_option} selected.", ephemeral=True)
+        return await interaction.response.send_message(f"{self.view.cb_option} Casus Belli selected.", ephemeral=True)
 
 
 class CNC(commands.Cog):
