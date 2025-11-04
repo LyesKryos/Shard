@@ -3345,7 +3345,7 @@ class CasusBelliDropdown(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         # pull the selected value
-        self.view.cb_option = self.value[0]
+        self.view.cb_option = self.values[0]
         # disable and update view
         self.disabled = True
         await self.interaction.edit_original_response(view=self.view)
