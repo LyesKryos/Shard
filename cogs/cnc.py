@@ -4220,8 +4220,8 @@ class CNC(commands.Cog):
             return await interaction.followup.send(f"{user_info['name']} is not currently at war.")
         # otherwise, display all the wars the user is a part of
         # create the initial embed
-        all_wars_embed = discord.Embed(title="Global Wars", color=discord.Color.red(),
-                                       description="A directory of all ongoing wars.")
+        all_wars_embed = discord.Embed(title="National Wars", color=discord.Color.red(),
+                                       description=f"A directory of all ongoing wars involving {user_info['name']}.")
         # populate the first ten options
         wars_to_display = user_wars[:10]
         for war in wars_to_display:
