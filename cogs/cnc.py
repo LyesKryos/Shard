@@ -2303,7 +2303,6 @@ class DiplomaticMenuView(discord.ui.View):
         hostile_actions = HostileDiplomaticActions(interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=hostile_actions)
 
-
 class CooperativeDiplomaticActions(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, recipient_info: asyncpg.Record):
@@ -2782,7 +2781,6 @@ class CooperativeDiplomaticActions(discord.ui.View):
         # return to menu
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         await interaction.edit_original_response(view=diplo_menu)
-
 
 class HostileDiplomaticActions(discord.ui.View):
 
@@ -3287,10 +3285,11 @@ class WarDeclarationView(discord.ui.View):
         else:
             dynamic_war_name = dynamic_war_name_raw.replace("# ", "").replace("ATTACKER", self.sender_info['name']).replace("DEFENDER", self.recipient_info['name'])
         # add the war to the db
-        await self.conn.execute('''INSERT INTO cnc_wars(id, attackers, defenders, cb) 
-                                   VALUES ($1, $2, $3, $4);''',
+        await self.conn.execute('''INSERT INTO cnc_wars(id, attackers, defenders, 
+                                                        cb, primary_attacker, primary_defender) 
+                                   VALUES ($1, $2, $3, $4, $5, $6);''',
                                 self.interaction.message.id, attackers_names,
-                                defenders_names, self.cb_option)
+                                defenders_names, self.cb_option, self.sender_info['name'], self.recipient_info['name'])
         # create the war embed
         war_embed = discord.Embed(title=f"The {dynamic_war_name}",
                                   description=f"The hounds of war have been released by "
@@ -3340,6 +3339,57 @@ class CasusBelliDropdown(discord.ui.Select):
         self.disabled = True
         await self.interaction.edit_original_response(view=self.view)
         return await interaction.response.send_message(f"{self.view.cb_option} Casus Belli selected.", ephemeral=True)
+
+class WarsPaginator(discord.ui.View):
+
+    def __init__(self, interaction, all_wars: asyncpg.Record, wars_embed: discord.Embed):
+        self.interaction = interaction
+        self.page = 1
+        self.all_wars = all_wars
+        self.wars_embed = wars_embed
+        super().__init__(timeout=300)
+
+    async def on_timeout(self) -> None:
+        # remove dropdown
+        for item in self.children:
+            self.remove_item(item)
+        return await self.interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.blurple, disabled=True, emoji="\u23ea")
+    async def back(self, interaction: discord.Interaction, back_button: discord.Button):
+        # defer response
+        await interaction.response.defer()
+        # set forward button on
+        self.forward.disabled = False
+        # subtract from page
+        self.page -= 1
+        # page cannot be less than 1
+        if self.page <= 1:
+            self.page = 1
+            back_button.disabled = True
+        # count the wars
+        wars_to_display = self.all_wars[(self.page*10)-10:(self.page*10)-1]
+        # clear the embed
+        self.wars_embed.clear_fields()
+        # populate the embed with the next set of wars
+        for war in wars_to_display:
+            # get the list of attackers and defenders, placing the primary first and adding asterisk
+            attackers = (f"**{war['primary_attacker']}**" +
+                         ", ".join(war['attackers'].remove(war['primary_attacker'])))
+            defenders = (f"**{war['primary_defender']}**" +
+                         ", ".join(war['defenders'].remove(war['primary_defender'])))
+            all_wars_embed.add_field(name=f"{war['name']}",
+                                     value=f"ID: {war['id']}\n"
+                                           f"Attackers: {attackers}\n"
+                                           f"Defenders: {defenders}\n"
+                                           f"Casus Belli: {war['cb']}\n"
+                                           f"Defensio Belli: {war['db'] or 'None'}\n"
+                                           f"Turns: {war['turns']}\n"
+                                           f"Deaths: {war['deaths']}")
+        # update the embed and the view
+
+
+
 
 
 class CNC(commands.Cog):
@@ -3618,73 +3668,73 @@ class CNC(commands.Cog):
                 f"**\"I came, I saw, I conquered.\" -Julius Caesar**"
             )
 
-    @cnc.command(name="change_color", description="Changes your nation's color on the map.")
-    @app_commands.checks.cooldown(1, 30)
-    @app_commands.describe(color="The hex code of your new map color. Include the '#'.")
-    async def recolor(self, interaction: discord.Interaction, color: str):
-        # defer interaction
-        await interaction.response.defer(thinking=True)
-        # deny access if in DMs
-        if not interaction.guild:
-            return commands.NoPrivateMessage
-        # establish connection
-        conn = self.bot.pool
-        # pull userinfo
-        user_info = await user_db_info(interaction.user.id)
-        # check for registration
-        if user_info is None:
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
-        # check if the color is taken, banned, or even a color
-        check_color_taken = await conn.fetchrow('''SELECT *
-                                                   FROM cnc_users
-                                                   WHERE color = $1;''', color)
-        if check_color_taken is not None:
-            return await interaction.followup.send("That color is already taken. "
-                                                   "Please select a different color.")
-        # pull all colors
-        pull_all_colors = await conn.fetch('''SELECT name, color
-                                              FROM cnc_users;''')
-        # check each color
-        for c in pull_all_colors:
-            color_check = c['color']
-            if self.color_difference(color_check, color) < 50:
-                return await interaction.followup.send(f"Your selected color, {color}, is too similar to an "
-                                                       f"existing color, registered to {c['name']} ({c['color']}).")
-
-        if color in self.banned_colors:
-            return await interaction.followup.send("That color is a restricted color. "
-                                                   "Please select a different color.")
-        for c in self.banned_colors:
-            if self.color_difference(c, color) < 50:
-                return await interaction.followup.send(f"That color is too similar to a banned color, {c}.")
-        # try and get the color from the hex code
-        try:
-            ImageColor.getrgb(color)
-        except ValueError:
-            # if the color isn't a real hex code, return that they need to get the right hex code
-            return await interaction.followup.send(
-                "That doesn't appear to be a valid hex color code. Include the `#` symbol.")
-        # if the color is valid, update the database
-        await conn.execute('''UPDATE cnc_users
-                              SET color = $1
-                              WHERE user_id = $2;''', color, interaction.user.id)
-        # get all provinces
-        all_provinces = await conn.fetch('''SELECT *
-                                            FROM cnc_provinces
-                                            WHERE owner_id = $1;''', interaction.user.id)
-        for p in all_provinces:
-            p_id = p['id']
-            if p['occupier_id'] == user_info['user_id']:
-                await map_color(p_id, color, conn)
-            elif p['occupier_id'] == 0:
-                await self.occupy_color(p_id, '#000000', color)
-            elif p['occupier_id'] != user_info['user_id']:
-                occupier_color = await conn.fetchrow('''SELECT color
-                                                        FROM cnc_users
-                                                        WHERE user_id = $1;''',
-                                                     p['occupier_id'])
-                await self.occupy_color(p_id, occupier_color, color)
-        return await interaction.followup.send(f"Color successfully changed to {color}!")
+    # @cnc.command(name="change_color", description="Changes your nation's color on the map.")
+    # @app_commands.checks.cooldown(1, 30)
+    # @app_commands.describe(color="The hex code of your new map color. Include the '#'.")
+    # async def recolor(self, interaction: discord.Interaction, color: str):
+    #     # defer interaction
+    #     await interaction.response.defer(thinking=True)
+    #     # deny access if in DMs
+    #     if not interaction.guild:
+    #         return commands.NoPrivateMessage
+    #     # establish connection
+    #     conn = self.bot.pool
+    #     # pull userinfo
+    #     user_info = await user_db_info(interaction.user.id)
+    #     # check for registration
+    #     if user_info is None:
+    #         return await interaction.followup.send("You are not a registered member of the CNC system.")
+    #     # check if the color is taken, banned, or even a color
+    #     check_color_taken = await conn.fetchrow('''SELECT *
+    #                                                FROM cnc_users
+    #                                                WHERE color = $1;''', color)
+    #     if check_color_taken is not None:
+    #         return await interaction.followup.send("That color is already taken. "
+    #                                                "Please select a different color.")
+    #     # pull all colors
+    #     pull_all_colors = await conn.fetch('''SELECT name, color
+    #                                           FROM cnc_users;''')
+    #     # check each color
+    #     for c in pull_all_colors:
+    #         color_check = c['color']
+    #         if self.color_difference(color_check, color) < 50:
+    #             return await interaction.followup.send(f"Your selected color, {color}, is too similar to an "
+    #                                                    f"existing color, registered to {c['name']} ({c['color']}).")
+    #
+    #     if color in self.banned_colors:
+    #         return await interaction.followup.send("That color is a restricted color. "
+    #                                                "Please select a different color.")
+    #     for c in self.banned_colors:
+    #         if self.color_difference(c, color) < 50:
+    #             return await interaction.followup.send(f"That color is too similar to a banned color, {c}.")
+    #     # try and get the color from the hex code
+    #     try:
+    #         ImageColor.getrgb(color)
+    #     except ValueError:
+    #         # if the color isn't a real hex code, return that they need to get the right hex code
+    #         return await interaction.followup.send(
+    #             "That doesn't appear to be a valid hex color code. Include the `#` symbol.")
+    #     # if the color is valid, update the database
+    #     await conn.execute('''UPDATE cnc_users
+    #                           SET color = $1
+    #                           WHERE user_id = $2;''', color, interaction.user.id)
+    #     # get all provinces
+    #     all_provinces = await conn.fetch('''SELECT *
+    #                                         FROM cnc_provinces
+    #                                         WHERE owner_id = $1;''', interaction.user.id)
+    #     for p in all_provinces:
+    #         p_id = p['id']
+    #         if p['occupier_id'] == user_info['user_id']:
+    #             await map_color(p_id, color, conn)
+    #         elif p['occupier_id'] == 0:
+    #             await self.occupy_color(p_id, '#000000', color)
+    #         elif p['occupier_id'] != user_info['user_id']:
+    #             occupier_color = await conn.fetchrow('''SELECT color
+    #                                                     FROM cnc_users
+    #                                                     WHERE user_id = $1;''',
+    #                                                  p['occupier_id'])
+    #             await self.occupy_color(p_id, occupier_color, color)
+    #     return await interaction.followup.send(f"Color successfully changed to {color}!")
 
     @cnc.command(name="map", description="Opens the map for viewing.")
     async def map(self, interaction: discord.Interaction):
@@ -4059,12 +4109,46 @@ class CNC(commands.Cog):
                                                                               f"**General**: {general}")
         return await interaction.followup.send(embed=armies_embed)
 
-    @cnc.command(name="wars", description="Displays information about all ongoing wars.")
-    async def view_wars(self, interaction: discord.Interaction):
+    @cnc.command(name="view_wars", description="Displays information about all ongoing wars.")
+    @app_commands.describe(view_all="Optional: select True for viewing all ongoing wars.")
+    async def view_wars(self, interaction: discord.Interaction, view_all: bool = False):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # define the pool
         conn = self.bot.pool
+        # if the user opted to see all wars, display them
+        all_wars = await conn.fetch('''SELECT * FROM cnc_wars 
+                                       WHERE active = True;''')
+        # if there are no active wars, send such
+        if not all_wars:
+            return await interaction.followup.send("There are no ongoing wars. Peace on earth! Goodwill towards men!")
+        # list out all the wars
+        else:
+            # create the initial embed
+            all_wars_embed = discord.Embed(title="Global Wars", color=discord.Color.red(),
+                                           description="A directory of all ongoing wars.")
+            # populate the first ten options
+            wars_to_display = all_wars[:10]
+            for war in wars_to_display:
+                # get the list of attackers and defenders, placing the primary first and adding asterisk
+                attackers = (f"**{war['primary_attacker']}**" +
+                             ", ".join(war['attackers'].remove(war['primary_attacker'])))
+                defenders = (f"**{war['primary_defender']}**" +
+                             ", ".join(war['defenders'].remove(war['primary_defender'])))
+                all_wars_embed.add_field(name=f"{war['name']}",
+                                         value=f"ID: {war['id']}\n"
+                                               f"Attackers: {attackers}\n"
+                                               f"Defenders: {defenders}\n"
+                                               f"Casus Belli: {war['cb']}\n"
+                                               f"Defensio Belli: {war['db'] or 'None'}\n"
+                                               f"Turns: {war['turns']}\n"
+                                               f"Deaths: {war['deaths']}")
+            # if there are less than 10, send embed
+            if len(all_wars) <= 10:
+                return await interaction.followup.send(embed=all_wars_embed)
+            else:
+
+            await interaction.followup.send()
         # check for the user's data
         user_info = await user_db_info(interaction.user.id, conn)
         # if the user is not registered, return denial
@@ -4072,7 +4156,13 @@ class CNC(commands.Cog):
             return await interaction.followup.send("You are not a registered user of the Command and Conquest system.\n"
                                                    "To register, use the `\cnc register` command!")
         # check for what wars the user is in
-        wars_check = await conn.fetch('''SELECT * FROM cnc_wars WHERE $1 = ANY()''')
+        wars_check = await conn.fetch('''SELECT * FROM cnc_wars 
+                                         WHERE $1 = ANY(array_cat(attackers,defenders)) 
+                                           AND active = True;''',
+                                      user_info['name'])
+        # if they have no active wars, send such
+        if not wars_check:
+            return await interaction.followup.send(f"{user_info['name']} is not currently at war.")
 
     # === Tech Commands === #
 
