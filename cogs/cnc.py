@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from random import randrange, randint
 import asyncpg
 from discord import app_commands, Interaction
@@ -10,7 +12,6 @@ from base64 import b64encode
 import requests
 from discord.ui import View
 import math
-from customchecks import SilentFail
 
 
 async def safe_dm(bot: discord.Client, user_id: int, *, content: str | None = None,
@@ -2808,29 +2809,7 @@ class HostileDiplomaticActions(discord.ui.View):
         user_info = await user_db_info(interaction.user.id, self.conn)
         # create the recipient user
         recipient_user = self.bot.get_user(self.recipient_info['user_id'])
-        # government type checks
-        if self.recipient_info['govt_subtype'] == "Parish":
-            return await interaction.followup.send("Voluntary diplomatic relations are disabled for nations with the"
-                                                   " Parish Equalism ideology.")
-        if ("Anarchic" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']] and
-                "Equalism" not in [self.recipient_info['govt_type'], user_info['govt_type']]):
-            return await interaction.followup.send(
-                "Nations with Anarchic Equalism cannot accept diplomatic relations with "
-                "non-Equalist nations.")
-        if (("Postcolonial" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']]) and
-                (any(idea not in ["Equalism", "Anarchy"]) for idea in
-                 [self.recipient_info['govt_type'], user_info['govt_type']])):
-            return await interaction.followup.send(
-                "Nations with Postcolonial Anarchy cannot accept diplomatic relations "
-                "with any non-Equalist or non-Anarchic nations.")
-        elif self.recipient_info['govt_subtype'] in ["Primivitist", "Radical", "Authoritarian"]:
-            return await interaction.followup.send(f"{self.recipient_info['govt_subtype']} "
-                                                   f"{self.recipient_info['govt_type']} nations cannot receive "
-                                                   f"diplomatic relations.")
-        # if either nation is pacificistic, it cannot participate in anything but diplomatic relations
-        if "Pacifistic" in [self.recipient_info['govt_subtype'], self.recipient_info['govt_type']]:
-            return await interaction.followup.send("Nations with the Pacifistic Anarchy ideology cannot use any "
-                                                   "diplomatic action other than Diplomatic Relations.")
+
         # check if the user is already embargoing
         embargo_check = await self.conn.fetchrow('''SELECT *
                                                     FROM cnc_embargoes
@@ -3874,17 +3853,6 @@ class CNC(commands.Cog):
             user_embed.set_footer(text="Diplomatic actions are disabled for your own nation.")
             # send the embed
             return await interaction.followup.send(embed=user_embed)
-        # check for other restriction options, such as government type
-        elif caller_info['govt_subtype'] == "Parish":
-            user_embed.set_footer(text="Voluntary diplomatic actions are disabled for nations "
-                                       "with the Parish Equalism ideology.")
-            # send the embed
-            return await interaction.followup.send(embed=user_embed)
-        elif caller_info['govt_subtype'] in ["Primivitist", "Radical"]:
-            user_embed.set_footer(text="Diplomatic actions are disabled for nations "
-                                       "with the Radical and Primitivist Anarchy ideologies.")
-            # send the embed
-            return await interaction.followup.send(embed=user_embed)
         else:
             diplomacy_view = DiplomaticMenuView(interaction, conn, user_info)
             # send the embed
@@ -4090,6 +4058,21 @@ class CNC(commands.Cog):
                                                                               f"**Location**: {location}\n"
                                                                               f"**General**: {general}")
         return await interaction.followup.send(embed=armies_embed)
+
+    @cnc.command(name="wars", description="Displays information about all ongoing wars.")
+    async def view_wars(self, interaction: discord.Interaction):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # define the pool
+        conn = self.bot.pool
+        # check for the user's data
+        user_info = await user_db_info(interaction.user.id, conn)
+        # if the user is not registered, return denial
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered user of the Command and Conquest system.\n"
+                                                   "To register, use the `\cnc register` command!")
+        # check for what wars the user is in
+        wars_check = await conn.fetch('''SELECT * FROM cnc_wars WHERE $1 = ANY()''')
 
     # === Tech Commands === #
 
