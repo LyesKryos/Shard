@@ -1,5 +1,6 @@
 import logging
 
+import discord
 import discord.errors
 from discord import app_commands
 from ShardBot import Shard
@@ -18,6 +19,69 @@ class ShardErrorHandler(commands.Cog):
         tree = self.bot.tree
         self._old_tree_error = tree.on_error
         tree.on_error = self.on_app_command_error
+        # Patch discord.ui error handlers (Views, Modals) so their exceptions are caught and logged
+        # Store originals to restore on unload
+        self._old_view_on_error = getattr(discord.ui.View, 'on_error', None)
+        self._old_modal_on_error = getattr(discord.ui.Modal, 'on_error', None)
+
+        logger = self.logger
+
+        async def _patched_view_on_error(view_self, error: Exception, item: discord.ui.Item, interaction: discord.Interaction):
+            try:
+                view_name = type(view_self).__name__
+                item_repr = getattr(item, 'custom_id', None) or getattr(item, 'label', None) or type(item).__name__
+                cmd = interaction.command.name if getattr(interaction, 'command', None) else None
+                where = f"View={view_name} Item={item_repr} Cmd={cmd or 'N/A'}"
+                # Try to notify the user
+                try:
+                    content = "An error occurred while handling this UI action. The incident was logged."
+                    if interaction.response.is_done():
+                        await interaction.followup.send(content, ephemeral=True)
+                    else:
+                        await interaction.response.send_message(content, ephemeral=True)
+                except Exception:
+                    pass
+                logger.exception(msg=f"Unhandled UI error in {where}", exc_info=error)
+            except Exception:
+                # Last-chance log if even the handler fails
+                logger.exception(msg="Failed inside patched View.on_error handler", exc_info=True)
+
+        async def _patched_modal_on_error(modal_self, interaction: discord.Interaction, error: Exception):
+            try:
+                modal_name = type(modal_self).__name__
+                cmd = interaction.command.name if getattr(interaction, 'command', None) else None
+                where = f"Modal={modal_name} Cmd={cmd or 'N/A'}"
+                # Try to notify the user
+                try:
+                    content = "An error occurred while submitting this modal. The incident was logged."
+                    if interaction.response.is_done():
+                        await interaction.followup.send(content, ephemeral=True)
+                    else:
+                        await interaction.response.send_message(content, ephemeral=True)
+                except Exception:
+                    pass
+                logger.exception(msg=f"Unhandled Modal error in {where}", exc_info=error)
+            except Exception:
+                logger.exception(msg="Failed inside patched Modal.on_error handler", exc_info=True)
+
+        discord.ui.View.on_error = _patched_view_on_error
+        discord.ui.Modal.on_error = _patched_modal_on_error
+
+    def cog_unload(self):
+        # Restore tree error handler
+        try:
+            tree = self.bot.tree
+            tree.on_error = getattr(self, '_old_tree_error', tree.on_error)
+        except Exception:
+            pass
+        # Restore original UI error handlers
+        try:
+            if getattr(self, '_old_view_on_error', None) is not None:
+                discord.ui.View.on_error = self._old_view_on_error
+            if getattr(self, '_old_modal_on_error', None) is not None:
+                discord.ui.Modal.on_error = self._old_modal_on_error
+        except Exception:
+            self.logger.exception(msg="Failed to restore original UI error handlers on cog unload", exc_info=True)
 
     @commands.command()
     async def debug_mode(self, ctx, on_off: bool):
