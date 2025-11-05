@@ -3368,28 +3368,79 @@ class WarsPaginator(discord.ui.View):
             self.page = 1
             back_button.disabled = True
         # count the wars
-        wars_to_display = self.all_wars[(self.page*10)-10:(self.page*10)-1]
+        start = (self.page - 1) * 10
+        end = self.page * 10
+        wars_to_display = self.all_wars[start:end]
         # clear the embed
         self.wars_embed.clear_fields()
         # populate the embed with the next set of wars
         for war in wars_to_display:
             # get the list of attackers and defenders, placing the primary first and adding asterisk
-            attackers = (f"**{war['primary_attacker']}**" +
-                         ", ".join(war['attackers'].remove(war['primary_attacker'])))
-            defenders = (f"**{war['primary_defender']}**" +
-                         ", ".join(war['defenders'].remove(war['primary_defender'])))
-            all_wars_embed.add_field(name=f"{war['name']}",
-                                     value=f"ID: {war['id']}\n"
-                                           f"Attackers: {attackers}\n"
-                                           f"Defenders: {defenders}\n"
-                                           f"Casus Belli: {war['cb']}\n"
-                                           f"Defensio Belli: {war['db'] or 'None'}\n"
-                                           f"Turns: {war['turns']}\n"
-                                           f"Deaths: {war['deaths']}")
+            attackers_list = list(war['attackers']) if war['attackers'] is not None else []
+            defenders_list = list(war['defenders']) if war['defenders'] is not None else []
+            attackers_others = [a for a in attackers_list if a != war['primary_attacker']]
+            defenders_others = [d for d in defenders_list if d != war['primary_defender']]
+            attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war['primary_attacker'] else ", ".join(attackers_list)
+            defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war['primary_defender'] else ", ".join(defenders_list)
+            self.wars_embed.add_field(name=f"{war['name']}",
+                                      value=f"ID: {war['id']}\n"
+                                            f"Attackers: {attackers}\n"
+                                            f"Defenders: {defenders}\n"
+                                            f"Casus Belli: {war['cb']}\n"
+                                            f"Defensio Belli: {war['db'] or 'None'}\n"
+                                            f"Turns: {war['turns']}\n"
+                                            f"Deaths: {war['deaths']}")
         # update the embed and the view
+        return await self.interaction.edit_original_response(embed=self.wars_embed, view=self)
 
+    @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
+    async def close(self, interaction: discord.Interaction, close: discord.Button):
+        # defer response
+        await interaction.response.defer()
+        # remove all components and close the view
+        for item in list(self.children):
+            self.remove_item(item)
+        return await self.interaction.edit_original_response(view=None)
 
-
+    @discord.ui.button(label="Next", style=discord.ButtonStyle.blurple, emoji="\u23e9")
+    async def forward(self, interaction: discord.Interaction, forward_button: discord.Button):
+        # defer response
+        await interaction.response.defer()
+        # enable back button
+        self.back.disabled = False
+        # add page
+        self.page += 1
+        # set max
+        max_page = math.ceil(len(self.all_wars) / 10) if self.all_wars else 1
+        # disable forward on last page
+        if self.page >= max_page:
+            self.page = max_page
+            forward_button.disabled = True
+        # count the wars
+        start = (self.page - 1) * 10
+        end = self.page * 10
+        wars_to_display = self.all_wars[start:end]
+        # clear the embed
+        self.wars_embed.clear_fields()
+        # populate the embed with the next set of wars
+        for war in wars_to_display:
+            # get the list of attackers and defenders, placing the primary first and adding asterisk
+            attackers_list = list(war['attackers']) if war['attackers'] is not None else []
+            defenders_list = list(war['defenders']) if war['defenders'] is not None else []
+            attackers_others = [a for a in attackers_list if a != war['primary_attacker']]
+            defenders_others = [d for d in defenders_list if d != war['primary_defender']]
+            attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war['primary_attacker'] else ", ".join(attackers_list)
+            defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war['primary_defender'] else ", ".join(defenders_list)
+            self.wars_embed.add_field(name=f"{war['name']}",
+                                      value=f"ID: {war['id']}\n"
+                                            f"Attackers: {attackers}\n"
+                                            f"Defenders: {defenders}\n"
+                                            f"Casus Belli: {war['cb']}\n"
+                                            f"Defensio Belli: {war['db'] or 'None'}\n"
+                                            f"Turns: {war['turns']}\n"
+                                            f"Deaths: {war['deaths']}")
+        # update the embed and the view
+        return await self.interaction.edit_original_response(embed=self.wars_embed, view=self)
 
 
 class CNC(commands.Cog):
@@ -4117,38 +4168,41 @@ class CNC(commands.Cog):
         # define the pool
         conn = self.bot.pool
         # if the user opted to see all wars, display them
-        all_wars = await conn.fetch('''SELECT * FROM cnc_wars 
-                                       WHERE active = True;''')
-        # if there are no active wars, send such
-        if not all_wars:
-            return await interaction.followup.send("There are no ongoing wars. Peace on earth! Goodwill towards men!")
-        # list out all the wars
-        else:
-            # create the initial embed
-            all_wars_embed = discord.Embed(title="Global Wars", color=discord.Color.red(),
-                                           description="A directory of all ongoing wars.")
-            # populate the first ten options
-            wars_to_display = all_wars[:10]
-            for war in wars_to_display:
-                # get the list of attackers and defenders, placing the primary first and adding asterisk
-                attackers = (f"**{war['primary_attacker']}**" +
-                             ", ".join(war['attackers'].remove(war['primary_attacker'])))
-                defenders = (f"**{war['primary_defender']}**" +
-                             ", ".join(war['defenders'].remove(war['primary_defender'])))
-                all_wars_embed.add_field(name=f"{war['name']}",
-                                         value=f"ID: {war['id']}\n"
-                                               f"Attackers: {attackers}\n"
-                                               f"Defenders: {defenders}\n"
-                                               f"Casus Belli: {war['cb']}\n"
-                                               f"Defensio Belli: {war['db'] or 'None'}\n"
-                                               f"Turns: {war['turns']}\n"
-                                               f"Deaths: {war['deaths']}")
-            # if there are less than 10, send embed
-            if len(all_wars) <= 10:
-                return await interaction.followup.send(embed=all_wars_embed)
+        if view_all is True:
+            all_wars = await conn.fetch('''SELECT * FROM cnc_wars 
+                                           WHERE active = True;''')
+            # if there are no active wars, send such
+            if not all_wars:
+                return await interaction.followup.send("There are no ongoing wars. Peace on earth! Goodwill towards men!")
+            # list out all the wars
             else:
-
-            await interaction.followup.send()
+                # create the initial embed
+                all_wars_embed = discord.Embed(title="Global Wars", color=discord.Color.red(),
+                                               description="A directory of all ongoing wars.")
+                # populate the first ten options
+                wars_to_display = all_wars[:10]
+                for war in wars_to_display:
+                    # get the list of attackers and defenders, placing the primary first and adding asterisk
+                    attackers_list = list(war['attackers']) if war['attackers'] is not None else []
+                    defenders_list = list(war['defenders']) if war['defenders'] is not None else []
+                    attackers_others = [a for a in attackers_list if a != war['primary_attacker']]
+                    defenders_others = [d for d in defenders_list if d != war['primary_defender']]
+                    attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war['primary_attacker'] else ", ".join(attackers_list)
+                    defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war['primary_defender'] else ", ".join(defenders_list)
+                    all_wars_embed.add_field(name=f"{war['name']}",
+                                             value=f"ID: {war['id']}\n"
+                                                   f"Attackers: {attackers}\n"
+                                                   f"Defenders: {defenders}\n"
+                                                   f"Casus Belli: {war['cb']}\n"
+                                                   f"Defensio Belli: {war['db'] or 'None'}\n"
+                                                   f"Turns: {war['turns']}\n"
+                                                   f"Deaths: {war['deaths']}")
+                # if there are less than 10, send embed
+                if len(all_wars) <= 10:
+                    return await interaction.followup.send(embed=all_wars_embed)
+                else:
+                    all_wars_pages = WarsPaginator(interaction, all_wars, all_wars_embed)
+                    return await interaction.followup.send(embed=all_wars_embed, view=all_wars_pages)
         # check for the user's data
         user_info = await user_db_info(interaction.user.id, conn)
         # if the user is not registered, return denial
@@ -4156,13 +4210,41 @@ class CNC(commands.Cog):
             return await interaction.followup.send("You are not a registered user of the Command and Conquest system.\n"
                                                    "To register, use the `\cnc register` command!")
         # check for what wars the user is in
-        wars_check = await conn.fetch('''SELECT * FROM cnc_wars 
+        user_wars = await conn.fetch('''SELECT * FROM cnc_wars 
                                          WHERE $1 = ANY(array_cat(attackers,defenders)) 
                                            AND active = True;''',
                                       user_info['name'])
         # if they have no active wars, send such
-        if not wars_check:
+        if not user_wars:
             return await interaction.followup.send(f"{user_info['name']} is not currently at war.")
+        # otherwise, display all the wars the user is a part of
+        # create the initial embed
+        all_wars_embed = discord.Embed(title="Global Wars", color=discord.Color.red(),
+                                       description="A directory of all ongoing wars.")
+        # populate the first ten options
+        wars_to_display = user_wars[:10]
+        for war in wars_to_display:
+            # get the list of attackers and defenders, placing the primary first and adding asterisk
+            attackers_list = list(war['attackers']) if war['attackers'] is not None else []
+            defenders_list = list(war['defenders']) if war['defenders'] is not None else []
+            attackers_others = [a for a in attackers_list if a != war['primary_attacker']]
+            defenders_others = [d for d in defenders_list if d != war['primary_defender']]
+            attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war['primary_attacker'] else ", ".join(attackers_list)
+            defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war['primary_defender'] else ", ".join(defenders_list)
+            all_wars_embed.add_field(name=f"{war['name']}",
+                                     value=f"ID: {war['id']}\n"
+                                           f"Attackers: {attackers}\n"
+                                           f"Defenders: {defenders}\n"
+                                           f"Casus Belli: {war['cb']}\n"
+                                           f"Defensio Belli: {war['db'] or 'None'}\n"
+                                           f"Turns: {war['turns']}\n"
+                                           f"Deaths: {war['deaths']}")
+        # if there are less than 10, send embed
+        if len(user_wars) <= 10:
+            return await interaction.followup.send(embed=all_wars_embed)
+        else:
+            all_wars_pages = WarsPaginator(interaction, user_wars, all_wars_embed)
+            return await interaction.followup.send(embed=all_wars_embed, view=all_wars_pages)
 
     # === Tech Commands === #
 
