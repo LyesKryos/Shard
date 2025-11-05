@@ -3268,8 +3268,8 @@ class WarDeclarationView(discord.ui.View):
         defenders_names = [self.recipient_info['name']]
         # check if the user has already had a war with this nation with this CB and how many
         historic_war_check = await self.conn.fetch('''SELECT * FROM cnc_wars 
-                                                      WHERE $1 = ANY(array_cat(attackers, defenders)) 
-                                                        AND $2 = ANY(array_cat(attackers, defenders)) 
+                                                      WHERE primary_attacker = $1
+                                                        AND primary_defender = $2
                                                         AND cb = $3;''',
                                                    self.sender_info['name'],
                                                    self.recipient_info['name'],
@@ -3286,10 +3286,11 @@ class WarDeclarationView(discord.ui.View):
             dynamic_war_name = dynamic_war_name_raw.replace("# ", "").replace("ATTACKER", self.sender_info['name']).replace("DEFENDER", self.recipient_info['name'])
         # add the war to the db
         await self.conn.execute('''INSERT INTO cnc_wars(id, attackers, defenders, 
-                                                        cb, primary_attacker, primary_defender) 
-                                   VALUES ($1, $2, $3, $4, $5, $6);''',
+                                                        cb, primary_attacker, primary_defender, name) 
+                                   VALUES ($1, $2, $3, $4, $5, $6, $7);''',
                                 self.interaction.message.id, attackers_names,
-                                defenders_names, self.cb_option, self.sender_info['name'], self.recipient_info['name'])
+                                defenders_names, self.cb_option, self.sender_info['name'], self.recipient_info['name'],
+                                dynamic_war_name)
         # create the war embed
         war_embed = discord.Embed(title=f"The {dynamic_war_name}",
                                   description=f"The hounds of war have been released by "
