@@ -782,8 +782,6 @@ class SubMarketView(View):
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
     async def close(self, interaction: discord.Interaction, close: discord.Button):
-        # define bot
-        bot = interaction.client
         try:
             # defer response
             await interaction.response.defer()
