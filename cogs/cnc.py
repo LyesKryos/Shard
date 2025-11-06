@@ -3266,6 +3266,10 @@ class WarDeclarationView(discord.ui.View):
         # build simple attacker/defender name lists for storage
         attackers_names = [self.sender_info['name']]
         defenders_names = [self.recipient_info['name']]
+        # pull all defender's allies and add to defenders
+        defender_alliances = await self.conn.fetchrow('''SELECT * FROM cnc_alliances WHERE $1 = ANY(members);''',
+                                                      self.recipient_info['name'])
+        defenders_names.append(defender_alliances['members'].remove(self.recipient_info['name']))
         # check if the user has already had a war with this nation with this CB and how many
         historic_war_check = await self.conn.fetch('''SELECT * FROM cnc_wars 
                                                       WHERE primary_attacker = $1
@@ -3301,6 +3305,7 @@ class WarDeclarationView(discord.ui.View):
         war_embed.add_field(name="War Goal(s)", value=cb_war_goals)
         war_embed.add_field(name="Prohibited Peace Treaties", value=cb_prohib_pts)
         war_embed.add_field(name="\u200b", value="\u200b")
+        war_embed.set_footer(text=f"War ID: {self.interaction.message.id}")
         # notify all parties
         for uid in (self.sender_info['user_id'], self.recipient_info['user_id']):
             await safe_dm(self.bot, uid, embed=war_embed)
@@ -3383,7 +3388,7 @@ class WarsPaginator(discord.ui.View):
             defenders_others = [d for d in defenders_list if d != war['primary_defender']]
             attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war['primary_attacker'] else ", ".join(attackers_list)
             defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war['primary_defender'] else ", ".join(defenders_list)
-            self.wars_embed.add_field(name=f"{war['name']}",
+            self.wars_embed.add_field(name=f"The {war['name']}",
                                       value=f"ID: {war['id']}\n"
                                             f"Attackers: {attackers}\n"
                                             f"Defenders: {defenders}\n"
@@ -3432,7 +3437,7 @@ class WarsPaginator(discord.ui.View):
             defenders_others = [d for d in defenders_list if d != war['primary_defender']]
             attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war['primary_attacker'] else ", ".join(attackers_list)
             defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war['primary_defender'] else ", ".join(defenders_list)
-            self.wars_embed.add_field(name=f"{war['name']}",
+            self.wars_embed.add_field(name=f"The {war['name']}",
                                       value=f"ID: {war['id']}\n"
                                             f"Attackers: {attackers}\n"
                                             f"Defenders: {defenders}\n"
@@ -4190,7 +4195,7 @@ class CNC(commands.Cog):
                     defenders_others = [d for d in defenders_list if d != war['primary_defender']]
                     attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war['primary_attacker'] else ", ".join(attackers_list)
                     defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war['primary_defender'] else ", ".join(defenders_list)
-                    all_wars_embed.add_field(name=f"{war['name']}",
+                    all_wars_embed.add_field(name=f"The {war['name']}",
                                              value=f"ID: {war['id']}\n"
                                                    f"Attackers: {attackers}\n"
                                                    f"Defenders: {defenders}\n"
@@ -4232,7 +4237,7 @@ class CNC(commands.Cog):
             defenders_others = [d for d in defenders_list if d != war['primary_defender']]
             attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war['primary_attacker'] else ", ".join(attackers_list)
             defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war['primary_defender'] else ", ".join(defenders_list)
-            all_wars_embed.add_field(name=f"{war['name']}",
+            all_wars_embed.add_field(name=f"The {war['name']}",
                                      value=f"ID: {war['id']}\n"
                                            f"Attackers: {attackers}\n"
                                            f"Defenders: {defenders}\n"
