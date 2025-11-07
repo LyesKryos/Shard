@@ -119,12 +119,18 @@ async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> di
     return prov_embed
 
 
-async def user_db_info(user_id: int, conn: asyncpg.Pool) -> asyncpg.Record:
+async def user_db_info(user_id: int | str, conn: asyncpg.Pool) -> asyncpg.Record:
     """Pulls user info from the database using Discord user ID."""
-    # pull the user data
-    user_info = await conn.fetchrow('''SELECT *
-                                       FROM cnc_users
-                                       WHERE user_id = $1;''', user_id)
+    # if the type is int, its a user id
+    if type(user_id) == int:
+        user_info = await conn.fetchrow('''SELECT *
+                                           FROM cnc_users
+                                           WHERE user_id = $1;''', user_id)
+    # if the type is str, its a user nation name
+    else:
+        user_info = await conn.fetchrow('''SELECT *
+                                           FROM cnc_users
+                                           WHERE lower(name) = $1;''', user_id.lower())
     return user_info
 
 
@@ -2935,7 +2941,7 @@ class HostileDiplomaticActions(discord.ui.View):
             sender_dev = await self.conn.fetchrow('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1;''',
                                              sender_info['id'])
             recipient_dev = await self.conn.fetchrow('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1;''',
-                                                     self.recipient_info['id'])
+                                                     self.recipient_info['user_id'])
             # if 50% of the senders dev is larger than the recipient's dev, permit subjugation
             if recipient_dev['avg'] < sender_dev['avg'] * .5:
                 available_cbs.append("Subjugate")
@@ -3345,7 +3351,7 @@ class CasusBelliDropdown(discord.ui.Select):
         await self.interaction.edit_original_response(view=self.view)
         return await interaction.response.send_message(f"{self.view.cb_option} Casus Belli selected.", ephemeral=True)
 
-class DefesioBelliView(discord.ui.View):
+class DefensioBelliView(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool,
                  sender_info: asyncpg.Record, recipient_info: asyncpg.Record,
@@ -3633,8 +3639,8 @@ class MilitaryAllianceButton(discord.ui.Button):
                 # get the name of the alliance or set it as "your alliance"
                 alliance_name = alliance_info['name'] or "your alliance"
                 # create a small embed about the war
-                war_embed = discord.Embed(title="Global Wars", color=discord.Color.red(),
-                                               description="A directory of all ongoing wars.")
+                war_embed = discord.Embed(title=f"The {war_info['name']}", color=discord.Color.red(),
+                                               description="An invitation to the following war has been received.")
                 # get the list of attackers and defenders, placing the primary first and bolding
                 attackers_list = list(war_info['attackers']) if war_info['attackers'] is not None else []
                 defenders_list = list(war_info['defenders']) if war_info['defenders'] is not None else []
@@ -3653,11 +3659,114 @@ class MilitaryAllianceButton(discord.ui.Button):
                 # create the accept/decline view
                 war_invitation_view = AllianceWarInvitiation(conn=conn, war_info=war_info, attacker=False,
                                                              alliance_name=alliance_name, sender_info=self.user_info)
+                # create the content for the message
+                war_invitation_message = (f"War has been declared on our ally, {self.user_info['name']}! "
+                                          f"They have requested our aid. How shall we respond?")
                 # send the DM safely
-                await safe_dm(interaction.client, ally_user_info['user_id'], )
+                await safe_dm(interaction.client, ally_user_info['user_id'], content=war_invitation_message,
+                              embed=war_embed, view=war_invitation_view)
+        # if the user is not the defender, they must be the attacker
+        else:
+            # get a list of any allied nations that are not in the war
+            non_participants = list(set(alliance_info['members']).difference(set(war_info['attackers'])))
+            # for each non-participant
+            for np in non_participants:
+                # get their user object
+                ally_user_info = await user_db_info(np, conn)
+                # get the name of the alliance or set it as "your alliance"
+                alliance_name = alliance_info['name'] or "your alliance"
+                # create a small embed about the war
+                war_embed = discord.Embed(title=f"The {war_info['name']}", color=discord.Color.red(),
+                                          description="An invitation to the following war has been received.")
+                # get the list of attackers and defenders, placing the primary first and bolding
+                attackers_list = list(war_info['attackers']) if war_info['attackers'] is not None else []
+                defenders_list = list(war_info['defenders']) if war_info['defenders'] is not None else []
+                attackers_others = [a for a in attackers_list if a != war_info['primary_attacker']]
+                defenders_others = [d for d in defenders_list if d != war_info['primary_defender']]
+                attackers = ", ".join([f"**{war_info['primary_attacker']}**"] + attackers_others) if war_info[
+                    'primary_attacker'] else ", ".join(attackers_list)
+                defenders = ", ".join([f"**{war_info['primary_defender']}**"] + defenders_others) if war_info[
+                    'primary_defender'] else ", ".join(defenders_list)
+                war_embed.add_field(name=f"The {war_info['name']}",
+                                    value=f"ID: {war_info['id']}\n"
+                                          f"Attackers: {attackers}\n"
+                                          f"Defenders: {defenders}\n"
+                                          f"Casus Belli: {war_info['cb']}\n"
+                                          f"Defensio Belli: {war_info['db'] or 'None'}\n"
+                                          f"Turns: {war_info['turns']}\n"
+                                          f"Deaths: {war_info['deaths']}")
+                # create the accept/decline view
+                war_invitation_view = AllianceWarInvitiation(conn=conn, war_info=war_info, attacker=False,
+                                                             alliance_name=alliance_name, sender_info=self.user_info)
+                # create the content for the message
+                war_invitation_message = (f"War has been declared by our ally, {self.user_info['name']}! "
+                                          f"They have requested our aid. How shall we respond?")
+                # send the DM safely
+                await safe_dm(interaction.client, ally_user_info['user_id'], content=war_invitation_message,
+                              embed=war_embed, view=war_invitation_view)
+        # disable all the buttons and update the view
+        for child in self.view.children:
+            child.disabled = True
+        return await interaction.edit_original_response(view=self.view)
 
+class DefensioBelliButton(discord.ui.Button):
 
+    def __init__(self, conn: asyncpg.Pool, war_info: asyncpg.Record, user_info: asyncpg.Record):
+        self.conn = conn
+        self.war_info = war_info
+        self.user_info = user_info
+        super().__init__(label="Declare a Defensio Belli", style=discord.ButtonStyle.blurple, emoji="\U0001f4dc")
 
+    async def callback(self, interaction: discord.Interaction):
+        # defer the interaction
+        await interaction.reponse.defer(thinking=True)
+        # establish the connection
+        conn = self.conn
+        # define user info
+        sender_info = self.user_info
+        # get recipient info
+        recipient_info = await user_db_info(self.war_info['primary_attacker'], conn)
+        # get all the options for the defensio belli
+        # create a base list of CBs available
+        available_dbs = ["Conquest", "Subjugate", "Force Reparations"]
+        # check CBs available by tech
+        if "Ideological Crusade" in sender_info['tech']:
+            available_dbs.append("Indoctrinate")
+        if "National Humiliation" in sender_info['tech']:
+            available_dbs.append("Humiliate")
+        if "Subjugation" in sender_info['tech']:
+            # calculate the average national developments of sender and receiver
+            sender_dev = await self.conn.fetchrow('''SELECT AVG(development)
+                                                     FROM cnc_provinces
+                                                     WHERE owner_id = $1;''',
+                                                  sender_info['id'])
+            recipient_dev = await self.conn.fetchrow('''SELECT AVG(development)
+                                                        FROM cnc_provinces
+                                                        WHERE owner_id = $1;''',
+                                                     recipient_info['user_id'])
+            # if 50% of the senders dev is larger than the recipient's dev, permit subjugation
+            if recipient_dev['avg'] < sender_dev['avg'] * .5:
+                available_dbs.append("Subjugate")
+        if "Total War" in sender_info['tech']:
+            available_dbs.append("Total War")
+        # check to see if the recipient has any puppets
+        overlord_check = await self.conn.fetch('''SELECT *
+                                                  FROM cnc_users
+                                                  WHERE overlord = $1;''', recipient_info['user_id'])
+        if overlord_check:
+            available_dbs.append("Force Independence")
+        # if the recipient is equalist and the sender is not equalist, add the suppression the revolution CB
+        if (self.recipient_info['govt_type'] == "Equalism") and (sender_info['govt_type'] != "Equalism"):
+            available_dbs.append("Suppress the Revolution")
+        # if the recipient is not equalist and the sender is equalist, add the Spread the Revolution CB
+        if (self.recipient_info['govt_type'] != "Equalism") and (sender_info['govt_type'] == "Equalism"):
+            available_dbs.append("Spread the Revolution")
+        # create the dbs dropdown view
+        db_dropdown_view = DefensioBelliView(interaction=interaction, conn=conn, sender_info=sender_info,
+                                             recipient_info=recipient_info, bot=interaction.client, dbs=available_dbs,
+                                             war_id=self.war_info['id'])
+        # add the dropdown view and disable our button
+        await interaction.edit_original_response(view=db_dropdown_view)
 
 class WarOptionsView(discord.ui.View):
 
@@ -3666,10 +3775,13 @@ class WarOptionsView(discord.ui.View):
         self.interaction = interaction
         self.conn = conn
         self.war_info = war_info
-        self.alliance_button = alliance_button
-        self.db_button = db_button
         self.user_info = user_info
         super().__init__(timeout=120)
+        # add military alliance button
+        if alliance_button:
+            self.add_item(MilitaryAllianceButton(conn=self.conn, war_info=self.war_info, user_info=self.user_info))
+        if db_button:
+            self.add_item(DefensioBelliButton(conn=self.conn, war_info=self.war_info, user_info=self.user_info))
 
     async def on_timeout(self):
         # remove dropdown
@@ -3679,11 +3791,6 @@ class WarOptionsView(discord.ui.View):
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.interaction.user.id
-
-
-
-
-
 
 
 class CNC(commands.Cog):
@@ -4555,8 +4662,9 @@ class CNC(commands.Cog):
             else:
                 defensio_belli_button = False
             # add the appropriate buttons, including the peace negotiation button
-
-            return None
+            war_options_view = WarOptionsView(interaction, conn, war_info,
+                                              alliance_button, defensio_belli_button, user_info)
+            return await interaction.followup.send(embed=war_embed, view=war_options_view)
         # if the user is in the war and is not a primary, add the peace option
         elif (user_info['name'] == attackers_others) or (user_info['name'] == defenders_others):
             # CODE HERE
