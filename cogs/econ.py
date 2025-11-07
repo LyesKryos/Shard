@@ -6,8 +6,6 @@ import math
 import typing
 from datetime import datetime, timedelta
 from random import randint, uniform, choice
-from typing import Any, Coroutine
-
 import discord
 import pandas as pd
 from dateutil.relativedelta import relativedelta
