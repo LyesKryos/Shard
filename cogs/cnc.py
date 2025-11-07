@@ -3772,11 +3772,11 @@ class WarOptionsView(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, war_info: asyncpg.Record,
                  alliance_button: bool, db_button: bool, user_info: asyncpg.Record):
+        super().__init__(timeout=120)
         self.interaction = interaction
         self.conn = conn
         self.war_info = war_info
         self.user_info = user_info
-        super().__init__(timeout=120)
         # add military alliance button
         if alliance_button:
             self.add_item(MilitaryAllianceButton(conn=self.conn, war_info=self.war_info, user_info=self.user_info))
@@ -4646,7 +4646,7 @@ class CNC(commands.Cog):
         # send the embed with the appropriate buttons
         # if the user is in the war and is a primary, add the military alliance option and the peace option
         if (user_info['name'] == war_info['primary_attacker']) or (user_info['name'] == war_info['primary_defender']):
-            # if the user is in a miliary alliance, enable that button
+            # if the user is in a military alliance, enable that button
             alliance_check = await conn.fetchrow('''SELECT * FROM cnc_alliances WHERE $1 = ANY(members);''',
                                                  user_info['name'])
             if alliance_check:
