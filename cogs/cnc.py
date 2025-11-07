@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from random import randrange, randint
 import asyncpg
 from discord import app_commands, Interaction
@@ -15,7 +14,7 @@ import math
 
 
 async def safe_dm(bot: discord.Client, user_id: int, *, content: str | None = None,
-                  embed: discord.Embed | None = None, fallback_channel_id: int = 927288304301387816) -> bool:
+                  embed: discord.Embed | None = None, view: discord.ui.View | None = None, fallback_channel_id: int = 927288304301387816) -> bool:
     """Attempt to DM a user. On failure, warn them in a public fallback channel.
     Returns True if DM sent, False otherwise.
     """
@@ -31,11 +30,11 @@ async def safe_dm(bot: discord.Client, user_id: int, *, content: str | None = No
         return False
     try:
         if embed is not None and content is not None:
-            await user.send(content=content, embed=embed)
+            await user.send(content=content, embed=embed, view=view)
         elif embed is not None:
-            await user.send(embed=embed)
+            await user.send(embed=embed, view=view)
         else:
-            await user.send(content or "")
+            await user.send(content or "", view=view)
         return True
     except (discord.Forbidden, discord.HTTPException):
         channel = bot.get_channel(fallback_channel_id)
@@ -3156,8 +3155,6 @@ class TradePactRespondView(discord.ui.View):
         self.stop()
         # send message that the user has failed to react in time
         await self.dm.reply(content="You have failed to reply within 24 hours. The request has been auto-rejected.")
-        # send message to the sender that the request has been denied
-        sender_user = self.bot.get_user(self.sender_info['user_id'])
         # delete pending request
         await self.conn.execute('''DELETE
                                    FROM cnc_pending_requests
@@ -3223,6 +3220,8 @@ class TradePactRespondView(discord.ui.View):
                                        f"the offer for a trade pact from {self.sender_info['name']}!")
         # close out the buttons
         return await interaction.edit_original_response(view=None)
+
+# === WAR VIEWS ===
 
 class WarDeclarationView(discord.ui.View):
 
@@ -3346,6 +3345,66 @@ class CasusBelliDropdown(discord.ui.Select):
         await self.interaction.edit_original_response(view=self.view)
         return await interaction.response.send_message(f"{self.view.cb_option} Casus Belli selected.", ephemeral=True)
 
+class DefesioBelliView(discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool,
+                 sender_info: asyncpg.Record, recipient_info: asyncpg.Record,
+                 bot: discord.Client, dbs: list, war_id: int):
+        super().__init__(timeout=86400)
+        self.interaction = interaction
+        # add the dropdown
+        db_options_dropdown = DefensioBelliDropdown(interaction, dbs, war_id)
+        self.add_item(db_options_dropdown)
+        # establish the view
+        self.db_option = None
+        # establish the variables
+        self.conn = conn
+        self.sender_info = sender_info
+        self.recipient_info = recipient_info
+        self.bot = bot
+        self.war_id = war_id
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.interaction.user.id
+
+    async def on_timeout(self) -> None:
+        # disable all the views
+        for child in self.children:
+            child.disabled = True
+        # update the view and send a message
+        await self.interaction.edit_original_response(view=self)
+        return await self.interaction.followup.send(f"No Defensio Belli selected. "
+                                                    f"You may select a Defensio Belli by using the "
+                                                    f"`/cnc war id:{self.war_id}` command.")
+
+class DefensioBelliDropdown(discord.ui.Select):
+
+    def __init__(self, interaction: discord.Interaction, dbs: list, war_id: int):
+        self.interaction = interaction
+        # create the options
+        db_options = []
+        for db in dbs:
+            db_options.append(discord.SelectOption(label=db))
+        # define the super
+        super().__init__(placeholder="Choose a Defensio Belli...", min_values=1, max_values=1,
+                         options=db_options)
+        self.war_id = war_id
+        self.conn = interaction.client.pool
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.interaction.user.id
+
+    async def callback(self, interaction: discord.Interaction):
+        # pull the selected value
+        db_option = self.values[0]
+        # disable and update view
+        self.disabled = True
+        await self.interaction.edit_original_response(view=self.view)
+        # add the defensio belli
+        await self.conn.execute('''UPDATE cnc_wars SET db = $1 WHERE id = $2;''',
+                                db_option, self.war_id)
+        return await interaction.response.send_message(f"{db_option} Defensio Belli selected.")
+
 class WarsPaginator(discord.ui.View):
 
     def __init__(self, interaction, all_wars: asyncpg.Record, wars_embed: discord.Embed):
@@ -3355,7 +3414,7 @@ class WarsPaginator(discord.ui.View):
         self.wars_embed = wars_embed
         super().__init__(timeout=300)
 
-    async def on_timeout(self) -> None:
+    async def on_timeout(self):
         # remove dropdown
         for item in self.children:
             self.remove_item(item)
@@ -3447,6 +3506,184 @@ class WarsPaginator(discord.ui.View):
                                             f"Deaths: {war['deaths']}")
         # update the embed and the view
         return await self.interaction.edit_original_response(embed=self.wars_embed, view=self)
+
+class AllianceWarInvitiation(discord.ui.View):
+
+    def __init__(self, conn: asyncpg.Pool, war_info: asyncpg.Record, attacker: bool,
+                 alliance_name: str, sender_info: asyncpg.Record):
+        self.war_info = war_info
+        self.attacker = attacker
+        self.conn = conn
+        self.alliance_name = alliance_name
+        self.sender_info = sender_info
+        super().__init__(timeout=86400)
+
+    async def on_timeout(self):
+        # remove dropdown
+        for item in self.children:
+            self.remove_item(item)
+        return await self.interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.green)
+    async def accept_war(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.conn
+        # pull user info
+        user_info = user_db_info(interaction.user.id, conn)
+        # add the user to the correct side
+        if self.attacker:
+            # if the user is an attacker, add them to the attacker list
+            await conn.execute('''UPDATE cnc_wars SET attackers = array_append(attackers, $1) WHERE id = $2;''',
+                               user_info['name'], self.war_info['id'])
+            # dm the attackers notifying them that a new nation has joined on the side of the attackers
+            for belligerent in self.war_info['attackers']:
+                # get belligerent info
+                belligerent_info = await user_db_info(belligerent, conn)
+                # pull the user id
+                belligerent_id = belligerent_info['user_id']
+                # attempt to DM the user
+                belligerent_joined_msg = (f"**The {user_info['pretitle']} of {user_info['name']}**, "
+                                          f"a member of {self.alliance_name}, has joined our glorious war against "
+                                          f"**{self.war_info['primary_defender']}**!")
+                await safe_dm(interaction.client, belligerent_id, content=belligerent_joined_msg)
+            # get the cnc channel
+            cnc_channel = interaction.client.get_channel(927288304301387816)
+            # send a message to that channel
+            await cnc_channel.send(f"**{user_info['name']}** has joined the {self.war_info['name']} "
+                                   f"as an attacker.")
+        # if the user is not an attacker, they must be a defender
+        else:
+            # add them to the defender list
+            await conn.execute('''UPDATE cnc_wars
+                                  SET defenders = array_append(defenders, $1)
+                                  WHERE id = $2;''',
+                               user_info['name'], self.war_info['id'])
+            # dm the attackers notifying them that a new nation has joined on the side of the attackers
+            for belligerent in self.war_info['defenders']:
+                # get belligerent info
+                belligerent_info = await user_db_info(belligerent, conn)
+                # pull the user id
+                belligerent_id = belligerent_info['user_id']
+                # attempt to DM the user
+                belligerent_joined_msg = (f"**The {user_info['pretitle']} of {user_info['name']}**, "
+                                          f"a member of {self.alliance_name}, has joined in our valiant defense against"
+                                          f"**{self.war_info['primary_attacker']}**!")
+                await safe_dm(interaction.client, belligerent_id, content=belligerent_joined_msg)
+            # get the cnc channel
+            cnc_channel = interaction.client.get_channel(927288304301387816)
+            # send a message to that channel
+            await cnc_channel.send(f"**{user_info['name']}** has joined the {self.war_info['name']} "
+                                   f"as a defender.")
+        # update the view with the disabled button
+        for child in self.children:
+            child.disabled = True
+        return await interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Decline", style=discord.ButtonStyle.red)
+    async def decline_war(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.conn
+        # pull user info
+        user_info = user_db_info(interaction.user.id, conn)
+        # send a message to the primary attacker/defender
+        if self.attacker:
+            # use safe dm to send them the decline message
+            decline_message = (f"**The {user_info['pretitle']} of {user_info['name']}** has declined to join the "
+                               f"{self.war_info['name']} against {self.war_info['primary_defender']}.")
+            await safe_dm(interaction.client, sender_info['id'], content=decline_message)
+        else:
+            # declining a call to war for a defender automatically ends the military alliance
+            pass
+        # disable the buttons
+        for child in self.children:
+            child.disabled = True
+        return await interaction.edit_original_message(view=self)
+
+class MilitaryAllianceButton(discord.ui.Button):
+
+    def __init__(self, conn: asyncpg.Pool, war_info: asyncpg.Record, user_info: asyncpg.Record):
+        self.conn = conn
+        self.war_info = war_info
+        self.user_info = user_info
+        super().__init__(label="Call Allies to War!", style=discord.ButtonStyle.blurple, emoji="\U0001f6e1")
+
+    async def callback(self, interaction: discord.Interaction):
+        # defer the interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.conn
+        # define the war info
+        war_info = self.war_info
+        # check to see if any members of the user's military alliance are not yet in the war
+        # pull the alliance information
+        alliance_info = await conn.fetchrow('''SELECT members FROM cnc_alliances WHERE $1 = ANY(members);''',
+                                            self.user_info['name'])
+        # if the user is the defender, pull the defenders
+        if self.user_info['name'] == self.war_info['primary_defender']:
+            # get a list of any allied nations that are not in the war
+            non_participants = list(set(alliance_info['members']).difference(set(war_info['defenders'])))
+            # for each non-participant
+            for np in non_participants:
+                # get their user object
+                ally_user_info = await user_db_info(np, conn)
+                # get the name of the alliance or set it as "your alliance"
+                alliance_name = alliance_info['name'] or "your alliance"
+                # create a small embed about the war
+                war_embed = discord.Embed(title="Global Wars", color=discord.Color.red(),
+                                               description="A directory of all ongoing wars.")
+                # get the list of attackers and defenders, placing the primary first and bolding
+                attackers_list = list(war_info['attackers']) if war_info['attackers'] is not None else []
+                defenders_list = list(war_info['defenders']) if war_info['defenders'] is not None else []
+                attackers_others = [a for a in attackers_list if a != war_info['primary_attacker']]
+                defenders_others = [d for d in defenders_list if d != war_info['primary_defender']]
+                attackers = ", ".join([f"**{war_info['primary_attacker']}**"] + attackers_others) if war_info['primary_attacker'] else ", ".join(attackers_list)
+                defenders = ", ".join([f"**{war_info['primary_defender']}**"] + defenders_others) if war_info['primary_defender'] else ", ".join(defenders_list)
+                war_embed.add_field(name=f"The {war_info['name']}",
+                                         value=f"ID: {war_info['id']}\n"
+                                               f"Attackers: {attackers}\n"
+                                               f"Defenders: {defenders}\n"
+                                               f"Casus Belli: {war_info['cb']}\n"
+                                               f"Defensio Belli: {war_info['db'] or 'None'}\n"
+                                               f"Turns: {war_info['turns']}\n"
+                                               f"Deaths: {war_info['deaths']}")
+                # create the accept/decline view
+                war_invitation_view = AllianceWarInvitiation(conn=conn, war_info=war_info, attacker=False,
+                                                             alliance_name=alliance_name, sender_info=self.user_info)
+                # send the DM safely
+                await safe_dm(interaction.client, ally_user_info['user_id'], )
+
+
+
+
+class WarOptionsView(discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, war_info: asyncpg.Record,
+                 alliance_button: bool, db_button: bool, user_info: asyncpg.Record):
+        self.interaction = interaction
+        self.conn = conn
+        self.war_info = war_info
+        self.alliance_button = alliance_button
+        self.db_button = db_button
+        self.user_info = user_info
+        super().__init__(timeout=120)
+
+    async def on_timeout(self):
+        # remove dropdown
+        for item in self.children:
+            self.remove_item(item)
+        return await self.interaction.edit_original_response(view=self)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.interaction.user.id
+
+
+
+
+
 
 
 class CNC(commands.Cog):
@@ -4179,7 +4416,8 @@ class CNC(commands.Cog):
                                            WHERE active = True;''')
             # if there are no active wars, send such
             if not all_wars:
-                return await interaction.followup.send("There are no ongoing wars. Peace on earth! Goodwill towards men!")
+                return await interaction.followup.send("There are no ongoing wars. "
+                                                       "Peace on earth! Goodwill towards men!")
             # list out all the wars
             else:
                 # create the initial embed
@@ -4188,7 +4426,7 @@ class CNC(commands.Cog):
                 # populate the first ten options
                 wars_to_display = all_wars[:10]
                 for war in wars_to_display:
-                    # get the list of attackers and defenders, placing the primary first and adding asterisk
+                    # get the list of attackers and defenders, placing the primary first and bolding
                     attackers_list = list(war['attackers']) if war['attackers'] is not None else []
                     defenders_list = list(war['defenders']) if war['defenders'] is not None else []
                     attackers_others = [a for a in attackers_list if a != war['primary_attacker']]
@@ -4251,6 +4489,81 @@ class CNC(commands.Cog):
         else:
             all_wars_pages = WarsPaginator(interaction, user_wars, all_wars_embed)
             return await interaction.followup.send(embed=all_wars_embed, view=all_wars_pages)
+
+    @cnc.command(name="war", description="Displays information about a specific war and option related to that war.")
+    @app_commands.describe(war_id="The war's ID or full name.")
+    async def war_info(self, interaction: discord.Interaction, war_id: str):
+        # defer the interaction
+        await interaction.response.defer(thinking=True)
+        # establish the conn
+        conn = self.bot.pool
+        # look for the user info, if any
+        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        # parse the war id
+        try:
+            war_id = int(war_id)
+            # search for the active war using the id
+            war_info = await conn.fetchrow('''SELECT *
+                                              FROM cnc_wars
+                                              WHERE id = $1 
+                                                AND active=True;''',
+                                           war_id)
+        except ValueError:
+            war_id = str(war_id)
+            # search for the active war using the name
+            war_info = await conn.fetchrow('''SELECT *
+                                              FROM cnc_wars
+                                              WHERE name = $1 
+                                                AND active=True;''',
+                                           war_id)
+        # create the war embed
+        war_embed = discord.Embed(title=f"{war_info['name']}", color=discord.Color.red(),
+                                       description="Information about an ongoing war.")
+        # get the list of attackers and defenders, placing the primary first and bolding
+        attackers_list = list(war_info['attackers']) if war_info['attackers'] is not None else []
+        defenders_list = list(war_info['defenders']) if war_info['defenders'] is not None else []
+        attackers_others = [a for a in attackers_list if a != war_info['primary_attacker']]
+        defenders_others = [d for d in defenders_list if d != war_info['primary_defender']]
+        attackers = ", ".join([f"**{war_info['primary_attacker']}**"] + attackers_others) if war_info[
+            'primary_attacker'] else ", ".join(attackers_list)
+        defenders = ", ".join([f"**{war_info['primary_defender']}**"] + defenders_others) if war_info[
+            'primary_defender'] else ", ".join(defenders_list)
+        war_embed.add_field(name=f"The {war_info['name']}",
+                                 value=f"ID: {war_info['id']}\n"
+                                       f"Attackers: {attackers}\n"
+                                       f"Defenders: {defenders}\n"
+                                       f"Casus Belli: {war_info['cb']}\n"
+                                       f"Defensio Belli: {war_info['db'] or 'None'}\n"
+                                       f"Turns: {war_info['turns']}\n"
+                                       f"Deaths: {war_info['deaths']}")
+        # send the embed with the appropriate buttons
+        # if the user is in the war and is a primary, add the military alliance option and the peace option
+        if (user_info['name'] == war_info['primary_attacker']) or (user_info['name'] == war_info['primary_defender']):
+            # if the user is in a miliary alliance, enable that button
+            alliance_check = await conn.fetchrow('''SELECT * FROM cnc_alliances WHERE $1 = ANY(members);''',
+                                                 user_info['name'])
+            if alliance_check:
+                alliance_button = True
+            else:
+                alliance_button = False
+            # if the war has no defensio belli option and the user is the primary defender, enable that button
+            if user_info['name'] == war_info['primary_defender']:
+                if not war_info['db']:
+                    defensio_belli_button = True
+                else:
+                    defensio_belli_button = False
+            else:
+                defensio_belli_button = False
+            # add the appropriate buttons, including the peace negotiation button
+
+            return None
+        # if the user is in the war and is not a primary, add the peace option
+        elif (user_info['name'] == attackers_others) or (user_info['name'] == defenders_others):
+            # CODE HERE
+            return None
+        # in any other case (unregistered/uninvolved user), return the embed as is, no buttons
+        else:
+            return await interaction.followup.send(embed=war_embed)
 
     # === Tech Commands === #
 
