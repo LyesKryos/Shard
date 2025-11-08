@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import logging
 from random import randrange, randint
 import asyncpg
 from discord import app_commands, Interaction
@@ -3840,7 +3842,10 @@ class WarOptionsView(discord.ui.View):
             cb_info = await conn.fetchrow('''SELECT * FROM cnc_cbs WHERE name = $1;''', war_info['cb'])
             # remove prohibited pts
             for prohibited_pt in cb_info['prohibited_pts']:
-                peace_treaty_options.remove(prohibited_pt)
+                try:
+                    peace_treaty_options.remove(prohibited_pt)
+                except ValueError:
+                    logging.getLogger(__name__).exception(f"Option: {prohibited_pt}")
         # otherwise, they are defender
         else:
             # if there is no db, only white peace is an option
