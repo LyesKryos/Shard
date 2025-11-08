@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Add &quot;Force Government Type&quot; to peace treaty options" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Add &quot;White Peace&quot; to peace treaty options list">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -497,7 +499,7 @@
       <workItem from="1762450375668" duration="16103000" />
       <workItem from="1762535789995" duration="10887000" />
       <workItem from="1762636213040" duration="182000" />
-      <workItem from="1762636404393" duration="623000" />
+      <workItem from="1762636404393" duration="1247000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -842,7 +844,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1261" />
+    <option name="localTasksCounter" value="1264" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -861,9 +863,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting 'value' misattribution for CB dropdown" />
-    <MESSAGE value="Correcting misuse of &quot;get_channel&quot;" />
-    <MESSAGE value="Adding interaction response to dropdown" />
     <MESSAGE value="Correcting poor timeout handling for war buttons" />
     <MESSAGE value="Adding the proper interaction followup and original interaction editing to disable the view." />
     <MESSAGE value="Fixing bad interaction.edit_original_response calls" />
@@ -886,7 +885,10 @@
     <MESSAGE value="Add peace negotiation system to war options&#10;&#10;- Add &quot;Status Quo&quot; as default Defensio Belli option&#10;- Implement peace negotiation button in WarOptionsView&#10;- Create peace negotiation embed with war details and current status&#10;- Add logic to determine available peace treaty options based on CB/DB&#10;- Filter prohibited peace terms based on attacker's CB or defender's DB&#10;- Add PeaceNegotiationOptionsDropdown for selecting peace demands&#10;- Implement interaction check and timeout handling for peace negotiations&#10;- Add support for multiple peace treaty demand types (cede province, reparations, etc.)" />
     <MESSAGE value="Fix peace negotiation interaction handling&#10;&#10;- Disable &quot;thinking&quot; mode for response deferral&#10;- Ensure database connection is correctly referenced" />
     <MESSAGE value="Add &quot;Force Government Type&quot; to peace treaty options" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add &quot;Force Government Type&quot; to peace treaty options" />
+    <MESSAGE value="Handle missing prohibited peace treaty options gracefully&#10;&#10;- Add exception handling to prevent crashes when prohibited options are missing&#10;- Log missing prohibited options for debugging purposes" />
+    <MESSAGE value="Remove redundant exception handling; fix peace negotiation dropdown view usage" />
+    <MESSAGE value="Add &quot;White Peace&quot; to peace treaty options list" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add &quot;White Peace&quot; to peace treaty options list" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />

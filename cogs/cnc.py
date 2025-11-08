@@ -283,7 +283,7 @@ class Accept(View):
 
     # When the confirm button is pressed, set the inner value to `True` and
     # stop the View from listening to more input.
-    @discord.ui.button(label='Accept', style=discord.ButtonStyle.green)
+    @discord.ui.button(label='Accept', style=discord.ButtonStyle.success)
     async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.value = True
         self.stop()
@@ -3532,7 +3532,7 @@ class AllianceWarInvitiation(discord.ui.View):
             self.remove_item(item)
         return await self.interaction.edit_original_response(view=self)
 
-    @discord.ui.button(label="Accept", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
     async def accept_war(self, interaction: discord.Interaction, button: discord.Button):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -3794,7 +3794,7 @@ class WarOptionsView(discord.ui.View):
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.interaction.user.id
 
-    @discord.ui.button(label="Sue for Peace", style=discord.ButtonStyle.green, emoji="\U0001f54a")
+    @discord.ui.button(label="Sue for Peace", style=discord.ButtonStyle.success, emoji="\U0001f54a")
     async def peace_negotiation(self, interaction: discord.Interaction, button: discord.Button):
         # defer the interaction
         await interaction.response.defer(thinking=False)
@@ -3883,8 +3883,6 @@ class WarOptionsView(discord.ui.View):
         # parse the options
         negotiation_demands = peace_options_returned.data['values']
 
-
-
 class PeaceNegotiationOptionsDropdown(discord.ui.Select):
 
     # hypersimplistic dropdown
@@ -3894,7 +3892,7 @@ class PeaceNegotiationOptionsDropdown(discord.ui.Select):
         for pt in pts:
             pt_options.append(discord.SelectOption(label=pt))
         # define the super
-        super().__init__(placeholder="Choose Peace Treaty Demands...", min_values=1, max_values=25,
+        super().__init__(placeholder="Choose Peace Treaty Demands...", min_values=1, max_values=len(pt_options),
                          options=pt_options, custom_id="peace_treaty_negotiations_dropdown")
 
 
