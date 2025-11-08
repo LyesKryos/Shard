@@ -3870,6 +3870,16 @@ class WarOptionsView(discord.ui.View):
         # create and add the view
         peace_negotiation_dropdown_view = discord.ui.View()
         peace_negotiation_dropdown_view.add_item(PeaceNegotiationOptionsDropdown(peace_treaty_options))
+        # add a cancel button to the view
+        cancel_peace_negotiations = discord.ui.Button(label="Cancel", style=discord.ButtonStyle.danger)
+
+        async def cancel_peace_negotiations_callback(interaction: discord.Interaction):
+            for child in peace_negotiation_dropdown_view.children:
+                child.disabled = True
+            return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
+
+        cancel_peace_negotiations.callback = cancel_peace_negotiations_callback
+        peace_negotiation_dropdown_view.add_item(cancel_peace_negotiations)
         # update the original message with the embed and the view
         await self.interaction.edit_original_response(embed=peace_embed, view=peace_negotiation_dropdown_view)
 
