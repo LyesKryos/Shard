@@ -3864,7 +3864,6 @@ class WarOptionsView(discord.ui.View):
             # Ensure it's the same message & same user
             return (
                     inter.user == self.interaction.user
-                    and inter.data["component_type"] == 3  # 3 = select
                     and inter.data['custom_id'] == "peace_treaty_negotiations_dropdown"
             )
         # create and add the view
