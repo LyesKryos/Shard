@@ -3795,7 +3795,9 @@ class WarOptionsView(discord.ui.View):
     @discord.ui.button(label="Sue for Peace", style=discord.ButtonStyle.green, emoji="\U0001f54a")
     async def peace_negotiation(self, interaction: discord.Interaction, button: discord.Button):
         # defer the interaction
-        await interaction.response.defer(thinking=True)
+        await interaction.response.defer(thinking=False)
+        # establish the connection
+        conn = self.conn
         # establish other variables
         war_info = self.war_info
         user_info = self.user_info
