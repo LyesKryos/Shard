@@ -3831,6 +3831,7 @@ class WarOptionsView(discord.ui.View):
             "End Trade Pacts",
             "Subjugate",
             "Dismantle",
+            "Force Government Type"
             "White Peace"
         ]
         # if the user is using a cb (attacker), then search for the cb prohibited options for that cb
