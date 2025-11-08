@@ -3842,10 +3842,8 @@ class WarOptionsView(discord.ui.View):
             cb_info = await conn.fetchrow('''SELECT * FROM cnc_cbs WHERE name = $1;''', war_info['cb'])
             # remove prohibited pts
             for prohibited_pt in cb_info['prohibited_pts']:
-                try:
-                    peace_treaty_options.remove(prohibited_pt)
-                except ValueError:
-                    logging.getLogger(__name__).exception(f"Option: {prohibited_pt}")
+                peace_treaty_options.remove(prohibited_pt)
+
         # otherwise, they are defender
         else:
             # if there is no db, only white peace is an option
@@ -3871,7 +3869,7 @@ class WarOptionsView(discord.ui.View):
             )
         # create and add the view
         peace_negotiation_dropdown_view = discord.ui.View()
-        view.add_item(PeaceNegotiationOptionsDropdown(peace_treaty_options))
+        peace_negotiation_dropdown_view.add_item(PeaceNegotiationOptionsDropdown(peace_treaty_options))
         # update the original message with the embed and the view
         await self.interaction.edit_original_response(embed=peace_embed, view=peace_negotiation_dropdown_view)
 
