@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Update button styles and enhance dropdown behavior&#10;&#10;- Replace `discord.ButtonStyle.green` with `discord.ButtonStyle.success` for consistency&#10;- Adjust `PeaceNegotiationOptionsDropdown` max values to dynamically match options count" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Defer interaction response in cancel peace negotiations callback">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -497,7 +500,7 @@
       <workItem from="1762450375668" duration="16103000" />
       <workItem from="1762535789995" duration="10887000" />
       <workItem from="1762636213040" duration="182000" />
-      <workItem from="1762636404393" duration="1586000" />
+      <workItem from="1762636404393" duration="3936000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -842,7 +845,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1265" />
+    <option name="localTasksCounter" value="1267" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -861,8 +864,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding the proper interaction followup and original interaction editing to disable the view." />
-    <MESSAGE value="Fixing bad interaction.edit_original_response calls" />
     <MESSAGE value="Fixing bad reference to recipient" />
     <MESSAGE value="Disabling cooperative relations while the users are at war." />
     <MESSAGE value="Removing incorrect handling of diplomatic relations at the nation command level&#10;Removing the incorrect handling of hostile diplomatic relations at the hostile view level" />
@@ -886,7 +887,9 @@
     <MESSAGE value="Remove redundant exception handling; fix peace negotiation dropdown view usage" />
     <MESSAGE value="Add &quot;White Peace&quot; to peace treaty options list" />
     <MESSAGE value="Update button styles and enhance dropdown behavior&#10;&#10;- Replace `discord.ButtonStyle.green` with `discord.ButtonStyle.success` for consistency&#10;- Adjust `PeaceNegotiationOptionsDropdown` max values to dynamically match options count" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update button styles and enhance dropdown behavior&#10;&#10;- Replace `discord.ButtonStyle.green` with `discord.ButtonStyle.success` for consistency&#10;- Adjust `PeaceNegotiationOptionsDropdown` max values to dynamically match options count" />
+    <MESSAGE value="Add cancel button to peace negotiation view&#10;&#10;- Implement `Cancel` button with danger style in peace negotiation dropdown view  &#10;- Disable view components upon cancellation to ensure proper interaction handling" />
+    <MESSAGE value="Defer interaction response in cancel peace negotiations callback" />
+    <option name="LAST_COMMIT_MESSAGE" value="Defer interaction response in cancel peace negotiations callback" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
