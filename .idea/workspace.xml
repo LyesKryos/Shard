@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Removing unused imports in econ.py">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fix typo in comment and reorder super() call in `cnc.py` constructor">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -493,7 +493,7 @@
       <workItem from="1762195954106" duration="8904000" />
       <workItem from="1762277052045" duration="17571000" />
       <workItem from="1762450375668" duration="16103000" />
-      <workItem from="1762535789995" duration="642000" />
+      <workItem from="1762535789995" duration="9224000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -838,7 +838,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1257" />
+    <option name="localTasksCounter" value="1258" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -857,8 +857,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding war features to CNC." />
-    <MESSAGE value="Correcting slight user information error for CNC war option button." />
     <MESSAGE value="Correcting slight error with DB call for historic wars." />
     <MESSAGE value="Correcting 'techs' reference - not the right reference." />
     <MESSAGE value="Correcting conn misattribution" />
@@ -882,7 +880,9 @@
     <MESSAGE value="Updating user_db_info function to support user names alongside user IDs and adding Defensio Belli functionality." />
     <MESSAGE value="Handling multiple user identifiers in `user_db_info`&#10;Adding war_options_view for defenders in the view_war command" />
     <MESSAGE value="Removing unused imports in econ.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Removing unused imports in econ.py" />
+    <MESSAGE value="Fixing the db " />
+    <MESSAGE value="Fix typo in comment and reorder super() call in `cnc.py` constructor" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix typo in comment and reorder super() call in `cnc.py` constructor" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />

@@ -3388,7 +3388,7 @@ class DefensioBelliDropdown(discord.ui.Select):
     def __init__(self, interaction: discord.Interaction, dbs: list, war_id: int):
         self.interaction = interaction
         # create the options
-        db_options = []
+        db_options = [discord.SelectOption(label="Status Quo")]
         for db in dbs:
             db_options.append(discord.SelectOption(label=db))
         # define the super
@@ -3791,6 +3791,105 @@ class WarOptionsView(discord.ui.View):
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.interaction.user.id
+
+    @discord.ui.button(label="Sue for Peace", style=discord.ButtonStyle.green, emoji="\U0001f54a")
+    async def peace_negotiation(self, interaction: discord.Interaction, button: discord.Button):
+        # defer the interaction
+        await interaction.response.defer(thinking=True)
+        # establish other variables
+        war_info = self.war_info
+        user_info = self.user_info
+        # create the negotiation embed
+        peace_embed = discord.Embed(title=f"Peace Negotiations for the {war_info['name']}", color=discord.Color.red(),
+                                        description="Peace negotiations have begun between the belligerents of this war.")
+        # add the details of the proposal
+        peace_embed.add_field(name="Proposed by",
+                              value=f"The {user_info['pretitle']} of {user_info['name']}",
+                              inline=False)
+        peace_embed.add_field(name="War Score",
+                              value=f"(A) {war_info['war_score'][0]} \U00002694 {war_info['war_score'][1]} (D)",
+                              inline=False)
+        peace_embed.add_field(name="Current Negotiations",
+                              value="None",
+                              inline=False)
+        peace_embed.add_field(name="Information",
+                              value=f"*Turns*: {war_info['turns']}\n"
+                                    f"*Deaths*: {war_info['deaths']}\n"
+                                    f"*Casus Belli*: {war_info['cb']}\n"
+                                    f"*Defensio Belli*: {war_info['db'] or 'None'}")
+        peace_embed.set_footer(text="Use the dropdown below to begin negotiations.",
+                               icon_url="https://i.ibb.co/CKScCw9P/Command-Conquest-symbol-circular.png")
+        # select any peace negotiation options
+        peace_treaty_options = [
+            "Cede Province",
+            "Give Province",
+            "Demand Reparations",
+            "End Embargo",
+            "End Military Alliance",
+            "End Trade Pacts",
+            "Subjugate",
+            "Dismantle",
+            "White Peace"
+        ]
+        # if the user is using a cb (attacker), then search for the cb prohibited options for that cb
+        if (user_info['name'] == war_info['primary_attacker']) or (user_info['name'] in war_info['attackers']):
+            # pull cb info
+            cb_info = await conn.fetchrow('''SELECT * FROM cnc_cbs WHERE name = $1;''', war_info['cb'])
+            # remove prohibited pts
+            for prohibited_pt in cb_info['prohibited_pts']:
+                peace_treaty_options.remove(prohibited_pt)
+        # otherwise, they are defender
+        else:
+            # if there is no db, only white peace is an option
+            if war_info['db'] is None:
+                peace_treaty_options = ["White Peace"]
+            # if the db is status quo, also only permit white peace
+            elif war_info['db'] == "Status Quo":
+                peace_treaty_options = ["White Peace"]
+            # if the db is anything else, proceed
+            else:
+                # pull db info
+                db_info = await conn.fetchrow('''SELECT * FROM cnc_cbs WHERE name = $1;''', war_info['db'])
+                # remove prohibited pts
+                for prohibited_pt in db_info['prohibited_pts']:
+                    peace_treaty_options.remove(prohibited_pt)
+        # create view check to ensure proper parsing
+        def pnd_check(inter: discord.Interaction):
+            # Ensure it's the same message & same user
+            return (
+                    inter.user == self.interaction.user
+                    and inter.data["component_type"] == 3  # 3 = select
+                    and inter.data['custom_id'] == "peace_treaty_negotiations_dropdown"
+            )
+        # create and add the view
+        peace_negotiation_dropdown_view = discord.ui.View()
+        view.add_item(PeaceNegotiationOptionsDropdown(peace_treaty_options))
+        # update the original message with the embed and the view
+        await self.interaction.edit_original_response(embed=peace_embed, view=peace_negotiation_dropdown_view)
+
+        # wait for the options to be selected
+        try:
+            peace_options_returned = await interaction.client.wait_for("interaction", check=pnd_check, timeout=120)
+        except asyncio.TimeoutError:
+            # return and remove the view if the user does not interact
+            return await self.interaction.edit_original_response(view=None)
+
+        # parse the options
+        negotiation_demands = peace_options_returned.data['values']
+
+
+
+class PeaceNegotiationOptionsDropdown(discord.ui.Select):
+
+    # hypersimplistic dropdown
+    def __init__(self, pts: list):
+        # create the options
+        pt_options = []
+        for pt in pts:
+            pt_options.append(discord.SelectOption(label=pt))
+        # define the super
+        super().__init__(placeholder="Choose Peace Treaty Demands...", min_values=1, max_values=25,
+                         options=pt_options, custom_id="peace_treaty_negotiations_dropdown")
 
 
 class CNC(commands.Cog):
