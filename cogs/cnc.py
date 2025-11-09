@@ -3902,7 +3902,7 @@ class WarOptionsView(discord.ui.View):
                 # update the value
                 field.value = negotiation_demands_string
         # send the updated embed
-        await self.interaction.edit_original_response(embed=peace_embed)
+        await self.interaction.edit_original_response(embed=peace_embed, view=None)
 
 class PeaceNegotiationOptionsDropdown(discord.ui.Select):
 
