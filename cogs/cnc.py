@@ -3890,6 +3890,8 @@ class WarOptionsView(discord.ui.View):
             # return and remove the view if the user does not interact
             return await self.interaction.edit_original_response(view=None)
 
+        # defer the peace options interaction
+        await peace_options_returned.response.defer(thinking=False)
         # parse the options
         negotiation_demands = peace_options_returned.data['values']
         # update the embed with those options
