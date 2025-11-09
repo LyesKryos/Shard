@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Defer interaction response in peace negotiation options callback" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Set view to `None` after editing peace negotiation embed response">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -497,7 +499,7 @@
       <workItem from="1762450375668" duration="16103000" />
       <workItem from="1762535789995" duration="10887000" />
       <workItem from="1762636213040" duration="182000" />
-      <workItem from="1762636404393" duration="6107000" />
+      <workItem from="1762636404393" duration="6855000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -842,7 +844,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1271" />
+    <option name="localTasksCounter" value="1272" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -861,7 +863,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Disabling change_color command for future purchasing feature" />
     <MESSAGE value="Create wars view feature." />
     <MESSAGE value="Adding the dynamic war name to the war declaration function" />
     <MESSAGE value="Updating the war_view command to ensure correct verbiage" />
@@ -886,7 +887,8 @@
     <MESSAGE value="Remove redundant component type check in peace negotiation interaction" />
     <MESSAGE value="Fix incorrect reference to interaction in peace negotiation response editing" />
     <MESSAGE value="Defer interaction response in peace negotiation options callback" />
-    <option name="LAST_COMMIT_MESSAGE" value="Defer interaction response in peace negotiation options callback" />
+    <MESSAGE value="Set view to `None` after editing peace negotiation embed response" />
+    <option name="LAST_COMMIT_MESSAGE" value="Set view to `None` after editing peace negotiation embed response" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />

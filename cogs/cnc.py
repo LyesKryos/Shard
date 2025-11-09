@@ -3895,12 +3895,17 @@ class WarOptionsView(discord.ui.View):
         # parse the options
         negotiation_demands = peace_options_returned.data['values']
         # update the embed with those options
-        for field in peace_embed.fields:
+        for index, field in peace_embed.fields:
             if field.name == "Current Negotiations":
                 # create the string
-                negotiation_demands_string = "\n".join(negotiation_demands)
-                # update the value
-                field.value = negotiation_demands_string
+                negotiation_demands_string = "\n".join(negotiation_demands) or "None"
+                peace_embed.set_field_at(
+                    index,
+                    name=field.name,
+                    value=negotiation_demands_string,
+                    inline=field.inline
+                )
+                break
         # send the updated embed
         await self.interaction.edit_original_response(embed=peace_embed, view=None)
 
