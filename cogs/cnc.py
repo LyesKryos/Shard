@@ -3721,7 +3721,7 @@ class DefensioBelliButton(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction):
         # defer the interaction
-        await interaction.reponse.defer(thinking=True)
+        await interaction.response.defer(thinking=False)
         # establish the connection
         conn = self.conn
         # define user info
@@ -3908,6 +3908,8 @@ class WarOptionsView(discord.ui.View):
                 break
         # send the updated embed
         await self.interaction.edit_original_response(embed=peace_embed, view=None)
+
+        # additional code here
 
 class PeaceNegotiationOptionsDropdown(discord.ui.Select):
 
