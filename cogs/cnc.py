@@ -3863,6 +3863,23 @@ class WarOptionsView(discord.ui.View):
 
         # create modal input function
         async def simple_wait_for_modal(parent_interaction: discord.Interaction, title: str, label: str):
+            """
+            Waits for user input via a modal interaction and returns the value entered by the user.
+
+            This asynchronous function creates a custom modal dialog using a specific
+            title and label for the text input. It sends the modal to the user and waits
+            for their interaction. The user's input is captured and returned.
+
+            Parameters:
+                parent_interaction (discord.Interaction): The interaction object representing
+                    the initial interaction to which the modal is a response. MUST BE A RESPONSE, NOT FOLLOWUP.
+                title (str): The title of the modal to be displayed to the user.
+                label (str): The label for the text input field inside the modal.
+
+            Returns:
+                str | None: The value entered by the user in the modal's input field,
+                or None if the modal times out or no value is provided.
+            """
             class SimpleModal(discord.ui.Modal):
                 def __init__(self, parent_interaction: discord.Interaction):
                     super().__init__(title=title, timeout=120)
@@ -3888,7 +3905,7 @@ class WarOptionsView(discord.ui.View):
 
             # create and send the modal
             modal = SimpleModal(parent_interaction)
-            await parent_interaction.followup.send_modal(modal)
+            await parent_interaction.response.send_modal(modal)
             # await the modal response
             await modal.wait()
             # return the value
