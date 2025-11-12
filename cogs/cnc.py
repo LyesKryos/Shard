@@ -4042,8 +4042,6 @@ class WarOptionsView(discord.ui.View):
             # return and remove the view if the user does not interact
             return await self.interaction.edit_original_response(view=None)
 
-        # defer the peace options interaction
-        await peace_options_returned.response.defer(thinking=False)
         # parse the options
         negotiation_demands = peace_options_returned.data['values']
         # update the embed with those options
@@ -4070,8 +4068,8 @@ class WarOptionsView(discord.ui.View):
                 target_provinces_raw = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id = $1;''',
                                                     target_info['user_id'])
                 target_provinces = [p['id'] for p in target_provinces_raw]
-                # query demand for provinces
-                await simple_wait_for_modal(self.interaction, "Demand Provinces",
+                # query demand for provinces using the peace options dropdown interaction
+                await simple_wait_for_modal(peace_options_returned.interaction, "Demand Provinces",
                                             "List of provinces to demand separated by comma...")
 
 
