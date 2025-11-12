@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-import logging
 from random import randrange, randint
 import asyncpg
 from discord import app_commands, Interaction
+from discord._types import ClientT
+
 from ShardBot import Shard
 import discord
 from discord.ext import commands, tasks
@@ -1199,12 +1200,17 @@ class DossierView(View):
         await interaction.response.defer()
         # clear emebed
         self.doss_embed.clear_fields()
+        # count the number of provinces the user has
+        province_count_raw = await self.conn.fetchrow('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1;''',
+                                                  self.user_info['user_id'])
+        province_count = province_count_raw['count']
         # populate unrest, stability, overextension
         self.doss_embed.add_field(name="=====================GOVERNMENT===================",
                                   value="Information about your nation's government.", inline=False)
         self.doss_embed.add_field(name="National Unrest", value=f"{self.user_info['unrest']}")
         self.doss_embed.add_field(name="Stability", value=f"{self.user_info['stability']}")
-        self.doss_embed.add_field(name="Overextension Limit", value=f"{self.user_info['overextend_limit']}")
+        self.doss_embed.add_field(name="Overextension Limit",
+                                  value=f"{province_count}/{self.user_info['overextend_limit']}")
         # populate overlord, if applicable
         if self.user_info['overlord']:
             self.doss_embed.add_field(name="Overlord", value=f"{self.user_info['overlord']}")
@@ -3813,6 +3819,21 @@ class WarOptionsView(discord.ui.View):
         peace_embed.add_field(name="War Score",
                               value=f"(A) {war_info['war_score'][0]} \U00002694 {war_info['war_score'][1]} (D)",
                               inline=False)
+        # get the list of attackers and defenders, placing the primary first bolding
+        attackers_list = list(war['attackers']) if war['attackers'] is not None else []
+        attackers_list = list(war['defenders']) if war['defenders'] is not None else []
+        attackers_others = [a for a in attackers_list if a != war['primary_attacker']]
+        defenders_others = [d for d in attackers_list if d != war['primary_defender']]
+        attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war[
+            'primary_attacker'] else ", ".join(attackers_list)
+        defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war[
+            'primary_defender'] else ", ".join(attackers_list)
+        peace_embed.add_field(name="Aggressor(s)",
+                              value=attackers,
+                              inline=False)
+        peace_embed.add_field(name="Defender(s)",
+                              value=defenders,
+                              inline=False)
         peace_embed.add_field(name="Current Negotiations",
                               value="None",
                               inline=False)
@@ -3823,6 +3844,8 @@ class WarOptionsView(discord.ui.View):
                                     f"*Defensio Belli*: {war_info['db'] or 'None'}")
         peace_embed.set_footer(text="Use the dropdown below to begin negotiations.",
                                icon_url="https://i.ibb.co/CKScCw9P/Command-Conquest-symbol-circular.png")
+        # send the embed
+        await self.interaction.edit_original_response(embed=peace_embed)
         # select any peace negotiation options
         peace_treaty_options = [
             "Cede Province",
@@ -3834,18 +3857,147 @@ class WarOptionsView(discord.ui.View):
             "Subjugate",
             "Dismantle",
             "Force Government Type",
+            "Humiliate",
             "White Peace"
         ]
+
+        # create modal input function
+        async def simple_wait_for_modal(parent_interaction: discord.Interaction, title: str, label: str):
+            class SimpleModal(discord.ui.Modal):
+                def __init__(self, parent_interaction: discord.Interaction):
+                    super().__init__(title=title, timeout=120)
+                    # define and add the text input
+                    self.demand_input = discord.ui.TextInput(label=label)
+                    self.add_item(self.demand_input)
+                    # define variables
+                    self.value = None
+                    self.parent_interaction = parent_interaction
+
+                async def on_submit(self, interaction: Interaction):
+                    # defer the interaction
+                    await interaction.response.defer(thinking=False)
+                    # define the value and stop listening to the modal
+                    self.value = self.demand_input.value
+                    self.stop()
+
+                async def on_timeout(self):
+                    # if the user fails to respond, stop listening
+                    # and remove all the options from the original interaction message, effectively canceling
+                    self.stop()
+                    return await self.parent_interaction.edit_original_response(view=None)
+
+            # create and send the modal
+            modal = SimpleModal(parent_interaction)
+            await parent_interaction.followup.send_modal(modal)
+            # await the modal response
+            await modal.wait()
+            # return the value
+            return modal.value
+                    
         # if the user is using a cb (attacker), then search for the cb prohibited options for that cb
         if (user_info['name'] == war_info['primary_attacker']) or (user_info['name'] in war_info['attackers']):
+            # define the target of the negotiation, defaulting to the primary attacker
+            target = war_info['primary_defender']
+            # if the war has multiple belligerents on the opposing side, the proposer may select which one to target
+            if len(attackers_list) > 1:
+                # add the "General Peace" to the list as a whole option
+                attackers_list = ["General Peace"] + attackers_list
+
+                # create view check to ensure proper parsing
+                def target_check(inter: discord.Interaction):
+                    # Ensure it's the same message & same user
+                    return (
+                            inter.user == self.interaction.user
+                            and inter.data['custom_id'] == "target_dropdown"
+                    )
+
+                # create a view for the dropdown and add it
+                peace_target_view = discord.ui.View()
+                peace_target_view.add_item(PeaceNegotiationTargetsDropdown(attackers_list))
+                # add a cancel button to the view
+                cancel_button = discord.ui.Button(label="Cancel", style=discord.ButtonStyle.danger)
+
+                async def cancel_button_callback(interaction: discord.Interaction, view: discord.ui.View):
+                    await interaction.response.defer()
+                    for child in view.children:
+                        child.disabled = True
+                    return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
+
+                cancel_button.callback = cancel_button_callback
+                peace_target_view.add_item(cancel_button)
+                # add the view to the embed
+                await self.interaction.edit_original_response(view=peace_target_view)
+
+                # wait for the options to be selected
+                try:
+                    target_returned = await interaction.client.wait_for("interaction", check=target_check,
+                                                                               timeout=120)
+                except asyncio.TimeoutError:
+                    # return and remove the view if the user does not interact
+                    return await self.interaction.edit_original_response(view=None)
+
+                # if the target is "General Peace", keep the target at the defaul
+                if target_returned.data['values'][0] == "General Peace":
+                    target = target
+                else:
+                    target = target_returned.data['values'][0]
+            # get target data
+            target_info = await user_db_info(target, conn)
             # pull cb info
             cb_info = await conn.fetchrow('''SELECT * FROM cnc_cbs WHERE name = $1;''', war_info['cb'])
-            # remove prohibited pts
+            # remove prohibited targets
             for prohibited_pt in cb_info['prohibited_pts']:
                 peace_treaty_options.remove(prohibited_pt)
 
         # otherwise, they are defender
         else:
+            # define the target of the negotiation, defaulting to the primary attacker
+            target = war_info['primary_attacker']
+            # if the war has multiple belligerents on the opposing side, the proposer may select which one to target
+            if len(attackers_list) > 1:
+                # add the "General Peace" to the list as a whole option
+                attackers_list = ["General Peace"] + attackers_list
+
+                # create view check to ensure proper parsing
+                def target_check(inter: discord.Interaction):
+                    # Ensure it's the same message & same user
+                    return (
+                            inter.user == self.interaction.user
+                            and inter.data['custom_id'] == "target_dropdown"
+                    )
+
+                # create a view for the dropdown and add it
+                peace_target_view = discord.ui.View()
+                peace_target_view.add_item(PeaceNegotiationTargetsDropdown(attackers_list))
+                # add a cancel button to the view
+                cancel_button = discord.ui.Button(label="Cancel", style=discord.ButtonStyle.danger)
+
+                async def cancel_button_callback(interaction: discord.Interaction, view: discord.ui.View):
+                    await interaction.response.defer()
+                    for child in view.children:
+                        child.disabled = True
+                    return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
+
+                cancel_button.callback = cancel_button_callback
+                peace_target_view.add_item(cancel_button)
+                # add the view to the embed
+                await self.interaction.edit_original_response(view=peace_target_view)
+
+                # wait for the options to be selected
+                try:
+                    target_returned = await interaction.client.wait_for("interaction", check=target_check,
+                                                                               timeout=120)
+                except asyncio.TimeoutError:
+                    # return and remove the view if the user does not interact
+                    return await self.interaction.edit_original_response(view=None)
+
+                # if the target is "General Peace", keep the target at the defaul
+                if target_returned.data['values'][0] == "General Peace":
+                    target = target
+                else:
+                    target = target_returned.data['values'][0]
+            # get target data
+            target_info = await user_db_info(target, conn)
             # if there is no db, only white peace is an option
             if war_info['db'] is None:
                 peace_treaty_options = ["White Peace"]
@@ -3856,7 +4008,7 @@ class WarOptionsView(discord.ui.View):
             else:
                 # pull db info
                 db_info = await conn.fetchrow('''SELECT * FROM cnc_cbs WHERE name = $1;''', war_info['db'])
-                # remove prohibited pts
+                # remove prohibited targets
                 for prohibited_pt in db_info['prohibited_pts']:
                     peace_treaty_options.remove(prohibited_pt)
         # create view check to ensure proper parsing
@@ -3870,16 +4022,16 @@ class WarOptionsView(discord.ui.View):
         peace_negotiation_dropdown_view = discord.ui.View()
         peace_negotiation_dropdown_view.add_item(PeaceNegotiationOptionsDropdown(peace_treaty_options))
         # add a cancel button to the view
-        cancel_peace_negotiations = discord.ui.Button(label="Cancel", style=discord.ButtonStyle.danger)
+        cancel_button = discord.ui.Button(label="Cancel", style=discord.ButtonStyle.danger)
 
-        async def cancel_peace_negotiations_callback(interaction: discord.Interaction):
+        async def cancel_button_callback(interaction: discord.Interaction):
             await interaction.response.defer()
-            for child in peace_negotiation_dropdown_view.children:
+            for child in view.children:
                 child.disabled = True
             return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
 
-        cancel_peace_negotiations.callback = cancel_peace_negotiations_callback
-        peace_negotiation_dropdown_view.add_item(cancel_peace_negotiations)
+        cancel_button.callback = cancel_button_callback
+        peace_negotiation_dropdown_view.add_item(cancel_button)
         # update the original message with the embed and the view
         await self.interaction.edit_original_response(embed=peace_embed, view=peace_negotiation_dropdown_view)
 
@@ -3908,8 +4060,22 @@ class WarOptionsView(discord.ui.View):
                 break
         # send the updated embed
         await self.interaction.edit_original_response(embed=peace_embed, view=None)
+        # set the war score ticker
+        demand_score = 0
+        # parse out the demands and handle each
+        for demand in negotiation_demands:
+            # if the demand is to cede a province, determine which provinces the demander claims
+            if demand == "Cede Province":
+                # get the provinces owned by the target
+                target_provinces_raw = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id = $1;''',
+                                                    target_info['id'])
+                target_provinces = [p['id'] for p in target_provinces_raw]
+                # query demand for provinces
+                await simple_wait_for_modal(self.interaction, "Demand Provinces",
+                                            "List of provinces to demand separated by comma...")
 
-        # additional code here
+
+
 
 class PeaceNegotiationOptionsDropdown(discord.ui.Select):
 
@@ -3922,6 +4088,18 @@ class PeaceNegotiationOptionsDropdown(discord.ui.Select):
         # define the super
         super().__init__(placeholder="Choose Peace Treaty Demands...", min_values=1, max_values=len(pt_options),
                          options=pt_options, custom_id="peace_treaty_negotiations_dropdown")
+
+class PeaceNegotiationTargetsDropdown(discord.ui.Select):
+
+    # hypersimplistic dropdown
+    def __init__(self, targets: list):
+        # create the options
+        target_options = []
+        for pt in targets:
+            target_options.append(discord.SelectOption(label=pt))
+        # define the super
+        super().__init__(placeholder="Choose Treaty Target...", min_values=1, max_values=1,
+                         options=target_options, custom_id="target_dropdown")
 
 
 class CNC(commands.Cog):
