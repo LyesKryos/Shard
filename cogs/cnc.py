@@ -3820,13 +3820,13 @@ class WarOptionsView(discord.ui.View):
                               value=f"(A) {war_info['war_score'][0]} \U00002694 {war_info['war_score'][1]} (D)",
                               inline=False)
         # get the list of attackers and defenders, placing the primary first bolding
-        attackers_list = list(war['attackers']) if war['attackers'] is not None else []
-        attackers_list = list(war['defenders']) if war['defenders'] is not None else []
-        attackers_others = [a for a in attackers_list if a != war['primary_attacker']]
-        defenders_others = [d for d in attackers_list if d != war['primary_defender']]
-        attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war[
+        attackers_list = list(war_info['attackers']) if war_info['attackers'] is not None else []
+        attackers_list = list(war_info['defenders']) if war_info['defenders'] is not None else []
+        attackers_others = [a for a in attackers_list if a != war_info['primary_attacker']]
+        defenders_others = [d for d in attackers_list if d != war_info['primary_defender']]
+        attackers = ", ".join([f"**{war_info['primary_attacker']}**"] + attackers_others) if war[
             'primary_attacker'] else ", ".join(attackers_list)
-        defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war[
+        defenders = ", ".join([f"**{war_info['primary_defender']}**"] + defenders_others) if war[
             'primary_defender'] else ", ".join(attackers_list)
         peace_embed.add_field(name="Aggressor(s)",
                               value=attackers,
