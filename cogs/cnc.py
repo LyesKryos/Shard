@@ -4069,7 +4069,7 @@ class WarOptionsView(discord.ui.View):
                                                     target_info['user_id'])
                 target_provinces = [p['id'] for p in target_provinces_raw]
                 # query demand for provinces using the peace options dropdown interaction
-                await simple_wait_for_modal(peace_options_returned.interaction, "Demand Provinces",
+                await simple_wait_for_modal(peace_options_returned, "Demand Provinces",
                                             "List of provinces to demand separated by comma...")
 
 
