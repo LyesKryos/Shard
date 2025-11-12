@@ -3824,9 +3824,9 @@ class WarOptionsView(discord.ui.View):
         attackers_list = list(war_info['defenders']) if war_info['defenders'] is not None else []
         attackers_others = [a for a in attackers_list if a != war_info['primary_attacker']]
         defenders_others = [d for d in attackers_list if d != war_info['primary_defender']]
-        attackers = ", ".join([f"**{war_info['primary_attacker']}**"] + attackers_others) if war[
+        attackers = ", ".join([f"**{war_info['primary_attacker']}**"] + attackers_others) if war_info[
             'primary_attacker'] else ", ".join(attackers_list)
-        defenders = ", ".join([f"**{war_info['primary_defender']}**"] + defenders_others) if war[
+        defenders = ", ".join([f"**{war_info['primary_defender']}**"] + defenders_others) if war_info[
             'primary_defender'] else ", ".join(attackers_list)
         peace_embed.add_field(name="Aggressor(s)",
                               value=attackers,
