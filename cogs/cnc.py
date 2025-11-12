@@ -4085,7 +4085,7 @@ class WarOptionsView(discord.ui.View):
                 target_provinces_raw = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id = $1;''',
                                                     target_info['user_id'])
                 target_provinces = [p['id'] for p in target_provinces_raw]
-                # query demand for provinces using the peace options dropdown interaction
+                # query demand for provinces using the peace options dropdown interaction response
                 await simple_wait_for_modal(peace_options_returned, "Demand Provinces",
                                             "List of provinces to demand separated by comma...")
 
