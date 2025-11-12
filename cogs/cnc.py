@@ -3764,10 +3764,10 @@ class DefensioBelliButton(discord.ui.Button):
         if overlord_check:
             available_dbs.append("Force Independence")
         # if the recipient is equalist and the sender is not equalist, add the suppression the revolution CB
-        if (self.recipient_info['govt_type'] == "Equalism") and (sender_info['govt_type'] != "Equalism"):
+        if (recipient_info['govt_type'] == "Equalism") and (sender_info['govt_type'] != "Equalism"):
             available_dbs.append("Suppress the Revolution")
         # if the recipient is not equalist and the sender is equalist, add the Spread the Revolution CB
-        if (self.recipient_info['govt_type'] != "Equalism") and (sender_info['govt_type'] == "Equalism"):
+        if (recipient_info['govt_type'] != "Equalism") and (sender_info['govt_type'] == "Equalism"):
             available_dbs.append("Spread the Revolution")
         # create the dbs dropdown view
         db_dropdown_view = DefensioBelliView(interaction=interaction, conn=conn, sender_info=sender_info,
