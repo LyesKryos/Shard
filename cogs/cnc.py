@@ -4068,7 +4068,7 @@ class WarOptionsView(discord.ui.View):
             if demand == "Cede Province":
                 # get the provinces owned by the target
                 target_provinces_raw = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id = $1;''',
-                                                    target_info['id'])
+                                                    target_info['user_id'])
                 target_provinces = [p['id'] for p in target_provinces_raw]
                 # query demand for provinces
                 await simple_wait_for_modal(self.interaction, "Demand Provinces",
