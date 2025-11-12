@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fix incorrect modal input handling in peace negotiations&#10;&#10;- Remove redundant interaction response deferral.&#10;- Use the correct peace options dropdown interaction for modal input." />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Clarify comment on peace options dropdown interaction response">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -503,7 +505,7 @@
       <workItem from="1762825587031" duration="2413000" />
       <workItem from="1762881504369" duration="6356000" />
       <workItem from="1762969580227" duration="576000" />
-      <workItem from="1762973240397" duration="1713000" />
+      <workItem from="1762973240397" duration="2029000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -848,7 +850,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1282" />
+    <option name="localTasksCounter" value="1285" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -867,8 +869,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Add peace negotiation system to war options&#10;&#10;- Add &quot;Status Quo&quot; as default Defensio Belli option&#10;- Implement peace negotiation button in WarOptionsView&#10;- Create peace negotiation embed with war details and current status&#10;- Add logic to determine available peace treaty options based on CB/DB&#10;- Filter prohibited peace terms based on attacker's CB or defender's DB&#10;- Add PeaceNegotiationOptionsDropdown for selecting peace demands&#10;- Implement interaction check and timeout handling for peace negotiations&#10;- Add support for multiple peace treaty demand types (cede province, reparations, etc.)" />
-    <MESSAGE value="Fix peace negotiation interaction handling&#10;&#10;- Disable &quot;thinking&quot; mode for response deferral&#10;- Ensure database connection is correctly referenced" />
     <MESSAGE value="Add &quot;Force Government Type&quot; to peace treaty options" />
     <MESSAGE value="Handle missing prohibited peace treaty options gracefully&#10;&#10;- Add exception handling to prevent crashes when prohibited options are missing&#10;- Log missing prohibited options for debugging purposes" />
     <MESSAGE value="Remove redundant exception handling; fix peace negotiation dropdown view usage" />
@@ -892,7 +892,9 @@
     <MESSAGE value="Fixing incorrect database reference in the Defensio Belli button callback." />
     <MESSAGE value="Fix incorrect interaction handling in peace negotiations&#10;&#10;- Remove unnecessary interaction response deferral in peace options callback.&#10;- Correct modal input handling by using peace options dropdown interaction." />
     <MESSAGE value="Fix incorrect modal input handling in peace negotiations&#10;&#10;- Remove redundant interaction response deferral.&#10;- Use the correct peace options dropdown interaction for modal input." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix incorrect modal input handling in peace negotiations&#10;&#10;- Remove redundant interaction response deferral.&#10;- Use the correct peace options dropdown interaction for modal input." />
+    <MESSAGE value="Add modal input handling function for user interactions&#10;&#10;- Implement `simple_wait_for_modal` to streamline modal-based user input. &#10;- Replace `followup.send_modal` with `response.send_modal` for proper interaction handling." />
+    <MESSAGE value="Clarify comment on peace options dropdown interaction response" />
+    <option name="LAST_COMMIT_MESSAGE" value="Clarify comment on peace options dropdown interaction response" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />

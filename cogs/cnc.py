@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from random import randrange, randint
 import asyncpg
 from discord import app_commands, Interaction
@@ -3884,7 +3883,7 @@ class WarOptionsView(discord.ui.View):
                 def __init__(self, parent_interaction: discord.Interaction):
                     super().__init__(title=title, timeout=120)
                     # define and add the text input
-                    self.demand_input = discord.ui.TextInput(label=label)
+                    self.demand_input = discord.ui.TextInput(label=label, style=discord.TextStyle.short)
                     self.add_item(self.demand_input)
                     # define variables
                     self.value = None
@@ -4087,7 +4086,7 @@ class WarOptionsView(discord.ui.View):
                 target_provinces = [p['id'] for p in target_provinces_raw]
                 # query demand for provinces using the peace options dropdown interaction response
                 await simple_wait_for_modal(peace_options_returned, "Demand Provinces",
-                                            "List of provinces to demand separated by comma...")
+                                            "List of provinces separated by comma...")
 
 
 
