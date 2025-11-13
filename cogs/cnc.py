@@ -3919,7 +3919,7 @@ class WarOptionsView(discord.ui.View):
             # return the value
             return modal.value
 
-        # define total negotations
+        # define total negotiations
         total_negotiation = False
                     
         # if the user is using a cb (attacker), then search for the cb prohibited options for that cb
@@ -4093,7 +4093,7 @@ class WarOptionsView(discord.ui.View):
         # set the war score ticker
         demand_score = 0
         # create the pending peace negotiation
-        await conn.execute('''INSERT INTO cnc_peace_negotiations(war_id, total_negotation, sender, target) 
+        await conn.execute('''INSERT INTO cnc_peace_negotiations(war_id, total_negotiation, sender, target) 
                               VALUES($1, $2, $3, $4);''',
                            war_info['id'], total_negotiation, user_info['name'], target)
         # parse out the demands and handle each
