@@ -3808,6 +3808,15 @@ class WarOptionsView(discord.ui.View):
         # establish other variables
         war_info = self.war_info
         user_info = self.user_info
+        # check if a peace negotiation is pending
+        pending_peace_negotiation = await conn.fetchrow('''SELECT * FROM cnc_peace_negotiations WHERE war_id = $1;''',
+                                                        war_info['id'])
+        # if there is a pending negotiation, return
+        if pending_peace_negotiation is not None:
+            for child in self.children:
+                child.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("A peace negotiation is already pending for this war.")
         # create the negotiation embed
         peace_embed = discord.Embed(title=f"Peace Negotiations for the {war_info['name']}", color=discord.Color.red(),
                                         description="Peace negotiations have begun between the belligerents of this war.")
@@ -3909,9 +3918,12 @@ class WarOptionsView(discord.ui.View):
             await modal.wait()
             # return the value
             return modal.value
+
+        # define total negotations
+        total_negotiation = False
                     
         # if the user is using a cb (attacker), then search for the cb prohibited options for that cb
-        if (user_info['name'] == war_info['primary_attacker']) or (user_info['name'] in war_info['attackers']):
+        if user_info['name'] in war_info['attackers']:
             # define the target of the negotiation, defaulting to the primary attacker
             target = war_info['primary_defender']
             # if the war has multiple belligerents on the opposing side, the proposer may select which one to target
@@ -3955,6 +3967,7 @@ class WarOptionsView(discord.ui.View):
                 # if the target is "General Peace", keep the target at the defaul
                 if target_returned.data['values'][0] == "General Peace":
                     target = target
+                    total_negotiation = True
                 else:
                     target = target_returned.data['values'][0]
             # get target data
@@ -4010,6 +4023,7 @@ class WarOptionsView(discord.ui.View):
                 # if the target is "General Peace", keep the target at the defaul
                 if target_returned.data['values'][0] == "General Peace":
                     target = target
+                    total_negotiation = True
                 else:
                     target = target_returned.data['values'][0]
             # get target data
@@ -4027,6 +4041,7 @@ class WarOptionsView(discord.ui.View):
                 # remove prohibited targets
                 for prohibited_pt in db_info['prohibited_pts']:
                     peace_treaty_options.remove(prohibited_pt)
+
         # create view check to ensure proper parsing
         def pnd_check(inter: discord.Interaction):
             # Ensure it's the same message & same user
@@ -4034,6 +4049,7 @@ class WarOptionsView(discord.ui.View):
                     inter.user == self.interaction.user
                     and inter.data['custom_id'] == "peace_treaty_negotiations_dropdown"
             )
+
         # create and add the view
         peace_negotiation_dropdown_view = discord.ui.View()
         peace_negotiation_dropdown_view.add_item(PeaceNegotiationOptionsDropdown(peace_treaty_options))
@@ -4076,18 +4092,115 @@ class WarOptionsView(discord.ui.View):
         await self.interaction.edit_original_response(embed=peace_embed, view=None)
         # set the war score ticker
         demand_score = 0
+        # create the pending peace negotiation
+        await conn.execute('''INSERT INTO cnc_peace_negotiations(war_id, total_negotation, sender, target) 
+                              VALUES($1, $2, $3, $4);''',
+                           war_info['id'], total_negotiation, user_info['name'], target)
         # parse out the demands and handle each
         for demand in negotiation_demands:
+            # get the provinces owned by the target
+            target_provinces_raw = await conn.fetch('''SELECT *
+                                                       FROM cnc_provinces
+                                                       WHERE owner_id = $1;''',
+                                                    target_info['user_id'])
+            target_provinces = [p['id'] for p in target_provinces_raw]
             # if the demand is to cede a province, determine which provinces the demander claims
             if demand == "Cede Province":
-                # get the provinces owned by the target
-                target_provinces_raw = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id = $1;''',
-                                                    target_info['user_id'])
-                target_provinces = [p['id'] for p in target_provinces_raw]
                 # query demand for provinces using the peace options dropdown interaction response
-                await simple_wait_for_modal(peace_options_returned, "Demand Provinces",
-                                            "List of provinces separated by comma...")
+                provinces_demanded = await simple_wait_for_modal(peace_options_returned, "Demand Provinces",
+                                            "List province IDs separated by comma:")
+                # separate the list
+                provinces_demanded = [p.strip() for p in provinces_demanded.split(',')]
+                # if the list has no items, return
+                if not provinces_demanded:
+                    await self.interaction.followup.send("You must specify at least one province.", ephemeral=True)
+                    return await self.interaction.edit_original_response(view=None)
+                # if the list has items, proceed
+                else:
+                    # if the list of provinces demanded has any province that are not owned by the target
+                    if not set(provinces_demanded).issubset(set(target_provinces)):
+                        # get the provinces that are not
+                        provinces_not_of_target = set(provinces_demanded) - set(target_provinces)
+                        await self.interaction.followup.send("You must specify provinces that are owned by the target.\n"
+                                                             f"Target does not own: {','.join(provinces_not_of_target)}.",
+                                                            ephemeral=True)
+                        return await self.interaction.edit_original_response(view=None)
+                    # otherwise, add the list of provinces to the tracker
+                    await conn.execute('''UPDATE cnc_peace_negotiations SET cede_provinces = $1 WHERE war_id = $2;''',
+                                       provinces_demanded, war_info['id'])
+                    await self.interaction.followup.send("Cede Provinces demand added to the Peace Negotiations.")
 
+            # if the demand is to give provinces, determine which ally the provinces will go to and which provinces those are
+            elif demand == "Give Province":
+                # pull all the allies of the target if they are the attacker
+                if user_info['name'] in war_info['attackers']:
+                    potential_ally_targets = war_info['attackers'].remove(user_info['name'])
+                # pull all the allies of the target if they are the defender
+                else:
+                    potential_ally_targets = war_info['defenders'].remove(user_info['name'])
+
+                # create view check to ensure proper parsing
+                def gp_target_check(inter: discord.Interaction):
+                    # Ensure it's the same message & same user
+                    return (
+                            inter.user == self.interaction.user
+                            and inter.data['custom_id'] == "target_dropdown"
+                    )
+
+                # create the view and dropdown to select the ally
+                ally_select_view = discord.ui.View()
+                ally_select_view.add_item(PeaceNegotiationGiveProvincesDropdown(potential_ally_targets))
+                # create and add the cancel button
+                cancel_button = discord.ui.Button(label="Cancel", style=discord.ButtonStyle.danger)
+
+                async def cancel_button_callback(interaction: discord.Interaction):
+                    await interaction.response.defer()
+                    for child in view.children:
+                        child.disabled = True
+                    return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
+
+                cancel_button.callback = cancel_button_callback
+                ally_select_view.add_item(cancel_button)
+                # update the original message with the embed and the view
+                await self.interaction.edit_original_response(view=ally_select_view)
+
+                # wait for the ally to be selected
+                try:
+                    target_returned = await interaction.client.wait_for("interaction",
+                                                                        check=gp_target_check,
+                                                                        timeout=120)
+                except asyncio.TimeoutError:
+                    # return and remove the view if the user does not interact
+                    return await self.interaction.edit_original_response(view=None)
+
+                # define target option
+                ally_target = target_returned.data['values'][0]
+                # with the target defined, create the text modal to get the provinces demanded
+                provinces_demanded = await simple_wait_for_modal(target_returned, title=f"Give Provinces to {ally_target}",
+                                            label="List province IDs separated by comma:")
+                # separate the list
+                provinces_demanded = [p.strip() for p in provinces_demanded.split(',')]
+                # if the list has no items, return
+                if not provinces_demanded:
+                    await self.interaction.followup.send("You must specify at least one province.", ephemeral=True)
+                    return await self.interaction.edit_original_response(view=None)
+                # if the list has items, proceed
+                else:
+                    # if the list of provinces demanded has any province that are not owned by the target
+                    if not set(provinces_demanded).issubset(set(target_provinces)):
+                        # get the provinces that are not
+                        provinces_not_of_target = set(provinces_demanded) - set(target_provinces)
+                        await self.interaction.followup.send(
+                            "You must specify provinces that are owned by the target.\n"
+                            f"Target does not own: {','.join(provinces_not_of_target)}.",
+                            ephemeral=True)
+                        return await self.interaction.edit_original_response(view=None)
+                    # otherwise, add to the tracker
+                    await conn.execute('''UPDATE cnc_peace_negotiations SET give_provinces = hstore($1, $2) 
+                                          WHERE war_id = $3;''',
+                                       ally_target, ",".join(provinces_demanded), war_info['id'])
+                    # notify of success
+                    await self.interaction.followup.send("Give Provinces demand added to the Peace Negotiations.")
 
 
 
@@ -4114,6 +4227,18 @@ class PeaceNegotiationTargetsDropdown(discord.ui.Select):
         # define the super
         super().__init__(placeholder="Choose Treaty Target...", min_values=1, max_values=1,
                          options=target_options, custom_id="target_dropdown")
+
+class PeaceNegotiationGiveProvincesDropdown(discord.ui.Select):
+
+    # hypersimplistic dropdown
+    def __init__(self, potential_targets: list):
+        # create the options
+        potential_targets = []
+        for target in potential_targets:
+            potential_targets.append(discord.SelectOption(label=target))
+        # define the super
+        super().__init__(placeholder="Choose Give Provinces Target...", min_values=1, max_values=1,
+                         options=target_options, custom_id="give_provinces_target")
 
 
 class CNC(commands.Cog):

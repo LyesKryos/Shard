@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Reducing characters for cede province modal">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Set default value for `modifier` in `roll` command to 0">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -507,6 +507,8 @@
       <workItem from="1762881504369" duration="6356000" />
       <workItem from="1762969580227" duration="576000" />
       <workItem from="1762973240397" duration="5976000" />
+      <workItem from="1762997853381" duration="646000" />
+      <workItem from="1763057090142" duration="4610000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -851,7 +853,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1286" />
+    <option name="localTasksCounter" value="1287" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -870,7 +872,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Handle missing prohibited peace treaty options gracefully&#10;&#10;- Add exception handling to prevent crashes when prohibited options are missing&#10;- Log missing prohibited options for debugging purposes" />
     <MESSAGE value="Remove redundant exception handling; fix peace negotiation dropdown view usage" />
     <MESSAGE value="Add &quot;White Peace&quot; to peace treaty options list" />
     <MESSAGE value="Update button styles and enhance dropdown behavior&#10;&#10;- Replace `discord.ButtonStyle.green` with `discord.ButtonStyle.success` for consistency&#10;- Adjust `PeaceNegotiationOptionsDropdown` max values to dynamically match options count" />
@@ -895,7 +896,8 @@
     <MESSAGE value="Add modal input handling function for user interactions&#10;&#10;- Implement `simple_wait_for_modal` to streamline modal-based user input. &#10;- Replace `followup.send_modal` with `response.send_modal` for proper interaction handling." />
     <MESSAGE value="Clarify comment on peace options dropdown interaction response" />
     <MESSAGE value="Reducing characters for cede province modal" />
-    <option name="LAST_COMMIT_MESSAGE" value="Reducing characters for cede province modal" />
+    <MESSAGE value="Set default value for `modifier` in `roll` command to 0" />
+    <option name="LAST_COMMIT_MESSAGE" value="Set default value for `modifier` in `roll` command to 0" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
