@@ -3829,9 +3829,9 @@ class WarOptionsView(discord.ui.View):
                               inline=False)
         # get the list of attackers and defenders, placing the primary first bolding
         attackers_list = list(war_info['attackers']) if war_info['attackers'] is not None else []
-        attackers_list = list(war_info['defenders']) if war_info['defenders'] is not None else []
+        defenders_list = list(war_info['defenders']) if war_info['defenders'] is not None else []
         attackers_others = [a for a in attackers_list if a != war_info['primary_attacker']]
-        defenders_others = [d for d in attackers_list if d != war_info['primary_defender']]
+        defenders_others = [d for d in defenders_list if d != war_info['primary_defender']]
         attackers = ", ".join([f"**{war_info['primary_attacker']}**"] + attackers_others) if war_info[
             'primary_attacker'] else ", ".join(attackers_list)
         defenders = ", ".join([f"**{war_info['primary_defender']}**"] + defenders_others) if war_info[
@@ -3964,12 +3964,15 @@ class WarOptionsView(discord.ui.View):
                     # return and remove the view if the user does not interact
                     return await self.interaction.edit_original_response(view=None)
 
-                # if the target is "General Peace", keep the target at the defaul
+                # if the target is "General Peace", keep the target at the default
                 if target_returned.data['values'][0] == "General Peace":
                     target = target
                     total_negotiation = True
                 else:
                     target = target_returned.data['values'][0]
+            # if there is only one possible target, the total negotiation should be true
+            else:
+                total_negotiation = True
             # get target data
             target_info = await user_db_info(target, conn)
             # pull cb info
@@ -4026,6 +4029,9 @@ class WarOptionsView(discord.ui.View):
                     total_negotiation = True
                 else:
                     target = target_returned.data['values'][0]
+            # if there is only one possible target, the total negotiation should be true
+            else:
+                total_negotiation = True
             # get target data
             target_info = await user_db_info(target, conn)
             # if there is no db, only white peace is an option
@@ -4106,14 +4112,29 @@ class WarOptionsView(discord.ui.View):
             target_provinces = [p['id'] for p in target_provinces_raw]
             # if the demand is to cede a province, determine which provinces the demander claims
             if demand == "Cede Province":
-                # query demand for provinces using the peace options dropdown interaction response
-                provinces_demanded = await simple_wait_for_modal(peace_options_returned, "Demand Provinces",
-                                            "List province IDs separated by comma:")
+                try:
+                    # query demand for provinces using the peace options dropdown interaction response
+                    provinces_demanded = await simple_wait_for_modal(peace_options_returned, "Demand Provinces",
+                                                "List province IDs separated by comma:")
+                # if the user gives no response or cancels
+                except asyncio.TimeoutError:
+                    # destroy the pending negotiation
+                    await conn.execute('''DELETE
+                                          FROM cnc_peace_negotiations
+                                          WHERE war_id = $1;''', war_info['id'])
+                    # remove the view
+                    return await self.interaction.edit_original_response(view=None)
                 # separate the list
                 provinces_demanded = [p.strip() for p in provinces_demanded.split(',')]
                 # if the list has no items, return
                 if not provinces_demanded:
+                    # reject message
                     await self.interaction.followup.send("You must specify at least one province.", ephemeral=True)
+                    # destroy the pending negotiation
+                    await conn.execute('''DELETE
+                                          FROM cnc_peace_negotiations
+                                          WHERE war_id = $1;''', war_info['id'])
+                    # remove view
                     return await self.interaction.edit_original_response(view=None)
                 # if the list has items, proceed
                 else:
@@ -4121,9 +4142,13 @@ class WarOptionsView(discord.ui.View):
                     if not set(provinces_demanded).issubset(set(target_provinces)):
                         # get the provinces that are not
                         provinces_not_of_target = set(provinces_demanded) - set(target_provinces)
+                        # send a message of denial
                         await self.interaction.followup.send("You must specify provinces that are owned by the target.\n"
                                                              f"Target does not own: {','.join(provinces_not_of_target)}.",
                                                             ephemeral=True)
+                        # destroy the pending negotiation
+                        await conn.execute('''DELETE FROM cnc_peace_negotiations WHERE war_id = $1;''', war_info['id'])
+                        # return the denial
                         return await self.interaction.edit_original_response(view=None)
                     # otherwise, add the list of provinces to the tracker
                     await conn.execute('''UPDATE cnc_peace_negotiations SET cede_provinces = $1 WHERE war_id = $2;''',
@@ -4155,6 +4180,10 @@ class WarOptionsView(discord.ui.View):
 
                 async def cancel_button_callback(interaction: discord.Interaction):
                     await interaction.response.defer()
+                    # destroy the pending negotiation
+                    await conn.execute('''DELETE
+                                          FROM cnc_peace_negotiations
+                                          WHERE war_id = $1;''', war_info['id'])
                     for child in view.children:
                         child.disabled = True
                     return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
@@ -4170,19 +4199,40 @@ class WarOptionsView(discord.ui.View):
                                                                         check=gp_target_check,
                                                                         timeout=120)
                 except asyncio.TimeoutError:
+                    # destroy the pending negotiation
+                    await conn.execute('''DELETE
+                                          FROM cnc_peace_negotiations
+                                          WHERE war_id = $1;''', war_info['id'])
                     # return and remove the view if the user does not interact
                     return await self.interaction.edit_original_response(view=None)
 
                 # define target option
                 ally_target = target_returned.data['values'][0]
                 # with the target defined, create the text modal to get the provinces demanded
-                provinces_demanded = await simple_wait_for_modal(target_returned, title=f"Give Provinces to {ally_target}",
-                                            label="List province IDs separated by comma:")
+                try:
+                    provinces_demanded = await simple_wait_for_modal(target_returned,
+                                                                     title=f"Give Provinces to {ally_target}",
+                                                                     label="List province IDs separated by comma:")
+                # if the user gives no response or cancels
+                except asyncio.TimeoutError:
+                    # destroy the pending negotiation
+                    await conn.execute('''DELETE
+                                          FROM cnc_peace_negotiations
+                                          WHERE war_id = $1;''', war_info['id'])
+                    # remove the view
+                    return await self.interaction.edit_original_response(view=None)
+
                 # separate the list
                 provinces_demanded = [p.strip() for p in provinces_demanded.split(',')]
                 # if the list has no items, return
                 if not provinces_demanded:
+                    # send a message of denial
                     await self.interaction.followup.send("You must specify at least one province.", ephemeral=True)
+                    # destroy the pending negotiation
+                    await conn.execute('''DELETE
+                                          FROM cnc_peace_negotiations
+                                          WHERE war_id = $1;''', war_info['id'])
+                    # return no view
                     return await self.interaction.edit_original_response(view=None)
                 # if the list has items, proceed
                 else:
@@ -4190,10 +4240,14 @@ class WarOptionsView(discord.ui.View):
                     if not set(provinces_demanded).issubset(set(target_provinces)):
                         # get the provinces that are not
                         provinces_not_of_target = set(provinces_demanded) - set(target_provinces)
+                        # send a message of denial
                         await self.interaction.followup.send(
                             "You must specify provinces that are owned by the target.\n"
                             f"Target does not own: {','.join(provinces_not_of_target)}.",
                             ephemeral=True)
+                        # destroy the pending negotiation
+                        await conn.execute('''DELETE FROM cnc_peace_negotiations WHERE war_id = $1;''', war_info['id'])
+                        # return no view
                         return await self.interaction.edit_original_response(view=None)
                     # otherwise, add to the tracker
                     await conn.execute('''UPDATE cnc_peace_negotiations SET give_provinces = hstore($1, $2) 
