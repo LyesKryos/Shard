@@ -3890,7 +3890,7 @@ class WarOptionsView(discord.ui.View):
             """
             class SimpleModal(discord.ui.Modal):
                 def __init__(self, parent_interaction: discord.Interaction):
-                    super().__init__(title=title, timeout=120)
+                    super().__init__(title=title, timeout=60)
                     # define and add the text input
                     self.demand_input = discord.ui.TextInput(label=label, style=discord.TextStyle.short)
                     self.add_item(self.demand_input)
