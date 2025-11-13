@@ -3870,7 +3870,7 @@ class WarOptionsView(discord.ui.View):
         ]
 
         # create modal input function
-        async def simple_wait_for_modal(parent_interaction: discord.Interaction, title: str, label: str):
+        async def demanding_provinces_wait_for_modal(parent_interaction: discord.Interaction, title: str, label: str):
             """
             Waits for user input via a modal interaction and returns the value entered by the user.
 
@@ -3888,8 +3888,8 @@ class WarOptionsView(discord.ui.View):
                 str | None: The value entered by the user in the modal's input field,
                 or None if the modal times out or no value is provided.
             """
-            class SimpleModal(discord.ui.Modal):
-                def __init__(self, parent_interaction: discord.Interaction):
+            class ProvinceInputModal(discord.ui.Modal):
+                def __init__(self):
                     super().__init__(title=title, timeout=60)
                     # define and add the text input
                     self.demand_input = discord.ui.TextInput(label=label, style=discord.TextStyle.short)
@@ -3898,9 +3898,9 @@ class WarOptionsView(discord.ui.View):
                     self.value = None
                     self.parent_interaction = parent_interaction
 
-                async def on_submit(self, interaction: Interaction):
+                async def on_submit(self, submit_interaction: Interaction):
                     # defer the interaction
-                    await interaction.response.defer(thinking=False)
+                    await submit_interaction.response.defer(thinking=False)
                     # define the value and stop listening to the modal
                     self.value = self.demand_input.value
                     self.stop()
@@ -3909,10 +3909,15 @@ class WarOptionsView(discord.ui.View):
                     # if the user fails to respond, stop listening
                     # and remove all the options from the original interaction message, effectively canceling
                     self.stop()
-                    return await self.parent_interaction.edit_original_response(view=None)
+                    # if the user gives no response or cancels
+                    await conn.execute('''DELETE
+                                          FROM cnc_peace_negotiations
+                                          WHERE war_id = $1;''', war_info['id'])
+                    # remove the view
+                    return await parent_interaction.edit_original_response(view=None)
 
             # create and send the modal
-            modal = SimpleModal(parent_interaction)
+            modal = ProvinceInputModal()
             await parent_interaction.response.send_modal(modal)
             # await the modal response
             await modal.wait()
@@ -4114,7 +4119,7 @@ class WarOptionsView(discord.ui.View):
             if demand == "Cede Province":
                 try:
                     # query demand for provinces using the peace options dropdown interaction response
-                    provinces_demanded = await simple_wait_for_modal(peace_options_returned, "Demand Provinces",
+                    provinces_demanded = await demanding_provinces_wait_for_modal(peace_options_returned, "Demand Provinces",
                                                 "List province IDs separated by comma:")
                 # if the user gives no response or cancels
                 except asyncio.TimeoutError:
@@ -4210,7 +4215,7 @@ class WarOptionsView(discord.ui.View):
                 ally_target = target_returned.data['values'][0]
                 # with the target defined, create the text modal to get the provinces demanded
                 try:
-                    provinces_demanded = await simple_wait_for_modal(target_returned,
+                    provinces_demanded = await demanding_provinces_wait_for_modal(target_returned,
                                                                      title=f"Give Provinces to {ally_target}",
                                                                      label="List province IDs separated by comma:")
                 # if the user gives no response or cancels
