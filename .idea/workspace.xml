@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding the deletion of pending peace negotiations to the demanding_provinces_wait_for_modal function">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Refactor logger configuration in `alive` task to use module-specific logger.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/base.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -510,6 +511,7 @@
       <workItem from="1762997853381" duration="646000" />
       <workItem from="1763057090142" duration="9830000" />
       <workItem from="1764117469348" duration="622000" />
+      <workItem from="1765330770550" duration="990000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -854,7 +856,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1292" />
+    <option name="localTasksCounter" value="1293" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -873,9 +875,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Update peace negotiation embed with selected demands&#10;&#10;- Dynamically populate &quot;Current Negotiations&quot; field with selected peace treaty options&#10;- Edit embed response to reflect updated demands" />
-    <MESSAGE value="Remove redundant component type check in peace negotiation interaction" />
-    <MESSAGE value="Fix incorrect reference to interaction in peace negotiation response editing" />
     <MESSAGE value="Defer interaction response in peace negotiation options callback" />
     <MESSAGE value="Set view to `None` after editing peace negotiation embed response" />
     <MESSAGE value="Fix peace embed update to ensure correct field modification&#10;&#10;- Use `set_field_at` to update &quot;Current Negotiations&quot; field dynamically&#10;- Handle empty negotiation demands with default &quot;None&quot; value&#10;- Break the loop after updating the target embed field" />
@@ -898,7 +897,10 @@
     <MESSAGE value="Adding exceptions for TextInput Modal timeouts" />
     <MESSAGE value="Altering SimpleModal timeout to be 60 seconds for security reasons." />
     <MESSAGE value="Adding the deletion of pending peace negotiations to the demanding_provinces_wait_for_modal function" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding the deletion of pending peace negotiations to the demanding_provinces_wait_for_modal function" />
+    <MESSAGE value="Fixing base.p" />
+    <MESSAGE value="Remove redundant exception handling for TextInput Modal timeouts and simplify province demand logic" />
+    <MESSAGE value="Refactor logger configuration in `alive` task to use module-specific logger." />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor logger configuration in `alive` task to use module-specific logger." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />

@@ -7,7 +7,6 @@ import discord
 from discord import app_commands
 from ShardBot import Shard
 from discord.ext import commands
-import os
 from cogs import EXTENSIONS
 from customchecks import SilentFail
 
@@ -88,6 +87,7 @@ class BaseCommands(commands.Cog):
     @commands.is_owner()
     async def reload(self, ctx, extension):
         await self.bot.unload_extension(f"cogs.{extension}")
+        bot.system_message = ""
         await self.bot.load_extension(f"cogs.{extension}")
         await ctx.send(f"Reloaded extension: `{extension}`")
 
@@ -147,7 +147,7 @@ class BaseCommands(commands.Cog):
 
     async def on_ready(self):
         print("Ready.")
-        await self.bot.change_presence(activity=discord.Game("m$help for commands"))
+        await self.bot.change_presence(activity=discord.Game("$help for commands"))
         channel = self.bot.get_channel(835579413625569322)
         await channel.send("We are online.")
 
