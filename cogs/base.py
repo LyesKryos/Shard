@@ -229,7 +229,8 @@ async def setup(bot: Shard):
             await asyncio.sleep(3)
             await channel.send(f"We are online.\n{bot.system_message}")
         except Exception:
-            bot.logger.warning(msg=traceback.format_exc())
+            logger = logging.getLogger(__name__)
+            logger.warning(msg=traceback.format_exc())
 
     loop = bot.loop
     loop.create_task(alive(bot))
