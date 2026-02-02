@@ -361,61 +361,38 @@ class Roleplay(commands.Cog):
     typing.Literal ['Thaler', '1890 USD', '1890 GBP', '2025 USD', '2025 GBP'], consider_ppp: bool = False):
         # defer interaction
         await interaction.response.defer(thinking=True)
+        # determine codes for the various symbols
+        currency_symbols = {"1895 USD":"\U00000024","1895 GBP":"\U000000a3","2025 USD":"\U00000024","2025 GBP":"\U000000a3","Thaler":"\U000020b8"}
+        # remember that Thaler = CS/100
+        currency_rates = {"Thaler":0.1824,"1895 USD":0.34,"1895 GBP":0.0696,"2025 USD":2.54,"2025 GBP":1.93}
         # define the rates
-        USD_PPP = 2.58
-        GBP_PPP = 12.54
-        Thaler = 1
-        pastUSD_out = Thaler * .22
-        pastUSD_in = (Thaler / .22)
-        pastGBP_out = Thaler * .047
-        pastGBP_in = (Thaler / .047)
+        USD_PPP = 1.08
+        # remember that the GBP PPP to the International Dollar 2000 is 0.67
+        GBP_PPP = .7236
+        # calculate the conversion
+        exchange = currency_rates[from_currency]/currency_rates[to_currency] * amount_in
+        # if the ppp is to be considered, multiply by that
         if consider_ppp:
-            pastUSD_out *= USD_PPP
-            pastUSD_in /= USD_PPP
-            pastGBP_out *= GBP_PPP
-            pastGBP_in /= GBP_PPP
-        USD2025_out = pastUSD_out * 35.14
-        USD2025_in = pastUSD_in * .03
-        GBP2025_out = pastGBP_out * 164.21
-        GBP2025_in = pastGBP_in * .01
+            # if the from or to is not the thaler, disallow, as the PPP doesn't matter for the other currencies
+            if "Thaler" not in from_currency and "Thaler" not in to_currency:
+                return await interaction.followup.send("The PPP does not apply to the conversion of "
+                                                       "currencies other than the Thaler.")
+            # if the currency is USD, multiply by the PPP
+            if "USD" in from_currency:
+                exchange /= USD_PPP
+            elif "USD" in to_currency:
+                exchange *= USD_PPP
+            elif "GBP" in from_currency:
+                exchange /= GBP_PPP
+            elif "GBP" in to_currency:
+                exchange *= GBP_PPP
+        # construct the display
+        await interaction.followup.send(f"{currency_symbols[to_currency]}{exchange:,.3}")
 
-        # select the option for from_currency
-        if from_currency == "Thaler":
-            from_currency_calc = Thaler
-        elif from_currency == "1890 USD":
-            from_currency_calc = pastUSD_in
-        elif from_currency == "1890 GBP":
-            from_currency_calc = pastGBP_in
-        elif from_currency == "2025 USD":
-            from_currency_calc = USD2025_in
-        elif from_currency == "2025 GBP":
-            from_currency_calc = GBP2025_in
-        else:
-            symbol = None
-            return await interaction.followup.send("Please select a listed option.")
-        # select the option for to_currency
-        if to_currency == "Thaler":
-            to_currency_calc = Thaler
-            symbol = "\u20B8"
-        elif to_currency == "1890 USD":
-            to_currency_calc = pastUSD_out
-            symbol = "\u0024"
-        elif to_currency == "1890 GBP":
-            to_currency_calc = pastGBP_out
-            symbol = "\u00A3"
-        elif to_currency == "2025 USD":
-            to_currency_calc = USD2025_out
-            symbol = "\u0024"
-        elif to_currency == "2025 GBP":
-            to_currency_calc = GBP2025_out
-            symbol = "\u00A3"
-        else:
-            return await interaction.followup.send("Please select a listed option.")
-        conversion = float((amount_in * from_currency_calc) * to_currency_calc)
-        if to_currency == "Thaler":
-            return await interaction.followup.send(f"{round(conversion, 3):,.3f}{symbol}")
-        else:
-            return await interaction.followup.send(f"{symbol}{round(conversion, 3):,.3f} ({to_currency})")
+
+
+
+
 
     @senate.command(name="divide_thaler",
                     description="Display the division of a given amount of thaler into respective parts.")
