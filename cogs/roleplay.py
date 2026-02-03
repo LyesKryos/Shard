@@ -436,9 +436,5 @@ class Roleplay(commands.Cog):
         # send message
         return await interaction.followup.send(message)
 
-
-
-
-
 async def setup(bot: Shard):
     await bot.add_cog(Roleplay(bot))

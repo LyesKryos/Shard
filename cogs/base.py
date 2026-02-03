@@ -87,7 +87,7 @@ class BaseCommands(commands.Cog):
     @commands.is_owner()
     async def reload(self, ctx, extension):
         await self.bot.unload_extension(f"cogs.{extension}")
-        bot.system_message = ""
+        self.bot.system_message = ""
         await self.bot.load_extension(f"cogs.{extension}")
         await ctx.send(f"Reloaded extension: `{extension}`")
 
