@@ -364,7 +364,7 @@ class Roleplay(commands.Cog):
         # determine codes for the various symbols
         currency_symbols = {"1895 USD":"\U00000024","1895 GBP":"\U000000a3","2025 USD":"\U00000024","2025 GBP":"\U000000a3","Thaler":"\U000020b8"}
         # remember that Thaler = Currency Strength/100 (representing 100 CS = Int'l (1990) $1)
-        currency_rates = {"Thaler":.1824,"1895 USD":0.34,"1895 GBP":0.0696,"2025 USD":2.54,"2025 GBP":1.93}
+        currency_rates = {"Thaler":.5428,"1895 USD":0.34,"1895 GBP":0.0696,"2025 USD":2.54,"2025 GBP":1.93}
         # define the rates
         USD_PPP = 1.08
         # remember that the GBP PPP to the International Dollar 2000 is 0.67
