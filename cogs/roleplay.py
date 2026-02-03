@@ -357,8 +357,8 @@ class Roleplay(commands.Cog):
                            to_currency="The currency to be converted to.")
     @app_commands.guild_only()
     async def convert_thaler(self, interaction: discord.Interaction, amount_in: float, from_currency:
-    typing.Literal ['Thaler', '1890 USD', '1890 GBP', '2025 USD', '2025 GBP'], to_currency:
-    typing.Literal ['Thaler', '1890 USD', '1890 GBP', '2025 USD', '2025 GBP'], consider_ppp: bool = False):
+    typing.Literal ['Thaler', '1895 USD', '1895 GBP', '2025 USD', '2025 GBP'], to_currency:
+    typing.Literal ['Thaler', '1895 USD', '1895 GBP', '2025 USD', '2025 GBP'], consider_ppp: bool = False):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # determine codes for the various symbols
