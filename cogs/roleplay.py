@@ -387,7 +387,10 @@ class Roleplay(commands.Cog):
             elif "GBP" in to_currency:
                 exchange *= GBP_PPP
         # return the display of the conversion
-        return await interaction.followup.send(f"{currency_symbols[to_currency]}{exchange:,.3}")
+        # "," > with thousands separator
+        # ".3" > with 3 decimal places
+        # "f" > with fixed-point notation
+        return await interaction.followup.send(f"{currency_symbols[to_currency]}{exchange:,.3f}")
 
     @senate.command(name="divide_thaler",
                     description="Display the division of a given amount of thaler into respective parts.")
