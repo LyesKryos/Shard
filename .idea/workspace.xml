@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing the notation for the currency exchange output">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting the rates of the Thaler">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/roleplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/roleplay.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -513,7 +515,7 @@
       <workItem from="1769997457813" duration="3213000" />
       <workItem from="1770053989361" duration="695000" />
       <workItem from="1770139845548" duration="1845000" />
-      <workItem from="1770313866649" duration="676000" />
+      <workItem from="1770313866649" duration="1393000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -858,7 +860,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1301" />
+    <option name="localTasksCounter" value="1302" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -877,7 +879,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Fix incorrect references in war info embed generation&#10;&#10;- Replace `war` with `war_info` for consistency.&#10;- Correctly handle attackers and defenders listings." />
     <MESSAGE value="Fix incorrect column reference in province ownership query during &quot;Cede Province&quot; demand" />
     <MESSAGE value="Fixing incorrect database reference in the Defensio Belli button callback." />
     <MESSAGE value="Fix incorrect interaction handling in peace negotiations&#10;&#10;- Remove unnecessary interaction response deferral in peace options callback.&#10;- Correct modal input handling by using peace options dropdown interaction." />
@@ -902,7 +903,8 @@
     <MESSAGE value="Fix currency rate for Thaler and update exchange calculation logic in `convert_thaler` command." />
     <MESSAGE value="Modifying Thaler value with updated currency rate average" />
     <MESSAGE value="Fixing the notation for the currency exchange output" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing the notation for the currency exchange output" />
+    <MESSAGE value="Correcting the rates of the Thaler" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcting the rates of the Thaler" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
