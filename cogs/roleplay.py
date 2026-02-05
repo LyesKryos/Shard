@@ -363,15 +363,15 @@ class Roleplay(commands.Cog):
         await interaction.response.defer(thinking=True)
         # determine codes for the various symbols
         currency_symbols = {"1895 USD":"\U00000024","1895 GBP":"\U000000a3","2025 USD":"\U00000024","2025 GBP":"\U000000a3","Thaler":"\U000020b8"}
-        # remember that Thaler = 1 / (Currency Strength/100) (representing 100 CS = Int'l (1990) $1)
-        # the rates are all in Int'l (1990) dollars: 1 INTL $ = 1.842, 1 INTL $ = 0.34 1895 USD
-        currency_rates = {"Thaler": 1.842,"1895 USD":.34,"1895 GBP":.70,"2025 USD":2.54,"2025 GBP":.31}
+        # remember that Thaler = 1/ (Currency Strength/100) (representing 100 CS = Int'l (1990) $1)
+        # the rates are all in Int'l (1990) dollars: 1 INTL $ = 1.84 Thaler, 1 INTL $ = 0.34 1895 USD
+        currency_rates = {"Thaler": 1.84,"1895 USD":.34,"1895 GBP":.070,"2025 USD":2.54,"2025 GBP":.31}
         # define the PPP rates
         USD_PPP = 1.08
         # remember that the GBP PPP to the International Dollar 2000 is 0.67
         GBP_PPP = .7236
         # calculate the conversion
-        exchange = (currency_rates[from_currency]/currency_rates[to_currency]) * amount_in
+        exchange = (currency_rates[to_currency]/currency_rates[from_currency]) * amount_in
         # if the ppp is to be considered, multiply by that
         if consider_ppp:
             # if the from or to is not the thaler, disallow, as the PPP doesn't matter for the other currencies
