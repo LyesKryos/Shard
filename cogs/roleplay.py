@@ -363,9 +363,9 @@ class Roleplay(commands.Cog):
         await interaction.response.defer(thinking=True)
         # determine codes for the various symbols
         currency_symbols = {"1895 USD":"\U00000024","1895 GBP":"\U000000a3","2025 USD":"\U00000024","2025 GBP":"\U000000a3","Thaler":"\U000020b8"}
-        # remember that Thaler = 2 - (Currency Strength/100) (representing 100 CS = Int'l (1990) $1)
+        # remember that Thaler = 1 / (Currency Strength/100) (representing 100 CS = Int'l (1990) $1)
         # the rates are all in Int'l (1990) dollars; 1 Thaler = 0.5428 Int'l (1990) dollars, 1 1895 USD = 2.90
-        currency_rates = {"Thaler":.5428,"1895 USD":2.90,"1895 GBP":1.66,"2025 USD":.42,"2025 GBP":.31}
+        currency_rates = {"Thaler": 1.842,"1895 USD":.34,"1895 GBP":.70,"2025 USD":2.54,"2025 GBP":.31}
         # define the PPP rates
         USD_PPP = 1.08
         # remember that the GBP PPP to the International Dollar 2000 is 0.67
@@ -378,7 +378,7 @@ class Roleplay(commands.Cog):
             if "Thaler" not in from_currency and "Thaler" not in to_currency:
                 return await interaction.followup.send("The PPP does not apply to the conversion of "
                                                        "currencies other than the Thaler.")
-            # if the currency is USD, multiply by the PPP
+            # if the currency is USD, multiply by the PPPq
             if "USD" in from_currency:
                 exchange /= USD_PPP
             elif "USD" in to_currency:
