@@ -1125,8 +1125,15 @@ class DossierView(View):
         await interaction.response.defer()
         # clear embed
         self.doss_embed.clear_fields()
+        # pull province data
+        province_list = await self.conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id = $1;''',
+                                              self.user_info['user_id'])
+        province_list = [p['id'] for p in province_list]
+        province_count = len(province_list)
+        province_list = ", ".join(str(p) for p in province_list)
         # populate summary
-        self.doss_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}")
+        self.doss_embed.add_field(name="Government",
+                                  value=f"{self.user_info['govt_subtype']} {self.user_info['govt_type']}")
         # populate territory and count on its own line
         self.doss_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}", inline=False)
         # send update

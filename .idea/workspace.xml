@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting rates in general for the currency exchange">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Add &quot;Summary&quot; button and remove unnecessary exception handling during province demand">
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -515,7 +514,7 @@
       <workItem from="1770053989361" duration="695000" />
       <workItem from="1770139845548" duration="1845000" />
       <workItem from="1770313866649" duration="3645000" />
-      <workItem from="1771263218301" duration="299000" />
+      <workItem from="1771263218301" duration="608000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -860,7 +859,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1306" />
+    <option name="localTasksCounter" value="1307" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -879,7 +878,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Fixing incorrect database reference in the Defensio Belli button callback." />
     <MESSAGE value="Fix incorrect interaction handling in peace negotiations&#10;&#10;- Remove unnecessary interaction response deferral in peace options callback.&#10;- Correct modal input handling by using peace options dropdown interaction." />
     <MESSAGE value="Fix incorrect modal input handling in peace negotiations&#10;&#10;- Remove redundant interaction response deferral.&#10;- Use the correct peace options dropdown interaction for modal input." />
     <MESSAGE value="Add modal input handling function for user interactions&#10;&#10;- Implement `simple_wait_for_modal` to streamline modal-based user input. &#10;- Replace `followup.send_modal` with `response.send_modal` for proper interaction handling." />
@@ -904,7 +902,8 @@
     <MESSAGE value="Fixing the notation for the currency exchange output" />
     <MESSAGE value="Correcting the rates of the Thaler" />
     <MESSAGE value="Correcting rates in general for the currency exchange" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting rates in general for the currency exchange" />
+    <MESSAGE value="Add &quot;Summary&quot; button and remove unnecessary exception handling during province demand" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add &quot;Summary&quot; button and remove unnecessary exception handling during province demand" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
