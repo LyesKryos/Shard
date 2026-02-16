@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding proper buffer_output handling for wars parsing" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correctly parsing all the names rather than each name individually." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -512,7 +512,7 @@
       <workItem from="1770053989361" duration="695000" />
       <workItem from="1770139845548" duration="1845000" />
       <workItem from="1770313866649" duration="3645000" />
-      <workItem from="1771263218301" duration="1606000" />
+      <workItem from="1771263218301" duration="2167000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -857,7 +857,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1311" />
+    <option name="localTasksCounter" value="1312" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -876,7 +876,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Reducing characters for cede province modal" />
     <MESSAGE value="Set default value for `modifier` in `roll` command to 0" />
     <MESSAGE value="Add handling for pending peace negotiations and implement new province demand logic&#10;&#10;- Prevent initiating peace negotiations if one is already pending.&#10;- Improve modal input handling for &quot;Cede Province&quot; and &quot;Give Province&quot; demands.&#10;- Add database updates for tracking demands during negotiations." />
     <MESSAGE value="Fixing spelling error" />
@@ -901,16 +900,17 @@
     <MESSAGE value="Correcting variable calling for pre-reference allocation" />
     <MESSAGE value="Correcting unnecesary double dipping for buffer_output creation at 1278." />
     <MESSAGE value="Adding proper buffer_output handling for wars parsing" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding proper buffer_output handling for wars parsing" />
+    <MESSAGE value="Correctly parsing all the names rather than each name individually." />
+    <option name="LAST_COMMIT_MESSAGE" value="Correctly parsing all the names rather than each name individually." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
-    <SUITE FILE_PATH="coverage/Shard$scratch_2.coverage" NAME="scratch_2 Coverage Results" MODIFIED="1761860961970" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
     <SUITE FILE_PATH="coverage/Shard$scratch_8.coverage" NAME="scratch_8 Coverage Results" MODIFIED="1647534686885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
-    <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
     <SUITE FILE_PATH="coverage/Shard$cnc_research.coverage" NAME="cnc_research Coverage Results" MODIFIED="1659879062745" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Shard$1.coverage" NAME="1 Coverage Results" MODIFIED="1673727138457" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
+    <SUITE FILE_PATH="coverage/Shard$scratch.coverage" NAME="scratch Coverage Results" MODIFIED="1771265336291" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
     <SUITE FILE_PATH="coverage/Shard$resources_updating_cnc.coverage" NAME="resources_updating_cnc Coverage Results" MODIFIED="1661216424601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Shard$scratch.coverage" NAME="scratch Coverage Results" MODIFIED="1733511773736" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
+    <SUITE FILE_PATH="coverage/Shard$scratch_2.coverage" NAME="scratch_2 Coverage Results" MODIFIED="1761860961970" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
+    <SUITE FILE_PATH="coverage/Shard$scratch_7.coverage" NAME="scratch_7 Coverage Results" MODIFIED="1675343185917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
+    <SUITE FILE_PATH="coverage/Shard$1.coverage" NAME="1 Coverage Results" MODIFIED="1673727138457" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
   </component>
 </project>
