@@ -1263,7 +1263,7 @@ class DossierView(View):
                                               WHERE $1 = ANY (members);''',
                                            self.user_info['name'])
 
-        def parse_relations(relations: list, wars: bool = False) -> str:
+        def parse_relations(relations: list, name: str, wars: bool = False) -> str:
             """
             Parses out the names of nations within the input relations.
             ``wars``, if true, parses out attackers and defenders rather than "members".
@@ -1275,22 +1275,22 @@ class DossierView(View):
                 output = ""
                 # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
                 for relation in relations:
-                    buffer_output = ", ".join([r for r in relation['attackers'] if r != user_info['name']])
-                    buffer_output += ", ".join([r for r in relation['defenders'] if r != user_info['name']])
+                    buffer_output = ", ".join([r for r in relation['attackers'] if r != name])
+                    buffer_output += ", ".join([r for r in relation['defenders'] if r != name])
                     output += buffer_output
                 return output
             else:
                 output = ""
                 # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
                 for relation in relations:
-                    buffer_output = ", ".join([r for r in relation['members'] if r != user_info['name']])
+                    buffer_output = ", ".join([r for r in relation['members'] if r != name])
                     output += buffer_output
                 return output
 
-        allies = parse_relations(alliances)
-        wars = parse_relations(wars, True)
-        trade_pacts = parse_relations(trade_pacts)
-        military_access = parse_relations(military_access)
+        allies = parse_relations(alliances, self.user_info['name'])
+        wars = parse_relations(wars, self.user_info['name'], True)
+        trade_pacts = parse_relations(trade_pacts, self.user_info['name'])
+        military_access = parse_relations(military_access, self.user_info['name'])
         # populate relations
         self.doss_embed.add_field(name="=====================RELATIONS=====================",
                                   value="Information about your nation's diplomatic relationships.", inline=False)
