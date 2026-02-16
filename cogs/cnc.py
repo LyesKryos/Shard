@@ -1272,7 +1272,6 @@ class DossierView(View):
                 output = "None"
                 return output
             elif wars:
-                output = ""
                 # define combined names
                 combined_names = list()
                 # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
@@ -1280,7 +1279,7 @@ class DossierView(View):
                     # define all names
                     defenders_names = [r for r in relation['defenders'] if r != name]
                     attackers_names = [r for r in relation['attackers'] if r != name]
-                    combined_names.append(defenders_names+attackers_names)
+                    combined_names += defenders_names + attackers_names
                 output = ", ".join(combined_names)
                 return output
             else:
