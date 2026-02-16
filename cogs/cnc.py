@@ -1119,11 +1119,24 @@ class DossierView(View):
             child.disabled = True
         return await self.interaction.edit_original_response(view=self)
 
+    @discord.ui.button(label="Summary", style=discord.ButtonStyle.blurple)
+    async def summary(self, interaction: discord.Interaction, button: discord.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # clear embed
+        self.doss_embed.clear_fields()
+        # populate summary
+        self.doss_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}")
+        # populate territory and count on its own line
+        self.doss_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}", inline=False)
+        # send update
+        await interaction.edit_original_response(embed=self.doss_embed)
+
     @discord.ui.button(label="Authority", style=discord.ButtonStyle.blurple)
     async def authority(self, interaction: discord.Interaction, button: discord.Button):
         # defer interaction
         await interaction.response.defer()
-        # clear emebed
+        # clear embed
         self.doss_embed.clear_fields()
         # populate authority and gains
         self.doss_embed.add_field(name="=====================AUTHORITY=====================",
@@ -4117,18 +4130,9 @@ class WarOptionsView(discord.ui.View):
             target_provinces = [p['id'] for p in target_provinces_raw]
             # if the demand is to cede a province, determine which provinces the demander claims
             if demand == "Cede Province":
-                try:
-                    # query demand for provinces using the peace options dropdown interaction response
-                    provinces_demanded = await demanding_provinces_wait_for_modal(peace_options_returned, "Demand Provinces",
-                                                "List province IDs separated by comma:")
-                # if the user gives no response or cancels
-                except asyncio.TimeoutError:
-                    # destroy the pending negotiation
-                    await conn.execute('''DELETE
-                                          FROM cnc_peace_negotiations
-                                          WHERE war_id = $1;''', war_info['id'])
-                    # remove the view
-                    return await self.interaction.edit_original_response(view=None)
+                # query demand for provinces using the peace options dropdown interaction response
+                provinces_demanded = await demanding_provinces_wait_for_modal(peace_options_returned, "Demand Provinces",
+                                            "List province IDs separated by comma:")
                 # separate the list
                 provinces_demanded = [p.strip() for p in provinces_demanded.split(',')]
                 # if the list has no items, return
@@ -4214,19 +4218,9 @@ class WarOptionsView(discord.ui.View):
                 # define target option
                 ally_target = target_returned.data['values'][0]
                 # with the target defined, create the text modal to get the provinces demanded
-                try:
-                    provinces_demanded = await demanding_provinces_wait_for_modal(target_returned,
+                provinces_demanded = await demanding_provinces_wait_for_modal(target_returned,
                                                                      title=f"Give Provinces to {ally_target}",
                                                                      label="List province IDs separated by comma:")
-                # if the user gives no response or cancels
-                except asyncio.TimeoutError:
-                    # destroy the pending negotiation
-                    await conn.execute('''DELETE
-                                          FROM cnc_peace_negotiations
-                                          WHERE war_id = $1;''', war_info['id'])
-                    # remove the view
-                    return await self.interaction.edit_original_response(view=None)
-
                 # separate the list
                 provinces_demanded = [p.strip() for p in provinces_demanded.split(',')]
                 # if the list has no items, return
