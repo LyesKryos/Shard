@@ -1275,7 +1275,9 @@ class DossierView(View):
                 output = ""
                 # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
                 for relation in relations:
-                    buffer_output = ", ".join([r for r in relation['attackers'] if r != name])
+                    buffer_output = ""
+                    buffer_output += ", ".join([r for r in relation['attackers'] if r != name])
+                    buffer_output += ", ".join([r for r in relation['defenders'] if r != name])
                     output += buffer_output
                 return output
             else:
