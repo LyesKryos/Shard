@@ -2958,7 +2958,9 @@ class HostileDiplomaticActions(discord.ui.View):
             button.disabled = True
             await self.interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"You are already participating in a war against "
-                                                   f"{self.recipient_info['name']} and cannot declare another war.")
+                                                   f"{self.recipient_info['name']} and cannot declare another war.\n"
+                                                   f"To negotiate a peace with this nation, "
+                                                   f"use `/cnc war {war_check['id']}`.")
         # create a base list of CBs available
         available_cbs = ["Conquest", "Subjugate", "Force Reparations"]
         # check CBs available by tech
