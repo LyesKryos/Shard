@@ -2960,7 +2960,7 @@ class HostileDiplomaticActions(discord.ui.View):
             return await interaction.followup.send(f"You are already participating in a war against "
                                                    f"{self.recipient_info['name']} and cannot declare another war.\n"
                                                    f"To negotiate a peace with this nation, "
-                                                   f"use `/cnc war {war_check['id']}`.")
+                                                   f"use `/cnc war war_id:{war_check['id']}`.")
         # create a base list of CBs available
         available_cbs = ["Conquest", "Subjugate", "Force Reparations"]
         # check CBs available by tech
@@ -4165,7 +4165,7 @@ class WarOptionsView(discord.ui.View):
                         provinces_not_of_target = set(provinces_demanded) - set(target_provinces)
                         # send a message of denial
                         await self.interaction.followup.send("You must specify provinces that are owned by the target.\n"
-                                                             f"Target does not own: {','.join(provinces_not_of_target)}.",
+                                                             f"Target does not own: {','.join(provinces_not_of_target.sort())}.",
                                                             ephemeral=True)
                         # destroy the pending negotiation
                         await conn.execute('''DELETE FROM cnc_peace_negotiations WHERE war_id = $1;''', war_info['id'])
