@@ -4159,7 +4159,7 @@ class WarOptionsView(discord.ui.View):
                     return await self.interaction.edit_original_response(view=None)
                 # if the list has items, proceed
                 else:
-                    # if the list of provinces demanded has any province that are not owned by the target
+                    # if the list of provinces demanded has any provinces that are not owned by the target
                     if not set(provinces_demanded).issubset(set(target_provinces)):
                         # get the provinces that are not
                         provinces_not_of_target = set(provinces_demanded) - set(target_provinces)
@@ -4167,14 +4167,16 @@ class WarOptionsView(discord.ui.View):
                         await self.interaction.followup.send("You must specify provinces that are owned by the target.\n"
                                                              f"Target does not own: {','.join(provinces_not_of_target.sort())}.",
                                                             ephemeral=True)
+                        await self.interaction.followup.send(provinces_demanded, target_provinces)
                         # destroy the pending negotiation
                         await conn.execute('''DELETE FROM cnc_peace_negotiations WHERE war_id = $1;''', war_info['id'])
                         # return the denial
-                        return await self.interaction.edit_original_response(view=None)
-                    # otherwise, add the list of provinces to the tracker
-                    await conn.execute('''UPDATE cnc_peace_negotiations SET cede_provinces = $1 WHERE war_id = $2;''',
-                                       provinces_demanded, war_info['id'])
-                    await self.interaction.followup.send("Cede Provinces demand added to the Peace Negotiations.")
+                        await self.interaction.edit_original_response(view=None)
+                    else:
+                        # otherwise, add the list of provinces to the tracker
+                        await conn.execute('''UPDATE cnc_peace_negotiations SET cede_provinces = $1 WHERE war_id = $2;''',
+                                           provinces_demanded, war_info['id'])
+                        await self.interaction.followup.send("Cede Provinces demand added to the Peace Negotiations.")
 
             # if the demand is to give provinces, determine which ally the provinces will go to and which provinces those are
             elif demand == "Give Province":
