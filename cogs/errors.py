@@ -168,6 +168,9 @@ class ShardErrorHandler(commands.Cog):
         elif isinstance(error, app_commands.CheckFailure):
             await interaction.response.send_message(content="You do not have the right permissions for this command "
                                                     "or are blocked from using this command.", ephemeral=True)
+        elif isinstance(error, app_commands.errors.TransformerError):
+            await interaction.response.send_message("I am unfamiliar with that input. Please try again.",
+                                                    ephemeral=True)
         else:
             await interaction.channel.send(f"An error occurred. Check the logs.")
             self.logger.exception(msg=f"Unhandled error in command: {command_name}", exc_info=error)
