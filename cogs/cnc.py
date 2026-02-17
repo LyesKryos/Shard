@@ -4165,8 +4165,9 @@ class WarOptionsView(discord.ui.View):
                         provinces_not_of_target = set(provinces_demanded) - set(target_provinces)
                         # send a message of denial
                         await self.interaction.followup.send("You must specify provinces that are owned by the target.\n"
-                                                             f"Target does not own: {','.join(provinces_not_of_target.sort())}.",
-                                                            ephemeral=True)
+                                                             f"Target does not own: "
+                                                             f"{','.join(sorted(provinces_not_of_target))}.",
+                                                             ephemeral=True)
                         await self.interaction.followup.send(provinces_demanded, target_provinces)
                         # destroy the pending negotiation
                         await conn.execute('''DELETE FROM cnc_peace_negotiations WHERE war_id = $1;''', war_info['id'])
