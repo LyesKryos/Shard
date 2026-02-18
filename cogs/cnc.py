@@ -4152,8 +4152,6 @@ class WarOptionsView(discord.ui.View):
                 if not provinces_demanded:
                     # reject message
                     await self.interaction.followup.send("You must specify at least one province.", ephemeral=True)
-                    # reset the view
-                    return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
                 # if the list has items, proceed
                 else:
                     # if the list of provinces demanded has any provinces that are not owned by the target
@@ -4165,8 +4163,6 @@ class WarOptionsView(discord.ui.View):
                                                              f"Target does not own: "
                                                              f"{(', '.join(sorted(provinces_not_of_target)))}.",
                                                              ephemeral=True)
-                        # reset the view
-                        return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
                     else:
                         # calculate the war score
                         war_score = 0
