@@ -4129,8 +4129,6 @@ class WarOptionsView(discord.ui.View):
                 break
         # send the updated embed
         await self.interaction.edit_original_response(embed=peace_embed, view=None)
-        # set the war score ticker
-        demand_score = 0
         # create the pending peace negotiation
         await conn.execute('''INSERT INTO cnc_peace_negotiations(war_id, total_negotiation, sender, target) 
                               VALUES($1, $2, $3, $4);''',
@@ -4154,6 +4152,8 @@ class WarOptionsView(discord.ui.View):
                 if not provinces_demanded:
                     # reject message
                     await self.interaction.followup.send("You must specify at least one province.", ephemeral=True)
+                    # reset the view
+                    return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
                 # if the list has items, proceed
                 else:
                     # if the list of provinces demanded has any provinces that are not owned by the target
@@ -4193,7 +4193,6 @@ class WarOptionsView(discord.ui.View):
                 # if the list is empty, return
                 if not potential_ally_targets:
                     await self.interaction.followup.send("No potential allies to give provinces to.")
-
                 # otherwise, proceed
                 else:
                     # create view check to ensure proper parsing
