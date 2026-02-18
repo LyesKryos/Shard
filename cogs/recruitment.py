@@ -395,7 +395,7 @@ class Recruitment(commands.Cog):
             headers = {"User-Agent": "Bassiliya"}
             newnationsparams = {'q': 'newnations'}
             telegram_params = {'a': 'sendTG',
-                               'client': '5f98ba8c',
+                               'client': 'qNTmzwN2GxLqx0FS',
                                'tgid': '35007722',
                                'key': 'e05930056abe'}
             # start the session
