@@ -4169,7 +4169,7 @@ class WarOptionsView(discord.ui.View):
                         # send a message of denial
                         await self.interaction.followup.send("You must specify provinces that are owned by the target.\n"
                                                              f"Target does not own: "
-                                                             f"{','.join(sorted(provinces_not_of_target))}.",
+                                                             f"{(', '.join(sorted(provinces_not_of_target)))}.",
                                                              ephemeral=True)
                         await self.interaction.followup.send(provinces_demanded, target_provinces)
                         # destroy the pending negotiation
@@ -4191,7 +4191,7 @@ class WarOptionsView(discord.ui.View):
                                            provinces_demanded, war_score, war_info['id'])
                         await self.interaction.followup.send(f"Cede Provinces demand added to the Peace Negotiations "
                                                              f"for `{war_info['id']}` from the following provinces:\n"
-                                                             f"{",".join(provinces_demanded)}")
+                                                             f"{(", ".join(provinces_demanded))}")
 
             # if the demand is to give provinces, determine which ally the provinces will go to and which provinces those are
             elif demand == "Give Province":
@@ -4276,7 +4276,7 @@ class WarOptionsView(discord.ui.View):
                             # send a message of denial
                             await self.interaction.followup.send(
                                 "You must specify provinces that are owned by the target.\n"
-                                f"Target does not own: {','.join(sorted(provinces_not_of_target))}.",
+                                f"Target does not own: {(', '.join(sorted(provinces_not_of_target)))}.",
                                 ephemeral=True)
                             # destroy the pending negotiation
                             await conn.execute('''DELETE FROM cnc_peace_negotiations WHERE war_id = $1;''', war_info['id'])
@@ -4295,7 +4295,7 @@ class WarOptionsView(discord.ui.View):
                             # notify of success
                             await self.interaction.followup.send("Give Provinces demand added to the Peace Negotiations"
                                                                  f"for a cost of `{war_score}` for these provinces:\n"
-                                                                 f"{",".join(provinces_demanded)}")
+                                                                 f"{(", ".join(provinces_demanded))}")
 
 
 
