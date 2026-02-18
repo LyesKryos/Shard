@@ -4190,8 +4190,8 @@ class WarOptionsView(discord.ui.View):
                                               WHERE war_id = $3;''',
                                            provinces_demanded, war_score, war_info['id'])
                         await self.interaction.followup.send(f"Cede Provinces demand added to the Peace Negotiations "
-                                                             f"for `{war_info['id']}` from the following provinces:\n"
-                                                             f"{(", ".join(provinces_demanded))}")
+                                                             f"for `{war_info['id']}` from the following provinces:\n"+
+                                                             ", ".join(provinces_demanded))
 
             # if the demand is to give provinces, determine which ally the provinces will go to and which provinces those are
             elif demand == "Give Province":
