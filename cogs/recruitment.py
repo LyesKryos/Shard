@@ -703,11 +703,16 @@ class Recruitment(commands.Cog):
         # stops autogrammer
         if not self.autogrammer.is_running():
             return await ctx.send("Autogrammer not running.")
+        # define the next iteration before cutting
+        next_iter = self.autogrammer.next_iteration.second
+        # attempt to cut
         message = await ctx.send("Cutting...")
         self.autogrammer.stop()
+        # if the cut was successful
         if not self.autogrammer.is_running():
             return await message.edit("Autogrammer cut!")
-        await asyncio.sleep(self.autogrammer.next_iteration.second)
+        # otherwise, wait until the next iteration in seconds and then try check the cutting again
+        await asyncio.sleep(next_iter)
         if not self.autogrammer.is_running():
             return await message.edit(content="Autogrammer cut!")
 
