@@ -16,8 +16,7 @@ import aiohttp
 from time import perf_counter, strftime
 from PIL import ImageColor
 from customchecks import RecruitmentCheck, TooManyRequests
-import pyshorteners
-
+import pyshortener
 
 
 from ratelimiter import Ratelimiter
@@ -200,7 +199,8 @@ class Recruitment(commands.Cog):
                                               "\"Block All\" under Recruitment. Instant relief!")
                                 welcome_tg = urllib.parse.quote(welcome_tg)
                                 welcome_link = f"https://www.nationstates.net/page=compose_telegram?tgto={n};message={welcome_tg}"
-                                welcome_link = pyshorteners.Shortener().tinyurl.short(welcome_link)
+                                welcome_link = pyshortener.shor(welcome_link, custom_short_url="welcome_telegram",
+                                                                service="v.gd")
                                 notif = await recruitment_channel.send(
                                     f"{name} has arrived, {notifrole.mention}!",
                                     view=RetentionButton(welcome_link))
