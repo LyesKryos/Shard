@@ -397,7 +397,7 @@ class Recruitment(commands.Cog):
             telegram_params = {'a': 'sendTG',
                                'client': 'qNTmzwN2GxLqx0FS',
                                'tgid': '35007722',
-                               'key': 'e05930056abe'}
+                               'key': 'FITdVM4HGqIy1J9O'}
             # start the session
             async with aiohttp.ClientSession() as session:
                 # ratelimiter
