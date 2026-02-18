@@ -4128,7 +4128,7 @@ class WarOptionsView(discord.ui.View):
                 )
                 break
         # send the updated embed
-        await self.interaction.edit_original_response(embed=peace_embed, view=None)
+        await self.interaction.edit_original_response(embed=peace_embed)
         # create the pending peace negotiation
         await conn.execute('''INSERT INTO cnc_peace_negotiations(war_id, total_negotiation, sender, target) 
                               VALUES($1, $2, $3, $4);''',
