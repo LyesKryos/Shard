@@ -4166,7 +4166,7 @@ class WarOptionsView(discord.ui.View):
                                                              f"{(', '.join(sorted(provinces_not_of_target)))}.",
                                                              ephemeral=True)
                         # reset the view
-                        await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
+                        return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
                     else:
                         # calculate the war score
                         war_score = 0

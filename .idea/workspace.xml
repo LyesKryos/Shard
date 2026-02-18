@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Remove redundant cleanup actions in peace negotiation province validation." />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Reset view handling in peace negotiation validation to improve user feedback.">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -513,7 +515,7 @@
       <workItem from="1770139845548" duration="1845000" />
       <workItem from="1770313866649" duration="3645000" />
       <workItem from="1771263218301" duration="4020000" />
-      <workItem from="1771440323116" duration="2892000" />
+      <workItem from="1771440323116" duration="3193000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -858,7 +860,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1326" />
+    <option name="localTasksCounter" value="1327" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -877,7 +879,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting name use for `bot` variable." />
     <MESSAGE value="Update `convert_thaler` command to correct currency rate for Thaler and streamline interaction response." />
     <MESSAGE value="Fix currency rate for Thaler and update exchange calculation logic in `convert_thaler` command." />
     <MESSAGE value="Modifying Thaler value with updated currency rate average" />
@@ -902,7 +903,8 @@
     <MESSAGE value="Correcting province list formatting for consistency in peace negotiation messages." />
     <MESSAGE value="Fix province list formatting in peace negotiation messages." />
     <MESSAGE value="Remove redundant cleanup actions in peace negotiation province validation." />
-    <option name="LAST_COMMIT_MESSAGE" value="Remove redundant cleanup actions in peace negotiation province validation." />
+    <MESSAGE value="Reset view handling in peace negotiation validation to improve user feedback." />
+    <option name="LAST_COMMIT_MESSAGE" value="Reset view handling in peace negotiation validation to improve user feedback." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
