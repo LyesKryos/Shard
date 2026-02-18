@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding sorting to the province ids for not owned during peace negotiations">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Small code correction for sorting a set">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -514,7 +515,8 @@
       <workItem from="1770053989361" duration="695000" />
       <workItem from="1770139845548" duration="1845000" />
       <workItem from="1770313866649" duration="3645000" />
-      <workItem from="1771263218301" duration="3722000" />
+      <workItem from="1771263218301" duration="4020000" />
+      <workItem from="1771440323116" duration="1715000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -859,7 +861,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1317" />
+    <option name="localTasksCounter" value="1319" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -878,8 +880,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding the deletion of pending peace negotiations to the demanding_provinces_wait_for_modal function" />
-    <MESSAGE value="Fixing base.p" />
     <MESSAGE value="Remove redundant exception handling for TextInput Modal timeouts and simplify province demand logic" />
     <MESSAGE value="Refactor logger configuration in `alive` task to use module-specific logger." />
     <MESSAGE value="Refactor `reload` command to initialize `system_message`, update bot activity to use `$help`, and remove unused import." />
@@ -903,7 +903,9 @@
     <MESSAGE value="Adding war ID to response about existing war" />
     <MESSAGE value="Adding transformer error to errors.py" />
     <MESSAGE value="Adding sorting to the province ids for not owned during peace negotiations" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding sorting to the province ids for not owned during peace negotiations" />
+    <MESSAGE value="Troubleshooting demand province negotiation." />
+    <MESSAGE value="Small code correction for sorting a set" />
+    <option name="LAST_COMMIT_MESSAGE" value="Small code correction for sorting a set" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
