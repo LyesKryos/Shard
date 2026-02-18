@@ -4148,7 +4148,7 @@ class WarOptionsView(discord.ui.View):
                                             "List province IDs separated by comma:")
                 # separate the list
                 provinces_demanded = [p.strip() for p in provinces_demanded.split(',')]
-                # if the list has no items, return
+                # if the list has no items (somehow?), return
                 if not provinces_demanded:
                     # reject message
                     await self.interaction.followup.send("You must specify at least one province.", ephemeral=True)
@@ -4165,6 +4165,8 @@ class WarOptionsView(discord.ui.View):
                                                              f"Target does not own: "
                                                              f"{(', '.join(sorted(provinces_not_of_target)))}.",
                                                              ephemeral=True)
+                        # reset the view
+                        await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
                     else:
                         # calculate the war score
                         war_score = 0
