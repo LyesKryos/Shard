@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Bug fix" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fix province list formatting in peace negotiation messages.">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -513,7 +515,7 @@
       <workItem from="1770139845548" duration="1845000" />
       <workItem from="1770313866649" duration="3645000" />
       <workItem from="1771263218301" duration="4020000" />
-      <workItem from="1771440323116" duration="2243000" />
+      <workItem from="1771440323116" duration="2568000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -858,7 +860,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1322" />
+    <option name="localTasksCounter" value="1325" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -877,8 +879,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Refactor `reload` command to initialize `system_message`, update bot activity to use `$help`, and remove unused import." />
-    <MESSAGE value="Updated convert command for Thaler" />
     <MESSAGE value="Update currency options for `convert_thaler` command to replace 1890 with 1895." />
     <MESSAGE value="Correcting name use for `bot` variable." />
     <MESSAGE value="Update `convert_thaler` command to correct currency rate for Thaler and streamline interaction response." />
@@ -902,7 +902,9 @@
     <MESSAGE value="Small code correction for sorting a set" />
     <MESSAGE value="Calculate and track war score costs for province demands in peace negotiations.&#10;Add logic for improved validation and better messaging." />
     <MESSAGE value="Bug fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="Bug fix" />
+    <MESSAGE value="Correcting province list formatting for consistency in peace negotiation messages." />
+    <MESSAGE value="Fix province list formatting in peace negotiation messages." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix province list formatting in peace negotiation messages." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
