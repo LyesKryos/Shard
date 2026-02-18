@@ -4189,7 +4189,7 @@ class WarOptionsView(discord.ui.View):
                                                                                 war_score_cost = war_score_cost + $2
                                               WHERE war_id = $3;''',
                                            provinces_demanded, war_score, war_info['id'])
-                        await self.interaction.followup.send("Cede Provinces demand added to the Peace Negotiations "
+                        await self.interaction.followup.send(f"Cede Provinces demand added to the Peace Negotiations "
                                                              f"for `{war_info['id']}` from the following provinces:\n"
                                                              f"{", ".join(provinces_demanded)}.")
 
