@@ -4295,7 +4295,7 @@ class WarOptionsView(discord.ui.View):
                             # notify of success
                             await self.interaction.followup.send("Give Provinces demand added to the Peace Negotiations"
                                                                  f"for a cost of `{war_score}` for these provinces:\n"
-                                                                 f"{(", ".join(provinces_demanded))}")
+                                                                 +", ".join(provinces_demanded))
 
 
 
