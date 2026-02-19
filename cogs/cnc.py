@@ -4089,50 +4089,54 @@ class WarOptionsView(discord.ui.View):
                     and inter.data['custom_id'] == "peace_treaty_negotiations_dropdown"
             )
 
-        # create and add the view
-        peace_negotiation_dropdown_view = discord.ui.View()
-        peace_negotiation_dropdown_view.add_item(PeaceNegotiationOptionsDropdown(peace_treaty_options))
-        # add a cancel button to the view
-        cancel_button = discord.ui.Button(label="Cancel", style=discord.ButtonStyle.danger)
 
-        async def cancel_button_callback(interaction: discord.Interaction):
-            await interaction.response.defer()
-            for child in peace_negotiation_dropdown_view.children:
-                child.disabled = True
-            return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
+        async def peace_view():
+            # create and add the view
+            peace_negotiation_dropdown_view = discord.ui.View()
+            peace_negotiation_dropdown_view.add_item(PeaceNegotiationOptionsDropdown(peace_treaty_options))
+            # add a cancel button to the view
+            cancel_button = discord.ui.Button(label="Cancel", style=discord.ButtonStyle.danger)
 
-        cancel_button.callback = cancel_button_callback
-        peace_negotiation_dropdown_view.add_item(cancel_button)
-        # update the original message with the embed and the view
-        await self.interaction.edit_original_response(embed=peace_embed, view=peace_negotiation_dropdown_view)
+            async def cancel_button_callback(interaction: discord.Interaction):
+                await interaction.response.defer()
+                for child in peace_negotiation_dropdown_view.children:
+                    child.disabled = True
+                return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
 
-        # wait for the options to be selected
-        try:
-            peace_options_returned = await interaction.client.wait_for("interaction", check=pnd_check, timeout=120)
-        except asyncio.TimeoutError:
-            # destroy any pending negotiation
-            await conn.execute('''DELETE
-                                  FROM cnc_peace_negotiations
-                                  WHERE war_id = $1;''', war_info['id'])
-            # return and remove the view if the user does not interact
-            return await self.interaction.edit_original_response(view=None)
+            cancel_button.callback = cancel_button_callback
+            peace_negotiation_dropdown_view.add_item(cancel_button)
+            # update the original message with the embed and the view
+            await self.interaction.edit_original_response(embed=peace_embed, view=peace_negotiation_dropdown_view)
 
-        # parse the options
-        negotiation_demands = peace_options_returned.data['values']
-        # update the embed with those options
-        for index, field in enumerate(peace_embed.fields):
-            if field.name == "Current Negotiations":
-                # create the string
-                negotiation_demands_string = "\n".join(negotiation_demands) or "None"
-                peace_embed.set_field_at(
-                    index,
-                    name=field.name,
-                    value=negotiation_demands_string,
-                    inline=field.inline
-                )
-                break
-        # send the updated embed
-        await self.interaction.edit_original_response(embed=peace_embed)
+            # wait for the options to be selected
+            try:
+                peace_options_returned = await interaction.client.wait_for("interaction", check=pnd_check, timeout=120)
+            except asyncio.TimeoutError:
+                # destroy any pending negotiation
+                await conn.execute('''DELETE
+                                      FROM cnc_peace_negotiations
+                                      WHERE war_id = $1;''', war_info['id'])
+                # return and remove the view if the user does not interact
+                return await self.interaction.edit_original_response(view=None)
+
+            # parse the options
+            negotiation_demands = peace_options_returned.data['values']
+            # update the embed with those options
+            for index, field in enumerate(peace_embed.fields):
+                if field.name == "Current Negotiations":
+                    # create the string
+                    negotiation_demands_string = "\n".join(negotiation_demands) or "None"
+                    peace_embed.set_field_at(
+                        index,
+                        name=field.name,
+                        value=negotiation_demands_string,
+                        inline=field.inline
+                    )
+                    break
+            # send the updated embed
+            return await self.interaction.edit_original_response(embed=peace_embed)
+        # create the peace view
+        await peace_view()
         # create the pending peace negotiation
         await conn.execute('''INSERT INTO cnc_peace_negotiations(war_id, total_negotiation, sender, target) 
                               VALUES($1, $2, $3, $4);''',
