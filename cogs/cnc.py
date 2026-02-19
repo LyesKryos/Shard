@@ -4110,6 +4110,10 @@ class WarOptionsView(discord.ui.View):
         try:
             peace_options_returned = await interaction.client.wait_for("interaction", check=pnd_check, timeout=120)
         except asyncio.TimeoutError:
+            # destroy any pending negotiation
+            await conn.execute('''DELETE
+                                  FROM cnc_peace_negotiations
+                                  WHERE war_id = $1;''', war_info['id'])
             # return and remove the view if the user does not interact
             return await self.interaction.edit_original_response(view=None)
 
@@ -4190,7 +4194,7 @@ class WarOptionsView(discord.ui.View):
                     potential_ally_targets = war_info['defenders'].remove(user_info['name'])
                 # if the list is empty, return
                 if not potential_ally_targets:
-                    await self.interaction.followup.send("No potential allies to give provinces to.")
+                    await self.interaction.followup.send("No potential allies to give provinces to.", ephemeral=True)
                 # otherwise, proceed
                 else:
                     # create view check to ensure proper parsing
