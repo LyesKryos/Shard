@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing outdated tinyurl">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Refactor peace negotiation flow by encapsulating dropdown and button logic into `peace_view` coroutine." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -517,7 +514,7 @@
       <workItem from="1770313866649" duration="3645000" />
       <workItem from="1771263218301" duration="4020000" />
       <workItem from="1771440323116" duration="5707000" />
-      <workItem from="1771523062152" duration="332000" />
+      <workItem from="1771523062152" duration="656000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -862,7 +859,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1333" />
+    <option name="localTasksCounter" value="1335" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -881,8 +878,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Modifying Thaler value with updated currency rate average" />
-    <MESSAGE value="Fixing the notation for the currency exchange output" />
     <MESSAGE value="Correcting the rates of the Thaler" />
     <MESSAGE value="Correcting rates in general for the currency exchange" />
     <MESSAGE value="Add &quot;Summary&quot; button and remove unnecessary exception handling during province demand" />
@@ -906,7 +901,9 @@
     <MESSAGE value="Reset view handling in peace negotiation validation to improve user feedback." />
     <MESSAGE value="Fix disable logic for dropdown children in peace negotiation views." />
     <MESSAGE value="Fixing outdated tinyurl" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing outdated tinyurl" />
+    <MESSAGE value="Handle peace negotiation timeout cleanup and improve ally province feedback." />
+    <MESSAGE value="Refactor peace negotiation flow by encapsulating dropdown and button logic into `peace_view` coroutine." />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor peace negotiation flow by encapsulating dropdown and button logic into `peace_view` coroutine." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />

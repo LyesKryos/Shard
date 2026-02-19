@@ -4101,6 +4101,10 @@ class WarOptionsView(discord.ui.View):
                 await interaction.response.defer()
                 for child in peace_negotiation_dropdown_view.children:
                     child.disabled = True
+                # destroy any pending negotiation
+                await conn.execute('''DELETE
+                                      FROM cnc_peace_negotiations
+                                      WHERE war_id = $1;''', war_info['id'])
                 return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
 
             cancel_button.callback = cancel_button_callback
@@ -4134,9 +4138,10 @@ class WarOptionsView(discord.ui.View):
                     )
                     break
             # send the updated embed
-            return await self.interaction.edit_original_response(embed=peace_embed)
+            await self.interaction.edit_original_response(embed=peace_embed)
+            return negotiation_demands
         # create the peace view
-        await peace_view()
+        negotiation_demands = await peace_view()
         # create the pending peace negotiation
         await conn.execute('''INSERT INTO cnc_peace_negotiations(war_id, total_negotiation, sender, target) 
                               VALUES($1, $2, $3, $4);''',
