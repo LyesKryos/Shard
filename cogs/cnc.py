@@ -4384,12 +4384,12 @@ class WarOptionsView(discord.ui.View):
                 # creating the view class
                 class AuthDemandView(discord.ui.LayoutView):
                     container = AuthorityDemandMenuContainer()
-                    auths_demanded: list = container.auths_demanded
-                    war_score = container.war_score
 
                 auth_demand_view = AuthDemandView(timeout=120)
+                auth_container = auth_demand_view.container
                 # wait for the response
                 await interaction.edit_original_response(view=auth_demand_view)
+                auth_timeout = await auth_demand_view.wait()
                 # if there is a timeout, delete everything and reject
                 if auth_timeout:
                     # destroy any pending negotiation
@@ -4402,12 +4402,12 @@ class WarOptionsView(discord.ui.View):
                 else:
                     # send notification
                     await self.interaction.followup.send(f"Demand Reparations has been "
-                                                         f"added at a cost of `{auth_demand_view.container.war_score}`.")
+                                                         f"added at a cost of `{auth_container.war_score}`.")
                     # update embed
                     peace_embed.add_field(name="Reparations Demanded",
-                                          value=f"{auth_demand_view.auths_demanded[0]} Military\n"
-                                                f"{auth_demand_view.auths_demanded[1]} Economic\n"
-                                                f"{auth_demand_view.auths_demanded[2]} Diplomatic\n",
+                                          value=f"{auth_container.mil_authority} Military\n"
+                                                f"{auth_container.econ_authority} Economic\n"
+                                                f"{auth_container.diplo_authority} Diplomatic\n",
                                           inline=False)
                     # add to total
                     total_war_score += auth_demand_view.container.war_score
