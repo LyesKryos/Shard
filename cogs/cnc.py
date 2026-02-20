@@ -4342,8 +4342,10 @@ class WarOptionsView(discord.ui.View):
                             self.parent_view = view
 
                         async def callback(self, interaction: discord.Interaction):
-                            self.parent_view.mil_authority = self.values[0]
+                            # defer response
                             await interaction.response.defer()
+                            self.parent_view.mil_authority = self.values[0]
+
 
                     class EconSelect(discord.ui.Select):
                         def __init__(self, view):
@@ -4356,8 +4358,10 @@ class WarOptionsView(discord.ui.View):
                             self.parent_view = view
 
                         async def callback(self, interaction: discord.Interaction):
-                            self.parent_view.econ_authority = self.values[0]
+                            # defer response
                             await interaction.response.defer()
+                            self.parent_view.econ_authority = self.values[0]
+
 
                     class DiploSelect(discord.ui.Select):
                         def __init__(self, view):
@@ -4370,8 +4374,10 @@ class WarOptionsView(discord.ui.View):
                             self.parent_view = view
 
                         async def callback(self, interaction: discord.Interaction):
-                            self.parent_view.diplo_authority = self.values[0]
+                            # defer response
                             await interaction.response.defer()
+                            self.parent_view.diplo_authority = self.values[0]
+
 
                     # create submit and cancel buttons
 
@@ -4395,7 +4401,7 @@ class WarOptionsView(discord.ui.View):
                         # calculate the war score
                         self.war_score = sum(self.auths_demanded) * 5
                         # execute the update
-                        await conn.execute('''UPDATE cnc_peace_negotiations SET demand_reparations || $1, 
+                        await conn.execute('''UPDATE cnc_peace_negotiations SET demand_reparations = $1, 
                                                                                 war_score_cost = war_score_cost + $2
                             WHERE war_id = $3;''',
                             self.auths_demanded,

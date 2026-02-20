@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting closure errors with container">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="removing all containers as they are not compatable and switching to a different setup that is more conducive to the current code" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -518,7 +515,7 @@
       <workItem from="1771263218301" duration="4020000" />
       <workItem from="1771440323116" duration="5707000" />
       <workItem from="1771523062152" duration="15744000" />
-      <workItem from="1771607668032" duration="10860000" />
+      <workItem from="1771607668032" duration="11055000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -863,7 +860,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1363" />
+    <option name="localTasksCounter" value="1364" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -882,7 +879,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Refactor peace negotiation system with improved handling for war score calculations, reparations demands, and dropdown/button logic, alongside cleanup enhancements for negotiation timeouts." />
     <MESSAGE value="Removing bad argument for wait_for" />
     <MESSAGE value="Fix modal interaction handling by adjusting response method and removing unused variables." />
     <MESSAGE value="Fix modal interaction handling by replacing `followup.send_modal` with `response.send_modal`." />
@@ -907,7 +903,8 @@
     <MESSAGE value="Refactor `AuthDemandView` and `AuthorityDemandMenuContainer` to improve timeout handling, clean up interaction responses, and enhance view initialization consistency." />
     <MESSAGE value="Correcing timeout behavior for WarView" />
     <MESSAGE value="Correcting closure errors with container" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting closure errors with container" />
+    <MESSAGE value="removing all containers as they are not compatable and switching to a different setup that is more conducive to the current code" />
+    <option name="LAST_COMMIT_MESSAGE" value="removing all containers as they are not compatable and switching to a different setup that is more conducive to the current code" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
