@@ -4112,8 +4112,7 @@ class WarOptionsView(discord.ui.View):
 
         # wait for the options to be selected
         try:
-            peace_options_returned = await interaction.client.wait_for("interaction", check=pnd_check, timeout=120,
-                                                                       custom_id="peace_treaty_negotiations_dropdown")
+            peace_options_returned = await interaction.client.wait_for("interaction", check=pnd_check, timeout=120)
         except asyncio.TimeoutError:
             # destroy any pending negotiation
             await conn.execute('''DELETE
@@ -4445,7 +4444,7 @@ class WarOptionsView(discord.ui.View):
                         # create a view for the dropdown and add it
                         peace_negotiation_view = discord.ui.View(timeout=86400)
 
-                        # define callbacks
+                        # define callbacks`
                         async def accept_callback(interaction: discord.Interaction):
                             # defer the interaction
                             await interaction.response.defer(ephemeral=True)
