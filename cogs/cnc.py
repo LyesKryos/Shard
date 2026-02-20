@@ -4160,7 +4160,8 @@ class WarOptionsView(discord.ui.View):
                         # get the provinces that are not
                         provinces_not_of_target = set(provinces_demanded) - set(target_provinces)
                         # send a message of denial
-                        await self.interaction.followup.send("You must specify provinces that are owned by the target.\n"
+                        await self.interaction.followup.send(provinces_demanded, target_provinces)
+                        return await self.interaction.followup.send("You must specify provinces that are owned by the target.\n"
                                                              f"Target does not own: "
                                                              f"{(', '.join(sorted(provinces_not_of_target)))}.",
                                                              ephemeral=True)
@@ -4449,8 +4450,6 @@ class WarOptionsView(discord.ui.View):
                     # add to total
                     total_war_score += auth_demand_view.war_score
 
-
-
         # when the loop has finished, clear the view
         peace_negotiation_dropdown_view.clear_items()
         # calculate the war score cost double if this is not a total negotiation
@@ -4459,7 +4458,7 @@ class WarOptionsView(discord.ui.View):
             await conn.execute('''UPDATE cnc_peace_negotiations SET war_score_cost = war_score_cost * 2 
                                   WHERE war_id = $1;''', war_info['id'])
         # add the total peace negotiation amount at the bottom
-        peace_embed.add_field(name="Total War Score Cost", value=f"{total_war_score}")
+        peace_embed.add_field(name="Total War Score Cost", value=f"{total_war_score}", inline=False)
         # send the updated embed
         await self.interaction.edit_original_response(embed=peace_embed)
         # add the buttons
