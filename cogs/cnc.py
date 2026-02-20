@@ -4438,13 +4438,14 @@ class WarOptionsView(discord.ui.View):
                     await self.interaction.followup.send(f"Demand Reparations has been "
                                                          f"added at a cost of `{auth_container.war_score}`.")
                     # remove the container view
-                    await interaction.edit_original_response(embed=peace_embed, view=None, content=None)
+                    await interaction.edit_original_response(view=None)
                     # update embed
                     peace_embed.add_field(name="Reparations Demanded",
                                           value=f"{auth_container.mil_authority} Military\n"
                                                 f"{auth_container.econ_authority} Economic\n"
                                                 f"{auth_container.diplo_authority} Diplomatic\n",
                                           inline=False)
+                    await interaction.edit_original_response(embed=peace_embed)
                     # add to total
                     total_war_score += auth_demand_view.container.war_score
 
