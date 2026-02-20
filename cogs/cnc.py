@@ -4426,10 +4426,9 @@ class WarOptionsView(discord.ui.View):
                         # update the view
                         return await self.parent_interaction.edit_original_response(view=None, embed=peace_embed)
 
-
-                auth_demand_view = AuthDemandView(self.interaction)
-                # send the view
                 try:
+                    auth_demand_view = AuthDemandView(self.interaction)
+                    # send the view
                     await self.interaction.edit_original_response(view=auth_demand_view, embed=peace_embed)
                 except Exception as e:
                     self.interaction.client.logger.error(f"Error sending auth demand view: {e}")
