@@ -3818,7 +3818,7 @@ class WarOptionsView(discord.ui.View):
         # remove dropdown
         for item in self.children:
             self.remove_item(item)
-        return await self.interaction.edit_original_response(view=self)
+        return await self.interaction.edit_original_response(view=self, content="The war options have timed out.")
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.interaction.user.id
@@ -4334,8 +4334,8 @@ class WarOptionsView(discord.ui.View):
                             discord.SelectOption(label="6")]
                     )
                     # define the select's callback
-                    async def mil_authority_select(self, interaction: discord.Interaction, option: discord.SelectOption):
-                        self.mil_authority = option.label
+                    async def mil_authority_select(self, interaction: discord.Interaction, select: discord.ui.Select):
+                        self.mil_authority = select.values[0]
 
                     # create the econ auth dropdown
                     @econ_auth_row.select(
@@ -4351,8 +4351,8 @@ class WarOptionsView(discord.ui.View):
                         ]
                     )
                     # define the select's callback
-                    async def econ_authority_select(self, interaction: discord.Interaction, option: discord.SelectOption):
-                        self.econ_authority = option.label
+                    async def econ_authority_select(self, interaction: discord.Interaction, select: discord.ui.Select):
+                        self.econ_authority = select.values[0]
 
                     # create the diplo auth dropdown
                     @diplo_auth_row.select(
@@ -4369,8 +4369,8 @@ class WarOptionsView(discord.ui.View):
                     )
 
                     # define the select's callback
-                    async def diplo_authority_select(self, interaction: discord.Interaction, option: discord.SelectOption):
-                        self.diplo_authority = option.label
+                    async def diplo_authority_select(self, interaction: discord.Interaction, select: discord.ui.Select):
+                        self.diplo_authority = select.values[0]
 
                     @submit_row.button(label="Submit", style=discord.ButtonStyle.success)
                     async def submit_auth_demand_button(self, interaction: discord.Interaction,
