@@ -4382,14 +4382,14 @@ class WarOptionsView(discord.ui.View):
                                               WHERE war_id = $3;''',
                                            self.auths_demanded, war_score, war_info['id'])
                 # creating the view class
-                class AuthDemandView(discord.ui.View):
+                class AuthDemandView(discord.ui.LayoutView):
                     container = AuthorityDemandMenuContainer()
                     auths_demanded: list = container.auths_demanded
                     war_score = container.war_score
 
                 auth_demand_view = AuthDemandView(timeout=120)
                 # wait for the response
-                auth_timeout = await auth_demand_view.wait()
+                await interaction.edit_original_response(view=auth_demand_view)
                 # if there is a timeout, delete everything and reject
                 if auth_timeout:
                     # destroy any pending negotiation
