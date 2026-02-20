@@ -4342,7 +4342,7 @@ class WarOptionsView(discord.ui.View):
 
                         async def callback(self, interaction: discord.Interaction):
                             # defer response
-                            await interaction.response.defer(thinking=False, ephemeral=True)
+                            await interaction.response.defer(thinking=False)
                             self.view.mil_authority = self.values[0]
 
 
@@ -4427,7 +4427,7 @@ class WarOptionsView(discord.ui.View):
 
                 auth_demand_view = AuthDemandView(self.interaction)
                 # send the view
-                await interaction.edit_original_response(view=auth_demand_view, content=None, embed=None)
+                await self.interaction.edit_original_response(view=auth_demand_view, content=None, embed=None)
                 # wait
                 auth_timeout = await auth_demand_view.wait()
                 # if there is a timeout, return
