@@ -3803,7 +3803,7 @@ class WarOptionsView(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, war_info: asyncpg.Record,
                  alliance_button: bool, db_button: bool, user_info: asyncpg.Record):
-        super().__init__(timeout=120)
+        super().__init__(timeout=240)
         self.interaction = interaction
         self.conn = conn
         self.war_info = war_info
@@ -3818,7 +3818,7 @@ class WarOptionsView(discord.ui.View):
         # remove dropdown
         for item in self.children:
             self.remove_item(item)
-        return await self.interaction.edit_original_response(view=self, content="The war options have timed out.")
+        return await self.interaction.edit_original_response(view=None, content="Timed out.")
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.interaction.user.id
@@ -4307,9 +4307,9 @@ class WarOptionsView(discord.ui.View):
                     submit_row = discord.ui.ActionRow()
 
                     # store the selections
-                    mil_authority = None
-                    econ_authority = None
-                    diplo_authority = None
+                    mil_authority = 0
+                    econ_authority = 0
+                    diplo_authority = 0
                     war_score = 0
                     auths_demanded = None
                     interaction_response = None
@@ -4398,7 +4398,8 @@ class WarOptionsView(discord.ui.View):
                         await conn.execute('''DELETE
                                               FROM cnc_peace_negotiations
                                               WHERE war_id = $1;''', war_info['id'])
-                        return await self.interaction_response.edit_original_response(view=None, embed=peace_embed)
+                        return await self.interaction_response.edit_original_response(view=None, embed=peace_embed,
+                                                                                      content=None)
 
                 # creating the view class
                 class AuthDemandView(discord.ui.LayoutView):
