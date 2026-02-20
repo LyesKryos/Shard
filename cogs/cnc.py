@@ -4327,7 +4327,7 @@ class WarOptionsView(discord.ui.View):
                                WHERE war_id = $1;''',
                             war_info['id']
                         )
-                        return await self.parent_interaction.edit_original_response(view=None)
+                        return await self.parent_interaction.edit_original_response(view=None, embed=peace_embed)
 
                     # create the select classes
 
@@ -4415,8 +4415,6 @@ class WarOptionsView(discord.ui.View):
                     async def cancel_button(self, interaction: discord.Interaction, button: discord.ui.Button):
                         # defer the interaction
                         await interaction.response.defer()
-                        # set the cancelled
-                        self.cancelled = True
                         # delete the pending interaction
                         await conn.execute(
                             '''DELETE
@@ -4426,6 +4424,8 @@ class WarOptionsView(discord.ui.View):
                         )
                         # stop the listening
                         self.stop()
+                        # update the view
+                        return await self.parent_interaction.edit_original_response(view=None, embed=peace_embed)
 
 
                 auth_demand_view = AuthDemandView(self.interaction)
