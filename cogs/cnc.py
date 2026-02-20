@@ -4346,7 +4346,7 @@ class WarOptionsView(discord.ui.View):
 
                 # create and send the modal
                 authority_modal = DemandReparationModal(interaction)
-                await interaction.followup.send_modal(authority_modal)
+                await interaction.response.send_modal(authority_modal)
                 # await the modal response
                 await authority_modal.wait()
                 # return the values
