@@ -4343,7 +4343,7 @@ class WarOptionsView(discord.ui.View):
 
                         async def callback(self, interaction: discord.Interaction):
                             # defer response
-                            await interaction.response.defer()
+                            await interaction.response.defer(thinking=False)
                             self.parent_view.mil_authority = self.values[0]
 
 
@@ -4359,7 +4359,7 @@ class WarOptionsView(discord.ui.View):
 
                         async def callback(self, interaction: discord.Interaction):
                             # defer response
-                            await interaction.response.defer()
+                            await interaction.response.defer(thinking=False)
                             self.parent_view.econ_authority = self.values[0]
 
 
@@ -4375,7 +4375,7 @@ class WarOptionsView(discord.ui.View):
 
                         async def callback(self, interaction: discord.Interaction):
                             # defer response
-                            await interaction.response.defer()
+                            await interaction.response.defer(thinking=False)
                             self.parent_view.diplo_authority = self.values[0]
 
 
@@ -4442,8 +4442,8 @@ class WarOptionsView(discord.ui.View):
                                                          f"added at a cost of `{auth_demand_view.war_score}`.")
                     # update embed
                     peace_embed.add_field(name="Reparations Demanded",
-                                          value=f"{auth_container.mil_authority} Military\n"
-                                                f"{auth_container.econ_authority} Economic\n"
+                                          value=f"{auth_demand_view.mil_authority} Military\n"
+                                                f"{auth_demand_view.econ_authority} Economic\n"
                                                 f"{auth_container.diplo_authority} Diplomatic\n",
                                           inline=False)
                     await interaction.edit_original_response(embed=peace_embed)
