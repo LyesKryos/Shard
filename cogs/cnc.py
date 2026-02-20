@@ -4160,7 +4160,7 @@ class WarOptionsView(discord.ui.View):
                         # get the provinces that are not
                         provinces_not_of_target = set(provinces_demanded) - set(target_provinces)
                         # send a message of denial
-                        await self.interaction.followup.send(provinces_demanded, target_provinces)
+                        await self.interaction.followup.send((provinces_demanded, target_provinces))
                         return await self.interaction.followup.send("You must specify provinces that are owned by the target.\n"
                                                              f"Target does not own: "
                                                              f"{(', '.join(sorted(provinces_not_of_target)))}.",
@@ -4170,7 +4170,7 @@ class WarOptionsView(discord.ui.View):
                         war_score = 0
                         for province in provinces_demanded:
                             # pull the province info
-                            p_info = await conn.fechtrow('''SELECT development FROM cnc_provinces WHERE id = $1;''', province)
+                            p_info = await conn.fetchrow('''SELECT development FROM cnc_provinces WHERE id = $1;''', province)
                             # calculate demand score as dev * .5
                             war_score = p_info['development'] * .5
                         # ensure the war score is a round number
