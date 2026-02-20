@@ -4429,7 +4429,10 @@ class WarOptionsView(discord.ui.View):
 
                 auth_demand_view = AuthDemandView(self.interaction)
                 # send the view
-                await self.interaction.edit_original_response(view=auth_demand_view, embed=peace_embed)
+                try:
+                    await self.interaction.edit_original_response(view=auth_demand_view, embed=peace_embed)
+                except Exception as e:
+                    self.interaction.client.logger.error(f"Error sending auth demand view: {e}")
                 # wait
                 auth_timeout = await auth_demand_view.wait()
                 # if there is a timeout, return
