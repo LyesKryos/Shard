@@ -4301,154 +4301,146 @@ class WarOptionsView(discord.ui.View):
 
             # if the demand is to give reparations, determine which authority will be taken and how much
             elif demand == "Demand Reparations":
-                # create a menu container
-                class AuthorityDemandMenuContainer(discord.ui.Container):
-                    # create the three rows of dropdowns
-                    mil_auth_row = discord.ui.ActionRow()
-                    econ_auth_row = discord.ui.ActionRow()
-                    diplo_auth_row = discord.ui.ActionRow()
-                    submit_row = discord.ui.ActionRow()
+                class AuthDemandView(discord.ui.View):
+                    def __init__(self, parent_interaction: discord.Interaction, timeout=120):
+                        super().__init__(timeout=timeout)
 
-                    def __init__(self):
-                        super().__init__()
+                        self.parent_interaction = parent_interaction
 
                         self.mil_authority = None
                         self.econ_authority = None
                         self.diplo_authority = None
-                        self.war_score = 0
                         self.auths_demanded = None
-                        self.interaction_response = None
+                        self.war_score = 0
+                        self.cancelled = False
 
+                        # Add selects
+                        self.add_item(self.MilSelect(self))
+                        self.add_item(self.EconSelect(self))
+                        self.add_item(self.DiploSelect(self))
 
-                    #create mil auth dropdown
-                    @mil_auth_row.select(
-                        placeholder="Select an amount of Military Authority...",
-                        options=[
-                            discord.SelectOption(label="0"),
-                            discord.SelectOption(label="1"),
-                            discord.SelectOption(label="2"),
-                            discord.SelectOption(label="3"),
-                            discord.SelectOption(label="4"),
-                            discord.SelectOption(label="5"),
-                            discord.SelectOption(label="6")]
-                    )
-                    # define the select's callback
-                    async def mil_authority_select(self, interaction: discord.Interaction, select: discord.ui.Select):
-                        await interaction.response.defer()
-                        self.mil_authority = select.values[0]
-
-                    # create the econ auth dropdown
-                    @econ_auth_row.select(
-                        placeholder="Select an amount of Economic Authority...",
-                        options=[
-                            discord.SelectOption(label="0"),
-                            discord.SelectOption(label="1"),
-                            discord.SelectOption(label="2"),
-                            discord.SelectOption(label="3"),
-                            discord.SelectOption(label="4"),
-                            discord.SelectOption(label="5"),
-                            discord.SelectOption(label="6")
-                        ]
-                    )
-                    # define the select's callback
-                    async def econ_authority_select(self, interaction: discord.Interaction, select: discord.ui.Select):
-                        await interaction.response.defer()
-                        self.econ_authority = select.values[0]
-
-                    # create the diplo auth dropdown
-                    @diplo_auth_row.select(
-                        placeholder="Select an amount of Diplomatic Authority...",
-                        options=[
-                            discord.SelectOption(label="0"),
-                            discord.SelectOption(label="1"),
-                            discord.SelectOption(label="2"),
-                            discord.SelectOption(label="3"),
-                            discord.SelectOption(label="4"),
-                            discord.SelectOption(label="5"),
-                            discord.SelectOption(label="6")
-                        ]
-                    )
-
-                    # define the select's callback
-                    async def diplo_authority_select(self, interaction: discord.Interaction, select: discord.ui.Select):
-                        await interaction.response.defer()
-                        self.diplo_authority = select.values[0]
-
-                    @submit_row.button(label="Submit", style=discord.ButtonStyle.success)
-                    async def submit_auth_demand_button(self, interaction: discord.Interaction,
-                                                        button: discord.ui.Button):
-                        # defer interaction
-                        await interaction.response.defer()
-                        # parse the demanded amounts
-                        self.auths_demanded = [int(self.mil_authority), int(self.econ_authority), int(self.diplo_authority)]
-                        # calculate war score
-                        war_score = sum(self.auths_demanded) * 5
-                        # add the demand to the negotiation
-                        await conn.execute('''UPDATE cnc_peace_negotiations SET demand_reparations = $1, 
-                                                                                war_score_cost = war_score_cost + $2 
-                                              WHERE war_id = $3;''',
-                                           self.auths_demanded, war_score, war_info['id'])
-                        # unblock the waiting for the view
-                        self.view.stop()
-
-                    @submit_row.button(label="Cancel", style=discord.ButtonStyle.danger)
-                    async def cancel_button(self, interaction: discord.Interaction,
-                                                        button: discord.ui.Button):
-                        await interaction.response.defer()
-                        # unblock the waiting for the view
-                        self.view.stop()
-                        # destroy the pending negotiation
-                        await conn.execute('''DELETE
-                                              FROM cnc_peace_negotiations
-                                              WHERE war_id = $1;''', war_info['id'])
-                        return await self.interaction_response.edit_original_response(view=None, embed=peace_embed,
-                                                                                      content=None)
-
-                # creating the view class
-                class AuthDemandView(discord.ui.LayoutView):
-
-                    def __init__(self, parent_interaction: discord.Interaction, timeout=120):
-                        super().__init__(timeout=timeout)
-
-                        self.container = AuthorityDemandMenuContainer()
-                        self.add_item(self.container)
-                        self.parent_interaction = parent_interaction
-
+                    # on timeout
                     async def on_timeout(self):
-                        # destroy the pending negotiation
-                        await conn.execute('''DELETE
-                                              FROM cnc_peace_negotiations
-                                              WHERE war_id = $1;''', war_info['id'])
-                        await self.parent_interaction.edit_original_response(view=None, embed=peace_embed)
+                        await conn.execute(
+                            '''DELETE
+                               FROM cnc_peace_negotiations
+                               WHERE war_id = $1;''',
+                            war_info['id']
+                        )
+                        return await self.parent_interaction.edit_original_response(view=None)
+
+                    # create the select classes
+
+                    class MilSelect(discord.ui.Select):
+                        def __init__(self, view):
+                            options = [discord.SelectOption(label=str(i), value=str(i)) for i in range(7)]
+                            super().__init__(
+                                placeholder="Select amount of Military Authority to demand...",
+                                options=options,
+                                row=0
+                            )
+                            self.parent_view = view
+
+                        async def callback(self, interaction: discord.Interaction):
+                            self.parent_view.mil_authority = self.values[0]
+                            await interaction.response.defer()
+
+                    class EconSelect(discord.ui.Select):
+                        def __init__(self, view):
+                            options = [discord.SelectOption(label=str(i), value=str(i)) for i in range(7)]
+                            super().__init__(
+                                placeholder="Select amount of Economic Authority to demand...",
+                                options=options,
+                                row=1
+                            )
+                            self.parent_view = view
+
+                        async def callback(self, interaction: discord.Interaction):
+                            self.parent_view.econ_authority = self.values[0]
+                            await interaction.response.defer()
+
+                    class DiploSelect(discord.ui.Select):
+                        def __init__(self, view):
+                            options = [discord.SelectOption(label=str(i), value=str(i)) for i in range(7)]
+                            super().__init__(
+                                placeholder="Select amount of Diplomatic Authority to demand...",
+                                options=options,
+                                row=2
+                            )
+                            self.parent_view = view
+
+                        async def callback(self, interaction: discord.Interaction):
+                            self.parent_view.diplo_authority = self.values[0]
+                            await interaction.response.defer()
+
+                    # create submit and cancel buttons
+
+                    @discord.ui.button(label="Submit", style=discord.ButtonStyle.success, row=3)
+                    async def submit_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+                        # defer the interaction
+                        await interaction.response.defer()
+                        # if the user has not selected one of the options as is necessary
+                        if None in (self.mil_authority, self.econ_authority, self.diplo_authority):
+                            await interaction.response.send_message(
+                                "You must select all three authority values first.",
+                                ephemeral=True
+                            )
+                            return
+                        # otherwise, define the auths demanded
+                        self.auths_demanded = [
+                            int(self.mil_authority),
+                            int(self.econ_authority),
+                            int(self.diplo_authority)
+                        ]
+                        # calculate the war score
+                        self.war_score = sum(self.auths_demanded) * 5
+                        # execute the update
+                        await conn.execute('''UPDATE cnc_peace_negotiations SET demand_reparations || $1, 
+                                                                                war_score_cost = war_score_cost + $2
+                            WHERE war_id = $3;''',
+                            self.auths_demanded,
+                            self.war_score,
+                            war_info['id']
+                        )
+                        # stop the listening
+                        self.stop()
+
+                    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger, row=3)
+                    async def cancel_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+                        # defer the interaction
+                        await interaction.response.defer()
+                        # set the cancelled
+                        self.cancelled = True
+                        # delete the pending interaction
+                        await conn.execute(
+                            '''DELETE
+                               FROM cnc_peace_negotiations
+                               WHERE war_id = $1;''',
+                            war_info['id']
+                        )
+                        # stop the listening
+                        self.stop()
+
 
                 auth_demand_view = AuthDemandView(self.interaction)
-                auth_container = auth_demand_view.container
                 # send the view
-                interaction_response = await interaction.edit_original_response(view=auth_demand_view,
-                                                                                content=None, embed=None)
-                # define the response and the view
-                auth_container.interaction_response = interaction_response
+                await interaction.edit_original_response(view=auth_demand_view, content=None, embed=None)
                 # wait
                 auth_timeout = await auth_demand_view.wait()
                 # if there is a timeout, return
-                if auth_timeout:
+                if auth_timeout or auth_demand_view.cancelled:
                     return
                 else:
                     # send notification
                     await self.interaction.followup.send(f"Demand Reparations has been "
-                                                         f"added at a cost of `{auth_container.war_score}`.")
-                    # disable the container view
-                    for child in auth_demand_view.children:
-                        if hasattr(child, "children"):
-                            for sub in child.children:
-                                sub.disabled = True
+                                                         f"added at a cost of `{auth_demand_view.war_score}`.")
                     # update embed
                     peace_embed.add_field(name="Reparations Demanded",
                                           value=f"{auth_container.mil_authority} Military\n"
                                                 f"{auth_container.econ_authority} Economic\n"
                                                 f"{auth_container.diplo_authority} Diplomatic\n",
                                           inline=False)
-                    await interaction.edit_original_response(embed=peace_embed, view=None)
+                    await interaction.edit_original_response(embed=peace_embed)
                     # add to total
                     total_war_score += auth_demand_view.container.war_score
 
