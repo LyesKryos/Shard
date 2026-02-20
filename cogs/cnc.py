@@ -4335,6 +4335,7 @@ class WarOptionsView(discord.ui.View):
                     )
                     # define the select's callback
                     async def mil_authority_select(self, interaction: discord.Interaction, select: discord.ui.Select):
+                        await interaction.response.defer()
                         self.mil_authority = select.values[0]
 
                     # create the econ auth dropdown
@@ -4352,6 +4353,7 @@ class WarOptionsView(discord.ui.View):
                     )
                     # define the select's callback
                     async def econ_authority_select(self, interaction: discord.Interaction, select: discord.ui.Select):
+                        await interaction.response.defer()
                         self.econ_authority = select.values[0]
 
                     # create the diplo auth dropdown
@@ -4370,6 +4372,7 @@ class WarOptionsView(discord.ui.View):
 
                     # define the select's callback
                     async def diplo_authority_select(self, interaction: discord.Interaction, select: discord.ui.Select):
+                        await interaction.response.defer()
                         self.diplo_authority = select.values[0]
 
                     @submit_row.button(label="Submit", style=discord.ButtonStyle.success)
