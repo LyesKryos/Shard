@@ -199,7 +199,7 @@ class Recruitment(commands.Cog):
                                               "\"Block All\" under Recruitment. Instant relief!")
                                 welcome_tg = urllib.parse.quote(welcome_tg)
                                 welcome_link = f"https://www.nationstates.net/page=compose_telegram?tgto={n};message={welcome_tg}"
-                                welcome_link = pyshortener.shor(welcome_link, custom_short_url="welcome_telegram",
+                                welcome_link = pyshortener.shorten(welcome_link, custom_short_url="welcome_telegram",
                                                                 service="v.gd")
                                 notif = await recruitment_channel.send(
                                     f"{name} has arrived, {notifrole.mention}!",
