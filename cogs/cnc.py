@@ -4389,7 +4389,8 @@ class WarOptionsView(discord.ui.View):
                                                                                 war_score_cost = war_score_cost + $2 
                                               WHERE war_id = $3;''',
                                            self.auths_demanded, war_score, war_info['id'])
-                        await self.view.stop()
+                        # unblock the waiting for the view
+                        self.view.stop()
 
                     @submit_row.button(label="Cancel", style=discord.ButtonStyle.danger)
                     async def cancel_button(self, interaction: discord.Interaction,
