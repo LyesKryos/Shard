@@ -4343,7 +4343,7 @@ class WarOptionsView(discord.ui.View):
 
                         async def callback(self, interaction: discord.Interaction):
                             # defer response
-                            await interaction.response.defer(thinking=False)
+                            await interaction.response.send("debugging")
                             self.parent_view.mil_authority = self.values[0]
 
 
@@ -4387,11 +4387,10 @@ class WarOptionsView(discord.ui.View):
                         await interaction.response.defer()
                         # if the user has not selected one of the options as is necessary
                         if None in (self.mil_authority, self.econ_authority, self.diplo_authority):
-                            await interaction.response.send_message(
+                            return await interaction.response.send_message(
                                 "You must select all three authority values first.",
                                 ephemeral=True
                             )
-                            return
                         # otherwise, define the auths demanded
                         self.auths_demanded = [
                             int(self.mil_authority),
@@ -4409,7 +4408,7 @@ class WarOptionsView(discord.ui.View):
                             war_info['id']
                         )
                         # stop the listening
-                        self.stop()
+                        return self.stop()
 
                     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger, row=3)
                     async def cancel_button(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -4444,11 +4443,11 @@ class WarOptionsView(discord.ui.View):
                     peace_embed.add_field(name="Reparations Demanded",
                                           value=f"{auth_demand_view.mil_authority} Military\n"
                                                 f"{auth_demand_view.econ_authority} Economic\n"
-                                                f"{auth_container.diplo_authority} Diplomatic\n",
+                                                f"{auth_demand_view.diplo_authority} Diplomatic\n",
                                           inline=False)
                     await interaction.edit_original_response(embed=peace_embed)
                     # add to total
-                    total_war_score += auth_demand_view.container.war_score
+                    total_war_score += auth_demand_view.war_score
 
 
 
