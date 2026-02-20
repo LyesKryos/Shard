@@ -4426,12 +4426,10 @@ class WarOptionsView(discord.ui.View):
                         # update the view
                         return await self.parent_interaction.edit_original_response(view=None, embed=peace_embed)
 
-                try:
-                    auth_demand_view = AuthDemandView(self.interaction)
-                    # send the view
-                    await self.interaction.edit_original_response(view=auth_demand_view, embed=peace_embed)
-                except Exception as e:
-                    self.interaction.client.logger.error(f"Error sending auth demand view: {e}")
+
+                auth_demand_view = AuthDemandView(self.interaction)
+                # send the view
+                await self.interaction.edit_original_response(view=auth_demand_view, embed=peace_embed)
                 # wait
                 auth_timeout = await auth_demand_view.wait()
                 # if there is a timeout, return
@@ -4447,7 +4445,7 @@ class WarOptionsView(discord.ui.View):
                                                 f"{auth_demand_view.econ_authority} Economic\n"
                                                 f"{auth_demand_view.diplo_authority} Diplomatic\n",
                                           inline=False)
-                    await interaction.edit_original_response(embed=peace_embed)
+                    await interaction.edit_original_response(embed=peace_embed, view=None)
                     # add to total
                     total_war_score += auth_demand_view.war_score
 
