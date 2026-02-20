@@ -4379,7 +4379,7 @@ class WarOptionsView(discord.ui.View):
                     async def submit_auth_demand_button(self, interaction: discord.Interaction,
                                                         button: discord.ui.Button):
                         # defer interaction
-                        await interaction.response.defer(thinking=True)
+                        await interaction.response.defer()
                         # parse the demanded amounts
                         self.auths_demanded = [int(self.mil_authority), int(self.econ_authority), int(self.diplo_authority)]
                         # calculate war score
@@ -4389,6 +4389,7 @@ class WarOptionsView(discord.ui.View):
                                                                                 war_score_cost = war_score_cost + $2 
                                               WHERE war_id = $3;''',
                                            self.auths_demanded, war_score, war_info['id'])
+                        await self.view.stop()
 
                     @submit_row.button(label="Cancel", style=discord.ButtonStyle.danger)
                     async def cancel_button(self, interaction: discord.Interaction,
