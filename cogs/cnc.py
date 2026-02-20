@@ -4301,7 +4301,7 @@ class WarOptionsView(discord.ui.View):
                 # create the view with dropdown to select the authority
                 demanded_authority_view = discord.ui.View(timeout=120)
                 # update the original message with the embed and the view
-                await self.interaction.edit_original_response(view=demanded_authority_view)
+                await self.interaction.edit_original_response(embed=None, view=demanded_authority_view)
 
                 # create a class for each authority tyep
                 class AuthorityDemandMenuContainer(discord.ui.Container):
@@ -4404,7 +4404,7 @@ class WarOptionsView(discord.ui.View):
                     await self.interaction.followup.send(f"Demand Reparations has been "
                                                          f"added at a cost of `{auth_container.war_score}`.")
                     # remove the container view
-                    await interaction.edit_original_response(view=None)
+                    await interaction.edit_original_response(embed=peace_embed, view=None)
                     # update embed
                     peace_embed.add_field(name="Reparations Demanded",
                                           value=f"{auth_container.mil_authority} Military\n"
