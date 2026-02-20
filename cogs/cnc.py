@@ -4151,16 +4151,23 @@ class WarOptionsView(discord.ui.View):
                 provinces_demanded = [int(p.strip()) for p in provinces_demanded.split(',')]
                 # if the list has no items (somehow?), return
                 if not provinces_demanded:
+                    # destroy any pending negotiation
+                    await conn.execute('''DELETE
+                                          FROM cnc_peace_negotiations
+                                          WHERE war_id = $1;''', war_info['id'])
                     # reject message
-                    await self.interaction.followup.send("You must specify at least one province.", ephemeral=True)
+                    return await self.interaction.followup.send("You must specify at least one province.", ephemeral=True)
                 # if the list has items, proceed
                 else:
                     # if the list of provinces demanded has any provinces that are not owned by the target
                     if not set(provinces_demanded).issubset(set(target_provinces)):
                         # get the provinces that are not
                         provinces_not_of_target: set[int] = set(set(provinces_demanded) - set(target_provinces))
+                        # destroy any pending negotiation
+                        await conn.execute('''DELETE
+                                              FROM cnc_peace_negotiations
+                                              WHERE war_id = $1;''', war_info['id'])
                         # send a message of denial
-                        await self.interaction.followup.send((provinces_demanded, target_provinces))
                         return await self.interaction.followup.send("You must specify provinces that are owned by the target.\n"
                                                              f"Target does not own: "
                                                              f"{(', '.join(map(str, sorted(provinces_not_of_target))))}.",
@@ -4221,7 +4228,7 @@ class WarOptionsView(discord.ui.View):
                         await conn.execute('''DELETE
                                               FROM cnc_peace_negotiations
                                               WHERE war_id = $1;''', war_info['id'])
-                        for child in self.interaction.view.children:
+                        for child in peace_negotiation_dropdown_view.children:
                             child.disabled = True
                         return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
 
@@ -4266,11 +4273,12 @@ class WarOptionsView(discord.ui.View):
                         # if the list of provinces demanded has any province that are not owned by the target
                         if not set(provinces_demanded).issubset(set(target_provinces)):
                             # get the provinces that are not
-                            provinces_not_of_target = set(provinces_demanded) - set(target_provinces)
+                            provinces_not_of_target: set[int] = set(set(provinces_demanded) - set(target_provinces))
                             # send a message of denial
                             await self.interaction.followup.send(
                                 "You must specify provinces that are owned by the target.\n"
-                                f"Target does not own: {(', '.join(sorted(provinces_not_of_target)))}.",
+                                f"Target does not own: "
+                                f"{(', '.join(map(str, sorted(provinces_not_of_target))))}.",
                                 ephemeral=True)
                             # destroy any pending negotiation
                             await conn.execute('''DELETE
