@@ -4315,9 +4315,9 @@ class WarOptionsView(discord.ui.View):
                         self.cancelled = False
 
                         # Add selects
-                        self.add_item(self.MilSelect(self))
-                        self.add_item(self.EconSelect(self))
-                        self.add_item(self.DiploSelect(self))
+                        self.add_item(self.MilSelect())
+                        self.add_item(self.EconSelect())
+                        self.add_item(self.DiploSelect())
 
                     # on timeout
                     async def on_timeout(self):
@@ -4332,51 +4332,49 @@ class WarOptionsView(discord.ui.View):
                     # create the select classes
 
                     class MilSelect(discord.ui.Select):
-                        def __init__(self, view):
+                        def __init__(self):
                             options = [discord.SelectOption(label=str(i), value=str(i)) for i in range(7)]
                             super().__init__(
                                 placeholder="Select amount of Military Authority to demand...",
                                 options=options,
                                 row=0
                             )
-                            self.parent_view = view
 
                         async def callback(self, interaction: discord.Interaction):
                             # defer response
-                            await interaction.response.send("debugging")
-                            self.parent_view.mil_authority = self.values[0]
+                            await interaction.response.defer(thinking=False, ephemeral=True)
+                            self.view.mil_authority = self.values[0]
 
 
                     class EconSelect(discord.ui.Select):
-                        def __init__(self, view):
+                        def __init__(self):
                             options = [discord.SelectOption(label=str(i), value=str(i)) for i in range(7)]
                             super().__init__(
                                 placeholder="Select amount of Economic Authority to demand...",
                                 options=options,
                                 row=1
                             )
-                            self.parent_view = view
+
 
                         async def callback(self, interaction: discord.Interaction):
                             # defer response
                             await interaction.response.defer(thinking=False)
-                            self.parent_view.econ_authority = self.values[0]
+                            self.view.econ_authority = self.values[0]
 
 
                     class DiploSelect(discord.ui.Select):
-                        def __init__(self, view):
+                        def __init__(self):
                             options = [discord.SelectOption(label=str(i), value=str(i)) for i in range(7)]
                             super().__init__(
                                 placeholder="Select amount of Diplomatic Authority to demand...",
                                 options=options,
                                 row=2
                             )
-                            self.parent_view = view
 
                         async def callback(self, interaction: discord.Interaction):
                             # defer response
                             await interaction.response.defer(thinking=False)
-                            self.parent_view.diplo_authority = self.values[0]
+                            self.view.diplo_authority = self.values[0]
 
 
                     # create submit and cancel buttons

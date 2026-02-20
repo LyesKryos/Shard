@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Update `AuthDemandView` to include peace embed on cancellation and improve response handling">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="debugging" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -519,6 +516,7 @@
       <workItem from="1771440323116" duration="5707000" />
       <workItem from="1771523062152" duration="15744000" />
       <workItem from="1771607668032" duration="11516000" />
+      <workItem from="1771621019215" duration="394000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -863,7 +861,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1366" />
+    <option name="localTasksCounter" value="1368" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -882,8 +880,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Fix modal interaction handling by replacing `followup.send_modal` with `response.send_modal`." />
-    <MESSAGE value="Fix typo in `pyshortener.shorten` function call for recruitment welcome links." />
     <MESSAGE value="Refactor authority demand system by replacing modal inputs with dropdowns and buttons, improving interaction handling and war score calculations." />
     <MESSAGE value="Refactor authority demand view by replacing modal timeout handling with direct interaction editing, improving response flow and UI consistency." />
     <MESSAGE value="Refactor `AuthDemandView` to enhance reparations demand handling by improving variable assignments and embed updates for consistency and clarity." />
@@ -907,7 +903,9 @@
     <MESSAGE value="removing all containers as they are not compatable and switching to a different setup that is more conducive to the current code" />
     <MESSAGE value="Putting the response defering first" />
     <MESSAGE value="Update `AuthDemandView` to include peace embed on cancellation and improve response handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update `AuthDemandView` to include peace embed on cancellation and improve response handling" />
+    <MESSAGE value="Refactor `AuthDemandView` to adjust response deferral behavior and correct authority value references in peace embed." />
+    <MESSAGE value="debugging" />
+    <option name="LAST_COMMIT_MESSAGE" value="debugging" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
