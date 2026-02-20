@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Refactor `AuthDemandView` to enhance reparations demand handling by improving variable assignments and embed updates for consistency and clarity." />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Removing problematic embed">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -515,7 +517,7 @@
       <workItem from="1771263218301" duration="4020000" />
       <workItem from="1771440323116" duration="5707000" />
       <workItem from="1771523062152" duration="15744000" />
-      <workItem from="1771607668032" duration="6364000" />
+      <workItem from="1771607668032" duration="6660000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -860,7 +862,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1345" />
+    <option name="localTasksCounter" value="1347" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -879,8 +881,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting list appending to be correctly formatted for join operations." />
-    <MESSAGE value="Adding war ID to response about existing war" />
     <MESSAGE value="Adding transformer error to errors.py" />
     <MESSAGE value="Adding sorting to the province ids for not owned during peace negotiations" />
     <MESSAGE value="Troubleshooting demand province negotiation." />
@@ -904,7 +904,9 @@
     <MESSAGE value="Refactor authority demand system by replacing modal inputs with dropdowns and buttons, improving interaction handling and war score calculations." />
     <MESSAGE value="Refactor authority demand view by replacing modal timeout handling with direct interaction editing, improving response flow and UI consistency." />
     <MESSAGE value="Refactor `AuthDemandView` to enhance reparations demand handling by improving variable assignments and embed updates for consistency and clarity." />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor `AuthDemandView` to enhance reparations demand handling by improving variable assignments and embed updates for consistency and clarity." />
+    <MESSAGE value="Removing problematic container view" />
+    <MESSAGE value="Removing problematic embed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Removing problematic embed" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />

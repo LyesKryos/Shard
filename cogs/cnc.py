@@ -4298,12 +4298,10 @@ class WarOptionsView(discord.ui.View):
 
             # if the demand is to give reparations, determine which authority will be taken and how much
             elif demand == "Demand Reparations":
-                # create the view with dropdown to select the authority
-                demanded_authority_view = discord.ui.View(timeout=120)
-                # update the original message with the embed and the view
-                await self.interaction.edit_original_response(embed=None, view=demanded_authority_view)
+                # show thinking
+                await self.interaction.edit_original_response(embed=None, content="Thinking...")
 
-                # create a class for each authority tyep
+                # create a menu container
                 class AuthorityDemandMenuContainer(discord.ui.Container):
                     # create the three rows of dropdowns
                     mil_auth_row = discord.ui.ActionRow()
@@ -4371,7 +4369,8 @@ class WarOptionsView(discord.ui.View):
                     @submit_row.button(label="Submit", style=discord.ButtonStyle.success)
                     async def submit_auth_demand_button(self, interaction: discord.Interaction,
                                                         button: discord.ui.Button):
-
+                        # defer interaction
+                        await interaction.response.defer(thinking=True)
                         # parse the demanded amounts
                         self.auths_demanded = [int(self.mil_authority), int(self.econ_authority), int(self.diplo_authority)]
                         # calculate war score
@@ -4397,14 +4396,14 @@ class WarOptionsView(discord.ui.View):
                                           FROM cnc_peace_negotiations
                                           WHERE war_id = $1;''', war_info['id'])
                     # return and remove the view if the user does not interact
-                    return await self.interaction.edit_original_response(view=None)
+                    return await self.interaction.edit_original_response(view=None, embed=peace_embed)
                 # otherwise, carry on
                 else:
                     # send notification
                     await self.interaction.followup.send(f"Demand Reparations has been "
                                                          f"added at a cost of `{auth_container.war_score}`.")
                     # remove the container view
-                    await interaction.edit_original_response(embed=peace_embed, view=None)
+                    await interaction.edit_original_response(embed=peace_embed, view=None, content=None)
                     # update embed
                     peace_embed.add_field(name="Reparations Demanded",
                                           value=f"{auth_container.mil_authority} Military\n"
@@ -4433,7 +4432,7 @@ class WarOptionsView(discord.ui.View):
         # define the callback for send
         async def send_callback(interaction: discord.Interaction):
             # defer the interaction
-            await interaction.response.defer(ephemeral=True)
+            await interaction.response.defer(thinking=True)
             # get the recipient(s) if it is a total negotiation
             if total_negotiation:
                 if user_info['name'] in war_info['attackers']:
@@ -4459,7 +4458,7 @@ class WarOptionsView(discord.ui.View):
                         # define callbacks`
                         async def accept_callback(interaction: discord.Interaction):
                             # defer the interaction
-                            await interaction.response.defer(ephemeral=True)
+                            await interaction.response.defer(thinking=True)
                             # pull peace negotiation information
                             peace_negotiation = await conn.fetchrow('''SELECT * FROM cnc_peace_negotiations 
                                                                        WHERE id = $1;''', war_info['id'])
@@ -4494,7 +4493,7 @@ class WarOptionsView(discord.ui.View):
 
                         async def decline_callback(interaction: discord.Interaction):
                             # defer the interaction
-                            await interaction.response.defer(ephemeral=True)
+                            await interaction.response.defer(thinking=True)
                             # destroy any pending negotiation
                             await conn.execute('''DELETE
                                                   FROM cnc_peace_negotiations
