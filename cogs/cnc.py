@@ -4398,7 +4398,7 @@ class WarOptionsView(discord.ui.View):
                         await conn.execute('''DELETE
                                               FROM cnc_peace_negotiations
                                               WHERE war_id = $1;''', war_info['id'])
-                        return await interaction.edit_original_response(view=None, embed=peace_embed)
+                        return await self.interaction_response.edit_original_response(view=None, embed=peace_embed)
 
                 # creating the view class
                 class AuthDemandView(discord.ui.LayoutView):
