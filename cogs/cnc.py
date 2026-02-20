@@ -4303,102 +4303,114 @@ class WarOptionsView(discord.ui.View):
                 # update the original message with the embed and the view
                 await self.interaction.edit_original_response(view=demanded_authority_view)
 
-                # create a class for the demand modals
+                # create a class for each authority tyep
+                class AuthorityDemandMenuContainer(discord.ui.Container):
+                    # create the three rows of dropdowns
+                    mil_auth_row = discord.ui.ActionRow()
+                    econ_auth_row = discord.ui.ActionRow()
+                    diplo_auth_row = discord.ui.ActionRow()
+                    submit_row = discord.ui.ActionRow()
 
-                class DemandReparationModal(discord.ui.Modal):
-                    def __init__(self, parent_interaction: discord.Interaction):
-                        super().__init__(title="Demand Reparations", timeout=60)
-                        # define and add the text input
-                        self.military = discord.ui.TextInput(label="Military Authority",
-                                                                 style=discord.TextStyle.short,
-                                                                 placeholder="Type an integer no greater than 6",
-                                                                 required=True)
-                        self.economic = discord.ui.TextInput(label="Economic Authority",
-                                                                 style=discord.TextStyle.short,
-                                                                 placeholder="Type an integer no greater than 6",
-                                                                 required=True)
-                        self.diplomatic = discord.ui.TextInput(label="Diplomatic Authority",
-                                                             style=discord.TextStyle.short,
-                                                             placeholder="Type an integer no greater than 6",
-                                                             required=True)
-                        self.add_item(self.military)
-                        self.add_item(self.economic)
-                        self.add_item(self.diplomatic)
-                        # define the interaction
-                        self.parent_interaction = parent_interaction
+                    # store the selections
+                    mil_authority = None
+                    econ_authority = None
+                    diplo_authority = None
+                    war_score = 0
+                    auths_demanded = None
 
-                    async def on_submit(self, submit_interaction: Interaction):
-                        # defer the interaction
-                        await submit_interaction.response.defer(thinking=False)
-                        # stop listening to the modal
-                        self.stop()
+                    #create mil auth dropdown
+                    @mil_auth_row.select(
+                        placeholder="Select an amount of Military Authority...",
+                        options=[
+                            discord.SelectOption(label="0"),
+                            discord.SelectOption(label="1"),
+                            discord.SelectOption(label="2"),
+                            discord.SelectOption(label="3"),
+                            discord.SelectOption(label="4"),
+                            discord.SelectOption(label="5"),
+                            discord.SelectOption(label="6")]
+                    )
+                    # define the select's callback
+                    async def mil_authority_select(self, interaction: discord.Interaction, option: discord.SelectOption):
+                        self.mil_authority = option.label
 
-                    async def on_timeout(self):
-                        # if the user fails to respond, stop listening
-                        # and remove all the options from the original interaction message, effectively canceling
-                        self.stop()
-                        # if the user gives no response or cancels
-                        await conn.execute('''DELETE
-                                              FROM cnc_peace_negotiations
-                                              WHERE war_id = $1;''', war_info['id'])
-                        # remove the view
-                        return await self.parent_interaction.edit_original_response(view=None)
+                    # create the econ auth dropdown
+                    @econ_auth_row.select(
+                        placeholder="Select an amount of Economic Authority...",
+                        options=[
+                            discord.SelectOption(label="0"),
+                            discord.SelectOption(label="1"),
+                            discord.SelectOption(label="2"),
+                            discord.SelectOption(label="3"),
+                            discord.SelectOption(label="4"),
+                            discord.SelectOption(label="5"),
+                            discord.SelectOption(label="6")
+                        ]
+                    )
+                    # define the select's callback
+                    async def econ_authority_select(self, interaction: discord.Interaction, option: discord.SelectOption):
+                        self.econ_authority = option.label
 
-                # create and send the modal
-                authority_modal = DemandReparationModal(interaction)
-                await interaction.response.send_modal(authority_modal)
-                # await the modal response
-                await authority_modal.wait()
-                # return the values
-                mil_auth = authority_modal.military.value
-                econ_auth = authority_modal.economic.value
-                dip_auth = authority_modal.diplomatic.value
-                auths_demanded = [mil_auth, econ_auth, dip_auth]
-                # for each within the values returned
-                for auth in auths_demanded:
-                    # if the amount_demanded is not an integer, return
-                    try:
-                        amount_demanded = int(auth)
-                    except ValueError:
-                        # destroy any pending negotiation
-                        await conn.execute('''DELETE
-                                              FROM cnc_peace_negotiations
-                                              WHERE war_id = $1;''', war_info['id'])
-                        # return and remove the view if the user does not interact
-                        await self.interaction.edit_original_response(view=None)
-                        return await self.interaction.followup.send("You must specify an integer amount.", ephemeral=True)
-                    # if the amount is greater than six, return
-                    if amount_demanded > 6:
-                        # destroy any pending negotiation
-                        await conn.execute('''DELETE
-                                              FROM cnc_peace_negotiations
-                                              WHERE war_id = $1;''', war_info['id'])
-                        # return and remove the view if the user does not interact
-                        await self.interaction.edit_original_response(view=None)
-                        return await self.interaction.followup.send("The amount of authority demanded must be less than six.",
-                                                                    ephemeral=True)
+                    # create the diplo auth dropdown
+                    @diplo_auth_row.select(
+                        placeholder="Select an amount of Diplomatic Authority...",
+                        options=[
+                            discord.SelectOption(label="0"),
+                            discord.SelectOption(label="1"),
+                            discord.SelectOption(label="2"),
+                            discord.SelectOption(label="3"),
+                            discord.SelectOption(label="4"),
+                            discord.SelectOption(label="5"),
+                            discord.SelectOption(label="6")
+                        ]
+                    )
+                    # define the select's callback
+                    async def diplo_authority_select(self, interaction: discord.Interaction, option: discord.SelectOption):
+                        self.diplo_authority = option.label
+
+                    @submit_row.button(label="Submit", style=discord.ButtonStyle.success)
+                    async def submit_auth_demand_button(self, interaction: discord.Interaction,
+                                                        button: discord.ui.Button):
+
+                        # parse the demanded amounts
+                        self.auths_demanded = [int(self.mil_authority), int(self.econ_authority), int(self.diplo_authority)]
+                        # calculate war score
+                        war_score = sum(self.auths_demanded) * .05
+                        # add the demand to the negotiation
+                        await conn.execute('''UPDATE cnc_peace_negotiations SET demand_reparations = $1, 
+                                                                                war_score_cost = war_score_cost + $2 
+                                              WHERE war_id = $3;''',
+                                           self.auths_demanded, war_score, war_info['id'])
+                # creating the view class
+                class AuthDemandView(discord.ui.View):
+                    container = AuthorityDemandMenuContainer()
+                    auths_demanded: list = container.auths_demanded
+                    war_score = container.war_score
+
+                auth_demand_view = AuthDemandView(timeout=120)
+                # wait for the response
+                auth_timeout = await auth_demand_view.wait()
+                # if there is a timeout, delete everything and reject
+                if auth_timeout:
+                    # destroy any pending negotiation
+                    await conn.execute('''DELETE
+                                          FROM cnc_peace_negotiations
+                                          WHERE war_id = $1;''', war_info['id'])
+                    # return and remove the view if the user does not interact
+                    return await self.interaction.edit_original_response(view=None)
                 # otherwise, carry on
                 else:
-                    # parse the demanded amounts
-                    auths_demanded = [int(mil_auth), int(econ_auth), int(dip_auth)]
-                    # calculate war score
-                    war_score = sum(auths_demanded) * .05
-                    # add the demand to the negotiation
-                    await conn.execute('''UPDATE cnc_peace_negotiations SET demand_reparations = $1, 
-                                                                            war_score_cost = war_score_cost + $2 
-                                          WHERE war_id = $3;''',
-                                       auths_demanded, war_score, war_info['id'])
                     # send notification
                     await self.interaction.followup.send(f"Demand Reparations has been "
-                                                         f"added at a cost of `{war_score}`.")
+                                                         f"added at a cost of `{auth_demand_view.container.war_score}`.")
                     # update embed
                     peace_embed.add_field(name="Reparations Demanded",
-                                          value=f"{auths_demanded[0]} Military\n"
-                                                f"{auths_demanded[1]} Economic\n"
-                                                f"{auths_demanded[2]} Diplomatic\n",
+                                          value=f"{auth_demand_view.auths_demanded[0]} Military\n"
+                                                f"{auth_demand_view.auths_demanded[1]} Economic\n"
+                                                f"{auth_demand_view.auths_demanded[2]} Diplomatic\n",
                                           inline=False)
                     # add to total
-                    total_war_score += war_score
+                    total_war_score += auth_demand_view.container.war_score
 
 
 
