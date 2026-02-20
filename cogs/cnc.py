@@ -4148,7 +4148,7 @@ class WarOptionsView(discord.ui.View):
                 provinces_demanded = await demanding_provinces_wait_for_modal(peace_options_returned, "Demand Provinces",
                                             "List province IDs separated by comma:")
                 # separate the list
-                provinces_demanded = [p.strip() for p in provinces_demanded.split(',')]
+                provinces_demanded = [int(p.strip()) for p in provinces_demanded.split(',')]
                 # if the list has no items (somehow?), return
                 if not provinces_demanded:
                     # reject message
@@ -4158,12 +4158,12 @@ class WarOptionsView(discord.ui.View):
                     # if the list of provinces demanded has any provinces that are not owned by the target
                     if not set(provinces_demanded).issubset(set(target_provinces)):
                         # get the provinces that are not
-                        provinces_not_of_target = set(provinces_demanded) - set(target_provinces)
+                        provinces_not_of_target: set[int] = set(set(provinces_demanded) - set(target_provinces))
                         # send a message of denial
                         await self.interaction.followup.send((provinces_demanded, target_provinces))
                         return await self.interaction.followup.send("You must specify provinces that are owned by the target.\n"
                                                              f"Target does not own: "
-                                                             f"{(', '.join(sorted(provinces_not_of_target)))}.",
+                                                             f"{(', '.join(map(str, sorted(provinces_not_of_target))))}.",
                                                              ephemeral=True)
                     else:
                         # calculate the war score
