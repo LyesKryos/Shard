@@ -3802,12 +3802,13 @@ class DefensioBelliButton(discord.ui.Button):
 class WarOptionsView(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, war_info: asyncpg.Record,
-                 alliance_button: bool, db_button: bool, user_info: asyncpg.Record):
+                 alliance_button: bool, db_button: bool, user_info: asyncpg.Record, war_embed: discord.Embed):
         super().__init__(timeout=240)
         self.interaction = interaction
         self.conn = conn
         self.war_info = war_info
         self.user_info = user_info
+        self.war_embed = war_embed
         # add military alliance button
         if alliance_button:
             self.add_item(MilitaryAllianceButton(conn=self.conn, war_info=self.war_info, user_info=self.user_info))
@@ -3818,7 +3819,8 @@ class WarOptionsView(discord.ui.View):
         # remove dropdown
         for item in self.children:
             self.remove_item(item)
-        return await self.interaction.edit_original_response(view=None, content="Timed out.")
+        await self.interaction.edit_original_response(view=None)
+        return await self.interaction.followup.send("Timed out.", embed=self.war_embed)
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.interaction.user.id
@@ -5488,7 +5490,7 @@ class CNC(commands.Cog):
                 defensio_belli_button = False
             # add the appropriate buttons, including the peace negotiation button
             war_options_view = WarOptionsView(interaction, conn, war_info,
-                                              alliance_button, defensio_belli_button, user_info)
+                                              alliance_button, defensio_belli_button, user_info, war_embed)
             return await interaction.followup.send(embed=war_embed, view=war_options_view)
         # if the user is in the war and is not a primary, add the peace option
         elif (user_info['name'] == attackers_others) or (user_info['name'] == defenders_others):
