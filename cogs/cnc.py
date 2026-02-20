@@ -4313,6 +4313,7 @@ class WarOptionsView(discord.ui.View):
                     war_score = 0
                     auths_demanded = None
                     interaction_response = None
+                    view = None
 
                     async def on_timeout(self):
                         # destroy the pending negotiation
@@ -4409,10 +4410,13 @@ class WarOptionsView(discord.ui.View):
 
                 auth_demand_view = AuthDemandView(timeout=120)
                 auth_container = auth_demand_view.container
-                # wait for the response
+                # send the view
                 interaction_response = await interaction.edit_original_response(view=auth_demand_view,
                                                                                 content=None, embed=None)
+                # define the response and the view
                 auth_container.interaction_response = interaction_response
+                auth_container.view = auth_demand_view
+                # wait
                 auth_timeout = await auth_demand_view.wait()
                 # if there is a timeout, return
                 if auth_timeout:
