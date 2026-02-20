@@ -4427,7 +4427,7 @@ class WarOptionsView(discord.ui.View):
 
                 auth_demand_view = AuthDemandView(self.interaction)
                 # send the view
-                await self.interaction.edit_original_response(view=auth_demand_view, content=None, embed=None)
+                await self.interaction.edit_original_response(view=auth_demand_view)
                 # wait
                 auth_timeout = await auth_demand_view.wait()
                 # if there is a timeout, return
