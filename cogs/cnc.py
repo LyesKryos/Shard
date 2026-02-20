@@ -3803,7 +3803,7 @@ class WarOptionsView(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, war_info: asyncpg.Record,
                  alliance_button: bool, db_button: bool, user_info: asyncpg.Record, war_embed: discord.Embed):
-        super().__init__(timeout=240)
+        super().__init__(timeout=180)
         self.interaction = interaction
         self.conn = conn
         self.war_info = war_info
@@ -4315,7 +4315,6 @@ class WarOptionsView(discord.ui.View):
                     war_score = 0
                     auths_demanded = None
                     interaction_response = None
-                    view = None
 
                     async def on_timeout(self):
                         # destroy the pending negotiation
@@ -4393,7 +4392,7 @@ class WarOptionsView(discord.ui.View):
                                               WHERE war_id = $3;''',
                                            self.auths_demanded, war_score, war_info['id'])
                         # unblock the waiting for the view
-                        self.view.stop()
+                        self._view.stop()
 
                     @submit_row.button(label="Cancel", style=discord.ButtonStyle.danger)
                     async def cancel_button(self, interaction: discord.Interaction,
@@ -4417,7 +4416,6 @@ class WarOptionsView(discord.ui.View):
                                                                                 content=None, embed=None)
                 # define the response and the view
                 auth_container.interaction_response = interaction_response
-                auth_container.view = auth_demand_view
                 # wait
                 auth_timeout = await auth_demand_view.wait()
                 # if there is a timeout, return

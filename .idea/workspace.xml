@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding stop to the container view" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing timeout handling" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -515,7 +515,7 @@
       <workItem from="1771263218301" duration="4020000" />
       <workItem from="1771440323116" duration="5707000" />
       <workItem from="1771523062152" duration="15744000" />
-      <workItem from="1771607668032" duration="8819000" />
+      <workItem from="1771607668032" duration="9302000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -860,7 +860,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1356" />
+    <option name="localTasksCounter" value="1358" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -879,8 +879,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Reset view handling in peace negotiation validation to improve user feedback." />
-    <MESSAGE value="Fix disable logic for dropdown children in peace negotiation views." />
     <MESSAGE value="Fixing outdated tinyurl" />
     <MESSAGE value="Handle peace negotiation timeout cleanup and improve ally province feedback." />
     <MESSAGE value="Refactor peace negotiation flow by encapsulating dropdown and button logic into `peace_view` coroutine." />
@@ -904,7 +902,9 @@
     <MESSAGE value="Correcting the cancel button issue" />
     <MESSAGE value="Extend interaction timeout and improve timeout messaging for better user experience. Adjust authority variable initialization and interaction responses for consistency." />
     <MESSAGE value="Adding stop to the container view" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding stop to the container view" />
+    <MESSAGE value="Update `AuthDemandView` to reset view on timeout and improve interaction handling" />
+    <MESSAGE value="Fixing timeout handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing timeout handling" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
