@@ -4298,9 +4298,6 @@ class WarOptionsView(discord.ui.View):
 
             # if the demand is to give reparations, determine which authority will be taken and how much
             elif demand == "Demand Reparations":
-                # show thinking
-                await self.interaction.edit_original_response(embed=None, content="Thinking...")
-
                 # create a menu container
                 class AuthorityDemandMenuContainer(discord.ui.Container):
                     # create the three rows of dropdowns
@@ -4387,7 +4384,7 @@ class WarOptionsView(discord.ui.View):
                 auth_demand_view = AuthDemandView(timeout=120)
                 auth_container = auth_demand_view.container
                 # wait for the response
-                await interaction.edit_original_response(view=auth_demand_view)
+                await interaction.edit_original_response(view=auth_demand_view, content=None, embed=None)
                 auth_timeout = await auth_demand_view.wait()
                 # if there is a timeout, delete everything and reject
                 if auth_timeout:
