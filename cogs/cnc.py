@@ -4412,6 +4412,8 @@ class WarOptionsView(discord.ui.View):
                     async def cancel_button(self, interaction: discord.Interaction, button: discord.ui.Button):
                         # defer the interaction
                         await interaction.response.defer()
+                        # determine if cancelled
+                        self.cancelled = True
                         # delete the pending interaction
                         await conn.execute(
                             '''DELETE
@@ -4427,7 +4429,7 @@ class WarOptionsView(discord.ui.View):
 
                 auth_demand_view = AuthDemandView(self.interaction)
                 # send the view
-                await self.interaction.edit_original_response(view=auth_demand_view)
+                await self.interaction.edit_original_response(view=auth_demand_view, embed=peace_embed)
                 # wait
                 auth_timeout = await auth_demand_view.wait()
                 # if there is a timeout, return
