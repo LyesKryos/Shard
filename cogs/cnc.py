@@ -3819,8 +3819,9 @@ class WarOptionsView(discord.ui.View):
         # remove dropdown
         for item in self.children:
             self.remove_item(item)
+        # delete the view and update with the war embed
         await self.interaction.edit_original_response(view=None)
-        return await self.interaction.followup.send("Timed out.", embed=self.war_embed)
+        return await self.interaction.edit_original_response(embed=self.war_embed)
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.interaction.user.id
