@@ -4182,11 +4182,11 @@ class WarOptionsView(discord.ui.View):
                                            provinces_demanded, war_score, war_info['id'])
                         await self.interaction.followup.send(f"Cede Provinces demand added to the Peace Negotiations "
                                                              f"for `{war_info['id']}` from the following provinces:\n"+
-                                                             ", ".join(provinces_demanded))
+                                                             ", ".join(map(str, provinces_demanded)))
                         # add to the total war score
                         total_war_score += war_score
                         # add to the embed
-                        peace_embed.add_field(name="Cede Provinces",value=", ".join(provinces_demanded))
+                        peace_embed.add_field(name="Cede Provinces",value=", ".join(map(str, provinces_demanded)))
 
             # if the demand is to give provinces, determine which ally the provinces will go to and which provinces those are
             elif demand == "Give Province":
