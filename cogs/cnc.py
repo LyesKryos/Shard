@@ -4312,6 +4312,14 @@ class WarOptionsView(discord.ui.View):
                     diplo_authority = None
                     war_score = 0
                     auths_demanded = None
+                    interaction_response = None
+
+                    async def on_timeout(self):
+                        # destroy the pending negotiation
+                        await conn.execute('''DELETE
+                                              FROM cnc_peace_negotiations
+                                              WHERE war_id = $1;''', war_info['id'])
+                        await self.interaction_response.edit_original_response(view=None, embed=peace_embed)
 
                     #create mil auth dropdown
                     @mil_auth_row.select(
@@ -4359,6 +4367,7 @@ class WarOptionsView(discord.ui.View):
                             discord.SelectOption(label="6")
                         ]
                     )
+
                     # define the select's callback
                     async def diplo_authority_select(self, interaction: discord.Interaction, option: discord.SelectOption):
                         self.diplo_authority = option.label
@@ -4377,6 +4386,17 @@ class WarOptionsView(discord.ui.View):
                                                                                 war_score_cost = war_score_cost + $2 
                                               WHERE war_id = $3;''',
                                            self.auths_demanded, war_score, war_info['id'])
+
+                    @submit_row.button(label="Cancel", style=discord.ButtonStyle.danger)
+                    async def cancel_button(self, interaction: discord.Interaction,
+                                                        button: discord.ui.Button):
+                        await interaction.response.defer()
+                        # destroy the pending negotiation
+                        await conn.execute('''DELETE
+                                              FROM cnc_peace_negotiations
+                                              WHERE war_id = $1;''', war_info['id'])
+                        return await interaction.edit_original_response(view=None, embed=peace_embed)
+
                 # creating the view class
                 class AuthDemandView(discord.ui.LayoutView):
                     container = AuthorityDemandMenuContainer()
@@ -4384,17 +4404,13 @@ class WarOptionsView(discord.ui.View):
                 auth_demand_view = AuthDemandView(timeout=120)
                 auth_container = auth_demand_view.container
                 # wait for the response
-                await interaction.edit_original_response(view=auth_demand_view, content=None, embed=None)
+                interaction_response = await interaction.edit_original_response(view=auth_demand_view,
+                                                                                content=None, embed=None)
+                auth_container.interaction_response = interaction_response
                 auth_timeout = await auth_demand_view.wait()
-                # if there is a timeout, delete everything and reject
+                # if there is a timeout, return
                 if auth_timeout:
-                    # destroy any pending negotiation
-                    await conn.execute('''DELETE
-                                          FROM cnc_peace_negotiations
-                                          WHERE war_id = $1;''', war_info['id'])
-                    # return and remove the view if the user does not interact
-                    return await self.interaction.edit_original_response(view=None, embed=peace_embed)
-                # otherwise, carry on
+                    return
                 else:
                     # send notification
                     await self.interaction.followup.send(f"Demand Reparations has been "
