@@ -4324,15 +4324,13 @@ class WarOptionsView(discord.ui.View):
                         self.add_item(self.military)
                         self.add_item(self.economic)
                         self.add_item(self.diplomatic)
-                        # define variables
-                        self.value = None
+                        # define the interaction
                         self.parent_interaction = parent_interaction
 
                     async def on_submit(self, submit_interaction: Interaction):
                         # defer the interaction
                         await submit_interaction.response.defer(thinking=False)
-                        # define the value and stop listening to the modal
-                        self.value = self.demand_input.value
+                        # stop listening to the modal
                         self.stop()
 
                     async def on_timeout(self):
@@ -4347,8 +4345,8 @@ class WarOptionsView(discord.ui.View):
                         return await self.parent_interaction.edit_original_response(view=None)
 
                 # create and send the modal
-                authority_modal = DemandReparationModal(self.interaction)
-                await self.interaction.response.send_modal(authority_modal)
+                authority_modal = DemandReparationModal(interaction)
+                await interaction.followup.send_modal(authority_modal)
                 # await the modal response
                 await authority_modal.wait()
                 # return the values
