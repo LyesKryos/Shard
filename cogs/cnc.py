@@ -3880,6 +3880,7 @@ class WarOptionsView(discord.ui.View):
         await self.interaction.edit_original_response(embed=peace_embed)
         # select any peace negotiation options
         peace_treaty_options = [
+            "White Peace",
             "Cede Province",
             "Give Province",
             "Demand Reparations",
@@ -3889,8 +3890,7 @@ class WarOptionsView(discord.ui.View):
             "Subjugate",
             "Dismantle",
             "Force Government Type",
-            "Humiliate",
-            "White Peace"
+            "Humiliate"
         ]
 
         # create modal input function
@@ -4128,6 +4128,8 @@ class WarOptionsView(discord.ui.View):
         negotiation_demands = embargo_targets_returned.data['values']
         # define the demand score
         total_war_score = 0
+        # define white peace
+        white_peace = False
         # send the updated embed
         await self.interaction.edit_original_response(embed=peace_embed)
         # create the pending peace negotiation
@@ -4142,8 +4144,24 @@ class WarOptionsView(discord.ui.View):
                                                        WHERE owner_id = $1;''',
                                                     target_info['user_id'])
             target_provinces = [p['id'] for p in target_provinces_raw]
+
+            # if the demand is white peace, immediately break
+            if demand == "White Peace":
+                # update the pending peace negotiation
+                await conn.execute('''UPDATE cnc_peace_negotiations SET white_peace = True WHERE war_id = $1;''',
+                                   war_info['id'])
+                # update the embed
+                peace_embed.add_field(name="White Peace", value="Offered", inline=False)
+                # send the updated embed
+                await self.interaction.edit_original_response(embed=peace_embed)
+                # return and remove the view if the user does not interact
+                await self.interaction.followup.send("White Peace has been offered. No other demands can be made.")
+                # break the cycle and do not process any other demands
+                white_peace = True
+                break
+
             # if the demand is to cede a province, determine which provinces the demander claims
-            if demand == "Cede Province":
+            elif demand == "Cede Province":
                 # query demand for provinces using the peace options dropdown interaction response
                 provinces_demanded = await demanding_provinces_wait_for_modal(embargo_targets_returned, "Demand Provinces",
                                             "List province IDs separated by comma:")
@@ -4546,6 +4564,15 @@ class WarOptionsView(discord.ui.View):
 
         # when the loop has finished, clear the view
         peace_negotiation_dropdown_view.clear_items()
+        # if the war score is 0, meaning there are no demands, do not bother sending
+        if (total_war_score == 0) and (not white_peace):
+            await self.interaction.edit_original_response(view=None, embed=peace_embed)
+            # destroy any pending negotiation, remove the view, and send rejection
+            await conn.execute('''DELETE
+                                  FROM cnc_peace_negotiations
+                                  WHERE war_id = $1;''', war_info['id'])
+            return await self.interaction.followup.send("No demands were added to the Peace Negotiations.",
+                                                        ephemeral=True)
         # calculate the war score cost double if this is not a total negotiation
         if not total_negotiation:
             total_war_score *= 2
