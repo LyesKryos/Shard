@@ -4563,7 +4563,7 @@ class WarOptionsView(discord.ui.View):
             # if the demand is to end a military alliance
             elif demand == "End Military Alliance":
                 # check to see if target is in a military alliance
-                target_alliance = await conn.fetchrow('''SELECT * FROM cnc_alliances WHERE ANY(members) = $1;''',
+                target_alliance = await conn.fetchrow('''SELECT * FROM cnc_alliances WHERE $1 = ANY(members);''',
                                                       target_info['name'])
                 # if they aren't in one, skip
                 if not target_alliance:
