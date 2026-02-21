@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding white peace to the peace negotiation options (at the top too)">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding end alliance demand">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -519,7 +519,8 @@
       <workItem from="1771440323116" duration="5707000" />
       <workItem from="1771523062152" duration="15744000" />
       <workItem from="1771607668032" duration="11516000" />
-      <workItem from="1771621019215" duration="9209000" />
+      <workItem from="1771621019215" duration="9331000" />
+      <workItem from="1771703946395" duration="309000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -864,7 +865,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1383" />
+    <option name="localTasksCounter" value="1385" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -883,7 +884,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Improve interaction handling by deferring with `thinking` for seamless user experience and consistency." />
     <MESSAGE value="Remove unnecessary &quot;Thinking...&quot; response and update interaction edit call for clarity and consistency." />
     <MESSAGE value="Add timeout and cancel handling to `AuthDemandView` for improved user experience and interaction consistency." />
     <MESSAGE value="Refactor authority selection callbacks to use `select.values[0]` instead of `option.label` for improved dropdown interaction handling." />
@@ -908,7 +908,8 @@
     <MESSAGE value="Destroy dangling peace negotiations in invalid cede provinces scenarios." />
     <MESSAGE value="Adding End Embargo peace negotiation option" />
     <MESSAGE value="Adding white peace to the peace negotiation options (at the top too)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding white peace to the peace negotiation options (at the top too)" />
+    <MESSAGE value="Adding end alliance demand" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding end alliance demand" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />

@@ -4582,8 +4582,35 @@ class WarOptionsView(discord.ui.View):
                     # update the embed
                     peace_embed.add_field(name="End Military Alliance", value="Demanded", inline=False)
                     # send notification
-                    await self.interaction.followup.send(f"Demand for the end of any military alliance with "
+                    await self.interaction.followup.send(f"Demand for the end of any Military Alliance with "
                                                          f"{target_info['name']} added for `15` War Score.")
+
+            # if the demand is to end a trade pact
+            elif demand == "End Trade Pacts":
+                # check to see if target is in a trade pact
+                target_pact = await conn.fetchrow('''SELECT * FROM cnc_trade_pacts WHERE $1 = ANY(members);''',
+                                                   target_info['name'])
+                # if they aren't in one, skip
+                if not target_pact:
+                    # send a message
+                    await self.interaction.followup.send(f"{target_info['name']} is not a member of any "
+                                                         f"Trade Pacts.", ephemeral=True)
+                    continue
+                # otherwise, carry on
+                else:
+                    # calculate war score
+                    war_score = 20
+                    # update the peace negotiation
+                    await conn.execute('''UPDATE cnc_peace_negotiations SET end_tp = True, 
+                                                                            war_score = war_score + $1
+                                          WHERE war_id = $2;''', war_score, war_info['id'])
+                    # update the embed
+                    peace_embed.add_field(name="End Trade Pacts", value="Demanded", inline=False)
+                    # send notification
+                    # send notification
+                    await self.interaction.followup.send(f"Demand for the end of any Trade Pact with "
+                                                         f"{target_info['name']} added for `20` War Score.")
+
 
 
 
