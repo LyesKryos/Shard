@@ -4552,13 +4552,38 @@ class WarOptionsView(discord.ui.View):
                                           SET end_embargo = $1, war_score_cost = war_score_cost + $2 
                                           WHERE war_id = $3;''',
                                        end_embargo_targets, war_score, war_info['id'])
+                    # update embed
+                    peace_embed.add_field(title="End Embargo(s)", value=', '.join(end_embargo_targets), inline=False)
                     # send notification
                     await self.interaction.followup.send(f"End Embargo against `{', '.join(end_embargo_targets)}`"
                                                          f" has been added at a cost of `{war_score}` war score.")
                     # add to total
                     total_war_score += war_score
-
-
+                    
+            # if the demand is to end a military alliance
+            elif demand == "End Military Alliance":
+                # check to see if target is in a military alliance
+                target_alliance = await conn.fetchrow('''SELECT * FROM cnc_alliances WHERE ANY(members) = $1;''',
+                                                      target_info['name'])
+                # if they aren't in one, skip
+                if not target_alliance:
+                    # send a message
+                    await self.interaction.followup.send(f"{target_info['name']} is not a member of any "
+                                                         f"military alliances.", ephemeral=True)
+                    continue
+                # otherwise, carry on
+                else:
+                    # calculate war score
+                    war_score = 15
+                    # update the peace negotiation
+                    await conn.execute('''UPDATE cnc_peace_negotiations SET end_ma = $1, war_score = war_score + $2 
+                                          WHERE war_id = $3;''',
+                                       target_alliance['id'], war_score, war_info['id'])
+                    # update the embed
+                    peace_embed.add_field(name="End Military Alliance", value="Demanded", inline=False)
+                    # send notification
+                    await self.interaction.followup.send(f"Demand for the end of any military alliance with "
+                                                         f"{target_info['name']} added for `15` War Score.")
 
 
 
