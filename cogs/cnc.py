@@ -4575,7 +4575,8 @@ class WarOptionsView(discord.ui.View):
                     # calculate war score
                     war_score = 15
                     # update the peace negotiation
-                    await conn.execute('''UPDATE cnc_peace_negotiations SET end_ma = $1, war_score = war_score + $2 
+                    await conn.execute('''UPDATE cnc_peace_negotiations SET end_ma = $1, 
+                                                                            war_score_cost = war_score_cost + $2 
                                           WHERE war_id = $3;''',
                                        target_alliance['id'], war_score, war_info['id'])
                     # update the embed
@@ -4601,7 +4602,7 @@ class WarOptionsView(discord.ui.View):
                     war_score = 20
                     # update the peace negotiation
                     await conn.execute('''UPDATE cnc_peace_negotiations SET end_tp = True, 
-                                                                            war_score = war_score + $1
+                                                                            war_score_cost = war_score_cost + $1
                                           WHERE war_id = $2;''', war_score, war_info['id'])
                     # update the embed
                     peace_embed.add_field(name="End Trade Pacts", value="Demanded", inline=False)
@@ -4641,7 +4642,7 @@ class WarOptionsView(discord.ui.View):
                     # if the war score for this option is less than 25, set at
                     # update the peace negotiation
                     await conn.execute('''UPDATE cnc_peace_negotiations SET subjugate = True, 
-                                                                            war_score = war_score + $1 
+                                                                            war_score_cost = war_score_cost + $1 
                                           WHERE war_id = $2;''', war_score, war_info['id'])
                     # update the embed
                     peace_embed.add_field(name="Subjugate", value="Demanded", inline=False)
