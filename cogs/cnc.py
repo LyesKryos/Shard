@@ -80,15 +80,15 @@ async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> di
     else:
         river = ""
     # troops and armies
-    troop_count = await conn.fetchrow('''SELECT SUM(troops)
+    troop_count = await conn.fetchval('''SELECT SUM(troops)
                                          FROM cnc_armies
                                          WHERE location = $1;''',
                                       prov_info['id'])
     # parse out troop count
-    if troop_count['sum'] is None:
+    if troop_count is None:
         troop_count = 0
     else:
-        troop_count = f"{troop_count['sum']:,}"
+        troop_count = f"{troop_count:,}"
     # parse structures
     if prov_info['structures'] is None:
         structures = "None"
@@ -96,7 +96,7 @@ async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> di
         structures = "None"
     else:
         structures = ",".join(p for p in prov_info['structures'])
-    army_list = await conn.fetchrow('''SELECT COUNT(*)
+    army_count = await conn.fetchval('''SELECT COUNT(*)
                                        FROM cnc_armies
                                        WHERE location = $1''', prov_info['id'])
     # build embed for province and populate name and ID
@@ -110,7 +110,7 @@ async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> di
     prov_embed.add_field(name="Core Owner", value=owner)
     prov_embed.add_field(name="Occupier", value=occupier)
     prov_embed.add_field(name="Troops and Armies", value=f"{troop_count} troops "
-                                                         f"in {army_list['count']} armies.")
+                                                         f"in {army_count} armies.")
     prov_embed.add_field(name="Terrain", value=f"{await terrain_name(prov_info['terrain'], conn)}" + river)
     prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
     prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
@@ -137,11 +137,11 @@ async def user_db_info(user_id: int | str, conn: asyncpg.Pool) -> asyncpg.Record
 
 async def terrain_name(terrain_id: int, conn: asyncpg.Pool) -> str:
     # make terrain db call
-    terrain_name = await conn.fetchrow('''SELECT name
+    terrain_name = await conn.fetchval('''SELECT name
                                           FROM cnc_terrains
                                           WHERE id = $1;''', terrain_id)
     # return name string
-    return str(terrain_name['name'])
+    return str(terrain_name)
 
 
 async def map_color(province: int, hexcode: str, conn: asyncpg.Pool):
@@ -993,11 +993,11 @@ class OwnedProvinceModifiation(View):
         if war_check is not None:
             return await interaction.response.send_message("You cannot abandon provinces while at war.")
         # check to make sure that the user will have > 1 province after
-        prov_owned_count = await conn.fetchrow('''SELECT count(id)
+        prov_owned_count = await conn.fetchval('''SELECT count(id)
                                                   FROM cnc_provinces
                                                   WHERE owner_id = $1;''',
                                                interaction.user.id)
-        if prov_owned_count['count'] - 1 < 1:
+        if prov_owned_count - 1 < 1:
             return await interaction.response.send_message("You cannot abandon your last province.")
         # otherwise, carry on
         abandon_province_view = AbandonConfirm(interaction.user, prov_info, user_info, conn)
@@ -1041,11 +1041,11 @@ class UnownedProvince(View):
         if prov_info['owner_id'] != 0:
             return await interaction.response.send_message("You cannot colonize a province owned by any other nation.")
         # check if the user has more than 15 provinces
-        prov_owned_count = await conn.fetchrow('''SELECT count(id)
+        prov_owned_count = await conn.fetchval('''SELECT count(id)
                                                   FROM cnc_provinces
                                                   WHERE owner_id = $1;''',
                                                user_id)
-        if prov_owned_count['count'] < 15:
+        if prov_owned_count < 15:
             return await interaction.response.send_message("You cannot colonize until you own at least 15 provinces.")
         # check if the province is on the coast or bordering a province owned by the nation
         bordering_check = await conn.fetch('''SELECT *
@@ -1058,7 +1058,7 @@ class UnownedProvince(View):
         # calculate cost
         cost = 1
         # cost of colonization = (5 + provinces count) - 25, minimum 1, maximum 10
-        cost += (5 + prov_owned_count['count']) - 25
+        cost += (5 + prov_owned_count) - 25
         # if the user has the "Manifest Destiny" tech, reduce cost by 2
         if "Manifest Destiny" in user_info['tech']:
             cost -= 2
@@ -1069,7 +1069,7 @@ class UnownedProvince(View):
         if cost > 10:
             cost = 10
         # if the nation is overextended, increase cost by 50%
-        if prov_owned_count['count'] > user_info['overextend_limit']:
+        if prov_owned_count > user_info['overextend_limit']:
             cost *= 1.5
         # if the nation is a puppet, increase cost by 15%
         if user_info['overlord'] is not None:
@@ -1166,32 +1166,32 @@ class DossierView(View):
         # establish user_id
         user_id = interaction.user.id
         # pull troop and army data
-        troops = await conn.fetchrow('''SELECT SUM(troops)
+        troops = await conn.fetchval('''SELECT SUM(troops)
                                         FROM cnc_armies
                                         WHERE owner_id = $1;''', user_id)
-        armies = await conn.fetchrow('''SELECT COUNT(*)
+        armies = await conn.fetchval('''SELECT COUNT(*)
                                         FROM cnc_armies
                                         WHERE owner_id = $1;''', user_id)
-        generals = await conn.fetchrow('''SELECT COUNT(*)
+        generals = await conn.fetchval('''SELECT COUNT(*)
                                           FROM cnc_generals
                                           WHERE owner_id = $1;''', user_id)
-        total_manpower = await conn.fetchrow('''SELECT SUM(citizens)
+        total_manpower = await conn.fetchval('''SELECT SUM(citizens)
                                                 FROM cnc_provinces
                                                 WHERE owner_id = $1;''',
                                              user_id)
         # populate troops and armies
         self.doss_embed.add_field(name="=======================MILITARY======================",
                                   value="Information about your nation's military.", inline=False)
-        self.doss_embed.add_field(name="Troops", value=f"{troops['sum']:,}")
-        self.doss_embed.add_field(name="Armies", value=f"{armies['count']}")
-        self.doss_embed.add_field(name="Generals", value=f"{generals['count']}")
+        self.doss_embed.add_field(name="Troops", value=f"{troops:,}")
+        self.doss_embed.add_field(name="Armies", value=f"{armies}")
+        self.doss_embed.add_field(name="Generals", value=f"{generals}")
         # populate manpower
         self.doss_embed.add_field(name="Manpower \n(Manpower Access)", value=f"{self.user_info['manpower']:,} "
                                                                              f"({self.user_info['manpower_access']}%)")
         self.doss_embed.add_field(name="Manpower Regen",
                                   value=f"{math.floor(total_manpower['sum'] * (self.user_info['manpower_regen'] / 100)):,} "
                                         f"({self.user_info['manpower_regen']}%)")
-        self.doss_embed.add_field(name="Total Manpower", value=f"{total_manpower['sum']:,}")
+        self.doss_embed.add_field(name="Total Manpower", value=f"{total_manpower:,}")
         # update
         await interaction.edit_original_response(embed=self.doss_embed)
 
@@ -1219,9 +1219,8 @@ class DossierView(View):
         # clear emebed
         self.doss_embed.clear_fields()
         # count the number of provinces the user has
-        province_count_raw = await self.conn.fetchrow('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1;''',
+        province_count = await self.conn.fetchval('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1;''',
                                                   self.user_info['user_id'])
-        province_count = province_count_raw['count']
         # populate unrest, stability, overextension
         self.doss_embed.add_field(name="=====================GOVERNMENT===================",
                                   value="Information about your nation's government.", inline=False)
@@ -1701,12 +1700,12 @@ class GovernmentReformMenu(View):
         if user_info['govt_type'] == "Anarchy":
             return await interaction.followup.send("Anarchist governments cannot voluntarily change government type.")
         # get development
-        development = await self.conn.fetchrow('''SELECT SUM(development)
+        development = await self.conn.fetchval('''SELECT SUM(development)
                                                   FROM cnc_provinces
                                                   WHERE owner_id = $1;''',
                                                self.author.id)
         # if the nation has less than 50 development, disallow
-        if development['sum'] < 50:
+        if development < 50:
             button.disabled = True
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"{user_info['name']} does not have enough development "
@@ -1874,15 +1873,15 @@ class GovernmentReformTypeEnact(discord.ui.View):
         # calculate cost
         if not self.user_info['free_govt_change']:
             # calculate cost
-            province_dev = await self.conn.fetchrow('''SELECT SUM(development)
+            province_dev = await self.conn.fetchval('''SELECT SUM(development)
                                                        FROM cnc_provinces
                                                        WHERE owner_id = $1;''',
                                                     self.interaction.user.id)
-            province_count = await self.conn.fetchrow('''SELECT COUNT(*)
+            province_count = await self.conn.fetchval('''SELECT COUNT(*)
                                                          FROM cnc_provinces
                                                          WHERE owner_id = $1;''',
                                                       self.interaction.user.id)
-            mean_dev = math.ceil(province_dev['sum'] / province_count['count'])
+            mean_dev = math.ceil(province_dev / province_count)
             total_cost = math.ceil(mean_dev / 5)
             # if the cost is greater than the 25-point limit, set it to 25
             if total_cost > 25:
@@ -2756,7 +2755,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                            FROM cnc_wars
                                            WHERE active = True
                                              AND ($1 = ANY (array_cat(attackers, defenders))
-                                               AND $2 = ANY (array_cat(attackers, defenders));''',
+                                               AND $2 = ANY (array_cat(attackers, defenders)));''',
                                         user_info['name'], self.recipient_info['name'])
         if wars is not None:
             button.disabled = True
@@ -2969,12 +2968,12 @@ class HostileDiplomaticActions(discord.ui.View):
             available_cbs.append("Humiliate")
         if "Subjugation" in sender_info['tech']:
             # calculate the average national developments of sender and receiver
-            sender_dev = await self.conn.fetchrow('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1;''',
+            sender_dev = await self.conn.fetchval('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1;''',
                                              sender_info['id'])
-            recipient_dev = await self.conn.fetchrow('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1;''',
+            recipient_dev = await self.conn.fetchval('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1;''',
                                                      self.recipient_info['user_id'])
             # if 50% of the senders dev is larger than the recipient's dev, permit subjugation
-            if recipient_dev['avg'] < sender_dev['avg'] * .5:
+            if recipient_dev < sender_dev * .5:
                 available_cbs.append("Subjugate")
         if "Total War" in sender_info['tech']:
             available_cbs.append("Total War")
@@ -3657,12 +3656,12 @@ class MilitaryAllianceButton(discord.ui.Button):
         war_info = self.war_info
         # check to see if any members of the user's military alliance are not yet in the war
         # pull the alliance information
-        alliance_info = await conn.fetchrow('''SELECT members FROM cnc_alliances WHERE $1 = ANY(members);''',
+        alliance_info = await conn.fetchval('''SELECT members FROM cnc_alliances WHERE $1 = ANY(members);''',
                                             self.user_info['name'])
         # if the user is the defender, pull the defenders
         if self.user_info['name'] == self.war_info['primary_defender']:
             # get a list of any allied nations that are not in the war
-            non_participants = list(set(alliance_info['members']).difference(set(war_info['defenders'])))
+            non_participants = list(set(alliance_info).difference(set(war_info['defenders'])))
             # for each non-participant
             for np in non_participants:
                 # get their user object
@@ -3767,16 +3766,16 @@ class DefensioBelliButton(discord.ui.Button):
             available_dbs.append("Humiliate")
         if "Subjugation" in sender_info['tech']:
             # calculate the average national developments of sender and receiver
-            sender_dev = await self.conn.fetchrow('''SELECT AVG(development)
+            sender_dev = await self.conn.fetchval('''SELECT AVG(development)
                                                      FROM cnc_provinces
                                                      WHERE owner_id = $1;''',
                                                   sender_info['id'])
-            recipient_dev = await self.conn.fetchrow('''SELECT AVG(development)
+            recipient_dev = await self.conn.fetchval('''SELECT AVG(development)
                                                         FROM cnc_provinces
                                                         WHERE owner_id = $1;''',
                                                      recipient_info['user_id'])
             # if 50% of the senders dev is larger than the recipient's dev, permit subjugation
-            if recipient_dev['avg'] < sender_dev['avg'] * .5:
+            if recipient_dev < sender_dev * .5:
                 available_dbs.append("Subjugate")
         if "Total War" in sender_info['tech']:
             available_dbs.append("Total War")
@@ -4195,9 +4194,9 @@ class WarOptionsView(discord.ui.View):
                         war_score = 0
                         for province in provinces_demanded:
                             # pull the province info
-                            p_info = await conn.fetchrow('''SELECT development FROM cnc_provinces WHERE id = $1;''', province)
+                            p_dev = await conn.fetchval('''SELECT development FROM cnc_provinces WHERE id = $1;''', province)
                             # calculate demand score as dev * .5
-                            war_score = p_info['development'] * .5
+                            war_score = p_dev * .5
                         # ensure the war score is a round number
                         war_score = int(war_score)
                         # otherwise, add the list of provinces to the tracker
@@ -4309,8 +4308,8 @@ class WarOptionsView(discord.ui.View):
                             # calculate war score
                             war_score = 0
                             for province in provinces_demanded:
-                                p_info = await conn.fetchrow('''SELECT development FROM cnc_provinces WHERE id = $1;''', province)
-                                war_score += p_info['development'] * 1
+                                p_dev = await conn.fetchval('''SELECT development FROM cnc_provinces WHERE id = $1;''', province)
+                                war_score += p_dev * 1
                             # ensure the war score is a round number
                             war_score = int(war_score)
                             # update negotiation
@@ -4553,7 +4552,7 @@ class WarOptionsView(discord.ui.View):
                                           WHERE war_id = $3;''',
                                        end_embargo_targets, war_score, war_info['id'])
                     # update embed
-                    peace_embed.add_field(title="End Embargo(s)", value=', '.join(end_embargo_targets), inline=False)
+                    peace_embed.add_field(name="End Embargo(s)", value=', '.join(end_embargo_targets), inline=False)
                     # send notification
                     await self.interaction.followup.send(f"End Embargo against `{', '.join(end_embargo_targets)}`"
                                                          f" has been added at a cost of `{war_score}` war score.")
@@ -4607,9 +4606,50 @@ class WarOptionsView(discord.ui.View):
                     # update the embed
                     peace_embed.add_field(name="End Trade Pacts", value="Demanded", inline=False)
                     # send notification
-                    # send notification
                     await self.interaction.followup.send(f"Demand for the end of any Trade Pact with "
                                                          f"{target_info['name']} added for `20` War Score.")
+
+            # if the demand is subjugation
+            elif demand == "Subjugate":
+                # check if the target already has an overlord
+                if target_info['overlord']:
+                    # send a message
+                    await self.interaction.followup.send(f"{target_info['name']} already has an Overlord.",
+                                                         ephemeral=True)
+                    continue
+                # check to see if the user has a puppet slot
+                puppets_check = await conn.fetch('''SELECT * FROM cnc_users WHERE overlord = $1;''',
+                                                 user_info['user_id'])
+                # if the user has 2 puppets (3 if GP), then reject
+                if len(puppets_check) >= 2:
+                    # if the user is a GP, they can have 3
+                    if not user_info['gp']:
+                        # reject
+                        await self.interaction.followup.send("Nations cannot have more than 2 puppets.", ephemeral=True)
+                    elif (user_info['gp']) and (len(puppets_check) >= 3):
+                        # reject
+                        await self.interaction.followup.send("Great Powers cannot have more than 3 puppets.",
+                                                             ephemeral=True)
+                # otherwise, carry on
+                else:
+                    # fetch the total development of the target
+                    target_total_development = await conn.fetchval('''SELECT SUM(development) FROM cnc_provinces 
+                                                                      WHERE owner_id = $1;''',
+                                                                   target_info['user_id'])
+                    # calculate war score
+                    war_score = max(2 * target_total_development, 25)
+                    # if the war score for this option is less than 25, set at
+                    # update the peace negotiation
+                    await conn.execute('''UPDATE cnc_peace_negotiations SET subjugate = True, 
+                                                                            war_score = war_score + $1 
+                                          WHERE war_id = $2;''', war_score, war_info['id'])
+                    # update the embed
+                    peace_embed.add_field(name="Subjugate", value="Demanded", inline=False)
+                    # send the notification
+                    await self.interaction.followup.send(f"Demand for Subjugation of {target_info['name']} added for "
+                                                         f"`{war_score}` War Score.")
+
+
 
 
 
@@ -5725,11 +5765,9 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull user's tech
-        techs = await conn.fetchrow('''SELECT tech
+        techs = await conn.fetchval('''SELECT tech
                                        FROM cnc_users
                                        WHERE user_id = $1;''', interaction.user.id)
-        # parse tech
-        techs = techs['tech']
         # map techs
         tech_map = Image.open(fr"{self.tech_directory}CNC Tech Tree.png").convert('RGBA')
         gear_icon = Image.open(fr"{self.tech_directory}CNC Gear Tech Icon.png").convert('RGBA')
@@ -5787,10 +5825,9 @@ class CNC(commands.Cog):
         # set base research time as four turns
         research_time = 4
         # pull development score
-        total_dev = await conn.fetchrow('''SELECT AVG(development)
+        total_dev = await conn.fetchval('''SELECT AVG(development)
                                            FROM cnc_provinces
                                            WHERE owner_id = $1;''', user_id)
-        total_dev = total_dev['avg']
         # pull research time
         research_buff = user_info['research_time']
         # calculate total research time
