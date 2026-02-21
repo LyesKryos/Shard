@@ -4535,7 +4535,7 @@ class WarOptionsView(discord.ui.View):
                                           WHERE war_id = $3;''',
                                        end_embargo_targets, war_score, war_info['id'])
                     # send notification
-                    await self.interaction.followup.send(f"End Embargo against `{", ".join(end_embargo_targets)}`"
+                    await self.interaction.followup.send(f"End Embargo against `{', '.join(end_embargo_targets)}`"
                                                          f" has been added at a cost of `{war_score}` war score.")
                     # add to total
                     total_war_score += war_score
