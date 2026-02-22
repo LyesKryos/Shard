@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting DB call for demanding subjugation">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding end overlordship to peace negotiation options">
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -521,7 +520,7 @@
       <workItem from="1771607668032" duration="11516000" />
       <workItem from="1771621019215" duration="9331000" />
       <workItem from="1771703946395" duration="3812000" />
-      <workItem from="1771722546915" duration="2050000" />
+      <workItem from="1771722546915" duration="2389000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -866,7 +865,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1388" />
+    <option name="localTasksCounter" value="1389" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -885,7 +884,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Update `AuthDemandView` to improve dropdown handling and interaction timeout messaging for consistency and clarity." />
     <MESSAGE value="Forgot to respond to the dropdown interactions" />
     <MESSAGE value="Correcting the cancel button issue" />
     <MESSAGE value="Extend interaction timeout and improve timeout messaging for better user experience. Adjust authority variable initialization and interaction responses for consistency." />
@@ -910,7 +908,8 @@
     <MESSAGE value="Adding end trade pacts demand" />
     <MESSAGE value="Correcting hostile check" />
     <MESSAGE value="Correcting DB call for demanding subjugation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting DB call for demanding subjugation" />
+    <MESSAGE value="Adding end overlordship to peace negotiation options" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding end overlordship to peace negotiation options" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />

@@ -3887,6 +3887,7 @@ class WarOptionsView(discord.ui.View):
             "End Military Alliance",
             "End Trade Pacts",
             "Subjugate",
+            "End Overlordship",
             "Dismantle",
             "Force Government Type",
             "Humiliate"
