@@ -4114,7 +4114,7 @@ class WarOptionsView(discord.ui.View):
 
         # wait for the options to be selected
         try:
-            embargo_targets_returned = await interaction.client.wait_for("interaction", check=pnd_check, timeout=120)
+            overlord_targets_returned = await interaction.client.wait_for("interaction", check=pnd_check, timeout=120)
         except asyncio.TimeoutError:
             # destroy any pending negotiation
             await conn.execute('''DELETE
@@ -4124,7 +4124,7 @@ class WarOptionsView(discord.ui.View):
             return await self.interaction.edit_original_response(view=None)
 
         # parse the options
-        negotiation_demands = embargo_targets_returned.data['values']
+        negotiation_demands = overlord_targets_returned.data['values']
         # define the demand score
         total_war_score = 0
         # define white peace
@@ -4162,33 +4162,29 @@ class WarOptionsView(discord.ui.View):
             # if the demand is to cede a province, determine which provinces the demander claims
             elif demand == "Cede Province":
                 # query demand for provinces using the peace options dropdown interaction response
-                provinces_demanded = await demanding_provinces_wait_for_modal(embargo_targets_returned, "Demand Provinces",
+                provinces_demanded = await demanding_provinces_wait_for_modal(overlord_targets_returned, "Demand Provinces",
                                             "List province IDs separated by comma:")
                 # separate the list
                 provinces_demanded = [int(p.strip()) for p in provinces_demanded.split(',')]
                 # if the list has no items (somehow?), return
                 if not provinces_demanded:
-                    # destroy any pending negotiation
-                    await conn.execute('''DELETE
-                                          FROM cnc_peace_negotiations
-                                          WHERE war_id = $1;''', war_info['id'])
                     # reject message
-                    return await self.interaction.followup.send("You must specify at least one province.", ephemeral=True)
+                    await self.interaction.followup.send("You must specify at least one province.", ephemeral=True)
+                    # skip this option
+                    continue
                 # if the list has items, proceed
                 else:
                     # if the list of provinces demanded has any provinces that are not owned by the target
                     if not set(provinces_demanded).issubset(set(target_provinces)):
                         # get the provinces that are not
                         provinces_not_of_target: set[int] = set(set(provinces_demanded) - set(target_provinces))
-                        # destroy any pending negotiation
-                        await conn.execute('''DELETE
-                                              FROM cnc_peace_negotiations
-                                              WHERE war_id = $1;''', war_info['id'])
                         # send a message of denial
-                        return await self.interaction.followup.send("You must specify provinces that are owned by the target.\n"
+                        await self.interaction.followup.send("You must specify provinces that are owned by the target.\n"
                                                              f"Target does not own: "
                                                              f"{(', '.join(map(str, sorted(provinces_not_of_target))))}.",
                                                              ephemeral=True)
+                        # skip this option
+                        continue
                     else:
                         # calculate the war score
                         war_score = 0
@@ -4212,6 +4208,7 @@ class WarOptionsView(discord.ui.View):
                         # add to the embed
                         peace_embed.add_field(name="Cede Provinces",value=", ".join(map(str, provinces_demanded)),
                                               inline=False)
+                        continue
 
             # if the demand is to give provinces, determine which ally the provinces will go to and which provinces those are
             elif demand == "Give Province":
@@ -4221,9 +4218,10 @@ class WarOptionsView(discord.ui.View):
                 # pull all the allies of the target if they are the defender
                 else:
                     potential_ally_targets = war_info['defenders'].remove(user_info['name'])
-                # if the list is empty, return
+                # if the list is empty, skip this option
                 if not potential_ally_targets:
                     await self.interaction.followup.send("No potential allies to give provinces to.", ephemeral=True)
+                    continue
                 # otherwise, proceed
                 else:
                     # create view check to ensure proper parsing
@@ -4280,12 +4278,8 @@ class WarOptionsView(discord.ui.View):
                     if not provinces_demanded:
                         # send a message of denial
                         await self.interaction.followup.send("You must specify at least one province.", ephemeral=True)
-                        # destroy any pending negotiation
-                        await conn.execute('''DELETE
-                                              FROM cnc_peace_negotiations
-                                              WHERE war_id = $1;''', war_info['id'])
-                        # return and remove the view if the user does not interact
-                        return await self.interaction.edit_original_response(view=None)
+                        # skip this option
+                        continue
                     # if the list has items, proceed
                     else:
                         # if the list of provinces demanded has any province that are not owned by the target
@@ -4298,12 +4292,8 @@ class WarOptionsView(discord.ui.View):
                                 f"Target does not own: "
                                 f"{(', '.join(map(str, sorted(provinces_not_of_target))))}.",
                                 ephemeral=True)
-                            # destroy any pending negotiation
-                            await conn.execute('''DELETE
-                                                  FROM cnc_peace_negotiations
-                                                  WHERE war_id = $1;''', war_info['id'])
-                            # return and remove the view if the user does not interact
-                            return await self.interaction.edit_original_response(view=None)
+                            # skip this option
+                            continue
                         else:
                             # calculate war score
                             war_score = 0
@@ -4328,9 +4318,11 @@ class WarOptionsView(discord.ui.View):
                             # add to the embed
                             peace_embed.add_field(name="Cede Provinces", value=", ".join(map(str, provinces_demanded)),
                                                   inline=False)
+                            continue
 
             # if the demand is to give reparations, determine which authority will be taken and how much
             elif demand == "Demand Reparations":
+                # create the auth demand view
                 class AuthDemandView(discord.ui.View):
                     def __init__(self, parent_interaction: discord.Interaction, timeout=120):
                         super().__init__(timeout=timeout)
@@ -4489,61 +4481,60 @@ class WarOptionsView(discord.ui.View):
                     # send a message
                     await self.interaction.followup.send("No embargoes to end.", ephemeral=True)
                     continue
-
-                # query who is the target
-                class EndEmbargoTargetDropdown(discord.ui.Select):
-
-                    # hypersimplistic dropdown
-                    def __init__(self):
-                        # create the options
-                        nation_options = []
-                        for n in all_targets:
-                            nation_options.append(discord.SelectOption(label=n['name']))
-                        # define the super
-                        super().__init__(placeholder="Choose End Embargo Target(s)...", min_values=1,
-                                         max_values=len(nation_options),
-                                         options=nation_options, custom_id="endembargodropdown")
-
-                # create a view
-                end_embargo_view = discord.ui.View(timeout=120)
-                # add the dropdown
-                end_embargo_view.add_item(EndEmbargoTargetDropdown())
-                # add the cancel button
-                cancel_button = discord.ui.Button(label="Cancel", style=discord.ButtonStyle.danger)
-                # define the cancel callback
-                cancel_button.callback = cancel_button_callback(self.interaction)
-                # add the cancel button to the view
-                end_embargo_view.add_item(cancel_button)
-
-                # send the view
-                await self.interaction.edit_original_response(view=end_embargo_view)
-
-                # create view check to ensure proper parsing
-                def embargo_check(inter: discord.Interaction):
-                    """
-                    This function ensures that the user ID of the interaction input is the same as the parent interaction user.
-                    """
-                    # Ensure it's the same message & same user
-                    return (
-                            inter.user == self.interaction.user
-                            and inter.data['custom_id'] == "endembargodropdown"
-                    )
-
-                # wait for the options to be selected
-                try:
-                    embargo_targets_returned = await interaction.client.wait_for("interaction", check=embargo_check,
-                                                                               timeout=120)
-                except asyncio.TimeoutError:
-                    # destroy any pending negotiation
-                    await conn.execute('''DELETE
-                                          FROM cnc_peace_negotiations
-                                          WHERE war_id = $1;''', war_info['id'])
-                    # return and remove the view if the user does not interact
-                    return await self.interaction.edit_original_response(view=None)
                 # otherwise, carry on
                 else:
+                    # query who is the target
+                    class EndEmbargoTargetDropdown(discord.ui.Select):
+
+                        # hypersimplistic dropdown
+                        def __init__(self):
+                            # create the options
+                            nation_options = []
+                            for n in all_targets:
+                                nation_options.append(discord.SelectOption(label=n['name']))
+                            # define the super
+                            super().__init__(placeholder="Choose End Embargo Target(s)...", min_values=1,
+                                             max_values=len(nation_options),
+                                             options=nation_options, custom_id="endembargodropdown")
+
+                    # create a view
+                    end_overlord_view = discord.ui.View(timeout=120)
+                    # add the dropdown
+                    end_overlord_view.add_item(EndEmbargoTargetDropdown())
+                    # add the cancel button
+                    cancel_button = discord.ui.Button(label="Cancel", style=discord.ButtonStyle.danger)
+                    # define the cancel callback
+                    cancel_button.callback = cancel_button_callback(self.interaction)
+                    # add the cancel button to the view
+                    end_overlord_view.add_item(cancel_button)
+
+                    # send the view
+                    await self.interaction.edit_original_response(view=end_overlord_view)
+
+                    # create view check to ensure proper parsing
+                    def embargo_check(inter: discord.Interaction):
+                        """
+                        This function ensures that the user ID of the interaction input is the same as the parent interaction user.
+                        """
+                        # Ensure it's the same message & same user
+                        return (
+                                inter.user == self.interaction.user
+                                and inter.data['custom_id'] == "endembargodropdown"
+                        )
+
+                    # wait for the options to be selected
+                    try:
+                        overlord_targets_returned = await interaction.client.wait_for("interaction", check=embargo_check,
+                                                                                     timeout=120)
+                    except asyncio.TimeoutError:
+                        # destroy any pending negotiation
+                        await conn.execute('''DELETE
+                                              FROM cnc_peace_negotiations
+                                              WHERE war_id = $1;''', war_info['id'])
+                        # return and remove the view if the user does not interact
+                        return await self.interaction.edit_original_response(view=None)
                     # parse the results
-                    end_embargo_targets = embargo_targets_returned.data['values']
+                    end_embargo_targets = overlord_targets_returned.data['values']
                     # calculate war score
                     war_score = len(end_embargo_targets) * 10
                     # add the embargo releases to the negotiation
@@ -4558,6 +4549,7 @@ class WarOptionsView(discord.ui.View):
                                                          f" has been added at a cost of `{war_score}` war score.")
                     # add to total
                     total_war_score += war_score
+                    continue
                     
             # if the demand is to end a military alliance
             elif demand == "End Military Alliance":
@@ -4584,6 +4576,9 @@ class WarOptionsView(discord.ui.View):
                     # send notification
                     await self.interaction.followup.send(f"Demand for the end of any Military Alliance with "
                                                          f"{target_info['name']} added for `15` War Score.")
+                    # add total war score
+                    total_war_score += war_score
+                    continue
 
             # if the demand is to end a trade pact
             elif demand == "End Trade Pacts":
@@ -4609,6 +4604,9 @@ class WarOptionsView(discord.ui.View):
                     # send notification
                     await self.interaction.followup.send(f"Demand for the end of any Trade Pact with "
                                                          f"{target_info['name']} added for `20` War Score.")
+                    # add total war score
+                    total_war_score += war_score
+                    continue
 
             # if the demand is subjugation
             elif demand == "Subjugate":
@@ -4627,10 +4625,14 @@ class WarOptionsView(discord.ui.View):
                     if not user_info['gp']:
                         # reject
                         await self.interaction.followup.send("Nations cannot have more than 2 puppets.", ephemeral=True)
+                        # skip this option
+                        continue
                     elif (user_info['gp']) and (len(puppets_check) >= 3):
                         # reject
                         await self.interaction.followup.send("Great Powers cannot have more than 3 puppets.",
                                                              ephemeral=True)
+                        # skip this option
+                        continue
                 # otherwise, carry on
                 else:
                     # fetch the total development of the target
@@ -4649,8 +4651,93 @@ class WarOptionsView(discord.ui.View):
                     # send the notification
                     await self.interaction.followup.send(f"Demand for Subjugation of {target_info['name']} added for "
                                                          f"`{war_score}` War Score.")
+                    # add total war score
+                    total_war_score += war_score
+                    continue
 
+            # if the demand is release subject
+            elif demand == "End Overlordship":
+                # check if the target already is an overlord
+                overlord_list = await conn.fetch('''SELECT * FROM cnc_users WHERE overlord = $1;''',
+                                                 target_info['user_id'])
+                # if the target is not the overlord of anyone
+                if not overlord_list:
+                    # send a message
+                    await self.interaction.followup.send(f"{target_info['name']} is not an Overlord.",
+                                                         ephemeral=True)
+                    continue
+                # otherwise, carry on
+                else:
+                    # query who is the target
+                    class EndOverlordTargetDropdown(discord.ui.Select):
 
+                        # hypersimplistic dropdown
+                        def __init__(self):
+                            # create the options
+                            nation_options = []
+                            for n in overlord_list:
+                                nation_options.append(discord.SelectOption(label=n['name']))
+                            # define the super
+                            super().__init__(placeholder="Choose End Overlordship Target(s)...", min_values=1,
+                                             max_values=len(nation_options),
+                                             options=nation_options, custom_id="endoverlorddropdown")
+
+                    # create a view
+                    end_overlord_view = discord.ui.View(timeout=120)
+                    # add the dropdown
+                    end_overlord_view.add_item(EndOverlordTargetDropdown())
+                    # add the cancel button
+                    cancel_button = discord.ui.Button(label="Cancel", style=discord.ButtonStyle.danger)
+                    # define the cancel callback
+                    cancel_button.callback = cancel_button_callback(self.interaction)
+                    # add the cancel button to the view
+                    end_overlord_view.add_item(cancel_button)
+
+                    # send the view
+                    await self.interaction.edit_original_response(view=end_overlord_view)
+
+                    # create view check to ensure proper parsing
+                    def overlord_check(inter: discord.Interaction):
+                        """
+                        This function ensures that the user ID of the interaction input is the same as the parent interaction user.
+                        """
+                        # Ensure it's the same message & same user
+                        return (
+                                inter.user == self.interaction.user
+                                and inter.data['custom_id'] == "endoverlorddropdown"
+                        )
+
+                    # wait for the options to be selected
+                    try:
+                        overlord_targets_returned = await interaction.client.wait_for("interaction",
+                                                                                     check=overlord_check,
+                                                                                     timeout=120)
+                    except asyncio.TimeoutError:
+                        # destroy any pending negotiation
+                        await conn.execute('''DELETE
+                                              FROM cnc_peace_negotiations
+                                              WHERE war_id = $1;''', war_info['id'])
+                        # return and remove the view if the user does not interact
+                        return await self.interaction.edit_original_response(view=None)
+                    # parse the results
+                    end_overlord_targets = overlord_targets_returned.data['values']
+                    # calculate war score
+                    war_score = len(end_overlord_targets) * 20
+                    # add the embargo releases to the negotiation
+                    await conn.execute('''UPDATE cnc_peace_negotiations 
+                                          SET end_overlord = $1, war_score_cost = war_score_cost + $2 
+                                          WHERE war_id = $3;''',
+                                       end_overlord_targets, war_score, war_info['id'])
+                    # update embed
+                    peace_embed.add_field(name="End Overlordship", value=', '.join(end_overlord_targets), inline=False)
+                    # send notification
+                    await self.interaction.followup.send(f"Demand to End the Overlordship of {target_info['name']} over"
+                                                         f" {', '.join(end_overlord_targets)} added for "
+                                                         f"`{war_score}` War Score.")
+                    # add total war score
+                    total_war_score += war_score
+                    # proceed
+                    continue
 
 
 
