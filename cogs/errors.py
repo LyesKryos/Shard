@@ -139,6 +139,8 @@ class ShardErrorHandler(commands.Cog):
             await ctx.send("A check failed. Check the logs.")
         elif isinstance(error, discord.errors.Forbidden):
             await ctx.send("I cannot complete that action.")
+        elif isinstance(error, commands.errors.ExtensionNotLoaded):
+            await ctx.send("That extension is not loaded.")
         else:
             # define command
             command_name = ctx.command.qualified_name or "No command name recognized."
