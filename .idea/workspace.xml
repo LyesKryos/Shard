@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding force government type peace option">
-      <change beforePath="$PROJECT_DIR$/cogs/errors.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/errors.py" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Archiving econ.py for now">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,11 +117,11 @@
       <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\CNC\Tech Tree" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\jaedo\PycharmProjects\Shard\!Archive" />
+      <recent name="C:\Users\jaedo\PycharmProjects\Shard" />
       <recent name="C:\Users\jaedo\PycharmProjects\Shard\cogs" />
       <recent name="C:\Users\jaedo\PycharmProjects\Shard\CNC\Modules" />
       <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\Retired Versions" />
-      <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\cogs" />
-      <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard" />
     </key>
   </component>
   <component name="RunManager" selected="Python.scratch">
@@ -521,7 +521,7 @@
       <workItem from="1771621019215" duration="9331000" />
       <workItem from="1771703946395" duration="3812000" />
       <workItem from="1771722546915" duration="2672000" />
-      <workItem from="1771771071996" duration="3149000" />
+      <workItem from="1771771071996" duration="4002000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -866,7 +866,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1392" />
+    <option name="localTasksCounter" value="1395" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -885,8 +885,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding stop to the container view" />
-    <MESSAGE value="Update `AuthDemandView` to reset view on timeout and improve interaction handling" />
     <MESSAGE value="Fixing timeout handling" />
     <MESSAGE value="Adjust interaction timeout and refine cleanup logic in `AuthDemandView` to improve handling and consistency." />
     <MESSAGE value="Refactor `AuthDemandView` and `AuthorityDemandMenuContainer` to improve timeout handling, clean up interaction responses, and enhance view initialization consistency." />
@@ -910,7 +908,9 @@
     <MESSAGE value="Added End Overlordship to peace treaty options" />
     <MESSAGE value="Updating roleplay joining message." />
     <MESSAGE value="Adding force government type peace option" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding force government type peace option" />
+    <MESSAGE value="Adding extension failure to the error handler" />
+    <MESSAGE value="Archiving econ.py for now" />
+    <option name="LAST_COMMIT_MESSAGE" value="Archiving econ.py for now" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />

@@ -4764,9 +4764,36 @@ class WarOptionsView(discord.ui.View):
                     total_war_score += war_score
                     # proceed
                     continue
-
-
-
+                    
+            # if the demand is humiliate
+            elif demand == "Humiliate":
+                # calculate the war score
+                war_score = 75
+                # update the peace negotiation
+                await conn.execute('''UPDATE cnc_peace_negotiations SET humiliate = True, 
+                                                                            war_score_cost = war_score_cost + $1 
+                                          WHERE war_id = $2;''', war_score, war_info['id'])
+                # update the embed
+                peace_embed.add_field(name="Humiliate", value="Demanded", inline=False)
+                # add the total war score
+                total_war_score += war_score
+                # proceed
+                continue
+            
+            # if the demand is dismantle
+            elif demand == "Dismantle":
+                # calculate the war score
+                war_score = 90
+                # update the peace negotiation
+                await conn.execute('''UPDATE cnc_peace_negotiations SET dismantle = True, 
+                                                                            war_score_cost = war_score_cost + $1 
+                                          WHERE war_id = $2;''', war_score, war_info['id'])
+                # update the embed
+                peace_embed.add_field(name="Dismantle", value="Demanded", inline=False)
+                # add the total war score
+                total_war_score += war_score
+                # proceed
+                continue
 
         # when the loop has finished, clear the view
         peace_negotiation_dropdown_view.clear_items()
