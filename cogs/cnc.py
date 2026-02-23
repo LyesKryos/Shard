@@ -4740,6 +4740,31 @@ class WarOptionsView(discord.ui.View):
                     # proceed
                     continue
 
+            # if the demand is Force Government Type
+            elif demand == "Force Government Type":
+                # check if the target's government type is already the same
+                if target_info['govt_type'] == user_info['govt_type']:
+                    # send a message
+                    await self.interaction.followup.send(f"{target_info['name']}'s government type is already "
+                                                         f"{user_info['govt_type']}.", ephemeral=True)
+                    # skip this option
+                    continue
+                # otherwise, carry on
+                else:
+                    # calculate war score
+                    war_score = 50
+                    # update the peace negotiation
+                    await conn.execute('''UPDATE cnc_peace_negotiations SET force_govt = $1, 
+                                                                            war_score_cost = war_score_cost + $2 
+                                          WHERE war_id = $3;''',
+                                       user_info['govt_type'], war_score, war_info['id'])
+                    # update the embed
+                    peace_embed.add_field(name="Force Government Type", value="Demanded", inline=False)
+                    # add the total war score
+                    total_war_score += war_score
+                    # proceed
+                    continue
+
 
 
 
