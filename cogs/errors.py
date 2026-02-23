@@ -141,6 +141,11 @@ class ShardErrorHandler(commands.Cog):
             await ctx.send("I cannot complete that action.")
         elif isinstance(error, commands.errors.ExtensionNotLoaded):
             await ctx.send("That extension is not loaded.")
+        elif isinstance(error, commands.errors.ExtensionFailed):
+            await ctx.send("That extension failed to load.")
+            self.logger.exception(msg=f"Unhandled error:", exc_info=error)
+        elif isinstance(error, commands.errors.ExtensionAlreadyLoaded):
+            await ctx.send("That extension is already loaded.")
         else:
             # define command
             command_name = ctx.command.qualified_name or "No command name recognized."
