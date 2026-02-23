@@ -90,20 +90,12 @@ class VerificationDropdown(discord.ui.Select):
                     await ooc_chat.send(f"Welcome to the Geopolitical Roleplay channels, {user.mention}!\n\n"
                                         f"These channels are used solely for the geopolitical roleplay within the Thegye "
                                         f"universe. Here you can browse current RPs, participate in worldbuilding, and chat"
-                                        f" with your fellow RPers. If you'd like to join our RP, you will need to:\n"
-                                        f"**1.** Have a nation within the [**Thegye NationStates region**]"
-                                        f"(<https://www.nationstates.net/region=thegye>)\n"
-                                        f"**2.** Fill out the [**Roleplay Statistics Chart**]"
-                                        f"(<https://www.nationstates.net/page=dispatch/id=1371516>) and follow the "
-                                        f"instructions to submit it for verification.\n"
-                                        f"**3.** Apply for a location on the [**nation map**]"
-                                        f"(<https://www.nationstates.net/page=dispatch/id=1310572>)\n\n"
-                                        f"After you have completed those steps, you are ready to go! Check out our "
+                                        f" with your fellow RPers. Check out our "
                                         f"[**roleplay dispatch**](<https://www.nationstates.net/page=dispatch/id=1370630>)"
                                         f" and our [**iiWiki page**](<https://iiwiki.us/wiki/Portal:Thegye>) for more "
                                         f"information! Feel free to let us know if you have any questions.")
                 # assign roles for Senate RP
-                if response == "Grand Senate of Thegye Roleplay" in self.values:
+                elif response == "Grand Senate of Thegye Roleplay" in self.values:
                     await user.remove_roles(unverified_role)
                     await user.add_roles(traveler_role)
                     backroom_channel = thegye_server.get_channel(1112080185949437983)
@@ -115,9 +107,9 @@ class VerificationDropdown(discord.ui.Select):
                                                 f"(<https://thegye.miraheze.org/wiki/Main_Page>) where you can find helpful"
                                                 f" information and more! Be sure to let us know if you have any questions.")
                 # assign roles for other
-                if response == "Other" in self.values:
+                elif response == "Other" in self.values:
                     await user.add_roles(traveler_role)
-                if response == "NationStates":
+                elif response == "NationStates":
                     # add the nationstates role
                     await user.add_roles(nationstates_role)
                     await gatehouse.send("I am sending you a DM!")
