@@ -4760,6 +4760,10 @@ class WarOptionsView(discord.ui.View):
                                        user_info['govt_type'], war_score, war_info['id'])
                     # update the embed
                     peace_embed.add_field(name="Force Government Type", value="Demanded", inline=False)
+                    # send notification
+                    await self.interaction.followup.send(f"Demand for {target_info['name']} to be forced into the"
+                                                         f"{user_info['govt_type']} Government Type added for "
+                                                         f"`{war_score}` War Score.")
                     # add the total war score
                     total_war_score += war_score
                     # proceed
@@ -4777,6 +4781,9 @@ class WarOptionsView(discord.ui.View):
                 peace_embed.add_field(name="Humiliate", value="Demanded", inline=False)
                 # add the total war score
                 total_war_score += war_score
+                # send notification
+                await self.interaction.followup.send(f"Demand for the Humiliation of {target_info['name']} added for "
+                                                     f"{war_score} War Score.")
                 # proceed
                 continue
             
@@ -4792,6 +4799,9 @@ class WarOptionsView(discord.ui.View):
                 peace_embed.add_field(name="Dismantle", value="Demanded", inline=False)
                 # add the total war score
                 total_war_score += war_score
+                # send notification
+                await self.interaction.followup.send(f"Demand for the Dismantling of {target_info['name']} added for "
+                                                     f"{war_score} War Score.")
                 # proceed
                 continue
 
