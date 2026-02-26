@@ -4178,7 +4178,10 @@ class WarOptionsView(discord.ui.View):
 
         # wait for the options to be selected
         try:
-            overlord_targets_returned = await interaction.client.wait_for("interaction", check=pnd_check, timeout=120)
+            overlord_targets_returned = await interaction.client.wait_for("interaction", check=pnd_check,
+                                                                          timeout=120)
+            await overlord_targets_returned.response.defer()
+            await overlord_targets_returned.followup.send("Processing...", ephemeral=True, delete_after=1)
         except asyncio.TimeoutError:
             # destroy any pending negotiation
             await conn.execute('''DELETE
