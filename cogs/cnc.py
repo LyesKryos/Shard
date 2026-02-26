@@ -4048,6 +4048,7 @@ class WarOptionsView(discord.ui.View):
                 try:
                     target_returned = await interaction.client.wait_for("interaction", check=target_check,
                                                                         timeout=120)
+                    await target_returned.response.defer()
                 except asyncio.TimeoutError:
                     # return and remove the view if the user does not interact
                     return await self.interaction.edit_original_response(view=None)
@@ -4111,6 +4112,7 @@ class WarOptionsView(discord.ui.View):
                 try:
                     target_returned = await interaction.client.wait_for("interaction", check=target_check,
                                                                         timeout=120)
+                    await target_returned.response.defer()
                 except asyncio.TimeoutError:
                     # return and remove the view if the user does not interact
                     return await self.interaction.edit_original_response(view=None)
@@ -4327,6 +4329,7 @@ class WarOptionsView(discord.ui.View):
                         target_returned = await interaction.client.wait_for("interaction",
                                                                             check=gp_target_check,
                                                                             timeout=120)
+                        await target_returned.response.defer()
                     except asyncio.TimeoutError:
                         # destroy the pending negotiation
                         await conn.execute('''DELETE
