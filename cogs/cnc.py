@@ -4436,10 +4436,10 @@ class WarOptionsView(discord.ui.View):
 
                         async def callback(self, interaction: discord.Interaction):
                             self.view.mil_authority = self.values[0]
-                                try:
-                                    await interaction.response.defer(thinking=False)  # or thinking=False if you want silent
-                                except discord.InteractionResponded:
-                                    pass  # ignore if already responded somehow
+                            try:
+                                await interaction.response.defer(thinking=False)  # or thinking=False if you want silent
+                            except discord.InteractionResponded:
+                                pass  # ignore if already responded somehow
 
                     class EconSelect(discord.ui.Select):
                         def __init__(self):
