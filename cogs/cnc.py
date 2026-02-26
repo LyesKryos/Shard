@@ -4398,9 +4398,10 @@ class WarOptionsView(discord.ui.View):
             # if the demand is to give reparations, determine which authority will be taken and how much
             elif demand == "Demand Reparations":
                 # create the auth demand view
-                auth_demand_view = AuthDemandView(self.interaction)
-                # send the view
-                await self.interaction.edit_original_response(view=auth_demand_view, embed=peace_embed)
+                auth_demand_view = AuthDemandView(self.interaction, conn, war_info)
+                # remove the view and send the new one
+                await self.interaction.edit_original_response(view=None)
+                await self.interaction.edit_original_response(view=auth_demand_view)
                 # wait
                 await auth_demand_view.wait()
                 # if the user cancels
@@ -5121,9 +5122,11 @@ class WarOptionsView(discord.ui.View):
             # remove view and send update
             return await self.interaction.edit_original_response(view=None)
 
+
 class AuthDemandView(discord.ui.View):
-    def __init__(self, parent_interaction: discord.Interaction, timeout=120):
-        super().__init__(timeout=timeout)
+    def __init__(self, parent_interaction: discord.Interaction, conn: asyncpg.Pool,
+                 war_info: asyncpg.Record):
+        super().__init__(timeout=120)
 
         self.parent_interaction = parent_interaction
 
@@ -5133,6 +5136,8 @@ class AuthDemandView(discord.ui.View):
         self.auths_demanded = None
         self.war_score = 0
         self.cancelled = False
+        self.conn = conn
+        self.war_info = war_info
 
         # Add selects
         self.add_item(self.MilSelect())
@@ -5141,13 +5146,13 @@ class AuthDemandView(discord.ui.View):
 
     # on timeout
     async def on_timeout(self):
-        await conn.execute(
+        await self.conn.execute(
             '''DELETE
                 FROM cnc_peace_negotiations
                 WHERE war_id = $1;''',
-            war_info['id']
+            self.war_info['id']
         )
-        return await self.parent_interaction.edit_original_response(view=None, embed=peace_embed)
+        return await self.parent_interaction.edit_original_response(view=None)
 
     # create the select classes
 
@@ -5211,13 +5216,13 @@ class AuthDemandView(discord.ui.View):
         # calculate the war score
         self.war_score = sum(self.auths_demanded) * 5
         # execute the update
-        await conn.execute('''UPDATE cnc_peace_negotiations
+        await self.conn.execute('''UPDATE cnc_peace_negotiations
                                 SET demand_reparations = $1,
                                     war_score_cost     = war_score_cost + $2
                                 WHERE war_id = $3;''',
                             self.auths_demanded,
                             self.war_score,
-                            war_info['id']
+                            self.war_info['id']
                             )
         # send notification
         await interaction.followup.send(f"Demand Reparations has been "
@@ -5230,17 +5235,16 @@ class AuthDemandView(discord.ui.View):
         # determine if cancelled
         self.cancelled = True
         # delete the pending interaction
-        await conn.execute(
+        await self.conn.execute(
             '''DELETE
                 FROM cnc_peace_negotiations
                 WHERE war_id = $1;''',
-            war_info['id']
+            self.war_info['id']
         )
-        # stop the listening
+        # stop listening
         self.stop()
         # update the view
-        return await self.parent_interaction.edit_original_response(view=None, embed=peace_embed)
-
+        return await self.parent_interaction.edit_original_response(view=None)
 
 
 class PeaceNegotiationOptionsDropdown(discord.ui.Select):
