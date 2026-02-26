@@ -4444,7 +4444,8 @@ class WarOptionsView(discord.ui.View):
                                               inline=False)
                         await interaction.edit_original_response(embed=peace_embed, view=None)
                         # add to total
-                        return self.total_war_score += self.war_score
+                        self.total_war_score += self.war_score
+                        return
 
                     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger, row=3)
                     async def cancel_button(self, interaction: discord.Interaction, button: discord.ui.Button):
