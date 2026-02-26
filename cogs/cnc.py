@@ -5075,6 +5075,10 @@ class WarOptionsView(discord.ui.View):
                         if timed_out:
                             # send messages and auto reject
                             await interaction.edit_original_response(view=None)
+                            # delete the negotiation
+                            await conn.execute('''DELETE
+                                                  FROM cnc_peace_negotiations
+                                                  WHERE war_id = $1;''', war_info['id'])
                             await interaction.followup.send("Peace Negotiation has timed out and been auto-rejected.")
                             return await user_info['user_id'].send(f"Peace Negotiation **declined** for war `{war_info['id']}` "
                                                             f"by {r_info['name']}.", embed=peace_embed)
@@ -5109,8 +5113,26 @@ class WarOptionsView(discord.ui.View):
 
         # add the callback for send
         send_button.callback = send_callback
-        #define the callback for cancel
+        # define the callback for cancel
         cancel_button.callback = cancel_button_callback
+        # create the send button view
+        send_button_view = discord.ui.View(timeout=120)
+        # add the buttons
+        send_button_view.add_item(send_button)
+        send_button_view.add_item(cancel_button)
+        # add the view to the embed
+        await self.interaction.edit_original_response(view=send_button_view)
+        # check to see if it has timed out
+        timed_out = await send_button_view.wait()
+        # if the primary message times out
+        if timed_out:
+            # delete the pending negotiation
+            await conn.execute('''DELETE
+                                  FROM cnc_peace_negotiations
+                                  WHERE war_id = $1;''', war_info['id'])
+            # remove view and send update
+            return await self.interaction.edit_original_response(view=None)
+
 
 
 class PeaceNegotiationOptionsDropdown(discord.ui.Select):
