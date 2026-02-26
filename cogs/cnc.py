@@ -4127,7 +4127,10 @@ class WarOptionsView(discord.ui.View):
         # parse the options
         negotiation_demands = overlord_targets_returned.data['values']
         # define the demand score
-        total_war_score = 0
+        class WarScore:
+            def __init__(self):
+                self.value = 0
+        total_war_score = WarScore()
         # define white peace
         white_peace = False
         # send the updated embed
@@ -4326,11 +4329,12 @@ class WarOptionsView(discord.ui.View):
             elif demand == "Demand Reparations":
                 # create the auth demand view
                 class AuthDemandView(discord.ui.View):
-                    def __init__(self, parent_interaction: discord.Interaction, timeout=120):
+                    def __init__(self, parent_interaction: discord.Interaction, total_war_score_class: WarScore,
+                                 timeout=120):
                         super().__init__(timeout=timeout)
 
                         self.parent_interaction = parent_interaction
-
+                        self.total_war_score = total_war_score_class.value
                         self.mil_authority = None
                         self.econ_authority = None
                         self.diplo_authority = None
@@ -4429,8 +4433,18 @@ class WarOptionsView(discord.ui.View):
                             self.war_score,
                             war_info['id']
                         )
-                        # stop the listening
-                        return self.stop()
+                        # send notification
+                        await self.parent_interaction.followup.send(f"Demand Reparations has been "
+                                                             f"added at a cost of `{self.war_score}`.")
+                        # update embed
+                        peace_embed.add_field(name="Reparations Demanded",
+                                              value=f"{self.mil_authority} Military\n"
+                                                    f"{self.econ_authority} Economic\n"
+                                                    f"{self.diplo_authority} Diplomatic\n",
+                                              inline=False)
+                        await interaction.edit_original_response(embed=peace_embed, view=None)
+                        # add to total
+                        return self.total_war_score += self.war_score
 
                     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger, row=3)
                     async def cancel_button(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -4450,22 +4464,12 @@ class WarOptionsView(discord.ui.View):
                         # update the view
                         return await self.parent_interaction.edit_original_response(view=None, embed=peace_embed)
 
-
+                # create the auth dropdown view
                 auth_demand_view = AuthDemandView(self.interaction)
                 # send the view
                 await self.interaction.edit_original_response(view=auth_demand_view, embed=peace_embed)
-                # send notification
-                await self.interaction.followup.send(f"Demand Reparations has been "
-                                                     f"added at a cost of `{auth_demand_view.war_score}`.")
-                # update embed
-                peace_embed.add_field(name="Reparations Demanded",
-                                      value=f"{auth_demand_view.mil_authority} Military\n"
-                                            f"{auth_demand_view.econ_authority} Economic\n"
-                                            f"{auth_demand_view.diplo_authority} Diplomatic\n",
-                                      inline=False)
-                await interaction.edit_original_response(embed=peace_embed, view=None)
-                # add to total
-                total_war_score += auth_demand_view.war_score
+
+
 
             # if the demand is to end embargo
             elif demand == "End Embargo":
