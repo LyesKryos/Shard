@@ -4435,8 +4435,6 @@ class WarOptionsView(discord.ui.View):
                             )
 
                         async def callback(self, interaction: discord.Interaction):
-                            # defer response
-                            await interaction.response.defer(thinking=False)
                             self.view.mil_authority = self.values[0]
 
                     class EconSelect(discord.ui.Select):
@@ -4449,8 +4447,6 @@ class WarOptionsView(discord.ui.View):
                             )
 
                         async def callback(self, interaction: discord.Interaction):
-                            # defer response
-                            await interaction.response.defer(thinking=False)
                             self.view.econ_authority = self.values[0]
 
                     class DiploSelect(discord.ui.Select):
@@ -4463,8 +4459,6 @@ class WarOptionsView(discord.ui.View):
                             )
 
                         async def callback(self, interaction: discord.Interaction):
-                            # defer response
-                            await interaction.response.defer(thinking=False)
                             self.view.diplo_authority = self.values[0]
 
                     # create submit and cancel buttons
@@ -4496,13 +4490,14 @@ class WarOptionsView(discord.ui.View):
                                            self.war_score,
                                            war_info['id']
                                            )
+                        # send notification
+                        await interaction.followup.send(f"Demand Reparations has been "
+                                                             f"added at a cost of `{self.war_score}` War Score.")
                         # stop the listening
                         return self.stop()
 
                     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger, row=3)
                     async def cancel_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-                        # defer the interaction
-                        await interaction.response.defer()
                         # determine if cancelled
                         self.cancelled = True
                         # delete the pending interaction
@@ -4521,14 +4516,11 @@ class WarOptionsView(discord.ui.View):
                 # send the view
                 await self.interaction.edit_original_response(view=auth_demand_view, embed=peace_embed)
                 # wait
-                auth_timeout = await auth_demand_view.wait()
-                # if there is a timeout, return
-                if auth_timeout or auth_demand_view.cancelled:
+                await auth_demand_view.wait()
+                # if the user cancels
+                if auth_demand_view.cancelled:
                     return
                 else:
-                    # send notification
-                    await self.interaction.followup.send(f"Demand Reparations has been "
-                                                         f"added at a cost of `{auth_demand_view.war_score}`.")
                     # update embed
                     peace_embed.add_field(name="Reparations Demanded",
                                           value=f"{auth_demand_view.mil_authority} Military\n"
