@@ -4209,7 +4209,7 @@ class WarOptionsView(discord.ui.View):
                                                              f"for `{war_score}` War Score for the following provinces:\n"+
                                                              ", ".join(map(str, provinces_demanded)))
                         # add to the total war score
-                        total_war_score += war_score
+                        total_war_score.value += war_score
                         # add to the embed
                         peace_embed.add_field(name="Cede Provinces",value=", ".join(map(str, provinces_demanded)),
                                               inline=False)
@@ -4319,7 +4319,7 @@ class WarOptionsView(discord.ui.View):
                                                                  f"following provinces:\n"
                                                                  ", ".join(map(str, provinces_demanded)))
                             # add to the total war score
-                            total_war_score += war_score
+                            total_war_score.value += war_score
                             # add to the embed
                             peace_embed.add_field(name="Cede Provinces", value=", ".join(map(str, provinces_demanded)),
                                                   inline=False)
@@ -4466,7 +4466,7 @@ class WarOptionsView(discord.ui.View):
                         return await self.parent_interaction.edit_original_response(view=None, embed=peace_embed)
 
                 # create the auth dropdown view
-                auth_demand_view = AuthDemandView(self.interaction)
+                auth_demand_view = AuthDemandView(self.interaction, total_war_score)
                 # send the view
                 await self.interaction.edit_original_response(view=auth_demand_view, embed=peace_embed)
 
@@ -4549,7 +4549,7 @@ class WarOptionsView(discord.ui.View):
                     await self.interaction.followup.send(f"End Embargo against `{', '.join(end_embargo_targets)}`"
                                                          f" has been added at a cost of `{war_score}` war score.")
                     # add to total
-                    total_war_score += war_score
+                    total_war_score.value += war_score
                     continue
                     
             # if the demand is to end a military alliance
@@ -4578,7 +4578,7 @@ class WarOptionsView(discord.ui.View):
                     await self.interaction.followup.send(f"Demand for the end of any Military Alliance with "
                                                          f"{target_info['name']} added for `15` War Score.")
                     # add total war score
-                    total_war_score += war_score
+                    total_war_score.value += war_score
                     continue
 
             # if the demand is to end a trade pact
@@ -4653,7 +4653,7 @@ class WarOptionsView(discord.ui.View):
                     await self.interaction.followup.send(f"Demand for Subjugation of {target_info['name']} added for "
                                                          f"`{war_score}` War Score.")
                     # add total war score
-                    total_war_score += war_score
+                    total_war_score.value += war_score
                     continue
 
             # if the demand is release subject
@@ -4736,7 +4736,7 @@ class WarOptionsView(discord.ui.View):
                                                          f" {', '.join(end_overlord_targets)} added for "
                                                          f"`{war_score}` War Score.")
                     # add total war score
-                    total_war_score += war_score
+                    total_war_score.value += war_score
                     # proceed
                     continue
 
@@ -4765,7 +4765,7 @@ class WarOptionsView(discord.ui.View):
                                                          f"{user_info['govt_type']} Government Type added for "
                                                          f"`{war_score}` War Score.")
                     # add the total war score
-                    total_war_score += war_score
+                    total_war_score.value += war_score
                     # proceed
                     continue
                     
@@ -4780,7 +4780,7 @@ class WarOptionsView(discord.ui.View):
                 # update the embed
                 peace_embed.add_field(name="Humiliate", value="Demanded", inline=False)
                 # add the total war score
-                total_war_score += war_score
+                total_war_score.value += war_score
                 # send notification
                 await self.interaction.followup.send(f"Demand for the Humiliation of {target_info['name']} added for "
                                                      f"{war_score} War Score.")
@@ -4798,7 +4798,7 @@ class WarOptionsView(discord.ui.View):
                 # update the embed
                 peace_embed.add_field(name="Dismantle", value="Demanded", inline=False)
                 # add the total war score
-                total_war_score += war_score
+                total_war_score.value += war_score
                 # send notification
                 await self.interaction.followup.send(f"Demand for the Dismantling of {target_info['name']} added for "
                                                      f"{war_score} War Score.")
@@ -4808,7 +4808,7 @@ class WarOptionsView(discord.ui.View):
         # when the loop has finished, clear the view
         peace_negotiation_dropdown_view.clear_items()
         # if the war score is 0, meaning there are no demands, do not bother sending
-        if (total_war_score == 0) and (not white_peace):
+        if (total_war_score.value == 0) and (not white_peace):
             await self.interaction.edit_original_response(view=None, embed=peace_embed)
             # destroy any pending negotiation, remove the view, and send rejection
             await conn.execute('''DELETE
@@ -4818,15 +4818,15 @@ class WarOptionsView(discord.ui.View):
                                                         ephemeral=True)
         # calculate the war score cost double if this is not a total negotiation
         if not total_negotiation:
-            total_war_score *= 2
+            total_war_score.value *= 2
             await conn.execute('''UPDATE cnc_peace_negotiations SET war_score_cost = war_score_cost * 2 
                                   WHERE war_id = $1;''', war_info['id'])
         # calculate the truce length where every 10% war score equals a turn of truce
-        truce_length = max(total_war_score // 10, 2)
+        truce_length = max(total_war_score.value // 10, 2)
         # add a turn for each demand
         truce_length += len(negotiation_demands)
         # add the total peace negotiation amount at the bottom
-        peace_embed.add_field(name="Total War Score Cost", value=f"{total_war_score}", inline=False)
+        peace_embed.add_field(name="Total War Score Cost", value=f"{total_war_score.value}", inline=False)
         # send the updated embed
         await self.interaction.edit_original_response(embed=peace_embed, view=peace_negotiation_dropdown_view)
         # add the buttons
@@ -5087,7 +5087,7 @@ class WarOptionsView(discord.ui.View):
             # otherwise, no negotiations required
             else:
                 # check to ensure the demands are less than 100
-                if total_war_score > 100:
+                if total_war_score.value > 100:
                     # destroy any pending negotiation, remove the view, and send rejection
                     await conn.execute('''DELETE
                                           FROM cnc_peace_negotiations
