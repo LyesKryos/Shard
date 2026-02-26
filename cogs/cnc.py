@@ -5093,6 +5093,8 @@ class WarOptionsView(discord.ui.View):
                                                            "exceed 100 demand cost.")
                 # otherwise, carry on
                 else:
+                    # parse out demands
+                    await negotiation_parse(war_info)
                     # notify the recipients that they have lost the war
                     for recipients in recipients_names:
                         # make db call
@@ -5104,7 +5106,6 @@ class WarOptionsView(discord.ui.View):
                                                   f"The forces of {primary} and their allies have been overwhelmed "
                                                   f"entirely. The negotiation has been automatically accepted.",
                                                   embed=peace_embed)
-                    # parse out demands
 
         # add the callback for send
         send_button.callback = send_callback
