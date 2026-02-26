@@ -4821,6 +4821,10 @@ class WarOptionsView(discord.ui.View):
             total_war_score *= 2
             await conn.execute('''UPDATE cnc_peace_negotiations SET war_score_cost = war_score_cost * 2 
                                   WHERE war_id = $1;''', war_info['id'])
+        # calculate the truce length where every 10% war score equals a turn of truce
+        truce_length = max(total_war_score // 10, 2)
+        # add a turn for each demand
+        truce_length += len(negotiation_demands)
         # add the total peace negotiation amount at the bottom
         peace_embed.add_field(name="Total War Score Cost", value=f"{total_war_score}", inline=False)
         # send the updated embed
@@ -4843,6 +4847,171 @@ class WarOptionsView(discord.ui.View):
                 recipients_names = [target]
             # primary recipient
             primary = recipients_names[0]
+            # create the peace treaty
+            await conn.execute('''INSERT INTO cnc_peace_treaties
+                                  VALUES ($1, $2, $3, $4);''',
+                               war_info['id'], war_info['attackers'].append(war_info['defenders']),
+                               primary, truce_length)
+            # if none of the default options were demanded, set to 0
+            if not negotiation_demands['end_embargo']:
+                await conn.execute('''UPDATE cnc_peace_treaties SET end_embargo = 0 WHERE war_id = $1;''',
+                                   war_info['id'])
+            if not negotiation_demands['end_ma']:
+                await conn.execute('''UPDATE cnc_peace_treaties SET end_ma = 0 WHERE war_id = $1;''',
+                                   war_info['id'])
+            if not negotiation_demands['end_tp']:
+                await conn.execute('''UPDATE cnc_peace_treaties SET end_tp = 0 WHERE war_id = $1;''',
+                                   war_info['id'])
+            if not negotiation_demands['humiliate']:
+                await conn.execute('''UPDATE cnc_peace_treaties SET humiliate = 0 WHERE war_id = $1;''',
+                                   war_info['id'])
+            if not negotiation_demands['dismantle']:
+                await conn.execute('''UPDATE cnc_peace_treaties SET dismantle = 0 WHERE war_id = $1;''',
+                                   war_info['id'])
+            # define the peace negotiation parse function
+            async def negotiation_parse(war_info: asyncpg.Record):
+                # pull peace negotiation information
+                peace_negotiation = await conn.fetchrow('''SELECT *
+                                                           FROM cnc_peace_negotiations
+                                                           WHERE id = $1;''', war_info['id'])
+                # parse out and execute demands
+                # if there are cede province demands, update the owner and occupier
+                if peace_negotiation['cede_provinces']:
+                    # for every province, update the db with the new owner and occupier
+                    for demanded_province in peace_negotiation['cede_provinces']:
+                        # update the owner and occupier
+                        await conn.execute('''UPDATE cnc_provinces
+                                              SET owner_id    = $1,
+                                                  occupier_id = $1
+                                              WHERE id = $2;''',
+                                           user_info['user_id'], demanded_province)
+                # if there are give province demands, update the owner and occupier
+                elif peace_negotiation['give_provinces']:
+                    # parse out the recipients and their provinces, updating as necessary
+                    for recipient in peace_negotiation['give_provinces']:
+                        # pull their data
+                        gpr_info = await conn.fetchrow('''SELECT *
+                                                          FROM cnc_users
+                                                          WHERE name = $1;''',
+                                                       recipient)
+                        # update the owner and the occupier for each province
+                        for demanded_province in peace_negotiation['give_provinces'][recipient]:
+                            await conn.execute('''UPDATE cnc_provinces
+                                                  SET owner_id    = $1,
+                                                      occupier_id = $1
+                                                  WHERE id = $2;''',
+                                               gpr_info['user_id'], demanded_province)
+                # if there are end embargo demands, update the embargo
+                elif peace_negotiation['end_embargo']:
+                    # for every nation listed in the end embargo list, remove the embargo
+                    for end_embargo in peace_negotiation['end_embargo']:
+                        # update the database
+                        await conn.execute('''DELETE
+                                              FROM cnc_embargoes
+                                              WHERE target = $1;''',
+                                           end_embargo)
+                        # notify target
+                        ended_embargo_user_id = await conn.fetchval('''SELECT user_id
+                                                                       FROM cnc_users
+                                                                       WHERE name = $1;''',
+                                                                    end_embargo)
+                        await self.interaction.client.get_user(ended_embargo_user_id).send(f"The Embargo against"
+                                                                                      f" {end_embargo} "
+                                                                                      f"issued by "
+                                                                                      f"{target_info['name']}"
+                                                                                      f" has been ended by "
+                                                                                      f"a Peace Treaty.")
+                # if there are end military alliance demands, update the military alliance
+                elif peace_negotiation['end_ma']:
+                    # pull ma info
+                    ma_info = await conn.fetchrow('''SELECT *
+                                                     FROM cnc_alliances
+                                                     WHERE $1 = ANY (members);''',
+                                                  target_info['name'])
+                    # message other members
+                    for member in ma_info['members']:
+                        # pull the member id
+                        member_info = await conn.fetchval('''SELECT user_id
+                                                             FROM cnc_users
+                                                             WHERE name = $1;''', member)
+                        # send the message
+                        await self.interaction.client.get_user(member_info).send(f"{target_info['name']} is no "
+                                                                            f"longer an ally of {member} "
+                                                                            f"due to a Peace Treaty.")
+                    # remove the target from the alliance
+                    await conn.execute('''UPDATE cnc_alliances
+                                          SET members = array_remove(members, $1)
+                                          WHERE id = $2;''', target_info['name'], ma_info['id'])
+
+                # if there are end trade pact demands, update the trade pacts
+                elif peace_negotiation['end_tp']:
+                    # pull tp info
+                    tp_info = await conn.fetch('''SELECT *
+                                                  FROM cnc_trade_partners
+                                                  WHERE $1 = ANY (members);''',
+                                               target_info['name'])
+                    # for every trade pact
+                    for trade_pact in tp_info:
+                        # message other members
+                        for member in trade_pact['members']:
+                            # pull the member id
+                            member_info = await conn.fetchval('''SELECT user_id
+                                                                 FROM cnc_users
+                                                                 WHERE name = $1;''', member)
+                            # send the message
+                            await self.interaction.client.get_user(member_info).send(f"{target_info['name']} has "
+                                                                                f"ended its Trade Pact with "
+                                                                                f"{member} due to a "
+                                                                                f"Peace Treaty.")
+                        # delete the trade pact
+                        await conn.execute('''DELETE
+                                              FROM cnc_trade_pacts
+                                              WHERE id = $1;''',
+                                           trade_pact['id'])
+
+                # if there are subjugate demands, create the puppet
+                elif peace_negotiation['subjugate']:
+                    # update the new puppet's overlord info
+                    await conn.execute('''UPDATE cnc_users
+                                          SET overlord = $1
+                                          WHERE user_id = $2;''',
+                                       user_info['name'], target_info['user_id'])
+
+                # if there are dismantle demands, execute the dismantle stipulations
+                elif peace_negotiation['dismantle']:
+                    # reduce army size cap by a random amount between 10% and 25%
+                    await conn.execute('''UPDATE cnc_users
+                                          SET army_size = FLOOR(army_size *
+                                                                (1 - (random() * (.25 - .10) + .10)))
+                                          WHERE user_id = $1;''', target_info['user_id'])
+
+                # if there are end overlordship demands, remove the overlordship
+                elif peace_negotiation['end_overlordship']:
+                    # for each of the demanded puppets
+                    for puppet in peace_negotiation['end_overlord']:
+                        # remove the overlordship
+                        await conn.execute('''UPDATE cnc_users
+                                              SET overlord = NULL
+                                              WHERE name = $1;''',
+                                           puppet)
+
+                # if there are force govt demands, execute force government
+                elif peace_negotiation['force_govt']:
+                    # pull the victor's govt type
+                    govt_type = await conn.fetchval('''SELECT govt_type
+                                                       FROM cnc_users
+                                                       WHERE user_id = $1;''',
+                                                    user_info['user_id'])
+                    # grab a random subtype
+                    govt_subtype = await conn.fetchval('''SELECT RAND(govt_subtype)
+                                                          FROM cnc_govts
+                                                          WHERE govt_type = $1;''', govt_type)
+                    # set the target's type and subtype
+                    await conn.execute('''UPDATE cnc_users
+                                          SET govt_type    = $1,
+                                              govt_subtype = $2
+                                          WHERE user_id = $3;''',
+                                       govt_type, govt_subtype, target_info['user_id'])
             # if the current war score is less than a 100% or if the target is not the primary
             if (target_war_score < 100) or (target != primary):
                 # pull their user ids and send the dm
@@ -4858,36 +5027,22 @@ class WarOptionsView(discord.ui.View):
                         async def accept_callback(interaction: discord.Interaction):
                             # defer the interaction
                             await interaction.response.defer(thinking=True)
-                            # pull peace negotiation information
-                            peace_negotiation = await conn.fetchrow('''SELECT * FROM cnc_peace_negotiations 
-                                                                       WHERE id = $1;''', war_info['id'])
-                            # parse out and execute demands
-                            # if there are cede province demands, update the owner and occupier
-                            if peace_negotiation['cede_provinces']:
-                                # for every province, update the db with the new owner and occupier
-                                for demanded_province in peace_negotiation['cede_provinces']:
-                                    # update the owner and occupier
-                                    await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1 
-                                                          WHERE id = $2;''',
-                                                       user_info['user_id'], demanded_province)
-                            # if there are give province demands, update the owner and occupier
-                            elif peace_negotiation['give_provinces']:
-                                # parse out the recipients and their provinces, updating as necessary
-                                for recipient in peace_negotiation['give_provinces']:
-                                    # pull their data
-                                    gpr_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE name = $1;''',
-                                                                   recipient)
-                                    # update the owner and the occupier for each province
-                                    for demanded_province in peace_negotiation['give_provinces'][recipient]:
-                                        await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1 
-                                                              WHERE id = $2;''',
-                                                           gpr_info['user_id'], demanded_province)
-                            # if demanded reparations
-
-                                
-
-
-
+                            # parse negotiations
+                            await negotiation_parse(war_info)
+                            # send the acceptance dm to all participants
+                            for member in [war_info['attackers'], war_info['defenders']]:
+                                # pull their user id
+                                user_id = await conn.fetchval('''SELECT user_id FROM cnc_users WHERE name = $1;''',
+                                                              member)
+                                # send notification
+                                await self.interaction.client.get_user(user_id).send(f"The Peace Negotiations to end the "
+                                                                                     f"**{war_info['name']}** have been "
+                                                                                     f"accepted by {target_info['name']}."
+                                                                                     f"The terms are as follows:",
+                                                                                     embed=peace_embed)
+                                # delete the peace negotiation
+                                await conn.execute('''DELETE FROM cnc_peace_negotiations WHERE war_id = $1;''',
+                                                   war_info['id'])
 
 
                         async def decline_callback(interaction: discord.Interaction):
