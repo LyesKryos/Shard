@@ -4155,7 +4155,8 @@ class WarOptionsView(discord.ui.View):
                 # send the updated embed
                 await self.interaction.edit_original_response(embed=peace_embed)
                 # return and remove the view if the user does not interact
-                await self.interaction.followup.send("White Peace has been offered. No other demands can be made.")
+                await self.interaction.followup.send("White Peace has been offered. No other demands can be made.",
+                                                     ephemeral=True)
                 # break the cycle and do not process any other demands
                 white_peace = True
                 break
@@ -4453,24 +4454,18 @@ class WarOptionsView(discord.ui.View):
                 auth_demand_view = AuthDemandView(self.interaction)
                 # send the view
                 await self.interaction.edit_original_response(view=auth_demand_view, embed=peace_embed)
-                # wait
-                auth_timeout = await auth_demand_view.wait()
-                # if there is a timeout, return
-                if auth_timeout or auth_demand_view.cancelled:
-                    return
-                else:
-                    # send notification
-                    await self.interaction.followup.send(f"Demand Reparations has been "
-                                                         f"added at a cost of `{auth_demand_view.war_score}`.")
-                    # update embed
-                    peace_embed.add_field(name="Reparations Demanded",
-                                          value=f"{auth_demand_view.mil_authority} Military\n"
-                                                f"{auth_demand_view.econ_authority} Economic\n"
-                                                f"{auth_demand_view.diplo_authority} Diplomatic\n",
-                                          inline=False)
-                    await interaction.edit_original_response(embed=peace_embed, view=None)
-                    # add to total
-                    total_war_score += auth_demand_view.war_score
+                # send notification
+                await self.interaction.followup.send(f"Demand Reparations has been "
+                                                     f"added at a cost of `{auth_demand_view.war_score}`.")
+                # update embed
+                peace_embed.add_field(name="Reparations Demanded",
+                                      value=f"{auth_demand_view.mil_authority} Military\n"
+                                            f"{auth_demand_view.econ_authority} Economic\n"
+                                            f"{auth_demand_view.diplo_authority} Diplomatic\n",
+                                      inline=False)
+                await interaction.edit_original_response(embed=peace_embed, view=None)
+                # add to total
+                total_war_score += auth_demand_view.war_score
 
             # if the demand is to end embargo
             elif demand == "End Embargo":
@@ -5115,23 +5110,24 @@ class WarOptionsView(discord.ui.View):
         send_button.callback = send_callback
         # define the callback for cancel
         cancel_button.callback = cancel_button_callback
+
         # create the send button view
-        send_button_view = discord.ui.View(timeout=120)
+        class SendButtonView(discord.ui.View):
+            async def on_timeout(self):
+                await conn.execute(
+                    '''DELETE
+                       FROM cnc_peace_negotiations
+                       WHERE war_id = $1;''',
+                    war_info['id']
+                )
+
+        # create the view
+        send_button_view = SendButtonView()
         # add the buttons
         send_button_view.add_item(send_button)
         send_button_view.add_item(cancel_button)
         # add the view to the embed
-        await self.interaction.edit_original_response(view=send_button_view)
-        # check to see if it has timed out
-        timed_out = await send_button_view.wait()
-        # if the primary message times out
-        if timed_out:
-            # delete the pending negotiation
-            await conn.execute('''DELETE
-                                  FROM cnc_peace_negotiations
-                                  WHERE war_id = $1;''', war_info['id'])
-            # remove view and send update
-            return await self.interaction.edit_original_response(view=None)
+        return await self.interaction.edit_original_response(view=send_button_view)
 
 
 

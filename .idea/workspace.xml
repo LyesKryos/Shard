@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding parse negotiations to automatic defeat">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding the send or cancel buttons to the peace neogitation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -525,7 +525,7 @@
       <workItem from="1771771071996" duration="5418000" />
       <workItem from="1771955779027" duration="3132000" />
       <workItem from="1772043665348" duration="6052000" />
-      <workItem from="1772127898578" duration="312000" />
+      <workItem from="1772127898578" duration="916000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -870,7 +870,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1399" />
+    <option name="localTasksCounter" value="1400" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -889,7 +889,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting closure errors with container" />
     <MESSAGE value="removing all containers as they are not compatable and switching to a different setup that is more conducive to the current code" />
     <MESSAGE value="Putting the response defering first" />
     <MESSAGE value="Update `AuthDemandView` to include peace embed on cancellation and improve response handling" />
@@ -914,7 +913,8 @@
     <MESSAGE value="Adding Humiliate and Dismantle peace negotiation options' messages" />
     <MESSAGE value="Adding meat to the accept button callback for peace negotiations" />
     <MESSAGE value="Adding parse negotiations to automatic defeat" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding parse negotiations to automatic defeat" />
+    <MESSAGE value="Adding the send or cancel buttons to the peace neogitation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding the send or cancel buttons to the peace neogitation" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
