@@ -15,7 +15,8 @@ import math
 
 
 async def safe_dm(bot: discord.Client, user_id: int, *, content: str | None = None,
-                  embed: discord.Embed | None = None, view: discord.ui.View | None = None, fallback_channel_id: int = 927288304301387816) -> bool:
+                  embed: discord.Embed | None = None, view: discord.ui.View | None = None,
+                  fallback_channel_id: int = 927288304301387816) -> bool:
     """Attempt to DM a user. On failure, warn them in a public fallback channel.
     Returns True if DM sent, False otherwise.
     """
@@ -27,7 +28,8 @@ async def safe_dm(bot: discord.Client, user_id: int, *, content: str | None = No
         # cannot resolve user; warn in fallback
         channel = bot.get_channel(fallback_channel_id)
         if channel:
-            await channel.send(f"<@{user_id}>, I was unable to send you a DM (couldn't resolve your user). Please enable DMs and try again.")
+            await channel.send(
+                f"<@{user_id}>, I was unable to send you a DM (couldn't resolve your user). Please enable DMs and try again.")
         return False
     try:
         if embed is not None and content is not None:
@@ -40,7 +42,8 @@ async def safe_dm(bot: discord.Client, user_id: int, *, content: str | None = No
     except (discord.Forbidden, discord.HTTPException):
         channel = bot.get_channel(fallback_channel_id)
         if channel:
-            await channel.send(f"<@{user_id}>, I was unable to send an important Command & Conquest notification to you! Be sure you permit DMs from me.")
+            await channel.send(
+                f"<@{user_id}>, I was unable to send an important Command & Conquest notification to you! Be sure you permit DMs from me.")
         return False
 
 
@@ -50,6 +53,7 @@ def plus_minus(number: int) -> str:
         return str(f"+{number}")
     elif number < 0:
         return str(f"-{number}")
+
 
 def ordinal_suffix(number: int) -> str:
     """
@@ -97,8 +101,8 @@ async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> di
     else:
         structures = ",".join(p for p in prov_info['structures'])
     army_count = await conn.fetchval('''SELECT COUNT(*)
-                                       FROM cnc_armies
-                                       WHERE location = $1''', prov_info['id'])
+                                        FROM cnc_armies
+                                        WHERE location = $1''', prov_info['id'])
     # build embed for province and populate name and ID
     prov_embed = discord.Embed(title=f"Province of {prov_info['name']}",
                                description=f"Province #{prov_info['id']}",
@@ -1125,7 +1129,9 @@ class DossierView(View):
         # clear embed
         self.doss_embed.clear_fields()
         # pull province data
-        province_list = await self.conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id = $1;''',
+        province_list = await self.conn.fetch('''SELECT *
+                                                 FROM cnc_provinces
+                                                 WHERE owner_id = $1;''',
                                               self.user_info['user_id'])
         province_list = [p['id'] for p in province_list]
         province_count = len(province_list)
@@ -1204,7 +1210,7 @@ class DossierView(View):
         # populate tax and spending stats
         self.doss_embed.add_field(name="======================ECONOMY======================",
                                   value="Information about your nation's economy.", inline=False)
-        self.doss_embed.add_field(name="Taxation Level", value=f"{self.user_info['tax_level']*100}%")
+        self.doss_embed.add_field(name="Taxation Level", value=f"{self.user_info['tax_level'] * 100}%")
         self.doss_embed.add_field(name="Public Spending Cost",
                                   value=f"{self.user_info['public_spend']} Economic Authority per turn")
         self.doss_embed.add_field(name="Military Upkeep Cost",
@@ -1219,7 +1225,9 @@ class DossierView(View):
         # clear emebed
         self.doss_embed.clear_fields()
         # count the number of provinces the user has
-        province_count = await self.conn.fetchval('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1;''',
+        province_count = await self.conn.fetchval('''SELECT count(id)
+                                                     FROM cnc_provinces
+                                                     WHERE owner_id = $1;''',
                                                   self.user_info['user_id'])
         # populate unrest, stability, overextension
         self.doss_embed.add_field(name="=====================GOVERNMENT===================",
@@ -2316,8 +2324,10 @@ class DiplomaticMenuView(discord.ui.View):
         # pull the db info for the user
         sender_info = await user_db_info(interaction.user.id, self.conn)
         # check to see if the nations are at war
-        war_check = await self.conn.fetchrow('''SELECT * FROM cnc_wars WHERE $1 = ANY(array_cat(attackers, defenders)) 
-                                                                         AND $2 = ANY(array_cat(attackers, defenders));''',
+        war_check = await self.conn.fetchrow('''SELECT *
+                                                FROM cnc_wars
+                                                WHERE $1 = ANY (array_cat(attackers, defenders))
+                                                  AND $2 = ANY (array_cat(attackers, defenders));''',
                                              sender_info['name'], self.recipient_info['name'])
         # if the nations are at war, block the cooperative actions button
         if war_check is not None:
@@ -2335,6 +2345,7 @@ class DiplomaticMenuView(discord.ui.View):
         # add hostile reactions
         hostile_actions = HostileDiplomaticActions(interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=hostile_actions)
+
 
 class CooperativeDiplomaticActions(discord.ui.View):
 
@@ -2815,6 +2826,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         await interaction.edit_original_response(view=diplo_menu)
 
+
 class HostileDiplomaticActions(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, recipient_info: asyncpg.Record):
@@ -2948,8 +2960,10 @@ class HostileDiplomaticActions(discord.ui.View):
             await self.interaction.edit_original_response(view=self)
             return await interaction.followup.send("You do not have enough Military Authority to declare war.")
         # check to see if the two nations are already at war
-        war_check = await self.conn.fetchrow('''SELECT * FROM cnc_wars WHERE $1 = ANY(array_cat(attackers, defenders)) 
-                                                                         AND $2 = ANY(array_cat(attackers, defenders));''',
+        war_check = await self.conn.fetchrow('''SELECT *
+                                                FROM cnc_wars
+                                                WHERE $1 = ANY (array_cat(attackers, defenders))
+                                                  AND $2 = ANY (array_cat(attackers, defenders));''',
                                              sender_info['name'], self.recipient_info['name'])
         if war_check is not None:
             # disable the button and return a message
@@ -2968,9 +2982,13 @@ class HostileDiplomaticActions(discord.ui.View):
             available_cbs.append("Humiliate")
         if "Subjugation" in sender_info['tech']:
             # calculate the average national developments of sender and receiver
-            sender_dev = await self.conn.fetchval('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1;''',
-                                             sender_info['id'])
-            recipient_dev = await self.conn.fetchval('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1;''',
+            sender_dev = await self.conn.fetchval('''SELECT AVG(development)
+                                                     FROM cnc_provinces
+                                                     WHERE owner_id = $1;''',
+                                                  sender_info['id'])
+            recipient_dev = await self.conn.fetchval('''SELECT AVG(development)
+                                                        FROM cnc_provinces
+                                                        WHERE owner_id = $1;''',
                                                      self.recipient_info['user_id'])
             # if 50% of the senders dev is larger than the recipient's dev, permit subjugation
             if recipient_dev < sender_dev * .5:
@@ -2978,7 +2996,9 @@ class HostileDiplomaticActions(discord.ui.View):
         if "Total War" in sender_info['tech']:
             available_cbs.append("Total War")
         # check to see if the recipient has any puppets
-        overlord_check = await self.conn.fetch('''SELECT * FROM cnc_users WHERE overlord = $1;''', recipient_user.id)
+        overlord_check = await self.conn.fetch('''SELECT *
+                                                  FROM cnc_users
+                                                  WHERE overlord = $1;''', recipient_user.id)
         if overlord_check:
             available_cbs.append("Force Independence")
         # if the recipient is equalist and the sender is not equalist, add the suppress the revolution CB
@@ -3004,6 +3024,7 @@ class HostileDiplomaticActions(discord.ui.View):
         # return to menu
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         await interaction.edit_original_response(view=diplo_menu)
+
 
 class DiplomaticRelationsRespondView(discord.ui.View):
 
@@ -3088,6 +3109,7 @@ class DiplomaticRelationsRespondView(discord.ui.View):
             f"the request for diplomatic relations from {self.sender_info['name']}!"))
         # close out the buttons
         return await interaction.edit_original_response(view=None)
+
 
 class MilitaryAllianceRespondView(discord.ui.View):
 
@@ -3174,6 +3196,7 @@ class MilitaryAllianceRespondView(discord.ui.View):
         # close out the buttons
         return await interaction.edit_original_response(view=None)
 
+
 class TradePactRespondView(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, sender_info: asyncpg.Record,
@@ -3257,6 +3280,7 @@ class TradePactRespondView(discord.ui.View):
         # close out the buttons
         return await interaction.edit_original_response(view=None)
 
+
 # === WAR VIEWS ===
 
 class WarDeclarationView(discord.ui.View):
@@ -3293,7 +3317,9 @@ class WarDeclarationView(discord.ui.View):
             return await interaction.followup.send("You have not selected a Casus Belli!")
         # if an option has been selected, declare the war
         # pull information about the cb type
-        cb_info = await self.conn.fetchrow('''SELECT * FROM cnc_cbs WHERE name = $1;''', self.cb_option)
+        cb_info = await self.conn.fetchrow('''SELECT *
+                                              FROM cnc_cbs
+                                              WHERE name = $1;''', self.cb_option)
         # define variables
         cb_war_goals = cb_info['war_goal']
         cb_prohib_pts = cb_info['prohibited_pts']
@@ -3302,11 +3328,14 @@ class WarDeclarationView(discord.ui.View):
         attackers_names = [self.sender_info['name']]
         defenders_names = [self.recipient_info['name']]
         # pull all defender's allies and add to defenders
-        defender_alliances = await self.conn.fetchrow('''SELECT * FROM cnc_alliances WHERE $1 = ANY(members);''',
+        defender_alliances = await self.conn.fetchrow('''SELECT *
+                                                         FROM cnc_alliances
+                                                         WHERE $1 = ANY (members);''',
                                                       self.recipient_info['name'])
         defenders_names.append(defender_alliances['members'].remove(self.recipient_info['name']))
         # check if the user has already had a war with this nation with this CB and how many
-        historic_war_check = await self.conn.fetch('''SELECT * FROM cnc_wars 
+        historic_war_check = await self.conn.fetch('''SELECT *
+                                                      FROM cnc_wars
                                                       WHERE primary_attacker = $1
                                                         AND primary_defender = $2
                                                         AND cb = $3;''',
@@ -3319,13 +3348,18 @@ class WarDeclarationView(discord.ui.View):
             number_of_wars = len(historic_war_check)
             # pull the ordinal version
             ordinal_war_number = ordinal_suffix(number_of_wars)
-            dynamic_war_name = dynamic_war_name_raw.replace("#", ordinal_war_number).replace("ATTACKER", self.sender_info['name']).replace("DEFENDER", self.recipient_info['name'])
+            dynamic_war_name = dynamic_war_name_raw.replace("#", ordinal_war_number).replace("ATTACKER",
+                                                                                             self.sender_info[
+                                                                                                 'name']).replace(
+                "DEFENDER", self.recipient_info['name'])
         # otherwise, it's the first war
         else:
-            dynamic_war_name = dynamic_war_name_raw.replace("# ", "").replace("ATTACKER", self.sender_info['name']).replace("DEFENDER", self.recipient_info['name'])
+            dynamic_war_name = dynamic_war_name_raw.replace("# ", "").replace("ATTACKER",
+                                                                              self.sender_info['name']).replace(
+                "DEFENDER", self.recipient_info['name'])
         # add the war to the db
-        await self.conn.execute('''INSERT INTO cnc_wars(id, attackers, defenders, 
-                                                        cb, primary_attacker, primary_defender, name) 
+        await self.conn.execute('''INSERT INTO cnc_wars(id, attackers, defenders,
+                                                        cb, primary_attacker, primary_defender, name)
                                    VALUES ($1, $2, $3, $4, $5, $6, $7);''',
                                 self.interaction.message.id, attackers_names,
                                 defenders_names, self.cb_option, self.sender_info['name'], self.recipient_info['name'],
@@ -3358,6 +3392,7 @@ class WarDeclarationView(discord.ui.View):
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         await interaction.edit_original_response(view=diplo_menu)
 
+
 class CasusBelliDropdown(discord.ui.Select):
 
     def __init__(self, interaction: discord.Interaction, cbs):
@@ -3380,6 +3415,7 @@ class CasusBelliDropdown(discord.ui.Select):
         self.disabled = True
         await self.interaction.edit_original_response(view=self.view)
         return await interaction.response.send_message(f"{self.view.cb_option} Casus Belli selected.", ephemeral=True)
+
 
 class DefensioBelliView(discord.ui.View):
 
@@ -3413,6 +3449,7 @@ class DefensioBelliView(discord.ui.View):
                                                     f"You may select a Defensio Belli by using the "
                                                     f"`/cnc war id:{self.war_id}` command.")
 
+
 class DefensioBelliDropdown(discord.ui.Select):
 
     def __init__(self, interaction: discord.Interaction, dbs: list, war_id: int):
@@ -3437,9 +3474,12 @@ class DefensioBelliDropdown(discord.ui.Select):
         self.disabled = True
         await self.interaction.edit_original_response(view=self.view)
         # add the defensio belli
-        await self.conn.execute('''UPDATE cnc_wars SET db = $1 WHERE id = $2;''',
+        await self.conn.execute('''UPDATE cnc_wars
+                                   SET db = $1
+                                   WHERE id = $2;''',
                                 db_option, self.war_id)
         return await interaction.response.send_message(f"{db_option} Defensio Belli selected.")
+
 
 class WarsPaginator(discord.ui.View):
 
@@ -3481,8 +3521,10 @@ class WarsPaginator(discord.ui.View):
             defenders_list = list(war['defenders']) if war['defenders'] is not None else []
             attackers_others = [a for a in attackers_list if a != war['primary_attacker']]
             defenders_others = [d for d in defenders_list if d != war['primary_defender']]
-            attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war['primary_attacker'] else ", ".join(attackers_list)
-            defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war['primary_defender'] else ", ".join(defenders_list)
+            attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war[
+                'primary_attacker'] else ", ".join(attackers_list)
+            defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war[
+                'primary_defender'] else ", ".join(defenders_list)
             self.wars_embed.add_field(name=f"The {war['name']}",
                                       value=f"ID: {war['id']}\n"
                                             f"Attackers: {attackers}\n"
@@ -3530,8 +3572,10 @@ class WarsPaginator(discord.ui.View):
             defenders_list = list(war['defenders']) if war['defenders'] is not None else []
             attackers_others = [a for a in attackers_list if a != war['primary_attacker']]
             defenders_others = [d for d in defenders_list if d != war['primary_defender']]
-            attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war['primary_attacker'] else ", ".join(attackers_list)
-            defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war['primary_defender'] else ", ".join(defenders_list)
+            attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war[
+                'primary_attacker'] else ", ".join(attackers_list)
+            defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war[
+                'primary_defender'] else ", ".join(defenders_list)
             self.wars_embed.add_field(name=f"The {war['name']}",
                                       value=f"ID: {war['id']}\n"
                                             f"Attackers: {attackers}\n"
@@ -3542,6 +3586,7 @@ class WarsPaginator(discord.ui.View):
                                             f"Deaths: {war['deaths']}")
         # update the embed and the view
         return await self.interaction.edit_original_response(embed=self.wars_embed, view=self)
+
 
 class AllianceWarInvitiation(discord.ui.View):
 
@@ -3571,7 +3616,9 @@ class AllianceWarInvitiation(discord.ui.View):
         # add the user to the correct side
         if self.attacker:
             # if the user is an attacker, add them to the attacker list
-            await conn.execute('''UPDATE cnc_wars SET attackers = array_append(attackers, $1) WHERE id = $2;''',
+            await conn.execute('''UPDATE cnc_wars
+                                  SET attackers = array_append(attackers, $1)
+                                  WHERE id = $2;''',
                                user_info['name'], self.war_info['id'])
             # dm the attackers notifying them that a new nation has joined on the side of the attackers
             for belligerent in self.war_info['attackers']:
@@ -3639,6 +3686,7 @@ class AllianceWarInvitiation(discord.ui.View):
             child.disabled = True
         return await interaction.edit_original_message(view=self)
 
+
 class MilitaryAllianceButton(discord.ui.Button):
 
     def __init__(self, conn: asyncpg.Pool, war_info: asyncpg.Record, user_info: asyncpg.Record):
@@ -3656,7 +3704,9 @@ class MilitaryAllianceButton(discord.ui.Button):
         war_info = self.war_info
         # check to see if any members of the user's military alliance are not yet in the war
         # pull the alliance information
-        alliance_info = await conn.fetchval('''SELECT members FROM cnc_alliances WHERE $1 = ANY(members);''',
+        alliance_info = await conn.fetchval('''SELECT members
+                                               FROM cnc_alliances
+                                               WHERE $1 = ANY (members);''',
                                             self.user_info['name'])
         # if the user is the defender, pull the defenders
         if self.user_info['name'] == self.war_info['primary_defender']:
@@ -3670,22 +3720,24 @@ class MilitaryAllianceButton(discord.ui.Button):
                 alliance_name = alliance_info['name'] or "your alliance"
                 # create a small embed about the war
                 war_embed = discord.Embed(title=f"The {war_info['name']}", color=discord.Color.red(),
-                                               description="An invitation to the following war has been received.")
+                                          description="An invitation to the following war has been received.")
                 # get the list of attackers and defenders, placing the primary first and bolding
                 attackers_list = list(war_info['attackers']) if war_info['attackers'] is not None else []
                 defenders_list = list(war_info['defenders']) if war_info['defenders'] is not None else []
                 attackers_others = [a for a in attackers_list if a != war_info['primary_attacker']]
                 defenders_others = [d for d in defenders_list if d != war_info['primary_defender']]
-                attackers = ", ".join([f"**{war_info['primary_attacker']}**"] + attackers_others) if war_info['primary_attacker'] else ", ".join(attackers_list)
-                defenders = ", ".join([f"**{war_info['primary_defender']}**"] + defenders_others) if war_info['primary_defender'] else ", ".join(defenders_list)
+                attackers = ", ".join([f"**{war_info['primary_attacker']}**"] + attackers_others) if war_info[
+                    'primary_attacker'] else ", ".join(attackers_list)
+                defenders = ", ".join([f"**{war_info['primary_defender']}**"] + defenders_others) if war_info[
+                    'primary_defender'] else ", ".join(defenders_list)
                 war_embed.add_field(name=f"The {war_info['name']}",
-                                         value=f"ID: {war_info['id']}\n"
-                                               f"Attackers: {attackers}\n"
-                                               f"Defenders: {defenders}\n"
-                                               f"Casus Belli: {war_info['cb']}\n"
-                                               f"Defensio Belli: {war_info['db'] or 'None'}\n"
-                                               f"Turns: {war_info['turns']}\n"
-                                               f"Deaths: {war_info['deaths']}")
+                                    value=f"ID: {war_info['id']}\n"
+                                          f"Attackers: {attackers}\n"
+                                          f"Defenders: {defenders}\n"
+                                          f"Casus Belli: {war_info['cb']}\n"
+                                          f"Defensio Belli: {war_info['db'] or 'None'}\n"
+                                          f"Turns: {war_info['turns']}\n"
+                                          f"Deaths: {war_info['deaths']}")
                 # create the accept/decline view
                 war_invitation_view = AllianceWarInvitiation(conn=conn, war_info=war_info, attacker=False,
                                                              alliance_name=alliance_name, sender_info=self.user_info)
@@ -3738,6 +3790,7 @@ class MilitaryAllianceButton(discord.ui.Button):
         for child in self.view.children:
             child.disabled = True
         return await interaction.edit_original_response(view=self.view)
+
 
 class DefensioBelliButton(discord.ui.Button):
 
@@ -3798,6 +3851,7 @@ class DefensioBelliButton(discord.ui.Button):
         # add the dropdown view and disable our button
         await interaction.edit_original_response(view=db_dropdown_view)
 
+
 class WarOptionsView(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, war_info: asyncpg.Record,
@@ -3835,7 +3889,9 @@ class WarOptionsView(discord.ui.View):
         war_info = self.war_info
         user_info = self.user_info
         # check if a peace negotiation is pending
-        pending_peace_negotiation = await conn.fetchrow('''SELECT * FROM cnc_peace_negotiations WHERE war_id = $1;''',
+        pending_peace_negotiation = await conn.fetchrow('''SELECT *
+                                                           FROM cnc_peace_negotiations
+                                                           WHERE war_id = $1;''',
                                                         war_info['id'])
         # if there is a pending negotiation, return
         if pending_peace_negotiation is not None:
@@ -3845,7 +3901,7 @@ class WarOptionsView(discord.ui.View):
             return await interaction.followup.send("A peace negotiation is already pending for this war.")
         # create the negotiation embed
         peace_embed = discord.Embed(title=f"Peace Negotiations for the {war_info['name']}", color=discord.Color.red(),
-                                        description="Peace negotiations have begun between the belligerents of this war.")
+                                    description="Peace negotiations have begun between the belligerents of this war.")
         # add the details of the proposal
         peace_embed.add_field(name="Proposed by",
                               value=f"The {user_info['pretitle']} of {user_info['name']}",
@@ -3912,6 +3968,7 @@ class WarOptionsView(discord.ui.View):
                 str | None: The value entered by the user in the modal's input field,
                 or None if the modal times out or no value is provided.
             """
+
             class ProvinceInputModal(discord.ui.Modal):
                 def __init__(self):
                     super().__init__(title=title, timeout=60)
@@ -3950,7 +4007,7 @@ class WarOptionsView(discord.ui.View):
 
         # define total negotiations
         total_negotiation = False
-                    
+
         # if the user is using a cb (attacker), then search for the cb prohibited options for that cb
         if user_info['name'] in war_info['attackers']:
             # define the target of the negotiation, defaulting to the primary attacker
@@ -3990,7 +4047,7 @@ class WarOptionsView(discord.ui.View):
                 # wait for the options to be selected
                 try:
                     target_returned = await interaction.client.wait_for("interaction", check=target_check,
-                                                                               timeout=120)
+                                                                        timeout=120)
                 except asyncio.TimeoutError:
                     # return and remove the view if the user does not interact
                     return await self.interaction.edit_original_response(view=None)
@@ -4007,7 +4064,9 @@ class WarOptionsView(discord.ui.View):
             # get target data
             target_info = await user_db_info(target, conn)
             # pull cb info
-            cb_info = await conn.fetchrow('''SELECT * FROM cnc_cbs WHERE name = $1;''', war_info['cb'])
+            cb_info = await conn.fetchrow('''SELECT *
+                                             FROM cnc_cbs
+                                             WHERE name = $1;''', war_info['cb'])
             # remove prohibited targets
             for prohibited_pt in cb_info['prohibited_pts']:
                 peace_treaty_options.remove(prohibited_pt)
@@ -4051,7 +4110,7 @@ class WarOptionsView(discord.ui.View):
                 # wait for the options to be selected
                 try:
                     target_returned = await interaction.client.wait_for("interaction", check=target_check,
-                                                                               timeout=120)
+                                                                        timeout=120)
                 except asyncio.TimeoutError:
                     # return and remove the view if the user does not interact
                     return await self.interaction.edit_original_response(view=None)
@@ -4076,7 +4135,9 @@ class WarOptionsView(discord.ui.View):
             # if the db is anything else, proceed
             else:
                 # pull db info
-                db_info = await conn.fetchrow('''SELECT * FROM cnc_cbs WHERE name = $1;''', war_info['db'])
+                db_info = await conn.fetchrow('''SELECT *
+                                                 FROM cnc_cbs
+                                                 WHERE name = $1;''', war_info['db'])
                 # remove prohibited targets
                 for prohibited_pt in db_info['prohibited_pts']:
                     peace_treaty_options.remove(prohibited_pt)
@@ -4127,17 +4188,14 @@ class WarOptionsView(discord.ui.View):
         # parse the options
         negotiation_demands = overlord_targets_returned.data['values']
         # define the demand score
-        class WarScore:
-            def __init__(self):
-                self.value = 0
-        total_war_score = WarScore()
+        total_war_score = 0
         # define white peace
         white_peace = False
         # send the updated embed
         await self.interaction.edit_original_response(embed=peace_embed)
         # create the pending peace negotiation
-        await conn.execute('''INSERT INTO cnc_peace_negotiations(war_id, total_negotiation, sender, target) 
-                              VALUES($1, $2, $3, $4);''',
+        await conn.execute('''INSERT INTO cnc_peace_negotiations(war_id, total_negotiation, sender, target)
+                              VALUES ($1, $2, $3, $4);''',
                            war_info['id'], total_negotiation, user_info['name'], target)
         # parse out the demands and handle each
         for demand in negotiation_demands:
@@ -4151,15 +4209,16 @@ class WarOptionsView(discord.ui.View):
             # if the demand is white peace, immediately break
             if demand == "White Peace":
                 # update the pending peace negotiation
-                await conn.execute('''UPDATE cnc_peace_negotiations SET white_peace = True WHERE war_id = $1;''',
+                await conn.execute('''UPDATE cnc_peace_negotiations
+                                      SET white_peace = True
+                                      WHERE war_id = $1;''',
                                    war_info['id'])
                 # update the embed
                 peace_embed.add_field(name="White Peace", value="Offered", inline=False)
                 # send the updated embed
                 await self.interaction.edit_original_response(embed=peace_embed)
                 # return and remove the view if the user does not interact
-                await self.interaction.followup.send("White Peace has been offered. No other demands can be made.",
-                                                     ephemeral=True)
+                await self.interaction.followup.send("White Peace has been offered. No other demands can be made.")
                 # break the cycle and do not process any other demands
                 white_peace = True
                 break
@@ -4167,8 +4226,9 @@ class WarOptionsView(discord.ui.View):
             # if the demand is to cede a province, determine which provinces the demander claims
             elif demand == "Cede Province":
                 # query demand for provinces using the peace options dropdown interaction response
-                provinces_demanded = await demanding_provinces_wait_for_modal(overlord_targets_returned, "Demand Provinces",
-                                            "List province IDs separated by comma:")
+                provinces_demanded = await demanding_provinces_wait_for_modal(overlord_targets_returned,
+                                                                              "Demand Provinces",
+                                                                              "List province IDs separated by comma:")
                 # separate the list
                 provinces_demanded = [int(p.strip()) for p in provinces_demanded.split(',')]
                 # if the list has no items (somehow?), return
@@ -4184,10 +4244,11 @@ class WarOptionsView(discord.ui.View):
                         # get the provinces that are not
                         provinces_not_of_target: set[int] = set(set(provinces_demanded) - set(target_provinces))
                         # send a message of denial
-                        await self.interaction.followup.send("You must specify provinces that are owned by the target.\n"
-                                                             f"Target does not own: "
-                                                             f"{(', '.join(map(str, sorted(provinces_not_of_target))))}.",
-                                                             ephemeral=True)
+                        await self.interaction.followup.send(
+                            "You must specify provinces that are owned by the target.\n"
+                            f"Target does not own: "
+                            f"{(', '.join(map(str, sorted(provinces_not_of_target))))}.",
+                            ephemeral=True)
                         # skip this option
                         continue
                     else:
@@ -4195,23 +4256,26 @@ class WarOptionsView(discord.ui.View):
                         war_score = 0
                         for province in provinces_demanded:
                             # pull the province info
-                            p_dev = await conn.fetchval('''SELECT development FROM cnc_provinces WHERE id = $1;''', province)
+                            p_dev = await conn.fetchval('''SELECT development
+                                                           FROM cnc_provinces
+                                                           WHERE id = $1;''', province)
                             # calculate demand score as dev * .5
                             war_score = p_dev * .5
                         # ensure the war score is a round number
                         war_score = int(war_score)
                         # otherwise, add the list of provinces to the tracker
-                        await conn.execute('''UPDATE cnc_peace_negotiations SET cede_provinces = cede_provinces || $1, 
-                                                                                war_score_cost = war_score_cost + $2
+                        await conn.execute('''UPDATE cnc_peace_negotiations
+                                              SET cede_provinces = cede_provinces || $1,
+                                                  war_score_cost = war_score_cost + $2
                                               WHERE war_id = $3;''',
                                            provinces_demanded, war_score, war_info['id'])
                         await self.interaction.followup.send(f"Cede Provinces demand added to the Peace Negotiations "
-                                                             f"for `{war_score}` War Score for the following provinces:\n"+
+                                                             f"for `{war_score}` War Score for the following provinces:\n" +
                                                              ", ".join(map(str, provinces_demanded)))
                         # add to the total war score
-                        total_war_score.value += war_score
+                        total_war_score += war_score
                         # add to the embed
-                        peace_embed.add_field(name="Cede Provinces",value=", ".join(map(str, provinces_demanded)),
+                        peace_embed.add_field(name="Cede Provinces", value=", ".join(map(str, provinces_demanded)),
                                               inline=False)
                         continue
 
@@ -4275,8 +4339,8 @@ class WarOptionsView(discord.ui.View):
                     ally_target = target_returned.data['values'][0]
                     # with the target defined, create the text modal to get the provinces demanded
                     provinces_demanded = await demanding_provinces_wait_for_modal(target_returned,
-                                                                         title=f"Give Provinces to {ally_target}",
-                                                                         label="List province IDs separated by comma:")
+                                                                                  title=f"Give Provinces to {ally_target}",
+                                                                                  label="List province IDs separated by comma:")
                     # separate the list
                     provinces_demanded = [int(p.strip()) for p in provinces_demanded.split(',')]
                     # if the list has no items, return
@@ -4303,13 +4367,16 @@ class WarOptionsView(discord.ui.View):
                             # calculate war score
                             war_score = 0
                             for province in provinces_demanded:
-                                p_dev = await conn.fetchval('''SELECT development FROM cnc_provinces WHERE id = $1;''', province)
+                                p_dev = await conn.fetchval('''SELECT development
+                                                               FROM cnc_provinces
+                                                               WHERE id = $1;''', province)
                                 war_score += p_dev * 1
                             # ensure the war score is a round number
                             war_score = int(war_score)
                             # update negotiation
-                            await conn.execute('''UPDATE cnc_peace_negotiations SET give_provinces = hstore($1, $2), 
-                                                                                    war_score_cost = war_score_cost + $3 
+                            await conn.execute('''UPDATE cnc_peace_negotiations
+                                                  SET give_provinces = hstore($1, $2),
+                                                      war_score_cost = war_score_cost + $3
                                                   WHERE war_id = $4;''',
                                                ally_target, ",".join(map(str, provinces_demanded)),
                                                war_score, war_info['id'])
@@ -4319,7 +4386,7 @@ class WarOptionsView(discord.ui.View):
                                                                  f"following provinces:\n"
                                                                  ", ".join(map(str, provinces_demanded)))
                             # add to the total war score
-                            total_war_score.value += war_score
+                            total_war_score += war_score
                             # add to the embed
                             peace_embed.add_field(name="Cede Provinces", value=", ".join(map(str, provinces_demanded)),
                                                   inline=False)
@@ -4329,12 +4396,11 @@ class WarOptionsView(discord.ui.View):
             elif demand == "Demand Reparations":
                 # create the auth demand view
                 class AuthDemandView(discord.ui.View):
-                    def __init__(self, parent_interaction: discord.Interaction, total_war_score_class: WarScore,
-                                 timeout=120):
+                    def __init__(self, parent_interaction: discord.Interaction, timeout=120):
                         super().__init__(timeout=timeout)
 
                         self.parent_interaction = parent_interaction
-                        self.total_war_score = total_war_score_class.value
+
                         self.mil_authority = None
                         self.econ_authority = None
                         self.diplo_authority = None
@@ -4373,7 +4439,6 @@ class WarOptionsView(discord.ui.View):
                             await interaction.response.defer(thinking=False)
                             self.view.mil_authority = self.values[0]
 
-
                     class EconSelect(discord.ui.Select):
                         def __init__(self):
                             options = [discord.SelectOption(label=str(i), value=str(i)) for i in range(7)]
@@ -4383,12 +4448,10 @@ class WarOptionsView(discord.ui.View):
                                 row=1
                             )
 
-
                         async def callback(self, interaction: discord.Interaction):
                             # defer response
                             await interaction.response.defer(thinking=False)
                             self.view.econ_authority = self.values[0]
-
 
                     class DiploSelect(discord.ui.Select):
                         def __init__(self):
@@ -4403,7 +4466,6 @@ class WarOptionsView(discord.ui.View):
                             # defer response
                             await interaction.response.defer(thinking=False)
                             self.view.diplo_authority = self.values[0]
-
 
                     # create submit and cancel buttons
 
@@ -4426,26 +4488,16 @@ class WarOptionsView(discord.ui.View):
                         # calculate the war score
                         self.war_score = sum(self.auths_demanded) * 5
                         # execute the update
-                        await conn.execute('''UPDATE cnc_peace_negotiations SET demand_reparations = $1, 
-                                                                                war_score_cost = war_score_cost + $2
-                            WHERE war_id = $3;''',
-                            self.auths_demanded,
-                            self.war_score,
-                            war_info['id']
-                        )
-                        # send notification
-                        await self.parent_interaction.followup.send(f"Demand Reparations has been "
-                                                             f"added at a cost of `{self.war_score}`.")
-                        # update embed
-                        peace_embed.add_field(name="Reparations Demanded",
-                                              value=f"{self.mil_authority} Military\n"
-                                                    f"{self.econ_authority} Economic\n"
-                                                    f"{self.diplo_authority} Diplomatic\n",
-                                              inline=False)
-                        await interaction.edit_original_response(embed=peace_embed, view=None)
-                        # add to total
-                        self.total_war_score += self.war_score
-                        return
+                        await conn.execute('''UPDATE cnc_peace_negotiations
+                                              SET demand_reparations = $1,
+                                                  war_score_cost     = war_score_cost + $2
+                                              WHERE war_id = $3;''',
+                                           self.auths_demanded,
+                                           self.war_score,
+                                           war_info['id']
+                                           )
+                        # stop the listening
+                        return self.stop()
 
                     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger, row=3)
                     async def cancel_button(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -4465,17 +4517,34 @@ class WarOptionsView(discord.ui.View):
                         # update the view
                         return await self.parent_interaction.edit_original_response(view=None, embed=peace_embed)
 
-                # create the auth dropdown view
-                auth_demand_view = AuthDemandView(self.interaction, total_war_score)
+                auth_demand_view = AuthDemandView(self.interaction)
                 # send the view
                 await self.interaction.edit_original_response(view=auth_demand_view, embed=peace_embed)
-
-
+                # wait
+                auth_timeout = await auth_demand_view.wait()
+                # if there is a timeout, return
+                if auth_timeout or auth_demand_view.cancelled:
+                    return
+                else:
+                    # send notification
+                    await self.interaction.followup.send(f"Demand Reparations has been "
+                                                         f"added at a cost of `{auth_demand_view.war_score}`.")
+                    # update embed
+                    peace_embed.add_field(name="Reparations Demanded",
+                                          value=f"{auth_demand_view.mil_authority} Military\n"
+                                                f"{auth_demand_view.econ_authority} Economic\n"
+                                                f"{auth_demand_view.diplo_authority} Diplomatic\n",
+                                          inline=False)
+                    await interaction.edit_original_response(embed=peace_embed, view=None)
+                    # add to total
+                    total_war_score += auth_demand_view.war_score
 
             # if the demand is to end embargo
             elif demand == "End Embargo":
                 # pull all potential targets
-                all_targets = await conn.fetch('''SELECT * FROM cnc_embargoes WHERE sender = $1;''',
+                all_targets = await conn.fetch('''SELECT *
+                                                  FROM cnc_embargoes
+                                                  WHERE sender = $1;''',
                                                target_info['name'])
                 # if it's empty, don't bother
                 if not all_targets:
@@ -4525,8 +4594,9 @@ class WarOptionsView(discord.ui.View):
 
                     # wait for the options to be selected
                     try:
-                        overlord_targets_returned = await interaction.client.wait_for("interaction", check=embargo_check,
-                                                                                     timeout=120)
+                        overlord_targets_returned = await interaction.client.wait_for("interaction",
+                                                                                      check=embargo_check,
+                                                                                      timeout=120)
                     except asyncio.TimeoutError:
                         # destroy any pending negotiation
                         await conn.execute('''DELETE
@@ -4539,8 +4609,9 @@ class WarOptionsView(discord.ui.View):
                     # calculate war score
                     war_score = len(end_embargo_targets) * 10
                     # add the embargo releases to the negotiation
-                    await conn.execute('''UPDATE cnc_peace_negotiations 
-                                          SET end_embargo = $1, war_score_cost = war_score_cost + $2 
+                    await conn.execute('''UPDATE cnc_peace_negotiations
+                                          SET end_embargo    = $1,
+                                              war_score_cost = war_score_cost + $2
                                           WHERE war_id = $3;''',
                                        end_embargo_targets, war_score, war_info['id'])
                     # update embed
@@ -4549,13 +4620,15 @@ class WarOptionsView(discord.ui.View):
                     await self.interaction.followup.send(f"End Embargo against `{', '.join(end_embargo_targets)}`"
                                                          f" has been added at a cost of `{war_score}` war score.")
                     # add to total
-                    total_war_score.value += war_score
+                    total_war_score += war_score
                     continue
-                    
+
             # if the demand is to end a military alliance
             elif demand == "End Military Alliance":
                 # check to see if target is in a military alliance
-                target_alliance = await conn.fetchrow('''SELECT * FROM cnc_alliances WHERE $1 = ANY(members);''',
+                target_alliance = await conn.fetchrow('''SELECT *
+                                                         FROM cnc_alliances
+                                                         WHERE $1 = ANY (members);''',
                                                       target_info['name'])
                 # if they aren't in one, skip
                 if not target_alliance:
@@ -4568,8 +4641,9 @@ class WarOptionsView(discord.ui.View):
                     # calculate war score
                     war_score = 15
                     # update the peace negotiation
-                    await conn.execute('''UPDATE cnc_peace_negotiations SET end_ma = $1, 
-                                                                            war_score_cost = war_score_cost + $2 
+                    await conn.execute('''UPDATE cnc_peace_negotiations
+                                          SET end_ma         = $1,
+                                              war_score_cost = war_score_cost + $2
                                           WHERE war_id = $3;''',
                                        target_alliance['id'], war_score, war_info['id'])
                     # update the embed
@@ -4578,14 +4652,16 @@ class WarOptionsView(discord.ui.View):
                     await self.interaction.followup.send(f"Demand for the end of any Military Alliance with "
                                                          f"{target_info['name']} added for `15` War Score.")
                     # add total war score
-                    total_war_score.value += war_score
+                    total_war_score += war_score
                     continue
 
             # if the demand is to end a trade pact
             elif demand == "End Trade Pacts":
                 # check to see if target is in a trade pact
-                target_pact = await conn.fetchrow('''SELECT * FROM cnc_trade_pacts WHERE $1 = ANY(members);''',
-                                                   target_info['name'])
+                target_pact = await conn.fetchrow('''SELECT *
+                                                     FROM cnc_trade_pacts
+                                                     WHERE $1 = ANY (members);''',
+                                                  target_info['name'])
                 # if they aren't in one, skip
                 if not target_pact:
                     # send a message
@@ -4597,8 +4673,9 @@ class WarOptionsView(discord.ui.View):
                     # calculate war score
                     war_score = 20
                     # update the peace negotiation
-                    await conn.execute('''UPDATE cnc_peace_negotiations SET end_tp = True, 
-                                                                            war_score_cost = war_score_cost + $1
+                    await conn.execute('''UPDATE cnc_peace_negotiations
+                                          SET end_tp         = True,
+                                              war_score_cost = war_score_cost + $1
                                           WHERE war_id = $2;''', war_score, war_info['id'])
                     # update the embed
                     peace_embed.add_field(name="End Trade Pacts", value="Demanded", inline=False)
@@ -4618,7 +4695,9 @@ class WarOptionsView(discord.ui.View):
                                                          ephemeral=True)
                     continue
                 # check to see if the user has a puppet slot
-                puppets_check = await conn.fetch('''SELECT * FROM cnc_users WHERE overlord = $1;''',
+                puppets_check = await conn.fetch('''SELECT *
+                                                    FROM cnc_users
+                                                    WHERE overlord = $1;''',
                                                  user_info['user_id'])
                 # if the user has 2 puppets (3 if GP), then reject
                 if len(puppets_check) >= 2:
@@ -4637,15 +4716,17 @@ class WarOptionsView(discord.ui.View):
                 # otherwise, carry on
                 else:
                     # fetch the total development of the target
-                    target_total_development = await conn.fetchval('''SELECT SUM(development) FROM cnc_provinces 
+                    target_total_development = await conn.fetchval('''SELECT SUM(development)
+                                                                      FROM cnc_provinces
                                                                       WHERE owner_id = $1;''',
                                                                    target_info['user_id'])
                     # calculate war score
                     war_score = max(2 * target_total_development, 25)
                     # if the war score for this option is less than 25, set at
                     # update the peace negotiation
-                    await conn.execute('''UPDATE cnc_peace_negotiations SET subjugate = True, 
-                                                                            war_score_cost = war_score_cost + $1 
+                    await conn.execute('''UPDATE cnc_peace_negotiations
+                                          SET subjugate      = True,
+                                              war_score_cost = war_score_cost + $1
                                           WHERE war_id = $2;''', war_score, war_info['id'])
                     # update the embed
                     peace_embed.add_field(name="Subjugate", value="Demanded", inline=False)
@@ -4653,13 +4734,15 @@ class WarOptionsView(discord.ui.View):
                     await self.interaction.followup.send(f"Demand for Subjugation of {target_info['name']} added for "
                                                          f"`{war_score}` War Score.")
                     # add total war score
-                    total_war_score.value += war_score
+                    total_war_score += war_score
                     continue
 
             # if the demand is release subject
             elif demand == "End Overlordship":
                 # check if the target already is an overlord
-                overlord_list = await conn.fetch('''SELECT * FROM cnc_users WHERE overlord = $1;''',
+                overlord_list = await conn.fetch('''SELECT *
+                                                    FROM cnc_users
+                                                    WHERE overlord = $1;''',
                                                  target_info['user_id'])
                 # if the target is not the overlord of anyone
                 if not overlord_list:
@@ -4711,8 +4794,8 @@ class WarOptionsView(discord.ui.View):
                     # wait for the options to be selected
                     try:
                         overlord_targets_returned = await interaction.client.wait_for("interaction",
-                                                                                     check=overlord_check,
-                                                                                     timeout=120)
+                                                                                      check=overlord_check,
+                                                                                      timeout=120)
                     except asyncio.TimeoutError:
                         # destroy any pending negotiation
                         await conn.execute('''DELETE
@@ -4725,8 +4808,9 @@ class WarOptionsView(discord.ui.View):
                     # calculate war score
                     war_score = len(end_overlord_targets) * 20
                     # add the embargo releases to the negotiation
-                    await conn.execute('''UPDATE cnc_peace_negotiations 
-                                          SET end_overlord = $1, war_score_cost = war_score_cost + $2 
+                    await conn.execute('''UPDATE cnc_peace_negotiations
+                                          SET end_overlord   = $1,
+                                              war_score_cost = war_score_cost + $2
                                           WHERE war_id = $3;''',
                                        end_overlord_targets, war_score, war_info['id'])
                     # update embed
@@ -4736,7 +4820,7 @@ class WarOptionsView(discord.ui.View):
                                                          f" {', '.join(end_overlord_targets)} added for "
                                                          f"`{war_score}` War Score.")
                     # add total war score
-                    total_war_score.value += war_score
+                    total_war_score += war_score
                     # proceed
                     continue
 
@@ -4754,8 +4838,9 @@ class WarOptionsView(discord.ui.View):
                     # calculate war score
                     war_score = 50
                     # update the peace negotiation
-                    await conn.execute('''UPDATE cnc_peace_negotiations SET force_govt = $1, 
-                                                                            war_score_cost = war_score_cost + $2 
+                    await conn.execute('''UPDATE cnc_peace_negotiations
+                                          SET force_govt     = $1,
+                                              war_score_cost = war_score_cost + $2
                                           WHERE war_id = $3;''',
                                        user_info['govt_type'], war_score, war_info['id'])
                     # update the embed
@@ -4765,40 +4850,42 @@ class WarOptionsView(discord.ui.View):
                                                          f"{user_info['govt_type']} Government Type added for "
                                                          f"`{war_score}` War Score.")
                     # add the total war score
-                    total_war_score.value += war_score
+                    total_war_score += war_score
                     # proceed
                     continue
-                    
+
             # if the demand is humiliate
             elif demand == "Humiliate":
                 # calculate the war score
                 war_score = 75
                 # update the peace negotiation
-                await conn.execute('''UPDATE cnc_peace_negotiations SET humiliate = True, 
-                                                                            war_score_cost = war_score_cost + $1 
-                                          WHERE war_id = $2;''', war_score, war_info['id'])
+                await conn.execute('''UPDATE cnc_peace_negotiations
+                                      SET humiliate      = True,
+                                          war_score_cost = war_score_cost + $1
+                                      WHERE war_id = $2;''', war_score, war_info['id'])
                 # update the embed
                 peace_embed.add_field(name="Humiliate", value="Demanded", inline=False)
                 # add the total war score
-                total_war_score.value += war_score
+                total_war_score += war_score
                 # send notification
                 await self.interaction.followup.send(f"Demand for the Humiliation of {target_info['name']} added for "
                                                      f"{war_score} War Score.")
                 # proceed
                 continue
-            
+
             # if the demand is dismantle
             elif demand == "Dismantle":
                 # calculate the war score
                 war_score = 90
                 # update the peace negotiation
-                await conn.execute('''UPDATE cnc_peace_negotiations SET dismantle = True, 
-                                                                            war_score_cost = war_score_cost + $1 
-                                          WHERE war_id = $2;''', war_score, war_info['id'])
+                await conn.execute('''UPDATE cnc_peace_negotiations
+                                      SET dismantle      = True,
+                                          war_score_cost = war_score_cost + $1
+                                      WHERE war_id = $2;''', war_score, war_info['id'])
                 # update the embed
                 peace_embed.add_field(name="Dismantle", value="Demanded", inline=False)
                 # add the total war score
-                total_war_score.value += war_score
+                total_war_score += war_score
                 # send notification
                 await self.interaction.followup.send(f"Demand for the Dismantling of {target_info['name']} added for "
                                                      f"{war_score} War Score.")
@@ -4808,7 +4895,7 @@ class WarOptionsView(discord.ui.View):
         # when the loop has finished, clear the view
         peace_negotiation_dropdown_view.clear_items()
         # if the war score is 0, meaning there are no demands, do not bother sending
-        if (total_war_score.value == 0) and (not white_peace):
+        if (total_war_score == 0) and (not white_peace):
             await self.interaction.edit_original_response(view=None, embed=peace_embed)
             # destroy any pending negotiation, remove the view, and send rejection
             await conn.execute('''DELETE
@@ -4818,20 +4905,22 @@ class WarOptionsView(discord.ui.View):
                                                         ephemeral=True)
         # calculate the war score cost double if this is not a total negotiation
         if not total_negotiation:
-            total_war_score.value *= 2
-            await conn.execute('''UPDATE cnc_peace_negotiations SET war_score_cost = war_score_cost * 2 
+            total_war_score *= 2
+            await conn.execute('''UPDATE cnc_peace_negotiations
+                                  SET war_score_cost = war_score_cost * 2
                                   WHERE war_id = $1;''', war_info['id'])
         # calculate the truce length where every 10% war score equals a turn of truce
-        truce_length = max(total_war_score.value // 10, 2)
+        truce_length = max(total_war_score // 10, 2)
         # add a turn for each demand
         truce_length += len(negotiation_demands)
         # add the total peace negotiation amount at the bottom
-        peace_embed.add_field(name="Total War Score Cost", value=f"{total_war_score.value}", inline=False)
+        peace_embed.add_field(name="Total War Score Cost", value=f"{total_war_score}", inline=False)
         # send the updated embed
         await self.interaction.edit_original_response(embed=peace_embed, view=peace_negotiation_dropdown_view)
         # add the buttons
         send_button = discord.ui.Button(label="Send Negotiation", style=discord.ButtonStyle.success)
         cancel_button = discord.ui.Button(label="Cancel", style=discord.ButtonStyle.danger)
+
         # define the callback for send
         async def send_callback(interaction: discord.Interaction):
             # defer the interaction
@@ -4854,20 +4943,31 @@ class WarOptionsView(discord.ui.View):
                                primary, truce_length)
             # if none of the default options were demanded, set to 0
             if not negotiation_demands['end_embargo']:
-                await conn.execute('''UPDATE cnc_peace_treaties SET end_embargo = 0 WHERE war_id = $1;''',
+                await conn.execute('''UPDATE cnc_peace_treaties
+                                      SET end_embargo = 0
+                                      WHERE war_id = $1;''',
                                    war_info['id'])
             if not negotiation_demands['end_ma']:
-                await conn.execute('''UPDATE cnc_peace_treaties SET end_ma = 0 WHERE war_id = $1;''',
+                await conn.execute('''UPDATE cnc_peace_treaties
+                                      SET end_ma = 0
+                                      WHERE war_id = $1;''',
                                    war_info['id'])
             if not negotiation_demands['end_tp']:
-                await conn.execute('''UPDATE cnc_peace_treaties SET end_tp = 0 WHERE war_id = $1;''',
+                await conn.execute('''UPDATE cnc_peace_treaties
+                                      SET end_tp = 0
+                                      WHERE war_id = $1;''',
                                    war_info['id'])
             if not negotiation_demands['humiliate']:
-                await conn.execute('''UPDATE cnc_peace_treaties SET humiliate = 0 WHERE war_id = $1;''',
+                await conn.execute('''UPDATE cnc_peace_treaties
+                                      SET humiliate = 0
+                                      WHERE war_id = $1;''',
                                    war_info['id'])
             if not negotiation_demands['dismantle']:
-                await conn.execute('''UPDATE cnc_peace_treaties SET dismantle = 0 WHERE war_id = $1;''',
+                await conn.execute('''UPDATE cnc_peace_treaties
+                                      SET dismantle = 0
+                                      WHERE war_id = $1;''',
                                    war_info['id'])
+
             # define the peace negotiation parse function
             async def negotiation_parse(war_info: asyncpg.Record):
                 # pull peace negotiation information
@@ -4916,11 +5016,11 @@ class WarOptionsView(discord.ui.View):
                                                                        WHERE name = $1;''',
                                                                     end_embargo)
                         await self.interaction.client.get_user(ended_embargo_user_id).send(f"The Embargo against"
-                                                                                      f" {end_embargo} "
-                                                                                      f"issued by "
-                                                                                      f"{target_info['name']}"
-                                                                                      f" has been ended by "
-                                                                                      f"a Peace Treaty.")
+                                                                                           f" {end_embargo} "
+                                                                                           f"issued by "
+                                                                                           f"{target_info['name']}"
+                                                                                           f" has been ended by "
+                                                                                           f"a Peace Treaty.")
                 # if there are end military alliance demands, update the military alliance
                 elif peace_negotiation['end_ma']:
                     # pull ma info
@@ -4936,8 +5036,8 @@ class WarOptionsView(discord.ui.View):
                                                              WHERE name = $1;''', member)
                         # send the message
                         await self.interaction.client.get_user(member_info).send(f"{target_info['name']} is no "
-                                                                            f"longer an ally of {member} "
-                                                                            f"due to a Peace Treaty.")
+                                                                                 f"longer an ally of {member} "
+                                                                                 f"due to a Peace Treaty.")
                     # remove the target from the alliance
                     await conn.execute('''UPDATE cnc_alliances
                                           SET members = array_remove(members, $1)
@@ -4960,9 +5060,9 @@ class WarOptionsView(discord.ui.View):
                                                                  WHERE name = $1;''', member)
                             # send the message
                             await self.interaction.client.get_user(member_info).send(f"{target_info['name']} has "
-                                                                                f"ended its Trade Pact with "
-                                                                                f"{member} due to a "
-                                                                                f"Peace Treaty.")
+                                                                                     f"ended its Trade Pact with "
+                                                                                     f"{member} due to a "
+                                                                                     f"Peace Treaty.")
                         # delete the trade pact
                         await conn.execute('''DELETE
                                               FROM cnc_trade_pacts
@@ -5012,12 +5112,15 @@ class WarOptionsView(discord.ui.View):
                                               govt_subtype = $2
                                           WHERE user_id = $3;''',
                                        govt_type, govt_subtype, target_info['user_id'])
+
             # if the current war score is less than a 100% or if the target is not the primary
             if (target_war_score < 100) or (target != primary):
                 # pull their user ids and send the dm
                 for recipients in recipients_names:
                     # make db call
-                    r_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE name = $1;''', recipients)
+                    r_info = await conn.fetchrow('''SELECT *
+                                                    FROM cnc_users
+                                                    WHERE name = $1;''', recipients)
                     # send dm (with options for the primary)
                     if recipients == primary:
                         # create a view for the dropdown and add it
@@ -5032,18 +5135,22 @@ class WarOptionsView(discord.ui.View):
                             # send the acceptance dm to all participants
                             for member in [war_info['attackers'], war_info['defenders']]:
                                 # pull their user id
-                                user_id = await conn.fetchval('''SELECT user_id FROM cnc_users WHERE name = $1;''',
+                                user_id = await conn.fetchval('''SELECT user_id
+                                                                 FROM cnc_users
+                                                                 WHERE name = $1;''',
                                                               member)
                                 # send notification
-                                await self.interaction.client.get_user(user_id).send(f"The Peace Negotiations to end the "
-                                                                                     f"**{war_info['name']}** have been "
-                                                                                     f"accepted by {target_info['name']}."
-                                                                                     f"The terms are as follows:",
-                                                                                     embed=peace_embed)
+                                await self.interaction.client.get_user(user_id).send(
+                                    f"The Peace Negotiations to end the "
+                                    f"**{war_info['name']}** have been "
+                                    f"accepted by {target_info['name']}."
+                                    f"The terms are as follows:",
+                                    embed=peace_embed)
                                 # delete the peace negotiation
-                                await conn.execute('''DELETE FROM cnc_peace_negotiations WHERE war_id = $1;''',
+                                await conn.execute('''DELETE
+                                                      FROM cnc_peace_negotiations
+                                                      WHERE war_id = $1;''',
                                                    war_info['id'])
-
 
                         async def decline_callback(interaction: discord.Interaction):
                             # defer the interaction
@@ -5055,8 +5162,9 @@ class WarOptionsView(discord.ui.View):
                             # send notifications
                             await interaction.edit_original_response(view=None)
                             await interaction.followup.send("Peace Negotiation declined.")
-                            return await user_info['user_id'].send(f"Peace Negotiation **declined** for war `{war_info['id']}` "
-                                                            f"by {r_info['name']}.", embed=peace_embed)
+                            return await user_info['user_id'].send(
+                                f"Peace Negotiation **declined** for war `{war_info['id']}` "
+                                f"by {r_info['name']}.", embed=peace_embed)
 
                         # create accept button
                         accept_button = discord.ui.Button(label="Accept", style=discord.ButtonStyle.success)
@@ -5080,14 +5188,15 @@ class WarOptionsView(discord.ui.View):
                                                   FROM cnc_peace_negotiations
                                                   WHERE war_id = $1;''', war_info['id'])
                             await interaction.followup.send("Peace Negotiation has timed out and been auto-rejected.")
-                            return await user_info['user_id'].send(f"Peace Negotiation **declined** for war `{war_info['id']}` "
-                                                            f"by {r_info['name']}.", embed=peace_embed)
+                            return await user_info['user_id'].send(
+                                f"Peace Negotiation **declined** for war `{war_info['id']}` "
+                                f"by {r_info['name']}.", embed=peace_embed)
                     else:
                         await r_info['user'].send(embed=peace_embed)
             # otherwise, no negotiations required
             else:
                 # check to ensure the demands are less than 100
-                if total_war_score.value > 100:
+                if total_war_score > 100:
                     # destroy any pending negotiation, remove the view, and send rejection
                     await conn.execute('''DELETE
                                           FROM cnc_peace_negotiations
@@ -5115,25 +5224,23 @@ class WarOptionsView(discord.ui.View):
         send_button.callback = send_callback
         # define the callback for cancel
         cancel_button.callback = cancel_button_callback
-
         # create the send button view
-        class SendButtonView(discord.ui.View):
-            async def on_timeout(self):
-                await conn.execute(
-                    '''DELETE
-                       FROM cnc_peace_negotiations
-                       WHERE war_id = $1;''',
-                    war_info['id']
-                )
-
-        # create the view
-        send_button_view = SendButtonView()
+        send_button_view = discord.ui.View(timeout=120)
         # add the buttons
         send_button_view.add_item(send_button)
         send_button_view.add_item(cancel_button)
         # add the view to the embed
-        return await self.interaction.edit_original_response(view=send_button_view)
-
+        await self.interaction.edit_original_response(view=send_button_view)
+        # check to see if it has timed out
+        timed_out = await send_button_view.wait()
+        # if the primary message times out
+        if timed_out:
+            # delete the pending negotiation
+            await conn.execute('''DELETE
+                                  FROM cnc_peace_negotiations
+                                  WHERE war_id = $1;''', war_info['id'])
+            # remove view and send update
+            return await self.interaction.edit_original_response(view=None)
 
 
 class PeaceNegotiationOptionsDropdown(discord.ui.Select):
@@ -5148,6 +5255,7 @@ class PeaceNegotiationOptionsDropdown(discord.ui.Select):
         super().__init__(placeholder="Choose Peace Treaty Demands...", min_values=1, max_values=len(pt_options),
                          options=pt_options, custom_id="peace_treaty_negotiations_dropdown")
 
+
 class PeaceNegotiationTargetsDropdown(discord.ui.Select):
 
     # hypersimplistic dropdown
@@ -5159,6 +5267,7 @@ class PeaceNegotiationTargetsDropdown(discord.ui.Select):
         # define the super
         super().__init__(placeholder="Choose Treaty Target...", min_values=1, max_values=1,
                          options=target_options, custom_id="target_dropdown")
+
 
 class PeaceNegotiationGiveProvincesDropdown(discord.ui.Select):
 
@@ -5899,7 +6008,8 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # if the user opted to see all wars, display them
         if view_all is True:
-            all_wars = await conn.fetch('''SELECT * FROM cnc_wars 
+            all_wars = await conn.fetch('''SELECT *
+                                           FROM cnc_wars
                                            WHERE active = True;''')
             # if there are no active wars, send such
             if not all_wars:
@@ -5918,8 +6028,10 @@ class CNC(commands.Cog):
                     defenders_list = list(war['defenders']) if war['defenders'] is not None else []
                     attackers_others = [a for a in attackers_list if a != war['primary_attacker']]
                     defenders_others = [d for d in defenders_list if d != war['primary_defender']]
-                    attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war['primary_attacker'] else ", ".join(attackers_list)
-                    defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war['primary_defender'] else ", ".join(defenders_list)
+                    attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war[
+                        'primary_attacker'] else ", ".join(attackers_list)
+                    defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war[
+                        'primary_defender'] else ", ".join(defenders_list)
                     all_wars_embed.add_field(name=f"The {war['name']}",
                                              value=f"ID: {war['id']}\n"
                                                    f"Attackers: {attackers}\n"
@@ -5941,10 +6053,11 @@ class CNC(commands.Cog):
             return await interaction.followup.send("You are not a registered user of the Command and Conquest system.\n"
                                                    "To register, use the `\cnc register` command!")
         # check for what wars the user is in
-        user_wars = await conn.fetch('''SELECT * FROM cnc_wars 
-                                         WHERE $1 = ANY(array_cat(attackers,defenders)) 
-                                           AND active = True;''',
-                                      user_info['name'])
+        user_wars = await conn.fetch('''SELECT *
+                                        FROM cnc_wars
+                                        WHERE $1 = ANY (array_cat(attackers, defenders))
+                                          AND active = True;''',
+                                     user_info['name'])
         # if they have no active wars, send such
         if not user_wars:
             return await interaction.followup.send(f"{user_info['name']} is not currently at war.")
@@ -5960,8 +6073,10 @@ class CNC(commands.Cog):
             defenders_list = list(war['defenders']) if war['defenders'] is not None else []
             attackers_others = [a for a in attackers_list if a != war['primary_attacker']]
             defenders_others = [d for d in defenders_list if d != war['primary_defender']]
-            attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war['primary_attacker'] else ", ".join(attackers_list)
-            defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war['primary_defender'] else ", ".join(defenders_list)
+            attackers = ", ".join([f"**{war['primary_attacker']}**"] + attackers_others) if war[
+                'primary_attacker'] else ", ".join(attackers_list)
+            defenders = ", ".join([f"**{war['primary_defender']}**"] + defenders_others) if war[
+                'primary_defender'] else ", ".join(defenders_list)
             all_wars_embed.add_field(name=f"The {war['name']}",
                                      value=f"ID: {war['id']}\n"
                                            f"Attackers: {attackers}\n"
@@ -5985,27 +6100,29 @@ class CNC(commands.Cog):
         # establish the conn
         conn = self.bot.pool
         # look for the user info, if any
-        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        user_info = await conn.fetchrow('''SELECT *
+                                           FROM cnc_users
+                                           WHERE user_id = $1;''', interaction.user.id)
         # parse the war id
         try:
             war_id = int(war_id)
             # search for the active war using the id
             war_info = await conn.fetchrow('''SELECT *
                                               FROM cnc_wars
-                                              WHERE id = $1 
-                                                AND active=True;''',
+                                              WHERE id = $1
+                                                AND active = True;''',
                                            war_id)
         except ValueError:
             war_id = str(war_id)
             # search for the active war using the name
             war_info = await conn.fetchrow('''SELECT *
                                               FROM cnc_wars
-                                              WHERE name = $1 
-                                                AND active=True;''',
+                                              WHERE name = $1
+                                                AND active = True;''',
                                            war_id)
         # create the war embed
         war_embed = discord.Embed(title=f"{war_info['name']}", color=discord.Color.red(),
-                                       description="Information about an ongoing war.")
+                                  description="Information about an ongoing war.")
         # get the list of attackers and defenders, placing the primary first and bolding
         attackers_list = list(war_info['attackers']) if war_info['attackers'] is not None else []
         defenders_list = list(war_info['defenders']) if war_info['defenders'] is not None else []
@@ -6016,18 +6133,20 @@ class CNC(commands.Cog):
         defenders = ", ".join([f"**{war_info['primary_defender']}**"] + defenders_others) if war_info[
             'primary_defender'] else ", ".join(defenders_list)
         war_embed.add_field(name=f"The {war_info['name']}",
-                                 value=f"ID: {war_info['id']}\n"
-                                       f"Attackers: {attackers}\n"
-                                       f"Defenders: {defenders}\n"
-                                       f"Casus Belli: {war_info['cb']}\n"
-                                       f"Defensio Belli: {war_info['db'] or 'None'}\n"
-                                       f"Turns: {war_info['turns']}\n"
-                                       f"Deaths: {war_info['deaths']}")
+                            value=f"ID: {war_info['id']}\n"
+                                  f"Attackers: {attackers}\n"
+                                  f"Defenders: {defenders}\n"
+                                  f"Casus Belli: {war_info['cb']}\n"
+                                  f"Defensio Belli: {war_info['db'] or 'None'}\n"
+                                  f"Turns: {war_info['turns']}\n"
+                                  f"Deaths: {war_info['deaths']}")
         # send the embed with the appropriate buttons
         # if the user is in the war and is a primary, add the military alliance option and the peace option
         if (user_info['name'] == war_info['primary_attacker']) or (user_info['name'] == war_info['primary_defender']):
             # if the user is in a military alliance, enable that button
-            alliance_check = await conn.fetchrow('''SELECT * FROM cnc_alliances WHERE $1 = ANY(members);''',
+            alliance_check = await conn.fetchrow('''SELECT *
+                                                    FROM cnc_alliances
+                                                    WHERE $1 = ANY (members);''',
                                                  user_info['name'])
             if alliance_check:
                 alliance_button = True
