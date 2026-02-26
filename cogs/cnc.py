@@ -4178,10 +4178,9 @@ class WarOptionsView(discord.ui.View):
 
         # wait for the options to be selected
         try:
-            overlord_targets_returned = await interaction.client.wait_for("interaction", check=pnd_check,
+            negotiation_demands = await interaction.client.wait_for("interaction", check=pnd_check,
                                                                           timeout=120)
-            await overlord_targets_returned.response.defer()
-            await overlord_targets_returned.followup.send("Processing...", ephemeral=True, delete_after=1)
+            await negotiation_demands.response.send_message('Processing...', ephemeral=True, delete_after=1)
         except asyncio.TimeoutError:
             # destroy any pending negotiation
             await conn.execute('''DELETE
@@ -4191,7 +4190,7 @@ class WarOptionsView(discord.ui.View):
             return await self.interaction.edit_original_response(view=None)
 
         # parse the options
-        negotiation_demands = overlord_targets_returned.data['values']
+        negotiation_demands = negotiation_demands.data['values']
         # define the demand score
         total_war_score = 0
         # define white peace
@@ -4231,7 +4230,7 @@ class WarOptionsView(discord.ui.View):
             # if the demand is to cede a province, determine which provinces the demander claims
             elif demand == "Cede Province":
                 # query demand for provinces using the peace options dropdown interaction response
-                provinces_demanded = await demanding_provinces_wait_for_modal(overlord_targets_returned,
+                provinces_demanded = await demanding_provinces_wait_for_modal(negotiation_demands,
                                                                               "Demand Provinces",
                                                                               "List province IDs separated by comma:")
                 # separate the list
@@ -4675,7 +4674,7 @@ class WarOptionsView(discord.ui.View):
 
                     # wait for the options to be selected
                     try:
-                        overlord_targets_returned = await interaction.client.wait_for("interaction",
+                        negotiation_demands = await interaction.client.wait_for("interaction",
                                                                                       check=overlord_check,
                                                                                       timeout=120)
                     except asyncio.TimeoutError:
@@ -4686,7 +4685,7 @@ class WarOptionsView(discord.ui.View):
                         # return and remove the view if the user does not interact
                         return await self.interaction.edit_original_response(view=None)
                     # parse the results
-                    end_overlord_targets = overlord_targets_returned.data['values']
+                    end_overlord_targets = negotiation_demands.data['values']
                     # calculate war score
                     war_score = len(end_overlord_targets) * 20
                     # add the embargo releases to the negotiation
