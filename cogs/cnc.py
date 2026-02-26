@@ -4436,10 +4436,7 @@ class WarOptionsView(discord.ui.View):
 
                         async def callback(self, interaction: discord.Interaction):
                             self.view.mil_authority = self.values[0]
-                            try:
-                                await interaction.response.defer(thinking=False)  # or thinking=False if you want silent
-                            except discord.InteractionResponded:
-                                pass  # ignore if already responded somehow
+                            await interaction.response.defer()
 
                     class EconSelect(discord.ui.Select):
                         def __init__(self):
@@ -4452,10 +4449,7 @@ class WarOptionsView(discord.ui.View):
 
                         async def callback(self, interaction: discord.Interaction):
                             self.view.econ_authority = self.values[0]
-                            try:
-                                await interaction.response.defer(thinking=False)  # or thinking=False if you want silent
-                            except discord.InteractionResponded:
-                                pass  # ignore if already responded somehow
+                            await interaction.response.defer()  # or thinking=False if you want silent
 
                     class DiploSelect(discord.ui.Select):
                         def __init__(self):
@@ -4468,10 +4462,7 @@ class WarOptionsView(discord.ui.View):
 
                         async def callback(self, interaction: discord.Interaction):
                             self.view.diplo_authority = self.values[0]
-                            try:
-                                await interaction.response.defer(thinking=False)  # or thinking=False if you want silent
-                            except discord.InteractionResponded:
-                                pass  # ignore if already responded somehow
+                            await interaction.response.defer() 
 
                     # create submit and cancel buttons
 
@@ -4481,7 +4472,7 @@ class WarOptionsView(discord.ui.View):
                         await interaction.response.defer()
                         # if the user has not selected one of the options as is necessary
                         if None in (self.mil_authority, self.econ_authority, self.diplo_authority):
-                            return await interaction.response.send_message(
+                            return await interaction.followup.send(
                                 "You must select all three authority values first.",
                                 ephemeral=True
                             )
@@ -4524,8 +4515,6 @@ class WarOptionsView(discord.ui.View):
                         # update the view
                         return await self.parent_interaction.edit_original_response(view=None, embed=peace_embed)
 
-                # defer (?)
-                await self.interaction.response.defer(thinking=False)
                 auth_demand_view = AuthDemandView(self.interaction)
                 # send the view
                 await self.interaction.edit_original_response(view=auth_demand_view, embed=peace_embed)
