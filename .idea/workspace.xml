@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting hostile relations check breaking">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting call to war button error">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -875,7 +876,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1435" />
+    <option name="localTasksCounter" value="1436" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -894,8 +895,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding Humiliate and Dismantle peace negotiation options" />
-    <MESSAGE value="Adding Humiliate and Dismantle peace negotiation options' messages" />
     <MESSAGE value="Adding meat to the accept button callback for peace negotiations" />
     <MESSAGE value="Adding parse negotiations to automatic defeat" />
     <MESSAGE value="Adding the send or cancel buttons to the peace neogitation" />
@@ -919,7 +918,9 @@
     <MESSAGE value="Correcting the unnecessary peace treaty creation" />
     <MESSAGE value="Finishing putting defenders and attackers in the alliance call button" />
     <MESSAGE value="Correcting hostile relations check breaking" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting hostile relations check breaking" />
+    <MESSAGE value="Correcting the embargo recall button" />
+    <MESSAGE value="Correcting call to war button error" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcting call to war button error" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />

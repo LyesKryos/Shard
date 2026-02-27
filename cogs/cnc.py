@@ -2960,8 +2960,9 @@ class HostileDiplomaticActions(discord.ui.View):
         # check to see if the two nations are already at war
         war_check = await self.conn.fetchrow('''SELECT *
                                                 FROM cnc_wars
-                                                WHERE $1 = ANY (array_cat(attackers, defenders))
-                                                  AND $2 = ANY (array_cat(attackers, defenders));''',
+                                                WHERE active = True
+                                                    AND $1 = ANY (array_cat(attackers, defenders))
+                                                    AND $2 = ANY (array_cat(attackers, defenders));''',
                                              sender_info['name'], self.recipient_info['name'])
         # check to see if the the nations have a truce
         truce_check = await self.conn.fetchrow('''SELECT * FROM cnc_peace_treaties 
@@ -3828,14 +3829,14 @@ class MilitaryAllianceButton(discord.ui.Button):
         war_info = self.war_info
         # check to see if any members of the user's military alliance are not yet in the war
         # pull the alliance information
-        alliance_info = await conn.fetchval('''SELECT members
+        alliance_info = await conn.fetchrow('''SELECT *
                                                FROM cnc_alliances
                                                WHERE $1 = ANY (members);''',
                                             self.user_info['name'])
         # if the user is the defender, pull the defenders
         if self.user_info['name'] == self.war_info['primary_defender']:
             # get a list of any allied nations that are not in the war
-            non_participants = list(set(alliance_info).difference(set(war_info['defenders'])))
+            non_participants = list(set(alliance_info['members']).difference(set(war_info['defenders'])))
             # for each non-participant
             for np in non_participants:
                 # get their user object
