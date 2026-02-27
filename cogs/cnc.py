@@ -5076,7 +5076,7 @@ class WarOptionsView(discord.ui.View):
                                 f"Peace Negotiation **declined** for war `{war_info['id']}` "
                                 f"by {r_info['name']}.", embed=peace_embed)
                     else:
-                        await r_info['user'].send(embed=peace_embed)
+                        await interaction.client.get_user(r_info['user_id']).send(embed=peace_embed)
             # otherwise, no negotiations required
             else:
                 # check to ensure the demands are less than 100
@@ -5099,7 +5099,8 @@ class WarOptionsView(discord.ui.View):
                                                         FROM cnc_users
                                                         WHERE name = $1;''', recipients)
                         # send notification
-                        await r_info['user'].send(f"{user_info['name']} has demanded the following peace treaty. "
+                        await interaction.client.get_user(r_info['user_id']).send(f"{user_info['name']} has demanded "
+                                                                                  f"the following peace treaty. "
                                                   f"The forces of {primary} and their allies have been overwhelmed "
                                                   f"entirely. The negotiation has been automatically accepted.",
                                                   embed=peace_embed)
