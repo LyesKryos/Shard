@@ -4805,7 +4805,9 @@ class WarOptionsView(discord.ui.View):
         # define the callback for send
         async def send_callback(interaction: discord.Interaction):
             # defer the interaction
-            await interaction.response.defer(thinking=True)
+            await interaction.response.defer(thinking=False)
+            # removing the view
+            await self.interaction.edit_original_response(view=None)
             # get the recipient(s) if it is a total negotiation
             if total_negotiation:
                 if user_info['name'] in war_info['attackers']:
