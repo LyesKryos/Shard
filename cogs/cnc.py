@@ -1110,7 +1110,7 @@ class UnownedProvince(View):
 
 class DossierView(View):
 
-    def __init__(self, interaction, embed: discord.Embed, user_info: asyncpg.Record, conn: asyncpg.Pool):
+    def __init__(self, interaction, embed: discord.Embed, user_info, conn: asyncpg.Pool):
         super().__init__(timeout=120)
         self.doss_embed = embed
         self.user_info = user_info
@@ -3749,7 +3749,7 @@ class AllianceWarInvitiation(discord.ui.View):
         # establish connection
         conn = self.conn
         # pull user info
-        user_info = user_db_info(interaction.user.id, conn)
+        user_info = await user_db_info(interaction.user.id, conn)
         # add the user to the correct side
         if self.attacker:
             # if the user is an attacker, add them to the attacker list
@@ -5086,7 +5086,7 @@ class WarOptionsView(discord.ui.View):
                     await conn.execute('''UPDATE cnc_users
                                           SET overlord = $1
                                           WHERE user_id = $2;''',
-                                       user_info['user_id'], target_info['user_id'])
+                                       user_info['name'], target_info['user_id'])
 
                 # if there are dismantle demands, execute the dismantle stipulations
                 elif peace_negotiation['dismantle']:
@@ -5156,58 +5156,49 @@ class WarOptionsView(discord.ui.View):
                     await interaction.response.defer(thinking=True)
                     # parse negotiations
                     await negotiation_parse(war_info)
-                    # define all members
-                    belligerents = war_info['attackers'] + war_info['defenders']
                     # create the peace treaty
                     await conn.execute('''INSERT INTO cnc_peace_treaties
                                           VALUES ($1, $2, $3, $4);''',
-                                       war_info['id'], belligerents,
+                                       war_info['id'], war_info['attackers'].append(war_info['defenders']),
                                        primary, truce_length)
                     # send the acceptance dm to all participants
-                    for belligerent in belligerents:
+                    for member in war_info['attackers'].append(war_info['defenders']):
                         # pull their user id
                         user_id = await conn.fetchval('''SELECT user_id
                                                          FROM cnc_users
                                                          WHERE name = $1;''',
-                                                      belligerent)
+                                                      member)
                         # send notification
                         await safe_dm(embed=peace_embed, user_id=user_id, bot=interaction.client,
                                       content=f"The Peace Negotiations to end the **{war_info['name']}** "
                                               f"have been **accepted** by {target_info['name']}. "
                                               f"The terms are as follows:")
-                    # delete the peace negotiation
-                    await conn.execute('''DELETE
-                                            FROM cnc_peace_negotiations
-                                            WHERE war_id = $1;''',
-                                        war_info['id'])
-                    # delete the war
-                    await conn.execute('''DELETE FROM cnc_wars WHERE id = $1;''', war_info['id'])
-                    # stop listening
-                    peace_negotiation_view.stop()
+                        # delete the peace negotiation
+                        await conn.execute('''DELETE
+                                              FROM cnc_peace_negotiations
+                                              WHERE war_id = $1;''',
+                                           war_info['id'])
+                        # delete the war
+                        await conn.execute('''DELETE FROM cnc_wars WHERE id = $1;''', war_info['id'])
+                        # stop listening
+                        peace_negotiation_view.stop()
 
                 async def decline_callback(interaction: discord.Interaction):
                     # defer the interaction
                     await interaction.response.defer(thinking=True)
-                    # define all members
-                    belligerents = war_info['attackers'] + war_info['defenders']
                     # destroy any pending negotiation
                     await conn.execute('''DELETE
                                           FROM cnc_peace_negotiations
                                           WHERE war_id = $1;''', war_info['id'])
                     # send notifications
-                    await interaction.edit_original_response(view=peace_negotiation_view)
+                    await interaction.edit_original_response(view=None, content="Declined")
+                    await interaction.followup.send("Peace Negotiation declined.")
                     # stop listening
                     peace_negotiation_view.stop()
-                    # for each player in the war
-                    for belligerent in belligerents:
-                        # pull their user id
-                        user_id = await conn.fetchval('''SELECT user_id
-                                                         FROM cnc_users
-                                                         WHERE name = $1;''',
-                                                      belligerent)
-                        await safe_dm(
-                            content=f"{target_info['name']} has **declined** the Peace Negotiation to end {war_info['name']}!", embed=peace_embed, bot=interaction.client,
-                            user_id=user_id)
+                    return await safe_dm(
+                        content=f"Peace Negotiation **declined** for war `{war_info['id']}` "
+                        f"by {target_info['name']}.", embed=peace_embed, bot=interaction.client,
+                        user_id=target_info['user_id'])
 
                 # create the accept button
                 accept_button = discord.ui.Button(label="Accept", style=discord.ButtonStyle.success)
@@ -5327,7 +5318,7 @@ class AuthDemandView(discord.ui.View):
 
         async def callback(self, interaction: discord.Interaction):
             self.view.mil_authority = self.values[0]
-            await interaction.response.defer(ephemeral=True)
+            await interaction.response.defer()
 
     class EconSelect(discord.ui.Select):
         def __init__(self):
@@ -5340,7 +5331,7 @@ class AuthDemandView(discord.ui.View):
 
         async def callback(self, interaction: discord.Interaction):
             self.view.econ_authority = self.values[0]
-            await interaction.response.defer(ephemeral=True)  # or thinking=False if you want silent
+            await interaction.response.defer()  # or thinking=False if you want silent
 
     class DiploSelect(discord.ui.Select):
         def __init__(self):
@@ -5353,7 +5344,7 @@ class AuthDemandView(discord.ui.View):
 
         async def callback(self, interaction: discord.Interaction):
             self.view.diplo_authority = self.values[0]
-            await interaction.response.defer(ephemeral=True) 
+            await interaction.response.defer() 
 
     # create submit and cancel buttons
 
@@ -5827,7 +5818,7 @@ class CNC(commands.Cog):
         if (nation is None) and (user is None):
             user_info = await user_db_info(interaction.user.id, self.bot.pool)
             if user_info is None:
-                return await interaction.response.send_message(f"You are not a registered player of the CNC system.",
+                return await interaction.followup.send(f"That user is not a registered player of the CNC system.",
                                                        ephemeral=True)
         # if both are submitted, return error message
         if (nation is not None) and (user is not None):
@@ -5937,11 +5928,6 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Capital", value=f"{capital}")
         # populate stability
         user_embed.add_field(name="Stability", value=f"{user_info['stability']}")
-        # populate overlord
-        if user_info['overlord']:
-            # get overlord name
-            overlord_name = await conn.fetchval('''SELECT name FROM cnc_users WHERE user_id = $1;''', user_info['overlord'])
-            user_embed.add_field(name="Overlord", value=f"{overlord_name}")
         # populate all three types of authority
         user_embed.add_field(name="=====================AUTHORITY=====================",
                              value="Information known about the nation's authority.", inline=False)
@@ -5995,11 +5981,6 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}")
         # populate territory and count on its own line
         user_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}", inline=False)
-        # populate overlord, if they exist
-        if user_info['overlord']:
-            # pull overlord
-            overlord_name = await conn.fetchval('''SELECT name FROM cnc_users WHERE user_id = $1;''', user_info['overlord'])
-            user_embed.add_field(name="Overlord", value=f"{overlord_name}")
         # create dossier view
         doss_view = DossierView(interaction, user_embed, user_info, conn)
         # send and include view
@@ -6914,11 +6895,10 @@ class CNC(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def cnc_permanent_delete_user(self, ctx, user_to_delete: discord.Member):
+    async def cnc_permanent_delete_user(self, ctx, user: discord.Member):
         # sent a confirmation message
-        delete_confirm = await ctx.send(f"Are you certain you would like to delete {user_to_delete.name} "
+        delete_confirm = await ctx.send(f"Are you certain you would like to delete {user.name} "
                                         f"from the Command and Conquest System?")
-
 
         # wait for a confirmation message
         def confirmation_check(reaction, user):
@@ -6929,37 +6909,37 @@ class CNC(commands.Cog):
             if str(reaction.emoji) != "\U00002705":
                 return await ctx.send("Must confirm deletion with: \U00002705")
         except asyncio.TimeoutError:
-            return await delete_confirm.edit(content=f"Permanent deletion of {user_to_delete.name} "
+            return await delete_confirm.edit(content=f"Permanent deletion of {user.name} "
                                                      f"from the Command and Conquest System aborted.")
         conn = self.bot.pool
         usercheck = await conn.fetchrow('''SELECT *
                                            FROM cnc_users
-                                           WHERE user_id = $1;''', user_to_delete.id)
+                                           WHERE user_id = $1;''', user.id)
         if usercheck is None:
             return await ctx.send("No such user in the CNC system.")
         try:
             await conn.execute('''DELETE
                                   FROM cnc_users
-                                  WHERE user_id = $1;''', user_to_delete.id)
+                                  WHERE user_id = $1;''', user.id)
             await conn.execute('''DELETE
                                   FROM cnc_armies
-                                  WHERE owner_id = $1;''', user_to_delete.id)
+                                  WHERE owner_id = $1;''', user.id)
             await conn.execute('''UPDATE cnc_provinces
                                   SET owner_id    = 0,
                                       occupier_id = 0,
                                       development = floor((random() * 9) + 1),
                                       citizens    = floor((random() * 10000) + 1000),
-                                      structures  = NULL,
+                                      structures  = text[],
                                       fort_level  = 0
                                   WHERE owner_id = $1
-                                    AND occupier_id = $1;''', user_to_delete.id)
+                                    AND occupier_id = $1;''', user.id)
             await conn.execute('''DELETE
                                   FROM cnc_researching
-                                  WHERE user_id = $1;''', user_to_delete.id)
+                                  WHERE user_id = $1;''', user.id)
             await delete_confirm.delete()
         except asyncpg.PostgresError as error:
             raise error
-        return await ctx.send(f"Permanent deletion of {user_to_delete.name} "
+        return await ctx.send(f"Permanent deletion of {user.name} "
                               "from the Command and Conquest System completed.")
 
     @commands.command()
