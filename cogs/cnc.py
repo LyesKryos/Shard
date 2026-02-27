@@ -2451,18 +2451,17 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                            FROM cnc_wars
                                            WHERE active = True
                                              AND ($1 = ANY (array_cat(attackers, defenders))
-                                               AND $2 = ANY (array_cat(attackers, defenders));''',
+                                               AND $2 = ANY (array_cat(attackers, defenders)));''',
                                         user_info['name'], self.recipient_info['name'])
         if wars is not None:
             button.disabled = True
             await interaction.edit_original_response(view=self)
-            return await interaction.followup.send(
-                "Cooperative diplomatic actions are disabled for hostile nations.")
+            return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.")
         # check embargoes
         embargoes = await self.conn.fetchrow('''SELECT *
                                                 FROM cnc_embargoes
-                                                WHERE $1 = ANY (sender)
-                                                  AND $2 = ANY (target);''',
+                                                WHERE $1 = ANY(array[sender, target])
+                                                  AND $2 = ANY(array[sender, target]);''',
                                              user_info['name'], self.recipient_info['name'])
         if embargoes is not None:
             button.disabled = True
@@ -2775,8 +2774,8 @@ class CooperativeDiplomaticActions(discord.ui.View):
         # check embargoes
         embargoes = await self.conn.fetchrow('''SELECT *
                                                 FROM cnc_embargoes
-                                                WHERE $1 = ANY (sender)
-                                                  AND $2 = ANY (target);''',
+                                                WHERE $1 = ANY(array[sender, target])
+                                                  AND $2 = ANY(array[sender, target]);''',
                                              user_info['name'], self.recipient_info['name'])
         if embargoes is not None:
             button.disabled = True
