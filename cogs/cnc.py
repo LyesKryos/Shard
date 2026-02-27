@@ -2872,9 +2872,8 @@ class HostileDiplomaticActions(discord.ui.View):
                 # remove diplomatic relations
                 await self.conn.execute('''DELETE
                                            FROM cnc_embargoes
-                                           WHERE $1 = ANY (members)
-                                             AND $2 = ANY (members);''',
-                                        user_info['name'], self.recipient_info['name'])
+                                           WHERE id = $1;''',
+                                        embargo_check['id'])
                 await remove_msg.edit(view=None)
                 await recipient_user.send(f"{user_info['name']} has ended the embargo against "
                                           f"{self.recipient_info['name']}.")
