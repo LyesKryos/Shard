@@ -1110,7 +1110,7 @@ class UnownedProvince(View):
 
 class DossierView(View):
 
-    def __init__(self, interaction, embed: discord.Embed, user_info, conn: asyncpg.Pool):
+    def __init__(self, interaction, embed: discord.Embed, user_info: asyncpg.Record, conn: asyncpg.Pool):
         super().__init__(timeout=120)
         self.doss_embed = embed
         self.user_info = user_info
@@ -6919,6 +6919,7 @@ class CNC(commands.Cog):
         delete_confirm = await ctx.send(f"Are you certain you would like to delete {user.name} "
                                         f"from the Command and Conquest System?")
 
+
         # wait for a confirmation message
         def confirmation_check(reaction, user):
             return user == ctx.message.author and str(reaction.emoji)
@@ -6948,7 +6949,7 @@ class CNC(commands.Cog):
                                       occupier_id = 0,
                                       development = floor((random() * 9) + 1),
                                       citizens    = floor((random() * 10000) + 1000),
-                                      structures  = text[],
+                                      structures  = NULL,
                                       fort_level  = 0
                                   WHERE owner_id = $1
                                     AND occupier_id = $1;''', user.id)
