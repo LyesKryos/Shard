@@ -3415,7 +3415,6 @@ class DefenderAcceptWarView(discord.ui.View):
         super().__init__(timeout=86400)
         self.war_id = war_id
 
-    @discord.ui.button(label="")
 
 class CasusBelliDropdown(discord.ui.Select):
 
