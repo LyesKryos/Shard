@@ -3391,24 +3391,6 @@ class WarDeclarationView(discord.ui.View):
         # send the war embed in the public channel
         await cnc_channel.send(embed=war_embed)
         await interaction.followup.send(embed=war_embed)
-        # pull all defender's allies
-        defender_alliances = await self.conn.fetchrow('''SELECT *
-                                                         FROM cnc_alliances
-                                                         WHERE $1 = ANY (members);''',
-                                                      self.recipient_info['name'])
-        # send a message to the defenders about joining the war
-        for defender in defender_alliances['members']:
-            # get defender info
-            defender_info = await user_db_info(defender, self.conn)
-            # create the view
-            defender_war_join_view = DefenderAcceptWarView(war_id=self.interaction.message.id,
-                                                           defender_info=defender_info,
-                                                           conn=self.conn,
-                                                           bot=self.bot)
-            # safe dm
-            await safe_dm(self.bot, defender_info['user_id'], view=defender_war_join_view, embed=war_embed,
-                          content=f"{self.sender_info['name']} has declared war on {self.recipient_info['name']}\n"
-                                  f"We must come to the aid of our ally or abandon them to their fate.")
         # disable the views
         return await self.interaction.edit_original_response(view=None)
 
@@ -3725,15 +3707,16 @@ class WarsPaginator(discord.ui.View):
         return await self.interaction.edit_original_response(embed=self.wars_embed, view=self)
 
 
-class AllianceWarInvitiation(discord.ui.View):
+class AllianceWarInvitation(discord.ui.View):
 
-    def __init__(self, conn: asyncpg.Pool, war_info: asyncpg.Record, attacker: bool,
+    def __init__(self, conn: asyncpg.Pool, interaction: discord.Interaction, war_info: asyncpg.Record, attacker: bool,
                  alliance_name: str, sender_info: asyncpg.Record):
         self.war_info = war_info
         self.attacker = attacker
         self.conn = conn
         self.alliance_name = alliance_name
         self.sender_info = sender_info
+        self.interaction = interaction
         super().__init__(timeout=86400)
 
     async def on_timeout(self):
@@ -3764,7 +3747,7 @@ class AllianceWarInvitiation(discord.ui.View):
                 # pull the user id
                 belligerent_id = belligerent_info['user_id']
                 # attempt to DM the user
-                belligerent_joined_msg = (f"**The {user_info['pretitle']} of {user_info['name']}**, "
+                belligerent_joined_msg = (f"**{user_info['name']}**, "
                                           f"a member of {self.alliance_name}, has joined our glorious war against "
                                           f"**{self.war_info['primary_defender']}**!")
                 await safe_dm(interaction.client, belligerent_id, content=belligerent_joined_msg)
@@ -3787,8 +3770,8 @@ class AllianceWarInvitiation(discord.ui.View):
                 # pull the user id
                 belligerent_id = belligerent_info['user_id']
                 # attempt to DM the user
-                belligerent_joined_msg = (f"**The {user_info['pretitle']} of {user_info['name']}**, "
-                                          f"a member of {self.alliance_name}, has joined in our valiant defense against"
+                belligerent_joined_msg = (f"**{user_info['name']}**, a member of {self.alliance_name}, "
+                                          f"has joined in our valiant defense against "
                                           f"**{self.war_info['primary_attacker']}**!")
                 await safe_dm(interaction.client, belligerent_id, content=belligerent_joined_msg)
             # get the cnc channel
@@ -3799,7 +3782,7 @@ class AllianceWarInvitiation(discord.ui.View):
         # update the view with the disabled button
         for child in self.children:
             child.disabled = True
-        return await interaction.edit_original_response(view=self)
+        return await self.interaction.edit_original_response(view=self)
 
     @discord.ui.button(label="Decline", style=discord.ButtonStyle.red)
     async def decline_war(self, interaction: discord.Interaction, button: discord.Button):
@@ -3808,20 +3791,26 @@ class AllianceWarInvitiation(discord.ui.View):
         # establish connection
         conn = self.conn
         # pull user info
-        user_info = user_db_info(interaction.user.id, conn)
+        user_info = await user_db_info(interaction.user.id, conn)
         # send a message to the primary attacker/defender
         if self.attacker:
             # use safe dm to send them the decline message
-            decline_message = (f"**The {user_info['pretitle']} of {user_info['name']}** has declined to join the "
+            decline_message = (f"**{user_info['name']}** has declined to join the "
                                f"{self.war_info['name']} against {self.war_info['primary_defender']}.")
             await safe_dm(interaction.client, self.sender_info['id'], content=decline_message)
         else:
             # declining a call to war for a defender automatically ends the military alliance
-            pass
+            await conn.execute('''UPDATE cnc_alliances SET members = ARRAY_REMOVE(members, $1) 
+                                  WHERE $1 = ANY(members);''', user_info['name'])
+            # decline and remove message
+            decline_message = (f"**{user_info['name']}** has declined to join the "
+                               f"{self.war_info['name']} against {self.war_info['primary_attacker']}. Their traitorous "
+                               f"refusal has removed them from {self.alliance_name}.")
+            await safe_dm(bot=interaction.client, user_id=self.sender_info['id'], content=decline_message)
         # disable the buttons
         for child in self.children:
             child.disabled = True
-        return await interaction.edit_original_message(view=self)
+        return await self.interaction.edit_original_response(view=self)
 
 
 class MilitaryAllianceButton(discord.ui.Button):
@@ -3876,8 +3865,9 @@ class MilitaryAllianceButton(discord.ui.Button):
                                           f"Turns: {war_info['turns']}\n"
                                           f"Deaths: {war_info['deaths']}")
                 # create the accept/decline view
-                war_invitation_view = AllianceWarInvitiation(conn=conn, war_info=war_info, attacker=False,
-                                                             alliance_name=alliance_name, sender_info=self.user_info)
+                war_invitation_view = AllianceWarInvitation(conn=conn, war_info=war_info, attacker=False,
+                                                            alliance_name=alliance_name, sender_info=self.user_info,
+                                                            interaction=interaction)
                 # create the content for the message
                 war_invitation_message = (f"War has been declared on our ally, {self.user_info['name']}! "
                                           f"They have requested our aid. How shall we respond?")
@@ -3915,8 +3905,9 @@ class MilitaryAllianceButton(discord.ui.Button):
                                           f"Turns: {war_info['turns']}\n"
                                           f"Deaths: {war_info['deaths']}")
                 # create the accept/decline view
-                war_invitation_view = AllianceWarInvitiation(conn=conn, war_info=war_info, attacker=False,
-                                                             alliance_name=alliance_name, sender_info=self.user_info)
+                war_invitation_view = AllianceWarInvitation(conn=conn, war_info=war_info, attacker=False,
+                                                            alliance_name=alliance_name, sender_info=self.user_info,
+                                                            interaction=interaction)
                 # create the content for the message
                 war_invitation_message = (f"War has been declared by our ally, {self.user_info['name']}! "
                                           f"They have requested our aid. How shall we respond?")
