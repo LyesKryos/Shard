@@ -5012,6 +5012,12 @@ class WarOptionsView(discord.ui.View):
                                           WHERE user_id = $3;''',
                                        govt_type, govt_subtype, target_info['user_id'])
 
+            # send notification
+            await interaction.followup.send("The Peace Negotiation has been delivered!")
+            # update the embed footer
+            peace_embed.set_footer(text=f"Peace Negotiation send.")
+            await self.interaction.edit_original_response(embed=peace_embed)
+
             # if the current war score is less than a 100% or if the target is not the primary
             if (target_war_score < 100) or (target != primary):
                 # pull their user ids and send the dm
@@ -5020,79 +5026,81 @@ class WarOptionsView(discord.ui.View):
                     r_info = await conn.fetchrow('''SELECT *
                                                     FROM cnc_users
                                                     WHERE name = $1;''', recipient)
-                    # send dm (with options for the primary)
-                    if recipient == primary:
-                        # create a view for the dropdown and add it
-                        peace_negotiation_view = discord.ui.View(timeout=86400)
-
-                        # define callbacks`
-                        async def accept_callback(interaction: discord.Interaction):
-                            # defer the interaction
-                            await interaction.response.defer(thinking=True)
-                            # parse negotiations
-                            await negotiation_parse(war_info)
-                            # send the acceptance dm to all participants
-                            for member in [war_info['attackers'], war_info['defenders']]:
-                                # pull their user id
-                                user_id = await conn.fetchval('''SELECT user_id
-                                                                 FROM cnc_users
-                                                                 WHERE name = $1;''',
-                                                              member)
-                                # send notification
-                                await self.interaction.client.get_user(user_id).send(
-                                    f"The Peace Negotiations to end the "
-                                    f"**{war_info['name']}** have been "
-                                    f"accepted by {target_info['name']}."
-                                    f"The terms are as follows:",
-                                    embed=peace_embed)
-                                # delete the peace negotiation
-                                await conn.execute('''DELETE
-                                                      FROM cnc_peace_negotiations
-                                                      WHERE war_id = $1;''',
-                                                   war_info['id'])
-
-                        async def decline_callback(interaction: discord.Interaction):
-                            # defer the interaction
-                            await interaction.response.defer(thinking=True)
-                            # destroy any pending negotiation
-                            await conn.execute('''DELETE
-                                                  FROM cnc_peace_negotiations
-                                                  WHERE war_id = $1;''', war_info['id'])
-                            # send notifications
-                            await interaction.edit_original_response(view=None, content="Declined")
-                            await interaction.followup.send("Peace Negotiation declined.")
-                            return await user_info['user_id'].send(
-                                f"Peace Negotiation **declined** for war `{war_info['id']}` "
-                                f"by {r_info['name']}.", embed=peace_embed)
-
-                        # create the accept button
-                        accept_button = discord.ui.Button(label="Accept", style=discord.ButtonStyle.success)
-                        accept_button.callback = accept_callback
-                        # create decline button
-                        decline_button = discord.ui.Button(label="Decline", style=discord.ButtonStyle.danger)
-                        decline_button.callback = decline_callback
-                        # add buttons to view
-                        peace_negotiation_view.add_item(accept_button)
-                        peace_negotiation_view.add_item(decline_button)
-                        # send to user with view
-                        await interaction.client.get_user(r_info['user_id']).send(embed=peace_embed,
-                                                                                  view=peace_negotiation_view)
-                        # check to see if it has timed out
-                        timed_out = await peace_negotiation_view.wait()
-                        # if the primary message times out
-                        if timed_out:
-                            # send messages and auto reject
-                            await interaction.edit_original_response(view=None)
-                            # delete the negotiation
-                            await conn.execute('''DELETE
-                                                  FROM cnc_peace_negotiations
-                                                  WHERE war_id = $1;''', war_info['id'])
-                            await interaction.followup.send("Peace Negotiation has timed out and been auto-rejected.")
-                            return await user_info['user_id'].send(
-                                f"Peace Negotiation **declined** for war `{war_info['id']}` "
-                                f"by {r_info['name']}.", embed=peace_embed)
+                    # if the recipient is NOT the primary, because the primary code blocks
+                    if recipient != primary:
+                        await safe_dm(embed=peace_embed, user_id=r_info['user_id'], bot=interaction.client)
+                    # continue
                     else:
-                        await interaction.client.get_user(r_info['user_id']).send(embed=peace_embed)
+                        continue
+                # send dm (with options for the primary)
+                # create a view for the dropdown and add it
+                peace_negotiation_view = discord.ui.View(timeout=86400)
+
+                # define callbacks`
+                async def accept_callback(interaction: discord.Interaction):
+                    # defer the interaction
+                    await interaction.response.defer(thinking=True)
+                    # parse negotiations
+                    await negotiation_parse(war_info)
+                    # send the acceptance dm to all participants
+                    for member in [war_info['attackers'], war_info['defenders']]:
+                        # pull their user id
+                        user_id = await conn.fetchval('''SELECT user_id
+                                                         FROM cnc_users
+                                                         WHERE name = $1;''',
+                                                      member)
+                        # send notification
+                        await safe_dm(embed=peace_embed, user_id=user_id, bot=interaction.client,
+                                      content=f"The Peace Negotiations to end the **{war_info['name']}** "
+                                              f"have been accepted by {target_info['name']}. "
+                                              f"The terms are as follows:")
+                        # delete the peace negotiation
+                        await conn.execute('''DELETE
+                                              FROM cnc_peace_negotiations
+                                              WHERE war_id = $1;''',
+                                           war_info['id'])
+
+                async def decline_callback(interaction: discord.Interaction):
+                    # defer the interaction
+                    await interaction.response.defer(thinking=True)
+                    # destroy any pending negotiation
+                    await conn.execute('''DELETE
+                                          FROM cnc_peace_negotiations
+                                          WHERE war_id = $1;''', war_info['id'])
+                    # send notifications
+                    await interaction.edit_original_response(view=None, content="Declined")
+                    await interaction.followup.send("Peace Negotiation declined.")
+                    return await safe_dm(
+                        content=f"Peace Negotiation **declined** for war `{war_info['id']}` "
+                        f"by {target_info['name']}.", embed=peace_embed, bot=interaction.client,
+                        user_id=target_info['user_id'])
+
+                # create the accept button
+                accept_button = discord.ui.Button(label="Accept", style=discord.ButtonStyle.success)
+                accept_button.callback = accept_callback
+                # create decline button
+                decline_button = discord.ui.Button(label="Decline", style=discord.ButtonStyle.danger)
+                decline_button.callback = decline_callback
+                # add buttons to view
+                peace_negotiation_view.add_item(accept_button)
+                peace_negotiation_view.add_item(decline_button)
+                # send to user with view
+                await safe_dm(embed=peace_embed, view=peace_negotiation_view, user_id=target_info['user_id'],
+                              bot=interaction.client)
+                # check to see if it has timed out
+                timed_out = await peace_negotiation_view.wait()
+                # if the primary message times out
+                if timed_out:
+                    # send messages and auto reject
+                    await interaction.edit_original_response(view=None)
+                    # delete the negotiation
+                    await conn.execute('''DELETE
+                                          FROM cnc_peace_negotiations
+                                          WHERE war_id = $1;''', war_info['id'])
+                    await interaction.followup.send("Peace Negotiation has timed out and been auto-rejected.")
+                    return await safe_dm(content=f"Peace Negotiation **declined** for war `{war_info['id']}` "
+                                                 f"by {target_info['name']}.",
+                                         embed=peace_embed, bot=interaction.client, user_id=target_info['user_id'])
             # otherwise, no negotiations required
             else:
                 # check to ensure the demands are less than 100
@@ -5115,13 +5123,10 @@ class WarOptionsView(discord.ui.View):
                                                         FROM cnc_users
                                                         WHERE name = $1;''', recipient)
                         # send notification
-                        await interaction.client.get_user(r_info['user_id']).send(f"{user_info['name']} has demanded "
-                                                                                  f"the following peace treaty. "
-                                                  f"The forces of {primary} and their allies have been overwhelmed "
-                                                  f"entirely. The negotiation has been automatically accepted.",
-                                                  embed=peace_embed)
-            # send the notification that it has been sent
-            return await interaction.followup.send("The Peace Negotiation has been delivered!")
+                        await safe_dm(content=f"{user_info['name']} has demanded the following peace treaty. "
+                                      f"The forces of {primary} and their allies have been overwhelmed "
+                                      f"entirely. The negotiation has been automatically accepted.",
+                                      embed=peace_embed, user_id=r_info['user_id'], bot=interaction.client)
 
         # add the callback for send
         send_button.callback = send_callback
