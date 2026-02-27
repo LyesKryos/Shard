@@ -5176,6 +5176,8 @@ class WarOptionsView(discord.ui.View):
                                               FROM cnc_peace_negotiations
                                               WHERE war_id = $1;''',
                                            war_info['id'])
+                        # delete the war
+                        await conn.execute('''DELETE FROM cnc_wars WHERE id = $1;''', war_info['id'])
 
                 async def decline_callback(interaction: discord.Interaction):
                     # defer the interaction
@@ -5244,6 +5246,8 @@ class WarOptionsView(discord.ui.View):
                                       f"The forces of {primary} and their allies have been overwhelmed "
                                       f"entirely. The negotiation has been automatically accepted.",
                                       embed=peace_embed, user_id=r_info['user_id'], bot=interaction.client)
+                        # delete the war
+                        await conn.execute('''DELETE FROM cnc_wars WHERE id = $1;''', war_info['id'])
 
         # add the callback for send
         send_button.callback = send_callback
