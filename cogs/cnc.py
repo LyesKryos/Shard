@@ -5059,7 +5059,7 @@ class WarOptionsView(discord.ui.View):
                                                   FROM cnc_peace_negotiations
                                                   WHERE war_id = $1;''', war_info['id'])
                             # send notifications
-                            await interaction.edit_original_response(view=None)
+                            await interaction.edit_original_response(view=None, content="Declined")
                             await interaction.followup.send("Peace Negotiation declined.")
                             return await user_info['user_id'].send(
                                 f"Peace Negotiation **declined** for war `{war_info['id']}` "
