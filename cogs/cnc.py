@@ -2646,8 +2646,8 @@ class CooperativeDiplomaticActions(discord.ui.View):
         # check embargoes
         embargoes = await self.conn.fetchrow('''SELECT *
                                                 FROM cnc_embargoes
-                                                WHERE $1 = ANY array_cat(sender, target)
-                                                  AND $2 = ANY array_cat(target, target);''',
+                                                WHERE $1 = ANY array(sender, target)
+                                                  AND $2 = ANY array(sender, target);''',
                                              user_info['name'], self.recipient_info['name'])
         if embargoes is not None:
             button.disabled = True
