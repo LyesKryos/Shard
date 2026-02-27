@@ -4845,7 +4845,7 @@ class WarOptionsView(discord.ui.View):
                 # pull peace negotiation information
                 peace_negotiation = await conn.fetchrow('''SELECT *
                                                            FROM cnc_peace_negotiations
-                                                           WHERE id = $1;''', war_info['id'])
+                                                           WHERE war_id = $1;''', war_info['id'])
                 # parse out and execute demands
                 # if none of the default options were demanded, set to 0
                 if not peace_negotiation['end_embargo']:
@@ -5065,7 +5065,7 @@ class WarOptionsView(discord.ui.View):
                                 f"Peace Negotiation **declined** for war `{war_info['id']}` "
                                 f"by {r_info['name']}.", embed=peace_embed)
 
-                        # create accept button
+                        # create the accept button
                         accept_button = discord.ui.Button(label="Accept", style=discord.ButtonStyle.success)
                         accept_button.callback = accept_callback
                         # create decline button
