@@ -5827,7 +5827,7 @@ class CNC(commands.Cog):
         if (nation is None) and (user is None):
             user_info = await user_db_info(interaction.user.id, self.bot.pool)
             if user_info is None:
-                return await interaction.response.send_message(f"That user is not a registered player of the CNC system.",
+                return await interaction.response.send_message(f"You are not a registered player of the CNC system.",
                                                        ephemeral=True)
         # if both are submitted, return error message
         if (nation is not None) and (user is not None):
@@ -6914,9 +6914,9 @@ class CNC(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def cnc_permanent_delete_user(self, ctx, user: discord.Member):
+    async def cnc_permanent_delete_user(self, ctx, user_to_delete: discord.Member):
         # sent a confirmation message
-        delete_confirm = await ctx.send(f"Are you certain you would like to delete {user.name} "
+        delete_confirm = await ctx.send(f"Are you certain you would like to delete {user_to_delete.name} "
                                         f"from the Command and Conquest System?")
 
 
@@ -6929,21 +6929,21 @@ class CNC(commands.Cog):
             if str(reaction.emoji) != "\U00002705":
                 return await ctx.send("Must confirm deletion with: \U00002705")
         except asyncio.TimeoutError:
-            return await delete_confirm.edit(content=f"Permanent deletion of {user.name} "
+            return await delete_confirm.edit(content=f"Permanent deletion of {user_to_delete.name} "
                                                      f"from the Command and Conquest System aborted.")
         conn = self.bot.pool
         usercheck = await conn.fetchrow('''SELECT *
                                            FROM cnc_users
-                                           WHERE user_id = $1;''', user.id)
+                                           WHERE user_id = $1;''', user_to_delete.id)
         if usercheck is None:
             return await ctx.send("No such user in the CNC system.")
         try:
             await conn.execute('''DELETE
                                   FROM cnc_users
-                                  WHERE user_id = $1;''', user.id)
+                                  WHERE user_id = $1;''', user_to_delete.id)
             await conn.execute('''DELETE
                                   FROM cnc_armies
-                                  WHERE owner_id = $1;''', user.id)
+                                  WHERE owner_id = $1;''', user_to_delete.id)
             await conn.execute('''UPDATE cnc_provinces
                                   SET owner_id    = 0,
                                       occupier_id = 0,
@@ -6952,14 +6952,14 @@ class CNC(commands.Cog):
                                       structures  = NULL,
                                       fort_level  = 0
                                   WHERE owner_id = $1
-                                    AND occupier_id = $1;''', user.id)
+                                    AND occupier_id = $1;''', user_to_delete.id)
             await conn.execute('''DELETE
                                   FROM cnc_researching
-                                  WHERE user_id = $1;''', user.id)
+                                  WHERE user_id = $1;''', user_to_delete.id)
             await delete_confirm.delete()
         except asyncpg.PostgresError as error:
             raise error
-        return await ctx.send(f"Permanent deletion of {user.name} "
+        return await ctx.send(f"Permanent deletion of {user_to_delete.name} "
                               "from the Command and Conquest System completed.")
 
     @commands.command()
