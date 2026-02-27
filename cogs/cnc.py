@@ -5086,7 +5086,7 @@ class WarOptionsView(discord.ui.View):
                     await conn.execute('''UPDATE cnc_users
                                           SET overlord = $1
                                           WHERE user_id = $2;''',
-                                       user_info['name'], target_info['user_id'])
+                                       user_info['user_id'], target_info['user_id'])
 
                 # if there are dismantle demands, execute the dismantle stipulations
                 elif peace_negotiation['dismantle']:
@@ -5318,7 +5318,7 @@ class AuthDemandView(discord.ui.View):
 
         async def callback(self, interaction: discord.Interaction):
             self.view.mil_authority = self.values[0]
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
 
     class EconSelect(discord.ui.Select):
         def __init__(self):
@@ -5331,7 +5331,7 @@ class AuthDemandView(discord.ui.View):
 
         async def callback(self, interaction: discord.Interaction):
             self.view.econ_authority = self.values[0]
-            await interaction.response.defer()  # or thinking=False if you want silent
+            await interaction.response.defer(ephemeral=True)  # or thinking=False if you want silent
 
     class DiploSelect(discord.ui.Select):
         def __init__(self):
@@ -5344,7 +5344,7 @@ class AuthDemandView(discord.ui.View):
 
         async def callback(self, interaction: discord.Interaction):
             self.view.diplo_authority = self.values[0]
-            await interaction.response.defer() 
+            await interaction.response.defer(ephemeral=True) 
 
     # create submit and cancel buttons
 
