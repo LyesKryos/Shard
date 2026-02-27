@@ -5059,7 +5059,7 @@ class WarOptionsView(discord.ui.View):
                         peace_negotiation_view.add_item(accept_button)
                         peace_negotiation_view.add_item(decline_button)
                         # send to user with view
-                        await r_info['user'].send(embed=peace_embed, view=peace_negotiation_view)
+                        await r_info['user_id'].send(embed=peace_embed, view=peace_negotiation_view)
                         # check to see if it has timed out
                         timed_out = await peace_negotiation_view.wait()
                         # if the primary message times out
