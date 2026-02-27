@@ -4951,11 +4951,6 @@ class WarOptionsView(discord.ui.View):
                 recipients_names = [target]
             # primary recipient
             primary = recipients_names[0]
-            # create the peace treaty
-            await conn.execute('''INSERT INTO cnc_peace_treaties
-                                  VALUES ($1, $2, $3, $4);''',
-                               war_info['id'], war_info['attackers'].append(war_info['defenders']),
-                               primary, truce_length)
 
             # define the peace negotiation parse function
             async def negotiation_parse(war_info: asyncpg.Record):
@@ -5161,6 +5156,11 @@ class WarOptionsView(discord.ui.View):
                     await interaction.response.defer(thinking=True)
                     # parse negotiations
                     await negotiation_parse(war_info)
+                    # create the peace treaty
+                    await conn.execute('''INSERT INTO cnc_peace_treaties
+                                          VALUES ($1, $2, $3, $4);''',
+                                       war_info['id'], war_info['attackers'].append(war_info['defenders']),
+                                       primary, truce_length)
                     # send the acceptance dm to all participants
                     for member in war_info['attackers'].append(war_info['defenders']):
                         # pull their user id
