@@ -4847,7 +4847,6 @@ class WarOptionsView(discord.ui.View):
                                                            FROM cnc_peace_negotiations
                                                            WHERE id = $1;''', war_info['id'])
                 # parse out and execute demands
-                # if there are cede province demands, update the owner and occupier
                 # if none of the default options were demanded, set to 0
                 if not peace_negotiation['end_embargo']:
                     await conn.execute('''UPDATE cnc_peace_treaties
@@ -4874,7 +4873,7 @@ class WarOptionsView(discord.ui.View):
                                           SET dismantle = 0
                                           WHERE war_id = $1;''',
                                        war_info['id'])
-                # begin parsing
+                # if there are cede province demands, update the owner and occupier
                 if peace_negotiation['cede_provinces']:
                     # for every province, update the db with the new owner and occupier
                     for demanded_province in peace_negotiation['cede_provinces']:
@@ -5016,13 +5015,13 @@ class WarOptionsView(discord.ui.View):
             # if the current war score is less than a 100% or if the target is not the primary
             if (target_war_score < 100) or (target != primary):
                 # pull their user ids and send the dm
-                for recipients in recipients_names:
+                for recipient in recipients_names:
                     # make db call
                     r_info = await conn.fetchrow('''SELECT *
                                                     FROM cnc_users
-                                                    WHERE name = $1;''', recipients)
+                                                    WHERE name = $1;''', recipient)
                     # send dm (with options for the primary)
-                    if recipients == primary:
+                    if recipient == primary:
                         # create a view for the dropdown and add it
                         peace_negotiation_view = discord.ui.View(timeout=86400)
 
@@ -5110,11 +5109,11 @@ class WarOptionsView(discord.ui.View):
                     # parse out demands
                     await negotiation_parse(war_info)
                     # notify the recipients that they have lost the war
-                    for recipients in recipients_names:
+                    for recipient in recipients_names:
                         # make db call
                         r_info = await conn.fetchrow('''SELECT *
                                                         FROM cnc_users
-                                                        WHERE name = $1;''', recipients)
+                                                        WHERE name = $1;''', recipient)
                         # send notification
                         await interaction.client.get_user(r_info['user_id']).send(f"{user_info['name']} has demanded "
                                                                                   f"the following peace treaty. "
