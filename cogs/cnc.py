@@ -5159,7 +5159,7 @@ class WarOptionsView(discord.ui.View):
                     # create the peace treaty
                     await conn.execute('''INSERT INTO cnc_peace_treaties
                                           VALUES ($1, $2, $3, $4);''',
-                                       war_info['id'], attackers_list.append(defenders_list)),
+                                       war_info['id'], attackers_list.append(defenders_list),
                                        primary, truce_length)
                     # send the acceptance dm to all participants
                     for member in attackers_list.append(defenders_list):
@@ -5173,15 +5173,15 @@ class WarOptionsView(discord.ui.View):
                                       content=f"The Peace Negotiations to end the **{war_info['name']}** "
                                               f"have been **accepted** by {target_info['name']}. "
                                               f"The terms are as follows:")
-                        # delete the peace negotiation
-                        await conn.execute('''DELETE
-                                              FROM cnc_peace_negotiations
-                                              WHERE war_id = $1;''',
-                                           war_info['id'])
-                        # delete the war
-                        await conn.execute('''DELETE FROM cnc_wars WHERE id = $1;''', war_info['id'])
-                        # stop listening
-                        peace_negotiation_view.stop()
+                    # delete the peace negotiation
+                    await conn.execute('''DELETE
+                                            FROM cnc_peace_negotiations
+                                            WHERE war_id = $1;''',
+                                        war_info['id'])
+                    # delete the war
+                    await conn.execute('''DELETE FROM cnc_wars WHERE id = $1;''', war_info['id'])
+                    # stop listening
+                    peace_negotiation_view.stop()
 
                 async def decline_callback(interaction: discord.Interaction):
                     # defer the interaction
