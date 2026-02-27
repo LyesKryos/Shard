@@ -5159,10 +5159,10 @@ class WarOptionsView(discord.ui.View):
                     # create the peace treaty
                     await conn.execute('''INSERT INTO cnc_peace_treaties
                                           VALUES ($1, $2, $3, $4);''',
-                                       war_info['id'], war_info['attackers'].append(war_info['defenders']),
+                                       war_info['id'], attackers_list.append(defenders_list)),
                                        primary, truce_length)
                     # send the acceptance dm to all participants
-                    for member in war_info['attackers'].append(war_info['defenders']):
+                    for member in attackers_list.append(defenders_list):
                         # pull their user id
                         user_id = await conn.fetchval('''SELECT user_id
                                                          FROM cnc_users
@@ -5191,14 +5191,19 @@ class WarOptionsView(discord.ui.View):
                                           FROM cnc_peace_negotiations
                                           WHERE war_id = $1;''', war_info['id'])
                     # send notifications
-                    await interaction.edit_original_response(view=None, content="Declined")
-                    await interaction.followup.send("Peace Negotiation declined.")
+                    await interaction.edit_original_response(view=peace_negotiation_view)
                     # stop listening
                     peace_negotiation_view.stop()
-                    return await safe_dm(
-                        content=f"Peace Negotiation **declined** for war `{war_info['id']}` "
-                        f"by {target_info['name']}.", embed=peace_embed, bot=interaction.client,
-                        user_id=target_info['user_id'])
+                    # for each player in the war
+                    for belligerent in attackers_list.append(defenders_list):
+                        # pull their user id
+                        user_id = await conn.fetchval('''SELECT user_id
+                                                         FROM cnc_users
+                                                         WHERE name = $1;''',
+                                                      belligerent)
+                        await safe_dm(
+                            content=f"{target_info['name']} has **declined** the Peace Negotiation to end {war_info['name']}!", embed=peace_embed, bot=interaction.client,
+                            user_id=user_id)
 
                 # create the accept button
                 accept_button = discord.ui.Button(label="Accept", style=discord.ButtonStyle.success)
