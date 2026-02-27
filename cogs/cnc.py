@@ -3342,12 +3342,13 @@ class WarDeclarationView(discord.ui.View):
         # build simple attacker/defender name lists for storage
         attackers_names = [self.sender_info['name']]
         defenders_names = [self.recipient_info['name']]
-        # pull all defender's allies and add to defenders
+        # pull all defender's allies
         defender_alliances = await self.conn.fetchrow('''SELECT *
                                                          FROM cnc_alliances
                                                          WHERE $1 = ANY (members);''',
                                                       self.recipient_info['name'])
-        defenders_names.append(defender_alliances['members'].remove(self.recipient_info['name']))
+        # send a message to the defenders about joining the war
+
         # check if the user has already had a war with this nation with this CB and how many
         historic_war_check = await self.conn.fetch('''SELECT *
                                                       FROM cnc_wars
@@ -3407,6 +3408,14 @@ class WarDeclarationView(discord.ui.View):
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         await interaction.edit_original_response(view=diplo_menu)
 
+class DefenderAcceptWarView(discord.ui.View):
+
+    def __init__(self, war_id: int):
+        # define timeout
+        super().__init__(timeout=86400)
+        self.war_id = war_id
+
+    @discord.ui.button(label="")
 
 class CasusBelliDropdown(discord.ui.Select):
 
@@ -3908,6 +3917,8 @@ class WarOptionsView(discord.ui.View):
                                                            FROM cnc_peace_negotiations
                                                            WHERE war_id = $1;''',
                                                         war_info['id'])
+        # create negotiation dispatched protector code
+        negotiation_dispatched = False
         # if there is a pending negotiation, return
         if pending_peace_negotiation is not None:
             for child in self.children:
@@ -4005,10 +4016,12 @@ class WarOptionsView(discord.ui.View):
                     # if the user fails to respond, stop listening
                     # and remove all the options from the original interaction message, effectively canceling
                     self.stop()
-                    # if the user gives no response or cancels
-                    await conn.execute('''DELETE
-                                          FROM cnc_peace_negotiations
-                                          WHERE war_id = $1;''', war_info['id'])
+                    # if the negotiation has yet to be sent
+                    if not negotiation_dispatched:
+                        # if the user gives no response or cancels
+                        await conn.execute('''DELETE
+                                              FROM cnc_peace_negotiations
+                                              WHERE war_id = $1;''', war_info['id'])
                     # remove the view
                     return await parent_interaction.edit_original_response(view=None)
 
@@ -4197,10 +4210,12 @@ class WarOptionsView(discord.ui.View):
                                                                           timeout=120)
             await negotiation_demands.response.send_message("Processing...", ephemeral=True, delete_after=1)
         except asyncio.TimeoutError:
-            # destroy any pending negotiation
-            await conn.execute('''DELETE
-                                  FROM cnc_peace_negotiations
-                                  WHERE war_id = $1;''', war_info['id'])
+            # if the negotiation has yet to be sent
+            if not negotiation_dispatched:
+                # destroy any pending negotiation
+                await conn.execute('''DELETE
+                                      FROM cnc_peace_negotiations
+                                      WHERE war_id = $1;''', war_info['id'])
             # return and remove the view if the user does not interact
             return await self.interaction.edit_original_response(view=None)
 
@@ -4348,10 +4363,12 @@ class WarOptionsView(discord.ui.View):
                                                                             timeout=120)
                         await target_returned.response.defer()
                     except asyncio.TimeoutError:
-                        # destroy the pending negotiation
-                        await conn.execute('''DELETE
-                                              FROM cnc_peace_negotiations
-                                              WHERE war_id = $1;''', war_info['id'])
+                        # if the negotiation has yet to be sent
+                        if not negotiation_dispatched:
+                            # destroy the pending negotiation
+                            await conn.execute('''DELETE
+                                                  FROM cnc_peace_negotiations
+                                                  WHERE war_id = $1;''', war_info['id'])
                         # return and remove the view if the user does not interact
                         return await self.interaction.edit_original_response(view=None)
 
@@ -4494,11 +4511,13 @@ class WarOptionsView(discord.ui.View):
                                                                                       check=embargo_check,
                                                                                       timeout=120)
                     except asyncio.TimeoutError:
-                        # destroy any pending negotiation
-                        await conn.execute('''DELETE
-                                              FROM cnc_peace_negotiations
-                                              WHERE war_id = $1;''', war_info['id'])
-                        # return and remove the view if the user does not interact
+                        # if the negotiation has yet to be sent
+                        if not negotiation_dispatched:
+                            # destroy any pending negotiation
+                            await conn.execute('''DELETE
+                                                  FROM cnc_peace_negotiations
+                                                  WHERE war_id = $1;''', war_info['id'])
+                            # return and remove the view if the user does not interact
                         return await self.interaction.edit_original_response(view=None)
                     # parse the results
                     end_embargo_targets = embargo_targets_returned.data['values']
@@ -4693,10 +4712,12 @@ class WarOptionsView(discord.ui.View):
                                                                                       check=overlord_check,
                                                                                       timeout=120)
                     except asyncio.TimeoutError:
-                        # destroy any pending negotiation
-                        await conn.execute('''DELETE
-                                              FROM cnc_peace_negotiations
-                                              WHERE war_id = $1;''', war_info['id'])
+                        # if the negotiation has yet to be sent
+                        if not negotiation_dispatched:
+                            # destroy any pending negotiation
+                            await conn.execute('''DELETE
+                                                  FROM cnc_peace_negotiations
+                                                  WHERE war_id = $1;''', war_info['id'])
                         # return and remove the view if the user does not interact
                         return await self.interaction.edit_original_response(view=None)
                     # parse the results
@@ -4821,6 +4842,9 @@ class WarOptionsView(discord.ui.View):
         async def send_callback(interaction: discord.Interaction):
             # defer the interaction
             await interaction.response.defer(thinking=False)
+            # protect the negotiation from being deleted
+            nonlocal negotiation_dispatched
+            negotiation_dispatched = True
             # removing the view
             await self.interaction.edit_original_response(view=None)
             # get the recipient(s) if it is a total negotiation
@@ -5174,12 +5198,6 @@ class AuthDemandView(discord.ui.View):
 
     # on timeout
     async def on_timeout(self):
-        await self.conn.execute(
-            '''DELETE
-                FROM cnc_peace_negotiations
-                WHERE war_id = $1;''',
-            self.war_info['id']
-        )
         return await self.parent_interaction.edit_original_response(view=None)
 
     # create the select classes
