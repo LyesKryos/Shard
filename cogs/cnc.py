@@ -3342,12 +3342,6 @@ class WarDeclarationView(discord.ui.View):
         # build simple attacker/defender name lists for storage
         attackers_names = [self.sender_info['name']]
         defenders_names = [self.recipient_info['name']]
-        # pull all defender's allies
-        defender_alliances = await self.conn.fetchrow('''SELECT *
-                                                         FROM cnc_alliances
-                                                         WHERE $1 = ANY (members);''',
-                                                      self.recipient_info['name'])
-        # send a message to the defenders about joining the war
 
         # check if the user has already had a war with this nation with this CB and how many
         historic_war_check = await self.conn.fetch('''SELECT *
@@ -3397,6 +3391,24 @@ class WarDeclarationView(discord.ui.View):
         # send the war embed in the public channel
         await cnc_channel.send(embed=war_embed)
         await interaction.followup.send(embed=war_embed)
+        # pull all defender's allies
+        defender_alliances = await self.conn.fetchrow('''SELECT *
+                                                         FROM cnc_alliances
+                                                         WHERE $1 = ANY (members);''',
+                                                      self.recipient_info['name'])
+        # send a message to the defenders about joining the war
+        for defender in defender_alliances['members']:
+            # get defender info
+            defender_info = await user_db_info(defender, self.conn)
+            # create the view
+            defender_war_join_view = DefenderAcceptWarView(war_id=self.interaction.message.id,
+                                                           defender_info=defender_info,
+                                                           conn=self.conn,
+                                                           bot=self.bot)
+            # safe dm
+            await safe_dm(self.bot, defender_info['user_id'], view=defender_war_join_view, embed=war_embed,
+                          content=f"{self.sender_info['name']} has declared war on {self.recipient_info['name']}\n"
+                                  f"We must come to the aid of our ally or abandon them to their fate.")
         # disable the views
         return await self.interaction.edit_original_response(view=None)
 
@@ -3410,10 +3422,112 @@ class WarDeclarationView(discord.ui.View):
 
 class DefenderAcceptWarView(discord.ui.View):
 
-    def __init__(self, war_id: int):
+    def __init__(self, war_id: int, defender_info: asyncpg.Record, conn: asyncpg.Pool, bot: discord.Client):
         # define timeout
         super().__init__(timeout=86400)
         self.war_id = war_id
+        self.defender_info = defender_info
+        self.conn = conn
+        self.bot = bot
+
+    async def on_timeout(self):
+        # establish connection
+        conn = self.conn
+        # get the war info
+        war_info = await conn.fetchrow('''SELECT * FROM cnc_wars WHERE id = $1;''', self.war_id)
+        # get defender info
+        defender_info = self.defender_info
+        # remove the defender from the alliance
+        await conn.execute('''UPDATE cnc_alliances
+                              SET members = ARRAY_REMOVE(members, $1)
+                              WHERE $1 = ANY (members);
+        )''',
+                           defender_info['name'])
+        # get alliance information
+        alliance_info = await conn.fetchrow('''SELECT *
+                                               FROM cnc_alliances
+                                               WHERE $1 = ANY (members);''',
+                                            war_info['primary_defender'])
+        # notify each member
+        for member in alliance_info['members']:
+            # get the member's info
+            member_info = await user_db_info(member, conn)
+            # send a message to the user
+            await safe_dm(self.bot, member_info['user_id'],
+                          content=f"{defender_info['name']} has betrayed the alliance "
+                                  f"and refused to join {war_info['name']}!")
+        # notify member
+        await safe_dm(bot=self.bot, user_id=defender_info['user_id'],
+                      content=f"{defender_info['name']} has betrayed the alliance "
+                              f"and refused to join {war_info['name']}!")
+        # stop listening
+        self.stop()
+
+    @discord.ui.button(label="Join War", style=discord.ButtonStyle.success, emoji="\U0001f6e1")
+    async def join_war(self, interaction: discord.Interaction):
+        # defer the interaction
+        await interaction.response.defer(thinking=False)
+        # establish the connection
+        conn = self.conn
+        # get user info
+        defender_info = self.defender_info
+        # add them to the defenders
+        await conn.execute('''UPDATE cnc_wars SET defenders = defenders || $1 WHERE id = $2;''',
+                           defender_info['name'], self.war_id)
+        # fetch the war info
+        war_info = await conn.fetchrow('''SELECT * FROM cnc_wars WHERE id = $1;''',
+                                       self.war_id)
+        # pull all user information
+        for member in war_info['attackers'].append(war_info['defenders']):
+            # if the user is the defender, continue
+            if member == defender_info['name']:
+                continue
+            # get their info
+            member_info = await user_db_info(member, conn)
+            # send a message to the user
+            await safe_dm(interaction.client, member_info['user_id'],
+                          content=f"{defender_info['name']} has joined the {war_info['name']} in defense of "
+                                  f"{war_info['primary_defender']}!")
+        # update the user
+        await interaction.followup.send(f"{defender_info['name']} has joined the {war_info['name']} in defense of "
+                                        f"{war_info['primary_defender']}!")
+        # notify the server
+        cnc_channel = interaction.client.get_channel(927288304301387816)
+        await cnc_channel.send(f"{defender_info['name']} has joined the {war_info['name']} in defense of "
+                                        f"{war_info['primary_defender']}!")
+        # stop listening
+        self.stop()
+
+    @discord.ui.button(label="Decline War", style=discord.ButtonStyle.danger, emoji="\U0001f525")
+    async def decline_war(self, interaction: discord.Interaction):
+        # defer the interaction
+        await interaction.response.defer(thinking=False)
+        # get the connection
+        conn = self.conn
+        # get the war info
+        war_info = await conn.fetchrow('''SELECT * FROM cnc_wars WHERE id = $1;''',
+                                       self.war_id)
+        # get defender info
+        defender_info = self.defender_info
+        # remove the defender from the alliance
+        await conn.execute('''UPDATE cnc_alliances SET members = ARRAY_REMOVE(members, $1) 
+                              WHERE $1 = ANY (members);)''',
+                           defender_info['name'])
+        # get alliance information
+        alliance_info = await conn.fetchrow('''SELECT * FROM cnc_alliances WHERE $1 = ANY (members);''',
+                                            war_info['primary_defender'])
+        # notify each member
+        for member in alliance_info['members']:
+            # get the member's info
+            member_info = await user_db_info(member, conn)
+            # send a message to the user
+            await safe_dm(interaction.client, member_info['user_id'],
+                          content=f"{defender_info['name']} has betrayed the alliance "
+                                  f"and refused to join {war_info['name']}!")
+        # notify member
+        await interaction.followup.send(f"{defender_info['name']} has betrayed their alliance and has been removed.")
+        # stop listening
+        self.stop()
 
 
 class CasusBelliDropdown(discord.ui.Select):
