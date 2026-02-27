@@ -5156,18 +5156,20 @@ class WarOptionsView(discord.ui.View):
                     await interaction.response.defer(thinking=True)
                     # parse negotiations
                     await negotiation_parse(war_info)
+                    # define all members
+                    belligerents = war_info['attackers'] + war_info['defenders']
                     # create the peace treaty
                     await conn.execute('''INSERT INTO cnc_peace_treaties
                                           VALUES ($1, $2, $3, $4);''',
-                                       war_info['id'], attackers_list.append(defenders_list),
+                                       war_info['id'], belligerents,
                                        primary, truce_length)
                     # send the acceptance dm to all participants
-                    for member in attackers_list.append(defenders_list):
+                    for belligerent in belligerents:
                         # pull their user id
                         user_id = await conn.fetchval('''SELECT user_id
                                                          FROM cnc_users
                                                          WHERE name = $1;''',
-                                                      member)
+                                                      belligerent)
                         # send notification
                         await safe_dm(embed=peace_embed, user_id=user_id, bot=interaction.client,
                                       content=f"The Peace Negotiations to end the **{war_info['name']}** "
@@ -5186,6 +5188,8 @@ class WarOptionsView(discord.ui.View):
                 async def decline_callback(interaction: discord.Interaction):
                     # defer the interaction
                     await interaction.response.defer(thinking=True)
+                    # define all members
+                    belligerents = war_info['attackers'] + war_info['defenders']
                     # destroy any pending negotiation
                     await conn.execute('''DELETE
                                           FROM cnc_peace_negotiations
@@ -5195,7 +5199,7 @@ class WarOptionsView(discord.ui.View):
                     # stop listening
                     peace_negotiation_view.stop()
                     # for each player in the war
-                    for belligerent in attackers_list.append(defenders_list):
+                    for belligerent in belligerents:
                         # pull their user id
                         user_id = await conn.fetchval('''SELECT user_id
                                                          FROM cnc_users
