@@ -2637,7 +2637,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                            FROM cnc_wars
                                            WHERE active = True
                                              AND ($1 = ANY (array_cat(attackers, defenders))
-                                               AND $2 = ANY (array_cat(attackers, defenders));''',
+                                               AND $2 = ANY (array_cat(attackers, defenders)));''',
                                         user_info['name'], self.recipient_info['name'])
         if wars is not None:
             button.disabled = True
