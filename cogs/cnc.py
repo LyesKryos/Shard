@@ -5995,6 +5995,11 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Government", value=f"{user_info['govt_subtype']} {user_info['govt_type']}")
         # populate territory and count on its own line
         user_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}", inline=False)
+        # populate overlord, if they exist
+        if user_info['overlord']:
+            # pull overlord
+            overlord_name = await conn.fetchval('''SELECT name FROM cnc_users WHERE user_id = $1;''', user_info['overlord'])
+            user_embed.add_field(name="Overlord", value=f"{overlord_name}")
         # create dossier view
         doss_view = DossierView(interaction, user_embed, user_info, conn)
         # send and include view
