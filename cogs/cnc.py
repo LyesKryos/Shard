@@ -5153,14 +5153,14 @@ class WarOptionsView(discord.ui.View):
                 # create a view for the dropdown and add it
                 peace_negotiation_view = discord.ui.View(timeout=86400)
 
-                # define callbacks`
+                # define callbacks
                 async def accept_callback(interaction: discord.Interaction):
                     # defer the interaction
                     await interaction.response.defer(thinking=True)
                     # parse negotiations
                     await negotiation_parse(war_info)
                     # send the acceptance dm to all participants
-                    for member in [war_info['attackers'], war_info['defenders']]:
+                    for member in war_info['attackers'].append(war_info['defenders']):
                         # pull their user id
                         user_id = await conn.fetchval('''SELECT user_id
                                                          FROM cnc_users
@@ -5169,7 +5169,7 @@ class WarOptionsView(discord.ui.View):
                         # send notification
                         await safe_dm(embed=peace_embed, user_id=user_id, bot=interaction.client,
                                       content=f"The Peace Negotiations to end the **{war_info['name']}** "
-                                              f"have been accepted by {target_info['name']}. "
+                                              f"have been **accepted** by {target_info['name']}. "
                                               f"The terms are as follows:")
                         # delete the peace negotiation
                         await conn.execute('''DELETE
@@ -5215,7 +5215,7 @@ class WarOptionsView(discord.ui.View):
                                           FROM cnc_peace_negotiations
                                           WHERE war_id = $1;''', war_info['id'])
                     await interaction.followup.send("Peace Negotiation has timed out and been auto-rejected.")
-                    return await safe_dm(content=f"Peace Negotiation **declined** for war `{war_info['id']}` "
+                    return await safe_dm(content=f"Peace Negotiation **auto-declined** for war `{war_info['id']}` "
                                                  f"by {target_info['name']}.",
                                          embed=peace_embed, bot=interaction.client, user_id=target_info['user_id'])
             # otherwise, no negotiations required
@@ -5264,6 +5264,8 @@ class WarOptionsView(discord.ui.View):
             await conn.execute('''DELETE
                                   FROM cnc_peace_negotiations
                                   WHERE war_id = $1;''', war_info['id'])
+            # respond
+            await self.interaction.followup.send("Peace Negotiation send has timed out.", ephemeral=True)
             # remove view and send update
             return await self.interaction.edit_original_response(view=None)
 
