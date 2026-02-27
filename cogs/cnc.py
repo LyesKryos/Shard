@@ -4302,6 +4302,8 @@ class WarOptionsView(discord.ui.View):
             await conn.execute('''DELETE
                                   FROM cnc_peace_negotiations
                                   WHERE war_id = $1;''', war_info['id'])
+            # stop listening
+            self.stop()
             return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
 
         cancel_button.callback = cancel_button_callback
@@ -5134,6 +5136,8 @@ class WarOptionsView(discord.ui.View):
             # update the embed footer
             peace_embed.set_footer(text=f"Peace Negotiation send.")
             await self.interaction.edit_original_response(embed=peace_embed)
+            # stop listening
+            self.stop()
 
             # if the current war score is less than a 100% or if the target is not the primary
             if (target_war_score < 100) or (target != primary):
@@ -5178,6 +5182,8 @@ class WarOptionsView(discord.ui.View):
                                            war_info['id'])
                         # delete the war
                         await conn.execute('''DELETE FROM cnc_wars WHERE id = $1;''', war_info['id'])
+                        # stop listening
+                        self.stop()
 
                 async def decline_callback(interaction: discord.Interaction):
                     # defer the interaction
@@ -5189,6 +5195,8 @@ class WarOptionsView(discord.ui.View):
                     # send notifications
                     await interaction.edit_original_response(view=None, content="Declined")
                     await interaction.followup.send("Peace Negotiation declined.")
+                    # stop listening
+                    self.stop()
                     return await safe_dm(
                         content=f"Peace Negotiation **declined** for war `{war_info['id']}` "
                         f"by {target_info['name']}.", embed=peace_embed, bot=interaction.client,
