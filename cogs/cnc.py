@@ -5937,6 +5937,11 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Capital", value=f"{capital}")
         # populate stability
         user_embed.add_field(name="Stability", value=f"{user_info['stability']}")
+        # populate overlord
+        if user_info['overlord']:
+            # get overlord name
+            overlord_name = await conn.fetchval('''SELECT name FROM cnc_users WHERE user_id = $1;''', user_info['overlord'])
+            user_embed.add_field(name="Overlord", value=f"{overlord_name}")
         # populate all three types of authority
         user_embed.add_field(name="=====================AUTHORITY=====================",
                              value="Information known about the nation's authority.", inline=False)
