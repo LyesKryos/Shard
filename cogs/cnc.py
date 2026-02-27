@@ -3904,7 +3904,7 @@ class MilitaryAllianceButton(discord.ui.Button):
                                           f"Turns: {war_info['turns']}\n"
                                           f"Deaths: {war_info['deaths']}")
                 # create the accept/decline view
-                war_invitation_view = AllianceWarInvitation(conn=conn, war_info=war_info, attacker=False,
+                war_invitation_view = AllianceWarInvitation(conn=conn, war_info=war_info, attacker=True,
                                                             alliance_name=alliance_name, sender_info=self.user_info,
                                                             interaction=interaction)
                 # create the content for the message
