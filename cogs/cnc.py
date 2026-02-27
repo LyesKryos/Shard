@@ -4180,7 +4180,7 @@ class WarOptionsView(discord.ui.View):
         try:
             negotiation_demands = await interaction.client.wait_for("interaction", check=pnd_check,
                                                                           timeout=120)
-            await negotiation_demands.response.send_message('Processing...', ephemeral=True, delete_after=1)
+            await negotiation_demands.response.send_message("Processing...", ephemeral=True, delete_after=1)
         except asyncio.TimeoutError:
             # destroy any pending negotiation
             await conn.execute('''DELETE
@@ -4822,32 +4822,6 @@ class WarOptionsView(discord.ui.View):
                                   VALUES ($1, $2, $3, $4);''',
                                war_info['id'], war_info['attackers'].append(war_info['defenders']),
                                primary, truce_length)
-            # if none of the default options were demanded, set to 0
-            if not negotiation_demands['end_embargo']:
-                await conn.execute('''UPDATE cnc_peace_treaties
-                                      SET end_embargo = 0
-                                      WHERE war_id = $1;''',
-                                   war_info['id'])
-            if not negotiation_demands['end_ma']:
-                await conn.execute('''UPDATE cnc_peace_treaties
-                                      SET end_ma = 0
-                                      WHERE war_id = $1;''',
-                                   war_info['id'])
-            if not negotiation_demands['end_tp']:
-                await conn.execute('''UPDATE cnc_peace_treaties
-                                      SET end_tp = 0
-                                      WHERE war_id = $1;''',
-                                   war_info['id'])
-            if not negotiation_demands['humiliate']:
-                await conn.execute('''UPDATE cnc_peace_treaties
-                                      SET humiliate = 0
-                                      WHERE war_id = $1;''',
-                                   war_info['id'])
-            if not negotiation_demands['dismantle']:
-                await conn.execute('''UPDATE cnc_peace_treaties
-                                      SET dismantle = 0
-                                      WHERE war_id = $1;''',
-                                   war_info['id'])
 
             # define the peace negotiation parse function
             async def negotiation_parse(war_info: asyncpg.Record):
@@ -4857,6 +4831,33 @@ class WarOptionsView(discord.ui.View):
                                                            WHERE id = $1;''', war_info['id'])
                 # parse out and execute demands
                 # if there are cede province demands, update the owner and occupier
+                # if none of the default options were demanded, set to 0
+                if not peace_negotiation['end_embargo']:
+                    await conn.execute('''UPDATE cnc_peace_treaties
+                                          SET end_embargo = 0
+                                          WHERE war_id = $1;''',
+                                       war_info['id'])
+                if not peace_negotiation['end_ma']:
+                    await conn.execute('''UPDATE cnc_peace_treaties
+                                          SET end_ma = 0
+                                          WHERE war_id = $1;''',
+                                       war_info['id'])
+                if not peace_negotiation['end_tp']:
+                    await conn.execute('''UPDATE cnc_peace_treaties
+                                          SET end_tp = 0
+                                          WHERE war_id = $1;''',
+                                       war_info['id'])
+                if not peace_negotiation['humiliate']:
+                    await conn.execute('''UPDATE cnc_peace_treaties
+                                          SET humiliate = 0
+                                          WHERE war_id = $1;''',
+                                       war_info['id'])
+                if not peace_negotiation['dismantle']:
+                    await conn.execute('''UPDATE cnc_peace_treaties
+                                          SET dismantle = 0
+                                          WHERE war_id = $1;''',
+                                       war_info['id'])
+                # begin parsing
                 if peace_negotiation['cede_provinces']:
                     # for every province, update the db with the new owner and occupier
                     for demanded_province in peace_negotiation['cede_provinces']:
