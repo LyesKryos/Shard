@@ -2965,6 +2965,21 @@ class HostileDiplomaticActions(discord.ui.View):
                                                 WHERE $1 = ANY (array_cat(attackers, defenders))
                                                   AND $2 = ANY (array_cat(attackers, defenders));''',
                                              sender_info['name'], self.recipient_info['name'])
+        # check to see if the the nations have a truce
+        truce_check = await self.conn.fetchrow('''SELECT * FROM cnc_peace_treaties 
+                                                  WHERE $1 = ANY (members) 
+                                                    AND $2 = ANY (members) 
+                                                    AND truce_length > 0;''',
+                                               sender_info['name'], self.recipient_info['name'])
+        # if the users already have a truce, disable the button and send a message
+        if truce_check is not None:
+            # disable button
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            # send message and return
+            return await interaction.followup.send(f"{sender_info['name']} and {self.recipient_info['name']} have an"
+                                            f"active truce, which will last for "
+                                            f"`{truce_check['truce_length']}` more turns.")
         if war_check is not None:
             # disable the button and return a message
             button.disabled = True

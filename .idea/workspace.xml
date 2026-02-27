@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing negotiation sending bug" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Cleaning up the peace negotiation">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -523,7 +525,7 @@
       <workItem from="1771955779027" duration="3132000" />
       <workItem from="1772043665348" duration="6052000" />
       <workItem from="1772127898578" duration="2914000" />
-      <workItem from="1772131043957" duration="3890000" />
+      <workItem from="1772131043957" duration="4273000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -868,7 +870,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1412" />
+    <option name="localTasksCounter" value="1415" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -887,7 +889,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Debugging the province detection for the cede provinces peace option." />
     <MESSAGE value="Destroy dangling peace negotiations in invalid cede provinces scenarios." />
     <MESSAGE value="Adding End Embargo peace negotiation option" />
     <MESSAGE value="Adding white peace to the peace negotiation options (at the top too)" />
@@ -912,7 +913,8 @@
     <MESSAGE value="Attemping to fix" />
     <MESSAGE value="Attemping to fix bad loading" />
     <MESSAGE value="Fixing negotiation sending bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing negotiation sending bug" />
+    <MESSAGE value="Cleaning up the peace negotiation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleaning up the peace negotiation" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />
