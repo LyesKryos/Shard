@@ -5106,6 +5106,8 @@ class WarOptionsView(discord.ui.View):
                                                   f"The forces of {primary} and their allies have been overwhelmed "
                                                   f"entirely. The negotiation has been automatically accepted.",
                                                   embed=peace_embed)
+            # send the notification that it has been sent
+            return await interaction.followup.send("The Peace Negotiation has been delivered!")
 
         # add the callback for send
         send_button.callback = send_callback
