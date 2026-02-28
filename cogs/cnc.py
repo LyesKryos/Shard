@@ -5854,10 +5854,6 @@ class CNC(commands.Cog):
                                                        ephemeral=True)
         # define connection
         conn = self.bot.pool
-        # pull the caller's info to check their government type
-        caller_info = await conn.fetchrow('''SELECT *
-                                             FROM cnc_users
-                                             WHERE user_id = $1;''', interaction.user.id)
         # pull province data
         province_list, province_count = await self.nation_provinces_db_sort(user_info['user_id'])
         # pull the name of the capital
@@ -5902,20 +5898,18 @@ class CNC(commands.Cog):
                 output = "None"
                 return output
             elif wars:
-                output = ""
+                buffer_list = list()
                 # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
                 for relation in relations:
-                    buffer_output = ", ".join([r for r in relation['attackers'] if r != user_info['name']])
-                    buffer_output += ", ".join([r for r in relation['defenders'] if r != user_info['name']])
-                    output += buffer_output
-                return output
+                    buffer_list.append([r for r in relation['attackers'] if r != user_info['name'] and r in relation['defenders']])
+                    buffer_list.append([r for r in relation['defenders'] if r != user_info['name'] and r in relation['attackers']])
+                return ", ".join(buffer_list)
             else:
-                output = ""
+                buffer_list = list()
                 # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
                 for relation in relations:
-                    buffer_output = ", ".join([r for r in relation['members'] if r != user_info['name']])
-                    output += buffer_output
-                return output
+                    buffer_list.append([r for r in relation['members'] if r != user_info['name']])
+                return ", ".join(buffer_list)
 
         allies = parse_relations(alliances)
         trade_pacts = parse_relations(trade_pacts)
