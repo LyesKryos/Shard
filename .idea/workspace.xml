@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting bug adding attacker ally to defender side">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing a big where the name was added character by character to the military alliance rather than the whole name" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -875,7 +873,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1438" />
+    <option name="localTasksCounter" value="1461" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -894,21 +892,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding parse negotiations to automatic defeat" />
-    <MESSAGE value="Adding the send or cancel buttons to the peace neogitation" />
-    <MESSAGE value="Correcting the adding of new views" />
-    <MESSAGE value="Restoring previous version" />
-    <MESSAGE value="Correcting button interaction error" />
-    <MESSAGE value="Attemping to fix" />
-    <MESSAGE value="Attemping to fix bad loading" />
-    <MESSAGE value="Fixing negotiation sending bug" />
-    <MESSAGE value="Cleaning up the peace negotiation" />
-    <MESSAGE value="Adding truce mechanic to war declaration" />
-    <MESSAGE value="Attempting peace negotiation fix" />
-    <MESSAGE value="Correcting incorrect column reference" />
-    <MESSAGE value="Cleaning up and ensuring correct use of safe DM" />
-    <MESSAGE value="Adding negotiation dispatched protection to timeout deletion" />
-    <MESSAGE value="Small bug fix" />
     <MESSAGE value="Adding defender joining for wars" />
     <MESSAGE value="Attempting better negotiation timeout deletion protection" />
     <MESSAGE value="Actually permitting peace to end the war." />
@@ -919,7 +902,22 @@
     <MESSAGE value="Correcting the embargo recall button" />
     <MESSAGE value="Correcting call to war button error" />
     <MESSAGE value="Correcting bug adding attacker ally to defender side" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting bug adding attacker ally to defender side" />
+    <MESSAGE value="Testing timeout functionality" />
+    <MESSAGE value="Correcting prohibited CB displays on the war embed" />
+    <MESSAGE value="Fixing cancel button" />
+    <MESSAGE value="Correcting mistaken use of defender list for attacker target dropdown options" />
+    <MESSAGE value="Setting peace negotiation timeout to 1 day" />
+    <MESSAGE value="Adding target name to peace info so that the users know who the target of the peace is" />
+    <MESSAGE value="Correcting how wars end if the user is not the primary attacker/defender" />
+    <MESSAGE value="Actually adding target to peace embed and updating it" />
+    <MESSAGE value="Adding decline notification to sender of peace negotiations." />
+    <MESSAGE value="Correcting cooperative relations war check" />
+    <MESSAGE value="Correcting parse_relations to have the correct displays for lists from multiple entries" />
+    <MESSAGE value="Correcting the manner in which nations are checked against cnc_wars for active conflicts" />
+    <MESSAGE value="Correcting hostile check for cooperative relations" />
+    <MESSAGE value="Adding dynamic button checking for call alliance button" />
+    <MESSAGE value="Fixing a big where the name was added character by character to the military alliance rather than the whole name" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing a big where the name was added character by character to the military alliance rather than the whole name" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />

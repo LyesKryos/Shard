@@ -3060,8 +3060,6 @@ class DiplomaticRelationsRespondView(discord.ui.View):
         self.stop()
         # send message that the user has failed to react in time
         await self.dm.reply(content="You have failed to reply within 24 hours. The request has been auto-rejected.")
-        # send message to the sender that the request has been denied
-        sender_user = self.bot.get_user(self.sender_info['user_id'])
         # delete pending request
         await self.conn.execute('''DELETE
                                    FROM cnc_pending_requests
@@ -3102,6 +3100,7 @@ class DiplomaticRelationsRespondView(discord.ui.View):
             f"{self.recipient_info['name']} has accepted "
             f"the request for diplomatic relations from {self.sender_info['name']}!"))
         # close out the buttons
+        self.stop()
         return await interaction.edit_original_response(view=None)
 
     @discord.ui.button(label="Reject", style=discord.ButtonStyle.danger)
@@ -3125,6 +3124,7 @@ class DiplomaticRelationsRespondView(discord.ui.View):
             f"{self.recipient_info['name']} has rejected "
             f"the request for diplomatic relations from {self.sender_info['name']}!"))
         # close out the buttons
+        self.stop()
         return await interaction.edit_original_response(view=None)
 
 
@@ -3187,6 +3187,7 @@ class MilitaryAllianceRespondView(discord.ui.View):
         await sender_user.send(content=f"{self.recipient_info['name']} has accepted the request to join a "
                                        f"military alliance with {self.sender_info['name']}!")
         # close out buttons
+        self.stop()
         return await interaction.edit_original_response(view=None)
 
     @discord.ui.button(label="Reject", style=discord.ButtonStyle.danger)
@@ -3211,6 +3212,7 @@ class MilitaryAllianceRespondView(discord.ui.View):
         await sender_user.send(content=f"{self.recipient_info['name']} has rejected "
                                        f"the request for a military alliance from {self.sender_info['name']}!")
         # close out the buttons
+        self.stop()
         return await interaction.edit_original_response(view=None)
 
 
@@ -3271,6 +3273,7 @@ class TradePactRespondView(discord.ui.View):
             f"{self.recipient_info['name']} has accepted "
             f"the offer of a trade pact with {self.sender_info['name']}!"))
         # close out the buttons
+        self.stop()
         return await interaction.edit_original_response(view=None)
 
     @discord.ui.button(label="Reject", style=discord.ButtonStyle.danger)
@@ -3295,6 +3298,7 @@ class TradePactRespondView(discord.ui.View):
         await sender_user.send(content=f"{self.recipient_info['name']} has rejected "
                                        f"the offer for a trade pact from {self.sender_info['name']}!")
         # close out the buttons
+        self.stop()
         return await interaction.edit_original_response(view=None)
 
 
