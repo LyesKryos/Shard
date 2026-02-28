@@ -6315,7 +6315,11 @@ class CNC(commands.Cog):
                                                     WHERE $1 = ANY (members);''',
                                                  user_info['name'])
             if alliance_check:
-                alliance_button = True
+                # check if there are any non_participating members
+                if not list(set(alliance_check['members']).difference(set(war_info['defenders']))):
+                    alliance_button = False
+                else:
+                    alliance_button = True
             else:
                 alliance_button = False
             # if the war has no defensio belli option and the user is the primary defender, enable that button
