@@ -6316,7 +6316,7 @@ class CNC(commands.Cog):
                                                  user_info['name'])
             if alliance_check:
                 # check if there are any non-participating members
-                if not set(alliance_check['members']).difference(set(war_info['defenders'])) or not set(alliance_check['members']).difference(set(war_info['attackers'])):
+                if (not set(alliance_check['members']).difference(set(war_info['defenders']))) or (not set(alliance_check['members']).difference(set(war_info['attackers']))):
                     alliance_button = False
                 # if there are non-participating members, enable the button
                 else:
