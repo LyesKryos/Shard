@@ -5901,14 +5901,16 @@ class CNC(commands.Cog):
                 buffer_list = list()
                 # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
                 for relation in relations:
-                    buffer_list.append(r for r in relation['attackers'] if r != user_info['name'] and r in relation['defenders'])
-                    buffer_list.append(r for r in relation['defenders'] if r != user_info['name'] and r in relation['attackers'])
+                    buffer_list += [r for r in relation['attackers']
+                                    if (r != user_info['name'] and user_info['name'] in relation['defenders'])]
+                    buffer_list += [r for r in relation['defenders']
+                                    if (r != user_info['name'] and user_info['name'] in relation['attackers'])]
                 return ", ".join(buffer_list)
             else:
                 buffer_list = list()
                 # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
                 for relation in relations:
-                    buffer_list.append(r for r in relation['members'] if r != user_info['name'])
+                    buffer_list += [r for r in relation['members'] if r != user_info['name']]
                 return ", ".join(buffer_list)
 
         allies = parse_relations(alliances)
