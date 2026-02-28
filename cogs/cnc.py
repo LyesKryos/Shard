@@ -2328,8 +2328,8 @@ class DiplomaticMenuView(discord.ui.View):
         # check to see if the nations are at war
         war_check = await self.conn.fetchrow('''SELECT *
                                                 FROM cnc_wars
-                                                WHERE $1 = ANY (array_cat(attackers, defenders))
-                                                  AND $2 = ANY (array_cat(attackers, defenders)) 
+                                                WHERE ($1 = ANY (array_cat(attackers, defenders))
+                                                  AND $2 = ANY (array_cat(attackers, defenders))) 
                                                   AND active = True;''',
                                              sender_info['name'], self.recipient_info['name'])
         # if the nations are at war, block the cooperative actions button
@@ -5203,10 +5203,10 @@ class WarOptionsView(discord.ui.View):
                     peace_negotiation_view.stop()
                     # send decline dm to the sender
                     await safe_dm(embed=peace_embed, user_id=user_info['user_id'], bot=interaction.client,
-                                  content=f"Peace Negotiation **declined** for the {war_info['name']} "
+                                  content=f"Peace Negotiation **declined** for the **{war_info['name']}** "
                         f"by {target_info['name']}.")
                     return await safe_dm(
-                        content=f"Peace Negotiation **declined** for the {war_info['name']} "
+                        content=f"Peace Negotiation **declined** for the **{war_info['name']}** "
                         f"by {target_info['name']}.", embed=peace_embed, bot=interaction.client,
                         user_id=target_info['user_id'])
 
@@ -5234,10 +5234,10 @@ class WarOptionsView(discord.ui.View):
                                           WHERE war_id = $1;''', war_info['id'])
                     await interaction.followup.send("Peace Negotiation has timed out and been **auto-declined**.")
                     # notify both sender and target
-                    await safe_dm(content=f"Peace Negotiation **auto-declined** for the `{war_info['name']}` "
+                    await safe_dm(content=f"Peace Negotiation **auto-declined** for the **{war_info['name']}** "
                                           f"by {target_info['name']}.",
                                   embed=peace_embed, bot=interaction.client, user_id=user_info['user_id'])
-                    return await safe_dm(content=f"Peace Negotiation **auto-declined** for the `{war_info['name']}` "
+                    return await safe_dm(content=f"Peace Negotiation **auto-declined** for the **{war_info['name']}** "
                                                  f"by {target_info['name']}.",
                                          embed=peace_embed, bot=interaction.client, user_id=target_info['user_id'])
             # otherwise, no negotiations required
