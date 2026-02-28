@@ -4134,16 +4134,16 @@ class WarOptionsView(discord.ui.View):
         # define total negotiations
         total_negotiation = False
 
-        # if the user is using a cb (attacker), then search for the cb prohibited options for that cb
+        # if the user is the attacker
         if user_info['name'] in war_info['attackers']:
             # define the target of the negotiation, defaulting to the primary attacker
             target = war_info['primary_defender']
             # define the target war score
             target_war_score = war_info['war_score'][1]
             # if the war has multiple belligerents on the opposing side, the proposer may select which one to target
-            if len(attackers_list) > 1:
+            if len(defenders_list) > 1:
                 # add the "General Peace" to the list as a whole option
-                attackers_list = ["General Peace"] + attackers_list
+                defenders_list = ["General Peace"] + defenders_list
 
                 # create view check to ensure proper parsing
                 def target_check(inter: discord.Interaction):
@@ -4155,7 +4155,7 @@ class WarOptionsView(discord.ui.View):
 
                 # create a view for the dropdown and add it
                 peace_target_view = discord.ui.View()
-                peace_target_view.add_item(PeaceNegotiationTargetsDropdown(attackers_list))
+                peace_target_view.add_item(PeaceNegotiationTargetsDropdown(defenders_list))
                 # add a cancel button to the view
                 cancel_button = discord.ui.Button(label="Cancel", style=discord.ButtonStyle.danger)
 
