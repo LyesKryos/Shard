@@ -3384,7 +3384,7 @@ class WarDeclarationView(discord.ui.View):
         war_embed.set_thumbnail(url="https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png")
         war_embed.add_field(name="Casus Belli", value=self.cb_option, inline=False)
         war_embed.add_field(name="War Goal(s)", value=cb_war_goals)
-        war_embed.add_field(name="Prohibited Peace Treaties", value=cb_prohib_pts)
+        war_embed.add_field(name="Prohibited Peace Treaties", value=",".join(cb_prohib_pts))
         war_embed.add_field(name="\u200b", value="\u200b")
         war_embed.set_footer(text=f"War ID: {self.interaction.message.id}")
         # notify all parties
