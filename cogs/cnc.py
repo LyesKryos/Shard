@@ -994,7 +994,7 @@ class OwnedProvinceModifiation(View):
         war_check = await conn.fetchrow('''SELECT *
                                            FROM cnc_wars
                                            WHERE $1 = ANY (array_cat(attackers, defenders)) 
-                                             AND active = True;''', user_info['name'])
+                                             AND active;''', user_info['name'])
         if war_check is not None:
             return await interaction.response.send_message("You cannot abandon provinces while at war.")
         # check to make sure that the user will have > 1 province after
@@ -2328,9 +2328,9 @@ class DiplomaticMenuView(discord.ui.View):
         # check to see if the nations are at war
         war_check = await self.conn.fetchrow('''SELECT *
                                                 FROM cnc_wars
-                                                WHERE ($1 = ANY (array_cat(attackers, defenders))
-                                                  AND $2 = ANY (array_cat(attackers, defenders))) 
-                                                  AND active = True;''',
+                                                WHERE (($1 = ANY(attackers) AND $2 = ANY(defenders))
+                                                    OR ($1 = ANY(defenders) AND $2 = ANY(attackers)))
+                                                  AND active;''',
                                              sender_info['name'], self.recipient_info['name'])
         # if the nations are at war, block the cooperative actions button
         if war_check is not None:
@@ -2960,14 +2960,14 @@ class HostileDiplomaticActions(discord.ui.View):
             button.disabled = True
             await self.interaction.edit_original_response(view=self)
             return await interaction.followup.send("You do not have enough Military Authority to declare war.")
-        # check to see if the two nations are already at war
+        # check to see if the two nations are involved in a war
         war_check = await self.conn.fetchrow('''SELECT *
                                                 FROM cnc_wars
-                                                WHERE active = True
-                                                    AND $1 = ANY (array_cat(attackers, defenders))
-                                                    AND $2 = ANY (array_cat(attackers, defenders));''',
+                                                WHERE (($1 = ANY(attackers) AND $2 = ANY(defenders))
+                                                    OR ($1 = ANY(defenders) AND $2 = ANY(attackers)))
+                                                  AND active;''',
                                              sender_info['name'], self.recipient_info['name'])
-        # check to see if the the nations have a truce
+        # check to see if the nations have a truce
         truce_check = await self.conn.fetchrow('''SELECT * FROM cnc_peace_treaties 
                                                   WHERE $1 = ANY (members) 
                                                     AND $2 = ANY (members) 
@@ -2986,7 +2986,7 @@ class HostileDiplomaticActions(discord.ui.View):
             # disable the button and return a message
             button.disabled = True
             await self.interaction.edit_original_response(view=self)
-            return await interaction.followup.send(f"You are already participating in a war against "
+            return await interaction.followup.send(f"You are already participating in a war with or against "
                                                    f"{self.recipient_info['name']} and cannot declare another war.\n"
                                                    f"To negotiate a peace with this nation, "
                                                    f"use `/cnc war war_id:{war_check['id']}`.")
@@ -6678,7 +6678,7 @@ class CNC(commands.Cog):
         war_check = await conn.fetchrow('''SELECT *
                                            FROM cnc_wars
                                            WHERE $1 = ANY (array_cat(attackers, defenders)) 
-                                             AND active = True;''', user_info['name'])
+                                             AND active;''', user_info['name'])
         if war_check is not None:
             return await interaction.followup.send("You cannot designate a new Capital while at war.")
         # otherwise, carry on
