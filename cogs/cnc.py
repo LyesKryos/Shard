@@ -993,7 +993,8 @@ class OwnedProvinceModifiation(View):
         # check if the user is at war. abandoning is not legal when at war
         war_check = await conn.fetchrow('''SELECT *
                                            FROM cnc_wars
-                                           WHERE $1 = ANY (array_cat(attackers, defenders));''', user_info['name'])
+                                           WHERE $1 = ANY (array_cat(attackers, defenders)) 
+                                             AND active = True;''', user_info['name'])
         if war_check is not None:
             return await interaction.response.send_message("You cannot abandon provinces while at war.")
         # check to make sure that the user will have > 1 province after
@@ -1258,7 +1259,8 @@ class DossierView(View):
                                      self.user_info['name'])
         wars = await conn.fetch('''SELECT *
                                    FROM cnc_wars
-                                   WHERE $1 = ANY (array_cat(attackers, defenders));''',
+                                   WHERE $1 = ANY (array_cat(attackers, defenders)) 
+                                     AND active = True;''',
                                 self.user_info['name'])
         trade_pacts = await conn.fetch('''SELECT *
                                           FROM cnc_trade_pacts
@@ -2327,7 +2329,8 @@ class DiplomaticMenuView(discord.ui.View):
         war_check = await self.conn.fetchrow('''SELECT *
                                                 FROM cnc_wars
                                                 WHERE $1 = ANY (array_cat(attackers, defenders))
-                                                  AND $2 = ANY (array_cat(attackers, defenders));''',
+                                                  AND $2 = ANY (array_cat(attackers, defenders)) 
+                                                  AND active = True;''',
                                              sender_info['name'], self.recipient_info['name'])
         # if the nations are at war, block the cooperative actions button
         if war_check is not None:
@@ -2450,7 +2453,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
         wars = await self.conn.fetchrow('''SELECT *
                                            FROM cnc_wars
                                            WHERE active = True
-                                             AND ($1 = ANY (array_cat(attackers, defenders))
+                                             AND ($1 = ANY (array_cat(attackers, defenders)) 
                                                AND $2 = ANY (array_cat(attackers, defenders)));''',
                                         user_info['name'], self.recipient_info['name'])
         if wars is not None:
@@ -5138,7 +5141,7 @@ class WarOptionsView(discord.ui.View):
                         continue
                 # send dm (with options for the primary)
                 # create a view for the dropdown and add it
-                peace_negotiation_view = discord.ui.View(timeout=86400)
+                peace_negotiation_view = discord.ui.View(timeout=5)
 
                 # define callbacks
                 async def accept_callback(interaction: discord.Interaction):
@@ -5169,7 +5172,8 @@ class WarOptionsView(discord.ui.View):
                                               WHERE war_id = $1;''',
                                            war_info['id'])
                         # delete the war
-                        await conn.execute('''DELETE FROM cnc_wars WHERE id = $1;''', war_info['id'])
+                        await conn.execute('''UPDATE cnc_wars SET active = False
+                                              WHERE id = $1;''', war_info['id'])
                         # stop listening
                         peace_negotiation_view.stop()
 
@@ -5242,8 +5246,9 @@ class WarOptionsView(discord.ui.View):
                                       f"The forces of {primary} and their allies have been overwhelmed "
                                       f"entirely. The negotiation has been automatically accepted.",
                                       embed=peace_embed, user_id=r_info['user_id'], bot=interaction.client)
-                        # delete the war
-                        await conn.execute('''DELETE FROM cnc_wars WHERE id = $1;''', war_info['id'])
+                        # deactivate the war
+                        return await conn.execute('''UPDATE cnc_wars SET active = False
+                                              WHERE id = $1;''', war_info['id'])
 
         # add the callback for send
         send_button.callback = send_callback
@@ -5850,7 +5855,7 @@ class CNC(commands.Cog):
                                      user_info['name'])
         wars = await conn.fetch('''SELECT *
                                    FROM cnc_wars
-                                   WHERE $1 = ANY (array_cat(attackers, defenders));''',
+                                   WHERE $1 = ANY (array_cat(attackers, defenders)) AND active = True;''',
                                 user_info['name'])
         trade_pacts = await conn.fetch('''SELECT *
                                           FROM cnc_trade_pacts
@@ -6656,7 +6661,8 @@ class CNC(commands.Cog):
         # check if the user is at war
         war_check = await conn.fetchrow('''SELECT *
                                            FROM cnc_wars
-                                           WHERE $1 = ANY (array_cat(attackers, defenders));''', user_info['name'])
+                                           WHERE $1 = ANY (array_cat(attackers, defenders)) 
+                                             AND active = True;''', user_info['name'])
         if war_check is not None:
             return await interaction.followup.send("You cannot designate a new Capital while at war.")
         # otherwise, carry on
