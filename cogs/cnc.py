@@ -4161,9 +4161,9 @@ class WarOptionsView(discord.ui.View):
 
                 async def cancel_button_callback(interaction: discord.Interaction):
                     await interaction.response.defer()
-                    for child in interaction.client.get_view(interaction.message).children:
+                    for child in peace_target_view.children:
                         child.disabled = True
-                    return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
+                    return await self.interaction.edit_original_response(view=peace_target_view)
 
                 cancel_button.callback = cancel_button_callback
                 peace_target_view.add_item(cancel_button)
@@ -4225,9 +4225,9 @@ class WarOptionsView(discord.ui.View):
 
                 async def cancel_button_callback(interaction: discord.Interaction):
                     await interaction.response.defer()
-                    for child in interaction.client.get_view(interaction.message).children:
+                    for child in peace_target_view.children:
                         child.disabled = True
-                    return await self.interaction.edit_original_response(view=peace_negotiation_dropdown_view)
+                    return await self.interaction.edit_original_response(view=peace_target_view)
 
                 cancel_button.callback = cancel_button_callback
                 peace_target_view.add_item(cancel_button)
