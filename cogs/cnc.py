@@ -2450,13 +2450,13 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                                    f"existing proposal from {user_info['name']}.")
         # check if the user has any hostile actions
         # check wars
-        wars = await self.conn.fetchrow('''SELECT *
-                                           FROM cnc_wars
-                                           WHERE active = True
-                                             AND ($1 = ANY (array_cat(attackers, defenders)) 
-                                               AND $2 = ANY (array_cat(attackers, defenders)));''',
+        war_check = await self.conn.fetchrow('''SELECT *
+                                                FROM cnc_wars
+                                                WHERE (($1 = ANY(attackers) AND $2 = ANY(defenders))
+                                                    OR ($1 = ANY(defenders) AND $2 = ANY(attackers)))
+                                                  AND active;;''',
                                         user_info['name'], self.recipient_info['name'])
-        if wars is not None:
+        if war_check is not None:
             button.disabled = True
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.")
@@ -2635,13 +2635,13 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                                    f"existing proposal from {user_info['name']}.")
         # check if the user has any hostile actions
         # check wars
-        wars = await self.conn.fetchrow('''SELECT *
-                                           FROM cnc_wars
-                                           WHERE active = True
-                                             AND ($1 = ANY (array_cat(attackers, defenders))
-                                               AND $2 = ANY (array_cat(attackers, defenders)));''',
+        war_check = await self.conn.fetchrow('''SELECT *
+                                                FROM cnc_wars
+                                                WHERE (($1 = ANY(attackers) AND $2 = ANY(defenders))
+                                                    OR ($1 = ANY(defenders) AND $2 = ANY(attackers)))
+                                                  AND active;''',
                                         user_info['name'], self.recipient_info['name'])
-        if wars is not None:
+        if war_check is not None:
             button.disabled = True
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.")
@@ -2764,13 +2764,13 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                                    f"existing proposal from {user_info['name']}.")
         # check if the user has any hostile actions
         # check wars
-        wars = await self.conn.fetchrow('''SELECT *
-                                           FROM cnc_wars
-                                           WHERE active = True
-                                             AND ($1 = ANY (array_cat(attackers, defenders))
-                                               AND $2 = ANY (array_cat(attackers, defenders)));''',
+        war_check = await self.conn.fetchrow('''SELECT *
+                                                FROM cnc_wars
+                                                WHERE (($1 = ANY(attackers) AND $2 = ANY(defenders))
+                                                    OR ($1 = ANY(defenders) AND $2 = ANY(attackers)))
+                                                  AND active;''',
                                         user_info['name'], self.recipient_info['name'])
-        if wars is not None:
+        if war_check is not None:
             button.disabled = True
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.")
