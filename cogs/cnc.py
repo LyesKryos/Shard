@@ -4255,6 +4255,7 @@ class WarOptionsView(discord.ui.View):
                 total_negotiation = True
             # update embed with the target
             peace_embed.set_field_at(1, name="Target", value=f"{target}", inline=False)
+            await self.interaction.edit_original_response(embed=peace_embed)
             # get target data
             target_info = await user_db_info(target, conn)
             # if there is no db, only white peace is an option
