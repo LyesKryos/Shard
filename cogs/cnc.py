@@ -5141,7 +5141,7 @@ class WarOptionsView(discord.ui.View):
                         continue
                 # send dm (with options for the primary)
                 # create a view for the dropdown and add it
-                peace_negotiation_view = discord.ui.View(timeout=5)
+                peace_negotiation_view = discord.ui.View(timeout=86400)
 
                 # define callbacks
                 async def accept_callback(interaction: discord.Interaction):
@@ -5216,7 +5216,11 @@ class WarOptionsView(discord.ui.View):
                     await conn.execute('''DELETE
                                           FROM cnc_peace_negotiations
                                           WHERE war_id = $1;''', war_info['id'])
-                    await interaction.followup.send("Peace Negotiation has timed out and been auto-rejected.")
+                    await interaction.followup.send("Peace Negotiation has timed out and been **auto-declined** .")
+                    # notify both sender and target
+                    await safe_dm(content=f"Peace Negotiation **auto-declined** for war `{war_info['id']}` "
+                                          f"by {target_info['name']}.",
+                                  embed=peace_embed, bot=interaction.client, user_id=user_info['user_id'])
                     return await safe_dm(content=f"Peace Negotiation **auto-declined** for war `{war_info['id']}` "
                                                  f"by {target_info['name']}.",
                                          embed=peace_embed, bot=interaction.client, user_id=target_info['user_id'])
