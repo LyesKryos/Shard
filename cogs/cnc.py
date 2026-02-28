@@ -5201,8 +5201,12 @@ class WarOptionsView(discord.ui.View):
                     await interaction.followup.send("Peace Negotiation declined.")
                     # stop listening
                     peace_negotiation_view.stop()
+                    # send decline dm to the sender
+                    await safe_dm(embed=peace_embed, user_id=user_info['user_id'], bot=interaction.client,
+                                  content=f"Peace Negotiation **declined** for the {war_info['name']} "
+                        f"by {target_info['name']}.")
                     return await safe_dm(
-                        content=f"Peace Negotiation **declined** for war `{war_info['id']}` "
+                        content=f"Peace Negotiation **declined** for the {war_info['name']} "
                         f"by {target_info['name']}.", embed=peace_embed, bot=interaction.client,
                         user_id=target_info['user_id'])
 
