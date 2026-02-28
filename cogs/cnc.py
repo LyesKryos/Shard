@@ -4036,6 +4036,7 @@ class WarOptionsView(discord.ui.View):
         peace_embed.add_field(name="Proposed by",
                               value=f"The {user_info['pretitle']} of {user_info['name']}",
                               inline=False)
+        peace_embed.add_field(name="Target", value="Pending...", inline=False)
         peace_embed.add_field(name="War Score",
                               value=f"(A) {war_info['war_score'][0]} \U00002694 {war_info['war_score'][1]} (D)",
                               inline=False)
@@ -4252,6 +4253,8 @@ class WarOptionsView(discord.ui.View):
             # if there is only one possible target, the total negotiation should be true
             else:
                 total_negotiation = True
+            # update embed with the target
+            peace_embed.set_field_at(1, name="Target", value=f"{target}", inline=False)
             # get target data
             target_info = await user_db_info(target, conn)
             # if there is no db, only white peace is an option
@@ -5119,8 +5122,6 @@ class WarOptionsView(discord.ui.View):
 
             # send notification
             await interaction.followup.send("The Peace Negotiation has been delivered!")
-            # update the embed footer
-            peace_embed.set_footer(text=f"Peace Negotiation send.")
             await self.interaction.edit_original_response(embed=peace_embed)
             # stop listening
             send_button_view.stop()
@@ -5216,12 +5217,12 @@ class WarOptionsView(discord.ui.View):
                     await conn.execute('''DELETE
                                           FROM cnc_peace_negotiations
                                           WHERE war_id = $1;''', war_info['id'])
-                    await interaction.followup.send("Peace Negotiation has timed out and been **auto-declined** .")
+                    await interaction.followup.send("Peace Negotiation has timed out and been **auto-declined**.")
                     # notify both sender and target
-                    await safe_dm(content=f"Peace Negotiation **auto-declined** for war `{war_info['id']}` "
+                    await safe_dm(content=f"Peace Negotiation **auto-declined** for the `{war_info['name']}` "
                                           f"by {target_info['name']}.",
                                   embed=peace_embed, bot=interaction.client, user_id=user_info['user_id'])
-                    return await safe_dm(content=f"Peace Negotiation **auto-declined** for war `{war_info['id']}` "
+                    return await safe_dm(content=f"Peace Negotiation **auto-declined** for the `{war_info['name']}` "
                                                  f"by {target_info['name']}.",
                                          embed=peace_embed, bot=interaction.client, user_id=target_info['user_id'])
             # otherwise, no negotiations required
