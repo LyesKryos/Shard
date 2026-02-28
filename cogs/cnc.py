@@ -5172,9 +5172,19 @@ class WarOptionsView(discord.ui.View):
                                               FROM cnc_peace_negotiations
                                               WHERE war_id = $1;''',
                                            war_info['id'])
-                        # delete the war
-                        await conn.execute('''UPDATE cnc_wars SET active = False
-                                              WHERE id = $1;''', war_info['id'])
+                        # if the target is not the primary defender, then remove them from the war
+                        if target != war_info['primary_defender']:
+                            await conn.execute('''UPDATE cnc_wars SET defenders = array_remove(defenders, $1) 
+                                                      WHERE id = $2;''', target, war_info['id'])
+                        # if they are not the primary attacker, remove from the attackers
+                        elif target != war_info['primary_attacker'] :
+                            await conn.execute('''UPDATE cnc_wars SET attackers = array_remove(attackers, $1) 
+                                               WHERE id = $2;''', target, war_info['id'])
+                        # if they are the primary attacker or defender, then end the war
+                        else:
+                            # stop the war
+                            await conn.execute('''UPDATE cnc_wars SET active = False
+                                                  WHERE id = $1;''', war_info['id'])
                         # stop listening
                         peace_negotiation_view.stop()
 
