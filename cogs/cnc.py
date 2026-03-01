@@ -6536,8 +6536,15 @@ class CNC(commands.Cog):
             return await interaction.followup.send(embed=war_embed, view=war_options_view)
         # if the user is in the war and is not a primary, add the peace option
         elif (user_info['name'] == attackers_others) or (user_info['name'] == defenders_others):
-            # CODE HERE
-            return None
+            # add the peace negotiation button only
+            war_options_view = WarOptionsView(interaction=interaction,
+                                              conn=conn,
+                                              war_info=war_info,
+                                              alliance_button=False,
+                                              db_button=False,
+                                              user_info=user_info,
+                                              war_embed=war_embed)
+            return await interaction.followup.send(embed=war_embed, view=war_options_view)
         # in any other case (unregistered/uninvolved user), return the embed as is, no buttons
         else:
             return await interaction.followup.send(embed=war_embed)
