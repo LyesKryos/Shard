@@ -6062,13 +6062,11 @@ class CNC(commands.Cog):
         player_number = await conn.fetchval('''SELECT count(user_id) FROM cnc_users;''')
         # create an embed
         info_embed = discord.Embed(title="Command & Conquest System",
-                                    description="This is a brief description about the system and basic information.\n"
-                                                "Read more by visiting the [**Command and Conquest Manual**]"
-                                                "(https://1drv.ms/w/c/5dd599eb776372c8/IQDIcmN365nVIIBd-BwDAAAAAcd5un34oydMgcopdUCOLNU?e=cGhQDY).",
-                                   color=discord.Color.red(),
-
-        )
-        info_embed.set_image(url="https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png")
+                                   description="This is a brief description about the system and basic information.\n"
+                                               "Read more by visiting the [**Command & Conquest Manual**]"
+                                               "(https://1drv.ms/w/c/5dd599eb776372c8/IQDIcmN365nVIIBd-BwDAAAAAcd5un34oydMgcopdUCOLNU?e=cGhQDY).",
+                                   color=discord.Color.red())
+        info_embed.set_thumbnail(url="https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png")
         info_embed.add_field(name="About",
                              value="The Command & Conquest (CnC) system is a simulated battle royale "
                                     "strategy game. The system makes use of combat between armies, "
@@ -6080,7 +6078,7 @@ class CNC(commands.Cog):
                                     "and subjugate all others? Will resource-rich provinces provide the "
                                     "backbone of small, powerful states? Only time will tell!",
                              inline=False)
-        info_embed.add_field(name="Version", value="Version 3.0 - The Overhual")
+        info_embed.add_field(name="Version", value="Version 3.0 - The Overhual", inline=False)
         info_embed.add_field(name="Turns", value=f"Current turn: #{turn}")
         info_embed.add_field(name="Players", value=f"Current players: {player_number}")
         info_embed.add_field(name="Questions?",
