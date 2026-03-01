@@ -3238,7 +3238,16 @@ class PuppetManagement(discord.ui.View):
         # define recipient info
         recipient_info = self.recipient_info
         # establish connection
-        conn = self.con
+        conn = self.conn
+        # check to ensure that neither is at war
+        war_check = await conn.fetchrow('''SELECT * FROM cnc_wars
+                                        WHERE (($1 = ANY(attackers) AND $2 = ANY(defenders))
+                                        OR ($1 = ANY(defenders) AND $2 = ANY(attackers)))
+                                        AND active;''', sender_info['name'], recipient_info['name'])
+        if war_check is not None:
+            # deny
+            return await interaction.response.send_message("You cannot confiscate territory while at war.",
+                                                           ephemeral=True)
         # check how much land the puppet has
         p_count = await conn.fetchval('''SELECT COUNT(*) FROM cnc_provinces WHERE owner_id = $1;''',
                                       recipient_info['user_id'])
@@ -3249,8 +3258,8 @@ class PuppetManagement(discord.ui.View):
             # update view
             await self.interaction.edit_original_response(view=self)
             # return message
-            return await interaction.followup.send(f"{recipient_info['name']} does not have enough land to confiscate.",
-                                                   ephemeral=True)
+            return await interaction.response.send_message(f"{recipient_info['name']} does not have "
+                                                           f"enough land to confiscate.", ephemeral=True)
         # otherwise, carry on
         else:
             provinces_demanded_raw = await demanding_provinces_wait_for_modal(parent_interaction=interaction,
@@ -3269,7 +3278,44 @@ class PuppetManagement(discord.ui.View):
             provinces_check = await conn.fetch('''SELECT ARRAY_AGG(id) FROM cnc_provinces 
                                                   WHERE owner_id = $1 AND occupier_id = $1;''',
                                                recipient_info['user_id'])
-            # if any of the provinces are not present
+            # calculate any that are not present
+            unowned_provinces = set(provinces_demanded).difference(set(provinces_check))
+            # if there are any unowned provinces, return
+            if unowned_provinces:
+                return await interaction.followup.send(f"The following provinces are not owned by "
+                                                       f"{recipient_info['name']}: "
+                                                       f"{', '.join(map(str, unowned_provinces))}",
+                                                       ephemeral=True)
+            # otherwise, carry on with the demand
+            else:
+                # calculate the total cost
+                total_cost = 0
+                for province_id in provinces_demanded:
+                    dev = await conn.fetchval('''SELECT development FROM cnc_provinces WHERE id = $1;''', province_id)
+                    total_cost += dev // 10
+                # check if the user has enough political authority to confiscate
+                if sender_info['pol_auth'] < total_cost:
+                    return await interaction.followup.send(f"You do not have enough political authority to confiscate "
+                                                           f"those provinces. The total cost of confiscating those "
+                                                           f"provinces is {total_cost}.", ephemeral=True)
+                # otherwise, carry on
+                else:
+                    # update owner and occupier
+                    await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1 
+                                          WHERE id = ANY($2);''', sender_info['user_id'], provinces_demanded)
+                    # remove political authority
+                    await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth - $1 WHERE user_id = $2;''',
+                                       total_cost, sender_info['user_id'])
+                    # notify recipient
+                    await safe_dm(bot=interaction.client,
+                                  user_id=recipient_info['user_id'],
+                                  content=f"{sender_info['name']} has confiscated the following provinces:\n"
+                                          f"{', '.join(map(str, provinces_demanded))}")
+                    # return message
+                    return await interaction.followup.send(f"{sender_info['name']} has confiscated the following "
+                                                           f"provinces:\n"
+                                                           f"{', '.join(map(str, provinces_demanded))}")
+
 
 
 
@@ -3284,6 +3330,7 @@ class PuppetManagement(discord.ui.View):
         # return to menu
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         await interaction.edit_original_response(view=diplo_menu)
+
 
 class DiplomaticRelationsRespondView(discord.ui.View):
 
@@ -3731,6 +3778,7 @@ class WarDeclarationView(discord.ui.View):
         # return to menu
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         await interaction.edit_original_response(view=diplo_menu)
+
 
 class DefenderAcceptWarView(discord.ui.View):
 
@@ -6352,7 +6400,7 @@ class CNC(commands.Cog):
             author = interaction.user
             owned_province_view = OwnedProvinceModifiation(author, prov_info, user_info, conn)
             owned_province_view.interaction = interaction
-            await interaction.edit_original_response(view=owned_province_view,
+            await interaction.followup.send(view=owned_province_view,
                                                      embed=await create_prov_embed(prov_info, conn))
 
         # if the user does not own the province, and it is unowned, open the unowned view
@@ -6363,14 +6411,14 @@ class CNC(commands.Cog):
                 if 'Colonialism' in user_info['tech']:
                     colony_view = UnownedProvince(interaction.user, prov_info, user_info, conn)
                     colony_view.interaction = interaction
-                    await interaction.edit_original_response(view=colony_view,
+                    await interaction.followup.send(view=colony_view,
                                                              embed=await create_prov_embed(prov_info, conn))
             else:
-                return await interaction.edit_original_response(embed=await create_prov_embed(prov_info, conn))
+                return await interaction.followup.send(embed=await create_prov_embed(prov_info, conn))
 
         # if the user does not own the province, and it is owned by another player, send the embed
         elif prov_info['owner_id'] != 0:
-            await interaction.edit_original_response(embed=await create_prov_embed(prov_info, conn))
+            await interaction.followup.send(embed=await create_prov_embed(prov_info, conn))
 
     @cnc.command(name="army_view", description="Displays information about a specific army.")
     @app_commands.describe(army_id="The ID of the army")
