@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding puppet and overlord to the nation view embed">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting province view bug" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -534,7 +531,7 @@
       <workItem from="1772131043957" duration="12427000" />
       <workItem from="1772321543362" duration="5852000" />
       <workItem from="1772371224150" duration="1618000" />
-      <workItem from="1772377460702" duration="1784000" />
+      <workItem from="1772377460702" duration="2090000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -879,7 +876,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1468" />
+    <option name="localTasksCounter" value="1469" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -898,7 +895,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting hostile relations check breaking" />
     <MESSAGE value="Correcting the embargo recall button" />
     <MESSAGE value="Correcting call to war button error" />
     <MESSAGE value="Correcting bug adding attacker ally to defender side" />
@@ -923,7 +919,8 @@
     <MESSAGE value="Correcting emoji error on Propose Subjugation" />
     <MESSAGE value="Adding correct peace view option for a user if they are not the primary" />
     <MESSAGE value="Adding puppet and overlord to the nation view embed" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding puppet and overlord to the nation view embed" />
+    <MESSAGE value="Correcting province view bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcting province view bug" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$cnc.coverage" NAME="cnc Coverage Results" MODIFIED="1734055017185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cogs" />

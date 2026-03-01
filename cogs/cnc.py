@@ -6400,7 +6400,7 @@ class CNC(commands.Cog):
             author = interaction.user
             owned_province_view = OwnedProvinceModifiation(author, prov_info, user_info, conn)
             owned_province_view.interaction = interaction
-            await interaction.followup.send(view=owned_province_view,
+            return await interaction.followup.send(view=owned_province_view,
                                                      embed=await create_prov_embed(prov_info, conn))
 
         # if the user does not own the province, and it is unowned, open the unowned view
@@ -6411,14 +6411,14 @@ class CNC(commands.Cog):
                 if 'Colonialism' in user_info['tech']:
                     colony_view = UnownedProvince(interaction.user, prov_info, user_info, conn)
                     colony_view.interaction = interaction
-                    await interaction.followup.send(view=colony_view,
+                    return await interaction.followup.send(view=colony_view,
                                                              embed=await create_prov_embed(prov_info, conn))
             else:
                 return await interaction.followup.send(embed=await create_prov_embed(prov_info, conn))
 
         # if the user does not own the province, and it is owned by another player, send the embed
-        elif prov_info['owner_id'] != 0:
-            await interaction.followup.send(embed=await create_prov_embed(prov_info, conn))
+        else:
+            return await interaction.followup.send(embed=await create_prov_embed(prov_info, conn))
 
     @cnc.command(name="army_view", description="Displays information about a specific army.")
     @app_commands.describe(army_id="The ID of the army")
