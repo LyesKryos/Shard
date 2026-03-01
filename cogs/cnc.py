@@ -6226,7 +6226,7 @@ class CNC(commands.Cog):
                                         user_info['user_id'])
         if puppet_check:
             # populate puppets
-            user_embed.add_field(name="Puppets", value=f"{", ".join(puppet_check)}")
+            user_embed.add_field(name="Puppets", value=", ".join(puppet_check))
         # populate all three types of authority
         user_embed.add_field(name="=====================AUTHORITY=====================",
                              value="Information known about the nation's authority.", inline=False)
