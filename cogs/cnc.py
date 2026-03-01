@@ -16,7 +16,7 @@ import math
 
 async def safe_dm(bot: discord.Client, user_id: int, *, content: str | None = None,
                   embed: discord.Embed | None = None, view: discord.ui.View | None = None,
-                  fallback_channel_id: int = 927288304301387816) -> bool:
+                  fallback_channel_id: int = 927288304301387816):
     """Attempt to DM a user. On failure, warn them in a public fallback channel.
     Returns True if DM sent, False otherwise.
     """
@@ -33,12 +33,12 @@ async def safe_dm(bot: discord.Client, user_id: int, *, content: str | None = No
         return False
     try:
         if embed is not None and content is not None:
-            await user.send(content=content, embed=embed, view=view)
+            dm = await user.send(content=content, embed=embed, view=view)
         elif embed is not None:
-            await user.send(embed=embed, view=view)
+            dm = await user.send(embed=embed, view=view)
         else:
-            await user.send(content or "", view=view)
-        return True
+            dm = await user.send(content or "", view=view)
+        return dm
     except (discord.Forbidden, discord.HTTPException):
         channel = bot.get_channel(fallback_channel_id)
         if channel:
@@ -2479,12 +2479,13 @@ class CooperativeDiplomaticActions(discord.ui.View):
             return await interaction.followup.send("You do not have sufficient Political Authority to send that "
                                                    "proposal.")
         # otherwise, send the message
-        recipient_dm = await recipient_user.send(content=f"The {user_info['pretitle']} of "
-                                                         f"{user_info['name']} has issued a request"
-                                                         f" to establish diplomatic relations with"
-                                                         f" {self.recipient_info['name']}. Please use"
-                                                         f" the buttons below within 24 hours to "
-                                                         f"respond to the request.")
+        recipient_dm = await safe_dm(bot=self.bot, user_id=self.recipient_info['user_id'],
+                                     content=f"The {user_info['pretitle']} of "
+                                             f"{user_info['name']} has issued a request"
+                                             f" to establish diplomatic relations with"
+                                             f" {self.recipient_info['name']}. Please use"
+                                             f" the buttons below within 24 hours to "
+                                             f"respond to the request.")
         # create the response view
         dp_response = DiplomaticRelationsRespondView(interaction, self.conn, user_info, self.recipient_info,
                                                      recipient_dm,
@@ -2663,16 +2664,21 @@ class CooperativeDiplomaticActions(discord.ui.View):
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send("You do not have sufficient Military Authority.")
         # otherwise, send the dm
-        recipient_dm = await recipient_user.send(f"The {user_info['pretitle']} of {user_info['name']} has proposed that"
-                                                 f" {self.recipient_info['name']} join their Military Alliance. Please"
-                                                 f" use the buttons below to respond to the request within 24 hours.")
+        recipient_dm = await safe_dm(bot=self.bot, user_id=self.recipient_info['user_id'],
+                                     content=f"The {user_info['pretitle']} of {user_info['name']} has proposed that "
+                                             f"{self.recipient_info['name']} join their Military Alliance. "
+                                             f"Please use the buttons below to respond to the request within 24 hours.")
         # create the response view
-        ma_response = MilitaryAllianceRespondView(interaction, self.conn, user_info, self.recipient_info, recipient_dm,
-                                                  self.bot)
+        ma_response = MilitaryAllianceRespondView(interaction=interaction,
+                                                  conn=self.conn,
+                                                  sender_info=user_info,
+                                                  recipient_info=self.recipient_info,
+                                                  bot=self.bot,
+                                                  dm=recipient_dm)
         # edit the dm with the response
         await recipient_dm.edit(view=ma_response)
         # let the sender know the request has been successfully sent
-        await interaction.followup.send(f"{self.recipient_info['name']} has recieved a "
+        await interaction.followup.send(f"{self.recipient_info['name']} has received a "
                                         f"request to join the Military Alliance.")
         # remove one military authority from sender
         await self.conn.execute('''UPDATE cnc_users
@@ -2792,12 +2798,10 @@ class CooperativeDiplomaticActions(discord.ui.View):
             return await interaction.followup.send("You do not have sufficient Political Authority to send that "
                                                    "proposal.")
         # otherwise, send the message
-        recipient_dm = await recipient_user.send(content=f"The {user_info['pretitle']} of "
-                                                         f"{user_info['name']} has issued a request"
-                                                         f" to establish a trade pact with"
-                                                         f" {self.recipient_info['name']}. Please use"
-                                                         f" the buttons below within 24 hours to "
-                                                         f"respond to the request.")
+        recipient_dm = await safe_dm(bot=self.bot, user_id=self.recipient_info['user_id'],
+                                     content=f"The {user_info['pretitle']} of {user_info['name']} has issued a request "
+                                             f"to establish a trade pact with {self.recipient_info['name']}. "
+                                             f"Please use the buttons below within 24 hours to respond to the request.")
         # create the response view
         tp_response = TradePactRespondView(interaction, self.conn, user_info, self.recipient_info,
                                            recipient_dm,
@@ -2926,7 +2930,8 @@ class HostileDiplomaticActions(discord.ui.View):
                                    VALUES ($1, $2, $3);''',
                                 interaction.id, user_info['name'], self.recipient_info['name'])
         # notify target
-        await recipient_user.send(f"{user_info['name']} has issued an embargo against {self.recipient_info['name']}.")
+        await safe_dm(bot=self.bot, user_id=self.recipient_info['user_id'],
+                      content=f"{user_info['name']} has issued an embargo against {self.recipient_info['name']}.")
         # notify user
         await interaction.followup.send(f"{user_info['name']} has issued an embargo against "
                                         f"{self.recipient_info['name']}.")
@@ -3151,10 +3156,9 @@ class MilitaryAllianceRespondView(discord.ui.View):
         await self.conn.execute('''DELETE
                                    FROM cnc_pending_requests
                                    WHERE id = $1;''', self.interaction.message.id)
-        return await sender_user.send(
-            f"The {self.recipient_info['pretitle']} of "
-            f"{self.recipient_info['name']} has auto-rejected your "
-            f"military alliance request.")
+        return await safe_dm(bot=self.bot, user_id = self.sender_info['user_id'],
+                             content=f"The {self.recipient_info['pretitle']} of "
+                                     f"{self.recipient_info['name']} has auto-rejected your military alliance request.")
 
     @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
     async def accept_alliance(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -3174,7 +3178,7 @@ class MilitaryAllianceRespondView(discord.ui.View):
                                        VALUES ($1, $2);''',
                                     self.interaction.message.id, [self.recipient_info['name'],
                                                                   self.sender_info['name']])
-        # reduce recipient's military authority by one
+        # reduce the recipient's military authority by one
         await self.conn.execute('''UPDATE cnc_users
                                    SET mil_auth = mil_auth - 1
                                    WHERE user_id = $1;''',
@@ -3393,7 +3397,7 @@ class WarDeclarationView(discord.ui.View):
         war_embed.set_footer(text=f"War ID: {self.interaction.message.id}")
         # notify all parties
         for uid in (self.sender_info['user_id'], self.recipient_info['user_id']):
-            await safe_dm(self.bot, uid, embed=war_embed)
+            await safe_dm(bot=self.bot, user_id=uid, embed=war_embed)
         # send the war embed in the public channel
         await cnc_channel.send(embed=war_embed)
         await interaction.followup.send(embed=war_embed)
