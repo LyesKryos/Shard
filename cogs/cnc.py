@@ -2391,7 +2391,12 @@ class DiplomaticMenuView(discord.ui.View):
             await self.interaction.edit_original_response(view=self)
             return await interaction.followup.send("Cooperative Relations are disabled while at war.")
         # add cooperative actions view
-        cooperative_actions = CooperativeDiplomaticActions(interaction, self.conn, self.recipient_info)
+        cooperative_actions = CooperativeDiplomaticActions(interaction=interaction,
+                                                           conn=self.conn,
+                                                           recipient_info=self.recipient_info,
+                                                           puppet=(True
+                                                                   if self.recipient_info['overlord'] == sender_info['user_id']
+                                                                   else False))
         return await interaction.edit_original_response(view=cooperative_actions)
 
     @discord.ui.button(label="Hostile Relations", style=discord.ButtonStyle.danger)
