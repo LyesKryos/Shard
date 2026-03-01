@@ -2824,7 +2824,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=diplo_menu)
 
-    @discord.ui.button(label="Propose Subjugation", style=discord.ButtonStyle.blurple, emoji="\U00002659")
+    @discord.ui.button(label="Propose Subjugation", style=discord.ButtonStyle.blurple, emoji="\U0000265f")
     async def propose_subjugation(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer()
@@ -2907,7 +2907,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
         subjugation_response = ProposeSubjugationResponseView(interaction=interaction, 
                                                      conn=self.conn, 
                                                      sender_info=user_info, 
-                                                     recipient=self.recipient_info,
+                                                     recipient_info=self.recipient_info,
                                                      dm=recipient_dm,
                                                      bot=self.bot)
         # edit the DM with the buttons
