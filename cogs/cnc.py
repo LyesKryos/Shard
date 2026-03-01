@@ -184,6 +184,59 @@ async def map_color(province: int, hexcode: str, conn: asyncpg.Pool):
     map.save(fr"{map_directory}wargame_provinces.png")
 
 
+# create modal input function
+async def demanding_provinces_wait_for_modal(parent_interaction: discord.Interaction, title: str, label: str):
+    """
+    Waits for user input via a modal interaction and returns the value entered by the user.
+
+    This asynchronous function creates a custom modal dialog using a specific
+    title and label for the text input. It sends the modal to the user and waits
+    for their interaction. The user's input is captured and returned.
+
+    Parameters:
+        parent_interaction (discord.Interaction): The interaction object representing
+            the initial interaction to which the modal is a response. MUST BE A RESPONSE, NOT FOLLOWUP.
+        title (str): The title of the modal to be displayed to the user.
+        label (str): The label for the text input field inside the modal.
+
+    Returns:
+        str | None: The value entered by the user in the modal's input field,
+        or None if the modal times out or no value is provided.
+    """
+
+    class ProvinceInputModal(discord.ui.Modal):
+        def __init__(self):
+            super().__init__(title=title, timeout=60)
+            # define and add the text input
+            self.demand_input = discord.ui.TextInput(label=label, style=discord.TextStyle.short, required=True)
+            self.add_item(self.demand_input)
+            # define variables
+            self.value = None
+            self.parent_interaction = parent_interaction
+
+        async def on_submit(self, submit_interaction: Interaction):
+            # defer the interaction
+            await submit_interaction.response.defer(thinking=False)
+            # define the value and stop listening to the modal
+            self.value = self.demand_input.value
+            self.stop()
+
+        async def on_timeout(self):
+            # if the user fails to respond, stop listening
+            # and remove all the options from the original interaction message, effectively canceling
+            self.stop()
+            # remove the view
+            return await parent_interaction.edit_original_response(view=None)
+
+    # create and send the modal
+    modal = ProvinceInputModal()
+    await parent_interaction.response.send_modal(modal)
+    # await the modal response
+    await modal.wait()
+    # return the value
+    return modal.value
+
+
 class MapButtons(View):
 
     def __init__(self, message: discord.InteractionMessage, author):
@@ -2349,6 +2402,13 @@ class DiplomaticMenuView(discord.ui.View):
         hostile_actions = HostileDiplomaticActions(interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=hostile_actions)
 
+    @discord.ui.button(label="Manage Puppet", style=discord.ButtonStyle.blurple)
+    async def puppet(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer response
+        await interaction.response.defer()
+        # add puppet management
+
+
 
 class CooperativeDiplomaticActions(discord.ui.View):
 
@@ -3152,6 +3212,78 @@ class HostileDiplomaticActions(discord.ui.View):
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         await interaction.edit_original_response(view=diplo_menu)
 
+
+class PuppetManagement(discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, recipient_info: asyncpg.Record):
+        super().__init__(timeout=120)
+        self.interaction = interaction
+        self.conn = conn
+        self.recipient_info = recipient_info
+
+    async def on_timeout(self):
+        # disable all buttons
+        for child in self.children:
+            child.disabled = True
+        # edit the view
+        await self.interaction.edit_original_response(view=self)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.interaction.user.id
+
+    @discord.ui.button(label="Confiscate Territory", style=discord.ButtonStyle.danger, emoji="\U0001faf3")
+    async def confiscate_land(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # pull sender information
+        sender_info = await user_db_info(interaction.user.id, self.conn)
+        # define recipient info
+        recipient_info = self.recipient_info
+        # establish connection
+        conn = self.con
+        # check how much land the puppet has
+        p_count = await conn.fetchval('''SELECT COUNT(*) FROM cnc_provinces WHERE owner_id = $1;''',
+                                      recipient_info['user_id'])
+        # if the puppet has less than 10 provinces, do not permit
+        if p_count < 10:
+            # disable button
+            button.disabled = True
+            # update view
+            await self.interaction.edit_original_response(view=self)
+            # return message
+            return await interaction.followup.send(f"{recipient_info['name']} does not have enough land to confiscate.",
+                                                   ephemeral=True)
+        # otherwise, carry on
+        else:
+            provinces_demanded_raw = await demanding_provinces_wait_for_modal(parent_interaction=interaction,
+                                                     title="Confiscate Puppet Territory",
+                                                     label="List province IDs separated by comma:")
+            # make these into a list
+            provinces_demanded = provinces_demanded_raw.split(",")
+            # turn each item into an integer
+            try:
+                provinces_demanded = [int(p) for p in provinces_demanded]
+            except ValueError:
+                return await interaction.followup.send("Invalid province IDs provided. "
+                                                       "Please enter only integers separated by comma.",
+                                                       ephemeral=True)
+            # check the list to ensure the puppet owns these
+            provinces_check = await conn.fetch('''SELECT ARRAY_AGG(id) FROM cnc_provinces 
+                                                  WHERE owner_id = $1 AND occupier_id = $1;''',
+                                               recipient_info['user_id'])
+            # if any of the provinces are not present
+
+
+
+
+
+
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
+    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # return to menu
+        diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+        await interaction.edit_original_response(view=diplo_menu)
 
 class DiplomaticRelationsRespondView(discord.ui.View):
 
@@ -4275,58 +4407,6 @@ class WarOptionsView(discord.ui.View):
             "Force Government Type",
             "Humiliate"
         ]
-
-        # create modal input function
-        async def demanding_provinces_wait_for_modal(parent_interaction: discord.Interaction, title: str, label: str):
-            """
-            Waits for user input via a modal interaction and returns the value entered by the user.
-
-            This asynchronous function creates a custom modal dialog using a specific
-            title and label for the text input. It sends the modal to the user and waits
-            for their interaction. The user's input is captured and returned.
-
-            Parameters:
-                parent_interaction (discord.Interaction): The interaction object representing
-                    the initial interaction to which the modal is a response. MUST BE A RESPONSE, NOT FOLLOWUP.
-                title (str): The title of the modal to be displayed to the user.
-                label (str): The label for the text input field inside the modal.
-
-            Returns:
-                str | None: The value entered by the user in the modal's input field,
-                or None if the modal times out or no value is provided.
-            """
-
-            class ProvinceInputModal(discord.ui.Modal):
-                def __init__(self):
-                    super().__init__(title=title, timeout=60)
-                    # define and add the text input
-                    self.demand_input = discord.ui.TextInput(label=label, style=discord.TextStyle.short, required=True)
-                    self.add_item(self.demand_input)
-                    # define variables
-                    self.value = None
-                    self.parent_interaction = parent_interaction
-
-                async def on_submit(self, submit_interaction: Interaction):
-                    # defer the interaction
-                    await submit_interaction.response.defer(thinking=False)
-                    # define the value and stop listening to the modal
-                    self.value = self.demand_input.value
-                    self.stop()
-
-                async def on_timeout(self):
-                    # if the user fails to respond, stop listening
-                    # and remove all the options from the original interaction message, effectively canceling
-                    self.stop()
-                    # remove the view
-                    return await parent_interaction.edit_original_response(view=None)
-
-            # create and send the modal
-            modal = ProvinceInputModal()
-            await parent_interaction.response.send_modal(modal)
-            # await the modal response
-            await modal.wait()
-            # return the value
-            return modal.value
 
         # define total negotiations
         total_negotiation = False
@@ -6135,6 +6215,18 @@ class CNC(commands.Cog):
         user_embed.add_field(name="Capital", value=f"{capital}")
         # populate stability
         user_embed.add_field(name="Stability", value=f"{user_info['stability']}")
+        # add overlord if present
+        if user_info['overlord']:
+            # pull info
+            overlord = await conn.fetchval('''SELECT name FROM cnc_users WHERE user_id = $1;''', user_info['overlord'])
+            # populate overlord
+            user_embed.add_field(name="Overlord", value=f"{overlord}")
+        # add puppets if present
+        puppet_check = await conn.fetchval('''SELECT ARRAY_AGG(name) FROM cnc_users WHERE overlord = $1;''',
+                                        user_info['user_id'])
+        if puppet_check:
+            # populate puppets
+            user_embed.add_field(name="Puppets", value=f"{", ".join(puppet_check)}")
         # populate all three types of authority
         user_embed.add_field(name="=====================AUTHORITY=====================",
                              value="Information known about the nation's authority.", inline=False)
