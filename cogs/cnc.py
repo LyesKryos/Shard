@@ -6409,10 +6409,15 @@ class CNC(commands.Cog):
             user_info = await user_db_info(interaction.user.id, conn)
             if user_info is not None:
                 if 'Colonialism' in user_info['tech']:
+                    # create the colony view and then send it along side the user
                     colony_view = UnownedProvince(interaction.user, prov_info, user_info, conn)
                     colony_view.interaction = interaction
                     return await interaction.followup.send(view=colony_view,
                                                              embed=await create_prov_embed(prov_info, conn))
+                # otherwise, send the regular embed
+                else:
+                    return await interaction.followup.send(embed=await create_prov_embed(prov_info, conn))
+            # otherwise, if the user is not a player, send the regular embed
             else:
                 return await interaction.followup.send(embed=await create_prov_embed(prov_info, conn))
 
