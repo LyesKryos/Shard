@@ -6037,7 +6037,7 @@ class CNC(commands.Cog):
                                f"Army of {starting_province['name']}")
             # send welcome message
             return await interaction.followup.send(
-                f"Welcome to the Command and Conquest System, {user.mention}!\n\n"
+                f"Welcome to the Command & Conquest System, {user.mention}!\n\n"
                 f"Your nation, {nation_name.title()}, has risen from the mists of history "
                 f"to make a name for itself in the annals of time. Will your people prove "
                 f"they are masters of warfare? Will your merchants dominate the global "
@@ -6051,6 +6051,48 @@ class CNC(commands.Cog):
                 f"guide, and an overview of all commands.\n\n"
                 f"**\"I came, I saw, I conquered.\" -Julius Caesar**"
             )
+        
+    @cnc.command(name="info", description="Sends information about the Command & Conquest system.")
+    async def send_info(self, interaction: discord.Interaction):
+        # establish conn
+        conn = self.bot.pool
+        # pull turn
+        turn = await conn.fetchval('''SELECT int FROM cnc_data WHERE name = 'Turn';''')
+        # pull number of players
+        player_number = await conn.fetchval('''SELECT count(user_id) FROM cnc_users;''')
+        # create an embed
+        info_embed = discord.Embed(title="Command & Conquest System",
+                                    description="This is a brief description about the system and basic information.\n"
+                                                "Read more by visiting the [**Command and Conquest Manual**]"
+                                                "(https://1drv.ms/w/c/5dd599eb776372c8/IQDIcmN365nVIIBd-BwDAAAAAcd5un34oydMgcopdUCOLNU?e=cGhQDY).",
+                                   color=discord.Color.red(),
+
+        )
+        info_embed.set_image(url="https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png")
+        info_embed.add_field(name="About",
+                             value="The Command & Conquest (CnC) system is a simulated battle royale "
+                                    "strategy game. The system makes use of combat between armies, "
+                                    "international relationships and intrigue, resources, trade, "
+                                    "and more to bring players a fun and immersive experience. "
+                                    "Players compete against each other to gain the largest, richest, "
+                                    "and most powerful empire! Will the nations of the world create "
+                                    "powerful factions? Will a single nation become the dominant power "
+                                    "and subjugate all others? Will resource-rich provinces provide the "
+                                    "backbone of small, powerful states? Only time will tell!",
+                             inline=False)
+        info_embed.add_field(name="Version", value="Version 3.0 - The Overhual")
+        info_embed.add_field(name="Turns", value=f"Current turn: #{turn}")
+        info_embed.add_field(name="Players", value=f"Current players: {player_number}")
+        info_embed.add_field(name="Questions?",
+                             value=f"Read the FAQ in the linked manual above or contact "
+                                   f"{self.bot.get_user(293518673417732098).mention}.",
+                             inline=False)
+        info_embed.set_footer(icon_url="https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png",
+                              text="Created by lieskryos")
+        # send the embed
+        await interaction.response.send_message(embed=info_embed)
+
+
 
     # @cnc.command(name="change_color", description="Changes your nation's color on the map.")
     # @app_commands.checks.cooldown(1, 30)
