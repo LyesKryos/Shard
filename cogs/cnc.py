@@ -2407,6 +2407,10 @@ class DiplomaticMenuView(discord.ui.View):
         # defer response
         await interaction.response.defer()
         # add puppet management
+        puppet_mangaement = PuppetManagement(interaction=interaction,
+                                             conn=self.conn,
+                                             recipient_info=self.recipient_info)
+        return await interaction.edit_original_response(view=puppet_mangaement)
 
 
 
