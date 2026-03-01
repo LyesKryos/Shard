@@ -2402,26 +2402,28 @@ class DiplomaticMenuView(discord.ui.View):
         hostile_actions = HostileDiplomaticActions(interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=hostile_actions)
 
-    @discord.ui.button(label="Manage Puppet", style=discord.ButtonStyle.blurple)
-    async def puppet(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # defer response
-        await interaction.response.defer()
-        # add puppet management
-        puppet_mangaement = PuppetManagement(interaction=interaction,
-                                             conn=self.conn,
-                                             recipient_info=self.recipient_info)
-        return await interaction.edit_original_response(view=puppet_mangaement)
-
 
 
 class CooperativeDiplomaticActions(discord.ui.View):
 
-    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, recipient_info: asyncpg.Record):
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, recipient_info: asyncpg.Record, puppet: bool):
         super().__init__(timeout=120)
         self.interaction = interaction
         self.recipient_info = recipient_info
         self.conn = conn
         self.bot = interaction.client
+
+        if puppet:
+            self.puppet_management_button = discord.ui.Button(label="Manage Puppet", style=discord.ButtonStyle.blurple)
+            self.puppet_management_button.callback = self.puppet_callback
+            self.add_item(self.puppet_management_button)
+
+        else:
+            self.propose_subjugation_button = discord.ui.Button(label="Propose Subjugation",
+                                                                style=discord.ButtonStyle.blurple,
+                                                                emoji="\U0000265f")
+            self.propose_subjugation_button.callback = self.propose_subjugation
+            self.add_item(self.propose_subjugation_button)
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.interaction.user.id
@@ -2888,7 +2890,6 @@ class CooperativeDiplomaticActions(discord.ui.View):
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=diplo_menu)
 
-    @discord.ui.button(label="Propose Subjugation", style=discord.ButtonStyle.blurple, emoji="\U0000265f")
     async def propose_subjugation(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer()
@@ -2992,6 +2993,14 @@ class CooperativeDiplomaticActions(discord.ui.View):
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=diplo_menu)
 
+    async def puppet_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer response
+        await interaction.response.defer()
+        # add puppet management
+        puppet_mangaement = PuppetManagement(interaction=interaction,
+                                             conn=self.conn,
+                                             recipient_info=self.recipient_info)
+        return await interaction.edit_original_response(view=puppet_mangaement)
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
