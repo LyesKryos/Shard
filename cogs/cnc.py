@@ -2418,17 +2418,25 @@ class CooperativeDiplomaticActions(discord.ui.View):
         self.conn = conn
         self.bot = interaction.client
 
+        # if the recipient is the users puppet, add the puppet management button
         if puppet:
-            self.puppet_management_button = discord.ui.Button(label="Manage Puppet", style=discord.ButtonStyle.blurple)
+            self.puppet_management_button = discord.ui.Button(label="Manage Puppet",
+                                                              style=discord.ButtonStyle.blurple,
+                                                              emoji="\U0001f4c3")
             self.puppet_management_button.callback = self.puppet_callback
             self.add_item(self.puppet_management_button)
 
+        # otherwise, add the propose subjugation button
         else:
             self.propose_subjugation_button = discord.ui.Button(label="Propose Subjugation",
                                                                 style=discord.ButtonStyle.blurple,
                                                                 emoji="\U0000265f")
             self.propose_subjugation_button.callback = self.propose_subjugation
             self.add_item(self.propose_subjugation_button)
+
+        back_button = discord.ui.Button(label="Back", style=discord.ButtonStyle.danger)
+        back_button.callback = self.back
+        self.add_item(back_button)
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.interaction.user.id
@@ -3007,7 +3015,6 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                              recipient_info=self.recipient_info)
         return await interaction.edit_original_response(view=puppet_mangaement)
 
-    @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer()
