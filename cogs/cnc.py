@@ -2824,6 +2824,111 @@ class CooperativeDiplomaticActions(discord.ui.View):
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=diplo_menu)
 
+    @discord.ui.button(label="Propose Subjugation", style=discord.ButtonStyle.blurple, emoji="\U00002659")
+    async def propose_subjugation(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # pull user info
+        user_info = await user_db_info(interaction.user.id, self.conn)
+        # government type checks
+        if self.recipient_info['govt_subtype'] == "Parish":
+            return await interaction.followup.send("Voluntary diplomatic actions are disabled for nations with the"
+                                                   " Parish Equalism ideology.")
+        if ("Anarchic" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']] and
+                "Equalism" not in [self.recipient_info['govt_type'], user_info['govt_type']]):
+            return await interaction.followup.send(
+                "Nations with Anarchic Equalism cannot accept diplomatic actions from "
+                "non-Equalist nations.")
+        if (("Postcolonial" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']]) and
+                (any(idea not in ["Equalism", "Anarchy"]) for idea in
+                 [self.recipient_info['govt_type'], user_info['govt_type']])):
+            return await interaction.followup.send(
+                "Nations with Postcolonial Anarchy cannot accept diplomatic actions "
+                "from any non-Equalist or non-Anarchic nations.")
+        elif self.recipient_info['govt_subtype'] in ["Primivitist", "Radical"]:
+            return await interaction.followup.send("Nations with Primitivist or Radical Anarchy cannot take "
+                                                   "any diplomatic actions.")
+        # if either nation is pacificistic, it cannot participate in anything but diplomatic relations
+        if "Pacifistic" in [self.recipient_info['govt_subtype'], self.recipient_info['govt_type']]:
+            return await interaction.followup.send("Nations with the Pacifistic Anarchy ideology cannot use any "
+                                                   "diplomatic action other than Diplomatic Relations.")
+        # if the user already has an overlord, deny
+        if self.recipient_info['overlord'] is not None:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            await interaction.followup.send(f"{self.recipient_info['name']} already has an Overlord.")
+        # check for pending offers
+        pending_check = await self.conn.fetchrow('''SELECT *
+                                                    FROM cnc_pending_requests
+                                                    WHERE $1 = ANY (members)
+                                                      AND $2 = ANY (members)
+                                                      AND type = 'Subjugation';''', user_info['name'],
+                                                 self.recipient_info['name'])
+        if pending_check:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"{self.recipient_info['name']} is already considering an "
+                                                   f"existing proposal from {user_info['name']}.")
+        # check if the user has any hostile actions
+        # check wars
+        war_check = await self.conn.fetchrow('''SELECT *
+                                                FROM cnc_wars
+                                                WHERE (($1 = ANY(attackers) AND $2 = ANY(defenders))
+                                                    OR ($1 = ANY(defenders) AND $2 = ANY(attackers)))
+                                                  AND active;''',
+                                        user_info['name'], self.recipient_info['name'])
+        if war_check is not None:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.")
+        # check embargoes
+        embargoes = await self.conn.fetchrow('''SELECT *
+                                                FROM cnc_embargoes
+                                                WHERE $1 = ANY(array[sender, target])
+                                                  AND $2 = ANY(array[sender, target]);''',
+                                             user_info['name'], self.recipient_info['name'])
+        if embargoes is not None:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.\n"
+                                                   "*Embargoes are considered hostile actions.*")
+        # check to ensure that the sender has sufficient political authority
+        if user_info['pol_auth'] < 1:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("You do not have sufficient Political Authority to send that "
+                                                   "proposal.")
+        # otherwise, send the message
+        recipient_dm = await safe_dm(bot=self.bot, user_id=self.recipient_info['user_id'],
+                                     content=f"The {user_info['pretitle']} of {user_info['name']} has issued a request "
+                                             f"to establish an Overlordship over {self.recipient_info['name']}. "
+                                             f"Please use the buttons below within 24 hours to respond to the request.")
+        # create the response view
+        subjugation_response = ProposeSubjugationResponseView(interaction=interaction, 
+                                                     conn=self.conn, 
+                                                     sender_info=user_info, 
+                                                     recipient=self.recipient_info,
+                                                     dm=recipient_dm,
+                                                     bot=self.bot)
+        # edit the DM with the buttons
+        await recipient_dm.edit(view=subjugation_response)
+        # let the user know that they have sent a request
+        await interaction.followup.send(f"{self.recipient_info['name']} has received a request to "
+                                        f"establish an Overlord relationship.")
+        # update the db to show pending
+        await self.conn.execute('''INSERT INTO cnc_pending_requests
+                                   VALUES ($1, $2, TRUE);''', interaction.message.id,
+                                [self.recipient_info['name'], user_info['name']])
+        # pre-emptively remove one political authoriy
+        await self.conn.execute('''UPDATE cnc_users
+                                   SET pol_auth = pol_auth - 1
+                                   WHERE user_id = $1;''',
+                                user_info['user_id'])
+        # return to menu
+        diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+        return await interaction.edit_original_response(view=diplo_menu)
+
+
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
@@ -3301,6 +3406,89 @@ class TradePactRespondView(discord.ui.View):
         # send sender confirmation
         await sender_user.send(content=f"{self.recipient_info['name']} has rejected "
                                        f"the offer for a trade pact from {self.sender_info['name']}!")
+        # close out the buttons
+        self.stop()
+        return await interaction.edit_original_response(view=None)
+    
+class ProposeSubjugationResponseView(discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, sender_info: asyncpg.Record,
+                 recipient_info: asyncpg.Record, dm: discord.Message, bot: discord.Client):
+        super().__init__(timeout=86400)
+        self.interaction = interaction
+        self.conn = conn
+        self.sender_info = sender_info
+        self.dm = dm
+        self.recipient_info = recipient_info
+        self.bot = bot
+
+    async def on_timeout(self):
+        # disable buttons and update view
+        self.stop()
+        # send message that the user has failed to react in time
+        await self.dm.reply(content="You have failed to reply within 24 hours. The request has been auto-rejected.")
+        # delete pending request
+        await self.conn.execute('''DELETE
+                                   FROM cnc_pending_requests
+                                   WHERE id = $1;''', self.interaction.message.id)
+        await safe_dm(self.bot, self.sender_info['user_id'], content=(
+            f"The {self.recipient_info['pretitle']} of "
+            f"{self.recipient_info['name']} has auto-rejected your "
+            f"Overlordship offer."))
+        return
+
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
+    async def accept_overlord(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # ensure that the user has enough diplomatic authority
+        if self.recipient_info['pol_auth'] < 1:
+            return await interaction.followup.send("You do not have enough Political Authority to accept that request.")
+        # alter overlord
+        await self.conn.execute('''UPDATE cnc_users SET overlord = $1 WHERE user_id = $2;''',
+                                self.sender_info['user_id'], self.recipient_info['user_id'])
+        # subtract one diplomatic authority from recipient
+        await self.conn.execute('''UPDATE cnc_users
+                                   SET pol_auth = pol_auth - 1
+                                   WHERE user_id = $1;''',
+                                self.recipient_info['user_id'])
+        # delete the pending
+        await self.conn.execute('''DELETE
+                                   FROM cnc_pending_requests
+                                   WHERE id = $1;''',
+                                self.interaction.message.id)
+        # confirm with both parties
+        await interaction.followup.send(f"{self.sender_info['name']} has established an Overlordship over "
+                                        f"{self.recipient_info['name']}!")
+        # notify sender via DM (with fallback on failure)
+        await safe_dm(self.bot, self.sender_info['user_id'], content=(
+            f"{self.recipient_info['name']} has accepted "
+            f"the offer of Overlordship under {self.sender_info['name']}!"))
+        # close out the buttons
+        self.stop()
+        return await interaction.edit_original_response(view=None)
+
+    @discord.ui.button(label="Reject", style=discord.ButtonStyle.danger)
+    async def reject_overlordship(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # delete pending request
+        await self.conn.execute('''DELETE
+                                   FROM cnc_pending_requests
+                                   WHERE id = $1;''', self.interaction.message.id)
+        # add political authority back to sender
+        await self.conn.execute('''UPDATE cnc_users
+                                   SET pol_auth = pol_auth + 1
+                                   WHERE user_id = $1;''',
+                                self.sender_info['user_id'])
+        # notify recipient
+        await interaction.followup.send(f"{self.recipient_info['name']} has rejected the Overlordship offer from "
+                                        f"{self.sender_info['name']}!")
+        # create sender dm
+        sender_user = self.bot.get_user(self.sender_info['user_id'])
+        # send sender confirmation
+        await sender_user.send(content=f"{self.recipient_info['name']} has rejected "
+                                       f"the offer for Overlordship under {self.sender_info['name']}!")
         # close out the buttons
         self.stop()
         return await interaction.edit_original_response(view=None)
