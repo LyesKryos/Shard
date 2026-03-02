@@ -3449,13 +3449,13 @@ class PuppetManagement(discord.ui.View):
         if war_check is not None:
             button.disabled = True
             await self.interaction.edit_original_response(view=self)
-            return await interaction.response.send_message("You cannot release a puppet while at war.", ephemeral=True)
+            return await interaction.followup.send("You cannot release a puppet while at war.", ephemeral=True)
         # otherwise, carry on
         else:
             # create a response view
             accept_view = Accept()
             # send a response to see if they actually want to release their puppet
-            await interaction.response.send_response(content=f"Are you sure you wish to release {self.recipient_info['name']}?", view=accept_view)
+            await interaction.followup.send(content=f"Are you sure you wish to release {self.recipient_info['name']}?", view=accept_view)
             # wait for a response
             release_response = await accept_view.wait()
             # if they accept, release the puppet
