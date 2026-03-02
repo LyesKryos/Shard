@@ -3085,6 +3085,13 @@ class HostileDiplomaticActions(discord.ui.View):
                 await interaction.edit_original_response(view=self)
                 # remove accept/deny buttons
                 return await remove_msg.edit(view=None)
+        # check if the user is the recipient's overlord
+        if self.recipient_info['overlord'] == interaction.user.id:
+            # deny message
+            await interaction.followup.send(f"You cannot Embargo your own puppet.", ephemeral=True)
+            # disable the button and update
+            button.disabled = True
+            return await self.interaction.edit_original_response(view=self)
         # check if the user has any existing cooperative relationships
         alliances = await self.conn.fetchrow('''SELECT *
                                                 FROM cnc_alliances
@@ -3162,7 +3169,7 @@ class HostileDiplomaticActions(discord.ui.View):
                                                     OR ($1 = ANY(defenders) AND $2 = ANY(attackers)))
                                                   AND active;''',
                                              sender_info['name'], self.recipient_info['name'])
-        # check to see if the nations have a truce
+        # check to see if the nations have a trucef
         truce_check = await self.conn.fetchrow('''SELECT * FROM cnc_peace_treaties 
                                                   WHERE $1 = ANY (members) 
                                                     AND $2 = ANY (members) 
@@ -3185,6 +3192,13 @@ class HostileDiplomaticActions(discord.ui.View):
                                                    f"{self.recipient_info['name']} and cannot declare another war.\n"
                                                    f"To negotiate a peace with this nation, "
                                                    f"use `/cnc war war_id:{war_check['id']}`.")
+        # check if the user is the recipient's overlord
+        if self.recipient_info['overlord'] == interaction.user.id:
+            # deny message
+            await interaction.followup.send(f"You cannot declare war on your own puppet.", ephemeral=True)
+            # disable the button and update
+            button.disabled = True
+            return await self.interaction.edit_original_response(view=self)
         # create a base list of CBs available
         available_cbs = ["Conquest", "Subjugate", "Force Reparations"]
         # check CBs available by tech
