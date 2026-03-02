@@ -6365,6 +6365,13 @@ class CNC(commands.Cog):
         url = await self.locate_color(province, cords)
         return await interaction.followup.send(url)
 
+    @nation.autocomplete("nation")
+    async def nation_autocomplete(interaction: discord.Interaction, current_nation: str) -> List[app_commands.Choice[str]]:
+        """This function searches for current player nations and then returns them as a list for autocomplete."""
+
+        current_nations = await conn.fetchval('''SELECT ARRAY_AGG(name) FROM cnc_users;''')
+        return [app_commands.Choice(name=n, value=n) for n in current_nations[0:24] if current_nation.lower() in n.lower()]
+
     @cnc.command(name="nation", description="Displays nation information for specified nation or player.")
     @app_commands.describe(nation="The name of the nation you wish to query.", user="The user you wish to query.")
     async def nation(self, interaction: discord.Interaction, user: discord.Member = None, nation: str = None):
