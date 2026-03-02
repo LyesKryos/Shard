@@ -3359,7 +3359,7 @@ class PuppetManagement(discord.ui.View):
         if self.recipient_info['govt_type'] == sender_info['govt_type']:
             # reject and disable the button
             button.disabled = True
-            await interaction.edit_original_response(view=self)
+            await self.interaction.edit_original_response(view=self)
             return await interaction.response.send_message(f"{self.recipient_info['name']} already has the same Government Type as {sender_info['name']}!", ephemeral=True)
         # otherwise, carry on
         else:
@@ -3367,8 +3367,8 @@ class PuppetManagement(discord.ui.View):
             if sender_info['pol_auth'] < 15:
                 # disable and reject
                 button.disabled = True
-                await interaction.edit_original_response(view=self)
-                return await interaction.followup.send_message(f"You do not have enough Political Authority to force {self.recipient_info['name']} to conform to your Government Type.")
+                await self.interaction.edit_original_response(view=self)
+                return await interaction.response.send_message(f"You do not have enough Political Authority to force {self.recipient_info['name']} to conform to your Government Type.")
             # otherwise, carry on
             else:
                 # select a random government subtype
@@ -3387,7 +3387,7 @@ class PuppetManagement(discord.ui.View):
                 diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
                 # stop listening
                 self.stop()
-                return await interaction.edit_original_response(view=diplo_menu)
+                return await self.interaction.edit_original_response(view=diplo_menu)
 
     @discord.ui.button(label="Force Government Subtype", style=discord.ButtonStyle.blurple, emoji="\U0001f4dc")
     async def force_subtype(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -3399,7 +3399,7 @@ class PuppetManagement(discord.ui.View):
         if self.recipient_info['govt_type'] != sender_info['govt_type']:
             # if NOT, reject and disable the button
             button.disabled = True
-            await interaction.edit_original_response(view=self)
+            await self.interaction.edit_original_response(view=self)
             return await interaction.response.send_message(f"{self.recipient_info['name']} does *not* have the same Government Type as {sender_info['name']}!", ephemeral=True)
         # check if the puppet already is the same subtype
         elif self.recipient_info['govt_subtype'] == sender_info['govt_subtype']:
@@ -3411,8 +3411,8 @@ class PuppetManagement(discord.ui.View):
         if sender_info['pol_auth'] < 7:
             # disable and reject
             button.disabled = True
-            await interaction.edit_original_response(view=self)
-            return await interaction.followup.send_message(f"You do not have enough Political Authority to force {self.recipient_info['name']} to conform to your Government Subtype.")
+            await self.interaction.edit_original_response(view=self)
+            return await interaction.response.send_message(f"You do not have enough Political Authority to force {self.recipient_info['name']} to conform to your Government Subtype.")
         # otherwise, carry on
         else:
             # update the sender's pol auth
@@ -3429,10 +3429,12 @@ class PuppetManagement(discord.ui.View):
             diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
             # stop listening
             self.stop()
-            return await interaction.edit_original_response(view=diplo_menu)
+            return await self.interaction.edit_original_response(view=diplo_menu)
 
     @discord.ui.button(label="Release Puppet", style=discord.ButtonStyle.danger, emoji="\U000026d3\U0000fe0f\U0000200d\U0001f4a5")
     async def release_puppet(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
         # establish connection
         conn = self.conn
         # pull sender info
@@ -3469,12 +3471,19 @@ class PuppetManagement(discord.ui.View):
                 content=f"{self.recipient_info['name']} has been released from their subjugation obligations by {sender_info['name']}!")
                 # notify sender
                 await interaction.followup.send(f"{self.recipient_info['name']} has been released from their subjugation obligations by {sender_info['name']}!")
-                            # return to menu
+                # return to menu
                 diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
                 # stop listening
                 self.stop()
-                return await interaction.edit_original_response(view=diplo_menu)
-
+                return await self.interaction.edit_original_response(view=diplo_menu)
+            # if they do not
+            else:
+                # return to menu
+                diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+                # stop listening
+                self.stop()
+                return await self.interaction.edit_original_response(view=diplo_menu)
+                
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
