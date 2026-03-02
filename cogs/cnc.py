@@ -3422,8 +3422,7 @@ class PuppetManagement(discord.ui.View):
             # notify recipient
             await safe_dm(bot=interaction.client,
                 user_id=self.recipient_info['user_id'],
-                content=f"{self.recipient_info['name']} has been forced to change their Government Subtype to 
-                **{sender_info['govt_subtype']}** {sender_info['govt_type']} by their overlord, {sender_info['name']}!")  
+                content=f"{self.recipient_info['name']} has been forced to change their Government Subtype to **{sender_info['govt_subtype']}** {sender_info['govt_type']} by their overlord, {sender_info['name']}!")  
             # notify sender
             await interaction.response.send_message(f"{self.recipient_info['name']} has been forced to change their Government Subtype to 
                 **{sender_info['govt_subtype']}** {sender_info['govt_type']} by their overlord, {sender_info['name']}!")
