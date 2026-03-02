@@ -6368,6 +6368,7 @@ class CNC(commands.Cog):
     async def nation_autocomplete(self, interaction: discord.Interaction, current_nation: str) -> List[app_commands.Choice[str]]:
         """This function searches for current player nations and then returns them as a list for autocomplete."""
 
+        conn = self.bot.pool
         current_nations = await conn.fetchval('''SELECT ARRAY_AGG(name) FROM cnc_users;''')
         return [app_commands.Choice(name=n, value=n) for n in current_nations[0:24] if current_nation.lower() in n.lower()]
 
