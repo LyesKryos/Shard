@@ -3174,7 +3174,7 @@ class HostileDiplomaticActions(discord.ui.View):
             button.disabled = True
             await interaction.edit_original_response(view=self)
             # send message and return
-            return await interaction.followup.send(f"{sender_info['name']} and {self.recipient_info['name']} have an"
+            return await interaction.followup.send(f"{sender_info['name']} and {self.recipient_info['name']} have an "
                                             f"active truce, which will last for "
                                             f"`{truce_check['truce_length']}` more turns.")
         if war_check is not None:
