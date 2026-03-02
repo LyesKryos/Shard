@@ -3382,8 +3382,7 @@ class PuppetManagement(discord.ui.View):
                 user_id=self.recipient_info['user_id'],
                 content=f"{self.recipient_info['name']} has been forced to change their Government Type to {rand_subtype} {sender_info['govt_type']} by their overlord, {sender_info['name']}!")
                 # notify sender
-                await interaction.response.send_message(f"{self.recipient_info['name']} has been forced to change their 
-                Government Type to {rand_subtype} {sender_info['govt_type']} by their overlord, {sender_info['name']}!")
+                await interaction.response.send_message(f"{self.recipient_info['name']} has been forced to change their Government Type to {rand_subtype} {sender_info['govt_type']} by their overlord, {sender_info['name']}!")
                 # return to menu
                 diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
                 # stop listening
