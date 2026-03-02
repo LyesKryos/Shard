@@ -2903,7 +2903,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=diplo_menu)
 
-    async def propose_subjugation(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def propose_subjugation(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer()
         # pull user info
@@ -3006,7 +3006,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=diplo_menu)
 
-    async def puppet_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def puppet_callback(self, interaction: discord.Interaction):
         # defer response
         await interaction.response.defer()
         # add puppet management
