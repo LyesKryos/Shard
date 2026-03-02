@@ -3405,7 +3405,7 @@ class PuppetManagement(discord.ui.View):
         elif self.recipient_info['govt_subtype'] == sender_info['govt_subtype']:
             # if so, reject and disable the button
             button.disabled = True
-            await interaction.edit_original_response(view=self)
+            await self.interaction.edit_original_response(view=self)
             return await interaction.response.send_message(f"{self.recipient_info['name']} already has the same Government Subtype as {sender_info['name']}!", ephemeral=True)
         # check to see if the user has the correct amount of pol auth
         if sender_info['pol_auth'] < 7:
@@ -3444,7 +3444,7 @@ class PuppetManagement(discord.ui.View):
                                                 FROM cnc_wars
                                                 WHERE ($1 = ANY(attackers) OR $1 = ANY(defenders))
                                                   AND active;''',
-                                             sender_info['name'], self.recipient_info['name'])
+                                             sender_info['name'])
         # if the sender is at war, block the release
         if war_check is not None:
             button.disabled = True
@@ -3483,7 +3483,7 @@ class PuppetManagement(discord.ui.View):
                 # stop listening
                 self.stop()
                 return await self.interaction.edit_original_response(view=diplo_menu)
-                
+
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
