@@ -6370,7 +6370,7 @@ class CNC(commands.Cog):
 
         conn = self.bot.pool
         current_nations = await conn.fetchval('''SELECT ARRAY_AGG(name) FROM cnc_users;''')
-        return [app_commands.Choice(name=n, value=n) for n in current_nations[0:24] if current_nation.lower() in n.lower()]
+        return [app_commands.Choice(name=n, value=n) for n in current_nations if current_nation.lower() in n.lower()][0:24] 
 
     @cnc.command(name="nation", description="Displays nation information for specified nation or player.")
     @app_commands.autocomplete(nation=nation_autocomplete)
