@@ -3103,11 +3103,6 @@ class HostileDiplomaticActions(discord.ui.View):
                                                   WHERE $1 = ANY (members)
                                                     AND $2 = ANY (members);''',
                                                user_info['name'], self.recipient_info['name'])
-        diplomatic_relations = await self.conn.fetchrow('''SELECT *
-                                                           FROM cnc_drs
-                                                           WHERE $1 = ANY (members)
-                                                             AND $2 = ANY (members);''',
-                                                        user_info['name'], self.recipient_info['name'])
         pending_cooperation = await self.conn.fetchrow('''SELECT *
                                                           FROM cnc_pending_requests
                                                           WHERE $1 = ANY (members)
@@ -3115,8 +3110,8 @@ class HostileDiplomaticActions(discord.ui.View):
                                                             AND type = ANY ($3);''',
                                                        user_info['name'], self.recipient_info['name'],
                                                        ["Military Alliance, Trade Pact, Diplomatic Relations"])
-        if (alliances is not None) or (trade_pacts is not None) or (diplomatic_relations is not None) or (
-                pending_cooperation is not None):
+        # if any of them are not empty 
+        if (alliances is not None) or (trade_pacts is not None) or (pending_cooperation is not None):
             button.disabled = True
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"Hostile actions cannot be performed while {user_info['name']} "
@@ -3945,6 +3940,9 @@ class WarDeclarationView(discord.ui.View):
         # send the war embed in the public channel
         await cnc_channel.send(embed=war_embed)
         await interaction.followup.send(embed=war_embed)
+        # remove any drs and trade pacts
+        await conn.execute('''DELETE FROM cnc_drs WHERE $1 = ANY(members) AND $2 = ANY(members);''', self.sender_info['name'], self.recipient_info['name'])
+        await conn.execute('''DELETE FROM cnc_trade_pacts WHERE $1 = ANY(members) AND $2 = ANY(members);''', self.sender_info['name'], self.recipient_info['name'])
         # disable the views
         return await self.interaction.edit_original_response(view=None)
 
