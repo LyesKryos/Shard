@@ -3318,6 +3318,9 @@ class PuppetManagement(discord.ui.View):
                 for province_id in provinces_demanded:
                     dev = await conn.fetchval('''SELECT development FROM cnc_provinces WHERE id = $1;''', province_id)
                     total_cost += dev // 10
+                # if the sender is an authoritarian democracy, reduce by one
+                if self.sender_info['govt_subtype'].lower() == "authoritarian":
+                    total_cost = max(1, total_cost-1)
                 # check if the user has enough political authority to confiscate
                 if sender_info['pol_auth'] < total_cost:
                     return await interaction.followup.send(f"You do not have enough political authority to confiscate "
@@ -3337,16 +3340,143 @@ class PuppetManagement(discord.ui.View):
                                   content=f"{sender_info['name']} has confiscated the following provinces:\n"
                                           f"{', '.join(map(str, provinces_demanded))}")
                     # return message
-                    return await interaction.followup.send(f"{sender_info['name']} has confiscated the following "
+                    await interaction.followup.send(f"{sender_info['name']} has confiscated the following "
                                                            f"provinces:\n"
                                                            f"{', '.join(map(str, provinces_demanded))}")
+                    # return to menu
+                    diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+                    # stop listening
+                    self.stop()
+                    return await interaction.edit_original_response(view=diplo_menu)
 
+    @discord.ui.button(label="Force Government Type", style=discord.ButtonStyle.blurple, emoji="\U0001f3db")
+    async def force_type(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # establish connection
+        conn = self.conn
+        # pull sender info
+        sender_info = await user_db_info(user_id=interaction.user.id, conn=conn)
+        # check if the puppet already has the government type
+        if self.recipient_info['govt_type'] == sender_info['govt_type']:
+            # reject and disable the button
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.response.send_message(f"{self.recipient_info['name']} already has the same Government Type as {sender_info['name']}!", ephemeral=True)
+        # otherwise, carry on
+        else:
+            # check to see if the user has the correct amount of pol auth
+            if sender_info['pol_auth'] < 15:
+                # disable and reject
+                button.disabled = True
+                await interaction.edit_original_response(view=self)
+                return await interaction.followup.send_message(f"You do not have enough Political Authority to force {self.recipient_info['name']} to conform to your Government Type.")
+            # otherwise, carry on
+            else:
+                # select a random government subtype
+                rand_subtype = await conn.fetchval('''SELECT govt_subtype FROM cnc_govts WHERE govt_type = $1 ORDER BY RANDOM();''', sender_info['govt_type'])
+                # update the sender's pol auth
+                await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth - 15 WHERE user_id = $1;''', sender_info['user_id'])
+                # update the recipient's government type
+                await conn.execute('''UPDATE cnc_users SET govt_type = $1, govt_subtype = $2 WHERE user_id = $3;''', sender_info['govt_type'], rand_subtype, self.recipient_info['user_id'])
+                # notify recipient
+                await safe_dm(bot=interaction.client,
+                user_id=self.recipient_info['user_id'],
+                content=f"{self.recipient_info['name']} has been forced to change their Government Type to {rand_subtype} {sender_info['govt_type']} by their overlord, {sender_info['name']}!")
+                # notify sender
+                await interaction.response.send_message(f"{self.recipient_info['name']} has been forced to change their 
+                Government Type to {rand_subtype} {sender_info['govt_type']} by their overlord, {sender_info['name']}!")
+                # return to menu
+                diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+                # stop listening
+                self.stop()
+                return await interaction.edit_original_response(view=diplo_menu)
 
+    @discord.ui.button(label="Force Government Subtype", style=discord.ButtonStyle.blurple, emoji="\U0001f4dc")
+    async def force_subtype(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # establish connection
+        conn = self.conn
+        # pull sender info
+        sender_info = await user_db_info(user_id=interaction.user.id, conn=conn)
+        # check if the puppet already has the government type
+        if self.recipient_info['govt_type'] != sender_info['govt_type']:
+            # if NOT, reject and disable the button
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.response.send_message(f"{self.recipient_info['name']} does *not* have the same Government Type as {sender_info['name']}!", ephemeral=True)
+        # check if the puppet already is the same subtype
+        elif self.recipient_info['govt_subtype'] == sender_info['govt_subtype']:
+            # if so, reject and disable the button
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.response.send_message(f"{self.recipient_info['name']} already has the same Government Subtype as {sender_info['name']}!", ephemeral=True)
+        # check to see if the user has the correct amount of pol auth
+        if sender_info['pol_auth'] < 7:
+            # disable and reject
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send_message(f"You do not have enough Political Authority to force {self.recipient_info['name']} to conform to your Government Subtype.")
+        # otherwise, carry on
+        else:
+            # update the sender's pol auth
+            await conn.execute('''UPDATE cnc_users SET pol_auth = pol_auth - 7 WHERE user_id = $1;''', sender_info['user_id'])
+            # update the recipient's government type
+            await conn.execute('''UPDATE cnc_users SET govt_subtype = $1 WHERE user_id = $2;''', sender_info['govt_subtype'], self.recipient_info['user_id'])
+            # notify recipient
+            await safe_dm(bot=interaction.client,
+                user_id=self.recipient_info['user_id'],
+                content=f"{self.recipient_info['name']} has been forced to change their Government Subtype to 
+                **{sender_info['govt_subtype']}** {sender_info['govt_type']} by their overlord, {sender_info['name']}!")  
+            # notify sender
+            await interaction.response.send_message(f"{self.recipient_info['name']} has been forced to change their Government Subtype to 
+                **{sender_info['govt_subtype']}** {sender_info['govt_type']} by their overlord, {sender_info['name']}!")
+            # return to menu
+            diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+            # stop listening
+            self.stop()
+            return await interaction.edit_original_response(view=diplo_menu)
 
-
-
-
-
+    @discord.ui.button(label="Release Puppet", style=discord.ButtonStyle.danger, emoji="\U000026d3\U0000fe0f\U0000200d\U0001f4a5")
+    async def release_puppet(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # establish connection
+        conn = self.conn
+        # pull sender info
+        sender_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+        # check to see if the nations are at war
+        war_check = await self.conn.fetchrow('''SELECT *
+                                                FROM cnc_wars
+                                                WHERE ($1 = ANY(attackers) OR $1 = ANY(defenders))
+                                                  AND active;''',
+                                             sender_info['name'], self.recipient_info['name'])
+        # if the sender is at war, block the release
+        if war_check is not None:
+            button.disabled = True
+            await self.interaction.edit_original_response(view=self)
+            return await interaction.response.send_message("You cannot release a puppet while at war.", ephemeral=True)
+        # otherwise, carry on
+        else:
+            # create a response view
+            accept_view = Accept()
+            # send a response to see if they actually want to release their puppet
+            await interaction.response.send_response(content=f"Are you sure you wish to release {self.recipient_info['name']}?", view=accept_view)
+            # wait for a response
+            release_response = await accept_view.wait()
+            # if they accept, release the puppet
+            if release_response:
+                # update the overlord status of the recipient
+                await conn.execute('''UPDATE cnc_users SET overlord = NULL WHERE user_id = $1;''', self.recipient_info['user_id'])
+                # create a truce
+                await conn.execute('''INSERT INTO cnc_peace_treaties(members, truce_length, end_embargo, end_ma, end_tp, reparations_length, humiliate, dismantle) 
+                VALUES($1, 12, 0, 0, 0, 0, 0, 0);''', [sender_info['name'], self.recipient_info['name']])
+                # notify recipient
+                await safe_dm(bot=interaction.user.id,
+                user_id=self.recipient_info['user_id'],
+                content=f"{self.recipient_info['name']} has been released from their subjugation obligations by {sender_info['name']}!")
+                # notify sender
+                await interaction.followup.send(f"{self.recipient_info['name']} has been released from their subjugation obligations by {sender_info['name']}!")
+                            # return to menu
+                diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+                # stop listening
+                self.stop()
+                return await interaction.edit_original_response(view=diplo_menu)
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -3354,7 +3484,9 @@ class PuppetManagement(discord.ui.View):
         await interaction.response.defer()
         # return to menu
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
-        await interaction.edit_original_response(view=diplo_menu)
+        # stop listening
+        self.stop()
+        return await interaction.edit_original_response(view=diplo_menu)
 
 
 class DiplomaticRelationsRespondView(discord.ui.View):
