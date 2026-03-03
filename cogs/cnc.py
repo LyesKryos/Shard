@@ -6604,8 +6604,32 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # pull all province names and ids
         provinces = await conn.fetch('''SELECT id, name FROM cnc_provinces ORDER BY id DESC;''')
+
+        def match_priority(province_id):
+            """This function attempts to create a priority list of the most accurately matching ID/name for the province"""
+            
+            # define the terms
+            province_id = str(province['id'])
+            province_name = province['name'].lower()
+            typed = province_typed.lower()
+            # if they are an exact match, give them priority 0
+            if province_id == typed or province_name == typed:
+                return 0
+            # if they start with, give them priority 1
+            elif province_id.startswith(typed) or province_name.startswith(typed):
+                return 1
+            # otherwise, give them lowest priorty
+            else:
+                return 2
+
+        # then match the provinces
+        matched_provinces = [app_commands.Choice(name=f"{province['name']} (ID: {province['id']})", value=str(province['id'])) for province in provinces if (province_typed.lower() in province['name'].lower()) or (province_typed in str(province['id']))]
+
+        # prioritize
+        matched.sort(key=lambda m: (match_priority(next(p for p in provinces if str(p['id']) == m.value)), int(m.value)))
+
         # sort and return
-        return [app_commands.Choice(name=f"{province['name']} (ID: {province['id']})", value=str(province['id'])) for province in provinces if (province_typed.lower() in province['name'].lower()) or (province_typed in str(province['id']))][0:24]
+        return matched[0:24]
 
     @cnc.command(name="province", description="Displays basic information about a province.")
     @app_commands.autocomplete(province=province_autocomplete)
