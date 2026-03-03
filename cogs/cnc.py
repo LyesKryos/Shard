@@ -6923,7 +6923,7 @@ class CNC(commands.Cog):
         """This function searches for technology names and then returns them as a list for autocomplete."""
 
         conn = self.bot.pool
-        techs = await conn.fetchval('''SELECT ARRAY_AGG(name) FROM cnc_tech;''')
+        techs = await conn.fetchval('''SELECT ARRAY_AGG(name) FROM cnc_tech ORDER BY random();''')
         return [app_commands.Choice(name=tech, value=tech) for tech in techs if tech_typed.lower() in tech.lower()][0:24]
 
 
@@ -6990,6 +6990,7 @@ class CNC(commands.Cog):
 
     @cnc.command(name="research", description="Begins researching a specified tech.")
     @app_commands.describe(tech="The tech to research.")
+    @app_commands.autocomplete(tech=tech_autocomplete)
     async def research(self, interaction: discord.Interaction, tech: str):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -7074,7 +7075,7 @@ class CNC(commands.Cog):
         # if there is no tech being researched currently
         if researching is None:
             # return message
-            return await interaction.followup.send("No tech is being researched currently.")
+            return await interaction.followup.send(f"{user_info['name']} is not currently researching any technology.")
         # if there is a tech being researched, send the info
         if researching is not None:
             # return info
@@ -7101,14 +7102,14 @@ class CNC(commands.Cog):
         # if there is no tech being researched currently
         if researching is None:
             # return message
-            return await interaction.followup.send("No tech is being researched currently.")
+            return await interaction.followup.send(f"{user_info['name']} is not currently researching any technology.")
         # cancel the research currently underway
         if researching is not None:
             # send cancel to db
             await conn.execute('''DELETE
                                   FROM cnc_researching
                                   WHERE user_id = $1;''', user_id)
-            return await interaction.followup.send(f"Scientists are no longer researching {researching['tech']}.")
+            return await interaction.followup.send(f"{user_info['name']} is no longer researching {researching['tech']}.")
 
     # === Government Commands ===
 
