@@ -7668,7 +7668,7 @@ class CNC(commands.Cog):
             if "Road" in (p['structures'] if p['structures'] is not None else []):
                 pc_map[p['id']] *= 0.5
             # if there is a river and not a bridge, the cost is 2
-            if (p['river']) and ("Bridge" not in p['structures']):
+            if (p['river']) and ("Bridge" not in (p['structures'] if p['structures'] is not None else [])):
                 pc_map[p['id']] = 2
 
         # now define the Dijkstra's algorithm
