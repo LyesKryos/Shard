@@ -6919,7 +6919,16 @@ class CNC(commands.Cog):
 
     # === Tech Commands === #
 
-    @cnc.command(name="tech", description="Opens the technology and research menu.")
+    async def tech_autocomplete(self, interaction: discord.Interaction, tech_typed: str) -> List[app_commands.Choice[str]]:
+         """This function searches for technology names and then returns them as a list for autocomplete."""
+
+        conn = self.bot.pool
+        techs = await conn.fetchval('''SELECT ARRAY_AGG(name) FROM cnc_tech;''')
+        return [app_commands.Choice(name=tech, value=tech) for tech in techs if tech_typed.lower() in tech.lower()][0:24]
+
+
+    @cnc.command(name="tech", description="Displays information about a specified technology.")
+    @app_commands.autocomplete(tech=tech_autocomplete)
     @app_commands.describe(tech="The tech to search.")
     async def tech(self, interaction: discord.Interaction, tech: str):
         # defer interaction
