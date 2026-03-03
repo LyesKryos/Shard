@@ -6834,6 +6834,7 @@ class CNC(commands.Cog):
 
 
     @cnc.command(name="war", description="Displays information about a specific war and option related to that war.")
+    @app_commands.autocomplete(war_id=war_autocomplete)
     @app_commands.describe(war_id="The war's ID or full name.")
     async def war_info(self, interaction: discord.Interaction, war_id: str):
         # defer the interaction
