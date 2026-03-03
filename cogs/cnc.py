@@ -7665,7 +7665,7 @@ class CNC(commands.Cog):
             p_map[p['id']] = p['bordering']
             pc_map[p['id']] = 1
             # if there is a road, the cost is halved (unles there is a river)
-            if "Road" in p['structures']:
+            if "Road" in (p['structures'] if p['structures'] is not None else []):
                 pc_map[p['id']] *= 0.5
             # if there is a river and not a bridge, the cost is 2
             if (p['river']) and ("Bridge" not in p['structures']):
