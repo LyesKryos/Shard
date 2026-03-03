@@ -6605,7 +6605,7 @@ class CNC(commands.Cog):
         # pull all province names and ids
         provinces = await conn.fetch('''SELECT id, name FROM cnc_provinces ORDER BY id DESC;''')
 
-        def match_priority(province_id):
+        def match_priority(province):
             """This function attempts to create a priority list of the most accurately matching ID/name for the province"""
             
             # define the terms
