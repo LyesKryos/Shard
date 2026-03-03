@@ -6920,7 +6920,7 @@ class CNC(commands.Cog):
     # === Tech Commands === #
 
     async def tech_autocomplete(self, interaction: discord.Interaction, tech_typed: str) -> List[app_commands.Choice[str]]:
-         """This function searches for technology names and then returns them as a list for autocomplete."""
+        """This function searches for technology names and then returns them as a list for autocomplete."""
 
         conn = self.bot.pool
         techs = await conn.fetchval('''SELECT ARRAY_AGG(name) FROM cnc_tech;''')
