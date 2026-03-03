@@ -6626,10 +6626,10 @@ class CNC(commands.Cog):
         matched_provinces = [app_commands.Choice(name=f"{province['name']} (ID: {province['id']})", value=str(province['id'])) for province in provinces if (province_typed.lower() in province['name'].lower()) or (province_typed in str(province['id']))]
 
         # prioritize
-        matched.sort(key=lambda m: (match_priority(next(p for p in provinces if str(p['id']) == m.value)), int(m.value)))
+        matched_provinces.sort(key=lambda m: (match_priority(next(p for p in provinces if str(p['id']) == m.value)), int(m.value)))
 
         # sort and return
-        return matched[0:24]
+        return matched_provinces[0:24]
 
     @cnc.command(name="province", description="Displays basic information about a province.")
     @app_commands.autocomplete(province=province_autocomplete)
