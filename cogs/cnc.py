@@ -7735,7 +7735,7 @@ class CNC(commands.Cog):
         if path is None:
             return await ctx.send(f"Province {destination} cannot be reached by land from Province {origin}.")
         # otherwise, return and send
-        return await ctx.send(f"The total cost of travel is {cost} points.\nThe path there travels through the following province IDs: {path}}")
+        return await ctx.send(f"The total cost of travel is {cost} points.\nThe path there travels through the following province IDs: {path}")
 
 
 
