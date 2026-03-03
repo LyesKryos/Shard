@@ -6830,7 +6830,7 @@ class CNC(commands.Cog):
         # pull all active wars
         active_wars = await conn.fetch('''SELECT name, id FROM cnc_wars WHERE active = True;''')
         # construct list
-        return [app_commands.Choice(name=f"{war['name']} (ID: {war['id']})", value={war['id']}) for war in active_wars if war_typed.lower() in war.lower()][0:24]
+        return [app_commands.Choice(name=f"{war['name']} (ID: {war['id']})", value={war['id']}) for war in active_wars if (war_typed.lower() in war['name'].lower()) or (war_typed.lower() in war['id'])][0:24]
 
 
     @cnc.command(name="war", description="Displays information about a specific war and option related to that war.")
