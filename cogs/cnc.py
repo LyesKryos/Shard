@@ -6605,7 +6605,7 @@ class CNC(commands.Cog):
         # pull all province names and ids
         provinces = await conn.fetch('''SELECT id, name FROM cnc_provinces ORDER BY random();''')
         # sort and return
-        return [app_commands.Choice(name=f"{province['name']} (ID: {province['id']})", value=province['id']) for province if (province_typed.lower() in province['name'].lower()) or (province_typed in province['id'])]
+        return [app_commands.Choice(name=f"{province['name']} (ID: {province['id']})", value=province['id']) for province in provinces if (province_typed.lower() in province['name'].lower()) or (province_typed in province['id'])]
 
     @cnc.command(name="province", description="Displays basic information about a province.")
     @app_commands.autocomplete(province=province_autocomplete)
