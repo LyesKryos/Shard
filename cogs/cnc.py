@@ -7730,12 +7730,14 @@ class CNC(commands.Cog):
             return path, best_cost[end_id]
         
         # run the function
-        path, cost = find_path(origin, destination)
+        result = find_path(origin, destination)
         # if there is no path, return such
-        if path is None:
+        if result is None:
             return await ctx.send(f"Province {destination} cannot be reached by land from Province {origin}.")
+        # split the variables
+        path, cost = result
         # otherwise, return and send
-        return await ctx.send(f"The total cost of travel is {cost} points.\nThe path there travels through the following province IDs: {path}")
+        return await ctx.send(f"The total cost of travel is {cost} point(s).\nThe path there travels through the following province IDs: {path}")
 
 
 
