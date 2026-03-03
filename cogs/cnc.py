@@ -6648,7 +6648,18 @@ class CNC(commands.Cog):
         else:
             return await interaction.followup.send(embed=await create_prov_embed(prov_info, conn))
 
+    async def army_autocomplete(self, interaction: discord.Interaction, army_typing: str) -> List[app_commands.Choice(str)]:
+        """This function searches for current player nations and then returns them as a list for autocomplete."""
+
+        # establish connection
+        conn = self.bot.pool
+        # pull all army names & ids
+        armies = await conn.fetch('''SELECT army_name, army_id FROM cnc_armies;''')
+        # parse out the armies
+        return [app_commands.Choice(name=f"{army['army_name']} (ID: {army['army_id']})", value=army['army_id']) for army in armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])]      
+
     @cnc.command(name="army_view", description="Displays information about a specific army.")
+    @app_commands.autocomplete(army_id=army_autocomplete)
     @app_commands.describe(army_id="The ID of the army")
     async def army_view(self, interaction: discord.Interaction, army_id: int):
         # defer interaction
