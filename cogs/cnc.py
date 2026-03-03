@@ -6603,7 +6603,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull all province names and ids
-        provinces = await conn.fetch('''SELECT id, name FROM cnc_provinces ORDER BY random();''')
+        provinces = await conn.fetch('''SELECT id, name FROM cnc_provinces ORDER BY id DESC;''')
         # sort and return
         return [app_commands.Choice(name=f"{province['name']} (ID: {province['id']})", value=str(province['id'])) for province in provinces if (province_typed.lower() in province['name'].lower()) or (province_typed in str(province['id']))][0:24]
 
