@@ -6597,22 +6597,31 @@ class CNC(commands.Cog):
         else:
             return
 
+    async def province_autocomplete(self, interaction: discord.Interaction, province_typed: str) -> List[app_commands.Choice(str)]:
+        """This function searches for current player nations and then returns them as a list for autocomplete."""
+
+        # establish connection
+        conn = self.bot.pool
+        # pull all province names and ids
+        provinces = await conn.fetch('''SELECT id, name FROM cnc_provinces ORDER BY random();''')
+        # sort and return
+        return [app_commands.Choice(name=f"{province['name']} (ID: {province['id']})", value=province['id']) for province if (province_typed.lower() in province['name'].lower()) or (province_typed in province['id'])]
+
     @cnc.command(name="province", description="Displays basic information about a province.")
-    @app_commands.describe(province_id="The ID of the province.", province_name="The name of the province.")
-    async def province(self, interaction: discord.Interaction, province_id: int = None, province_name: str = None):
+    @app_commands.autocomplete(province=province_autocomplete)
+    @app_commands.describe(province="The ID or name of the province.")
+    async def province(self, interaction: discord.Interaction, province: str):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establish connection
         conn = self.bot.pool
-        # gather province information
-        if (province_id is None) and (province_name is None):
-            return await interaction.followup.send("This command requires at least one argument.")
-        elif province_id is not None:
+        # check province id or name
+        try:
+            province_id = int(province)
             prov_info = await self.province_db_info(province_id=province_id)
-        elif province_name is not None:
+        except ValueError:
+            province_id = str(province)
             prov_info = await self.province_db_info(province_name=province_name)
-        else:
-            raise TypeError
         # if the province doesn't exist
         if prov_info is None:
             return await interaction.followup.send("That province does not appear to exist.")
