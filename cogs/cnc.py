@@ -6822,6 +6822,17 @@ class CNC(commands.Cog):
             all_wars_pages = WarsPaginator(interaction, user_wars, all_wars_embed)
             return await interaction.followup.send(embed=all_wars_embed, view=all_wars_pages)
 
+    async def war_autocomplete(self, interaction: discord.Interaction, war_typed: str) -> List[discord.Choice(str)]:
+        """This function searches for current player nations and then returns them as a list for autocomplete."""
+
+        # establish connection
+        conn = self.bot.pool
+        # pull all active wars
+        active_wars = await conn.fetch('''SELECT name, war_id FROM cnc_wars WHERE active = True;''')
+        # construct list
+        return [app_commands.Choice(name=f"{war['name']} (ID: {war['id']})", value={war['id']}) for war in active_wars if war_typed.lower() in war.lower()][0:24]
+
+
     @cnc.command(name="war", description="Displays information about a specific war and option related to that war.")
     @app_commands.describe(war_id="The war's ID or full name.")
     async def war_info(self, interaction: discord.Interaction, war_id: str):
