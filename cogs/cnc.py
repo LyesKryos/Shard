@@ -7758,7 +7758,7 @@ class CNC(commands.Cog):
             province_cord = ((int(province_cord[0])), (int(province_cord[1])))
             # define the hexcode
             s = str(province_info['id'])
-            hex_color = "#" + s.ljust(6, "0")
+            hexcode = "#" + s.ljust(6, "0")
             # get color
             try:
                 color = ImageColor.getrgb(hexcode)
