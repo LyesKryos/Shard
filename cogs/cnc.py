@@ -7728,7 +7728,7 @@ class CNC(commands.Cog):
         # define start time
         start_time = time.perf_counter()
         # run the function
-        result = find_path(conn, origin, destination)
+        result = await find_path(conn, origin, destination)
         # if there is no path, return such
         if result is None:
             return await ctx.send(f"Province {destination} cannot be reached by land from Province {origin}.")
