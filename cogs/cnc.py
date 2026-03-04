@@ -7743,7 +7743,7 @@ class CNC(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def unique_colors(self, ctx)
+    async def unique_colors(self, ctx):
         # establish connection
         conn = self.bot.pool
         # pull all provinces
