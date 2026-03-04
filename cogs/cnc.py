@@ -186,6 +186,8 @@ async def map_color(province: int, hexcode: str, conn: asyncpg.Pool):
     map.save(fr"{map_directory}wargame_provinces.png")
 
 
+
+
 # create modal input function
 async def demanding_provinces_wait_for_modal(parent_interaction: discord.Interaction, title: str, label: str):
     """
@@ -7739,7 +7741,48 @@ class CNC(commands.Cog):
         # otherwise, return and send
         return await ctx.send(f"The total cost of travel is {cost} point(s).\nThe path there travels through the following province IDs: {path}\nTotal time to search: {end_time-start_time} seconds.")
 
-
+    @commands.command()
+    @commands.is_owner()
+    async def unique_colors(self, ctx)
+        # establish connection
+        conn = self.bot.pool
+        # pull all provinces
+        provinces = await conn.fetch('''SELECT * FROM cnc_provinces''')
+        map_directory = r"/root/Shard/CNC/Map Files/Maps/"
+        for province in provinces:
+            province_directory = r"/root/Shard/CNC/Map Files/Province Layers/"
+            # pull province information
+            province_info = province
+            province_cord = province_info['cord']
+            # obtain the coordinate information
+            province_cord = ((int(province_cord[0])), (int(province_cord[1])))
+            # define the hexcode
+            s = str(province_info['id'])
+            hex_color = "#" + s.ljust(6, "0")
+            # get color
+            try:
+                color = ImageColor.getrgb(hexcode)
+            except ValueError:
+                return ValueError("Hex code issue")
+            # open the map and the province images
+            map = Image.open(fr"{map_directory}wargame_provinces.png").convert("RGBA")
+            prov = Image.open(fr"{province_directory}{province}.png").convert("RGBA")
+            # obtain size and coordinate information
+            width = prov.size[0]
+            height = prov.size[1]
+            cord = (province_cord[0], province_cord[1])
+            # for every pixel, change the color to the owners
+            for x in range(0, width):
+                for y in range(0, height):
+                    data = prov.getpixel((x, y))
+                    if data != color:
+                        if data != (0, 0, 0, 0):
+                            if data != (255, 255, 255, 0):
+                                prov.putpixel((x, y), color)
+            # convert, paste, and save the image
+            prov = prov.convert("RGBA")
+            map.paste(prov, box=cord, mask=prov)
+        map.save(fr"{map_directory}colored_provinces.png")
 
 
 async def setup(bot: Shard):
