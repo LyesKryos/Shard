@@ -7749,6 +7749,7 @@ class CNC(commands.Cog):
         # pull all provinces
         provinces = await conn.fetch('''SELECT * FROM cnc_provinces''')
         map_directory = r"/root/Shard/CNC/Map Files/Maps/"
+        map = Image.open(fr"{map_directory}wargame_provinces.png").convert("RGBA")
         for province in provinces:
             province_directory = r"/root/Shard/CNC/Map Files/Province Layers/"
             # pull province information
@@ -7765,7 +7766,6 @@ class CNC(commands.Cog):
             except ValueError:
                 return ValueError("Hex code issue")
             # open the map and the province images
-            map = Image.open(fr"{map_directory}wargame_provinces.png").convert("RGBA")
             prov = Image.open(fr"{province_directory}{province['id']}.png").convert("RGBA")
             # obtain size and coordinate information
             width = prov.size[0]
@@ -7783,6 +7783,8 @@ class CNC(commands.Cog):
             prov = prov.convert("RGBA")
             map.paste(prov, box=cord, mask=prov)
         map.save(fr"{map_directory}colored_provinces.png")
+        # RETURN A POST
+        return await ctx.send("Done!")
 
 
 async def setup(bot: Shard):
