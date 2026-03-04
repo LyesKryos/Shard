@@ -7735,7 +7735,7 @@ class CNC(commands.Cog):
         # split the variables
         path, cost = result
         # define the end time
-        end_time = time.per_counter()
+        end_time = time.perf_counter()
         # otherwise, return and send
         return await ctx.send(f"The total cost of travel is {cost} point(s).\nThe path there travels through the following province IDs: {path}\nTotal time to search: {end_time-start_time} seconds.")
 
