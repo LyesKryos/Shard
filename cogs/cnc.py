@@ -7766,7 +7766,7 @@ class CNC(commands.Cog):
                 return ValueError("Hex code issue")
             # open the map and the province images
             map = Image.open(fr"{map_directory}wargame_provinces.png").convert("RGBA")
-            prov = Image.open(fr"{province_directory}{province}.png").convert("RGBA")
+            prov = Image.open(fr"{province_directory}{province['id']}.png").convert("RGBA")
             # obtain size and coordinate information
             width = prov.size[0]
             height = prov.size[1]
