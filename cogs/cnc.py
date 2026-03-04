@@ -238,6 +238,78 @@ async def demanding_provinces_wait_for_modal(parent_interaction: discord.Interac
     # return the value
     return modal.value
 
+async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int):
+    """This program utilizes Dijkstra's algorithm to find the shortest path between two provinces."""
+
+    # define the province map
+    p_map = {}
+    # define the cost map
+    pc_map = {}
+    # pull province information and put it into a dict
+    all_provinces = await conn.fetch('''SELECT id, river, structures, bordering FROM cnc_provinces;''')
+    for p in all_provinces:
+        p_map[p['id']] = p['bordering']
+        pc_map[p['id']] = 1
+        # if there is a road, the cost is halved (unles there is a river)
+        if "Road" in (p['structures'] if p['structures'] is not None else []):
+            pc_map[p['id']] *= 0.5
+        # if there is a river and not a bridge, the cost is 2
+        if (p['river']) and ("Bridge" not in (p['structures'] if p['structures'] is not None else [])):
+            pc_map[p['id']] = 2
+    # define the best cost
+    best_cost = {start_id: 0}
+    # define the previous so we know which way to go
+    previous = {}
+    # establish the queue as a tuple because of heapq sorting
+    queue = [(0,start_id)]
+    
+    # while there are items in the queue
+    while queue:
+        
+        # get the lowest current value
+        cost, tile = heapq.heappop(queue)
+
+        # if the cost is greater than the best cost, then we skip it because it is stale
+        # remember, infinity = unknown distance
+        # this means that if the tile is unknown, the cost is infinite 
+        if cost > best_cost.get(tile, float('inf')):
+            continue
+        
+        # if we have finally reached our sestination, break
+        if tile == end_id:
+            break
+
+        # now we iterate for each neighbor in the map
+        for neighbor in p_map[tile]:
+            # add the cost of moving to this tile from the current tile
+            new_cost = cost + pc_map[neighbor]
+            # if the new cost is better than the current cost (or an unknown cost)
+            if new_cost < best_cost.get(neighbor, float('inf')):
+                # the best cost for that neighbor becomes the new cost, since it is less than any of the ones we know
+                best_cost[neighbor] = new_cost
+                # then we add the current tile to the previous so we can reconstruct
+                previous[neighbor] = tile
+                # then push this tile into the queue
+                heapq.heappush(queue, (new_cost, neighbor))
+
+    # if the end id is not anywhere in the best cost
+    if end_id not in best_cost:
+        return None
+
+    # if we did reach it, reconstruct the path
+    path = []
+    tile = end_id
+    # then cycle through the tiles to reconstruct the path
+    while tile is not None:
+        # append the current path tile
+        path.append(tile)
+        # then get the next tile in the previous path dict
+        tile = previous.get(tile)
+    # once we have made it to the end of the previous dict, we will reverse the order of the pathway 
+    path.reverse()
+    # return the path and the cost
+    return path, best_cost[end_id]
+
 
 class MapButtons(View):
 
@@ -7655,89 +7727,17 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # define start time
         start_time = time.perf_counter()
-        # define the province map
-        p_map = {}
-        # define the cost map
-        pc_map = {}
-        # pull province information and put it into a dict
-        all_provinces = await conn.fetch('''SELECT id, river, structures, bordering FROM cnc_provinces;''')
-        for p in all_provinces:
-            p_map[p['id']] = p['bordering']
-            pc_map[p['id']] = 1
-            # if there is a road, the cost is halved (unles there is a river)
-            if "Road" in (p['structures'] if p['structures'] is not None else []):
-                pc_map[p['id']] *= 0.5
-            # if there is a river and not a bridge, the cost is 2
-            if (p['river']) and ("Bridge" not in (p['structures'] if p['structures'] is not None else [])):
-                pc_map[p['id']] = 2
-
-        # now define the Dijkstra's algorithm
-        def find_path(start_id, end_id):
-            """This program utilizes Dijkstra's algorithm to find the shortest path between two provinces."""
-
-            # define the best cost
-            best_cost = {start_id: 0}
-            # define the previous so we know which way to go
-            previous = {}
-            # establish the queue as a tuple because of heapq sorting
-            queue = [(0,start_id)]
-            
-            # while there are items in the queue
-            while queue:
-                
-                # get the lowest current value
-                cost, tile = heapq.heappop(queue)
-
-                # if the cost is greater than the best cost, then we skip it because it is stale
-                # remember, infinity = unknown distance
-                # this means that if the tile is unknown, the cost is infinite 
-                if cost > best_cost.get(tile, float('inf')):
-                    continue
-                
-                # if we have finally reached our sestination, break
-                if tile == end_id:
-                    break
-
-                # now we iterate for each neighbor in the map
-                for neighbor in p_map[tile]:
-                    # add the cost of moving to this tile from the current tile
-                    new_cost = cost + pc_map[neighbor]
-                    # if the new cost is better than the current cost (or an unknown cost)
-                    if new_cost < best_cost.get(neighbor, float('inf')):
-                        # the best cost for that neighbor becomes the new cost, since it is less than any of the ones we know
-                        best_cost[neighbor] = new_cost
-                        # then we add the current tile to the previous so we can reconstruct
-                        previous[neighbor] = tile
-                        # then push this tile into the queue
-                        heapq.heappush(queue, (new_cost, neighbor))
-
-            # if the end id is not anywhere in the best cost
-            if end_id not in best_cost:
-                return None
-
-            # if we did reach it, reconstruct the path
-            path = []
-            tile = end_id
-            # then cycle through the tiles to reconstruct the path
-            while tile is not None:
-                # append the current path tile
-                path.append(tile)
-                # then get the next tile in the previous path dict
-                tile = previous.get(tile)
-            # once we have made it to the end of the previous dict, we will reverse the order of the pathway 
-            path.reverse()
-            # return the path and the cost
-            return path, best_cost[end_id]
-        
         # run the function
-        result = find_path(origin, destination)
+        result = find_path(conn, origin, destination)
         # if there is no path, return such
         if result is None:
             return await ctx.send(f"Province {destination} cannot be reached by land from Province {origin}.")
         # split the variables
         path, cost = result
+        # define the end time
+        end_time = time.per_counter()
         # otherwise, return and send
-        return await ctx.send(f"The total cost of travel is {cost} point(s).\nThe path there travels through the following province IDs: {path}")
+        return await ctx.send(f"The total cost of travel is {cost} point(s).\nThe path there travels through the following province IDs: {path}\nTotal time to search: {end_time-start_time} seconds.")
 
 
 
