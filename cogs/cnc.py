@@ -7732,7 +7732,7 @@ class CNC(commands.Cog):
             return await ctx.send(f"No path from {origin} to {destination} can be found by land.")
         # return the path and cost
         else:
-            cost, path = pathfinder
+            path, cost = pathfinder
             return await ctx.send(f"The total cost of the path is {cost} Movement points.\n The shortest path calculated is: {path}.")
 
 async def setup(bot: Shard):
