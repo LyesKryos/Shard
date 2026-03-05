@@ -251,13 +251,15 @@ async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int):
     all_provinces = await conn.fetch('''SELECT id, river, structures, bordering FROM cnc_provinces;''')
     for p in all_provinces:
         p_map[p['id']] = p['bordering']
-        pc_map[p['id']] = 1
+        # define terrain movement cost
+        movement_cost = await conn.fetchval('''SELECT movement FROM cnc_terrain WHERE id = $1;''', p['terrain'])
+        pc_map[p['id']] = movement_cost
         # if there is a road, the cost is halved (unles there is a river)
-        if "Road" in (p['structures'] if p['structures'] is not None else []):
+        if "Road" in (p['structures'] if p['structures'] is not None else []) and not p['river']:
             pc_map[p['id']] *= 0.5
-        # if there is a river and not a bridge, the cost is 2
+        # if there is a river and not a bridge, the cost is doubled
         if (p['river']) and ("Bridge" not in (p['structures'] if p['structures'] is not None else [])):
-            pc_map[p['id']] = 2
+            pc_map[p['id']] *= 2
     # define the best cost
     best_cost = {start_id: 0}
     # define the previous so we know which way to go
@@ -7710,82 +7712,6 @@ class CNC(commands.Cog):
                                   WHERE id = $2;''', total_dev, p['id'])
             total_p += 1
         return await ctx.send(f"{total_p} provinces have been set.")
-
-    @commands.command()
-    @commands.is_owner()
-    async def cnc_populate_world(self, ctx):
-        # establish connection
-        conn = self.bot.pool
-        # set population = base dev * a random number between 500 and 1500
-        async with ctx.typing():
-            await conn.execute('''UPDATE cnc_provinces
-                                  SET citizens = development * (RANDOM() * (1500 - 500) + 500);''')
-        return await ctx.send("World populated.")
-
-    @commands.command()
-    @commands.is_owner()
-    async def cnc_pathfinder_test(self, ctx, origin: int, destination: int):
-        # establish connection
-        conn = self.bot.pool
-        # define start time
-        start_time = time.perf_counter()
-        # run the function
-        result = await find_path(conn, origin, destination)
-        # if there is no path, return such
-        if result is None:
-            return await ctx.send(f"Province {destination} cannot be reached by land from Province {origin}.")
-        # split the variables
-        path, cost = result
-        # define the end time
-        end_time = time.perf_counter()
-        # otherwise, return and send
-        return await ctx.send(f"The total cost of travel is {cost} point(s).\nThe path there travels through the following province IDs: {path}\nTotal time to search: {end_time-start_time} seconds.")
-
-    @commands.command()
-    @commands.is_owner()
-    async def unique_colors(self, ctx):
-        # establish connection
-        conn = self.bot.pool
-        # pull all provinces
-        provinces = await conn.fetch('''SELECT * FROM cnc_provinces''')
-        map_directory = r"/root/Shard/CNC/Map Files/Maps/"
-        map = Image.open(fr"{map_directory}wargame_provinces.png").convert("RGBA")
-        for province in provinces:
-            province_directory = r"/root/Shard/CNC/Map Files/Province Layers/"
-            # pull province information
-            province_info = province
-            province_cord = province_info['cord']
-            # obtain the coordinate information
-            province_cord = ((int(province_cord[0])), (int(province_cord[1])))
-            # define the hexcode
-            s = str(province_info['id'])
-            hexcode = "#" + s.ljust(6, "0")
-            # get color
-            try:
-                color = ImageColor.getrgb(hexcode)
-            except ValueError:
-                return ValueError("Hex code issue")
-            # open the map and the province images
-            prov = Image.open(fr"{province_directory}{province['id']}.png").convert("RGBA")
-            # obtain size and coordinate information
-            width = prov.size[0]
-            height = prov.size[1]
-            cord = (province_cord[0], province_cord[1])
-            # for every pixel, change the color to the owners
-            for x in range(0, width):
-                for y in range(0, height):
-                    data = prov.getpixel((x, y))
-                    if data != color:
-                        if data != (0, 0, 0, 0):
-                            if data != (255, 255, 255, 0):
-                                prov.putpixel((x, y), color)
-            # convert, paste, and save the image
-            prov = prov.convert("RGBA")
-            map.paste(prov, box=cord, mask=prov)
-        map.save(fr"{map_directory}colored_provinces.png")
-        # RETURN A POST
-        return await ctx.send("Done!")
-
 
 async def setup(bot: Shard):
     # define the cog and add the cog
