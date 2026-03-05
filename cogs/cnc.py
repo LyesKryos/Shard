@@ -240,7 +240,7 @@ async def demanding_provinces_wait_for_modal(parent_interaction: discord.Interac
     # return the value
     return modal.value
 
-async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int):
+async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int) -> tuple:
     """This program utilizes Dijkstra's algorithm to find the shortest path between two provinces."""
 
     # define the province map
@@ -7712,6 +7712,28 @@ class CNC(commands.Cog):
                                   WHERE id = $2;''', total_dev, p['id'])
             total_p += 1
         return await ctx.send(f"{total_p} provinces have been set.")
+
+    @commands.command()
+    @commands.is_owner()
+    async def cnc_pathfinder_test(self, ctx, origin: int, destination: int):
+        # establish the connection
+        conn = self.bot.pool
+        # querry if either province isn't real
+        origin_check = await conn.fetch('''SELECT * FROM cnc_provinces WHERE id = $1;''', origin)
+        if not origin_check:
+            return await ctx.send(f"No such province as `{origin}`.")
+        desintation-check = await conn.fetch('''SELECT * FROM cnc_provinces WHERE id = $1;''', destination)
+        if not destination_check:
+            return await ctx.send(f"No such province as `{destination}`.")
+        # execute the command
+        pathfinder = await find_path(conn=conn, start_id=origin, end_id=destination)
+        # check if the path cannot be found
+        if pathfinder is None:
+            return await ctx.send(f"No path from {origin} to {destination} can be found by land.")
+        # return the path and cost
+        else:
+            cost, path = pathfinder
+            return await ctx.send(f"The total cost of the path is {cost} Movement points.\n The shortest path calculated is: {path}.")
 
 async def setup(bot: Shard):
     # define the cog and add the cog
