@@ -252,7 +252,7 @@ async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int) -> tuple:
     for p in all_provinces:
         p_map[p['id']] = p['bordering']
         # define terrain movement cost
-        movement_cost = await conn.fetchval('''SELECT movement FROM cnc_terrain WHERE id = $1;''', p['terrain'])
+        movement_cost = await conn.fetchval('''SELECT movement FROM cnc_terrains WHERE id = $1;''', p['terrain'])
         pc_map[p['id']] = movement_cost
         # if there is a road, the cost is halved (unles there is a river)
         if "Road" in (p['structures'] if p['structures'] is not None else []) and not p['river']:
