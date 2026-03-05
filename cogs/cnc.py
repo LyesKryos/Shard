@@ -7722,7 +7722,7 @@ class CNC(commands.Cog):
         origin_check = await conn.fetch('''SELECT * FROM cnc_provinces WHERE id = $1;''', origin)
         if not origin_check:
             return await ctx.send(f"No such province as `{origin}`.")
-        desintation_check = await conn.fetch('''SELECT * FROM cnc_provinces WHERE id = $1;''', destination)
+        destination_check = await conn.fetch('''SELECT * FROM cnc_provinces WHERE id = $1;''', destination)
         if not destination_check:
             return await ctx.send(f"No such province as `{destination}`.")
         # execute the command
