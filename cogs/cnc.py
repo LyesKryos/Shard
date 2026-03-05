@@ -248,7 +248,7 @@ async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int) -> tuple:
     # define the cost map
     pc_map = {}
     # pull province information and put it into a dict
-    all_provinces = await conn.fetch('''SELECT id, river, structures, bordering FROM cnc_provinces;''')
+    all_provinces = await conn.fetch('''SELECT id, river, structures, bordering, terrain FROM cnc_provinces;''')
     for p in all_provinces:
         p_map[p['id']] = p['bordering']
         # define terrain movement cost
