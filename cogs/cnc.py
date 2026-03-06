@@ -6063,7 +6063,7 @@ class ArmyActionsView(discord.ui.View):
     async def recruit_soldiers(self, interaction: discord.Interaction, button: discord.ui.Button):
         # create and add the view
         army_recruit_menu = ArmyRecruitMenu(parent_interaction=self.parent_interaction, army_info=self.army_info)
-        await self.parent_interaction.edit_original_response(view=army_recruit_menu)1
+        await self.parent_interaction.edit_original_response(view=army_recruit_menu)
         # stop listening
         self.stop()
 
