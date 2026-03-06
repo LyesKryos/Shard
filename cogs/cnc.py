@@ -6146,7 +6146,7 @@ class ArmyRecruitMenu(discord.ui.View):
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
-            return await parent_interaction.edit_original_response(view=army_actions_view)
+            return await self.parent_interaction.edit_original_response(view=army_actions_view)
 
     @discord.ui.button(label="Recruit 5,000", style=discord.ButtonStyle.blurple)
     async def recruit_fivek(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -6202,7 +6202,7 @@ class ArmyRecruitMenu(discord.ui.View):
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
-            return await parent_interaction.edit_original_response(view=army_actions_view)
+            return await self.parent_interaction.edit_original_response(view=army_actions_view)
 
     @discord.ui.button(label="Recruit 10,000", style=discord.ButtonStyle.blurple)
     async def recruit_tenk(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -6261,7 +6261,7 @@ class ArmyRecruitMenu(discord.ui.View):
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
-            return await parent_interaction.edit_original_response(view=army_actions_view)
+            return await self.parent_interaction.edit_original_response(view=army_actions_view)
     
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
