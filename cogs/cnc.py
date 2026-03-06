@@ -6803,8 +6803,8 @@ class CNC(commands.Cog):
         army_name = army_info['army_name']
         owner_id = army_info['owner_id']
         troops = army_info['troops']
-        location_data = await self.province_db_info(army_info['location'])
-        location = f"{location_data['name']} (ID: {location_data['id']})"
+        location = await conn.fetchval('''SELECT name FROM cnc_provinces WHERE id = $1;''', army_info['location'])
+        location = f"{location} (ID: {army_info['location']})"
         general = army_info['general']
         if general == 0:
             general = "None"
@@ -6855,7 +6855,8 @@ class CNC(commands.Cog):
             army_name = army['army_name']
             army_id = army['army_id']
             troops = army['troops']
-            location = army['location']
+            location = await conn.fetchval('''SELECT name FROM cnc_provinces WHERE id = $1;''', army['location'])
+            location = f"{location} (ID: {army['location']})"
             general = army['general']
             if general == 0:
                 general = "No"
