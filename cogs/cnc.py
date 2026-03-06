@@ -6061,11 +6061,11 @@ class ArmyActionsView(discord.ui.View):
 
     @discord.ui.button(label="Recruit", style=discord.ButtonStyle.blurple, emoji="\U0001f4ef")
     async def recruit_soldiers(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # respond to the interaction
+        await interaction.response.send_message(content="Processing...", delete_after=0.5, ephemeral=True)
         # create and add the view
         army_recruit_menu = ArmyRecruitMenu(parent_interaction=self.parent_interaction, army_info=self.army_info)
         await self.parent_interaction.edit_original_response(view=army_recruit_menu)
-        # respond to the interaction
-        await interaction.response.send_message(content="Processing...", delete_after=0.5, ephemeral=True)
         # stop listening
         self.stop()
 
@@ -6140,7 +6140,7 @@ class ArmyRecruitMenu(discord.ui.View):
             # pull new army info
             new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
             # call embed
-            original_message = await self.parent_interaction.original_message()
+            original_message = await self.parent_interaction.original_response()
             army_embed = original_message.embeds[0]
             # update embed
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
@@ -6196,7 +6196,7 @@ class ArmyRecruitMenu(discord.ui.View):
             # pull new army info
             new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
             # call embed
-            original_message = await self.parent_interaction.original_message()
+            original_message = await self.parent_interaction.original_response()
             army_embed = original_message.embeds[0]
             # update embed
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
@@ -6255,7 +6255,7 @@ class ArmyRecruitMenu(discord.ui.View):
             # pull new army info
             new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
             # call embed
-            original_message = await self.parent_interaction.original_message()
+            original_message = await self.parent_interaction.original_response()
             army_embed = original_message.embeds[0]
             # update embed
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
