@@ -6774,7 +6774,7 @@ class CNC(commands.Cog):
             army_choices = [app_commands.Choice(name=f"**{army['army_name']} (ID: {army['army_id']})**", value=army['army_id']) for army in user_armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])]
             # then pull and add the rest
             non_armies = await conn.fetch('''SELECT * FROM cnc_armies WHERE owner_id != $1;''', interaction.user.id)
-            army_choices.append([app_commands.Choice(name=f"{army['army_name']} (ID: {army['army_id']})", value=army['army_id']) for army in non_armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])])
+            army_choices += ([app_commands.Choice(name=f"{army['army_name']} (ID: {army['army_id']})", value=army['army_id']) for army in non_armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])])
         # if the user is not in the system, don't bother
         else:
             # pull all armies
