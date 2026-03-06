@@ -6064,6 +6064,8 @@ class ArmyActionsView(discord.ui.View):
         # create and add the view
         army_recruit_menu = ArmyRecruitMenu(parent_interaction=self.parent_interaction, army_info=self.army_info)
         await self.parent_interaction.edit_original_response(view=army_recruit_menu)
+        # respond to the interaction
+        await interaction.response.send_message(content="Processing...", delete_after=0.5)
         # stop listening
         self.stop()
 
@@ -6270,7 +6272,7 @@ class ArmyRecruitMenu(discord.ui.View):
         # reset menu
         army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=self.conn, army_info=self.army_info)
         # update the parent 
-        return await interaction.edit_original_response(view=army_actions_view)
+        return await self.parent_interaction.edit_original_response(view=army_actions_view)
     
 
 class CNC(commands.Cog):
