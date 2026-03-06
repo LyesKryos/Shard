@@ -6803,7 +6803,8 @@ class CNC(commands.Cog):
         army_name = army_info['army_name']
         owner_id = army_info['owner_id']
         troops = army_info['troops']
-        location = army_info['location']
+        location_data = await province_db_info(army_info['location'])
+        location = f"{location_data['name']} (ID: {location_data['id']})"
         general = army_info['general']
         if general == 0:
             general = "None"
@@ -6822,7 +6823,7 @@ class CNC(commands.Cog):
         army_embed.set_thumbnail(url=r"https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png")
         army_embed.add_field(name="Owner", value=f"{userinfo['name']}\n({user.mention})")
         army_embed.add_field(name="Troops", value=troops)
-        army_embed.add_field(name="Province Location ID", value=location, inline=False)
+        army_embed.add_field(name="Province Location", value=location, inline=False)
         army_embed.add_field(name="General", value=general)
         army_embed.add_field(name="Movement Available", value=movement)
         return await interaction.followup.send(embed=army_embed)
