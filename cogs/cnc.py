@@ -6061,6 +6061,11 @@ class ArmyActionsView(discord.ui.View):
 
     @discord.ui.Button(label="Recruit", style=discord.ui.ButtonStyle.blurple, emoji="\U0001f4ef")
     async def recruit_soldiers(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # create and add the view
+        army_recruit_menu = ArmyRecruitMenu(parent_interaction=self.parent_interaction, army_info=self.army_info)
+        await self.parent_interaction.edit_original_response(view=army_recruit_menu)
+        # stop listening
+        self.stop()
 
 
 
@@ -6070,6 +6075,7 @@ class ArmyRecruitMenu(discord.ui.View):
         super().__init__(timeout=120)
         self.parent_interaction = parent_interaction
         self.army_info = army_info
+        self.conn = parent_interaction.client.pool
     
     async def on_timeout(self):
         # disable all buttons
@@ -6090,8 +6096,11 @@ class ArmyRecruitMenu(discord.ui.View):
         army_info = self.army_info
         # pull user information
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+        # define tusail_mil_charge
+        tusail_mil_charge = False
         # check if the user has the correct amount of the authority required
         if "Tusail" in user_info['govt_subtype']:
+            tusail_mil_charge = True
             # check the amount of military authority
             if user_info['mil_auth'] < 1:
                 # reject
@@ -6105,34 +6114,149 @@ class ArmyRecruitMenu(discord.ui.View):
             # update the view
             return await self.parent_interaction.edit_original_response(view=None)
         # otherwise, carry on
+        # check to make sure the user is not at the army's cap
+        if army_info['troops'] + 1000 > user_info['army_limit']:
+            # reject
+            await interaction.followup.send(f"Recruiting additional troops into {army_info['name']} would exceed the troop limit.")
+            # remove buttons
+            for child in self.children:
+                child.disabled = True
+            # update view
+            return await self.parent_interaction.edit_original_response(view=self)
+        # otherwise, carry on
         else:
-            # check to make sure the user is not at the army's cap
-            if army_info['troops'] + 1000 > user_info['army_limit']:
-                # reject
-                await interaction.followup.send(f"Recruiting additional troops into {army_info['name']} would exceed the troop limit.")
-                # remove buttons
-                for child in self.children:
-                    child.disabled = True
-                # update view
-                return await self.parent_interaction.edit_original_response(view=self)
-            # otherwise, carry on
+            # stop listening
+            self.stop()
+            if tusail_mil_charge:
+                # subtract one military authority
+                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 1 WHERE user_id = $1;''', interaction.user.id)
             else:
-                # stop listening
-                self.stop()
                 # subtract one economic authority
                 await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 1 WHERE user_id = $1;''', interaction.user.id)
-                # add 1000 troops to the army
-                await conn.execute('''UPDATE cnc_armies SET troops = troops + 1000 WHERE army_id = $1;''', army_info['army_id'])
-                # pull new army info
-                new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info{'army_id'})
-                # call embed
-                original_message = await self.parent_interaction.original_message()
-                army_embed = original_message.embeds[0]
-                # update embed
-                army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
-                # reset menu
-                army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
-                return await parent_interaction.edit_original_response(view=army_actions_view)
+            # pull new army info
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info{'army_id'})
+            # call embed
+            original_message = await self.parent_interaction.original_message()
+            army_embed = original_message.embeds[0]
+            # update embed
+            army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
+            # reset menu
+            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
+            return await parent_interaction.edit_original_response(view=army_actions_view)
+
+    @discord.ui.Button(label="Recruit 5,000", style=discord.ui.ButtonStyle.blurple)
+    async def recruit_fivek(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.conn
+        army_info = self.army_info
+        # pull user information
+        user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+        # check if the user has the correct amount of the authority required
+        if "Tusail" in user_info['govt_subtype']:
+            # check the amount of military authority
+            if user_info['mil_auth'] < 5:
+                # reject
+                await interaction.followup.send(f"{user_info['name']} has insufficient Military Authority to recruit 5,000 troops.", ephemeral=True)
+                # update the view
+                return await self.parent_interaction.edit_original_response(view=None)
+        # check if the user has sufficient economic authority
+        elif user_info['econ_auth'] < 5:
+            # reject
+            await interaction.followup.send(f"{user_info['name']} has insufficient Economic Authority to recruit 5,000 troops.", ephemeral=True)
+            # update the view
+            return await self.parent_interaction.edit_original_response(view=None)
+        # otherwise, carry on
+        # check to make sure the user is not at the army's cap
+        if army_info['troops'] + 5000 > user_info['army_limit']:
+            # reject
+            await interaction.followup.send(f"Recruiting 5,000 additional troops into {army_info['name']} would exceed the troop limit.")
+            # remove buttons
+            for child in self.children:
+                child.disabled = True
+            # update view
+            return await self.parent_interaction.edit_original_response(view=self)
+        # otherwise, carry on
+        else:
+            # stop listening
+            self.stop()
+            if tusail_mil_charge:
+                # subtract five military authority
+                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 5 WHERE user_id = $1;''', interaction.user.id)
+            else:
+                # subtract five economic authority
+                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 5 WHERE user_id = $1;''', interaction.user.id)
+            # pull new army info
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info{'army_id'})
+            # call embed
+            original_message = await self.parent_interaction.original_message()
+            army_embed = original_message.embeds[0]
+            # update embed
+            army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
+            # reset menu
+            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
+            return await parent_interaction.edit_original_response(view=army_actions_view)
+
+    @discord.ui.Button(label="Recruit 10,000", style=discord.ui.ButtonStyle.blurple)
+    async def recruit_tenk(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.conn
+        army_info = self.army_info
+        # define tusail_mil_charge
+        tusail_mil_charge = False
+        # pull user information
+        user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+        # check if the user has the correct amount of the authority required
+        if "Tusail" in user_info['govt_subtype']:
+            tusail_mil_charge = True
+            # check the amount of military authority
+            if user_info['mil_auth'] < 10:
+                # reject
+                await interaction.followup.send(f"{user_info['name']} has insufficient Military Authority to recruit 10,000 troops.", ephemeral=True)
+                # update the view
+                return await self.parent_interaction.edit_original_response(view=None)
+        # check if the user has sufficient economic authority
+        elif user_info['econ_auth'] < 10:
+            # reject
+            await interaction.followup.send(f"{user_info['name']} has insufficient Economic Authority to recruit 10,000 troops.", ephemeral=True)
+            # update the view
+            return await self.parent_interaction.edit_original_response(view=None)
+        # otherwise, carry on
+        # check to make sure the user is not at the army's cap
+        if army_info['troops'] + 10000 > user_info['army_limit']:
+            # reject
+            await interaction.followup.send(f"Recruiting 10,000 additional troops into {army_info['name']} would exceed the troop limit.")
+            # remove buttons
+            for child in self.children:
+                child.disabled = True
+            # update view
+            return await self.parent_interaction.edit_original_response(view=self)
+        # otherwise, carry on
+        else:
+            # stop listening
+            self.stop()
+            if tusail_mil_charge:
+                # subtract ten military authority
+                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 10 WHERE user_id = $1;''', interaction.user.id)
+            else:
+                # subtract ten economic authority
+                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 10 WHERE user_id = $1;''', interaction.user.id)
+            # add 10000 troops to the army
+            await conn.execute('''UPDATE cnc_armies SET troops = troops + 10000 WHERE army_id = $1;''', army_info['army_id'])
+            # pull new army info
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info{'army_id'})
+            # call embed
+            original_message = await self.parent_interaction.original_message()
+            army_embed = original_message.embeds[0]
+            # update embed
+            army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
+            # reset menu
+            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
+            return await parent_interaction.edit_original_response(view=army_actions_view)
+
 
     
 
