@@ -6764,10 +6764,24 @@ class CNC(commands.Cog):
 
         # establish connection
         conn = self.bot.pool
-        # pull all army names & ids
-        armies = await conn.fetch('''SELECT army_name, army_id FROM cnc_armies;''')
-        # parse out the armies
-        return [app_commands.Choice(name=f"{army['army_name']} (ID: {army['army_id']})", value=army['army_id']) for army in armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])]      
+        # check if the user is in the system
+        user_check = await conn.fetchrow('''SELECT user_id FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        # if the user is in the system, compile their armies first and then add the rest
+        if user_check:
+            # pull all their armies
+            user_armies = await conn.fetch('''SELECT * FROM cnc_armies WHERE owner_id = $1;''', interaction.user.id)
+            # compile them into a list
+            army_choices = [app_commands.Choice(name=f"**{army['army_name']} (ID: {army['army_id']})**", value=army['army_id']) for army in user_armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])]
+            # then pull and add the rest
+            non_armies = await conn.fetch('''SELECT * FROM cnc_armies WHERE owner_id != $1;''', interaction.user.id)
+            army_choices.append([app_commands.Choice(name=f"{army['army_name']} (ID: {army['army_id']})", value=army['army_id']) for army in non_armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])])
+        # if the user is not in the system, don't bother
+        else:
+            # pull all armies
+            armies = await conn.fetchrow('''SELECT * FROM cnc_armies;''')
+            army_choices = [app_commands.Choice(name=f"{army['army_name']} (ID: {army['army_id']})", value=army['army_id']) for army in armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])]
+        # return the choices
+        return army_choices      
 
     @cnc.command(name="army_view", description="Displays information about a specific army.")
     @app_commands.autocomplete(army_id=army_autocomplete)
@@ -7733,7 +7747,7 @@ class CNC(commands.Cog):
         # return the path and cost
         else:
             path, cost = pathfinder
-            return await ctx.send(f"The total cost of the path is {cost} Movement points.\n The shortest path calculated is: {path}.")
+            return await ctx.send(f"The total cost of the path is {cost} Movement points.\nThe shortest path calculated is: {path}.")
 
 async def setup(bot: Shard):
     # define the cog and add the cog
