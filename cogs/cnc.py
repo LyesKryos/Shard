@@ -6803,7 +6803,7 @@ class CNC(commands.Cog):
         army_name = army_info['army_name']
         owner_id = army_info['owner_id']
         troops = army_info['troops']
-        location_data = await province_db_info(army_info['location'])
+        location_data = await self.province_db_info(army_info['location'])
         location = f"{location_data['name']} (ID: {location_data['id']})"
         general = army_info['general']
         if general == 0:
