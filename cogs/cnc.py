@@ -6133,8 +6133,10 @@ class ArmyRecruitMenu(discord.ui.View):
             else:
                 # subtract one economic authority
                 await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 1 WHERE user_id = $1;''', interaction.user.id)
+            # add troops
+            await conn.execute('''UPDATE cnc_armies SET troops = troops + 1000 WHERE army_id = $1;''', army_info['army_id'])
             # pull new army info
-            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info{'army_id'})
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
             # call embed
             original_message = await self.parent_interaction.original_message()
             army_embed = original_message.embeds[0]
@@ -6187,8 +6189,10 @@ class ArmyRecruitMenu(discord.ui.View):
             else:
                 # subtract five economic authority
                 await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 5 WHERE user_id = $1;''', interaction.user.id)
+            # add troops
+            await conn.execute('''UPDATE cnc_armies SET troops = troops + 5000 WHERE army_id = $1;''', army_info['army_id'])
             # pull new army info
-            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info{'army_id'})
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
             # call embed
             original_message = await self.parent_interaction.original_message()
             army_embed = original_message.embeds[0]
@@ -6247,7 +6251,7 @@ class ArmyRecruitMenu(discord.ui.View):
             # add 10000 troops to the army
             await conn.execute('''UPDATE cnc_armies SET troops = troops + 10000 WHERE army_id = $1;''', army_info['army_id'])
             # pull new army info
-            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info{'army_id'})
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
             # call embed
             original_message = await self.parent_interaction.original_message()
             army_embed = original_message.embeds[0]
@@ -7057,7 +7061,13 @@ class CNC(commands.Cog):
         army_embed.add_field(name="Province Location", value=location, inline=False)
         army_embed.add_field(name="General", value=general)
         army_embed.add_field(name="Movement Available", value=movement)
-        return await interaction.followup.send(embed=army_embed)
+        # if the caller is the user, add the army management menu
+        if army_info['owner_id'] == interaction.user.id:
+            army_menu = ArmyActionsView(parent_interaction=interaction, conn=conn, army_info=army_info)
+            await interaction.followup.send(embed=army_embed, view=army_menu)
+        # otherwise, return just the embed
+        else:
+            return await interaction.followup.send(embed=army_embed)
 
     @cnc.command(name="army_report", description="Displays information about all of a nation's armies.")
     async def army_report(self, interaction: discord.Interaction):
