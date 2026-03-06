@@ -6144,7 +6144,7 @@ class ArmyRecruitMenu(discord.ui.View):
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
-            await self.parent_interaction.edit_original_response(view=army_actions_view)
+            await self.parent_interaction.edit_original_response(view=army_actions_view, embed=army_embed)
             # notify user
             await interaction.followup.send(f"{army_info['army_name']} has successfully recruited an additional 1,000 troops!")
             # stop listening
@@ -6202,7 +6202,7 @@ class ArmyRecruitMenu(discord.ui.View):
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
-            await self.parent_interaction.edit_original_response(view=army_actions_view)
+            await self.parent_interaction.edit_original_response(view=army_actions_view, embed=army_embed)
             # notify user
             await interaction.followup.send(f"{army_info['army_name']} has successfully recruited an additional 5,000 troops!")
             # stop listening
@@ -6263,7 +6263,7 @@ class ArmyRecruitMenu(discord.ui.View):
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
-            await self.parent_interaction.edit_original_response(view=army_actions_view)
+            await self.parent_interaction.edit_original_response(view=army_actions_view, embed=army_embed)
             # notify user
             await interaction.followup.send(f"{army_info['army_name']} has successfully recruited an additional 10,000 troops!")
             # stop listening
@@ -7054,7 +7054,7 @@ class CNC(commands.Cog):
         # define values
         army_name = army_info['army_name']
         owner_id = army_info['owner_id']
-        troops = army_info['troops']
+        troops = f"{army_info['troops']:,}"
         location = await conn.fetchval('''SELECT name FROM cnc_provinces WHERE id = $1;''', army_info['location'])
         location = f"{location} (ID: {army_info['location']})"
         general = army_info['general']
