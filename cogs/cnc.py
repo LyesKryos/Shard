@@ -6028,6 +6028,113 @@ class PeaceNegotiationGiveProvincesDropdown(discord.ui.Select):
         super().__init__(placeholder="Choose Give Provinces Target...", min_values=1, max_values=1,
                          options=potential_targets, custom_id="give_provinces_target")
 
+# === Army Actions ===
+
+class ArmyActionsView(discord.ui.View):
+
+    def __init__(self, parent_interaction: discord.Interaction, conn: asyncpg.Pool, army_info: asyncpg.Record):
+        super().__init__(timeout=120)
+        self.parent_interaction = parent_interaction
+        self.conn = conn
+        self.army_info = army_info
+    
+    async def on_timeout(self):
+        # disable all buttons
+        for child in self.children:
+            child.disabled = True
+        # update view
+        return await self.parent_interaction.edit_original_response(view=self)
+    
+    async def interaction_check(self, interaction: discord.Interaction):
+        # pull the user's data to ensure they are not pacifistic
+        govt_subtype = await conn.fetchval('''SELECT govt_subtype FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        govt_type = await conn.fetchval('''SELECT govt_type FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        # if the user is anarchic, but is not postcolonial, they cannot take actions
+        if govt_type == "Anarchy" and govt_subtype != "Postcolonial":
+            # disable all buttons
+            for child in self.children:
+                child.disabled = True
+            await self.parent_interaction.edit_original_response(view=self)
+            return await interaction.response.send_message("Nations with the Anarchy Government Type (excepting Postcolonial) cannot modify their armies.", ephemeral=True)
+        # if not, simply return the normal check
+        return interaction.user.id == self.parent_interaction.user.id
+
+    @discord.ui.Button(label="Recruit", style=discord.ui.ButtonStyle.blurple, emoji="\U0001f4ef")
+    async def recruit_soldiers(self, interaction: discord.Interaction, button: discord.ui.Button):
+
+
+
+class ArmyRecruitMenu(discord.ui.View):
+
+    def __init__(self, parent_interaction: discord.Interaction, army_info: asyncpg.Record):
+        super().__init__(timeout=120)
+        self.parent_interaction = parent_interaction
+        self.army_info = army_info
+    
+    async def on_timeout(self):
+        # disable all buttons
+        for child in self.children:
+            child.disabled = True
+        # update the view
+        return await self.parent_interaction.edit_original_response(view=self)
+    
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.parent_interaction.user.id
+    
+    @discord.ui.Button(label="Recruit 1,000", style=discord.ui.ButtonStyle.blurple)
+    async def recruit_onek(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer(thinking=True)
+        # establish connection
+        conn = self.conn
+        army_info = self.army_info
+        # pull user information
+        user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+        # check if the user has the correct amount of the authority required
+        if "Tusail" in user_info['govt_subtype']:
+            # check the amount of military authority
+            if user_info['mil_auth'] < 1:
+                # reject
+                await interaction.followup.send(f"{user_info['name']} has insufficient Military Authority to recruit 1,000 troops.", ephemeral=True)
+                # update the view
+                return await self.parent_interaction.edit_original_response(view=None)
+        # check if the user has sufficient economic authority
+        elif user_info['econ_auth'] < 1:
+            # reject
+            await interaction.followup.send(f"{user_info['name']} has insufficient Economic Authority to recruit 1,000 troops.", ephemeral=True)
+            # update the view
+            return await self.parent_interaction.edit_original_response(view=None)
+        # otherwise, carry on
+        else:
+            # check to make sure the user is not at the army's cap
+            if army_info['troops'] + 1000 > user_info['army_limit']:
+                # reject
+                await interaction.followup.send(f"Recruiting additional troops into {army_info['name']} would exceed the troop limit.")
+                # remove buttons
+                for child in self.children:
+                    child.disabled = True
+                # update view
+                return await self.parent_interaction.edit_original_response(view=self)
+            # otherwise, carry on
+            else:
+                # stop listening
+                self.stop()
+                # subtract one economic authority
+                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 1 WHERE user_id = $1;''', interaction.user.id)
+                # add 1000 troops to the army
+                await conn.execute('''UPDATE cnc_armies SET troops = troops + 1000 WHERE army_id = $1;''', army_info['army_id'])
+                # pull new army info
+                new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info{'army_id'})
+                # call embed
+                original_message = await self.parent_interaction.original_message()
+                army_embed = original_message.embeds[0]
+                # update embed
+                army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
+                # reset menu
+                army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
+                return await parent_interaction.edit_original_response(view=army_actions_view)
+
+    
 
 class CNC(commands.Cog):
 
@@ -6038,7 +6145,7 @@ class CNC(commands.Cog):
         self.tech_directory = r"/root/Shard/CNC/Tech Tree/"
         self.bot = bot
         self.banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2", "#999999", "#FF0000"]
-        self.version = "version 4.0 New Horizons"
+        self.version = "version 3.0.a - The Overhaul"
         self.version_notes = ""
 
     async def interaction_check(self, interaction: discord.Interaction):
@@ -6331,7 +6438,7 @@ class CNC(commands.Cog):
                                     "and subjugate all others? Will resource-rich provinces provide the "
                                     "backbone of small, powerful states? Only time will tell!",
                              inline=False)
-        info_embed.add_field(name="Version", value="Version 3.0 - The Overhual", inline=False)
+        info_embed.add_field(name="Version", value=self.version, inline=False)
         info_embed.add_field(name="Turns", value=f"Current turn: #{turn}")
         info_embed.add_field(name="Players", value=f"Current players: {player_number}")
         info_embed.add_field(name="Questions?",
@@ -6828,7 +6935,7 @@ class CNC(commands.Cog):
         army_embed.add_field(name="Movement Available", value=movement)
         return await interaction.followup.send(embed=army_embed)
 
-    @cnc.command(name="army_report", description="Displays information about all armies.")
+    @cnc.command(name="army_report", description="Displays information about all of a nation's armies.")
     async def army_report(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer(thinking=True, ephemeral=True)
