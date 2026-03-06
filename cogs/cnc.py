@@ -6065,7 +6065,7 @@ class ArmyActionsView(discord.ui.View):
         army_recruit_menu = ArmyRecruitMenu(parent_interaction=self.parent_interaction, army_info=self.army_info)
         await self.parent_interaction.edit_original_response(view=army_recruit_menu)
         # respond to the interaction
-        await interaction.response.send_message(content="Processing...", delete_after=0.5)
+        await interaction.response.send_message(content="Processing...", delete_after=0.5, ephemeral=True)
         # stop listening
         self.stop()
 
@@ -6117,9 +6117,9 @@ class ArmyRecruitMenu(discord.ui.View):
             return await self.parent_interaction.edit_original_response(view=None)
         # otherwise, carry on
         # check to make sure the user is not at the army's cap
-        if army_info['troops'] + 1000 > user_info['army_limit']:
+        if army_info['troops'] + 1000 > user_info['army_size']:
             # reject
-            await interaction.followup.send(f"Recruiting additional troops into {army_info['name']} would exceed the troop limit.")
+            await interaction.followup.send(f"Recruiting additional troops into {army_info['army_name']} would exceed the troop limit.")
             # remove buttons
             for child in self.children:
                 child.disabled = True
@@ -6173,9 +6173,9 @@ class ArmyRecruitMenu(discord.ui.View):
             return await self.parent_interaction.edit_original_response(view=None)
         # otherwise, carry on
         # check to make sure the user is not at the army's cap
-        if army_info['troops'] + 5000 > user_info['army_limit']:
+        if army_info['troops'] + 5000 > user_info['army_size']:
             # reject
-            await interaction.followup.send(f"Recruiting 5,000 additional troops into {army_info['name']} would exceed the troop limit.")
+            await interaction.followup.send(f"Recruiting 5,000 additional troops into {army_info['army_name']} would exceed the troop limit.")
             # remove buttons
             for child in self.children:
                 child.disabled = True
@@ -6232,9 +6232,9 @@ class ArmyRecruitMenu(discord.ui.View):
             return await self.parent_interaction.edit_original_response(view=None)
         # otherwise, carry on
         # check to make sure the user is not at the army's cap
-        if army_info['troops'] + 10000 > user_info['army_limit']:
+        if army_info['troops'] + 10000 > user_info['army_size']:
             # reject
-            await interaction.followup.send(f"Recruiting 10,000 additional troops into {army_info['name']} would exceed the troop limit.")
+            await interaction.followup.send(f"Recruiting 10,000 additional troops into {army_info['army_name']} would exceed the troop limit.")
             # remove buttons
             for child in self.children:
                 child.disabled = True
