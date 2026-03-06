@@ -6047,8 +6047,8 @@ class ArmyActionsView(discord.ui.View):
     
     async def interaction_check(self, interaction: discord.Interaction):
         # pull the user's data to ensure they are not pacifistic
-        govt_subtype = await conn.fetchval('''SELECT govt_subtype FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
-        govt_type = await conn.fetchval('''SELECT govt_type FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        govt_subtype = await self.conn.fetchval('''SELECT govt_subtype FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        govt_type = await self.conn.fetchval('''SELECT govt_type FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
         # if the user is anarchic, but is not postcolonial, they cannot take actions
         if govt_type == "Anarchy" and govt_subtype != "Postcolonial":
             # disable all buttons
