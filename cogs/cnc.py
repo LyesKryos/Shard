@@ -6059,11 +6059,11 @@ class ArmyActionsView(discord.ui.View):
         # if not, simply return the normal check
         return interaction.user.id == self.parent_interaction.user.id
 
-    @discord.ui.Button(label="Recruit", style=discord.ui.ButtonStyle.blurple, emoji="\U0001f4ef")
+    @discord.ui.Button(label="Recruit", style=discord.ButtonStyle.blurple, emoji="\U0001f4ef")
     async def recruit_soldiers(self, interaction: discord.Interaction, button: discord.ui.Button):
         # create and add the view
         army_recruit_menu = ArmyRecruitMenu(parent_interaction=self.parent_interaction, army_info=self.army_info)
-        await self.parent_interaction.edit_original_response(view=army_recruit_menu)
+        await self.parent_interaction.edit_original_response(view=army_recruit_menu)1
         # stop listening
         self.stop()
 
@@ -6087,7 +6087,7 @@ class ArmyRecruitMenu(discord.ui.View):
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.parent_interaction.user.id
     
-    @discord.ui.Button(label="Recruit 1,000", style=discord.ui.ButtonStyle.blurple)
+    @discord.ui.Button(label="Recruit 1,000", style=discord.ButtonStyle.blurple)
     async def recruit_onek(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -6146,7 +6146,7 @@ class ArmyRecruitMenu(discord.ui.View):
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
             return await parent_interaction.edit_original_response(view=army_actions_view)
 
-    @discord.ui.Button(label="Recruit 5,000", style=discord.ui.ButtonStyle.blurple)
+    @discord.ui.Button(label="Recruit 5,000", style=discord.ButtonStyle.blurple)
     async def recruit_fivek(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -6202,7 +6202,7 @@ class ArmyRecruitMenu(discord.ui.View):
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
             return await parent_interaction.edit_original_response(view=army_actions_view)
 
-    @discord.ui.Button(label="Recruit 10,000", style=discord.ui.ButtonStyle.blurple)
+    @discord.ui.Button(label="Recruit 10,000", style=discord.ButtonStyle.blurple)
     async def recruit_tenk(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer(thinking=True)
