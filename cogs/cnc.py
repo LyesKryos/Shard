@@ -6145,6 +6145,8 @@ class ArmyRecruitMenu(discord.ui.View):
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
             await self.parent_interaction.edit_original_response(view=army_actions_view)
+            # notify user
+            await interaction.followup.send(f"{army_info['army_name']} has successfully recruited an additional 1,000 troops!")
             # stop listening
             return self.stop()
 
@@ -6201,6 +6203,8 @@ class ArmyRecruitMenu(discord.ui.View):
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
             await self.parent_interaction.edit_original_response(view=army_actions_view)
+            # notify user
+            await interaction.followup.send(f"{army_info['army_name']} has successfully recruited an additional 5,000 troops!")
             # stop listening
             return self.stop()
 
@@ -6260,6 +6264,8 @@ class ArmyRecruitMenu(discord.ui.View):
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
             await self.parent_interaction.edit_original_response(view=army_actions_view)
+            # notify user
+            await interaction.followup.send(f"{army_info['army_name']} has successfully recruited an additional 10,000 troops!")
             # stop listening
             return self.stop()
     
