@@ -6068,6 +6068,8 @@ class ArmyActionsView(discord.ui.View):
         await self.parent_interaction.edit_original_response(view=army_recruit_menu)
         # stop listening
         self.stop()
+    
+    @discord.ui.button(label="Disband", style=discord.ButtonStyle.danger, emoji="")
 
 
 
@@ -6119,7 +6121,7 @@ class ArmyRecruitMenu(discord.ui.View):
         # check to make sure the user is not at the army's cap
         if army_info['troops'] + 1000 > user_info['army_size']:
             # reject
-            await interaction.followup.send(f"Recruiting additional troops into {army_info['army_name']} would exceed the troop limit.")
+            await interaction.followup.send(f"Recruiting additional troops into {army_info['army_name']} would exceed the troop limit.", ephemeral=True)
             # remove buttons
             for child in self.children:
                 child.disabled = True
@@ -6146,7 +6148,7 @@ class ArmyRecruitMenu(discord.ui.View):
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
             await self.parent_interaction.edit_original_response(view=army_actions_view, embed=army_embed)
             # notify user
-            await interaction.followup.send(f"{army_info['army_name']} has successfully recruited an additional 1,000 troops!")
+            await interaction.followup.send(f"The {army_info['army_name']} has successfully recruited an additional 1,000 troops!")
             # stop listening
             return self.stop()
 
@@ -6177,7 +6179,7 @@ class ArmyRecruitMenu(discord.ui.View):
         # check to make sure the user is not at the army's cap
         if army_info['troops'] + 5000 > user_info['army_size']:
             # reject
-            await interaction.followup.send(f"Recruiting 5,000 additional troops into {army_info['army_name']} would exceed the troop limit.")
+            await interaction.followup.send(f"Recruiting 5,000 additional troops into {army_info['army_name']} would exceed the troop limit.", ephemeral=True)
             # remove buttons
             for child in self.children:
                 child.disabled = True
@@ -6204,7 +6206,7 @@ class ArmyRecruitMenu(discord.ui.View):
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
             await self.parent_interaction.edit_original_response(view=army_actions_view, embed=army_embed)
             # notify user
-            await interaction.followup.send(f"{army_info['army_name']} has successfully recruited an additional 5,000 troops!")
+            await interaction.followup.send(f"The {army_info['army_name']} has successfully recruited an additional 5,000 troops!")
             # stop listening
             return self.stop()
 
@@ -6238,7 +6240,7 @@ class ArmyRecruitMenu(discord.ui.View):
         # check to make sure the user is not at the army's cap
         if army_info['troops'] + 10000 > user_info['army_size']:
             # reject
-            await interaction.followup.send(f"Recruiting 10,000 additional troops into {army_info['army_name']} would exceed the troop limit.")
+            await interaction.followup.send(f"Recruiting 10,000 additional troops into {army_info['army_name']} would exceed the troop limit.", ephemeral=True)
             # remove buttons
             for child in self.children:
                 child.disabled = True
@@ -6265,7 +6267,7 @@ class ArmyRecruitMenu(discord.ui.View):
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
             await self.parent_interaction.edit_original_response(view=army_actions_view, embed=army_embed)
             # notify user
-            await interaction.followup.send(f"{army_info['army_name']} has successfully recruited an additional 10,000 troops!")
+            await interaction.followup.send(f"The {army_info['army_name']} has successfully recruited an additional 10,000 troops!")
             # stop listening
             return self.stop()
     
