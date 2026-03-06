@@ -6127,8 +6127,6 @@ class ArmyRecruitMenu(discord.ui.View):
             return await self.parent_interaction.edit_original_response(view=self)
         # otherwise, carry on
         else:
-            # stop listening
-            self.stop()
             if tusail_mil_charge:
                 # subtract one military authority
                 await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 1 WHERE user_id = $1;''', interaction.user.id)
@@ -6146,7 +6144,9 @@ class ArmyRecruitMenu(discord.ui.View):
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
-            return await self.parent_interaction.edit_original_response(view=army_actions_view)
+            await self.parent_interaction.edit_original_response(view=army_actions_view)
+            # stop listening
+            return self.stop()
 
     @discord.ui.button(label="Recruit 5,000", style=discord.ButtonStyle.blurple)
     async def recruit_fivek(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -6183,8 +6183,6 @@ class ArmyRecruitMenu(discord.ui.View):
             return await self.parent_interaction.edit_original_response(view=self)
         # otherwise, carry on
         else:
-            # stop listening
-            self.stop()
             if tusail_mil_charge:
                 # subtract five military authority
                 await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 5 WHERE user_id = $1;''', interaction.user.id)
@@ -6202,7 +6200,9 @@ class ArmyRecruitMenu(discord.ui.View):
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
-            return await self.parent_interaction.edit_original_response(view=army_actions_view)
+            await self.parent_interaction.edit_original_response(view=army_actions_view)
+            # stop listening
+            return self.stop()
 
     @discord.ui.button(label="Recruit 10,000", style=discord.ButtonStyle.blurple)
     async def recruit_tenk(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -6242,8 +6242,6 @@ class ArmyRecruitMenu(discord.ui.View):
             return await self.parent_interaction.edit_original_response(view=self)
         # otherwise, carry on
         else:
-            # stop listening
-            self.stop()
             if tusail_mil_charge:
                 # subtract ten military authority
                 await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 10 WHERE user_id = $1;''', interaction.user.id)
@@ -6261,18 +6259,20 @@ class ArmyRecruitMenu(discord.ui.View):
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
-            return await self.parent_interaction.edit_original_response(view=army_actions_view)
+            await self.parent_interaction.edit_original_response(view=army_actions_view)
+            # stop listening
+            return self.stop()
     
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer()
-        # stop listening
-        self.stop()
         # reset menu
         army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=self.conn, army_info=self.army_info)
         # update the parent 
-        return await self.parent_interaction.edit_original_response(view=army_actions_view)
+        await self.parent_interaction.edit_original_response(view=army_actions_view)
+        # stop listening
+        return self.stop()
     
 
 class CNC(commands.Cog):
