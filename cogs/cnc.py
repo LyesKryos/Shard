@@ -7283,7 +7283,7 @@ class CNC(commands.Cog):
         # check if the user exists
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # grab posting info
-        post_info = await province_db_info(province_id=int(posting))
+        post_info = await self.province_db_info(province_id=int(posting))
         # define tusail mil charge
         tusail_mil_charge = False
         # if they are not a user, reject
