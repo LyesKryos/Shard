@@ -7277,7 +7277,7 @@ class CNC(commands.Cog):
     @app_commands.describe(posting="The province to which the army should be posted.", recruit_troops="The number of troops to be recruited into the army upon creation. MUST be a round thousands.")
     async def create_army(self, interaction: discord.Interaction, posting: str, recruit_troops: int = 0):
         # defer the interaction
-        await interaction.followup.defer()
+        await interaction.response.defer()
         # establish connection
         conn = self.bot.pool
         # check if the user exists
