@@ -6325,7 +6325,7 @@ class ArmyDisbandMenu(discord.ui.View):
         # get user info
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # if the army has less than 1000, confirm if the user wishes to disband the army
-        if army_info['troops'] - 1000 =< 0: 
+        if army_info['troops'] - 1000 <= 0: 
             # create accept view
             accept_view = Accept(interaction)
             # send message
@@ -6375,7 +6375,7 @@ class ArmyDisbandMenu(discord.ui.View):
         # get user info
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # if the army has less than 1000, confirm if the user wishes to disband the army
-        if army_info['troops'] - 5000 =< 0: 
+        if army_info['troops'] - 5000 <= 0: 
             # create accept view
             accept_view = Accept(interaction)
             # send message
@@ -6425,7 +6425,7 @@ class ArmyDisbandMenu(discord.ui.View):
         # get user info
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # if the army has less than 1000, confirm if the user wishes to disband the army
-        if army_info['troops'] - 10000 =< 0: 
+        if army_info['troops'] - 10000 <= 0: 
             # create accept view
             accept_view = Accept(interaction)
             # send message
