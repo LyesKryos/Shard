@@ -6168,10 +6168,14 @@ class ArmyRecruitMenu(discord.ui.View):
         # establish connection
         conn = self.conn
         army_info = self.army_info
+        # define the mil charge
+        tusail_mil_charge = False
         # pull user information
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # check if the user has the correct amount of the authority required
         if "Tusail" in user_info['govt_subtype']:
+            # set the mil charge 
+            tusail_mil_charge = True
             # check the amount of military authority
             if user_info['mil_auth'] < 5:
                 # reject
