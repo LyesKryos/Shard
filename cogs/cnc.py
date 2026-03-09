@@ -6325,7 +6325,7 @@ class ArmyDisbandMenu(discord.ui.View):
             # create accept view
             accept_view = Accept(interaction)
             # send message
-            confirm_message = await interaction.followup.send(f"{army_info['army_name']} will be disbanded entirely by this action. Are you sure you wish to disband {army_info['army_name']}?", view=accept_view)
+            confirm_message = await interaction.followup.send(f"The {army_info['army_name']} will be disbanded entirely by this action. Are you sure you wish to disband {army_info['army_name']}?", view=accept_view)
             # wait for the accept
             accept_deny = await accept_view.wait()
             # if the accept is true
@@ -6337,7 +6337,7 @@ class ArmyDisbandMenu(discord.ui.View):
                 # update the general to not have any army, if there was a general
                 await conn.execute('''UPDATE cnc_generals SET army_id = NULL where army_id = $1;''', army_info['army_id'])
                 # confirm with the user
-                await interaction.followup.send(f"{army_info['army_name']} has been disbanded. Its troops have returned home. Any Generals have returned to headquarters for reassignment.")
+                await interaction.followup.send(f"The {army_info['army_name']} has been disbanded. Its troops have returned home. Any Generals have returned to headquarters for reassignment.")
                 # stop listening
                 return self.stop()
         # otherwise, carry on
@@ -6345,7 +6345,7 @@ class ArmyDisbandMenu(discord.ui.View):
             # reduce the amount of the army by 1000
             await conn.execute('''UPDATE cnc_armies SET troops = troops - 1000 WHERE army_id = $1;''', army_info['army_id'])
             # reply to user
-            await interaction.followup.send(f"1,000 troops, previously of {army_info['army_name']}, have returned home.")
+            await interaction.followup.send(f"1,000 troops, previously of the {army_info['army_name']}, have returned home.")
             # pull the new info
             new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
             # call embed
@@ -6358,10 +6358,118 @@ class ArmyDisbandMenu(discord.ui.View):
             # update the original
             await self.parent_interaction.edit_original_response(embed=army_embed, view=army_actions_view)
             # stop listening
-            return self.stop()          
+            return self.stop()
 
+    @discord.ui.button(label="Disband 5,000", style=discord.ButtonStyle.danger)
+    async def disband_fivek(self, interaction: discord.Interaction, button: discord.Button):
+        # defer the interaction
+        await interaction.response.defer()
+        # establish conn
+        conn = self.conn
+        # get army info
+        army_info = self.army_info
+        # get user info
+        user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+        # if the army has less than 1000, confirm if the user wishes to disband the army
+        if army_info['troops'] - 5000 < 0: 
+            # create accept view
+            accept_view = Accept(interaction)
+            # send message
+            confirm_message = await interaction.followup.send(f"The {army_info['army_name']} will be disbanded entirely by this action. Are you sure you wish to disband {army_info['army_name']}?", view=accept_view)
+            # wait for the accept
+            accept_deny = await accept_view.wait()
+            # if the accept is true
+            if accept_view.value:
+                # delete the message
+                await confirm_message.delete()
+                # delete the army
+                await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
+                # update the general to not have any army, if there was a general
+                await conn.execute('''UPDATE cnc_generals SET army_id = NULL where army_id = $1;''', army_info['army_id'])
+                # confirm with the user
+                await interaction.followup.send(f"The {army_info['army_name']} has been disbanded. Its troops have returned home. Any Generals have returned to headquarters for reassignment.")
+                # stop listening
+                return self.stop()
+        # otherwise, carry on
+        else:
+            # reduce the amount of the army by 1000
+            await conn.execute('''UPDATE cnc_armies SET troops = troops - 5000 WHERE army_id = $1;''', army_info['army_id'])
+            # reply to user
+            await interaction.followup.send(f"5,000 troops, previously of the {army_info['army_name']}, have returned home.")
+            # pull the new info
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
+            # call embed
+            original_message = await self.parent_interaction.original_response()
+            army_embed = original_message.embeds[0]
+            # update embed
+            army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
+            # reset menu
+            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)  
+            # update the original
+            await self.parent_interaction.edit_original_response(embed=army_embed, view=army_actions_view)
+            # stop listening
+            return self.stop()  
+           
+    @discord.ui.button(label="Disband 10,000", style=discord.ButtonStyle.danger)
+    async def disband_tenk(self, interaction: discord.Interaction, button: discord.Button):
+        # defer the interaction
+        await interaction.response.defer()
+        # establish conn
+        conn = self.conn
+        # get army info
+        army_info = self.army_info
+        # get user info
+        user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+        # if the army has less than 1000, confirm if the user wishes to disband the army
+        if army_info['troops'] - 10000 < 0: 
+            # create accept view
+            accept_view = Accept(interaction)
+            # send message
+            confirm_message = await interaction.followup.send(f"The {army_info['army_name']} will be disbanded entirely by this action. Are you sure you wish to disband {army_info['army_name']}?", view=accept_view)
+            # wait for the accept
+            accept_deny = await accept_view.wait()
+            # if the accept is true
+            if accept_view.value:
+                # delete the message
+                await confirm_message.delete()
+                # delete the army
+                await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
+                # update the general to not have any army, if there was a general
+                await conn.execute('''UPDATE cnc_generals SET army_id = NULL where army_id = $1;''', army_info['army_id'])
+                # confirm with the user
+                await interaction.followup.send(f"The {army_info['army_name']} has been disbanded. Its troops have returned home. Any Generals have returned to headquarters for reassignment.")
+                # stop listening
+                return self.stop()
+        # otherwise, carry on
+        else:
+            # reduce the amount of the army by 1000
+            await conn.execute('''UPDATE cnc_armies SET troops = troops - 10000 WHERE army_id = $1;''', army_info['army_id'])
+            # reply to user
+            await interaction.followup.send(f"10,000 troops, previously of the {army_info['army_name']}, have returned home.")
+            # pull the new info
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
+            # call embed
+            original_message = await self.parent_interaction.original_response()
+            army_embed = original_message.embeds[0]
+            # update embed
+            army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
+            # reset menu
+            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)  
+            # update the original
+            await self.parent_interaction.edit_original_response(embed=army_embed, view=army_actions_view)
+            # stop listening
+            return self.stop()  
 
-            
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
+    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # reset menu
+        army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=self.conn, army_info=self.army_info)
+        # update the parent 
+        await self.parent_interaction.edit_original_response(view=army_actions_view)
+        # stop listening
+        return self.stop()        
 
 
 class CNC(commands.Cog):
