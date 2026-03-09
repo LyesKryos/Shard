@@ -7162,6 +7162,40 @@ class CNC(commands.Cog):
         # sort and return
         return matched_provinces[0:24]
 
+    async def owned_province_autocomplete(self, interaction: discord.Interaction, province_typed: str) -> List[app_commands.Choice(str)]:
+        """This function searches for owned provinces and then returns them as a list for autocomplete."""
+
+        # establish connection
+        conn = self.bot.pool
+        # pull all province names and ids
+        provinces = await conn.fetch('''SELECT id, name FROM cnc_provinces WHERE owner_id = $1 AND occupier_id = $1 ORDER BY id DESC;''', interaction.user.id)
+
+        def match_priority(province):
+            """This function attempts to create a priority list of the most accurately matching ID/name for the province"""
+            
+            # define the terms
+            province_id = str(province['id'])
+            province_name = province['name'].lower()
+            typed = province_typed.lower()
+            # if they are an exact match, give them priority 0
+            if province_id == typed or province_name == typed:
+                return 0
+            # if they start with, give them priority 1
+            elif province_id.startswith(typed) or province_name.startswith(typed):
+                return 1
+            # otherwise, give them lowest priorty
+            else:
+                return 2
+
+        # then match the provinces
+        matched_provinces = [app_commands.Choice(name=f"{province['name']} (ID: {province['id']})", value=str(province['id'])) for province in provinces if (province_typed.lower() in province['name'].lower()) or (province_typed in str(province['id']))]
+
+        # prioritize
+        matched_provinces.sort(key=lambda m: (match_priority(next(p for p in provinces if str(p['id']) == m.value)), int(m.value)))
+
+        # sort and return
+        return matched_provinces[0:24]
+
     @cnc.command(name="province", description="Displays basic information about a province.")
     @app_commands.autocomplete(province=province_autocomplete)
     @app_commands.describe(province="The ID or name of the province.")
@@ -7212,6 +7246,8 @@ class CNC(commands.Cog):
         else:
             return await interaction.followup.send(embed=await create_prov_embed(prov_info, conn))
 
+    # === Army Commands ===
+
     async def army_autocomplete(self, interaction: discord.Interaction, army_typing: str) -> List[app_commands.Choice(str)]:
         """This function searches for current player nations and then returns them as a list for autocomplete."""
 
@@ -7236,7 +7272,88 @@ class CNC(commands.Cog):
         # return the choices
         return army_choices      
 
-    @cnc.command(name="army_view", description="Displays information about a specific army.")
+    @cnc.command(name="create_army", description="Creates a new army.")
+    @app_commands.autocomplete(posting=owned_province_autocomplete)
+    @cnc.describe(posting="The province to which the army should be posted.", recruit_troops="The number of troops to be recruited into the army upon creation. MUST be a round thousands.")
+    async def create_army(self, interaction: discord.Interaction, posting: str, recruit_troops: int = 0):
+        # defer the interaction
+        await interaction.followup.defer()
+        # establish connection
+        conn = self.bot.pool
+        # check if the user exists
+        user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+        # grab posting info
+        post_info = await province_db_info(province_id=int(posting))
+        # define tusail mil charge
+        tusail_mil_charge = False
+        # if they are not a user, reject
+        if user_info is None:
+            return await interaction.followup.send("You are not a registered member of the Command & Conquest system. Click here to register: </cnc register:1316831583159849021>.")
+        # if the number of recruit troops is not divisible evenly by 1000 (1000 = 1 auth cost)
+        elif recruit_troops % 1000 != 0:
+            return await interaction.followup.send(f"`{recruit_troops}` is not a valid troop amount. Troops must be recruited in the thousands evenly (e.g., 1,000, not 1,234).", ephemeral=True)
+        # otherwise, carry on
+        else:
+            # check to see if they are able to create an army
+            if (user_info['govt_type'] == "Anarchy") and (user_info['govt_subtype'] == "Postcolonial"):
+                return await interaction.followup.send("Nations with the Anarchy Government Type (excepting Postcolonial) cannot create new armies.", ephemeral=True)
+            # otherwise, carry on
+            else:
+                # count all current armies
+                army_count = await conn.fetchval('''SELECT count(army_id) FROM cnc_armies WHERE owner_id = $1;''', interaction.user.id)
+                # check if the user has sufficient army space
+                if army_count + 1 > user_info['army_limit']:
+                    # deny
+                    return await interaction.followup.send(f"{user_info['name']} cannot create another army, as doing so would exceed its current Army Limit.", ephemeral=True)
+                # check if the user has sufficient mil auth
+                elif user_info['mil_auth'] < 4:
+                    # deny
+                    return await interaction.followup.send(f"{user_info['name']} does not have sufficient Military Authority to create a new army.", ephemeral=True)
+                # check if the user has sufficient econ auth/mil auth
+                elif user_info['econ_auth'] < (recruit_troops / 1000):
+                    # check if the user is tusail
+                    if user_info['govt_subtype'] == "Tusail":
+                        # if they are, then they must pay mil auth instead
+                        tusail_mil_charge = True
+                        # check if they have enough
+                        if user_info['mil_auth'] < 4 + (recruit_troops / 1000):
+                            # deny
+                            return await interaction.followup.send(f"{user_info['name']} does not have sufficient Military Authority to create a new army with {recruit_troops:,} troops.", ephemeral=True)
+                    # otherwise
+                    else:
+                        # deny
+                        return await interaction.followup.send(f"{user_info['name']} does not have sufficient Economic Authority to create a new army with {recruit_troops:,} troops.", ephemeral=True)
+                # check if the posting location is owned and occupied by the user
+                elif (user_info['user_id'] != post_info['owner_id']) and (user_info['user_id'] != post_info['occupier_id']):
+                    # deny
+                    return await interaction.followup.send("Armies cannot be posted to provinces their owner does not both own and occupy.", ephemeral=True)
+                # otherwise, carry on
+                else:
+                    # subtract the mil auth
+                    await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 4 WHERE user_id = $1;''', user_info['user_id'])
+                    # if there is a troop cost
+                    if troop_count != 0:
+                        # if the tusail mil charge is active
+                        if tusail_mil_charge:
+                            await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - $2 WHERE user_id = $1;''', user_info['user_id'], (troop_count/1000))
+                        # otherwise, its econ
+                        else:
+                            await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $2 WHERE user_id = $1;''', user_info['user_id'], (troop_count/1000))
+                    # figure out the army name
+                    army_name_count = await conn.fetchval('''SELECT count(army_name) FROM cnc_armies WHERE army_name LIKE '%Army of $1%';''', post_info['name'])
+                    if army_name_count is not None:
+                        army_name_number = ordinal_suffix(amry_name_count)
+                        army_name = f"{ordinal_suffix} Army of {post_info['name']}"
+                    else:
+                        army_name = f"Army of {post_info['name']}"
+                    # create the army
+                    await conn.execute('''INSERT INTO cnc_armies(owner_id, troops, location, army_name) VALUES ($1, $2, $3, $4);''', user_info['user_id'], troop_count, post_info['id'], army_name)
+                    # notify
+                    return await interaction.followup.send(f"The {army_name} has been created in {post_info['name']} (ID: {post_info['id']}). It currently has `{troop_count}` troops. It is not commanded by a General.")
+                
+                
+    
+    @cnc.command(name="army", description="Displays information about a specific army.")
     @app_commands.autocomplete(army_id=army_autocomplete)
     @app_commands.describe(army_id="The ID of the army")
     async def army_view(self, interaction: discord.Interaction, army_id: int):
