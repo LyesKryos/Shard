@@ -6342,6 +6342,8 @@ class ArmyDisbandMenu(discord.ui.View):
                 await conn.execute('''UPDATE cnc_generals SET army_id = NULL where army_id = $1;''', army_info['army_id'])
                 # confirm with the user
                 await interaction.followup.send(f"The {army_info['army_name']} has been disbanded. Its troops have returned home. Any Generals have returned to headquarters for reassignment.")
+                # remove the buttons on the original
+                await self.parent_interaction.edit_original_response(view=None)
                 # stop listening
                 return self.stop()
         # otherwise, carry on
@@ -6392,6 +6394,8 @@ class ArmyDisbandMenu(discord.ui.View):
                 await conn.execute('''UPDATE cnc_generals SET army_id = NULL where army_id = $1;''', army_info['army_id'])
                 # confirm with the user
                 await interaction.followup.send(f"The {army_info['army_name']} has been disbanded. Its troops have returned home. Any Generals have returned to headquarters for reassignment.")
+                # remove the buttons on the original
+                await self.parent_interaction.edit_original_response(view=None)
                 # stop listening
                 return self.stop()
         # otherwise, carry on
@@ -6442,6 +6446,8 @@ class ArmyDisbandMenu(discord.ui.View):
                 await conn.execute('''UPDATE cnc_generals SET army_id = NULL where army_id = $1;''', army_info['army_id'])
                 # confirm with the user
                 await interaction.followup.send(f"The {army_info['army_name']} has been disbanded. Its troops have returned home. Any Generals have returned to headquarters for reassignment.")
+                # remove the buttons on the original
+                await self.parent_interaction.edit_original_response(view=None)
                 # stop listening
                 return self.stop()
         # otherwise, carry on
