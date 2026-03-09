@@ -7274,7 +7274,7 @@ class CNC(commands.Cog):
 
     @cnc.command(name="create_army", description="Creates a new army.")
     @app_commands.autocomplete(posting=owned_province_autocomplete)
-    @cnc.describe(posting="The province to which the army should be posted.", recruit_troops="The number of troops to be recruited into the army upon creation. MUST be a round thousands.")
+    @app_commands.describe(posting="The province to which the army should be posted.", recruit_troops="The number of troops to be recruited into the army upon creation. MUST be a round thousands.")
     async def create_army(self, interaction: discord.Interaction, posting: str, recruit_troops: int = 0):
         # defer the interaction
         await interaction.followup.defer()
