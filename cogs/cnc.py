@@ -14,6 +14,7 @@ from discord.ui import View
 import math
 import time
 import heapq
+from faker import Faker
 
 
 async def safe_dm(bot: discord.Client, user_id: int, *, content: str | None = None,
@@ -6069,7 +6070,11 @@ class ArmyActionsView(discord.ui.View):
         # stop listening
         self.stop()
     
-    @discord.ui.button(label="Disband", style=discord.ButtonStyle.danger, emoji="")
+    @discord.ui.button(label="Disband", style=discord.ButtonStyle.danger, emoji="\U0001f4a4")
+    async def disband_soldiers(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # respond to the interaction
+        await interaction.response.send_message(content="Processing...", delete_after=0.5, army_info=self.army_info)
+        # create and add the meny
 
 
 
@@ -6282,6 +6287,78 @@ class ArmyRecruitMenu(discord.ui.View):
         # stop listening
         return self.stop()
     
+
+class ArmyDisbandMenu(discord.ui.View):
+
+    def __init__(self, parent_interaction: discord.Interaction, army_info: asyncpg.Record):
+        super().__init__(timeout=120)
+        self.parent_interaction = parent_interaction
+        self.army_info = army_info
+        self.conn = parent_interaction.client.pool
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.parent_interaction.user.id
+
+    async def on_timeout(self):
+        # disable all the buttons
+        for child in self.children:
+            child.disabled = True
+        # update the view
+        await self.parent_interaction.edit_original_response(view=self)
+    
+    @discord.ui.button(label="Disband 1,000", style=discord.ButtonStyle.danger)
+    async def disband_onek(self, interaction: discord.Interaction, button: discord.Button):
+        # defer the interaction
+        await interaction.response.defer()
+        # establish conn
+        conn = self.conn
+        # get army info
+        army_info = self.army_info
+        # get user info
+        user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+        # if the army has less than 1000, confirm if the user wishes to disband the army
+        if army_info - 1000 < 0: 
+            # create accept view
+            accept_view = Accept(interaction)
+            # send message
+            confirm_message = await interaction.followup.send(f"{army_info['army_name']} will be disbanded entirely by this action. Are you sure you wish to disband {army_info['army_name']}?", view=accept_view)
+            # wait for the accept
+            accept_deny = await accept_view.wait()
+            # if the accept is true
+            if accept_view.value:
+                # delete the message
+                await confirm_message.delete()
+                # delete the army
+                await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
+                # update the general to not have any army, if there was a general
+                await conn.execute('''UPDATE cnc_generals SET army_id = NULL where army_id = $1;''', army_info['army_id'])
+                # confirm with the user
+                await interaction.followup.send(f"{army_info['army_name']} has been disbanded. Its troops have returned home. Any Generals have returned to headquarters for reassignment.")
+                # stop listening
+                return self.stop()
+        # otherwise, carry on
+        else:
+            # reduce the amount of the army by 1000
+            await conn.execute('''UPDATE cnc_armies SET troops = troops - 1000 WHERE army_id = $1;''', army_info['army_id'])
+            # reply to user
+            await interaction.followup.send(f"1,000 troops, previously of {army_info['army_name']}, have returned home.")
+            # pull the new info
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
+            # call embed
+            original_message = await self.parent_interaction.original_response()
+            army_embed = original_message.embeds[0]
+            # update embed
+            army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
+            # reset menu
+            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)  
+            # update the original
+            await self.parent_interaction.edit_original_response(embed=army_embed, view=army_actions_view)
+            # stop listening
+            return self.stop()          
+
+
+            
+
 
 class CNC(commands.Cog):
 
