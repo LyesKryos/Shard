@@ -6073,7 +6073,7 @@ class ArmyActionsView(discord.ui.View):
     @discord.ui.button(label="Disband", style=discord.ButtonStyle.danger, emoji="\U0001f4a4")
     async def disband_soldiers(self, interaction: discord.Interaction, button: discord.ui.Button):
         # respond to the interaction
-        await interaction.response.send_message(content="Processing...", delete_after=0.5, army_info=self.army_info)
+        await interaction.response.send_message(content="Processing...", delete_after=0.5, ephemeral=True)
         # create and add the menu
         army_disband_menu = ArmyDisbandMenu(parent_interaction=self.parent_interaction, army_info=self.army_info)
         await self.parent_interaction.edit_original_response(view=army_disband_menu)
