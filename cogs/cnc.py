@@ -7332,13 +7332,13 @@ class CNC(commands.Cog):
                     # subtract the mil auth
                     await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 4 WHERE user_id = $1;''', user_info['user_id'])
                     # if there is a troop cost
-                    if troop_count != 0:
+                    if recruit_troops != 0:
                         # if the tusail mil charge is active
                         if tusail_mil_charge:
-                            await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - $2 WHERE user_id = $1;''', user_info['user_id'], (troop_count/1000))
+                            await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - $2 WHERE user_id = $1;''', user_info['user_id'], (recruit_troops/1000))
                         # otherwise, its econ
                         else:
-                            await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $2 WHERE user_id = $1;''', user_info['user_id'], (troop_count/1000))
+                            await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $2 WHERE user_id = $1;''', user_info['user_id'], (recruit_troops/1000))
                     # figure out the army name
                     army_name_count = await conn.fetchval('''SELECT count(army_name) FROM cnc_armies WHERE army_name LIKE '%Army of $1%';''', post_info['name'])
                     if army_name_count is not None:
@@ -7347,9 +7347,9 @@ class CNC(commands.Cog):
                     else:
                         army_name = f"Army of {post_info['name']}"
                     # create the army
-                    await conn.execute('''INSERT INTO cnc_armies(owner_id, troops, location, army_name) VALUES ($1, $2, $3, $4);''', user_info['user_id'], troop_count, post_info['id'], army_name)
+                    await conn.execute('''INSERT INTO cnc_armies(owner_id, troops, location, army_name) VALUES ($1, $2, $3, $4);''', user_info['user_id'], recruit_troops, post_info['id'], army_name)
                     # notify
-                    return await interaction.followup.send(f"The {army_name} has been created in {post_info['name']} (ID: {post_info['id']}). It currently has `{troop_count}` troops. It is not commanded by a General.")
+                    return await interaction.followup.send(f"The {army_name} has been created in {post_info['name']} (ID: {post_info['id']}). It currently has `{recruit_troops}` troops. It is not commanded by a General.")
                 
                 
     
