@@ -6526,10 +6526,15 @@ class GeneralSelectMenu(discord.ui.Select):
             await interaction.response.send_message(content=f"General {general_name} has been assigned to {army_name}!")
             # stop listening
             self.stop()
+            # call embed
+            original_message = await self.parent_interaction.original_response()
+            army_embed = original_message.embeds[0]
+            # update embed
+            army_embed.set_field_at(4, name="General", value=f"{general_name}")
             # return to the army menu
             army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction, conn=interaction.client.pool, army_info=army_info)
             # update the interaction
-            return await self.parent_interaction.edit_original_response(view=army_action_menu)
+            return await self.parent_interaction.edit_original_response(view=army_action_menu, embed=army_embed)
 
         # if the option was recruit, attempt to recruit a new general
         else:
@@ -6559,10 +6564,15 @@ class GeneralSelectMenu(discord.ui.Select):
                 await interaction.response.send_message(f"General {general_name} has been recruited and assigned to command the {army_name}.\nTo view their stats, use /cnc general_info.")
                 # go back to the army menu
                 army_info = await interaction.client.pool.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', self.army_id)
+                 # call embed
+                original_message = await self.parent_interaction.original_response()
+                army_embed = original_message.embeds[0]
+                # update embed
+                army_embed.set_field_at(4, name="General", value=f"{general_name}")
                 # return to the army menu
                 army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction, conn=interaction.client.pool, army_info=army_info)
                 # update the interaction
-                await self.parent_interaction.edit_original_response(view=army_action_menu)
+                await self.parent_interaction.edit_original_response(view=army_action_menu, embed=army_embed)
                 # stop listening
                 return self.stop()
 
@@ -7510,7 +7520,7 @@ class CNC(commands.Cog):
             general_info = await conn.fetchrow('''SELECT *
                                                   FROM cnc_generals
                                                   WHERE general_id = $1;''', general)
-            general = f"{general_info['name']} (ID: {general_info['general_id']})"
+            general = f"{general_info['name']})"
         movement = army_info['movement']
         # pull userinfo
         userinfo = await user_db_info(owner_id, conn)
