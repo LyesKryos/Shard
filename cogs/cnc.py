@@ -7283,7 +7283,10 @@ class CNC(commands.Cog):
         # check if the user exists
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # grab posting info
-        post_info = await self.province_db_info(province_id=int(posting))
+        try:
+            post_info = await self.province_db_info(province_id=int(posting))
+        except ValueError:
+            return await interaction.followup.send(f"No such province as `{posting}`.\nNote: if additional spaces/characters were added to the autocomplete suggestion, the posting may appear invalid.", ephemeral=True)
         # define tusail mil charge
         tusail_mil_charge = False
         # if they are not a user, reject
