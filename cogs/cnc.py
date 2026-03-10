@@ -6565,7 +6565,7 @@ class GeneralSelectView(discord.ui.View):
         self.user_id = user_id
 
         # add the item
-        self.add_item(GeneralSelectMenu(generals_info=self.generals_info, army_id=self.army_i))
+        self.add_item(GeneralSelectMenu(generals_info=self.generals_info, army_id=self.army_id))
 
     async def on_timeout(self):
         # disable all children
