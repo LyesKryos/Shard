@@ -6526,8 +6526,6 @@ class GeneralSelectMenu(discord.ui.Select):
             await conn.execute('''UPDATE cnc_generals SET army_id = $1 WHERE general_id = $2;''', self.army_id, general_option)
             # notify
             await interaction.response.send_message(content=f"General {general_name} has been assigned to {army_name}!")
-            # stop listening
-            self.stop()
             # call embed
             original_message = await self.parent_interaction.original_response()
             army_embed = original_message.embeds[0]
@@ -6543,15 +6541,11 @@ class GeneralSelectMenu(discord.ui.Select):
             # check to ensure that the user has sufficient space for a new general
             if len(self.generals_info) >= user_info['gen_limit']:
                 # deny
-                await interaction.response.send_message(content=f"{user_info['name']} cannot recruit another General.")
-                # stop listening
-                return self.stop()
+                return await interaction.response.send_message(content=f"{user_info['name']} cannot recruit another General.")
             # check to ensure that the user has sufficient military authority
             elif user_info['mil_auth'] < 2:
                 # deny
-                await interaction.response.send_message(content=f"{user_info['name']} does not have sufficient Military Authority to recruit a General.")
-                # stop listening
-                return self.stop()
+                return await interaction.response.send_message(content=f"{user_info['name']} does not have sufficient Military Authority to recruit a General.")
             # otherwise, carry on
             else:
                 # if the army already has a general, unassign him
@@ -6574,9 +6568,8 @@ class GeneralSelectMenu(discord.ui.Select):
                 # return to the army menu
                 army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction, conn=interaction.client.pool, army_info=army_info)
                 # update the interaction
-                await self.parent_interaction.edit_original_response(view=army_action_menu, embed=army_embed)
-                # stop listening
-                return self.stop()
+                return await self.parent_interaction.edit_original_response(view=army_action_menu, embed=army_embed)
+
 
 
 
