@@ -6087,7 +6087,7 @@ class ArmyActionsView(discord.ui.View):
         # pull the generals info
         all_user_generals = await self.conn.fetch('''SELECT * FROM cnc_generals WHERE owner_id = $1;''', interaction.user.id)
         # add the dropdown menu
-        general_menu = GeneralSelectView(parent_interaction=self.parent_interaction, generals_info=all_user_generals, army_id=self.army_info['id'], user_id=interaction.user.id)
+        general_menu = GeneralSelectView(parent_interaction=self.parent_interaction, generals_info=all_user_generals, army_id=self.army_info['army_id'], user_id=interaction.user.id)
         await self.parent_interaction.edit_original_response(view=general_menu)
         # stop listening
         self.stop()
