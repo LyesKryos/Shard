@@ -7348,6 +7348,7 @@ class CNC(commands.Cog):
                             await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $2 WHERE user_id = $1;''', user_info['user_id'], (recruit_troops/1000))
                     # figure out the army name
                     army_name_count = await conn.fetchval('''SELECT count(army_name) FROM cnc_armies WHERE army_name LIKE $1;''', f"Army of {post_info['name']}")
+                    await interaction.followup.send(army_name_count)
                     if army_name_count != 0:
                         army_name_number = ordinal_suffix(army_name_count)
                         army_name = f"{army_name_number} Army of {post_info['name']}"
@@ -7356,7 +7357,7 @@ class CNC(commands.Cog):
                     # create the army
                     await conn.execute('''INSERT INTO cnc_armies(owner_id, troops, location, army_name) VALUES ($1, $2, $3, $4);''', user_info['user_id'], recruit_troops, post_info['id'], army_name)
                     # notify
-                    return await interaction.followup.send(f"The {army_name} has been created in {post_info['name']} (ID: {post_info['id']}). It currently has `{recruit_troops}` troops. It is not commanded by a General.")
+                    return await interaction.followup.send(f"The {army_name} has been created in {post_info['name']} (ID: {post_info['id']}). It currently has `{recruit_troops:,}` troops. It is not commanded by a General.")
                 
                 
     
