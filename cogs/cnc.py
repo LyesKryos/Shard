@@ -6548,7 +6548,7 @@ class GeneralSelectMenu(discord.ui.Select):
                 # define the name of the general
                 general_name = Faker().name()
                 # create the general
-                await conn.execute('''INSERT INTO cnc_generals(owner_id, type, level, army_id, name) VALUES($1, $2, $3, $4, $5);''', user_info['id'], random.choice(['Assault', 'Defensive', 'Seige']), user_info['gen_level'], self.army_id, general_name)
+                await conn.execute('''INSERT INTO cnc_generals(owner_id, type, level, army_id, name) VALUES($1, $2, $3, $4, $5);''', user_info['user_id'], random.choice(['Assault', 'Defensive', 'Seige']), user_info['gen_level'], self.army_id, general_name)
                 # notify user
                 await interaction.response.send_message(f"General {general_name} has been recruited and assigned to command the {army_name}.\nTo view their stats, use /cnc general_info.")
                 # stop listening
