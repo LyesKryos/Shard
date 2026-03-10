@@ -6080,6 +6080,13 @@ class ArmyActionsView(discord.ui.View):
         # stop listening
         self.stop()
 
+    @discord.ui.button(label="Assign General", style=discord.ButtonStyle.blurple, emoji="\U0001f482")
+    async def assign_general(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer the interaction
+        await interaction.response.defer()
+        # add the dropdown menu
+
+
 
 
 class ArmyRecruitMenu(discord.ui.View):
@@ -6480,6 +6487,97 @@ class ArmyDisbandMenu(discord.ui.View):
         await self.parent_interaction.edit_original_response(view=army_actions_view)
         # stop listening
         return self.stop()        
+
+class GeneralSelectMenu(discord.ui.Select):
+
+    def __init__(self, generals_info: asyncpg.Record, army_id: int):
+        # define the variables
+        self.army_id = army_id
+        self.generals_info = generals_info
+
+        # create the options
+        options = [discord.SelectOption(label=general['name'], value=general['general_id']) for general in generals_info]
+        options += [discord.SelectOption(label="Recruit General", value="recruit")]
+
+        # define the super
+        super().__init__(placeholder="Select a general to assign...", min_values=1, max_values=1, options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        # define variables
+        general_option: self.values[0]
+        conn = interaction.client.pool
+        user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+        # if the request was not to recruit
+        if general_option != "recruit":
+            # get general name
+            general_name = await conn.fetchval('''SELECT general_name FROM cnc_generals WHERE general_id = $1;''', general_option)
+            # get army name
+            army_name = await conn.fetchval('''SELECT army_name FROM cnc_armies WHERE army_id = $1;''', self.army_id)
+            # reassign the general
+            await conn.execute('''UPDATE cnc_generals SET army_id = $1 WHERE general_id = $2;''', self.army_id, general_option)
+            # notify
+            await interaction.response.send_message(content=f"General {general_name} has been assigned to {army_name}!")
+            # stop listening
+            return self.stop()
+        # if the option was recruit, attempt to recruit a new general
+        else:
+            # check to ensure that the user has sufficient space for a new general
+            if len(self.generals_info) >= user_info['gen_limit']:
+                # deny
+                await interaction.response.send_message(content=f"{user_info['name']} cannot recruit another General.")
+                # stop listening
+                return self.stop()
+            # check to ensure that the user has sufficient military authority
+            elif user_info['mil_auth'] < 2:
+                # deny
+                await interaction.response.send_message(content=f"{user_info['name']} does not have sufficient Military Authority to recruit a General.")
+                # stop listening
+                return self.stop()
+            # otherwise, carry on
+            else:
+                # subtract the cost
+                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 2 WHERE user_id = $1;''', user_info['user_id'])
+                # define the name of the general
+                general_name = Faker().name()
+                # create the general
+                await conn.execute('''INSERT INTO cnc_generals(owner_id, type, level, army_id, name) VALUES($1, $2, $3, $4, $5);''', user_info['id'], random.choice(['Assault', 'Defensive', 'Seige']), user_info['gen_level'], self.army_id, general_name)
+                # notify user
+                await interaction.response.send_message(f"General {general_name} has been recruited and assigned to command the {army_name}.\nTo view their stats, use /cnc general_info.")
+                # stop listening
+                return self.stop()
+
+class GeneralSelectView(discord.ui.View):
+
+    def __init__(self, parent_interaction: discord.Interaction, generals_info: asyncpg.Record, army_id: int, user_id: int, timeout=120):
+        # define variables
+        self.generals_info = generals_info
+        self.army_id = army_id
+        self.parent_interaction = parent_interaction
+        self.user_id = user_id
+
+        # add the item
+        self.add_item(GeneralSelectMenu(generals_info=self.generals_info, army_id=self.army_i))
+
+    async def on_timeout(self):
+        # disable all children
+        for child in self.children:
+            child.disabled = True
+        # update view
+        return await self.parent_interaction.edit_original_response(view=self)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.user_id
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
+    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # pull the army info
+        army_info = await interaction.client.pool.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', self.army_id)
+        # return to the army menu
+        army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction, conn=interaction.client.pool, army_info=army_info)
+        # update the interaction
+        await self.parent_interaction.edit_original_response(view=army_action_menu)
+        # reply
+        return await interaction.response.send_message(content="Processing...", ephemeral=True, delete_after=0.5)
 
 
 class CNC(commands.Cog):
@@ -7277,7 +7375,7 @@ class CNC(commands.Cog):
     @app_commands.describe(posting="The province to which the army should be posted.", recruit_troops="The number of troops to be recruited into the army upon creation. MUST be a round thousands.")
     async def create_army(self, interaction: discord.Interaction, posting: str, recruit_troops: int = 0):
         # defer the interaction
-        await interaction.response.defer()
+        await interaction.response.defer(ephemeral=True)
         # establish connection
         conn = self.bot.pool
         # check if the user exists
@@ -7356,7 +7454,7 @@ class CNC(commands.Cog):
                     # create the army
                     await conn.execute('''INSERT INTO cnc_armies(owner_id, troops, location, army_name) VALUES ($1, $2, $3, $4);''', user_info['user_id'], recruit_troops, post_info['id'], army_name)
                     # notify
-                    return await interaction.followup.send(f"The {army_name} has been created in {post_info['name']} (ID: {post_info['id']}). It currently has `{recruit_troops:,}` troops. It is not commanded by a General.")
+                    return await interaction.followup.send(f"The {army_name} has been created in {post_info['name']} (ID: {post_info['id']}). It currently has `{recruit_troops:,}` troops. It is not commanded by a General.", ephemeral=False)
                 
                 
     
