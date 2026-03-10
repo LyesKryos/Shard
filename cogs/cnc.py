@@ -6510,7 +6510,7 @@ class GeneralSelectMenu(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         # define variables
-        general_option: self.values[0]
+        general_option= self.values[0]
         conn = interaction.client.pool
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # if the request was not to recruit
