@@ -6496,10 +6496,11 @@ class ArmyDisbandMenu(discord.ui.View):
 
 class GeneralSelectMenu(discord.ui.Select):
 
-    def __init__(self, generals_info: asyncpg.Record, army_id: int):
+    def __init__(self, generals_info: asyncpg.Record, army_id: int, parent_interaction: discord.Interaction):
         # define the variables
         self.army_id = army_id
         self.generals_info = generals_info
+        self.parent_interaction = parent_interaction
 
         # create the options
         options = [discord.SelectOption(label=general['name'], value=general['general_id']) for general in generals_info]
@@ -6524,7 +6525,12 @@ class GeneralSelectMenu(discord.ui.Select):
             # notify
             await interaction.response.send_message(content=f"General {general_name} has been assigned to {army_name}!")
             # stop listening
-            return self.stop()
+            self.stop()
+            # return to the army menu
+            army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction, conn=interaction.client.pool, army_info=army_info)
+            # update the interaction
+            return await self.parent_interaction.edit_original_response(view=army_action_menu)
+
         # if the option was recruit, attempt to recruit a new general
         else:
             # check to ensure that the user has sufficient space for a new general
@@ -6551,8 +6557,15 @@ class GeneralSelectMenu(discord.ui.Select):
                 await conn.execute('''INSERT INTO cnc_generals(owner_id, type, level, army_id, name) VALUES($1, $2, $3, $4, $5);''', user_info['user_id'], choice(['Assault', 'Defensive', 'Seige']), user_info['gen_level'], self.army_id, general_name)
                 # notify user
                 await interaction.response.send_message(f"General {general_name} has been recruited and assigned to command the {army_name}.\nTo view their stats, use /cnc general_info.")
+                # go back to the army menu
+                army_info = await interaction.client.pool.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', self.army_id)
+                # return to the army menu
+                army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction, conn=interaction.client.pool, army_info=army_info)
+                # update the interaction
+                await self.parent_interaction.edit_original_response(view=army_action_menu)
                 # stop listening
                 return self.stop()
+
 
 
 class GeneralSelectView(discord.ui.View):
@@ -6566,7 +6579,7 @@ class GeneralSelectView(discord.ui.View):
         self.user_id = user_id
 
         # add the item
-        self.add_item(GeneralSelectMenu(generals_info=self.generals_info, army_id=self.army_id))
+        self.add_item(GeneralSelectMenu(generals_info=self.generals_info, army_id=self.army_id, parent_interaction=self.parent_interaction))
 
     async def on_timeout(self):
         # disable all children
@@ -7490,8 +7503,8 @@ class CNC(commands.Cog):
         troops = f"{army_info['troops']:,}"
         location = await conn.fetchval('''SELECT name FROM cnc_provinces WHERE id = $1;''', army_info['location'])
         location = f"{location} (ID: {army_info['location']})"
-        general = army_info['general']
-        if general == 0:
+        general = await conn.fetchval('''SELECT general_id FROM cnc_generals WHERE army_id = $1;''', army_id)
+        if general is None:
             general = "None"
         else:
             general_info = await conn.fetchrow('''SELECT *
