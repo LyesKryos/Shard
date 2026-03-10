@@ -6514,8 +6514,10 @@ class GeneralSelectMenu(discord.ui.Select):
         general_option= self.values[0]
         conn = interaction.client.pool
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
-         # get army name
-        army_name = await conn.fetchval('''SELECT army_name FROM cnc_armies WHERE army_id = $1;''', self.army_id)
+        # get army info
+        army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id - $1;''', self.army_id)
+        # define army name
+        army_name = army_info['army_name']
         # if the request was not to recruit
         if general_option != "recruit":
             # cast type
