@@ -70,6 +70,21 @@ def ordinal_suffix(number: int) -> str:
     return f"{number}{suffix}"
 
 
+def rand_name() -> str:
+    """Pulls a random name from the available locales, returning a more diverse spread."""
+    # create the faker
+    fake_locale = Faker()
+    # create a list of locales
+    locales = []
+    for _ in range(10):
+        locales += fake_locale.locale()
+    # now return a name
+    fake_name = Faker(locales)
+    return fake_name.name()
+
+
+
+
 async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> discord.Embed:
     # owner and occupier info
     if prov_info['owner_id'] != 0:
@@ -6522,6 +6537,8 @@ class GeneralSelectMenu(discord.ui.Select):
         if general_option != "recruit":
             # cast type
             general_option = int(general_option)
+            # if the army already has a general, unassign him
+            await conn.execute('''UPDATE cnc_generals SET army_id = NULL WHERE army_id = $1;''', self.army_id)
             # get general name
             general_name = await conn.fetchval('''SELECT name FROM cnc_generals WHERE general_id = $1;''', general_option)
             # reassign the general
@@ -6532,7 +6549,7 @@ class GeneralSelectMenu(discord.ui.Select):
             original_message = await self.parent_interaction.original_response()
             army_embed = original_message.embeds[0]
             # update embed
-            army_embed.set_field_at(4, name="General", value=f"{general_name}")
+            army_embed.set_field_at(3, name="General", value=f"{general_name}")
             # return to the army menu
             army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction, conn=interaction.client.pool, army_info=army_info)
             # update the interaction
@@ -6555,7 +6572,7 @@ class GeneralSelectMenu(discord.ui.Select):
                 # subtract the cost
                 await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 2 WHERE user_id = $1;''', user_info['user_id'])
                 # define the name of the general
-                general_name = Faker().name()
+                general_name = rand_name()
                 # create the general
                 await conn.execute('''INSERT INTO cnc_generals(owner_id, type, level, army_id, name) VALUES($1, $2, $3, $4, $5);''', user_info['user_id'], choice(['Assault', 'Defensive', 'Seige']), user_info['gen_level'], self.army_id, general_name)
                 # notify user
@@ -6566,12 +6583,11 @@ class GeneralSelectMenu(discord.ui.Select):
                 original_message = await self.parent_interaction.original_response()
                 army_embed = original_message.embeds[0]
                 # update embed
-                army_embed.set_field_at(4, name="General", value=f"{general_name}")
+                army_embed.set_field_at(3, name="General", value=f"{general_name}")
                 # return to the army menu
                 army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction, conn=interaction.client.pool, army_info=army_info)
                 # update the interaction
                 return await self.parent_interaction.edit_original_response(view=army_action_menu, embed=army_embed)
-
 
 
 
