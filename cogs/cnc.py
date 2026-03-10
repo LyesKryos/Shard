@@ -6561,7 +6561,7 @@ class GeneralSelectMenu(discord.ui.Select):
                 # notify user
                 await interaction.response.send_message(f"General {general_name} has been recruited and assigned to command the {army_name}.\nTo view their stats, use /cnc general_info.")
                 # go back to the army menu
-                army_info = await interaction.client.pool.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', self.army_id)
+                army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', self.army_id)
                  # call embed
                 original_message = await self.parent_interaction.original_response()
                 army_embed = original_message.embeds[0]
