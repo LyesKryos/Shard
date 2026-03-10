@@ -7324,9 +7324,9 @@ class CNC(commands.Cog):
                         # deny
                         return await interaction.followup.send(f"{user_info['name']} does not have sufficient Economic Authority to create a new army with {recruit_troops:,} troops.", ephemeral=True)
                 # check of the recruitment amount is over the army limit
-                elif recruit_troops > user_info['troop_limit']:
+                elif recruit_troops > user_info['army_size']:
                     # deny
-                    return await interaction.followup.send(f"{recruit_troops:,} exceeds the per-army Troop Limit of {user_info['name']}.", ephemeral=True)
+                    return await interaction.followup.send(f"{recruit_troops:,} exceeds the Army Size limit of {user_info['name']}.", ephemeral=True)
                 # check if the posting location is owned and occupied by the user
                 elif (user_info['user_id'] != post_info['owner_id']) and (user_info['user_id'] != post_info['occupier_id']):
                     # deny
