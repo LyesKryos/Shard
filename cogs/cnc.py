@@ -6535,6 +6535,8 @@ class GeneralSelectMenu(discord.ui.Select):
                 return self.stop()
             # otherwise, carry on
             else:
+                # if the army already has a general, unassign him
+                await conn.execute('''UPDATE cnc_generals SET army_id = NULL WHERE army_id = $1;''', self.army_id)
                 # subtract the cost
                 await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 2 WHERE user_id = $1;''', user_info['user_id'])
                 # define the name of the general
