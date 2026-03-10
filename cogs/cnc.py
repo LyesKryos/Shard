@@ -75,9 +75,7 @@ def rand_name() -> str:
     # create the faker
     fake_locale = Faker()
     # create a list of locales
-    locales = []
-    for _ in range(10):
-        locales.append(fake_locale.locale())
+    locales = ["en_US", "en_TH", "en_PK", "en_PH", "en_NZ", "en_NG", "en_MS", "en_KE", "en_IN", "en_IE", "en_GB", "en_CA", "en_BD", "en_AU", "de_AT", "de_CH", "de_DE", "da_DK", "az_AZ", "cs_CZ", "de_LI", "de_LU", "es_AR", "es_CA", "es_CL", "es_CO", "es_ES", "es_MX", "et_EE", "fi_FI", "fr_BE", "fr_CA", "fr_CH", "fr_FR", "fr_QC", "ga_IE", "ha_NG", "hr_HR", "it_IT", "lt_LT", "lv_LV", "nl_BE", "ro_RO", "sk_SK", "sl_SI", "sv_SE", "uz_UZ", "zu_ZA"]
     # now return a name
     fake_name = Faker(locales)
     return fake_name.name()
