@@ -7348,9 +7348,8 @@ class CNC(commands.Cog):
                             await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $2 WHERE user_id = $1;''', user_info['user_id'], (recruit_troops/1000))
                     # figure out the army name
                     army_name_count = await conn.fetchval('''SELECT count(army_name) FROM cnc_armies WHERE owner_id = $2 AND army_name LIKE $1;''', f"%Army of {post_info['name']}%", user_info['user_id'])
-                    await interaction.followup.send(army_name_count)
                     if army_name_count != 0:
-                        army_name_number = ordinal_suffix(army_name_count)
+                        army_name_number = ordinal_suffix(army_name_count+1)
                         army_name = f"{army_name_number} Army of {post_info['name']}"
                     else:
                         army_name = f"Army of {post_info['name']}"
