@@ -77,12 +77,10 @@ def rand_name() -> str:
     # create a list of locales
     locales = []
     for _ in range(10):
-        locales += fake_locale.locale()
+        locales.append(fake_locale.locale())
     # now return a name
     fake_name = Faker(locales)
     return fake_name.name()
-
-
 
 
 async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> discord.Embed:
