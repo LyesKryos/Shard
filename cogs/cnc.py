@@ -6557,7 +6557,8 @@ class GeneralSelectMenu(discord.ui.Select):
 
 class GeneralSelectView(discord.ui.View):
 
-    def __init__(self, parent_interaction: discord.Interaction, generals_info: asyncpg.Record, army_id: int, user_id: int, timeout=120):
+    def __init__(self, parent_interaction: discord.Interaction, generals_info: asyncpg.Record, army_id: int, user_id: int):
+        super().__init__(timeout=120)
         # define variables
         self.generals_info = generals_info
         self.army_id = army_id
