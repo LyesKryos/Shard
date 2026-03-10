@@ -6084,8 +6084,13 @@ class ArmyActionsView(discord.ui.View):
     async def assign_general(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer the interaction
         await interaction.response.defer()
+        # pull the generals info
+        all_user_generals = await self.conn.fetch('''SELECT * FROM cnc_generals WHERE owner_id = $1;''', interaction.user.id)
         # add the dropdown menu
-
+        general_menu = GeneralSelectView(parent_interaction=self.parent_interaction, generals_info=all_user_generals, army_id=self.army_info['id'], user_id=interaction.user.id)
+        await self.parent_interaction.edit_original_response(view=general_menu)
+        # stop listening
+        self.stop()
 
 
 
@@ -6488,6 +6493,7 @@ class ArmyDisbandMenu(discord.ui.View):
         # stop listening
         return self.stop()        
 
+
 class GeneralSelectMenu(discord.ui.Select):
 
     def __init__(self, generals_info: asyncpg.Record, army_id: int):
@@ -6547,6 +6553,7 @@ class GeneralSelectMenu(discord.ui.Select):
                 await interaction.response.send_message(f"General {general_name} has been recruited and assigned to command the {army_name}.\nTo view their stats, use /cnc general_info.")
                 # stop listening
                 return self.stop()
+
 
 class GeneralSelectView(discord.ui.View):
 
