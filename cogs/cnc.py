@@ -6519,7 +6519,7 @@ class GeneralSelectMenu(discord.ui.Select):
         # if the request was not to recruit
         if general_option != "recruit":
             # get general name
-            general_name = await conn.fetchval('''SELECT name FROM cnc_generals WHERE general_id = $1;''', general_option)
+            general_name = await conn.fetchval('''SELECT name FROM cnc_generals WHERE general_id = $1;''', int(general_option))
             # reassign the general
             await conn.execute('''UPDATE cnc_generals SET army_id = $1 WHERE general_id = $2;''', self.army_id, general_option)
             # notify
@@ -7520,7 +7520,7 @@ class CNC(commands.Cog):
             general_info = await conn.fetchrow('''SELECT *
                                                   FROM cnc_generals
                                                   WHERE general_id = $1;''', general)
-            general = f"{general_info['name']})"
+            general = f"{general_info['name']}"
         movement = army_info['movement']
         # pull userinfo
         userinfo = await user_db_info(owner_id, conn)
