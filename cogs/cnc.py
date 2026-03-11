@@ -6158,7 +6158,6 @@ class ArmyActionsView(discord.ui.View):
         # stop listening
         self.stop()
 
-
     async def embark_army(self, interaction: discord.Interaction, button: discord.ui.Button):
         # establish the connection
         conn = self.conn
