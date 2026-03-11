@@ -6176,7 +6176,7 @@ class ArmyActionsView(View):
             # remove the embark button
             self.remove_item(self.embark_button)
             # add the disembark button
-            disembark_button = discord.ui.button(label="Disembark", style=discord.ButtonStyle.blurple, emoji="\U00002693")
+            disembark_button = discord.ui.Button(label="Disembark", style=discord.ButtonStyle.blurple, emoji="\U00002693")
             disembark_button.callback = self.disembark_army
             self.add_item(disembark_button)
             # update the view
@@ -6194,7 +6194,7 @@ class ArmyActionsView(View):
         # remove the disembark button
         self.remove_item(self.disembark_button)
         # add the embark button
-        embark_button = discord.ui.button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
+        embark_button = discord.ui.Button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
         embark_button.callback = self.embark_army
         self.add_item(embark_button)
         # update the view
@@ -7514,7 +7514,7 @@ class CNC(commands.Cog):
     @app_commands.describe(posting="The province to which the army should be posted.", recruit_troops="The number of troops to be recruited into the army upon creation. MUST be a round thousands.")
     async def create_army(self, interaction: discord.Interaction, posting: str, recruit_troops: int = 0):
         # defer the interaction
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.defer()
         # establish connection
         conn = self.bot.pool
         # check if the user exists
