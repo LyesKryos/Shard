@@ -6184,7 +6184,7 @@ class ArmyActionsView(View):
             # set the embark to "true"
             await conn.execute('''UPDATE cnc_armies SET embark = TRUE WHERE army_id = $1;''', self.army_info['army_id'])
             # notify 
-            return await interaction.response.send_message(content=f"The {army_info['army_name']} is prepared to embark! When moved, it will attempt to reach its destination by sea.")
+            return await interaction.response.send_message(content=f"The {self.army_info['army_name']} is prepared to embark! When moved, it will attempt to reach its destination by sea.")
 
     async def disembark_army(self, interaction: discord.Interaction, button: discord.ui.Button):
         # establish the connection
@@ -6200,7 +6200,7 @@ class ArmyActionsView(View):
         # update the view
         await self.parent_interaction.edit_original_response(view=self)
         # notify
-        return await interaction.response.send_message(content=f"The {army_info['army_name']} has disembarked! It will no longer attempt to move by sea.")
+        return await interaction.response.send_message(content=f"The {self.army_info['army_name']} has disembarked! It will no longer attempt to move by sea.")
 
 
 class ArmyRecruitMenu(discord.ui.View):
