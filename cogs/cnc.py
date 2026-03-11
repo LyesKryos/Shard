@@ -7652,7 +7652,7 @@ class CNC(commands.Cog):
             # pull the army info
             army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', rename_target)
             # check if another army has that name already
-            same_name_check = await conn.fetchrow('''SELEC army_name FROM cnc_armies WHERE army_name = $1;''', rename_content)
+            same_name_check = await conn.fetchrow('''SELECT army_name FROM cnc_armies WHERE army_name = $1;''', rename_content)
             # if that army does not exist
             if army_info is None:
                 # reject
