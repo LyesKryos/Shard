@@ -3146,7 +3146,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                              recipient_info=self.recipient_info)
         return await interaction.edit_original_response(view=puppet_mangaement)
 
-    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def back(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer()
         # return to menu
@@ -6094,13 +6094,13 @@ class ArmyActionsView(View):
         # if the army is not embarked already, add the embark button
         if not army_info['embark']:
             # create the button and add it
-            embark_button = discord.ui.Button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
+            self.embark_button = discord.ui.Button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
             embark_button.callback = self.embark_army
             self.add_item(embark_button)
         # if the army is already embarked, add the disembarked button 
         else:
             # create the button and add it
-            disembark_button = discord.ui.Button(label="Disembark", style=discord.ButtonStyle.blurple, emoji="\U00002693")
+            self.disembark_button = discord.ui.Button(label="Disembark", style=discord.ButtonStyle.blurple, emoji="\U00002693")
             disembark_button.callback = self.disembark_army
             self.add_item(disembark_button)
             
@@ -6158,7 +6158,7 @@ class ArmyActionsView(View):
         # stop listening
         self.stop()
 
-    async def embark_army(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def embark_army(self, interaction: discord.Interaction):
         # establish the connection
         conn = self.conn
         # check the location to see if it is coastal
@@ -6166,7 +6166,7 @@ class ArmyActionsView(View):
         # if the province is not along the coast, reject
         if not coast_check:
             # disable the button
-            button.disabled = True
+            self.embark_button.disabled = True
             # update the view
             await self.parent_interaction.edit_original_response(view=self)
             # reject
@@ -6174,7 +6174,7 @@ class ArmyActionsView(View):
         # otherwise, carry on
         else:
             # remove the embark button
-            self.remove_item(button)
+            self.remove_item(self.embark_button)
             # add the disembark button
             disembark_button = discord.ui.button(label="Disembark", style=discord.ButtonStyle.blurple, emoji="\U00002693")
             disembark_button.callback = self.disembark_army
@@ -6192,7 +6192,7 @@ class ArmyActionsView(View):
         # reverse the embark
         await conn.execute('''UPDATE cnc_armies SET embark = FALSE WHERE army_id = $1;''', self.army_info['army_id'])
         # remove the disembark button
-        self.remove_item(button)
+        self.remove_item(self.disembark_button)
         # add the embark button
         embark_button = discord.ui.button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
         embark_button.callback = self.embark_army
@@ -6682,7 +6682,6 @@ class GeneralSelectMenu(discord.ui.Select):
                 army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction, conn=interaction.client.pool, army_info=army_info)
                 # update the interaction
                 return await self.parent_interaction.edit_original_response(view=army_action_menu, embed=army_embed)
-
 
 
 class GeneralSelectView(discord.ui.View):
