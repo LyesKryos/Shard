@@ -15,6 +15,8 @@ import math
 import time
 import heapq
 from faker import Faker
+from faker.exceptions import UniquenessException
+import re
 
 
 async def safe_dm(bot: discord.Client, user_id: int, *, content: str | None = None,
@@ -72,13 +74,52 @@ def ordinal_suffix(number: int) -> str:
 
 def rand_name() -> str:
     """Pulls a random name from the available locales, returning a more diverse spread."""
-    # create the faker
-    fake_locale = Faker()
-    # create a list of locales
-    locales = ["en_US", "en_TH", "en_PK", "en_PH", "en_NZ", "en_NG", "en_MS", "en_KE", "en_IN", "en_IE", "en_GB", "en_CA", "en_BD", "en_AU", "de_AT", "de_CH", "de_DE", "da_DK", "az_AZ", "cs_CZ", "de_LI", "de_LU", "es_AR", "es_CA", "es_CL", "es_CO", "es_ES", "es_MX", "et_EE", "fi_FI", "fr_BE", "fr_CA", "fr_CH", "fr_FR", "fr_QC", "ga_IE", "ha_NG", "hr_HR", "it_IT", "lt_LT", "lv_LV", "nl_BE", "ro_RO", "sk_SK", "sl_SI", "sv_SE", "uz_UZ", "zu_ZA"]
+    # define the list of locales
+    locales = ["en_US", "en_TH", "en_PK", "en_PH", "en_NZ", "en_NG", "en_MS", "en_KE", "en_IN", "en_IE", "en_GB", "en_CA", "en_BD", "en_AU", "de_AT", "de_CH", "de_DE", "da_DK", "az_AZ", "cs_CZ", "de_LI", "de_LU", "es_AR", "es_CA", "es_CL", "es_CO", "es_ES", "es_MX", "et_EE", "fi_FI", "fr_BE", "fr_CA", "fr_CH", "fr_FR", "ga_IE", "ha_NG", "hr_HR", "it_IT", "lt_LT", "lv_LV", "nl_BE", "ro_RO", "sk_SK", "sl_SI", "sv_SE", "uz_UZ", "zu_ZA"]
     # now return a name
     fake_name = Faker(locales)
     return fake_name.name()
+
+def rand_location_name() -> str:
+    """Pulls a random location name from the available locales, returning a more diverse spread of location names."""
+    # define the list of locales
+    locales = ["en_US", "en_TH", "en_PK", "en_PH", "en_NZ", "en_NG", "en_MS", "en_KE", "en_IN", "en_IE", "en_GB", "en_CA", "en_BD", "en_AU", "de_AT", "de_CH", "de_DE", "da_DK", "az_AZ", "cs_CZ", "de_LI", "de_LU", "es_AR", "es_CA", "es_CL", "es_CO", "es_ES", "es_MX", "et_EE", "fi_FI", "fr_BE", "fr_CA", "fr_CH", "fr_FR", "ga_IE", "ha_NG", "hr_HR", "it_IT", "lt_LT", "lv_LV", "nl_BE", "ro_RO", "sk_SK", "sl_SI", "sv_SE", "uz_UZ", "zu_ZA"]
+    # generate and return a location name
+    fake_location = Faker(locales)
+    return fake_location.city()
+
+def rand_location_name_list(list_range: int) -> List[str]:
+    """Pulls a list of unique location names. The list is the length specified by 'range'."""
+    # define the list of locales
+    locales = ["en_US", "en_TH", "en_PK", "en_PH", "en_NZ", "en_NG", "en_MS", "en_KE", "en_IN", "en_IE", "en_GB", "en_CA", "en_BD", "en_AU", "de_AT", "de_CH", "de_DE", "da_DK", "az_AZ", "cs_CZ", "de_LI", "de_LU", "es_AR", "es_CA", "es_CL", "es_CO", "es_ES", "es_MX", "et_EE", "fi_FI", "fr_BE", "fr_CA", "fr_CH", "fr_FR", "ga_IE", "ha_NG", "hr_HR", "it_IT", "lt_LT", "lv_LV", "nl_BE", "ro_RO", "sk_SK", "sl_SI", "sv_SE", "uz_UZ", "zu_ZA"]
+    # define the locale proxies, active locales, and the results
+    locale_fakers = {locale: Faker(locale) for locale in locales}
+    active_locales = list(locales)
+    results = []
+    # define the regex tag pattern
+    _TAG_PATTERN = re.compile(r'[\d()]')
+
+    # while the results are not long enough, loop through the locales and get unique names
+    while len(results) < list_range:
+        # if there are no active locales left to look through
+        if not active_locales:            
+            raise RuntimeError(f"All locales exhausted at length: {len(results)}. Results are as follows:\n{results}")
+        # cycle through active locales, dropping any that are exhausted
+        for locale in list(active_locales):
+            # if there are enough results, break
+            if len(results) >= list_range:
+                break
+            # try to append a unique value to the results
+            try:
+                locality_name = locale_fakers[locale].unique.city()
+                if not _TAG_PATTERN.search(city):
+                    results.append(city)
+            # if we have run out, then remove the locale from the active locales and keep trying with the remaining locales
+            except UniquenessException:
+                active_locales.remove(locale)
+    # when you are all done with the list (or have run out of locales), return the list of results
+    return results
+            
 
 
 async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> discord.Embed:
@@ -6103,6 +6144,11 @@ class ArmyActionsView(discord.ui.View):
         # stop listening
         self.stop()
 
+    @discord.ui.button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
+    async def embark_army(self, interaction: discord.Interaction, button:discord.ui.Button):
+        # defer the interaction
+        await interaction.response.defer()
+        # do the rest of the code here
 
 
 class ArmyRecruitMenu(discord.ui.View):
@@ -7389,7 +7435,7 @@ class CNC(commands.Cog):
     # === Army Commands ===
 
     async def army_autocomplete(self, interaction: discord.Interaction, army_typing: str) -> List[app_commands.Choice(str)]:
-        """This function searches for current player nations and then returns them as a list for autocomplete."""
+        """This function searches for all existing armies and then returns them as a list for autocomplete."""
 
         # establish connection
         conn = self.bot.pool
@@ -7589,6 +7635,44 @@ class CNC(commands.Cog):
                                                                               f"**Location**: {location}\n"
                                                                               f"**General**: {general}")
         return await interaction.followup.send(embed=armies_embed)
+
+    @cnc.command(name="rename_army", description="Renames a given army to the selected user input.")
+    @app_commands.describe(rename_target="The ID of the army to rename.", rename_content="The new name of the army.")
+    @app_commands.autocomplete(rename_target=army_autocomplete)
+    async def rename_army(self, interaction: discord.Interaction, rename_target: int, rename_content: str):
+        # establish the connection
+        conn = self.bot.pool
+        # search for the user
+        user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+        # if the user is not registered
+        if user_info is None:
+            return await interaction.response.send_message(content="You are not a registered member of the CNC system. Use </cnc register:1316831583159849021> to register.")
+        # otherwise, carry on
+        else:
+            # pull the army info
+            army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', rename_target)
+            # check if another army has that name already
+            same_name_check = await conn.fetchrow('''SELEC army_name FROM cnc_armies WHERE army_name = $1;''', rename_content)
+            # if that army does not exist
+            if army_info is None:
+                # reject
+                return await interaction.response.send_message(content=f"No army with the ID `{rename_target}` found.", ephemeral=True)
+            # if the user is not the owner of the army
+            elif army_info['owner_id'] != interaction.user.id:
+                # reject
+                return await interaction.response.send_message(content=f"{user_info['name']} does not commant the {army_info['army_name']} and therefore cannot rename it.")
+            # if another army already exists with that name
+            elif same_name_check is not None:
+                # reject
+                return await interaction.response.send_message(content=f"The {army_info['army_name']} cannot be renamed to `{rename_content}` because another army with that name already exists.")
+            # otherwise, carry on
+            else:
+                # rename the army to the user's specified content
+                await conn.execute('''UPDATE cnc_armies SET army_name = $1 WHERE army_id = $2;''', rename_content, rename_target)
+                # notify the user
+                return await interaction.response.send_message(content=f"The {army_info['army_name']} has be renamed to the `{rename_content}`!")
+
+    # === War Commands ===
 
     @cnc.command(name="view_wars", description="Displays information about all ongoing wars.")
     @app_commands.describe(view_all="Optional: select True for viewing all ongoing wars.")
@@ -8473,6 +8557,7 @@ class CNC(commands.Cog):
         else:
             path, cost = pathfinder
             return await ctx.send(f"The total cost of the path is {cost} Movement points.\nThe shortest path calculated is: {path}.")
+
 
 async def setup(bot: Shard):
     # define the cog and add the cog
