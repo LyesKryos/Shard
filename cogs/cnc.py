@@ -6186,7 +6186,7 @@ class ArmyActionsView(View):
             # notify 
             return await interaction.response.send_message(content=f"The {self.army_info['army_name']} is prepared to embark! When moved, it will attempt to reach its destination by sea.")
 
-    async def disembark_army(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def disembark_army(self, interaction: discord.Interaction):
         # establish the connection
         conn = self.conn
         # reverse the embark
