@@ -6176,9 +6176,7 @@ class ArmyActionsView(View):
             # remove the embark button
             self.remove_item(self.embark_button)
             # add the disembark button
-            disembark_button = discord.ui.Button(label="Disembark", style=discord.ButtonStyle.blurple, emoji="\U00002693")
-            disembark_button.callback = self.disembark_army
-            self.add_item(disembark_button)
+            self.add_item(self.disembark_button)
             # update the view
             await self.parent_interaction.edit_original_response(view=self)
             # set the embark to "true"
@@ -6194,9 +6192,7 @@ class ArmyActionsView(View):
         # remove the disembark button
         self.remove_item(self.disembark_button)
         # add the embark button
-        embark_button = discord.ui.Button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
-        embark_button.callback = self.embark_army
-        self.add_item(embark_button)
+        self.add_item(self.embark_button)
         # update the view
         await self.parent_interaction.edit_original_response(view=self)
         # notify
