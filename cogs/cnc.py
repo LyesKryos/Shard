@@ -6090,6 +6090,18 @@ class ArmyActionsView(discord.ui.View):
         self.parent_interaction = parent_interaction
         self.conn = conn
         self.army_info = army_info
+        
+        # if the army is not embarked already, add the embark button
+        if not army_info['embark']:
+            # create the button and add it
+            embark_button = discord.ui.button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
+            embark_button.callback = embark_army
+            self.add_item(embark_button)
+        # if the army is already embarked, add the disembarked button 
+        else:
+            # create the button and add it
+            disembark_button = discord.ui.button(label="Disembark", style=discord.ButtonStyle.blurple, emoji="\U00002693")
+            
     
     async def on_timeout(self):
         # disable all buttons
@@ -6144,7 +6156,7 @@ class ArmyActionsView(discord.ui.View):
         # stop listening
         self.stop()
 
-    @discord.ui.button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
+
     async def embark_army(self, interaction: discord.Interaction, button: discord.ui.Button):
         # establish the connection
         conn = self.conn
@@ -6160,10 +6172,34 @@ class ArmyActionsView(discord.ui.View):
             return await interaction.response.send_message(content=f"The {army_info['army_name']} cannot embark as it is not in a coastal province.", ephemeral=True)
         # otherwise, carry on
         else:
+            # remove the embark button
+            self.remove_item(button)
+            # add the disembark button
+            disembark_button = discord.ui.button(label="Disembark", style=discord.ButtonStyle.blurple, emoji="\U00002693")
+            disembark_button.callback = self.disembark_army
+            self.add_item(disembark_button)
+            # update the view
+            await self.parent_interaction.edit_original_response(view=self)
             # set the embark to "true"
             await conn.execute('''UPDATE cnc_armies SET embark = TRUE WHERE army_id = $1;''', self.army_info['army_id'])
             # notify 
             return await interaction.response.send_message(content=f"The {army_info['army_name']} is prepared to embark! When moved, it will attempt to reach its destination by sea.")
+
+    async def disembark_army(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # establish the connection
+        conn = self.conn
+        # reverse the embark
+        await conn.execute('''UPDATE cnc_armies SET embark = FALSE WHERE army_id = $1;''', self.army_info['army_id'])
+        # remove the disembark button
+        self.remove_item(button)
+        # add the embark button
+        embark_button = discord.ui.button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
+        embark_button.callback = embark_army
+        self.add_item(embark_button)
+        # update the view
+        await self.parent_interaction.edit_original_response(view=self)
+        # notify
+        return await interaction.response.send_message(content=f"The {army_info['army_name']} has disembarked! It will no longer attempt to move by sea.")
 
 
 class ArmyRecruitMenu(discord.ui.View):
