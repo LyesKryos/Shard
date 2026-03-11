@@ -6083,7 +6083,7 @@ class PeaceNegotiationGiveProvincesDropdown(discord.ui.Select):
 
 # === Army Actions ===
 
-class ArmyActionsView(discord.ui.View):
+class ArmyActionsView(View):
 
     def __init__(self, parent_interaction: discord.Interaction, conn: asyncpg.Pool, army_info: asyncpg.Record):
         super().__init__(timeout=120)
@@ -6094,13 +6094,13 @@ class ArmyActionsView(discord.ui.View):
         # if the army is not embarked already, add the embark button
         if not army_info['embark']:
             # create the button and add it
-            embark_button = discord.ui.button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
+            embark_button = discord.ui.Button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
             embark_button.callback = self.embark_army
             self.add_item(embark_button)
         # if the army is already embarked, add the disembarked button 
         else:
             # create the button and add it
-            disembark_button = discord.ui.button(label="Disembark", style=discord.ButtonStyle.blurple, emoji="\U00002693")
+            disembark_button = discord.ui.Button(label="Disembark", style=discord.ButtonStyle.blurple, emoji="\U00002693")
             disembark_button.callback = self.disembark_army
             self.add_item(disembark_button)
             
