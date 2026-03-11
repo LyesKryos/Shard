@@ -6095,12 +6095,14 @@ class ArmyActionsView(discord.ui.View):
         if not army_info['embark']:
             # create the button and add it
             embark_button = discord.ui.button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
-            embark_button.callback = embark_army
+            embark_button.callback = self.embark_army
             self.add_item(embark_button)
         # if the army is already embarked, add the disembarked button 
         else:
             # create the button and add it
             disembark_button = discord.ui.button(label="Disembark", style=discord.ButtonStyle.blurple, emoji="\U00002693")
+            disembark_button.callback = self.disembark_army
+            self.add_item(disembark_button)
             
     
     async def on_timeout(self):
@@ -6194,7 +6196,7 @@ class ArmyActionsView(discord.ui.View):
         self.remove_item(button)
         # add the embark button
         embark_button = discord.ui.button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
-        embark_button.callback = embark_army
+        embark_button.callback = self.embark_army
         self.add_item(embark_button)
         # update the view
         await self.parent_interaction.edit_original_response(view=self)
