@@ -6145,10 +6145,25 @@ class ArmyActionsView(discord.ui.View):
         self.stop()
 
     @discord.ui.button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
-    async def embark_army(self, interaction: discord.Interaction, button:discord.ui.Button):
-        # defer the interaction
-        await interaction.response.defer()
-        # do the rest of the code here
+    async def embark_army(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # establish the connection
+        conn = self.conn
+        # check the location to see if it is coastal
+        coast_check = await conn.fetchval('''SELECT coast FROM cnc_provinces WHERE id = $1;''', self.army_info['location'])
+        # if the province is not along the coast, reject
+        if not coast_check:
+            # disable the button
+            button.disabled = True
+            # update the view
+            await self.parent_interaction.edit_original_response(view=self)
+            # reject
+            return await interaction.response.send_message(content=f"The {army_info['army_name']} cannot embark as it is not in a coastal province.", ephemeral=True)
+        # otherwise, carry on
+        else:
+            # set the embark to "true"
+            await conn.execute('''UPDATE cnc_armies SET embark = TRUE WHERE army_id = $1;''', self.army_info['army_id'])
+            # notify 
+            return await interaction.response.send_message(content=f"The {army_info['army_name']} is prepared to embark! When moved, it will attempt to reach its destination by sea.")
 
 
 class ArmyRecruitMenu(discord.ui.View):
@@ -7660,7 +7675,7 @@ class CNC(commands.Cog):
             # if the user is not the owner of the army
             elif army_info['owner_id'] != interaction.user.id:
                 # reject
-                return await interaction.response.send_message(content=f"{user_info['name']} does not commant the {army_info['army_name']} and therefore cannot rename it.")
+                return await interaction.response.send_message(content=f"{user_info['name']} does not command the {army_info['army_name']} and therefore cannot rename it.")
             # if another army already exists with that name
             elif same_name_check is not None:
                 # reject
