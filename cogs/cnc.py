@@ -2570,6 +2570,31 @@ class CooperativeDiplomaticActions(discord.ui.View):
         self.add_item(back_button)
 
     async def interaction_check(self, interaction: discord.Interaction):
+        # pull user info
+        user_info = await user_db_info(interaction.user.id, self.conn)
+        # government type checks
+        if self.recipient_info['govt_subtype'] == "Parish":
+            return await interaction.response.send_message("Voluntary diplomatic relations are disabled for nations with the"
+                                                   " Parish Equalism ideology.")
+        elif ("Anarchic" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']] and
+                "Equalism" not in [self.recipient_info['govt_type'], user_info['govt_type']]):
+            return await interaction.response.send_message(
+                "Nations with Anarchic Equalism cannot accept diplomatic relations with "
+                "non-Equalist nations.")
+        elif (("Postcolonial" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']]) and
+                (any(idea not in ["Equalism", "Anarchy"]) for idea in
+                 [self.recipient_info['govt_type'], user_info['govt_type']])):
+            return await interaction.response.send_message(
+                "Nations with Postcolonial Anarchy cannot accept diplomatic relations "
+                "with any non-Equalist or non-Anarchic nations.")
+        elif self.recipient_info['govt_subtype'] in ["Primivitist", "Radical"]:
+            return await interaction.response.send_message("Nations with Primitivist or Radical Anarchy cannot take "
+                                                   "any diplomatic actions.")
+        # if either nation is pacificistic, it cannot participate in anything but diplomatic relations
+        elif "Pacifistic" in [self.recipient_info['govt_subtype'], self.recipient_info['govt_type']]:
+            return await interaction.response.send_message("Nations with the Pacifistic Anarchy ideology cannot use any "
+                                                   "diplomatic action other than Diplomatic Relations.")
+        # otherwise, check for the right user
         return interaction.user.id == self.interaction.user.id
 
     async def on_timeout(self):
@@ -2585,28 +2610,6 @@ class CooperativeDiplomaticActions(discord.ui.View):
         user_info = await user_db_info(interaction.user.id, self.conn)
         # create the recipient user
         recipient_user = self.bot.get_user(self.recipient_info['user_id'])
-        # government type checks
-        if self.recipient_info['govt_subtype'] == "Parish":
-            return await interaction.followup.send("Voluntary diplomatic relations are disabled for nations with the"
-                                                   " Parish Equalism ideology.")
-        if ("Anarchic" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']] and
-                "Equalism" not in [self.recipient_info['govt_type'], user_info['govt_type']]):
-            return await interaction.followup.send(
-                "Nations with Anarchic Equalism cannot accept diplomatic relations with "
-                "non-Equalist nations.")
-        if (("Postcolonial" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']]) and
-                (any(idea not in ["Equalism", "Anarchy"]) for idea in
-                 [self.recipient_info['govt_type'], user_info['govt_type']])):
-            return await interaction.followup.send(
-                "Nations with Postcolonial Anarchy cannot accept diplomatic relations "
-                "with any non-Equalist or non-Anarchic nations.")
-        elif self.recipient_info['govt_subtype'] in ["Primivitist", "Radical"]:
-            return await interaction.followup.send("Nations with Primitivist or Radical Anarchy cannot take "
-                                                   "any diplomatic actions.")
-        # if either nation is pacificistic, it cannot participate in anything but diplomatic relations
-        if "Pacifistic" in [self.recipient_info['govt_subtype'], self.recipient_info['govt_type']]:
-            return await interaction.followup.send("Nations with the Pacifistic Anarchy ideology cannot use any "
-                                                   "diplomatic action other than Diplomatic Relations.")
         # check if the nation already has diplomatic relations
         dp_check = await self.conn.fetchrow('''SELECT *
                                                FROM cnc_drs
@@ -2658,30 +2661,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"{self.recipient_info['name']} is already considering an "
                                                    f"existing proposal from {user_info['name']}.")
-        # check if the user has any hostile actions
-        # check wars
-        war_check = await self.conn.fetchrow('''SELECT *
-                                                FROM cnc_wars
-                                                WHERE (($1 = ANY(attackers) AND $2 = ANY(defenders))
-                                                    OR ($1 = ANY(defenders) AND $2 = ANY(attackers)))
-                                                  AND active;;''',
-                                        user_info['name'], self.recipient_info['name'])
-        if war_check is not None:
-            button.disabled = True
-            await interaction.edit_original_response(view=self)
-            return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.")
-        # check embargoes
-        embargoes = await self.conn.fetchrow('''SELECT *
-                                                FROM cnc_embargoes
-                                                WHERE $1 = ANY(array[sender, target])
-                                                  AND $2 = ANY(array[sender, target]);''',
-                                             user_info['name'], self.recipient_info['name'])
-        if embargoes is not None:
-            button.disabled = True
-            await interaction.edit_original_response(view=self)
-            return await interaction.followup.send(
-                "Cooperative diplomatic actions are disabled for hostile nations.\n"
-                "*Embargoes are considered hostile actions.*")
+
         # check to ensure that the sender has sufficient political authority
         if user_info['pol_auth'] < 1:
             button.disabled = True
@@ -2726,32 +2706,6 @@ class CooperativeDiplomaticActions(discord.ui.View):
         user_info = await user_db_info(interaction.user.id, self.conn)
         # get recipient user
         recipient_user = self.bot.get_user(self.recipient_info['user_id'])
-        # government type checks
-        if self.recipient_info['govt_subtype'] == "Parish":
-            button.disabled = True
-            await interaction.edit_original_response(view=self)
-            return await interaction.followup.send("Voluntary diplomatic relations are disabled for nations with the"
-                                                   " Parish Equalism ideology.")
-        if ("Anarchic" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']] and
-                "Equalism" not in [self.recipient_info['govt_type'], user_info['govt_type']]):
-            button.disabled = True
-            await interaction.edit_original_response(view=self)
-            return await interaction.followup.send(
-                "Nations with Anarchic Equalism cannot accept diplomatic relations with "
-                "non-Equalist nations.")
-        if (("Postcolonial" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']]) and
-                (any(idea not in ["Equalism", "Anarchy"]) for idea in
-                 [self.recipient_info['govt_type'], user_info['govt_type']])):
-            button.disabled = True
-            await interaction.edit_original_response(view=self)
-            return await interaction.followup.send(
-                "Nations with Postcolonial Anarchy cannot accept diplomatic relations "
-                "with any non-Equalist or non-Anarchic nations.")
-        elif self.recipient_info['govt_subtype'] in ["Primivitist", "Radical"]:
-            button.disabled = True
-            await interaction.edit_original_response(view=self)
-            return await interaction.followup.send("Nations with Primitivist or Radical Anarchy cannot take "
-                                                   "any diplomatic actions.")
         # if either nation is pacificistic, it cannot participate in anything but diplomatic relations
         if "Pacifistic" in [self.recipient_info['govt_subtype'], self.recipient_info['govt_type']]:
             button.disabled = True
@@ -2844,29 +2798,6 @@ class CooperativeDiplomaticActions(discord.ui.View):
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"{self.recipient_info['name']} is already considering an "
                                                    f"existing proposal from {user_info['name']}.")
-        # check if the user has any hostile actions
-        # check wars
-        war_check = await self.conn.fetchrow('''SELECT *
-                                                FROM cnc_wars
-                                                WHERE (($1 = ANY(attackers) AND $2 = ANY(defenders))
-                                                    OR ($1 = ANY(defenders) AND $2 = ANY(attackers)))
-                                                  AND active;''',
-                                        user_info['name'], self.recipient_info['name'])
-        if war_check is not None:
-            button.disabled = True
-            await interaction.edit_original_response(view=self)
-            return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.")
-        # check embargoes
-        embargoes = await self.conn.fetchrow('''SELECT *
-                                                FROM cnc_embargoes
-                                                WHERE $1 = ANY(array[sender, target])
-                                                  AND $2 = ANY(array[sender, target]);''',
-                                             user_info['name'], self.recipient_info['name'])
-        if embargoes is not None:
-            button.disabled = True
-            await interaction.edit_original_response(view=self)
-            return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.\n"
-                                                   "*Embargoes are considered hostile actions.*")
         # check to ensure that the sender has sufficient military authority
         if user_info['mil_auth'] < 1:
             # disable button
@@ -2907,28 +2838,6 @@ class CooperativeDiplomaticActions(discord.ui.View):
         user_info = await user_db_info(interaction.user.id, self.conn)
         # create the recipient user
         recipient_user = self.bot.get_user(self.recipient_info['user_id'])
-        # government type checks
-        if self.recipient_info['govt_subtype'] == "Parish":
-            return await interaction.followup.send("Voluntary diplomatic actions are disabled for nations with the"
-                                                   " Parish Equalism ideology.")
-        if ("Anarchic" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']] and
-                "Equalism" not in [self.recipient_info['govt_type'], user_info['govt_type']]):
-            return await interaction.followup.send(
-                "Nations with Anarchic Equalism cannot accept diplomatic actions from "
-                "non-Equalist nations.")
-        if (("Postcolonial" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']]) and
-                (any(idea not in ["Equalism", "Anarchy"]) for idea in
-                 [self.recipient_info['govt_type'], user_info['govt_type']])):
-            return await interaction.followup.send(
-                "Nations with Postcolonial Anarchy cannot accept diplomatic actions "
-                "from any non-Equalist or non-Anarchic nations.")
-        elif self.recipient_info['govt_subtype'] in ["Primivitist", "Radical"]:
-            return await interaction.followup.send("Nations with Primitivist or Radical Anarchy cannot take "
-                                                   "any diplomatic actions.")
-        # if either nation is pacificistic, it cannot participate in anything but diplomatic relations
-        if "Pacifistic" in [self.recipient_info['govt_subtype'], self.recipient_info['govt_type']]:
-            return await interaction.followup.send("Nations with the Pacifistic Anarchy ideology cannot use any "
-                                                   "diplomatic action other than Diplomatic Relations.")
         # check if the nation already has diplomatic relations
         tp_check = await self.conn.fetchrow('''SELECT *
                                                FROM cnc_trade_pacts
@@ -2978,29 +2887,6 @@ class CooperativeDiplomaticActions(discord.ui.View):
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"{self.recipient_info['name']} is already considering an "
                                                    f"existing proposal from {user_info['name']}.")
-        # check if the user has any hostile actions
-        # check wars
-        war_check = await self.conn.fetchrow('''SELECT *
-                                                FROM cnc_wars
-                                                WHERE (($1 = ANY(attackers) AND $2 = ANY(defenders))
-                                                    OR ($1 = ANY(defenders) AND $2 = ANY(attackers)))
-                                                  AND active;''',
-                                        user_info['name'], self.recipient_info['name'])
-        if war_check is not None:
-            button.disabled = True
-            await interaction.edit_original_response(view=self)
-            return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.")
-        # check embargoes
-        embargoes = await self.conn.fetchrow('''SELECT *
-                                                FROM cnc_embargoes
-                                                WHERE $1 = ANY(array[sender, target])
-                                                  AND $2 = ANY(array[sender, target]);''',
-                                             user_info['name'], self.recipient_info['name'])
-        if embargoes is not None:
-            button.disabled = True
-            await interaction.edit_original_response(view=self)
-            return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.\n"
-                                                   "*Embargoes are considered hostile actions.*")
         # check to ensure that the sender has sufficient political authority
         if user_info['pol_auth'] < 1:
             button.disabled = True
@@ -3034,33 +2920,50 @@ class CooperativeDiplomaticActions(discord.ui.View):
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=diplo_menu)
 
+    @discord.ui.button(label="Military Access", style=discord.ButtonStyle.blurple, emoji="\U0001f6e4")
+    async def military_access(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # pull user info
+        user_info = await user_db_info(interaction.user.id, self.conn)
+        # check if the nation already has military access
+        mil_access = await conn.fetchrow('''SELECT * FROM cnc_military_access WHERE $1 = ANY(members) AND $2 = ANY(members);''', user_info['name'], self.recipient_info['name'])
+        # if there is already military access, query termination
+        if mil_access:
+            # create the accept view
+            accept_view = Accept(interaction=interaction)
+            remove_msg = await interaction.followup.send(
+                f"{self.recipient_info['name']} has already established military access with {user_info['name']}."
+                f"\nWould you like to end the military access?", view=accept_view)
+            # wait for the accept/deny response
+            await accept_view.wait()
+            # if accept
+            if accept_view.value:
+                # remove diplomatic relations
+                await self.conn.execute('''DELETE
+                                           FROM cnc_military_access
+                                           WHERE id = $1;''', mil_access['id'])
+                await remove_msg.edit(view=None)
+                await safe_dm(bot=interaction.client, user_id=self.recipient_info['user_id'], content=f"{user_info['name']} has ended our Military Access Agreement. All armies within their territory shall return to one of our provinces.")
+                # return to menu
+                diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+                await interaction.edit_original_response(view=diplo_menu)
+                return await interaction.followup.send(f"{user_info['name']} has ended their Military Access Agreement "
+                                                       f"{self.recipient_info['name']}.")
+            if not accept_view.value:
+                # renable button
+                button.disabled = False
+                await interaction.edit_original_response(view=self)
+                # remove accept/deny buttons
+                return await remove_msg.edit(view=None)
+
+        
+
     async def propose_subjugation(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer()
         # pull user info
         user_info = await user_db_info(interaction.user.id, self.conn)
-        # government type checks
-        if self.recipient_info['govt_subtype'] == "Parish":
-            return await interaction.followup.send("Voluntary diplomatic actions are disabled for nations with the"
-                                                   " Parish Equalism ideology.")
-        if ("Anarchic" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']] and
-                "Equalism" not in [self.recipient_info['govt_type'], user_info['govt_type']]):
-            return await interaction.followup.send(
-                "Nations with Anarchic Equalism cannot accept diplomatic actions from "
-                "non-Equalist nations.")
-        if (("Postcolonial" in [self.recipient_info['govt_subtype'], user_info['govt_subtype']]) and
-                (any(idea not in ["Equalism", "Anarchy"]) for idea in
-                 [self.recipient_info['govt_type'], user_info['govt_type']])):
-            return await interaction.followup.send(
-                "Nations with Postcolonial Anarchy cannot accept diplomatic actions "
-                "from any non-Equalist or non-Anarchic nations.")
-        elif self.recipient_info['govt_subtype'] in ["Primivitist", "Radical"]:
-            return await interaction.followup.send("Nations with Primitivist or Radical Anarchy cannot take "
-                                                   "any diplomatic actions.")
-        # if either nation is pacificistic, it cannot participate in anything but diplomatic relations
-        if "Pacifistic" in [self.recipient_info['govt_subtype'], self.recipient_info['govt_type']]:
-            return await interaction.followup.send("Nations with the Pacifistic Anarchy ideology cannot use any "
-                                                   "diplomatic action other than Diplomatic Relations.")
         # if the user already has an overlord, deny
         if self.recipient_info['overlord'] is not None:
             button.disabled = True
