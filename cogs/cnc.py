@@ -1,5 +1,6 @@
 from __future__ import annotations
 from random import randrange, randint, choice
+from typing import List
 import asyncpg
 from discord import app_commands, Interaction
 from discord._types import ClientT
@@ -112,8 +113,8 @@ def rand_location_name_list(list_range: int) -> List[str]:
             # try to append a unique value to the results
             try:
                 locality_name = locale_fakers[locale].unique.city()
-                if not _TAG_PATTERN.search(city):
-                    results.append(city)
+                if not _TAG_PATTERN.search(locality_name):
+                    results.append(locality_name)
             # if we have run out, then remove the locale from the active locales and keep trying with the remaining locales
             except UniquenessException:
                 active_locales.remove(locale)
@@ -2891,8 +2892,8 @@ class CooperativeDiplomaticActions(discord.ui.View):
         if user_info['pol_auth'] < 1:
             button.disabled = True
             await interaction.edit_original_response(view=self)
-            return await interaction.followup.send("You do not have sufficient Political Authority to send that "
-                                                   "proposal.")
+            return await interaction.followup.send(f"{user_info['name']} does not have enough Political Authority to "
+                                                   f"send that proposal.")
         # otherwise, send the message
         recipient_dm = await safe_dm(bot=self.bot, user_id=self.recipient_info['user_id'],
                                      content=f"The {user_info['pretitle']} of {user_info['name']} has issued a request "
@@ -2916,6 +2917,8 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                    SET pol_auth = pol_auth - 1
                                    WHERE user_id = $1;''',
                                 user_info['user_id'])
+        # stop listening
+        self.stop()
         # return to menu
         diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
         return await interaction.edit_original_response(view=diplo_menu)
@@ -2924,12 +2927,27 @@ class CooperativeDiplomaticActions(discord.ui.View):
     async def military_access(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer()
+        # establish conn
+        conn = self.conn
         # pull user info
         user_info = await user_db_info(interaction.user.id, self.conn)
         # check if the nation already has military access
-        mil_access = await conn.fetchrow('''SELECT * FROM cnc_military_access WHERE $1 = ANY(members) AND $2 = ANY(members);''', user_info['name'], self.recipient_info['name'])
+        mil_access = await conn.fetchrow('''SELECT * FROM cnc_military_access 
+                                            WHERE $1 = ANY(members) AND $2 = ANY(members);''',
+                                         user_info['name'], self.recipient_info['name'])
+        # check for pending military access request
+        pending_check = await self.conn.fetchrow('''SELECT *
+                                                    FROM cnc_pending_requests
+                                                    WHERE $1 = ANY (members)
+                                                      AND $2 = ANY (members)
+                                                      AND type = 'Military Access';''',
+                                                 user_info['name'], self.recipient_info['name'])
         # if there is already military access, query termination
         if mil_access:
+            # disable the button
+            button.disabled = True
+            # update the view
+            await interaction.edit_original_response(view=self)
             # create the accept view
             accept_view = Accept(interaction=interaction)
             remove_msg = await interaction.followup.send(
@@ -2944,20 +2962,65 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                            FROM cnc_military_access
                                            WHERE id = $1;''', mil_access['id'])
                 await remove_msg.edit(view=None)
-                await safe_dm(bot=interaction.client, user_id=self.recipient_info['user_id'], content=f"{user_info['name']} has ended our Military Access Agreement. All armies within their territory shall return to one of our provinces.")
+                await safe_dm(bot=interaction.client, user_id=self.recipient_info['user_id'], 
+                              content=f"{user_info['name']} has ended our Military Access Agreement. "
+                                      f"All armies within their territory shall return to one of our provinces.")
                 # return to menu
                 diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
                 await interaction.edit_original_response(view=diplo_menu)
                 return await interaction.followup.send(f"{user_info['name']} has ended their Military Access Agreement "
                                                        f"{self.recipient_info['name']}.")
-            if not accept_view.value:
+            # if not accept
+            else:
                 # renable button
                 button.disabled = False
                 await interaction.edit_original_response(view=self)
                 # remove accept/deny buttons
                 return await remove_msg.edit(view=None)
-
-        
+        # if there is a pending request
+        elif pending_check:
+            # disable the button and reject
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"{self.recipient_info['name']} is already considering an "
+                                                   f"existing proposal from {user_info['name']}.")
+        # check if the user has sufficient political authority
+        elif user_info['pol_auth'] < 1:
+            # disable the button and reject
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"{user_info['name']} does not have enough Political Authority to "
+                                                   f"send that proposal.")
+        # otherwise, carry on
+        else:
+            # create a pending request
+            await conn.execute('''INSERT INTO cnc_pending_requests VALUES ($1, $2, $3);''',
+                               interaction.message.id, [user_info['name'], self.recipient_info['name']],
+                                "Military Access")
+            # send the recipient the offer message
+            recipient_dm = await safe_dm(bot=self.bot, user_id=self.recipient_info['user_id'],
+                                         content=f"The {user_info['pretitle']} of {user_info['name']} has issued a "
+                                                 f"request to establish military access with "
+                                                 f"{self.recipient_info['name']}. Please use the buttons below within "
+                                                 f"24 hours to respond to the request.")
+            # create the response view
+            mil_access_response = ProposeMilitaryAccessView(interaction, self.conn, user_info, self.recipient_info,
+                                                            recipient_dm, self.bot)
+            # edit the DM with the buttons
+            await recipient_dm.edit(view=mil_access_response)
+            # let the user know that they have sent a request
+            await interaction.followup.send(f"{self.recipient_info['name']} has received a request to "
+                                            f"establish a Military Access agreement. ")
+            # pre-emptively remove one political authoriy
+            await self.conn.execute('''UPDATE cnc_users
+                                       SET pol_auth = pol_auth - 1
+                                       WHERE user_id = $1;''',
+                                    user_info['user_id'])
+            # stop listening
+            self.stop()
+            # return to menu
+            diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
+            return await interaction.edit_original_response(view=diplo_menu)
 
     async def propose_subjugation(self, interaction: discord.Interaction):
         # defer interaction
@@ -2966,7 +3029,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
         user_info = await user_db_info(interaction.user.id, self.conn)
         # if the user already has an overlord, deny
         if self.recipient_info['overlord'] is not None:
-            button.disabled = True
+            self.propose_subjugation_button.disabled = True
             await interaction.edit_original_response(view=self)
             await interaction.followup.send(f"{self.recipient_info['name']} already has an Overlord.")
         # check for pending offers
@@ -2977,7 +3040,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                                       AND type = 'Subjugation';''', user_info['name'],
                                                  self.recipient_info['name'])
         if pending_check:
-            button.disabled = True
+            self.propose_subjugation_button.disabled = True
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"{self.recipient_info['name']} is already considering an "
                                                    f"existing proposal from {user_info['name']}.")
@@ -2990,7 +3053,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                                   AND active;''',
                                         user_info['name'], self.recipient_info['name'])
         if war_check is not None:
-            button.disabled = True
+            self.propose_subjugation_button.disabled = True
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.")
         # check embargoes
@@ -3000,13 +3063,13 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                                   AND $2 = ANY(array[sender, target]);''',
                                              user_info['name'], self.recipient_info['name'])
         if embargoes is not None:
-            button.disabled = True
+            self.propose_subjugation_button.disabled = True
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send("Cooperative diplomatic actions are disabled for hostile nations.\n"
                                                    "*Embargoes are considered hostile actions.*")
         # check to ensure that the sender has sufficient political authority
         if user_info['pol_auth'] < 1:
-            button.disabled = True
+            self.propose_subjugation_button.disabled = True
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send("You do not have sufficient Political Authority to send that "
                                                    "proposal.")
@@ -3878,6 +3941,89 @@ class ProposeSubjugationResponseView(discord.ui.View):
         self.stop()
         return await interaction.edit_original_response(view=None)
 
+class ProposeMilitaryAccessView (discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, sender_info: asyncpg.Record,
+                 recipient_info: asyncpg.Record, dm: discord.Message, bot: discord.Client):
+        super().__init__(timeout=86400)
+        self.interaction = interaction
+        self.conn = conn
+        self.sender_info = sender_info
+        self.dm = dm
+        self.recipient_info = recipient_info
+        self.bot = bot
+
+    async def on_timeout(self):
+        # disable buttons and update view
+        self.stop()
+        # send message that the user has failed to react in time
+        await self.dm.reply(content="You have failed to reply within 24 hours. The request has been auto-rejected.")
+        # delete pending request
+        await self.conn.execute('''DELETE
+                                   FROM cnc_pending_requests
+                                   WHERE id = $1;''', self.interaction.message.id)
+        await safe_dm(self.bot, self.sender_info['user_id'], content=(
+            f"The {self.recipient_info['pretitle']} of {self.recipient_info['name']} "
+            f"has auto-rejected your  Military Access offer."))
+        return
+
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
+    async def accept_mil_access(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # ensure that the user has enough diplomatic authority
+        if self.recipient_info['pol_auth'] < 1:
+            return await interaction.followup.send("You do not have enough Political Authority to accept that request.")
+        # subtract one pol authority from recipient
+        await self.conn.execute('''UPDATE cnc_users
+                                   SET pol_auth = pol_auth - 1
+                                   WHERE user_id = $1;''',
+                                self.recipient_info['user_id'])
+        # delete the pending
+        await self.conn.execute('''DELETE
+                                   FROM cnc_pending_requests
+                                   WHERE id = $1;''',
+                                self.interaction.message.id)
+        # add the agreement to the db
+        await self.conn.execute('''INSERT INTO cnc_military_access(id, members) VALUES ($1, $2);''',
+                                self.interaction.message.id,
+                                [self.recipient_info['name'], self.sender_info['name']])
+        # confirm with both parties
+        await interaction.followup.send(f"{self.sender_info['name']} has established a Military Access agreement with "
+                                        f"{self.recipient_info['name']}! Armies may now move freely over shared borders.")
+        # notify sender via DM (with fallback on failure)
+        await safe_dm(self.bot, self.sender_info['user_id'], content=(
+            f"{self.recipient_info['name']} has accepted "
+            f"the offer of Military Access from {self.sender_info['name']}!"))
+        # close out the buttons
+        self.stop()
+        return await interaction.edit_original_response(view=None)
+
+    @discord.ui.button(label="Reject", style=discord.ButtonStyle.danger)
+    async def reject_mil_access(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # delete pending request
+        await self.conn.execute('''DELETE
+                                   FROM cnc_pending_requests
+                                   WHERE id = $1;''', self.interaction.message.id)
+        # add political authority back to sender
+        await self.conn.execute('''UPDATE cnc_users
+                                   SET pol_auth = pol_auth + 1
+                                   WHERE user_id = $1;''',
+                                self.sender_info['user_id'])
+        # notify recipient
+        await interaction.followup.send(f"{self.recipient_info['name']} has rejected the Military Access offer from "
+                                        f"{self.sender_info['name']}!")
+        # create sender dm
+        sender_user = self.bot.get_user(self.sender_info['user_id'])
+        # send sender confirmation
+        await sender_user.send(content=f"{self.recipient_info['name']} has rejected "
+                                       f"the Military Access offer from {self.sender_info['name']}!")
+        # close out the buttons
+        self.stop()
+        return await interaction.edit_original_response(view=None)
+
 
 # === WAR VIEWS ===
 
@@ -3910,6 +4056,8 @@ class WarDeclarationView(discord.ui.View):
         await interaction.response.defer(thinking=True)
         # get the cnc channel
         cnc_channel = self.bot.get_channel(927288304301387816)
+        # establish the connection
+        conn = self.conn
         # if no option has been selected, send message
         if self.cb_option is None:
             return await interaction.followup.send("You have not selected a Casus Belli!")
@@ -6003,7 +6151,8 @@ class ArmyActionsView(View):
         # if the army is already embarked, add the disembarked button 
         else:
             # create the button and add it
-            self.disembark_button = discord.ui.Button(label="Disembark", style=discord.ButtonStyle.blurple, emoji="\U00002693")
+            self.disembark_button = discord.ui.Button(label="Disembark", style=discord.ButtonStyle.blurple,
+                                                      emoji="\U00002693")
             self.disembark_button.callback = self.disembark_army
             self.add_item(self.disembark_button)
             
@@ -6017,15 +6166,19 @@ class ArmyActionsView(View):
     
     async def interaction_check(self, interaction: discord.Interaction):
         # pull the user's data to ensure they are not pacifistic
-        govt_subtype = await self.conn.fetchval('''SELECT govt_subtype FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
-        govt_type = await self.conn.fetchval('''SELECT govt_type FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        govt_subtype = await self.conn.fetchval('''SELECT govt_subtype FROM cnc_users WHERE user_id = $1;''',
+                                                interaction.user.id)
+        govt_type = await self.conn.fetchval('''SELECT govt_type FROM cnc_users WHERE user_id = $1;''',
+                                             interaction.user.id)
         # if the user is anarchic, but is not postcolonial, they cannot take actions
         if govt_type == "Anarchy" and govt_subtype != "Postcolonial":
             # disable all buttons
             for child in self.children:
                 child.disabled = True
             await self.parent_interaction.edit_original_response(view=self)
-            return await interaction.response.send_message("Nations with the Anarchy Government Type (excepting Postcolonial) cannot modify their armies.", ephemeral=True)
+            return await interaction.response.send_message("Nations with the Anarchy Government Type "
+                                                           "(excepting Postcolonial) cannot modify their armies.",
+                                                           ephemeral=True)
         # if not, simply return the normal check
         return interaction.user.id == self.parent_interaction.user.id
 
@@ -6056,7 +6209,10 @@ class ArmyActionsView(View):
         # pull the generals info
         all_user_generals = await self.conn.fetch('''SELECT * FROM cnc_generals WHERE owner_id = $1;''', interaction.user.id)
         # add the dropdown menu
-        general_menu = GeneralSelectView(parent_interaction=self.parent_interaction, generals_info=all_user_generals, army_id=self.army_info['army_id'], user_id=interaction.user.id)
+        general_menu = GeneralSelectView(parent_interaction=self.parent_interaction,
+                                         generals_info=all_user_generals,
+                                         army_id=self.army_info['army_id'],
+                                         user_id=interaction.user.id)
         await self.parent_interaction.edit_original_response(view=general_menu)
         # stop listening
         self.stop()
@@ -6065,7 +6221,8 @@ class ArmyActionsView(View):
         # establish the connection
         conn = self.conn
         # check the location to see if it is coastal
-        coast_check = await conn.fetchval('''SELECT coast FROM cnc_provinces WHERE id = $1;''', self.army_info['location'])
+        coast_check = await conn.fetchval('''SELECT coast FROM cnc_provinces WHERE id = $1;''',
+                                          self.army_info['location'])
         # if the province is not along the coast, reject
         if not coast_check:
             # disable the button
@@ -6073,27 +6230,34 @@ class ArmyActionsView(View):
             # update the view
             await self.parent_interaction.edit_original_response(view=self)
             # reject
-            return await interaction.response.send_message(content=f"The {army_info['army_name']} cannot embark as it is not in a coastal province.", ephemeral=True)
+            return await interaction.response.send_message(content=f"The {self.army_info['army_name']} cannot embark "
+                                                                   f"as it is not in a coastal province.",
+                                                           ephemeral=True)
         # otherwise, carry on
         else:
             # remove the embark button
             self.remove_item(self.embark_button)
             # create the disembark button and add it
-            self.disembark_button = discord.ui.Button(label="Disembark", style=discord.ButtonStyle.blurple, emoji="\U00002693")
+            self.disembark_button = discord.ui.Button(label="Disembark", style=discord.ButtonStyle.blurple,
+                                                      emoji="\U00002693")
             self.disembark_button.callback = self.disembark_army
             self.add_item(self.disembark_button)
             # update the view
             await self.parent_interaction.edit_original_response(view=self)
             # set the embark to "true"
-            await conn.execute('''UPDATE cnc_armies SET embark = TRUE WHERE army_id = $1;''', self.army_info['army_id'])
+            await conn.execute('''UPDATE cnc_armies SET embark = TRUE WHERE army_id = $1;''',
+                               self.army_info['army_id'])
             # notify 
-            return await interaction.response.send_message(content=f"The {self.army_info['army_name']} is prepared to embark! When moved, it will attempt to reach its destination by sea.")
+            return await interaction.response.send_message(content=f"The {self.army_info['army_name']} is prepared to "
+                                                                   f"embark! When moved, it will attempt to reach its "
+                                                                   f"destination by sea.")
 
     async def disembark_army(self, interaction: discord.Interaction):
         # establish the connection
         conn = self.conn
         # reverse the embark
-        await conn.execute('''UPDATE cnc_armies SET embark = FALSE WHERE army_id = $1;''', self.army_info['army_id'])
+        await conn.execute('''UPDATE cnc_armies SET embark = FALSE WHERE army_id = $1;''',
+                           self.army_info['army_id'])
         # remove the disembark button
         self.remove_item(self.disembark_button)
         # create the disembark button and add it
@@ -6103,7 +6267,8 @@ class ArmyActionsView(View):
         # update the view
         await self.parent_interaction.edit_original_response(view=self)
         # notify
-        return await interaction.response.send_message(content=f"The {self.army_info['army_name']} has disembarked! It will no longer attempt to move by sea.")
+        return await interaction.response.send_message(content=f"The {self.army_info['army_name']} has disembarked! "
+                                                               f"It will no longer attempt to move by sea.")
 
 
 class ArmyRecruitMenu(discord.ui.View):
@@ -6141,20 +6306,23 @@ class ArmyRecruitMenu(discord.ui.View):
             # check the amount of military authority
             if user_info['mil_auth'] < 1:
                 # reject
-                await interaction.followup.send(f"{user_info['name']} has insufficient Military Authority to recruit 1,000 troops.", ephemeral=True)
+                await interaction.followup.send(f"{user_info['name']} has insufficient Military Authority to recruit "
+                                                f"1,000 troops.", ephemeral=True)
                 # update the view
                 return await self.parent_interaction.edit_original_response(view=None)
         # check if the user has sufficient economic authority
         elif user_info['econ_auth'] < 1:
             # reject
-            await interaction.followup.send(f"{user_info['name']} has insufficient Economic Authority to recruit 1,000 troops.", ephemeral=True)
+            await interaction.followup.send(f"{user_info['name']} has insufficient Economic Authority to recruit "
+                                            f"1,000 troops.", ephemeral=True)
             # update the view
             return await self.parent_interaction.edit_original_response(view=None)
         # otherwise, carry on
         # check to make sure the user is not at the army's cap
         if army_info['troops'] + 1000 > user_info['army_size']:
             # reject
-            await interaction.followup.send(f"Recruiting additional troops into {army_info['army_name']} would exceed the troop limit.", ephemeral=True)
+            await interaction.followup.send(f"Recruiting additional troops into {army_info['army_name']} would exceed "
+                                            f"the troop limit.", ephemeral=True)
             # remove buttons
             for child in self.children:
                 child.disabled = True
@@ -6164,22 +6332,29 @@ class ArmyRecruitMenu(discord.ui.View):
         else:
             if tusail_mil_charge:
                 # subtract one military authority
-                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 1 WHERE user_id = $1;''', interaction.user.id)
+                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 1 WHERE user_id = $1;''',
+                                   interaction.user.id)
             else:
                 # subtract one economic authority
-                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 1 WHERE user_id = $1;''', interaction.user.id)
+                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 1 WHERE user_id = $1;''',
+                                   interaction.user.id)
             # add troops
-            await conn.execute('''UPDATE cnc_armies SET troops = troops + 1000 WHERE army_id = $1;''', army_info['army_id'])
+            await conn.execute('''UPDATE cnc_armies SET troops = troops + 1000 WHERE army_id = $1;''',
+                               army_info['army_id'])
             # pull new army info
-            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
+                                                army_info['army_id'])
             # call embed
             original_message = await self.parent_interaction.original_response()
             army_embed = original_message.embeds[0]
             # update embed
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
-            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
-            await self.parent_interaction.edit_original_response(view=army_actions_view, embed=army_embed)
+            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
+                                                conn=conn,
+                                                army_info=new_army_info)
+            await self.parent_interaction.edit_original_response(view=army_actions_view,
+                                                                 embed=army_embed)
             # notify user
             await interaction.followup.send(f"The {army_info['army_name']} has successfully recruited an additional 1,000 troops!")
             # stop listening
@@ -6203,20 +6378,23 @@ class ArmyRecruitMenu(discord.ui.View):
             # check the amount of military authority
             if user_info['mil_auth'] < 5:
                 # reject
-                await interaction.followup.send(f"{user_info['name']} has insufficient Military Authority to recruit 5,000 troops.", ephemeral=True)
+                await interaction.followup.send(f"{user_info['name']} has insufficient Military Authority to recruit "
+                                                f"5,000 troops.", ephemeral=True)
                 # update the view
                 return await self.parent_interaction.edit_original_response(view=None)
         # check if the user has sufficient economic authority
         elif user_info['econ_auth'] < 5:
             # reject
-            await interaction.followup.send(f"{user_info['name']} has insufficient Economic Authority to recruit 5,000 troops.", ephemeral=True)
+            await interaction.followup.send(f"{user_info['name']} has insufficient Economic Authority to recruit "
+                                            f"5,000 troops.", ephemeral=True)
             # update the view
             return await self.parent_interaction.edit_original_response(view=None)
         # otherwise, carry on
         # check to make sure the user is not at the army's cap
         if army_info['troops'] + 5000 > user_info['army_size']:
             # reject
-            await interaction.followup.send(f"Recruiting 5,000 additional troops into {army_info['army_name']} would exceed the troop limit.", ephemeral=True)
+            await interaction.followup.send(f"Recruiting 5,000 additional troops into {army_info['army_name']} would "
+                                            f"exceed the troop limit.", ephemeral=True)
             # remove buttons
             for child in self.children:
                 child.disabled = True
@@ -6226,14 +6404,18 @@ class ArmyRecruitMenu(discord.ui.View):
         else:
             if tusail_mil_charge:
                 # subtract five military authority
-                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 5 WHERE user_id = $1;''', interaction.user.id)
+                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 5 WHERE user_id = $1;''',
+                                   interaction.user.id)
             else:
                 # subtract five economic authority
-                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 5 WHERE user_id = $1;''', interaction.user.id)
+                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 5 WHERE user_id = $1;''',
+                                   interaction.user.id)
             # add troops
-            await conn.execute('''UPDATE cnc_armies SET troops = troops + 5000 WHERE army_id = $1;''', army_info['army_id'])
+            await conn.execute('''UPDATE cnc_armies SET troops = troops + 5000 WHERE army_id = $1;''',
+                               army_info['army_id'])
             # pull new army info
-            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
+                                                army_info['army_id'])
             # call embed
             original_message = await self.parent_interaction.original_response()
             army_embed = original_message.embeds[0]
@@ -6243,7 +6425,8 @@ class ArmyRecruitMenu(discord.ui.View):
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
             await self.parent_interaction.edit_original_response(view=army_actions_view, embed=army_embed)
             # notify user
-            await interaction.followup.send(f"The {army_info['army_name']} has successfully recruited an additional 5,000 troops!")
+            await interaction.followup.send(f"The {army_info['army_name']} has successfully recruited an additional "
+                                            f"5,000 troops!")
             # stop listening
             return self.stop()
 
@@ -6264,20 +6447,23 @@ class ArmyRecruitMenu(discord.ui.View):
             # check the amount of military authority
             if user_info['mil_auth'] < 10:
                 # reject
-                await interaction.followup.send(f"{user_info['name']} has insufficient Military Authority to recruit 10,000 troops.", ephemeral=True)
+                await interaction.followup.send(f"{user_info['name']} has insufficient Military Authority to recruit "
+                                                f"10,000 troops.", ephemeral=True)
                 # update the view
                 return await self.parent_interaction.edit_original_response(view=None)
         # check if the user has sufficient economic authority
         elif user_info['econ_auth'] < 10:
             # reject
-            await interaction.followup.send(f"{user_info['name']} has insufficient Economic Authority to recruit 10,000 troops.", ephemeral=True)
+            await interaction.followup.send(f"{user_info['name']} has insufficient Economic Authority to recruit "
+                                            f"10,000 troops.", ephemeral=True)
             # update the view
             return await self.parent_interaction.edit_original_response(view=None)
         # otherwise, carry on
         # check to make sure the user is not at the army's cap
         if army_info['troops'] + 10000 > user_info['army_size']:
             # reject
-            await interaction.followup.send(f"Recruiting 10,000 additional troops into {army_info['army_name']} would exceed the troop limit.", ephemeral=True)
+            await interaction.followup.send(f"Recruiting 10,000 additional troops into {army_info['army_name']} would "
+                                            f"exceed the troop limit.", ephemeral=True)
             # remove buttons
             for child in self.children:
                 child.disabled = True
@@ -6287,24 +6473,30 @@ class ArmyRecruitMenu(discord.ui.View):
         else:
             if tusail_mil_charge:
                 # subtract ten military authority
-                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 10 WHERE user_id = $1;''', interaction.user.id)
+                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 10 WHERE user_id = $1;''',
+                                   interaction.user.id)
             else:
                 # subtract ten economic authority
-                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 10 WHERE user_id = $1;''', interaction.user.id)
+                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 10 WHERE user_id = $1;''',
+                                   interaction.user.id)
             # add 10000 troops to the army
-            await conn.execute('''UPDATE cnc_armies SET troops = troops + 10000 WHERE army_id = $1;''', army_info['army_id'])
+            await conn.execute('''UPDATE cnc_armies SET troops = troops + 10000 WHERE army_id = $1;''',
+                               army_info['army_id'])
             # pull new army info
-            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
+                                                army_info['army_id'])
             # call embed
             original_message = await self.parent_interaction.original_response()
             army_embed = original_message.embeds[0]
             # update embed
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
-            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
+            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
+                                                conn=conn, army_info=new_army_info)
             await self.parent_interaction.edit_original_response(view=army_actions_view, embed=army_embed)
             # notify user
-            await interaction.followup.send(f"The {army_info['army_name']} has successfully recruited an additional 10,000 troops!")
+            await interaction.followup.send(f"The {army_info['army_name']} has successfully recruited an additional "
+                                            f"10,000 troops!")
             # stop listening
             return self.stop()
     
@@ -6313,7 +6505,8 @@ class ArmyRecruitMenu(discord.ui.View):
         # defer interaction
         await interaction.response.defer()
         # reset menu
-        army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=self.conn, army_info=self.army_info)
+        army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
+                                            conn=self.conn, army_info=self.army_info)
         # update the parent 
         await self.parent_interaction.edit_original_response(view=army_actions_view)
         # stop listening
@@ -6353,7 +6546,9 @@ class ArmyDisbandMenu(discord.ui.View):
             # create accept view
             accept_view = Accept(interaction)
             # send message
-            confirm_message = await interaction.followup.send(f"The {army_info['army_name']} will be disbanded entirely by this action. Are you sure you wish to disband {army_info['army_name']}?", view=accept_view)
+            confirm_message = await interaction.followup.send(f"The {army_info['army_name']} will be disbanded entirely"
+                                                              f" by this action. Are you sure you wish to disband "
+                                                              f"{army_info['army_name']}?", view=accept_view)
             # wait for the accept
             accept_deny = await accept_view.wait()
             # if the accept is true
@@ -6363,9 +6558,12 @@ class ArmyDisbandMenu(discord.ui.View):
                 # delete the army
                 await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
                 # update the general to not have any army, if there was a general
-                await conn.execute('''UPDATE cnc_generals SET army_id = NULL where army_id = $1;''', army_info['army_id'])
+                await conn.execute('''UPDATE cnc_generals SET army_id = NULL where army_id = $1;''',
+                                   army_info['army_id'])
                 # confirm with the user
-                await interaction.followup.send(f"The {army_info['army_name']} has been disbanded. Its troops have returned home. Any Generals have returned to headquarters for reassignment.")
+                await interaction.followup.send(f"The {army_info['army_name']} has been disbanded. Its troops have "
+                                                f"returned home. Any Generals have returned to "
+                                                f"headquarters for reassignment.")
                 # remove the buttons on the original
                 await self.parent_interaction.edit_original_response(view=None)
                 # stop listening
@@ -6373,18 +6571,22 @@ class ArmyDisbandMenu(discord.ui.View):
         # otherwise, carry on
         else:
             # reduce the amount of the army by 1000
-            await conn.execute('''UPDATE cnc_armies SET troops = troops - 1000 WHERE army_id = $1;''', army_info['army_id'])
+            await conn.execute('''UPDATE cnc_armies SET troops = troops - 1000 WHERE army_id = $1;''',
+                               army_info['army_id'])
             # reply to user
-            await interaction.followup.send(f"1,000 troops, previously of the {army_info['army_name']}, have returned home.")
+            await interaction.followup.send(f"1,000 troops, previously of the {army_info['army_name']}, "
+                                            f"have returned home.")
             # pull the new info
-            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
+                                                army_info['army_id'])
             # call embed
             original_message = await self.parent_interaction.original_response()
             army_embed = original_message.embeds[0]
             # update embed
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
-            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)  
+            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
+                                                conn=conn, army_info=new_army_info)
             # update the original
             await self.parent_interaction.edit_original_response(embed=army_embed, view=army_actions_view)
             # stop listening
@@ -6405,7 +6607,9 @@ class ArmyDisbandMenu(discord.ui.View):
             # create accept view
             accept_view = Accept(interaction)
             # send message
-            confirm_message = await interaction.followup.send(f"The {army_info['army_name']} will be disbanded entirely by this action. Are you sure you wish to disband {army_info['army_name']}?", view=accept_view)
+            confirm_message = await interaction.followup.send(f"The {army_info['army_name']} will be disbanded "
+                                                              f"entirely by this action. Are you sure you wish to "
+                                                              f"disband {army_info['army_name']}?", view=accept_view)
             # wait for the accept
             accept_deny = await accept_view.wait()
             # if the accept is true
@@ -6415,9 +6619,12 @@ class ArmyDisbandMenu(discord.ui.View):
                 # delete the army
                 await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
                 # update the general to not have any army, if there was a general
-                await conn.execute('''UPDATE cnc_generals SET army_id = NULL where army_id = $1;''', army_info['army_id'])
+                await conn.execute('''UPDATE cnc_generals SET army_id = NULL where army_id = $1;''',
+                                   army_info['army_id'])
                 # confirm with the user
-                await interaction.followup.send(f"The {army_info['army_name']} has been disbanded. Its troops have returned home. Any Generals have returned to headquarters for reassignment.")
+                await interaction.followup.send(f"The {army_info['army_name']} has been disbanded. "
+                                                f"Its troops have returned home. Any Generals have returned to "
+                                                f"headquarters for reassignment.")
                 # remove the buttons on the original
                 await self.parent_interaction.edit_original_response(view=None)
                 # stop listening
@@ -6425,18 +6632,22 @@ class ArmyDisbandMenu(discord.ui.View):
         # otherwise, carry on
         else:
             # reduce the amount of the army by 1000
-            await conn.execute('''UPDATE cnc_armies SET troops = troops - 5000 WHERE army_id = $1;''', army_info['army_id'])
+            await conn.execute('''UPDATE cnc_armies SET troops = troops - 5000 WHERE army_id = $1;''',
+                               army_info['army_id'])
             # reply to user
-            await interaction.followup.send(f"5,000 troops, previously of the {army_info['army_name']}, have returned home.")
+            await interaction.followup.send(f"5,000 troops, previously of the {army_info['army_name']}, "
+                                            f"have returned home.")
             # pull the new info
-            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
+                                                army_info['army_id'])
             # call embed
             original_message = await self.parent_interaction.original_response()
             army_embed = original_message.embeds[0]
             # update embed
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
-            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)  
+            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
+                                                conn=conn, army_info=new_army_info)
             # update the original
             await self.parent_interaction.edit_original_response(embed=army_embed, view=army_actions_view)
             # stop listening
@@ -6457,7 +6668,9 @@ class ArmyDisbandMenu(discord.ui.View):
             # create accept view
             accept_view = Accept(interaction)
             # send message
-            confirm_message = await interaction.followup.send(f"The {army_info['army_name']} will be disbanded entirely by this action. Are you sure you wish to disband {army_info['army_name']}?", view=accept_view)
+            confirm_message = await interaction.followup.send(f"The {army_info['army_name']} will be disbanded "
+                                                              f"entirely by this action. Are you sure you wish to "
+                                                              f"disband {army_info['army_name']}?", view=accept_view)
             # wait for the accept
             accept_deny = await accept_view.wait()
             # if the accept is true
@@ -6467,9 +6680,11 @@ class ArmyDisbandMenu(discord.ui.View):
                 # delete the army
                 await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
                 # update the general to not have any army, if there was a general
-                await conn.execute('''UPDATE cnc_generals SET army_id = NULL where army_id = $1;''', army_info['army_id'])
+                await conn.execute('''UPDATE cnc_generals SET army_id = NULL where army_id = $1;''',
+                                   army_info['army_id'])
                 # confirm with the user
-                await interaction.followup.send(f"The {army_info['army_name']} has been disbanded. Its troops have returned home. Any Generals have returned to headquarters for reassignment.")
+                await interaction.followup.send(f"The {army_info['army_name']} has been disbanded. Its troops have "
+                                                f"returned home. Any Generals have returned to headquarters for reassignment.")
                 # remove the buttons on the original
                 await self.parent_interaction.edit_original_response(view=None)
                 # stop listening
@@ -6477,18 +6692,22 @@ class ArmyDisbandMenu(discord.ui.View):
         # otherwise, carry on
         else:
             # reduce the amount of the army by 1000
-            await conn.execute('''UPDATE cnc_armies SET troops = troops - 10000 WHERE army_id = $1;''', army_info['army_id'])
+            await conn.execute('''UPDATE cnc_armies SET troops = troops - 10000 WHERE army_id = $1;''',
+                               army_info['army_id'])
             # reply to user
-            await interaction.followup.send(f"10,000 troops, previously of the {army_info['army_name']}, have returned home.")
+            await interaction.followup.send(f"10,000 troops, previously of the {army_info['army_name']}, "
+                                            f"have returned home.")
             # pull the new info
-            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army_info['army_id'])
+            new_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
+                                                army_info['army_id'])
             # call embed
             original_message = await self.parent_interaction.original_response()
             army_embed = original_message.embeds[0]
             # update embed
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
-            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)  
+            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
+                                                conn=conn, army_info=new_army_info)
             # update the original
             await self.parent_interaction.edit_original_response(embed=army_embed, view=army_actions_view)
             # stop listening
@@ -6499,7 +6718,8 @@ class ArmyDisbandMenu(discord.ui.View):
         # defer interaction
         await interaction.response.defer()
         # reset menu
-        army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=self.conn, army_info=self.army_info)
+        army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
+                                            conn=self.conn, army_info=self.army_info)
         # update the parent 
         await self.parent_interaction.edit_original_response(view=army_actions_view)
         # stop listening
@@ -6537,9 +6757,11 @@ class GeneralSelectMenu(discord.ui.Select):
             # if the army already has a general, unassign him
             await conn.execute('''UPDATE cnc_generals SET army_id = NULL WHERE army_id = $1;''', self.army_id)
             # get general name
-            general_name = await conn.fetchval('''SELECT name FROM cnc_generals WHERE general_id = $1;''', general_option)
+            general_name = await conn.fetchval('''SELECT name FROM cnc_generals WHERE general_id = $1;''',
+                                               general_option)
             # reassign the general
-            await conn.execute('''UPDATE cnc_generals SET army_id = $1 WHERE general_id = $2;''', self.army_id, general_option)
+            await conn.execute('''UPDATE cnc_generals SET army_id = $1 WHERE general_id = $2;''',
+                               self.army_id, general_option)
             # notify
             await interaction.response.send_message(content=f"General {general_name} has been assigned to {army_name}!")
             # call embed
@@ -6557,23 +6779,31 @@ class GeneralSelectMenu(discord.ui.Select):
             # check to ensure that the user has sufficient space for a new general
             if len(self.generals_info) >= user_info['gen_limit']:
                 # deny
-                return await interaction.response.send_message(content=f"{user_info['name']} cannot recruit another General.")
+                return await interaction.response.send_message(content=f"{user_info['name']} "
+                                                                       f"cannot recruit another General.")
             # check to ensure that the user has sufficient military authority
             elif user_info['mil_auth'] < 2:
                 # deny
-                return await interaction.response.send_message(content=f"{user_info['name']} does not have sufficient Military Authority to recruit a General.")
+                return await interaction.response.send_message(content=f"{user_info['name']} does not have sufficient "
+                                                                       f"Military Authority to recruit a General.")
             # otherwise, carry on
             else:
                 # if the army already has a general, unassign him
                 await conn.execute('''UPDATE cnc_generals SET army_id = NULL WHERE army_id = $1;''', self.army_id)
                 # subtract the cost
-                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 2 WHERE user_id = $1;''', user_info['user_id'])
+                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 2 WHERE user_id = $1;''',
+                                   user_info['user_id'])
                 # define the name of the general
                 general_name = rand_name()
                 # create the general
-                await conn.execute('''INSERT INTO cnc_generals(owner_id, type, level, army_id, name) VALUES($1, $2, $3, $4, $5);''', user_info['user_id'], choice(['Assault', 'Defensive', 'Seige']), user_info['gen_level'], self.army_id, general_name)
+                await conn.execute('''INSERT INTO cnc_generals(owner_id, type, level, army_id, name) 
+                                      VALUES($1, $2, $3, $4, $5);''', user_info['user_id'],
+                                   choice(['Assault', 'Defensive', 'Siege']), user_info['gen_level'],
+                                   self.army_id, general_name)
                 # notify user
-                await interaction.response.send_message(f"General {general_name} has been recruited and assigned to command the {army_name}.\nTo view their stats, use /cnc general_info.")
+                await interaction.response.send_message(f"General {general_name} has been recruited and assigned to "
+                                                        f"command the {army_name}."
+                                                        f"\nTo view their stats, use /cnc general_info.")
                 # go back to the army menu
                 army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', self.army_id)
                  # call embed
@@ -6582,14 +6812,16 @@ class GeneralSelectMenu(discord.ui.Select):
                 # update embed
                 army_embed.set_field_at(3, name="General", value=f"{general_name}")
                 # return to the army menu
-                army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction, conn=interaction.client.pool, army_info=army_info)
+                army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction,
+                                                   conn=interaction.client.pool, army_info=army_info)
                 # update the interaction
                 return await self.parent_interaction.edit_original_response(view=army_action_menu, embed=army_embed)
 
 
 class GeneralSelectView(discord.ui.View):
 
-    def __init__(self, parent_interaction: discord.Interaction, generals_info: asyncpg.Record, army_id: int, user_id: int):
+    def __init__(self, parent_interaction: discord.Interaction, generals_info: List[asyncpg.Record],
+                 army_id: int, user_id: int):
         super().__init__(timeout=120)
         # define variables
         self.generals_info = generals_info
@@ -6598,7 +6830,9 @@ class GeneralSelectView(discord.ui.View):
         self.user_id = user_id
 
         # add the item
-        self.add_item(GeneralSelectMenu(generals_info=self.generals_info, army_id=self.army_id, parent_interaction=self.parent_interaction))
+        self.add_item(GeneralSelectMenu(generals_info=self.generals_info,
+                                        army_id=self.army_id,
+                                        parent_interaction=self.parent_interaction))
 
     async def on_timeout(self):
         # disable all children
@@ -6613,9 +6847,12 @@ class GeneralSelectView(discord.ui.View):
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
         # pull the army info
-        army_info = await interaction.client.pool.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', self.army_id)
+        army_info = await interaction.client.pool.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
+                                                           self.army_id)
         # return to the army menu
-        army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction, conn=interaction.client.pool, army_info=army_info)
+        army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction,
+                                           conn=interaction.client.pool,
+                                           army_info=army_info)
         # update the interaction
         await self.parent_interaction.edit_original_response(view=army_action_menu)
         # reply
@@ -7349,7 +7586,7 @@ class CNC(commands.Cog):
             province_id = int(province)
             prov_info = await self.province_db_info(province_id=province_id)
         except ValueError:
-            province_id = str(province)
+            province_name = str(province)
             prov_info = await self.province_db_info(province_name=province_name)
         # if the province doesn't exist
         if prov_info is None:
