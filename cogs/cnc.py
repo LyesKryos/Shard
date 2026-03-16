@@ -7842,8 +7842,6 @@ class CNC(commands.Cog):
         army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army)
         # get the province info
         prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', move_to)
-        # get the departing province info
-        depart_prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', army_info['location'])
         # get the user info
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # define if a battle must occur, default no
@@ -7853,11 +7851,13 @@ class CNC(commands.Cog):
             # reject
             return await interaction.followup.send(f"There is no such army with the ID: `{army}`.", ephemeral=True)
         # if that is not a province
-        elif not prov_info:
+        if not prov_info:
             # reject
             return await interaction.followup.send(f"There is so such province with the ID: `{move_to}`.", ephemeral=True)
+        # get the departing province info
+        depart_prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', army_info['location'])
         # if the user does not own the army
-        elif army_info['army_id'] != user_info['user_id']:
+        if army_info['owner_id'] != user_info['user_id']:
             # reject
             return await interaction.followup.send(f"{user_info['name']} does not command the {army_info['army_name']}.", ephemeral=True)
         # if the army is embarked, try looking for a naval path
@@ -7887,7 +7887,7 @@ class CNC(commands.Cog):
                                                            f"{prov_info['name']} (ID: {prov_info['id']}).")
                 # otherwise, initiate combat
                 else:
-                    pass
+                    battle = True
         # otherwise, calculate the path
         else:
             # calculate the distance using find_path
@@ -7897,11 +7897,12 @@ class CNC(commands.Cog):
                                                              moving_user_id=interaction.user.id)
             # check if the path exists
             if path is None:
+                # if the path was blocked 
                 if blocked_by_hostiles:
+                    # reject with special message
                     return await interaction.followup.send(f"The {army_info['army_name']} cannot move to "
-                                                           f"{prov_info['name']} (ID: {prov_info['id']}) as it has been"
-                                                           f" blocked by hostile armies along the way.", ephemeral=True)
-                # reject
+                                                           f"{prov_info['name']} (ID: {prov_info['id']}), in part because it has been blocked by hostile armies along the way.", ephemeral=True)
+                # reject normally
                 return await interaction.followup.send(f"The {army_info['army_name']} cannot find an open land path to "
                                                        f"{prov_info['name']} (ID: {prov_info['id']}).\n"
                                                        f"The path is either blocked by geography, hostile armies, "
@@ -7914,6 +7915,42 @@ class CNC(commands.Cog):
                                                        f"\nThe total movement cost from {depart_prov_info['name']} "
                                                        f"(ID: {depart_prov_info['id']}) to the desired location is "
                                                        f"`{cost}` movement points.")
+        # if the province is not occupied by the user
+        if prov_info['occupier_id'] != interaction.user.id:
+            # get the occupier info
+            occupier_info = await user_db_info(conn=conn, user_id=prov_info['occupier_id'])
+            # war check
+            war_check = await conn.fetchrow('''SELECT *
+                                                FROM cnc_wars
+                                                WHERE (
+                                                    ($1 = ANY (attackers) AND $2 = ANY (defenders))
+                                                        OR
+                                                    ($1 = ANY (defenders) AND $2 = ANY (attackers)))
+                                                    AND active;''',
+                                            user_info['name'], occupier_info['name']) 
+            # if the users are at war and an army of the enemy is present, then battle
+            if war_check:
+                # check which side the user is on
+                if user_info['name'] in war_check['attackers']:
+                    # check if any army present is a defender army
+                    enemy_army_list = await conn.fetch('''SELECT army_id FROM cnc_armies WHERE location = $1 AND army_id = ANY($2);''', move_to, war_check['defenders'])
+                else:
+                    # check if any army present is a defender army
+                    enemy_army_list = await conn.fetch('''SELECT army_id FROM cnc_armies WHERE location = $1 AND army_id = ANY($2);''', move_to, war_check['attackers'])
+                # if there are enemy armies present, battle
+                if len(enemy_army_list) > 0:
+                    battle = True
+                # otherwise, occupy
+                else:
+                    # do the occupation code here
+                    pass
+            # otherwise, update the army position
+            else:
+                # change the army position and reduce the movement
+                await conn.execute('''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''', move_to, cost, army)
+                # notify user
+                return await interaction.followup.send(f"The {army_info['army_name']} has successfuly moved to {prov_info['name']} (ID: {prov_info['id']}) at a cost of `{cost}` movement points.")
+
 
 
 
