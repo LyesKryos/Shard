@@ -305,19 +305,38 @@ async def demanding_provinces_wait_for_modal(parent_interaction: discord.Interac
     # return the value
     return modal.value
 
-async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int) -> tuple:
+async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int, moving_user_id: int) -> tuple:
     """This program utilizes Dijkstra's algorithm to find the shortest path between two provinces."""
 
     # define the province map
     p_map = {}
     # define the cost map
     pc_map = {}
+    # define the occupier map
+    occupier_map = {}
+    # define the terrain costs
+    all_terrains = await conn.fetch('''SELECT id, movement FROM cnc_terrains;''')
+    terrain_costs = {t['id']: t['movement'] for t in all_terrains}
+    # get the user info
+    user_info = await user_db_info(conn=conn, user_id=moving_user_id)
+    # pull all armies and their locations before the loop
+    all_armies = await conn.fetch('''SELECT location, owner_id FROM cnc_armies;''')
+    # define all army locations
+    army_locations = {}
+    for a in all_armies:
+        # if location is not already accounted for, add the location to the list
+        if a['location'] not in army_locations:
+            army_locations[a['location']] = []
+        # append the owner to the army
+        army_locations[a['location']].append(a['owner_id'])
+    # define if there is an army blocking
+    army_block = False
     # pull province information and put it into a dict
-    all_provinces = await conn.fetch('''SELECT id, river, structures, bordering, terrain FROM cnc_provinces;''')
+    all_provinces = await conn.fetch('''SELECT * FROM cnc_provinces;''')
     for p in all_provinces:
         p_map[p['id']] = p['bordering']
         # define terrain movement cost
-        movement_cost = await conn.fetchval('''SELECT movement FROM cnc_terrains WHERE id = $1;''', p['terrain'])
+        movement_cost = terrain_costs[p['terrain']]
         pc_map[p['id']] = movement_cost
         # if there is a road, the cost is halved (unles there is a river)
         if "Road" in (p['structures'] if p['structures'] is not None else []) and not p['river']:
@@ -325,31 +344,95 @@ async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int) -> tuple:
         # if there is a river and not a bridge, the cost is doubled
         if (p['river']) and ("Bridge" not in (p['structures'] if p['structures'] is not None else [])):
             pc_map[p['id']] *= 2
+        # add the province owner to the p_map
+        occupier_map[p['id']] = p['occupier_id']
     # define the best cost
     best_cost = {start_id: 0}
     # define the previous so we know which way to go
     previous = {}
     # establish the queue as a tuple because of heapq sorting
     queue = [(0,start_id)]
-    
+
     # while there are items in the queue
     while queue:
-        
+
         # get the lowest current value
         cost, tile = heapq.heappop(queue)
 
         # if the cost is greater than the best cost, then we skip it because it is stale
         # remember, infinity = unknown distance
-        # this means that if the tile is unknown, the cost is infinite 
+        # this means that if the tile is unknown, the cost is infinite
         if cost > best_cost.get(tile, float('inf')):
             continue
-        
-        # if we have finally reached our sestination, break
+
+        # if we have finally reached our destination, break
         if tile == end_id:
             break
 
         # now we iterate for each neighbor in the map
         for neighbor in p_map[tile]:
+            # if the neighbor has not yet been sorted, protect by skipping
+            if neighbor not in pc_map:
+                continue
+            # define the hostile found
+            hostile_found = False
+            # check for hostile armies but never block the destination
+            if neighbor != end_id:
+                # for every army at this location, we check the army_owner
+                for army_owner_id in army_locations.get(neighbor, []):
+                    # if the army owner is the user, pass
+                    if army_owner_id == moving_user_id:
+                        pass
+                    # if the army owner isn't the user, check if the army is hostile
+                    else:
+                        # get the owner info
+                        army_owner_info = await user_db_info(conn=conn, user_id=army_owner_id)
+                        # war check
+                        war_check = await conn.fetchrow('''SELECT *
+                                                           FROM cnc_wars
+                                                           WHERE (
+                                                               ($1 = ANY (attackers) AND $2 = ANY (defenders))
+                                                                   OR
+                                                               ($1 = ANY (defenders) AND $2 = ANY (attackers)))
+                                                             AND active;''',
+                                                        user_info['name'], army_owner_info['name'])
+                        # if there is a war, block and do not permit
+                        if war_check:
+                            hostile_found = True
+
+                            army_block = True
+                            break
+                        # otherwise, carry on
+                        else:
+                            continue
+            # if the army blocks, skip this tile
+            if hostile_found:
+                continue
+            # if the tile is occupier by someone other than 0
+            if occupier_map.get(neighbor, 0) != 0:
+                # get the occupier info
+                occupier_info = await user_db_info(conn=conn, user_id=occupier_map[neighbor])
+                # war check
+                war_check = await conn.fetchrow('''SELECT *
+                                                   FROM cnc_wars
+                                                   WHERE (($1 = ANY (attackers) AND $2 = ANY (defenders))
+                                                       OR ($1 = ANY (defenders) AND $2 = ANY (attackers)))
+                                                     AND active;''',
+                                                user_info['name'], occupier_info['name'])
+                # military access check
+                mil_access_check = await conn.fetchrow('''SELECT *
+                                                          FROM cnc_military_access
+                                                          WHERE ($1 = ANY (members) AND $2 = ANY (members));''',
+                                                       user_info['name'], occupier_info['name'])
+                # if the war check is true, we can proceeed
+                if war_check:
+                    pass
+                # if the mil access check is true, we can proceed
+                elif mil_access_check:
+                    pass
+                # otherwise, the user does not have access and we skip this tile
+                else:
+                    continue
             # add the cost of moving to this tile from the current tile
             new_cost = cost + pc_map[neighbor]
             # if the new cost is better than the current cost (or an unknown cost)
@@ -363,7 +446,7 @@ async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int) -> tuple:
 
     # if the end id is not anywhere in the best cost, that means the province cannot be reached
     if end_id not in best_cost:
-        return None
+        return None, None, army_block
 
     # if we did reach it, reconstruct the path
     path = []
@@ -374,10 +457,10 @@ async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int) -> tuple:
         path.append(tile)
         # then get the next tile in the previous path dict
         tile = previous.get(tile)
-    # once we have made it to the end of the previous dict, we will reverse the order of the pathway 
+    # once we have made it to the end of the previous dict, we will reverse the order of the pathway
     path.reverse()
     # return the path and the cost
-    return path, best_cost[end_id]
+    return path, best_cost[end_id], army_block
 
 
 class MapButtons(View):
@@ -7758,11 +7841,11 @@ class CNC(commands.Cog):
         # get the army info
         army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army)
         # get the province info
-        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', prov_info)
+        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', move_to)
         # get the departing province info
         depart_prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', army_info['location'])
         # get the user info
-        user_info = await user_db_info(conn=conn, user_id)
+        user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # define if a battle must occur, default no
         battle = False
         # if that is not an army
@@ -7777,34 +7860,13 @@ class CNC(commands.Cog):
         elif army_info['army_id'] != user_info['user_id']:
             # reject
             return await interaction.followup.send(f"{user_info['name']} does not command the {army_info['army_name']}.", ephemeral=True)
-        # if the user does not occupy the province, check for wars and military access agreements unless the owner is natives
-        elif (prov_info['occupier_id'] != user_info['user_id']) and (prov_info['owner_id'] != 0):
-             # get the prov occupier name
-            prov_occupier_info = await user_db_info(conn=conn, user_id=prov_info['occupier_id'])
-            # war check
-            war_check = await conn.fetchrow('''SELECT *
-                                                    FROM cnc_wars
-                                                    WHERE (($1 = ANY(attackers) AND $2 = ANY(defenders))
-                                                        OR ($1 = ANY(defenders) AND $2 = ANY(attackers)))
-                                                    AND active;''',
-                                                user_info['name'], prov_occupier_info['name'])
-            # military access check
-            mil_access_check = await conn.fetchrow('''SELECT * FROM cnc_military_access WHERE ($1 = ANY(members) AND $2 = ANY(members));''', user_info['name'], prov_occupier_info['name'])
-            # if at war, set the battle check as true
-            if war_check:
-                battle = True
-            # if the military access check is good, pass
-            elif mil_access_check:
-                pass
-            # if neither are good, reject
-            else:
-                return await interaction.folloup.send(f"{user_info['name']} cannot move troops into provinces belonging to {prov_occupier_info['name']} unless they have a Military Access agreement or are at war.", ephemeral=True)
         # if the army is embarked, try looking for a naval path
         if army_info['embarked']:
             # check if the province is coastal
-            if not province_info['coastal']:
+            if not prov_info['coastal']:
                 # reject
-                return await interaction.followup.send(f"The {army_info['name']} is currently embarked and cannot navigate to non-coastal provinces.", ephemeral=True)
+                return await interaction.followup.send(f"The {army_info['name']} is currently embarked and cannot "
+                                                       f"navigate to non-coastal provinces.", ephemeral=True)
             # otherwise, carry on
             else:
                 # calculate the movement cost if a port is not in the leaving province
@@ -7812,29 +7874,48 @@ class CNC(commands.Cog):
                 # check if the army has sufficient movement
                 if army_info['movement'] < movement_cost:
                     # reject
-                    return await interaction.followup.send(f"The {army_info['army_name']} does not have sufficient movement to move to {prov_info['name']} (ID: {prov_info['id']}).", ephemeral=True)
+                    return await interaction.followup.send(f"The {army_info['army_name']} does not have sufficient "
+                                                           f"movement to move to {prov_info['name']} "
+                                                           f"(ID: {prov_info['id']}).", ephemeral=True)
                 # subtract the movement cost and update the army location
-                await conn.execute('''UPDATE cnc_armies SET movement = movement - $2, location = $3 WHERE army_id = $1;''', army_info['army_id'], movement_cost, move_to)
+                await conn.execute('''UPDATE cnc_armies SET movement = movement - $2, location = $3 
+                                      WHERE army_id = $1;''', army_info['army_id'], movement_cost, move_to)
                 # if there is no battle, move immediately
                 if not battle:
                     # notify user
-                    return await interaction.followup.send(f"The {army_info['army_name']} has successfully landed at {prov_info['name']} (ID: {prov_info['id']}).")
+                    return await interaction.followup.send(f"The {army_info['army_name']} has successfully landed at "
+                                                           f"{prov_info['name']} (ID: {prov_info['id']}).")
                 # otherwise, initiate combat
                 else:
                     pass
         # otherwise, calculate the path
         else:
             # calculate the distance using find_path
-            path, cost = await find_path(conn=conn, start_id=army_info['location'], end_id=move_to)
+            path, cost, blocked_by_hostiles = await find_path(conn=conn, 
+                                                             start_id=army_info['location'], 
+                                                             end_id=move_to, 
+                                                             moving_user_id=interaction.user.id)
             # check if the path exists
             if path is None:
+                if blocked_by_hostiles:
+                    return await interaction.followup.send(f"The {army_info['army_name']} cannot move to "
+                                                           f"{prov_info['name']} (ID: {prov_info['id']}) as it has been"
+                                                           f" blocked by hostile armies along the way.", ephemeral=True)
                 # reject
-                return await interaction.followup.send(f"The {army_info['army_name']} cannot find a land path to {prov_info['name']} (ID: {prov_info['id']}).", ephemeral=True) 
+                return await interaction.followup.send(f"The {army_info['army_name']} cannot find an open land path to "
+                                                       f"{prov_info['name']} (ID: {prov_info['id']}).\n"
+                                                       f"The path is either blocked by geography, hostile armies, "
+                                                       f"or occupied provinces.", ephemeral=True)
             # if the cost is greater than the movement of the army
             elif cost > army_info['movement']:
                 # reject
-                return await interaction.followup.send(f"The {army_info['name']} cannot reach {prov_info['name']} (ID: {move_to}) as it has insufficient movement.\nThe total movement cost from {depart_prov_info['name']} (ID: {depart_prov_info['id']}) to the desired location is `{movement_cost}` movement points.")
-            # check if the path to the 
+                return await interaction.followup.send(f"The {army_info['name']} cannot reach {prov_info['name']} "
+                                                       f"(ID: {move_to}) as it has insufficient movement."
+                                                       f"\nThe total movement cost from {depart_prov_info['name']} "
+                                                       f"(ID: {depart_prov_info['id']}) to the desired location is "
+                                                       f"`{cost}` movement points.")
+
+
 
     @cnc.command(name="army", description="Displays information about a specific army.")
     @app_commands.autocomplete(army_id=army_autocomplete)
