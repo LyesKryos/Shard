@@ -19,6 +19,17 @@ from faker import Faker
 from faker.exceptions import UniquenessException
 import re
 
+async def cnc_user_check(interaction: discord.Interaction) -> bool:
+    # establish the conn
+    conn = interaction.client.pool
+    # check the user data
+    user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+    # if the user info is none, return a false
+    if not user_info:
+        return False
+    # otherwise, return true
+    else:
+        return True
 
 async def safe_dm(bot: discord.Client, user_id: int, *, content: str | None = None,
                   embed: discord.Embed | None = None, view: discord.ui.View | None = None,
@@ -7734,9 +7745,30 @@ class CNC(commands.Cog):
                     await conn.execute('''INSERT INTO cnc_armies(owner_id, troops, location, army_name) VALUES ($1, $2, $3, $4);''', user_info['user_id'], recruit_troops, post_info['id'], army_name)
                     # notify
                     return await interaction.followup.send(f"The {army_name} has been created in {post_info['name']} (ID: {post_info['id']}). It currently has `{recruit_troops:,}` troops. It is not commanded by a General.", ephemeral=False)
-                
-                
     
+    @cnc.command(name="move_army", description="Moves an army to a new location, initiating army combat or siege where applicable.")
+    @app_commands.autocomplete(army=army_autocomplete, move_to=province_autocomplete)
+    @app_commands.describe(army="The ID of the army you wish to move.", move_to="The ID of the province to move the army to.")
+    @app_commands.check(cnc_user_check)
+    async def move_army(self, interaction: discord.Interaction, army: int, move_to: int):
+        # defer response
+        await interaction.response.defer()
+        # establish conn
+        conn = self.bot.pool
+        # get the army info
+        army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', army)
+        # get the province info
+        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', prov_info)
+        # if that is not an army
+        if not army_info:
+            # reject
+            return await interaction.followup.send(f"There is no such army with the ID: `{army}`.", ephemeral=True)
+        # if that is not a province
+        elif not prov_info:
+            
+        
+        
+
     @cnc.command(name="army", description="Displays information about a specific army.")
     @app_commands.autocomplete(army_id=army_autocomplete)
     @app_commands.describe(army_id="The ID of the army")

@@ -5,7 +5,7 @@ import discord.errors
 from discord import app_commands
 from ShardBot import Shard
 from discord.ext import commands
-from customchecks import SilentFail
+from customchecks import SilentFail, NotCNCUser
 
 
 class ShardErrorHandler(commands.Cog):
@@ -172,6 +172,8 @@ class ShardErrorHandler(commands.Cog):
                                                     ephemeral=True)
         elif isinstance(error, app_commands.errors.MissingRole):
             await interaction.response.send_message("You are missing the proper roles for this command.")
+        elif isinstance(error, NotCNCUser):
+            await interaction.response.send_message("You are not a registered member of the Command & Conquest System. To register, use </cnc register:1316831583159849021>.", ephemeral=True)
         elif isinstance(error, app_commands.CheckFailure):
             await interaction.response.send_message(content="You do not have the right permissions for this command "
                                                     "or are blocked from using this command.", ephemeral=True)

@@ -1,6 +1,6 @@
 from discord.ext import commands
 from discord.utils import get
-
+from discord import app_commands
 
 class SilentFail(commands.CommandError):
     pass
@@ -8,6 +8,8 @@ class SilentFail(commands.CommandError):
 class CNCFail(commands.CheckFailure):
     pass
 
+class NotCNCUser(app_commands.CheckFailure):
+    pass
 
 class TooManyRequests(Exception):
 
