@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Pushing changes">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Creating battlesim.py with everything necessary for battle simulation (theoretically)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlesim.py" beforeDir="false" afterPath="$PROJECT_DIR$/battlesim.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -539,7 +540,7 @@
       <workItem from="1772670838803" duration="1866000" />
       <workItem from="1773435837414" duration="4509000" />
       <workItem from="1773683117706" duration="6369000" />
-      <workItem from="1773757420896" duration="5127000" />
+      <workItem from="1773757420896" duration="12464000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -884,7 +885,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1480" />
+    <option name="localTasksCounter" value="1482" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -903,7 +904,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Setting peace negotiation timeout to 1 day" />
     <MESSAGE value="Adding target name to peace info so that the users know who the target of the peace is" />
     <MESSAGE value="Correcting how wars end if the user is not the primary attacker/defender" />
     <MESSAGE value="Actually adding target to peace embed and updating it" />
@@ -928,7 +928,8 @@
     <MESSAGE value="Correcting back button placement for cooperative diplo relations" />
     <MESSAGE value="Adding the military access button functionality and the accept view associated." />
     <MESSAGE value="Pushing changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Pushing changes" />
+    <MESSAGE value="Creating battlesim.py with everything necessary for battle simulation (theoretically)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Creating battlesim.py with everything necessary for battle simulation (theoretically)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

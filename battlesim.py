@@ -101,6 +101,9 @@ class Battle:
         self.landing = landing
 
     async def battle(self) -> Tuple[str, int, int]:
+        """Simulates a battle based on given parameters. Internally updates armies based on casualties.
+
+        Returns victor -> str = 'attacker' or 'defender' and total casualties -> int (attacker), int (defender)"""
         # establish conn
         conn = self.conn
 
@@ -156,7 +159,7 @@ class Battle:
 
             victor, attack_casualties_percent, defense_casualties_percent = await _skirmish.skirmish()
             # update the casualty tracker
-            total_attack_casualties += self.attacking_army['troops'] * attack_casualties_percent
+            total_attack_casualties += round(self.attacking_army['troops'] * attack_casualties_percent)
             # tally the victory
             if victor == "attacker":
                 attack_victory_tally += 1
@@ -169,7 +172,7 @@ class Battle:
             self.attacking_army = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
                                                       self.attacking_army['army_id'])
             # get the total defense casualties and add them to the tracker
-            total_defense_casualties += sum(a['troops'] for a in self.defending_armies) * defense_casualties_percent
+            total_defense_casualties += round(sum(a['troops'] for a in self.defending_armies) * defense_casualties_percent)
             # for each of the defending armies, share the casualties
             refreshed = []
             for army in self.defending_armies:
