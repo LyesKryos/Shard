@@ -7881,6 +7881,34 @@ class CNC(commands.Cog):
                                                    f"command the {army_info['army_name']}.", ephemeral=True)
         # if the army is embarked, try looking for a naval path
         if army_info['embarked']:
+            # define
+            war = None
+            # check for war and mil access
+            if (prov_info['occupier_id'] != 0) and (prov_info['occupier_id'] != user_info['user_id']):
+                # get occupier info
+                occupier_info = await user_db_info(conn=conn, user_id=prov_info['occupier_id'])
+                # war check
+                war_check = await conn.fetchrow('''SELECT *
+                                                   FROM cnc_wars
+                                                   WHERE (($1 = ANY (attackers) AND $2 = ANY (defenders))
+                                                       OR ($1 = ANY (defenders) AND $2 = ANY (attackers)))
+                                                     AND active;''',
+                                                user_info['name'], occupier_info['name'])
+                # military access check
+                mil_access_check = await conn.fetchrow('''SELECT *
+                                                          FROM cnc_military_access
+                                                          WHERE ($1 = ANY (members) AND $2 = ANY (members));''',
+                                                       user_info['name'], occupier_info['name'])
+                # if neither are true, reject
+                if not war_check and not mil_access_check:
+                    return await interaction.followup.send(f"The {army_info['name']} is not authorized to land at "
+                                                           f"{prov_info['name']} (ID: {prov_info['id']}).",
+                                                           ephemeral=True)
+                elif war_check:
+                    war = war_check
+                # otherwise, pass through to the other checks
+                else:
+                    pass
             # check if the movement target is coastal
             if not prov_info['coastal']:
                 # reject
@@ -7896,17 +7924,160 @@ class CNC(commands.Cog):
                     return await interaction.followup.send(f"The {army_info['army_name']} does not have sufficient "
                                                            f"movement to sail to {prov_info['name']} "
                                                            f"(ID: {prov_info['id']}).", ephemeral=True)
-                # subtract the movement cost and update the army location
-                await conn.execute('''UPDATE cnc_armies SET movement = movement - $2, location = $3 
-                                      WHERE army_id = $1;''', army_info['army_id'], movement_cost, move_to)
-                # if there is no battle, move immediately
+                # if the province is owned by natives
+                if prov_info['occupier_id'] == 0:
+                    # check if there is a war
+                    war = await conn.fetchrow('''SELECT * FROM cnc_wars 
+                                                 WHERE ($1 = ANY(attackers) OR $1 = ANY(defenders)) 
+                                                   AND active = True;''', user_info['name'])
+                    # if there is a war, check for enemy armies
+                    if war is not None:
+                        # check for armies of the opposing side
+                        if user_info['name'] in war['attackers']:
+                            user_side = "attacker"
+                            # get all the defender ids
+                            defender_ids = []
+                            for d in war['defenders']:
+                                defender_id = await conn.fetchval('''SELECT user_id
+                                                                     FROM cnc_users
+                                                                     WHERE name = $1;''',
+                                                                  d)
+                                defender_ids.append(defender_id)
+                            # check if any army present is a defender army
+                            enemy_army_list = await conn.fetch('''SELECT army_id
+                                                                  FROM cnc_armies
+                                                                  WHERE location = $1
+                                                                    AND ownwer_id = ANY ($2);''', move_to, defender_ids)
+                        else:
+                            user_side = "defender"
+                            # get all the attacker ids
+                            attacker_ids = []
+                            for a in war['attackers']:
+                                attacker_id = await conn.fetchval('''SELECT user_id
+                                                                     FROM cnc_users
+                                                                     WHERE name = $1;''',
+                                                                  a)
+                                attacker_ids.append(attacker_id)
+                            # check if any army present is a defender army
+                            enemy_army_list = await conn.fetch('''SELECT army_id
+                                                                  FROM cnc_armies
+                                                                  WHERE location = $1
+                                                                    AND army_id = ANY ($2);''', move_to,
+                                                               attacker_ids)
+                        # if there are enemy armies present, battle
+                        if len(enemy_army_list) > 0:
+                            battle = True
+                        # otherwise, check if the user has more than 15 provinces
+                        prov_count = await conn.fetchval('''SELECT COUNT(id) FROM cnc_provinces 
+                                                            WHERE owner_id = $1;''', user_info['user_id'])
+                        # if they have more than 15, move
+                        if prov_count > 15:
+                            # subtract the movement cost and update the army location
+                            await conn.execute('''UPDATE cnc_armies
+                                                  SET movement = movement - $2,
+                                                      location = $3
+                                                  WHERE army_id = $1;''', army_info['army_id'], movement_cost, move_to)
+                            # notify user
+                            return await interaction.followup.send(
+                                f"The {army_info['army_name']} has successfully landed at "
+                                f"{prov_info['name']} (ID: {prov_info['id']}).")
+                # if there is a war, do battle/occupation
+                if war is not None:
+                    # check for armies of the opposing side
+                    if user_info['name'] in war['attackers']:
+                        user_side = "attacker"
+                        # get all the defender ids
+                        defender_ids = []
+                        for d in war['defenders']:
+                            defender_id = await conn.fetchval('''SELECT user_id FROM cnc_users WHERE name = $1;''',
+                                                              d)
+                            defender_ids.append(defender_id)
+                        # check if any army present is a defender army
+                        enemy_army_list = await conn.fetch('''SELECT army_id
+                                                              FROM cnc_armies
+                                                              WHERE location = $1
+                                                                AND ownwer_id = ANY ($2);''', move_to, defender_ids)
+                    else:
+                        user_side = "defender"
+                        # get all the attacker ids
+                        attacker_ids = []
+                        for a in war['attackers']:
+                            attacker_id = await conn.fetchval('''SELECT user_id FROM cnc_users WHERE name = $1;''',
+                                                              a)
+                            attacker_ids.append(attacker_id)
+                        # check if any army present is a defender army
+                        enemy_army_list = await conn.fetch('''SELECT army_id
+                                                              FROM cnc_armies
+                                                              WHERE location = $1
+                                                                AND army_id = ANY ($2);''', move_to,
+                                                           attacker_ids)
+                    # if there are enemy armies present, battle
+                    if len(enemy_army_list) > 0:
+                        battle = True
+                    # otherwise, occupy the province
+                    else:
+                        # get the occupier info
+                        occupier_info = await user_db_info(conn=conn, user_id=prov_info['occupier_id'])
+                        # change the army position and reduce the movement
+                        await conn.execute('''UPDATE cnc_armies SET location = $1, movement = movement - $2 
+                                            WHERE army_id = $3;''', move_to, movement_cost, army)
+                        # update the province's occupier
+                        await conn.execute('''UPDATE cnc_provinces SET occupier_id = $2 WHERE id = $1;''',
+                                           move_to, user_info['user_id'])
+                        # run the occupier coloring
+                        await self.occupy_color(province=move_to,
+                                                occupy_color=user_info['color'],
+                                                owner_color=occupier_info['color'])
+                        # calculate the base war score
+                        war_score_gained = prov_info['development'] * .25
+                        # if the user is the attacker, use the cb and the purpose to calculate war score
+                        if user_side == "attacker":
+                            # get the war purpose
+                            war_purpose = await conn.fetchval('''SELECT purpose FROM cnc_cbs WHERE war_goal = $1;''',
+                                                              war['cb'])
+                            # if the war purpose has "capture provinces", calculate the special war score bonus
+                            if "Capture Provinces" in war_purpose:
+                                # the special war goal is 1/4 dev * random(1.3,1.7)
+                                war_score_gained *= uniform(1.3,1.7)
+                            # update the attacker war score
+                            await conn.execute('''UPDATE cnc_wars SET war_score[1] = war_score[1] + $2 
+                                                  WHERE id = $1;''', war['id'], war_score_gained)
+                        # if the user is the defender, use the db (if it is not status quo)
+                        elif user_side == "defender" and war['db'] != "Status Quo":
+                                                        # get the war purpose
+                            war_purpose = await conn.fetchval('''SELECT purpose FROM cnc_cbs WHERE war_goal = $1;''',
+                                                              war['db'])
+                            # if the war purpose has "capture provinces", calculate the special war score bonus
+                            if "Capture Provinces" in war_purpose:
+                                # the special war goal is 1/4 dev * random(1.3,1.7)
+                                war_score_gained *= uniform(1.3,1.7)
+                            # update the defender war score
+                            await conn.execute('''UPDATE cnc_wars
+                                                  SET war_score[2] = war_score[2] + $2
+                                                  WHERE id = $1;''', war['id'], war_score_gained)
+                        else:
+                            # update the plain defender war score
+                            await conn.execute('''UPDATE cnc_wars SET war_score[2] = war_score[2] + $2 
+                                                  WHERE id = $1;''', war['id'], war_score_gained)
+                        # wrap up with a message
+                        return await interaction.followup.send(f"The {army_info['name']} has captured and occupied "
+                                                               f"{prov_info['name']} (ID: {prov_info['id']}), adding "
+                                                               f"`{round(war_score_gained)}` War Score to the "
+                                                               f"{war['name']}.")
+
+                # if there is no battle and no war, move immediately
                 if not battle:
+                    # subtract the movement cost and update the army location
+                    await conn.execute('''UPDATE cnc_armies
+                                          SET movement = movement - $2,
+                                              location = $3
+                                          WHERE army_id = $1;''', army_info['army_id'], movement_cost, move_to)
                     # notify user
                     return await interaction.followup.send(f"The {army_info['army_name']} has successfully landed at "
                                                            f"{prov_info['name']} (ID: {prov_info['id']}).")
-                # otherwise, initiate combat
+                # otherwise, pass through to the battle portion
                 else:
-                    battle = True
+                    pass
         # otherwise, calculate the path
         else:
             # calculate the distance using find_path
@@ -7956,21 +8127,35 @@ class CNC(commands.Cog):
                                                     user_info['name'])
                     # if the users are at war and an army of the enemy is present, then battle
                     if war_check:
-                        # check which side the user is on
                         if user_info['name'] in war_check['attackers']:
+                            # get all the defender ids
+                            defender_ids = []
+                            for d in war_check['defenders']:
+                                defender_id = await conn.fetchval('''SELECT user_id
+                                                                     FROM cnc_users
+                                                                     WHERE name = $1;''',
+                                                                  d)
+                                defender_ids.append(defender_id)
                             # check if any army present is a defender army
                             enemy_army_list = await conn.fetch('''SELECT army_id
                                                                   FROM cnc_armies
                                                                   WHERE location = $1
-                                                                    AND army_id = ANY ($2);''', move_to,
-                                                               war_check['defenders'])
+                                                                    AND ownwer_id = ANY ($2);''', move_to, defender_ids)
                         else:
+                            # get all the attacker ids
+                            attacker_ids = []
+                            for a in war_check['attackers']:
+                                attacker_id = await conn.fetchval('''SELECT user_id
+                                                                     FROM cnc_users
+                                                                     WHERE name = $1;''',
+                                                                  a)
+                                attacker_ids.append(attacker_id)
                             # check if any army present is a defender army
                             enemy_army_list = await conn.fetch('''SELECT army_id
                                                                   FROM cnc_armies
                                                                   WHERE location = $1
                                                                     AND army_id = ANY ($2);''', move_to,
-                                                               war_check['attackers'])
+                                                               attacker_ids)
                         # if there are enemy armies present, battle
                         if len(enemy_army_list) > 0:
                             battle = True
@@ -8018,45 +8203,66 @@ class CNC(commands.Cog):
                     if user_info['name'] in war_check['attackers']:
                         user_side = "attacker"
                         # check if any army present is a defender army
-                        enemy_army_list = await conn.fetch('''SELECT army_id FROM cnc_armies WHERE location = $1 AND army_id = ANY($2);''', move_to, war_check['defenders'])
+                        enemy_army_list = await conn.fetch('''SELECT army_id FROM cnc_armies 
+                                                              WHERE location = $1 AND army_id = ANY($2);''',
+                                                           move_to, war_check['defenders'])
                     else:
                         user_side = "defender"
                         # check if any army present is a defender army
-                        enemy_army_list = await conn.fetch('''SELECT army_id FROM cnc_armies WHERE location = $1 AND army_id = ANY($2);''', move_to, war_check['attackers'])
+                        enemy_army_list = await conn.fetch('''SELECT army_id FROM cnc_armies 
+                                                              WHERE location = $1 AND army_id = ANY($2);''',
+                                                           move_to, war_check['attackers'])
                     # if there are enemy armies present, battle
                     if len(enemy_army_list) > 0:
                         battle = True
-                    # otherwise, occupy
+                    # otherwise, occupy the province
                     else:
                         # change the army position and reduce the movement
                         await conn.execute('''UPDATE cnc_armies SET location = $1, movement = movement - $2 
                                             WHERE army_id = $3;''', move_to, cost, army)
                         # update the province's occupier
-                        await conn.execute('''UPDATE cnc_provinces SET occupier_id = $1 WHERE id = $1;''', move_to)
+                        await conn.execute('''UPDATE cnc_provinces SET occupier_id = $2 WHERE id = $1;''',
+                                           move_to, user_info['user_id'])
+                        # run the occupier coloring
+                        await self.occupy_color(province=move_to,
+                                                occupy_color=user_info['color'],
+                                                owner_color=occupier_info['color'])
                         # calculate the base war score
                         war_score_gained = prov_info['development'] * .25
                         # if the user is the attacker, use the cb and the purpose to calculate war score
-                        if user_side = "attacker":
+                        if user_side == "attacker":
                             # get the war purpose
-                            war_purpose = await conn.fetchval('''SELECT purpose FROM cnc_cbs WHERE war_goal = $1;''', war_check['cb'])
-                            # if the war purpose has "capture provinces", caluculate the special war score bonus
+                            war_purpose = await conn.fetchval('''SELECT purpose FROM cnc_cbs WHERE war_goal = $1;''',
+                                                              war_check['cb'])
+                            # if the war purpose has "capture provinces", calculate the special war score bonus
                             if "Capture Provinces" in war_purpose:
                                 # the special war goal is 1/4 dev * random(1.3,1.7)
                                 war_score_gained *= uniform(1.3,1.7)
                             # update the attacker war score
-                            await conn.execute('''UPDATE cnc_wars SET war_score[1] = war_score[1] + $2 WHERE id = $1;''', war_check['id'], war_score_gained)
+                            await conn.execute('''UPDATE cnc_wars SET war_score[1] = war_score[1] + $2 
+                                                  WHERE id = $1;''', war_check['id'], war_score_gained)
                         # if the user is the defender, use the db (if it is not status quo)
-                        elif user_side = "defender" and war_check['db'] != "Status Quo":
+                        elif user_side == "defender" and war_check['db'] != "Status Quo":
                                                         # get the war purpose
-                            war_purpose = await conn.fetchval('''SELECT purpose FROM cnc_cbs WHERE war_goal = $1;''', war_check['db'])
-                            # if the war purpose has "capture provinces", caluculate the special war score bonus
+                            war_purpose = await conn.fetchval('''SELECT purpose FROM cnc_cbs WHERE war_goal = $1;''',
+                                                              war_check['db'])
+                            # if the war purpose has "capture provinces", calculate the special war score bonus
                             if "Capture Provinces" in war_purpose:
                                 # the special war goal is 1/4 dev * random(1.3,1.7)
                                 war_score_gained *= uniform(1.3,1.7)
-                            # update the war 
+                            # update the defender war score
+                            await conn.execute('''UPDATE cnc_wars
+                                                  SET war_score[2] = war_score[2] + $2
+                                                  WHERE id = $1;''', war_check['id'], war_score_gained)
                         else:
                             # update the plain defender war score
-                            await conn.execute('''UPDATE cnc_wars SET war_score[2] = war_score[2] + $2 WHERE id = $1;''', war_check['id'], war_score_gained)
+                            await conn.execute('''UPDATE cnc_wars SET war_score[2] = war_score[2] + $2 
+                                                  WHERE id = $1;''', war_check['id'], war_score_gained)
+                        # wrap up with a message
+                        return await interaction.followup.send(f"The {army_info['name']} has captured and occupied "
+                                                               f"{prov_info['name']} (ID: {prov_info['id']}), adding "
+                                                               f"`{round(war_score_gained)}` War Score to the "
+                                                               f"{war_check['name']}.")
                 # otherwise, update the army position
                 else:
                     # change the army position and reduce the movement
@@ -8077,10 +8283,10 @@ class CNC(commands.Cog):
                 return await interaction.followup.send(f"The {army_info['army_name']} has successfully moved to "
                                                        f"{prov_info['name']} (ID: {prov_info['id']}) at a cost of "
                                                        f"`{cost}` movement points.")
-            # 
-
-
-
+            # if there is to be a battle
+            if battle:
+                # battle
+                pass
 
 
     @cnc.command(name="army", description="Displays information about a specific army.")
