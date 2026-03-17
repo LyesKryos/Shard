@@ -1,5 +1,5 @@
 from __future__ import annotations
-from random import randrange, randint, choice
+from random import randrange, randint, choice, uniform
 from typing import List
 import asyncpg
 from discord import app_commands, Interaction
@@ -7881,7 +7881,7 @@ class CNC(commands.Cog):
                                                    f"command the {army_info['army_name']}.", ephemeral=True)
         # if the army is embarked, try looking for a naval path
         if army_info['embarked']:
-            # check if the province is coastal
+            # check if the movement target is coastal
             if not prov_info['coastal']:
                 # reject
                 return await interaction.followup.send(f"The {army_info['name']} is currently embarked and cannot "
@@ -7894,7 +7894,7 @@ class CNC(commands.Cog):
                 if army_info['movement'] < movement_cost:
                     # reject
                     return await interaction.followup.send(f"The {army_info['army_name']} does not have sufficient "
-                                                           f"movement to move to {prov_info['name']} "
+                                                           f"movement to sail to {prov_info['name']} "
                                                            f"(ID: {prov_info['id']}).", ephemeral=True)
                 # subtract the movement cost and update the army location
                 await conn.execute('''UPDATE cnc_armies SET movement = movement - $2, location = $3 
@@ -7916,19 +7916,19 @@ class CNC(commands.Cog):
                                                              moving_user_id=interaction.user.id)
             # check if the path exists
             if path is None:
-                # if the path was blocked 
+                # if the path was blocked by armies/forts
                 if blocked_by_hostiles:
                     # reject with a special message
                     return await interaction.followup.send(f"The {army_info['army_name']} cannot move to "
                                                            f"{prov_info['name']} (ID: {prov_info['id']}), either "
-                                                           f"because it has been blocked by hostile armies along the "
+                                                           f"because it has been blocked by hostile armies or forts along the "
                                                            f"way, the army does not have military access to a province,"
                                                            f" or because of geography.", ephemeral=True)
                 # reject normally
                 return await interaction.followup.send(f"The {army_info['army_name']} cannot find an open land path to "
                                                        f"{prov_info['name']} (ID: {prov_info['id']}).\n"
                                                        f"The path is either blocked by geography, hostile armies, "
-                                                       f"or occupied provinces.", ephemeral=True)
+                                                       f"enemy forts, or occupied provinces.", ephemeral=True)
             # if the cost is greater than the movement of the army
             elif cost > army_info['movement']:
                 # reject
@@ -7941,7 +7941,8 @@ class CNC(commands.Cog):
             if prov_info['owner_id'] == 0:
                 # check how many provinces the user has
                 province_count = await conn.fetchval('''SELECT COUNT(id) FROM cnc_provinces WHERE owner_id = $1;''',
-                                                     user_info['user_id'])
+                     
+                                                   user_info['user_id'])
                 # if the user has fewer than 15, battle
                 if province_count < 15:
                     battle = True
@@ -8015,9 +8016,11 @@ class CNC(commands.Cog):
                 if war_check:
                     # check which side the user is on
                     if user_info['name'] in war_check['attackers']:
+                        user_side = "attacker"
                         # check if any army present is a defender army
                         enemy_army_list = await conn.fetch('''SELECT army_id FROM cnc_armies WHERE location = $1 AND army_id = ANY($2);''', move_to, war_check['defenders'])
                     else:
+                        user_side = "defender"
                         # check if any army present is a defender army
                         enemy_army_list = await conn.fetch('''SELECT army_id FROM cnc_armies WHERE location = $1 AND army_id = ANY($2);''', move_to, war_check['attackers'])
                     # if there are enemy armies present, battle
@@ -8025,8 +8028,35 @@ class CNC(commands.Cog):
                         battle = True
                     # otherwise, occupy
                     else:
-                        # do the occupation code here
-                        pass
+                        # change the army position and reduce the movement
+                        await conn.execute('''UPDATE cnc_armies SET location = $1, movement = movement - $2 
+                                            WHERE army_id = $3;''', move_to, cost, army)
+                        # update the province's occupier
+                        await conn.execute('''UPDATE cnc_provinces SET occupier_id = $1 WHERE id = $1;''', move_to)
+                        # calculate the base war score
+                        war_score_gained = prov_info['development'] * .25
+                        # if the user is the attacker, use the cb and the purpose to calculate war score
+                        if user_side = "attacker":
+                            # get the war purpose
+                            war_purpose = await conn.fetchval('''SELECT purpose FROM cnc_cbs WHERE war_goal = $1;''', war_check['cb'])
+                            # if the war purpose has "capture provinces", caluculate the special war score bonus
+                            if "Capture Provinces" in war_purpose:
+                                # the special war goal is 1/4 dev * random(1.3,1.7)
+                                war_score_gained *= uniform(1.3,1.7)
+                            # update the attacker war score
+                            await conn.execute('''UPDATE cnc_wars SET war_score[1] = war_score[1] + $2 WHERE id = $1;''', war_check['id'], war_score_gained)
+                        # if the user is the defender, use the db (if it is not status quo)
+                        elif user_side = "defender" and war_check['db'] != "Status Quo":
+                                                        # get the war purpose
+                            war_purpose = await conn.fetchval('''SELECT purpose FROM cnc_cbs WHERE war_goal = $1;''', war_check['db'])
+                            # if the war purpose has "capture provinces", caluculate the special war score bonus
+                            if "Capture Provinces" in war_purpose:
+                                # the special war goal is 1/4 dev * random(1.3,1.7)
+                                war_score_gained *= uniform(1.3,1.7)
+                            # update the war 
+                        else:
+                            # update the plain defender war score
+                            await conn.execute('''UPDATE cnc_wars SET war_score[2] = war_score[2] + $2 WHERE id = $1;''', war_check['id'], war_score_gained)
                 # otherwise, update the army position
                 else:
                     # change the army position and reduce the movement
@@ -8047,6 +8077,7 @@ class CNC(commands.Cog):
                 return await interaction.followup.send(f"The {army_info['army_name']} has successfully moved to "
                                                        f"{prov_info['name']} (ID: {prov_info['id']}) at a cost of "
                                                        f"`{cost}` movement points.")
+            # 
 
 
 
