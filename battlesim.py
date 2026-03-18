@@ -103,10 +103,11 @@ class Skirmish:
         defense_casualties_percent = uniform(0.01, (attack_roll/10)) * uniform(1, 0.95+terrain_casualties)
 
         # log results
-        logger.debug(f"attack_casualties_percent: {attack_casualties_percent}, "
-                     f"defense_roll: {defense_roll}, "
-                     f"terrain_casualties: {terrain_casualties}, "
-                     f"1-casualties: {1 - attack_casualties_percent}, "
+        logger.debug(f"attack_casualties_percent: {attack_casualties_percent}, \n"
+                     f"defense_roll: {defense_roll}, \n"
+                     f"attack_roll: {attack_roll} ({attacking_general_level} + {ratio} + dice), \n"
+                     f"terrain_casualties: {terrain_casualties}, \n"
+                     f"1-casualties: {1 - attack_casualties_percent}, \n"
                      f"troops_before: {self.attacking_army['troops']}")
         # return all values
         return victor, attack_casualties_percent, defense_casualties_percent
@@ -177,6 +178,7 @@ class Battle:
         # define victories
         attack_victory_tally = 0
         defense_victory_tally = 0
+        logger.debug(f"Total skirmishes to run: {skirmishes}")
         for _ in range(skirmishes):
             # select a terrain
             terrain_id = choice(terrain_options)
