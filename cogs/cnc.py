@@ -5955,11 +5955,11 @@ class WarOptionsView(discord.ui.View):
                                           WHERE war_id = $1;''',
                                        war_info['id'])
                     # if the target is not the primary defender, then remove them from the war
-                    if target != war_info['primary_defender']:
+                    if target != war_info['primary_defender'] and target in war_info['defenders']:
                         await conn.execute('''UPDATE cnc_wars SET defenders = array_remove(defenders, $1) 
                                                   WHERE id = $2;''', target, war_info['id'])
                     # if they are not the primary attacker, remove from the attackers
-                    elif target != war_info['primary_attacker'] :
+                    elif target != war_info['primary_attacker'] and target in war_info['attackers']:
                         await conn.execute('''UPDATE cnc_wars SET attackers = array_remove(attackers, $1) 
                                            WHERE id = $2;''', target, war_info['id'])
                     # if they are the primary attacker or defender, then end the war
