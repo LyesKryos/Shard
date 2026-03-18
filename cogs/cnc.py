@@ -8247,7 +8247,7 @@ class CNC(commands.Cog):
             if prov_info['owner_id'] == 0 and len(enemy_army_list) == 0:
                 native_army = {
                     'army_id': None,  # no DB record
-                    'troops': prov_info['citizens'] * (prov_info['development']/10),
+                    'troops': int(prov_info['citizens'] * (prov_info['development']/10)),
                     'general': None,
                     'owner_id': 0,
                     'army_name': f"Warriors of {prov_info['name']}"
@@ -8264,6 +8264,9 @@ class CNC(commands.Cog):
                 )
                 # run battle and return results
                 victor, attacker_casualties, defender_casualties = await battle.battle()
+                # since this is directly attacking the province natives, reduce the citizenry by the casualties
+                await conn.execute('''UPDATE cnc_provinces SET citizens = citizens - $2 WHERE id = $1;''', 
+                                   prov_info['id'], defender_casualties)
                 # === VICTORY ===
                 if victor == "attacker":
                     # the army is already moved, so update the province owner
@@ -8302,12 +8305,13 @@ class CNC(commands.Cog):
                                              color=discord.Color.red())
                 # define the attacking attributes
                 battle_embed.add_field(name="Attacker", value=user_info['name'])
-                battle_embed.add_field(name="Attacking Army", value=f"The {army_info['army_name']}\n{army_info['troops']}")
+                battle_embed.add_field(name="Attacking Army",
+                                       value=f"The {army_info['army_name']}\n{army_info['troops']} troops")
                 battle_embed.add_field(name="\u200b", value="\u200b")
                 # define the defending attributes
                 battle_embed.add_field(name="Defenders", value="Natives")
                 battle_embed.add_field(name="Defending Army",
-                                       value=f"The {native_army['army_name']}\n{native_army['troops']}")
+                                       value=f"The {native_army['army_name']}\n{native_army['troops']} troops")
                 battle_embed.add_field(name="\u200b", value="\u200b")
                 # outcome
                 battle_embed.add_field(name="Outcome", value=victor_string, inline=False)
