@@ -8247,7 +8247,7 @@ class CNC(commands.Cog):
             if prov_info['owner_id'] == 0 and len(enemy_army_list) == 0:
                 native_army = {
                     'army_id': None,  # no DB record
-                    'troops': int(prov_info['citizens'] * (prov_info['development']/10)),
+                    'troops': int(prov_info['citizens'] * max(prov_info['development']/10, 0.9)),
                     'general': None,
                     'owner_id': 0,
                     'army_name': f"Warriors of {prov_info['name']}"
