@@ -7866,7 +7866,12 @@ class CNC(commands.Cog):
         if not army_info:
             # reject
             return await interaction.followup.send(f"There is no such army with the ID: `{army}`.", ephemeral=True)
-        # if the province doesn't eixt
+        # if the army has no troops, it cannot move
+        elif army_info['troops'] <= 0:
+            # reject
+            return await interaction.followup.send(f"The {army_info['army_name']} cannot move as it has no troops.",
+                                                   ephemeral=True)
+        # if the province doesn't exist
         if not prov_info:
             # reject
             return await interaction.followup.send(f"There is no such province with the ID: `{move_to}`.",
@@ -7926,7 +7931,7 @@ class CNC(commands.Cog):
                 return round(score)
 
         # if the army has been embarked
-        if army_info['embarked']:
+        if army_info['embark']:
             # define the global war
             war = None
             # define the landing
