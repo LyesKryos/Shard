@@ -5949,18 +5949,6 @@ class WarOptionsView(discord.ui.View):
                                           VALUES ($1, $2, $3, $4);''',
                                        war_info['id'], war_info['attackers'] + (war_info['defenders']),
                                        primary, truce_length)
-                    # send the acceptance dm to all participants
-                    for member in war_info['attackers'] + war_info['defenders']:
-                        # pull their user id
-                        user_id = await conn.fetchval('''SELECT user_id
-                                                         FROM cnc_users
-                                                         WHERE name = $1;''',
-                                                      member)
-                        # send notification
-                        await safe_dm(embed=peace_embed, user_id=user_id, bot=interaction.client,
-                                      content=f"The Peace Negotiations to end the **{war_info['name']}** "
-                                              f"have been **accepted** by {target_info['name']}. "
-                                              f"The terms are as follows:")
                     # delete the peace negotiation
                     await conn.execute('''DELETE
                                           FROM cnc_peace_negotiations
@@ -5979,6 +5967,18 @@ class WarOptionsView(discord.ui.View):
                         # stop the war
                         await conn.execute('''UPDATE cnc_wars SET active = False
                                               WHERE id = $1;''', war_info['id'])
+                    # send the acceptance dm to all participants
+                    for member in war_info['attackers'] + war_info['defenders']:
+                        # pull their user id
+                        user_id = await conn.fetchval('''SELECT user_id
+                                                         FROM cnc_users
+                                                         WHERE name = $1;''',
+                                                      member)
+                        # send notification
+                        await safe_dm(embed=peace_embed, user_id=user_id, bot=interaction.client,
+                                      content=f"The Peace Negotiations to end the **{war_info['name']}** "
+                                              f"have been **accepted** by {target_info['name']}. "
+                                              f"The terms are as follows:")
                     # stop listening
                     peace_negotiation_view.stop()
 
