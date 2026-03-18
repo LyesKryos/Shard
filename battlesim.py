@@ -6,7 +6,7 @@ import logging
 # initialize logger
 logger = logging.getLogger('battlesim')
 logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler('Shard/CNC/battlesim.log')
+handler = logging.FileHandler('CNC/battlesim.log')
 handler.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
 logger.addHandler(handler)
 
