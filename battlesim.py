@@ -181,60 +181,93 @@ class Battle:
         logger.debug(f"Total skirmishes to run: {skirmishes}")
         for skirm in range(skirmishes):
             logger.debug(f"Starting skirmish iteration {skirm + 1} of {skirmishes}\n"
-                         f"troops at the top of skrimish {skirm}: {self.attacking_army}")
+                         f"troops at the top of skirmish {skirm}: {self.attacking_army}")
             # select a terrain
             terrain_id = choice(terrain_options)
             # initialize the skirmish class
             _skirmish = Skirmish(self.attacking_army, self.defending_armies, terrain_id,
-                                conn, self.attack_mod, self.defense_mod)
+                                 conn, self.attack_mod, self.defense_mod)
 
             victor, attack_casualties_percent, defense_casualties_percent = await _skirmish.skirmish()
+            logger.debug(f"step 1 - skirmish complete: victor={victor}, "
+                         f"attack_casualties_percent={attack_casualties_percent}, "
+                         f"defense_casualties_percent={defense_casualties_percent}")
+
             # update the casualty tracker
             total_attack_casualties += round(self.attacking_army['troops'] * attack_casualties_percent)
+            logger.debug(f"step 2 - casualty tracker updated: total_attack_casualties={total_attack_casualties}")
+
             # tally the victory
             if victor == "attacker":
                 attack_victory_tally += 1
             else:
                 defense_victory_tally += 1
+            logger.debug(f"step 3 - victory tallied: attack={attack_victory_tally}, defense={defense_victory_tally}")
+
             # update the attacking casualties in the db
-            await conn.execute('''UPDATE cnc_armies SET troops = ROUND(troops * $1) WHERE army_id = $2;''',
+            logger.debug(f"step 4 - about to update DB troops: "
+                         f"multiplier={1 - attack_casualties_percent}, army_id={self.attacking_army['army_id']}")
+            await conn.execute('''UPDATE cnc_armies
+                                  SET troops = ROUND(troops * $1)
+                                  WHERE army_id = $2;''',
                                1 - attack_casualties_percent, self.attacking_army['army_id'])
+            logger.debug("step 5 - DB update complete")
+
             # update the attacking army stats internally
-            self.attacking_army = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
+            self.attacking_army = await conn.fetchrow('''SELECT *
+                                                         FROM cnc_armies
+                                                         WHERE army_id = $1;''',
                                                       self.attacking_army['army_id'])
+            logger.debug(
+                f"step 6 - army refreshed: {self.attacking_army['troops'] if self.attacking_army else 'NONE - RECORD IS GONE'}")
+
             # get the total defense casualties and add them to the tracker
-            total_defense_casualties += round(sum(a['troops'] for a in self.defending_armies) * defense_casualties_percent)
+            total_defense_casualties += round(
+                sum(a['troops'] for a in self.defending_armies) * defense_casualties_percent)
+            logger.debug(f"step 7 - defense casualties tracked: total_defense_casualties={total_defense_casualties}")
+
             # for each of the defending armies, share the casualties
             refreshed = []
             for army in self.defending_armies:
                 if army['army_id'] is None:
+                    logger.debug(f"step 8a - native army casualties: before={army['troops']}")
                     # manually reduce the synthetic troop count
                     updated = dict(army)
                     updated['troops'] = army['troops'] * defense_casualties_percent
                     refreshed.append(updated)
+                    logger.debug(f"step 8a - native army casualties: after={updated['troops']}")
                 else:
                     # divide the percentage of casualties caught by each defending army
                     defense_casualties_share = defense_casualties_percent / len(self.defending_armies)
+                    logger.debug(f"step 8b - real army casualties: army_id={army['army_id']}, "
+                                 f"share={defense_casualties_share}, multiplier={1 - defense_casualties_share}")
                     # execute casualties
-                    await conn.execute('''UPDATE cnc_armies SET troops = ROUND(troops * $2) WHERE army_id - $1;''',
+                    await conn.execute('''UPDATE cnc_armies
+                                          SET troops = ROUND(troops * $2)
+                                          WHERE army_id = $1;''',
                                        army['army_id'], 1 - defense_casualties_share)
-                    army = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
-                                              army['army_id'])
+                    army = await conn.fetchrow('''SELECT *
+                                                  FROM cnc_armies
+                                                  WHERE army_id = $1;''',
+                                               army['army_id'])
                     refreshed.append(army)
+                    logger.debug(f"step 8b - real army after casualties: {army['troops'] if army else 'NONE'}")
             self.defending_armies = refreshed
+            logger.debug(f"step 9 - defenders refreshed: total={sum(a['troops'] for a in self.defending_armies)}")
 
             # === TOTAL LOSS CHECK ===
+            logger.debug(f"step 10 - loss check: attacking={self.attacking_army['troops']}, "
+                         f"defending={sum(a['troops'] for a in self.defending_armies)}")
             # if any armies have 0, they are destroyed and removed from the battle
             if self.attacking_army['troops'] <= 0:
-                # give victor to the defender
+                logger.debug("step 11 - ATTACKER TOTAL LOSS - breaking")
                 defense_victory_tally = float('inf')
-                # break
                 break
             if sum(a['troops'] for a in self.defending_armies) <= 0:
+                logger.debug("step 11 - DEFENDER TOTAL LOSS - breaking")
                 attack_victory_tally = float('inf')
-                # break
                 break
-
+            logger.debug(f"step 11 - loss checks passed, proceeding to iteration {skirm + 2}")
 
         # determine the victor
         if attack_victory_tally > defense_victory_tally:
