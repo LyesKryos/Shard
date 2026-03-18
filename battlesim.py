@@ -180,6 +180,7 @@ class Battle:
         defense_victory_tally = 0
         logger.debug(f"Total skirmishes to run: {skirmishes}")
         for _ in range(skirmishes):
+            logger.debug(f"troops at the top of skrimish: {self.attacking_army}")
             # select a terrain
             terrain_id = choice(terrain_options)
             # initialize the skirmish class
@@ -243,7 +244,3 @@ class Battle:
 
         # return victor, total attack casualties, and total defense casualties
         return total_victor, total_attack_casualties, total_defense_casualties
-
-
-
-
