@@ -8017,10 +8017,6 @@ class CNC(commands.Cog):
                     await conn.execute(
                         '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
                         move_to, movement_cost, army_info['army_id'])
-                    # update the movement and location
-                    await conn.execute(
-                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
-                        move_to, movement_cost, army_info['army_id'])
 
             # if at war, handle occupation or battle
             if war is not None and not battle:
@@ -8146,7 +8142,7 @@ class CNC(commands.Cog):
                             # update movement and location
                             await conn.execute(
                                 '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
-                                move_to, cost, army)
+                                move_to, cost, army_info['army_id'])
                             # return success message
                             return await interaction.followup.send(
                                 f"The {army_info['army_name']} has successfully moved to "
@@ -8156,7 +8152,7 @@ class CNC(commands.Cog):
                         # update movement and location
                         await conn.execute(
                             '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
-                            move_to, cost, army)
+                            move_to, cost, army_info['army_id'])
                         # return success message
                         return await interaction.followup.send(
                             f"The {army_info['army_name']} has successfully moved to "
@@ -8199,7 +8195,7 @@ class CNC(commands.Cog):
                         # update movement and location
                         await conn.execute(
                             '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
-                            move_to, cost, army)
+                            move_to, cost, army_info['army_id'])
                         # update the occupier
                         await conn.execute('''UPDATE cnc_provinces SET occupier_id = $2 WHERE id = $1;''',
                                            move_to, user_info['user_id'])
@@ -8224,7 +8220,7 @@ class CNC(commands.Cog):
                     # update movement and location
                     await conn.execute(
                         '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
-                        move_to, cost, army)
+                        move_to, cost, army_info['army_id'])
                     # return success message
                     return await interaction.followup.send(
                         f"The {army_info['army_name']} has successfully moved to "
@@ -8235,7 +8231,7 @@ class CNC(commands.Cog):
                 # update movement and location
                 await conn.execute(
                     '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
-                    move_to, cost, army)
+                    move_to, cost, army_info['army_id'])
                 # return success message
                 return await interaction.followup.send(
                     f"The {army_info['army_name']} has successfully moved to "
@@ -8252,6 +8248,8 @@ class CNC(commands.Cog):
                     'owner_id': 0,
                     'army_name': f"Warriors of {prov_info['name']}"
                 }
+                self.bot.logger.debug(f"army param: {army}, army_info army_id: {army_info['army_id']}, troops in DB: "
+                f"{await conn.fetchval('SELECT troops FROM cnc_armies WHERE army_id = $1', army_info['army_id'])}")
                 # initialize battle
                 battle = Battle(
                     attacking_army=army_info,
