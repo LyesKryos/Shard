@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding move_army command and battle mechanics" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding move_army command and battle mechanics">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -536,7 +538,7 @@
       <workItem from="1772670838803" duration="1866000" />
       <workItem from="1773435837414" duration="4509000" />
       <workItem from="1773683117706" duration="6369000" />
-      <workItem from="1773757420896" duration="33014000" />
+      <workItem from="1773757420896" duration="33649000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -881,7 +883,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1501" />
+    <option name="localTasksCounter" value="1503" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -934,11 +936,6 @@
           <url>file://$PROJECT_DIR$/cogs/cnc.py</url>
           <line>7855</line>
           <option name="timeStamp" value="17" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/battlesim.py</url>
-          <line>181</line>
-          <option name="timeStamp" value="18" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
