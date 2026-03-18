@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import logging
 from random import randrange, randint, choice, uniform
 from typing import List
 import asyncpg
@@ -8248,7 +8250,7 @@ class CNC(commands.Cog):
                     'owner_id': 0,
                     'army_name': f"Warriors of {prov_info['name']}"
                 }
-                self.bot.logger.debug(f"army param: {army}, army_info army_id: {army_info['army_id']}, troops in DB: "
+                logging.getLogger(__name__).debug(f"army param: {army}, army_info army_id: {army_info['army_id']}, troops in DB: "
                 f"{await conn.fetchval('SELECT troops FROM cnc_armies WHERE army_id = $1', army_info['army_id'])}")
                 # initialize battle
                 battle = Battle(
