@@ -7876,6 +7876,11 @@ class CNC(commands.Cog):
             # reject
             return await interaction.followup.send(f"There is no such province with the ID: `{move_to}`.",
                                                    ephemeral=True)
+        # if the army is already at that province
+        elif army_info['location'] == prov_info['id']:
+            # reject
+            return await interaction.followup.send(f"The {army_info['name']} is already located at "
+                                                   f"{prov_info['name']} (ID: {prov_info['id']}).", ephemeral=True)
         # if the user doesn't own the army
         if army_info['owner_id'] != user_info['user_id']:
             return await interaction.followup.send(
