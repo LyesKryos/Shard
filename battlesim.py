@@ -49,7 +49,7 @@ class Skirmish:
         # === GENERALS INFO ===
         # get the attacking general info
         attacking_general_level = 0
-        if self.attacking_army['general'] is not None:
+        if not self.attacking_army['general']:
             # pull the general level IF they are an attack general
             general_level = await conn.fetchval('''SELECT * FROM cnc_generals 
                                                    WHERE general_id = $1 AND type = 'Assault';''',
@@ -67,7 +67,7 @@ class Skirmish:
             general_level = await conn.fetchval('''SELECT * FROM cnc_generals 
                                                    WHERE general_id = $1 AND type = 'Defensive';''',
                                                 defending_general_army['general'])
-            defending_general_level = general_level if general_level is not None else 0
+            defending_general_level = general_level if not general_level else 0
         # add the general level to the defense roll
         defense_roll_mod += defending_general_level
 
@@ -179,8 +179,9 @@ class Battle:
         attack_victory_tally = 0
         defense_victory_tally = 0
         logger.debug(f"Total skirmishes to run: {skirmishes}")
-        for _ in range(skirmishes):
-            logger.debug(f"troops at the top of skrimish: {self.attacking_army}")
+        for skirm in range(skirmishes):
+            logger.debug(f"Starting skirmish iteration {skirm + 1} of {skirmishes}\n"
+                         f"troops at the top of skrimish {skirm}: {self.attacking_army}")
             # select a terrain
             terrain_id = choice(terrain_options)
             # initialize the skirmish class
