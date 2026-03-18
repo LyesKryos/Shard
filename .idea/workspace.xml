@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding move_army command and battle mechanics">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Peace accept command dming broken?????">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -538,7 +538,7 @@
       <workItem from="1772670838803" duration="1866000" />
       <workItem from="1773435837414" duration="4509000" />
       <workItem from="1773683117706" duration="6369000" />
-      <workItem from="1773757420896" duration="33649000" />
+      <workItem from="1773757420896" duration="33971000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -883,7 +883,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1503" />
+    <option name="localTasksCounter" value="1505" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -902,7 +902,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting cooperative relations war check" />
     <MESSAGE value="Correcting parse_relations to have the correct displays for lists from multiple entries" />
     <MESSAGE value="Correcting the manner in which nations are checked against cnc_wars for active conflicts" />
     <MESSAGE value="Correcting hostile check for cooperative relations" />
@@ -927,7 +926,8 @@
     <MESSAGE value="Adding logging for battlesim" />
     <MESSAGE value="Adding move_army command and battle möechanics" />
     <MESSAGE value="Adding move_army command and battle mechanics" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding move_army command and battle mechanics" />
+    <MESSAGE value="Peace accept command dming broken?????" />
+    <option name="LAST_COMMIT_MESSAGE" value="Peace accept command dming broken?????" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

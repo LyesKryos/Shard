@@ -5950,7 +5950,7 @@ class WarOptionsView(discord.ui.View):
                                        war_info['id'], war_info['attackers'].append(war_info['defenders']),
                                        primary, truce_length)
                     # send the acceptance dm to all participants
-                    for member in war_info['attackers'].extend(war_info['defenders']):
+                    for member in [*war_info['attackers'], *war_info['defenders']]:
                         # pull their user id
                         user_id = await conn.fetchval('''SELECT user_id
                                                          FROM cnc_users
