@@ -5961,26 +5961,26 @@ class WarOptionsView(discord.ui.View):
                                       content=f"The Peace Negotiations to end the **{war_info['name']}** "
                                               f"have been **accepted** by {target_info['name']}. "
                                               f"The terms are as follows:")
-                        # delete the peace negotiation
-                        await conn.execute('''DELETE
-                                              FROM cnc_peace_negotiations
-                                              WHERE war_id = $1;''',
-                                           war_info['id'])
-                        # if the target is not the primary defender, then remove them from the war
-                        if target != war_info['primary_defender']:
-                            await conn.execute('''UPDATE cnc_wars SET defenders = array_remove(defenders, $1) 
-                                                      WHERE id = $2;''', target, war_info['id'])
-                        # if they are not the primary attacker, remove from the attackers
-                        elif target != war_info['primary_attacker'] :
-                            await conn.execute('''UPDATE cnc_wars SET attackers = array_remove(attackers, $1) 
-                                               WHERE id = $2;''', target, war_info['id'])
-                        # if they are the primary attacker or defender, then end the war
-                        else:
-                            # stop the war
-                            await conn.execute('''UPDATE cnc_wars SET active = False
-                                                  WHERE id = $1;''', war_info['id'])
-                        # stop listening
-                        peace_negotiation_view.stop()
+                    # delete the peace negotiation
+                    await conn.execute('''DELETE
+                                          FROM cnc_peace_negotiations
+                                          WHERE war_id = $1;''',
+                                       war_info['id'])
+                    # if the target is not the primary defender, then remove them from the war
+                    if target != war_info['primary_defender']:
+                        await conn.execute('''UPDATE cnc_wars SET defenders = array_remove(defenders, $1) 
+                                                  WHERE id = $2;''', target, war_info['id'])
+                    # if they are not the primary attacker, remove from the attackers
+                    elif target != war_info['primary_attacker'] :
+                        await conn.execute('''UPDATE cnc_wars SET attackers = array_remove(attackers, $1) 
+                                           WHERE id = $2;''', target, war_info['id'])
+                    # if they are the primary attacker or defender, then end the war
+                    else:
+                        # stop the war
+                        await conn.execute('''UPDATE cnc_wars SET active = False
+                                              WHERE id = $1;''', war_info['id'])
+                    # stop listening
+                    peace_negotiation_view.stop()
 
                 async def decline_callback(interaction: discord.Interaction):
                     # defer the interaction
