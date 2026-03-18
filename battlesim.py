@@ -5,7 +5,7 @@ from typing import Tuple, List
 
 class Skirmish:
 
-    def __init__(self, attacking_army: asyncpg.Record, defending_armies: list[asyncpg.Record],
+    def __init__(self, attacking_army: asyncpg.Record, defending_armies: list[asyncpg.Record] | list[dict],
                  terrain_id: int, conn: asyncpg.Pool, attack_mod: float, defense_mod: float):
         # define the class variables
         self.attacking_army = attacking_army
@@ -87,7 +87,7 @@ class Skirmish:
 
 class Battle:
 
-    def __init__(self, attacking_army: asyncpg.Record, defending_armies: list[asyncpg.Record],
+    def __init__(self, attacking_army: asyncpg.Record, defending_armies: list[asyncpg.Record] | list[dict],
                  province_info: asyncpg.Record, conn: asyncpg.Pool, attack_mod: float, defense_mod: float,
                  landing: bool = False):
 

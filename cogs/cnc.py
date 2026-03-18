@@ -18,6 +18,7 @@ import heapq
 from faker import Faker
 from faker.exceptions import UniquenessException
 import re
+from battlesim import Battle
 
 async def cnc_user_check(interaction: discord.Interaction) -> bool:
     # establish the conn
@@ -7876,8 +7877,10 @@ class CNC(commands.Cog):
                 f"{user_info['name']} does not command the {army_info['army_name']}.", ephemeral=True)
         # get the departure province info
         depart_prov_info = await conn.fetchrow('SELECT * FROM cnc_provinces WHERE id = $1;', army_info['location'])
-        # global definition of the battle
+        # global definition of the battle and landing and armies
         battle = False
+        enemy_army_list = []
+        landing = False
 
         # create a helper to get the enemy ids
         async def get_enemy_ids(war: asyncpg.Record, user_name: str) -> List[int]:
@@ -7926,6 +7929,8 @@ class CNC(commands.Cog):
         if army_info['embarked']:
             # define the global war
             war = None
+            # define the landing
+            landing = True
 
             # check if target is coastal
             if not prov_info['coastal']:
@@ -7979,17 +7984,33 @@ class CNC(commands.Cog):
                     enemy_ids = await get_enemy_ids(war, user_info['name'])
                     # get the enemy army list
                     enemy_army_list = await conn.fetch(
-                        '''SELECT army_id FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2);''',
+                        '''SELECT army_id FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2)
+                        ORDER BY troops DESC;''',
                         move_to, enemy_ids)
                     # if there are enemy armies, set the battle = true
                     if len(enemy_army_list) > 0:
                         battle = True
+                        # update the movement and location
+                        await conn.execute(
+                            '''UPDATE cnc_armies
+                               SET location = $1,
+                                   movement = movement - $2
+                               WHERE army_id = $3;''',
+                            move_to, movement_cost, army_info['army_id'])
                 # check if the user already has 15 provinces
                 prov_count = await conn.fetchval(
                     '''SELECT COUNT(id) FROM cnc_provinces WHERE owner_id = $1;''', user_info['user_id'])
                 # if they have more than 15, battle
                 if prov_count <= 15:
                     battle = True
+                    # update the movement and location
+                    await conn.execute(
+                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
+                        move_to, movement_cost, army_info['army_id'])
+                    # update the movement and location
+                    await conn.execute(
+                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
+                        move_to, movement_cost, army_info['army_id'])
 
             # if at war, handle occupation or battle
             if war is not None and not battle:
@@ -7999,11 +8020,16 @@ class CNC(commands.Cog):
                 enemy_ids = await get_enemy_ids(war, user_info['name'])
                 # fetch enemy army list
                 enemy_army_list = await conn.fetch(
-                    'SELECT army_id FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2);',
+                    '''SELECT army_id FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2) 
+                       ORDER BY troops DESC;''',
                     move_to, enemy_ids)
                 # if there are enemy armies, set battle = true
                 if len(enemy_army_list) > 0:
                     battle = True
+                    # update the movement and location
+                    await conn.execute(
+                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
+                        move_to, movement_cost, army_info['army_id'])
                 # otherwise, occupy
                 else:
                     # pull the occupier info
@@ -8077,6 +8103,10 @@ class CNC(commands.Cog):
                 # if the owner has fewer than 15 provinces, battle for the province
                 if province_count < 15:
                     battle = True
+                    # update the movement and location
+                    await conn.execute(
+                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
+                        move_to, cost, army_info['army_id'])
                 # otherwise, check for wars
                 else:
                     war_check = await conn.fetchrow('''SELECT *
@@ -8088,11 +8118,19 @@ class CNC(commands.Cog):
                         enemy_ids = await get_enemy_ids(war_check, user_info['name'])
                         # fetch the enemy armies
                         enemy_army_list = await conn.fetch(
-                            '''SELECT army_id FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2);''',
+                            '''SELECT army_id FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2) 
+                               ORDER BY troops DESC;''',
                             move_to, enemy_ids)
                         # if there are any enemy armies, battle
                         if len(enemy_army_list) > 0:
                             battle = True
+                            # update the movement and location
+                            await conn.execute(
+                                '''UPDATE cnc_armies
+                                   SET location = $1,
+                                       movement = movement - $2
+                                   WHERE army_id = $3;''',
+                                move_to, cost, army_info['army_id'])
                         # otherwise, move there
                         else:
                             # update movement and location
@@ -8133,11 +8171,19 @@ class CNC(commands.Cog):
                     enemy_ids = await get_enemy_ids(war_check, user_info['name'])
                     # fetch any enemy armies present
                     enemy_army_list = await conn.fetch(
-                        'SELECT army_id FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2);',
+                        '''SELECT army_id FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2) 
+                           ORDER BY troops DESC;''',
                         move_to, enemy_ids)
                     # if there are enemy armies, battle
                     if len(enemy_army_list) > 0:
                         battle = True
+                        # update the movement and location
+                        await conn.execute(
+                            '''UPDATE cnc_armies
+                               SET location = $1,
+                                   movement = movement - $2
+                               WHERE army_id = $3;''',
+                            move_to, cost, army_info['army_id'])
                     # otherwise, occupy
                     else:
                         # update movement and location
@@ -8187,8 +8233,210 @@ class CNC(commands.Cog):
 
         # battle handler
         if battle:
-            # TODO: implement battle
-            pass
+            # for natives and not when there is a real battle
+            if prov_info['owner_id'] == 0 and len(enemy_army_list) == 0:
+                native_army = {
+                    'army_id': None,  # no DB record
+                    'troops': prov_info['citizens'] * (prov_info['development']/10),
+                    'general': None,
+                    'owner_id': 0,
+                    'army_name': f"Warriors of {prov_info['name']}"
+                }
+                # initialize battle
+                battle = Battle(
+                    attacking_army=army_info,
+                    defending_armies=[native_army],
+                    province_info=prov_info,
+                    conn=conn,
+                    attack_mod=user_info['attack_effect'],
+                    defense_mod=0,
+                    landing=landing
+                )
+                # run battle and return results
+                victor, attacker_casualties, defender_casualties = await battle.battle()
+                # === VICTORY ===
+                if victor == "attacker":
+                    # the army is already moved, so update the province owner
+                    await conn.execute('''UPDATE cnc_provinces SET owner_id = $1, occupier_id = $1 WHERE id = $2;''',
+                                       user_info['user_id'], move_to)
+                    victor_string = f"{user_info['name']} is victorious!"
+                    footer = (f"{user_info['name']} has successfully subdued and "
+                              f"conquered the natives of {prov_info['name']}.")
+                # === DEFEAT ===
+                else:
+                    # retreat the attackers to whence they came
+                    await conn.execute('''UPDATE cnc_armies SET location = $2 WHERE army_id = $1;''',
+                                       army_info['army_id'], depart_prov_info['id'])
+                    victor_string = "The native defenders are victorious!"
+                    footer = (f"The natives of {prov_info['name']} have successfully repelled their foreign invaders.\n"
+                              f"The {army_info['army_name']} has retreated to {depart_prov_info['name']}.")
+
+                # create the battle embed and send it
+                battle_embed = discord.Embed(title=f"The Conquest of {prov_info['name']}",
+                                             description=f"A battle to conquer the province of "
+                                                         f"{prov_info['name']} from its native peoples.",
+                                             color=discord.Color.red())
+                # define the attacking attributes
+                battle_embed.add_field(name="Attacker", value=user_info['name'])
+                battle_embed.add_field(name="Attacking Army", value=f"The {army_info['army_name']}\n{army_info['troops']}")
+                battle_embed.add_field(name="\u200b", value="\u200b")
+                # define the defending attributes
+                battle_embed.add_field(name="Defenders", value="Natives")
+                battle_embed.add_field(name="Defending Army",
+                                       value=f"The {native_army['army_name']}\n{native_army['troops']}")
+                battle_embed.add_field(name="\u200b", value="\u200b")
+                # outcome
+                battle_embed.add_field(name="Outcome", value=victor_string, inline=False)
+                # casualties
+                battle_embed.add_field(name="Attacking Casualties", value=f"{attacker_casualties} troops")
+                battle_embed.add_field(name="Defending Casualties", value=f"{defender_casualties} troops")
+                battle_embed.add_field(name="\u200b", value="\u200b")
+                # footnote
+                battle_embed.set_footer(text=footer)
+                # return the battle embed
+                return await interaction.followup.send(embed=battle_embed)
+
+            # otherwise, normal battle
+            else:
+                # get the defense modifier of the largest army
+                largest_defending_army = max(enemy_army_list, key=lambda army: army['troops'])
+                defense_mod = await conn.fetchval('''SELECT defense_effect FROM cnc_users WHERE user_id = $1;''',
+                                                  largest_defending_army['owner_id'])
+                # initialize battle
+                battle = Battle(
+                    attacking_army=army_info,
+                    defending_armies=enemy_army_list,
+                    province_info=prov_info,
+                    conn=conn,
+                    attack_mod=user_info['attack_effect'],
+                    defense_mod=defense_mod,
+                    landing=landing
+                )
+                # run battle and return results
+                victor, attacker_casualties, defender_casualties = await battle.battle()
+
+                # === VICTORY ===
+                if victor == "attacker":
+                    # the army is already moved, so update the province occupier (if the battle takes place in a non-native province)
+                    if prov_info['owner_id'] != 0:
+                        # occupy color if the owner is not the user
+                        if prov_info['owner_id'] != user_info['user_id']:
+                            # get the occupier info
+                            occupier_info = await user_db_info(conn=conn, user_id=prov_info['owner_id'])
+                            # execute occupy coloring
+                            await self.occupy_color(province=move_to,
+                                                    occupy_color=user_info['color'],
+                                                    owner_color=occupier_info['color'])
+                        # regular color if the owner is a user (basically resetting)
+                        else:
+                            await map_color(province=move_to,
+                                            hexcode=user_info['color'],
+                                            conn=conn)
+                        await conn.execute('''UPDATE cnc_provinces
+                                              SET occupier_id = $1
+                                              WHERE id = $2;''',
+                                           user_info['user_id'], move_to)
+                        footer = f"{user_info['name']} has successfully occupied {prov_info['name']}."
+                    else:
+                        footer = (f"{user_info['name']} has successfully defeated its enemies at {prov_info['name']}.\n"
+                                  f"All enemy armies have been forced to retreat to a friendly province.")
+                    victor_string = f"{user_info['name']} is victorious!"
+                    retreat_message = ""
+
+                    # defender retreat, processed on a per army basis
+                    for army in enemy_army_list:
+                        # define the best location and cost
+                        retreat_locations = {}
+                        # get their possible retreat locations that they own
+                        owned_provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE occupier_id = $1;''',
+                                                           army['owner_id'])
+                        # owner info
+                        army_owner_info = await user_db_info(conn=conn, user_id=army['owner_id'])
+                        # get all the possible retreat locations that they have access to
+                        military_access = await conn.fetch('''SELECT * FROM cnc_military_access 
+                                                              WHERE $1 = ANY(members);''', army_owner_info['name'])
+                        # define a list of all provinces
+                        all_provinces = owned_provinces
+                        # get the names of the other members of the ma
+                        possible_mas = []
+                        for ma in military_access:
+                            # for each member in the list
+                            for member_name in ma['members']:
+                                # if the member name is not the same as the owner of the army
+                                if member_name != army_owner_info['name']:
+                                    ma_id = await conn.fetchval('SELECT user_id FROM cnc_users WHERE name = $1;',
+                                                                member_name)
+                                    possible_mas.append(ma_id)
+                        for ma_id in possible_mas:
+                            ma_user_info = await user_db_info(conn=conn, user_id=ma_id)
+                            all_provinces += await conn.fetch('SELECT * FROM cnc_provinces WHERE occupier_id = $1;',
+                                                              ma_user_info['user_id'])
+                        # for all the possible provinces
+                        for p in all_provinces:
+                            # calculate the route
+                            path, cost, blocked_by_hostiles = await find_path(conn=conn,
+                                                                            start_id=move_to,
+                                                                            end_id=p['id'],
+                                                                            moving_user_id=army['owner_id'])
+                            if path is None:
+                                continue
+                            # add the cost to the tracker if the distance is greater than 3 provinces
+                            retreat_locations[p['id']] = cost if len(path) > 3 else float('inf')
+                        # if there are no possible retreat locations, destroy the army as overrun
+                        if len(retreat_locations) == 0:
+                            # destroy the army
+                            await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''', army['army_id'])
+                            retreat_message += f"The {army['army_name']} has been overrun and destroyed.\n"
+                        # otherwise, select a retreat location
+                        else:
+                            # select the province with the best cost
+                            retreat_province = min(retreat_locations, key=retreat_locations.get)
+                            # update the army location
+                            await conn.execute('''UPDATE cnc_armies SET location = $2 WHERE army_id = $1;''',
+                                               army['army_id'], retreat_province)
+                            retreat_message += f"The {army['army_name']} has retreated to {retreat_province}.\n"
+                # === DEFEAT ===
+                else:
+                    # retreat the attackers to whence they came
+                    await conn.execute('''UPDATE cnc_armies SET location = $2 WHERE army_id = $1;''',
+                                       army_info['army_id'], depart_prov_info['id'])
+                    retreat_message = (f"The {army_info['army_name']} has retreated to "
+                                       f"{depart_prov_info['name']} (ID: {depart_prov_info['id']})!")
+                    victor_string = "The defenders are victorious!"
+                    footer = (f"The defenders at {prov_info['name']} have successfully defended their positions.\n"
+                              f"The {army_info['army_name']} has retreated to {depart_prov_info['name']}.")
+
+                # create the battle embed and send it
+                battle_embed = discord.Embed(title=f"The Battle of {prov_info['name']}",
+                                             description=f"A battle between enemy armies "
+                                                         f"for the mastery of this province.",
+                                             color=discord.Color.red())
+                # define the attacking attributes
+                battle_embed.add_field(name="Attacker", value=f"The {user_info['pretitle']} of {user_info['name']}")
+                battle_embed.add_field(name="Attacking Army",
+                                       value=f"The {army_info['army_name']}\n{army_info['troops']}")
+                battle_embed.add_field(name="\u200b", value="\u200b")
+                # define the primary defender
+                primary_defender = await user_db_info(conn=conn, user_id=enemy_army_list[0]['owner_id'])
+                battle_embed.add_field(name="Defender", 
+                                       value=f"The {primary_defender['pretitle']} of {primary_defender['name']}")
+                # define the defending attributes
+                battle_embed.add_field(name="Defending Army(s)",
+                                       value=(", ".join([a['army_name'] for a in enemy_army_list]))
+                                             +f"\nTotal Force: {sum(a['troops'] for a in enemy_army_list)}")
+                battle_embed.add_field(name="\u200b", value="\u200b")
+                # outcome
+                battle_embed.add_field(name="Outcome", value=victor_string, inline=False)
+                # casualties
+                battle_embed.add_field(name="Attacking Casualties", value=f"{attacker_casualties} troops")
+                battle_embed.add_field(name="Defending Casualties", value=f"{defender_casualties} troops")
+                battle_embed.add_field(name="\u200b", value="\u200b")
+                # retreat location
+                battle_embed.add_field(name="Retreat!", value=retreat_message)
+                # footnote
+                battle_embed.set_footer(text=footer)
+                # return the battle embed
+                return await interaction.followup.send(embed=battle_embed)
 
     @cnc.command(name="army", description="Displays information about a specific army.")
     @app_commands.autocomplete(army_id=army_autocomplete)
