@@ -1,6 +1,14 @@
 from random import randint, choice, uniform
 import asyncpg
-from typing import Tuple, List
+from typing import Tuple
+import logging
+
+# initialize logger
+logger = logging.getLogger('battlesim')
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler('Shard/CNC/battlesim.log')
+handler.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
+logger.addHandler(handler)
 
 
 class Skirmish:
@@ -94,6 +102,12 @@ class Skirmish:
         # the defender casualties = same as above
         defense_casualties_percent = uniform(0.01, (attack_roll/10)) * uniform(1, 0.95+terrain_casualties)
 
+        # log results
+        logger.debug(f"attack_casualties_percent: {attack_casualties_percent}, "
+                     f"defense_roll: {defense_roll}, "
+                     f"terrain_casualties: {terrain_casualties}, "
+                     f"1-casualties: {1 - attack_casualties_percent}, "
+                     f"troops_before: {self.attacking_army['troops']}")
         # return all values
         return victor, attack_casualties_percent, defense_casualties_percent
 
