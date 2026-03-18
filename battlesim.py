@@ -120,7 +120,7 @@ class Battle:
             defending_general_level = general_level if general_level is not None else 0
 
         # === BASE TERRAIN ROLLS ===
-        base_terrain_rolls = await conn.fetchval('''SELECT rolls FROM cnc_terrains WHERE id = $1;''',
+        base_terrain_rolls = await conn.fetchval('''SELECT roll FROM cnc_terrains WHERE id = $1;''',
                                                  self.province_info['terrain'])
 
         # === NUMBER OF SKIRMISHES ===
