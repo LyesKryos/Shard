@@ -3,7 +3,7 @@ from random import randrange, randint, choice, uniform
 from typing import List
 import asyncpg
 from discord import app_commands, Interaction
-from discord._types import ClientT
+import importlib
 from ShardBot import Shard
 import discord
 from discord.ext import commands, tasks
