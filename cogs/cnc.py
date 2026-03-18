@@ -7881,7 +7881,7 @@ class CNC(commands.Cog):
         # if the army is already at that province
         elif army_info['location'] == prov_info['id']:
             # reject
-            return await interaction.followup.send(f"The {army_info['name']} is already located at "
+            return await interaction.followup.send(f"The {army_info['army_name']} is already located at "
                                                    f"{prov_info['name']} (ID: {prov_info['id']}).", ephemeral=True)
         # if the user doesn't own the army
         if army_info['owner_id'] != user_info['user_id']:
@@ -8275,6 +8275,10 @@ class CNC(commands.Cog):
                     victor_string = f"{user_info['name']} is victorious!"
                     footer = (f"{user_info['name']} has successfully subdued and "
                               f"conquered the natives of {prov_info['name']}.")
+                    # color the province properly
+                    await map_color(province=prov_info['id'],
+                                    hexcode=user_info['color'],
+                                    conn=conn)
                 # === DEFEAT ===
                 else:
                     # check if the attacker army was destroyed or should be destroyed
