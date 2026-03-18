@@ -8397,6 +8397,9 @@ class CNC(commands.Cog):
                             # destroy the army
                             await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''', army['army_id'])
                             retreat_message += f"The {army['army_name']} has been overrun and destroyed.\n"
+                            # remove any general assignment
+                            await conn.execute('''UPDATE cnc_generals SET army_id = NULL WHERE army_id = $1;''',
+                                               army['army_id'])
                         # otherwise, select a retreat location
                         else:
                             # select the province with the best cost

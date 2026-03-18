@@ -31,7 +31,7 @@ class Skirmish:
         if self.attacking_army['general'] is not None:
             # pull the general level IF they are an attack general
             general_level = await conn.fetchval('''SELECT * FROM cnc_generals 
-                                                   WHERE id = $1 AND type = 'Assault';''',
+                                                   WHERE general_id = $1 AND type = 'Assault';''',
                                                 self.attacking_army['general'])
             attacking_general_level = general_level if general_level is not None else 0
         # add the general level to the attack roll
@@ -44,7 +44,7 @@ class Skirmish:
         if defending_general_army['general'] is not None:
             # pull the general level IF they are a defensive general
             general_level = await conn.fetchval('''SELECT * FROM cnc_generals 
-                                                   WHERE id = $1 AND type = 'Defensive';''',
+                                                   WHERE general_id = $1 AND type = 'Defensive';''',
                                                 defending_general_army['general'])
             defending_general_level = general_level if general_level is not None else 0
         # add the general level to the defense roll
@@ -115,7 +115,7 @@ class Battle:
         if defending_general_army['general'] is not None:
             # pull the general level IF they are a defensive general
             general_level = await conn.fetchval('''SELECT level FROM cnc_generals 
-                                                   WHERE id = $1 AND type = 'Defensive';''',
+                                                   WHERE general_id = $1 AND type = 'Defensive';''',
                                                 defending_general_army['general'])
             defending_general_level = general_level if general_level is not None else 0
 
