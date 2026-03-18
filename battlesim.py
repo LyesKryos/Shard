@@ -192,9 +192,14 @@ class Battle:
                 if army['army_id'] is None:
                     # manually reduce the synthetic troop count
                     updated = dict(army)
-                    updated['troops'] = army['troops'] * (1 - (defense_casualties_percent / len(self.defending_armies)))
+                    updated['troops'] = army['troops'] * defense_casualties_percent
                     refreshed.append(updated)
                 else:
+                    # divide the percentage of casualties caught by each defending army
+                    defense_casualties_share = defense_casualties_percent / len(self.defending_armies)
+                    # execute casualties
+                    await conn.execute('''UPDATE cnc_armies SET troops = troops * $2 WHERE army_id - $1;''',
+                                       army['army_id'], 1 - defense_casualties_share)
                     army = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
                                               army['army_id'])
                     refreshed.append(army)
@@ -205,16 +210,10 @@ class Battle:
             if self.attacking_army['troops'] <= 0:
                 # give victor to the defender
                 defense_victory_tally = float('inf')
-                # destroy the army
-                await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''',
-                                   self.attacking_army['army_id'])
                 # break
                 break
             if sum(a['troops'] for a in self.defending_armies) <= 0:
                 attack_victory_tally = float('inf')
-                # destroy the armies
-                await conn.execute('''DELETE FROM cnc_armies WHERE army_id = ANY($1);''',
-                                   [a['army_id'] for a in self.defending_armies])
                 # break
                 break
 

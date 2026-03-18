@@ -8278,11 +8278,11 @@ class CNC(commands.Cog):
                 # === DEFEAT ===
                 else:
                     # check if the attacker army was destroyed or should be destroyed
-                    if attacker_casualties >= .8 * army_info['troops']:
+                    if attacker_casualties >= (.8 * army_info['troops']):
                         # destroy the army
                         await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''',
                                            army_info['army_id'])
-                        # disassign any generals
+                        # unassign any generals
                         await conn.execute('''UPDATE cnc_generals SET army_id = NULL WHERE army_id = $1;''',
                                            army_info['army_id'])
                         victor_string = "The native defenders are victorious!"
@@ -8306,18 +8306,18 @@ class CNC(commands.Cog):
                 # define the attacking attributes
                 battle_embed.add_field(name="Attacker", value=user_info['name'])
                 battle_embed.add_field(name="Attacking Army",
-                                       value=f"The {army_info['army_name']}\n{army_info['troops']} troops")
+                                       value=f"The {army_info['army_name']}\n{army_info['troops']:,} troops")
                 battle_embed.add_field(name="\u200b", value="\u200b")
                 # define the defending attributes
                 battle_embed.add_field(name="Defenders", value="Natives")
                 battle_embed.add_field(name="Defending Army",
-                                       value=f"The {native_army['army_name']}\n{native_army['troops']} troops")
+                                       value=f"The {native_army['army_name']}\n{native_army['troops']:,} troops")
                 battle_embed.add_field(name="\u200b", value="\u200b")
                 # outcome
                 battle_embed.add_field(name="Outcome", value=victor_string, inline=False)
                 # casualties
-                battle_embed.add_field(name="Attacking Casualties", value=f"{attacker_casualties} troops")
-                battle_embed.add_field(name="Defending Casualties", value=f"{defender_casualties} troops")
+                battle_embed.add_field(name="Attacking Casualties", value=f"{attacker_casualties:,} troops")
+                battle_embed.add_field(name="Defending Casualties", value=f"{defender_casualties:,} troops")
                 battle_embed.add_field(name="\u200b", value="\u200b")
                 # footnote
                 battle_embed.set_footer(text=footer)
@@ -8438,7 +8438,7 @@ class CNC(commands.Cog):
                 # === DEFEAT ===
                 else:
                     # check if the attacker army was destroyed or should be destroyed
-                    if attacker_casualties >= .8 * army_info['troops']:
+                    if attacker_casualties >= (.8 * army_info['troops']):
                         # destroy the army
                         await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''',
                                            army_info['army_id'])
@@ -8446,9 +8446,9 @@ class CNC(commands.Cog):
                         await conn.execute('''UPDATE cnc_generals SET army_id = NULL WHERE army_id = $1;''',
                                            army_info['army_id'])
                         victor_string = "The defenders are victorious!"
+                        retreat_message = f"The {army_info['army_name']} has been utterly destroyed."
                         footer = (
-                            f"The defenders at {prov_info['name']} have successfully defended their positions.\n"
-                            f"The {army_info['army_name']} has been utterly destroyed.")
+                            f"The defenders at {prov_info['name']} have successfully defended their positions.")
                     # otherwise, retreat
                     else:
                         # retreat the attackers to whence they came
@@ -8468,7 +8468,7 @@ class CNC(commands.Cog):
                 # define the attacking attributes
                 battle_embed.add_field(name="Attacker", value=f"The {user_info['pretitle']} of {user_info['name']}")
                 battle_embed.add_field(name="Attacking Army",
-                                       value=f"The {army_info['army_name']}\n{army_info['troops']}")
+                                       value=f"The {army_info['army_name']}\n{army_info['troops']:,}")
                 battle_embed.add_field(name="\u200b", value="\u200b")
                 # define the primary defender
                 primary_defender = await user_db_info(conn=conn, user_id=enemy_army_list[0]['owner_id'])
@@ -8477,13 +8477,13 @@ class CNC(commands.Cog):
                 # define the defending attributes
                 battle_embed.add_field(name="Defending Army(s)",
                                        value=(", ".join([a['army_name'] for a in enemy_army_list]))
-                                             +f"\nTotal Force: {sum(a['troops'] for a in enemy_army_list)}")
+                                             +f"\nTotal Force: {sum(a['troops'] for a in enemy_army_list):,}")
                 battle_embed.add_field(name="\u200b", value="\u200b")
                 # outcome
                 battle_embed.add_field(name="Outcome", value=victor_string, inline=False)
                 # casualties
-                battle_embed.add_field(name="Attacking Casualties", value=f"{attacker_casualties} troops")
-                battle_embed.add_field(name="Defending Casualties", value=f"{defender_casualties} troops")
+                battle_embed.add_field(name="Attacking Casualties", value=f"{attacker_casualties:,} troops")
+                battle_embed.add_field(name="Defending Casualties", value=f"{defender_casualties:,} troops")
                 battle_embed.add_field(name="\u200b", value="\u200b")
                 # retreat location
                 battle_embed.add_field(name="Retreat!", value=retreat_message)
