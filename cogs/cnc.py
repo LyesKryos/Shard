@@ -8274,12 +8274,26 @@ class CNC(commands.Cog):
                               f"conquered the natives of {prov_info['name']}.")
                 # === DEFEAT ===
                 else:
-                    # retreat the attackers to whence they came
-                    await conn.execute('''UPDATE cnc_armies SET location = $2 WHERE army_id = $1;''',
-                                       army_info['army_id'], depart_prov_info['id'])
-                    victor_string = "The native defenders are victorious!"
-                    footer = (f"The natives of {prov_info['name']} have successfully repelled their foreign invaders.\n"
-                              f"The {army_info['army_name']} has retreated to {depart_prov_info['name']}.")
+                    # check if the attacker army was destroyed or should be destroyed
+                    if attacker_casualties >= .8 * army_info['troops']:
+                        # destroy the army
+                        await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''',
+                                           army_info['army_id'])
+                        # disassign any generals
+                        await conn.execute('''UPDATE cnc_generals SET army_id = NULL WHERE army_id = $1;''',
+                                           army_info['army_id'])
+                        victor_string = "The native defenders are victorious!"
+                        footer = (
+                            f"The natives of {prov_info['name']} have successfully repelled their foreign invaders.\n"
+                            f"The {army_info['army_name']} has been utterly destroyed.")
+                    # otherwise, normal defeat
+                    else:
+                        # retreat the attackers to whence they came
+                        await conn.execute('''UPDATE cnc_armies SET location = $2 WHERE army_id = $1;''',
+                                           army_info['army_id'], depart_prov_info['id'])
+                        victor_string = "The native defenders are victorious!"
+                        footer = (f"The natives of {prov_info['name']} have successfully repelled their foreign invaders.\n"
+                                  f"The {army_info['army_name']} has retreated to {depart_prov_info['name']}.")
 
                 # create the battle embed and send it
                 battle_embed = discord.Embed(title=f"The Conquest of {prov_info['name']}",
@@ -8355,69 +8369,92 @@ class CNC(commands.Cog):
 
                     # defender retreat, processed on a per army basis
                     for army in enemy_army_list:
-                        # define the best location and cost
-                        retreat_locations = {}
-                        # get their possible retreat locations that they own
-                        owned_provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE occupier_id = $1;''',
-                                                           army['owner_id'])
-                        # owner info
-                        army_owner_info = await user_db_info(conn=conn, user_id=army['owner_id'])
-                        # get all the possible retreat locations that they have access to
-                        military_access = await conn.fetch('''SELECT * FROM cnc_military_access 
-                                                              WHERE $1 = ANY(members);''', army_owner_info['name'])
-                        # define a list of all provinces
-                        all_provinces = owned_provinces
-                        # get the names of the other members of the ma
-                        possible_mas = []
-                        for ma in military_access:
-                            # for each member in the list
-                            for member_name in ma['members']:
-                                # if the member name is not the same as the owner of the army
-                                if member_name != army_owner_info['name']:
-                                    ma_id = await conn.fetchval('SELECT user_id FROM cnc_users WHERE name = $1;',
-                                                                member_name)
-                                    possible_mas.append(ma_id)
-                        for ma_id in possible_mas:
-                            ma_user_info = await user_db_info(conn=conn, user_id=ma_id)
-                            all_provinces += await conn.fetch('SELECT * FROM cnc_provinces WHERE occupier_id = $1;',
-                                                              ma_user_info['user_id'])
-                        # for all the possible provinces
-                        for p in all_provinces:
-                            # calculate the route
-                            path, cost, blocked_by_hostiles = await find_path(conn=conn,
-                                                                            start_id=move_to,
-                                                                            end_id=p['id'],
-                                                                            moving_user_id=army['owner_id'])
-                            if path is None:
-                                continue
-                            # add the cost to the tracker if the distance is greater than 3 provinces
-                            retreat_locations[p['id']] = cost if len(path) > 3 else float('inf')
-                        # if there are no possible retreat locations, destroy the army as overrun
-                        if len(retreat_locations) == 0:
-                            # destroy the army
-                            await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''', army['army_id'])
-                            retreat_message += f"The {army['army_name']} has been overrun and destroyed.\n"
-                            # remove any general assignment
+                        # check each army for destroyed by casualties
+                        if defender_casualties/sum(a['troops'] for a in enemy_army_list) >= .8:
+                            # delete the army and unassign general
+                            await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''',
+                                               army['army_id'])
                             await conn.execute('''UPDATE cnc_generals SET army_id = NULL WHERE army_id = $1;''',
                                                army['army_id'])
-                        # otherwise, select a retreat location
+                        # otherwise, search for a retreat option
                         else:
-                            # select the province with the best cost
-                            retreat_province = min(retreat_locations, key=retreat_locations.get)
-                            # update the army location
-                            await conn.execute('''UPDATE cnc_armies SET location = $2 WHERE army_id = $1;''',
-                                               army['army_id'], retreat_province)
-                            retreat_message += f"The {army['army_name']} has retreated to {retreat_province}.\n"
+                            # define the best location and cost
+                            retreat_locations = {}
+                            # get their possible retreat locations that they own
+                            owned_provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE occupier_id = $1;''',
+                                                               army['owner_id'])
+                            # owner info
+                            army_owner_info = await user_db_info(conn=conn, user_id=army['owner_id'])
+                            # get all the possible retreat locations that they have access to
+                            military_access = await conn.fetch('''SELECT * FROM cnc_military_access 
+                                                                  WHERE $1 = ANY(members);''', army_owner_info['name'])
+                            # define a list of all provinces
+                            all_provinces = owned_provinces
+                            # get the names of the other members of the ma
+                            possible_mas = []
+                            for ma in military_access:
+                                # for each member in the list
+                                for member_name in ma['members']:
+                                    # if the member name is not the same as the owner of the army
+                                    if member_name != army_owner_info['name']:
+                                        ma_id = await conn.fetchval('SELECT user_id FROM cnc_users WHERE name = $1;',
+                                                                    member_name)
+                                        possible_mas.append(ma_id)
+                            for ma_id in possible_mas:
+                                ma_user_info = await user_db_info(conn=conn, user_id=ma_id)
+                                all_provinces += await conn.fetch('SELECT * FROM cnc_provinces WHERE occupier_id = $1;',
+                                                                  ma_user_info['user_id'])
+                            # for all the possible provinces
+                            for p in all_provinces:
+                                # calculate the route
+                                path, cost, blocked_by_hostiles = await find_path(conn=conn,
+                                                                                start_id=move_to,
+                                                                                end_id=p['id'],
+                                                                                moving_user_id=army['owner_id'])
+                                if path is None:
+                                    continue
+                                # add the cost to the tracker if the distance is greater than 3 provinces
+                                retreat_locations[p['id']] = cost if len(path) > 3 else float('inf')
+                            # if there are no possible retreat locations, destroy the army as overrun
+                            if len(retreat_locations) == 0:
+                                # destroy the army
+                                await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''', army['army_id'])
+                                retreat_message += f"The {army['army_name']} has been overrun and destroyed.\n"
+                                # remove any general assignment
+                                await conn.execute('''UPDATE cnc_generals SET army_id = NULL WHERE army_id = $1;''',
+                                                   army['army_id'])
+                            # otherwise, select a retreat location
+                            else:
+                                # select the province with the best cost
+                                retreat_province = min(retreat_locations, key=retreat_locations.get)
+                                # update the army location
+                                await conn.execute('''UPDATE cnc_armies SET location = $2 WHERE army_id = $1;''',
+                                                   army['army_id'], retreat_province)
+                                retreat_message += f"The {army['army_name']} has retreated to {retreat_province}.\n"
                 # === DEFEAT ===
                 else:
-                    # retreat the attackers to whence they came
-                    await conn.execute('''UPDATE cnc_armies SET location = $2 WHERE army_id = $1;''',
-                                       army_info['army_id'], depart_prov_info['id'])
-                    retreat_message = (f"The {army_info['army_name']} has retreated to "
-                                       f"{depart_prov_info['name']} (ID: {depart_prov_info['id']})!")
-                    victor_string = "The defenders are victorious!"
-                    footer = (f"The defenders at {prov_info['name']} have successfully defended their positions.\n"
-                              f"The {army_info['army_name']} has retreated to {depart_prov_info['name']}.")
+                    # check if the attacker army was destroyed or should be destroyed
+                    if attacker_casualties >= .8 * army_info['troops']:
+                        # destroy the army
+                        await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''',
+                                           army_info['army_id'])
+                        # unassign any generals
+                        await conn.execute('''UPDATE cnc_generals SET army_id = NULL WHERE army_id = $1;''',
+                                           army_info['army_id'])
+                        victor_string = "The defenders are victorious!"
+                        footer = (
+                            f"The defenders at {prov_info['name']} have successfully defended their positions.\n"
+                            f"The {army_info['army_name']} has been utterly destroyed.")
+                    # otherwise, retreat
+                    else:
+                        # retreat the attackers to whence they came
+                        await conn.execute('''UPDATE cnc_armies SET location = $2 WHERE army_id = $1;''',
+                                           army_info['army_id'], depart_prov_info['id'])
+                        retreat_message = (f"The {army_info['army_name']} has retreated to "
+                                           f"{depart_prov_info['name']} (ID: {depart_prov_info['id']})!")
+                        victor_string = "The defenders are victorious!"
+                        footer = (f"The defenders at {prov_info['name']} have successfully defended their positions.\n"
+                                  f"The {army_info['army_name']} has retreated to {depart_prov_info['name']}.")
 
                 # create the battle embed and send it
                 battle_embed = discord.Embed(title=f"The Battle of {prov_info['name']}",

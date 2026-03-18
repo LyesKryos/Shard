@@ -25,6 +25,19 @@ class Skirmish:
         attack_roll_mod = 0
         defense_roll_mod = 0
 
+        # === TOTAL LOSS DEFENSE ===
+        # if either army = 0 troops at any point, defer the win automatically to them
+        if self.attacking_army['troops'] <= 0:
+            victor = "defender"
+            attack_casualties_percent, defense_casualties_percent = 0,0
+            # return all values
+            return victor, attack_casualties_percent, defense_casualties_percent
+        if sum(a['troops'] for a in self.defending_armies) <= 0:
+            victor = "attacker"
+            attack_casualties_percent, defense_casualties_percent = 0,0
+            # return all values
+            return victor, attack_casualties_percent, defense_casualties_percent
+
         # === GENERALS INFO ===
         # get the attacking general info
         attacking_general_level = 0
@@ -186,6 +199,24 @@ class Battle:
                                               army['army_id'])
                     refreshed.append(army)
             self.defending_armies = refreshed
+
+            # === TOTAL LOSS CHECK ===
+            # if any armies have 0, they are destroyed and removed from the battle
+            if self.attacking_army['troops'] <= 0:
+                # give victor to the defender
+                defense_victory_tally = float('inf')
+                # destroy the army
+                await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''',
+                                   self.attacking_army['army_id'])
+                # break
+                break
+            if sum(a['troops'] for a in self.defending_armies) <= 0:
+                attack_victory_tally = float('inf')
+                # destroy the armies
+                await conn.execute('''DELETE FROM cnc_armies WHERE army_id = ANY($1);''',
+                                   [a['army_id'] for a in self.defending_armies])
+                # break
+                break
 
 
         # determine the victor
