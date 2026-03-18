@@ -8287,7 +8287,7 @@ class CNC(commands.Cog):
                                            army_info['army_id'])
                         victor_string = "The native defenders are victorious!"
                         footer = (
-                            f"The natives of {prov_info['name']} have successfully repelled their foreign invaders.\n"
+                            f"The natives of {prov_info['name']} have successfully repelled the foreign invaders.\n"
                             f"The {army_info['army_name']} has been utterly destroyed.")
                     # otherwise, normal defeat
                     else:
@@ -8295,7 +8295,7 @@ class CNC(commands.Cog):
                         await conn.execute('''UPDATE cnc_armies SET location = $2 WHERE army_id = $1;''',
                                            army_info['army_id'], depart_prov_info['id'])
                         victor_string = "The native defenders are victorious!"
-                        footer = (f"The natives of {prov_info['name']} have successfully repelled their foreign invaders.\n"
+                        footer = (f"The natives of {prov_info['name']} have successfully repelled the foreign invaders.\n"
                                   f"The {army_info['army_name']} has retreated to {depart_prov_info['name']}.")
 
                 # create the battle embed and send it

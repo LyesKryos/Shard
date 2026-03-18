@@ -179,7 +179,7 @@ class Battle:
             else:
                 defense_victory_tally += 1
             # update the attacking casualties in the db
-            await conn.execute('''UPDATE cnc_armies SET troops = troops * $1 WHERE army_id = $2;''',
+            await conn.execute('''UPDATE cnc_armies SET troops = ROUND(troops * $1) WHERE army_id = $2;''',
                                1 - attack_casualties_percent, self.attacking_army['army_id'])
             # update the attacking army stats internally
             self.attacking_army = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
@@ -198,7 +198,7 @@ class Battle:
                     # divide the percentage of casualties caught by each defending army
                     defense_casualties_share = defense_casualties_percent / len(self.defending_armies)
                     # execute casualties
-                    await conn.execute('''UPDATE cnc_armies SET troops = troops * $2 WHERE army_id - $1;''',
+                    await conn.execute('''UPDATE cnc_armies SET troops = ROUND(troops * $2) WHERE army_id - $1;''',
                                        army['army_id'], 1 - defense_casualties_share)
                     army = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
                                               army['army_id'])
