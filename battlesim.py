@@ -208,7 +208,7 @@ class Battle:
             logger.debug(f"step 4 - about to update DB troops: "
                          f"multiplier={1 - attack_casualties_percent}, army_id={self.attacking_army['army_id']}")
             await conn.execute('''UPDATE cnc_armies
-                                  SET troops = ROUND(troops * $1)
+                                  SET troops = ROUND(troops::numeric * $1::numeric)
                                   WHERE army_id = $2;''',
                                1 - attack_casualties_percent, self.attacking_army['army_id'])
             logger.debug("step 5 - DB update complete")
@@ -243,7 +243,7 @@ class Battle:
                                  f"share={defense_casualties_share}, multiplier={1 - defense_casualties_share}")
                     # execute casualties
                     await conn.execute('''UPDATE cnc_armies
-                                          SET troops = ROUND(troops * $2)
+                                          SET troops = ROUND(troops::numeric * $2::numeric)
                                           WHERE army_id = $1;''',
                                        army['army_id'], 1 - defense_casualties_share)
                     army = await conn.fetchrow('''SELECT *
