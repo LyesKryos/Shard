@@ -352,6 +352,12 @@ async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int, moving_user_
         # if there is a river and not a bridge, the cost is doubled
         if (p['river']) and ("Bridge" not in (p['structures'] if p['structures'] is not None else [])):
             pc_map[p['id']] *= 2
+        # if the province is owned by the user, reduce by 20%
+        if moving_user_id == p['owner_id'] and moving_user_id == p['occupier_id']:
+            # reduce the cost
+            pc_map[p['id']] *= .8
+        # ensure that the cost minimum is at least 0.1
+        pc_map[p['id']] = max(pc_map[p['id']], 0.1)
         # add the province owner to the p_map
         occupier_map[p['id']] = p['occupier_id']
     # define the best cost
@@ -6429,7 +6435,16 @@ class ArmyRecruitMenu(discord.ui.View):
                                             f"1,000 troops.", ephemeral=True)
             # update the view
             return await self.parent_interaction.edit_original_response(view=None)
-        # otherwise, carry on
+        # check if the user has enough manpower
+        elif user_info['manpower'] < 1000:
+            # reject
+            await interaction.followup.send(f"{user_info['name']} does not have sufficient manpower reserves to recruit"
+                                            f" 1,000 troops.")
+            # disable buttons
+            for child in self.children:
+                child.disabled = True
+            # update view
+            return await self.parent_interaction.edit_original_response(view=self)
         # check to make sure the user is not at the army's cap
         if army_info['troops'] + 1000 > user_info['army_size']:
             # reject
@@ -6501,7 +6516,6 @@ class ArmyRecruitMenu(discord.ui.View):
                                             f"5,000 troops.", ephemeral=True)
             # update the view
             return await self.parent_interaction.edit_original_response(view=None)
-        # otherwise, carry on
         # check to make sure the user is not at the army's cap
         if army_info['troops'] + 5000 > user_info['army_size']:
             # reject
@@ -6512,6 +6526,17 @@ class ArmyRecruitMenu(discord.ui.View):
                 child.disabled = True
             # update view
             return await self.parent_interaction.edit_original_response(view=self)
+        # check if the user has sufficient manpower
+        elif user_info['manpower'] < 5000:
+            # reject
+            await interaction.followup.send(f"{user_info['name']} does not have sufficient manpower reserves to recruit"
+                                            f" 5,000 troops.")
+            # disable buttons
+            for child in self.children:
+                child.disabled = True
+            # update view
+            return await self.parent_interaction.edit_original_response(view=self)
+
         # otherwise, carry on
         else:
             if tusail_mil_charge:
@@ -6581,6 +6606,17 @@ class ArmyRecruitMenu(discord.ui.View):
                 child.disabled = True
             # update view
             return await self.parent_interaction.edit_original_response(view=self)
+        # check if the user has sufficient manpower
+        elif user_info['manpower'] < 10000:
+            # reject
+            await interaction.followup.send(f"{user_info['name']} does not have sufficient manpower reserves to recruit"
+                                            f" 10,000 troops.")
+            # disable buttons
+            for child in self.children:
+                child.disabled = True
+            # update view
+            return await self.parent_interaction.edit_original_response(view=self)
+
         # otherwise, carry on
         else:
             if tusail_mil_charge:
