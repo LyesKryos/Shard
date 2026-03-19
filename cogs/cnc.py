@@ -5964,15 +5964,62 @@ class WarOptionsView(discord.ui.View):
                     if target != war_info['primary_defender'] and target in war_info['defenders']:
                         await conn.execute('''UPDATE cnc_wars SET defenders = array_remove(defenders, $1) 
                                                   WHERE id = $2;''', target, war_info['id'])
+                        # get user info
+                        t_info = await user_db_info(conn=conn, user_id=target)
+                        # color their occupied provinces
+                        occupied_provinces = await conn.fetch('''SELECT *
+                                                                 FROM cnc_provinces
+                                                                 WHERE occupier_id != owner_id AND owner_id = $1;''',
+                                                              t_info['user_id'])
+                        # for each province, color
+                        for p in occupied_provinces:
+                            await map_color(p['id'], user_info['user_id'], conn)
+                        # update their provinces
+                        await conn.execute('''UPDATE cnc_provinces
+                                              SET occupier_id   = owner_id,
+                                                  fort_besieged = False,
+                                                  fort_level    = $2
+                                              WHERE owner_id = $1;''', t_info['user_id'], t_info['fort_level'])
                     # if they are not the primary attacker, remove from the attackers
                     elif target != war_info['primary_attacker'] and target in war_info['attackers']:
                         await conn.execute('''UPDATE cnc_wars SET attackers = array_remove(attackers, $1) 
                                            WHERE id = $2;''', target, war_info['id'])
+                        # get user info
+                        t_info = await user_db_info(conn=conn, user_id=target)
+                        # color their occupied provinces
+                        occupied_provinces = await conn.fetch('''SELECT *
+                                                                 FROM cnc_provinces
+                                                                 WHERE occupier_id != owner_id AND owner_id = $1;''',
+                                                              t_info['user_id'])
+                        # for each province, color
+                        for p in occupied_provinces:
+                            await map_color(p['id'], user_info['user_id'], conn)
+                        # update their provinces
+                        await conn.execute('''UPDATE cnc_provinces
+                                              SET occupier_id   = owner_id,
+                                                  fort_besieged = False,
+                                                  fort_level    = $2
+                                              WHERE owner_id = $1;''', t_info['user_id'], t_info['fort_level'])
                     # if they are the primary attacker or defender, then end the war
                     else:
                         # stop the war
                         await conn.execute('''UPDATE cnc_wars SET active = False
                                               WHERE id = $1;''', war_info['id'])
+                        # revert occupation, fort levels, and besieges
+                        for belligerent in war_info['attackers'] + war_info['defenders']:
+                            # get user info
+                            t_info = await user_db_info(conn=conn, user_id=belligerent)
+                            # color their occupied provinces
+                            occupied_provinces = await conn.fetch('''SELECT * FROM cnc_provinces 
+                                                                     WHERE occupier_id != owner_id AND owner_id = $1;''',
+                                                                  t_info['user_id'])
+                            # for each province, color
+                            for p in occupied_provinces:
+                                await map_color(p['id'], user_info['user_id'], conn)
+                            # update their provinces
+                            await conn.execute('''UPDATE cnc_provinces 
+                                                  SET occupier_id = owner_id, fort_besieged = False, fort_level = $2 
+                                                  WHERE owner_id = $1;''', t_info['user_id'], t_info['fort_level'])
                     # send the acceptance dm to all participants
                     for member in war_info['attackers'] + war_info['defenders']:
                         # pull their user id
@@ -6066,8 +6113,24 @@ class WarOptionsView(discord.ui.View):
                                       f"entirely. The negotiation has been automatically accepted.",
                                       embed=peace_embed, user_id=r_info['user_id'], bot=interaction.client)
                         # deactivate the war
-                        return await conn.execute('''UPDATE cnc_wars SET active = False
+                        await conn.execute('''UPDATE cnc_wars SET active = False
                                               WHERE id = $1;''', war_info['id'])
+                        # get user info
+                        t_info = await user_db_info(conn=conn, user_id=recipient)
+                        # color their occupied provinces
+                        occupied_provinces = await conn.fetch('''SELECT *
+                                                                 FROM cnc_provinces
+                                                                 WHERE occupier_id != owner_id AND owner_id = $1;''',
+                                                              t_info['user_id'])
+                        # for each province, color
+                        for p in occupied_provinces:
+                            await map_color(p['id'], user_info['user_id'])
+                        # update their provinces
+                        return await conn.execute('''UPDATE cnc_provinces
+                                              SET occupier_id   = owner_id,
+                                                  fort_besieged = False,
+                                                  fort_level    = $2
+                                              WHERE owner_id = $1;''', t_info['user_id'], t_info['fort_level'])
 
         # add the callback for send
         send_button.callback = send_callback
@@ -7923,8 +7986,30 @@ class CNC(commands.Cog):
         if army_info['owner_id'] != user_info['user_id']:
             return await interaction.followup.send(
                 f"{user_info['name']} does not command the {army_info['army_name']}.", ephemeral=True)
+
         # get the departure province info
         depart_prov_info = await conn.fetchrow('SELECT * FROM cnc_provinces WHERE id = $1;', army_info['location'])
+
+        # if a fort is present, it has levels, the owner is at war with the user, and the user is attempting to move to a province they do not own
+        if not depart_prov_info['fort_besieged'] and depart_prov_info['fort_level'] > 0 and depart_prov_info['owner_id'] != user_info['user_id'] and prov_info['occupier_id'] != user_info['user_id']:
+            # get the prov owner info
+            fort_owner_info = await user_db_info(conn=conn, user_id=depart_prov_info['owner_id'])
+            # check if the province owner is at war with the user
+            war_check = await conn.fetchrow('''SELECT *
+                                               FROM cnc_wars
+                                               WHERE (($1 = ANY (attackers) AND $2 = ANY (defenders))
+                                                   OR ($1 = ANY (defenders) AND $2 = ANY (attackers)))
+                                                 AND active;''', user_info['name'], fort_owner_info['name'])
+            # if there is a war, do reject
+            if war_check:
+                return await interaction.followup.send(f"The {army_info['army_name']} cannot move from "
+                                                       f"{depart_prov_info['name']} (ID: {depart_prov_info['id']}) "
+                                                       f"as a Fort exists in that province. The army must first "
+                                                       f"successfully besiege the Fort.\n"
+                                                       f"Use </cnc province:1316831583159849021> to besiege the Fort.")
+            # otherwise, pass and carry on
+            else: pass
+
         # global definition of the battle and landing and armies
         battle = False
         enemy_army_list = []
@@ -8223,6 +8308,22 @@ class CNC(commands.Cog):
                            WHERE army_id = $3;''', move_to, movement_cost, army_info['army_id'])
                 # otherwise, occupy
                 else:
+                    # if the province they are leaving has an unbesieged fort then it reverts
+                    if not depart_prov_info['fort_besieged'] and depart_prov_info['fort_level'] > 0 and \
+                            depart_prov_info[
+                                'owner_id'] != user_info['user_id'] and prov_info['occupier_id'] != user_info[
+                        'user_id']:
+                        # get the owner info
+                        fort_owner_info = await user_db_info(conn=conn, user_id=depart_prov_info['owner_id'])
+                        # revert the province
+                        await conn.execute('''UPDATE cnc_provinces
+                                              SET occupier_id = owner_id
+                                              WHERE id = $1;''',
+                                           depart_prov_info['id'])
+                        # color the map with the owner color
+                        await map_color(province=depart_prov_info['id'],
+                                        hexcode=fort_owner_info['color'],
+                                        conn=conn)
                     # pull the occupier info
                     occupier_info = await user_db_info(conn=conn, user_id=prov_info['occupier_id'])
                     # update the movement and location
@@ -8254,6 +8355,19 @@ class CNC(commands.Cog):
 
             # if there is no battle, just land
             if not battle:
+                # if the province they are leaving has an unbesieged fort then it reverts
+                if not depart_prov_info['fort_besieged'] and depart_prov_info['fort_level'] > 0 and depart_prov_info[
+                    'owner_id'] != user_info['user_id'] and prov_info['occupier_id'] != user_info['user_id']:
+                    # get the owner info
+                    fort_owner_info = await user_db_info(conn=conn, user_id=depart_prov_info['owner_id'])
+                    # revert the province
+                    await conn.execute('''UPDATE cnc_provinces SET occupier_id = owner_id WHERE id = $1;''',
+                                       depart_prov_info['id'])
+                    # color the map with the owner color
+                    await map_color(province=depart_prov_info['id'],
+                                    hexcode=fort_owner_info['color'],
+                                    conn=conn)
+
                 # update the movement cost and location
                 await conn.execute('''UPDATE cnc_armies SET movement = movement - $2, location = $3, embark = False 
                                       WHERE army_id = $1;''', army_info['army_id'], movement_cost, move_to)
@@ -8328,6 +8442,22 @@ class CNC(commands.Cog):
                                 move_to, cost, army_info['army_id'])
                         # otherwise, move there
                         else:
+                            # if the province they are leaving has an unbesieged fort then it reverts
+                            if not depart_prov_info['fort_besieged'] and depart_prov_info['fort_level'] > 0 and \
+                                    depart_prov_info[
+                                        'owner_id'] != user_info['user_id'] and prov_info['occupier_id'] != user_info[
+                                'user_id']:
+                                # get the owner info
+                                fort_owner_info = await user_db_info(conn=conn, user_id=depart_prov_info['owner_id'])
+                                # revert the province
+                                await conn.execute('''UPDATE cnc_provinces
+                                                      SET occupier_id = owner_id
+                                                      WHERE id = $1;''',
+                                                   depart_prov_info['id'])
+                                # color the map with the owner color
+                                await map_color(province=depart_prov_info['id'],
+                                                hexcode=fort_owner_info['color'],
+                                                conn=conn)
                             # update movement and location
                             await conn.execute(
                                 '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
@@ -8338,6 +8468,22 @@ class CNC(commands.Cog):
                                 f"{prov_info['name']} (ID: {prov_info['id']}) at a cost of `{cost}` movement points.")
                     # otherwise (no war), move freely
                     else:
+                        # if the province they are leaving has an unbesieged fort then it reverts
+                        if not depart_prov_info['fort_besieged'] and depart_prov_info['fort_level'] > 0 and \
+                                depart_prov_info[
+                                    'owner_id'] != user_info['user_id'] and prov_info['occupier_id'] != user_info[
+                            'user_id']:
+                            # get the owner info
+                            fort_owner_info = await user_db_info(conn=conn, user_id=depart_prov_info['owner_id'])
+                            # revert the province
+                            await conn.execute('''UPDATE cnc_provinces
+                                                  SET occupier_id = owner_id
+                                                  WHERE id = $1;''',
+                                               depart_prov_info['id'])
+                            # color the map with the owner color
+                            await map_color(province=depart_prov_info['id'],
+                                            hexcode=fort_owner_info['color'],
+                                            conn=conn)
                         # update movement and location
                         await conn.execute(
                             '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
@@ -8381,6 +8527,22 @@ class CNC(commands.Cog):
                             move_to, cost, army_info['army_id'])
                     # otherwise, occupy
                     else:
+                        # if the province they are leaving has an unbesieged fort then it reverts
+                        if not depart_prov_info['fort_besieged'] and depart_prov_info['fort_level'] > 0 and \
+                                depart_prov_info[
+                                    'owner_id'] != user_info['user_id'] and prov_info['occupier_id'] != user_info[
+                            'user_id']:
+                            # get the owner info
+                            fort_owner_info = await user_db_info(conn=conn, user_id=depart_prov_info['owner_id'])
+                            # revert the province
+                            await conn.execute('''UPDATE cnc_provinces
+                                                  SET occupier_id = owner_id
+                                                  WHERE id = $1;''',
+                                               depart_prov_info['id'])
+                            # color the map with the owner color
+                            await map_color(province=depart_prov_info['id'],
+                                            hexcode=fort_owner_info['color'],
+                                            conn=conn)
                         # update movement and location
                         await conn.execute(
                             '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
@@ -8409,6 +8571,22 @@ class CNC(commands.Cog):
                             f"(ID: {prov_info['id']}), adding `{round(score)}` War Score to the {war_check['name']}.")
                 # otherwise, if there is no war and the user has access, move
                 else:
+                    # if the province they are leaving has an unbesieged fort then it reverts
+                    if not depart_prov_info['fort_besieged'] and depart_prov_info['fort_level'] > 0 and \
+                            depart_prov_info[
+                                'owner_id'] != user_info['user_id'] and prov_info['occupier_id'] != user_info[
+                        'user_id']:
+                        # get the owner info
+                        fort_owner_info = await user_db_info(conn=conn, user_id=depart_prov_info['owner_id'])
+                        # revert the province
+                        await conn.execute('''UPDATE cnc_provinces
+                                              SET occupier_id = owner_id
+                                              WHERE id = $1;''',
+                                           depart_prov_info['id'])
+                        # color the map with the owner color
+                        await map_color(province=depart_prov_info['id'],
+                                        hexcode=fort_owner_info['color'],
+                                        conn=conn)
                     # update movement and location
                     await conn.execute(
                         '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
@@ -8420,6 +8598,22 @@ class CNC(commands.Cog):
 
             # if the province is occupied by the user, move freely
             elif prov_info['occupier_id'] == user_info['user_id']:
+                # if the province they are leaving has an unbesieged fort then it reverts
+                if not depart_prov_info['fort_besieged'] and depart_prov_info['fort_level'] > 0 and \
+                        depart_prov_info[
+                            'owner_id'] != user_info['user_id'] and prov_info['occupier_id'] != user_info[
+                    'user_id']:
+                    # get the owner info
+                    fort_owner_info = await user_db_info(conn=conn, user_id=depart_prov_info['owner_id'])
+                    # revert the province
+                    await conn.execute('''UPDATE cnc_provinces
+                                          SET occupier_id = owner_id
+                                          WHERE id = $1;''',
+                                       depart_prov_info['id'])
+                    # color the map with the owner color
+                    await map_color(province=depart_prov_info['id'],
+                                    hexcode=fort_owner_info['color'],
+                                    conn=conn)
                 # update movement and location
                 await conn.execute(
                     '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
@@ -8543,6 +8737,22 @@ class CNC(commands.Cog):
                 if victor == "attacker":
                     # the army is already moved, so update the province occupier (if the battle takes place in a non-native province)
                     if prov_info['owner_id'] != 0:
+                        # if the province they are leaving has an unbesieged fort then it reverts
+                        if not depart_prov_info['fort_besieged'] and depart_prov_info['fort_level'] > 0 and \
+                                depart_prov_info[
+                                    'owner_id'] != user_info['user_id'] and prov_info['occupier_id'] != user_info[
+                            'user_id']:
+                            # get the owner info
+                            fort_owner_info = await user_db_info(conn=conn, user_id=depart_prov_info['owner_id'])
+                            # revert the province
+                            await conn.execute('''UPDATE cnc_provinces
+                                                  SET occupier_id = owner_id
+                                                  WHERE id = $1;''',
+                                               depart_prov_info['id'])
+                            # color the map with the owner color
+                            await map_color(province=depart_prov_info['id'],
+                                            hexcode=fort_owner_info['color'],
+                                            conn=conn)
                         # occupy color if the owner is not the user
                         if prov_info['owner_id'] != user_info['user_id']:
                             # get the occupier info
