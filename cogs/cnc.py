@@ -1499,7 +1499,7 @@ class DossierView(View):
         self.doss_embed.add_field(name="Manpower \n(Manpower Access)", value=f"{self.user_info['manpower']:,} "
                                                                              f"({self.user_info['manpower_access']}%)")
         self.doss_embed.add_field(name="Manpower Regen",
-                                  value=f"{math.floor(total_manpower['sum'] * (self.user_info['manpower_regen'] / 100)):,} "
+                                  value=f"{math.floor(total_manpower * (self.user_info['manpower_regen'] / 100)):,} "
                                         f"({self.user_info['manpower_regen']}%)")
         self.doss_embed.add_field(name="Total Manpower", value=f"{total_manpower:,}")
         # update
@@ -7929,6 +7929,8 @@ class CNC(commands.Cog):
         battle = False
         enemy_army_list = []
         landing = False
+        war = None
+        user_side = None
 
         # create a helper to get the enemy ids
         async def get_enemy_ids(war: asyncpg.Record, user_name: str) -> List[int]:
@@ -7942,41 +7944,192 @@ class CNC(commands.Cog):
                 ids.append(uid)
             return ids
 
-        # create a helper to pass through the war score
-        async def apply_war_score(war: asyncpg.Record, user_side: str) -> int:
-            # if the user is not the owner, add war score
-            if prov_info['owner_id'] != user_info['user_id']:
-                score = prov_info['development'] * 0.25
+        async def war_score(war: asyncpg.Record, user_side: str, action: str, casualties: int = None,
+                            enemy_armies: List[asyncpg.Record] = None, prov_info: asyncpg.Record = None, ):
+            """A function that calculates the war score of a given action.
+
+            action: province (requires prov_info), siege (requires prov_info),
+                    battle_victor (requires casualties & enemy_armies), battle_defeat (requires casualties)"""
+
+            # define province war score
+            if action == "province":
+                # get enemy info
+                enemy_info = await user_db_info(conn=conn, user_id=prov_info['owner_id'])
+                # define the base score
+                prov_score = 0
+                # if the user does not own the province
+                if prov_info['owner_id'] != user_info['user_id']:
+                    # get the user's cb
+                    cb_key = war['cb'] if user_side == 'attacker' else war.get('db')
+                    # get the purpose from the cb
+                    if cb_key and cb_key != 'Status Quo':
+                        war_goal = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE war_goal = $1;', cb_key)
+                        war_goal = war_goal.lower().split(",")
+                    else:
+                        war_goal = []
+                    # define the base war score
+                    prov_score += prov_info['development'] * 0.25
+                    # if the cb/db purpose is to capture provinces
+                    if "capture provinces" in war_goal:
+                        # add a random amount to the score
+                        prov_score *= uniform(1.3, 1.7)
+                    # if the cb/db purpose is to capture ports/cities
+                    if "capture provinces with ports and cities" in war_goal:
+                        # add a random amount to the score
+                        prov_score *= uniform(1.3, 1.7)
+                    # check if the province is the captial
+                    if enemy_info['capital'] == prov_info['id']:
+                        # add 25 war score
+                        prov_score += 25
+
+                    # set the base score
+                    prov_score = max(prov_score, 1)
+                    # add the war_score
+                    war_score_index = 1 if user_side == 'attacker' else 2
+                    await conn.execute(f'UPDATE cnc_wars '
+                                       f'SET war_score[{war_score_index}] = war_score[{war_score_index}] + $2 '
+                                       f'WHERE id = $1;',
+                                       war['id'], prov_score)
+                    return round(prov_score)
+
+                # if the user does own the province
+                elif prov_info['owner_id'] == user_info['user_id']:
+                    # get the enemy's cb
+                    cb_key = war['db'] if user_side == 'attacker' else war.get('cb')
+                    # get the purpose from the cb
+                    if cb_key and cb_key != 'Status Quo':
+                        war_goal = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE war_goal = $1;', cb_key)
+                        war_goal = war_goal.lower().split(",")
+                    else:
+                        war_goal = []
+                    # define the base war score
+                    prov_score += prov_info['development'] * 0.25
+                    # if the cb/db purpose is to capture provinces
+                    if "capture provinces" in war_goal:
+                        # add a random amount to the score
+                        prov_score *= uniform(1.3, 1.7)
+                    # if the cb/db purpose is to capture ports/cities
+                    if "capture provinces with ports and cities" in war_goal:
+                        # add a random amount to the score
+                        prov_score *= uniform(1.3, 1.7)
+                    # check if the province is the captial
+                    if user_info['capital'] == prov_info['id']:
+                        # add 25 war score
+                        prov_score += 25
+
+                    # set the base score
+                    prov_score = max(prov_score, 1)
+                    # subtract the score from the enemy
+                    war_score_index = 2 if user_side == 'attacker' else 1
+                    await conn.execute(f'UPDATE cnc_wars '
+                                       f'SET war_score[{war_score_index}] = war_score[{war_score_index}] - $2 '
+                                       f'WHERE id = $1;',
+                                       war['id'], prov_score)
+                    return round(prov_score)
+
+            # if the action is besieging a fort
+            elif action == "siege":
+                # if the user does not own the province
+                if prov_info['owner_id'] != user_info['user_id']:
+                    # add the fort score
+                    fort_score = prov_info['fort_level'] * uniform(5, 11.5)
+                    # add the war_score
+                    war_score_index = 1 if user_side == 'attacker' else 2
+                    await conn.execute(f'UPDATE cnc_wars '
+                                       f'SET war_score[{war_score_index}] = war_score[{war_score_index}] + $2 '
+                                       f'WHERE id = $1;',
+                                       war['id'], fort_score)
+                    return round(fort_score)
+                # if the user does own the province
+                elif prov_info['owner_id'] == user_info['user_id']:
+                    # add the fort score
+                    fort_score = prov_info['fort_level'] * uniform(5, 11.5)
+                    # subtract the score from the enemy
+                    war_score_index = 2 if user_side == 'attacker' else 1
+                    await conn.execute(f'UPDATE cnc_wars '
+                                       f'SET war_score[{war_score_index}] = war_score[{war_score_index}] - $2 '
+                                       f'WHERE id = $1;',
+                                       war['id'], fort_score)
+                    return round(fort_score)
+
+            # if the attacker is victorious, add war score to their side
+            elif action == "battle_victor":
+                # define the base score
+                battle_score = 0
+                total_manpower = 0
+
+                # get the user's cb
                 cb_key = war['cb'] if user_side == 'attacker' else war.get('db')
+                # get the purpose from the cb
                 if cb_key and cb_key != 'Status Quo':
-                    purpose = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE war_goal = $1;', cb_key)
-                    if purpose and 'Capture Provinces' in purpose:
-                        score *= uniform(1.3, 1.7)
+                    war_goal = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE war_goal = $1;', cb_key)
+                    war_goal = war_goal.lower().split(",")
+                else:
+                    war_goal = []
+
+                # get the user info for each army
+                for army in enemy_armies:
+                    # get army owner info
+                    enemy_info = await user_db_info(conn=conn, user_id=army['owner_id'])
+                    # get the total possible manpower of the enemy
+                    total_possible_manpower = await conn.fetchval('''SELECT SUM(citizens)
+                                                                     FROM cnc_provinces
+                                                                     WHERE owner_id = $1;''', enemy_info['user_id'])
+                    # calculate the total manpower
+                    total_manpower += total_possible_manpower * enemy_info['manpower_access']
+
+                # calculate the score
+                battle_score += (casualties / total_manpower) * 47.3
+                # if the war goal is win battles
+                if "win battles" in war_goal:
+                    # add a random amount to the score
+                    battle_score *= uniform(1.3, 1.7)
+                # update the war score
                 war_score_index = 1 if user_side == 'attacker' else 2
                 await conn.execute(f'UPDATE cnc_wars '
                                    f'SET war_score[{war_score_index}] = war_score[{war_score_index}] + $2 '
                                    f'WHERE id = $1;',
-                                   war['id'], score)
-                return round(score)
-            # if the user is the owner, reduce the enemy war score
-            else:
-                score = prov_info['development'] * 0.25
-                cb_key = war['db'] if user_side == 'attacker' else war.get('cb')
+                                   war['id'], battle_score)
+                return round(battle_score)
+
+            # if the attacker is defeated, add the war score to the enemy side
+            elif action == "battle_defeat":
+                # define the base score
+                battle_score = 0
+                total_manpower = 0
+
+                # get the user's cb
+                cb_key = war['cb'] if user_side == 'attacker' else war.get('db')
+                # get the purpose from the cb
                 if cb_key and cb_key != 'Status Quo':
-                    purpose = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE war_goal = $1;', cb_key)
-                    if purpose and 'Capture Provinces' in purpose:
-                        score *= uniform(1.3, 1.7)
+                    war_goal = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE war_goal = $1;', cb_key)
+                    war_goal = war_goal.lower().split(",")
+                else:
+                    war_goal = []
+
+                # get the total possible manpower of the defeated
+                total_possible_manpower = await conn.fetchval('''SELECT SUM(citizens)
+                                                                 FROM cnc_provinces
+                                                                 WHERE owner_id = $1;''', user_info['user_id'])
+                # calculate the total manpower
+                total_manpower += total_possible_manpower * user_info['manpower_access']
+
+                # calculate the score
+                battle_score += (casualties / total_manpower) * 47.3
+                # if the war goal is win battles
+                if "win battles" in war_goal:
+                    # add a random amount to the score
+                    battle_score *= uniform(1.3, 1.7)
+                # update the war score
                 war_score_index = 2 if user_side == 'attacker' else 1
                 await conn.execute(f'UPDATE cnc_wars '
-                                   f'SET war_score[{war_score_index}] = war_score[{war_score_index}] - $2 '
+                                   f'SET war_score[{war_score_index}] = war_score[{war_score_index}] + $2 '
                                    f'WHERE id = $1;',
-                                   war['id'], score)
-                return round(score)
+                                   war['id'], battle_score)
+                return round(battle_score)
 
         # if the army has been embarked
         if army_info['embark']:
-            # define the global war
-            war = None
             # define the landing
             landing = True
 
@@ -8032,29 +8185,23 @@ class CNC(commands.Cog):
                     enemy_ids = await get_enemy_ids(war, user_info['name'])
                     # get the enemy army list
                     enemy_army_list = await conn.fetch(
-                        '''SELECT army_id FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2)
+                        '''SELECT * FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2)
                         ORDER BY troops DESC;''',
                         move_to, enemy_ids)
                     # if there are enemy armies, set the battle = true
                     if len(enemy_army_list) > 0:
                         battle = True
-                        # update the movement and location
-                        await conn.execute(
-                            '''UPDATE cnc_armies
-                               SET location = $1,
-                                   movement = movement - $2
-                               WHERE army_id = $3;''',
-                            move_to, movement_cost, army_info['army_id'])
                 # check if the user already has 15 provinces
                 prov_count = await conn.fetchval(
                     '''SELECT COUNT(id) FROM cnc_provinces WHERE owner_id = $1;''', user_info['user_id'])
-                # if they have more than 15, battle
+                # if they have fewer than 15, battle
                 if prov_count <= 15:
                     battle = True
-                    # update the movement and location
-                    await conn.execute(
-                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
-                        move_to, movement_cost, army_info['army_id'])
+
+                # update the movement and location
+                await conn.execute(
+                    '''UPDATE cnc_armies SET location = $1, movement = movement - $2, embark = False 
+                       WHERE army_id = $3;''', move_to, movement_cost, army_info['army_id'])
 
             # if at war, handle occupation or battle
             if war is not None and not battle:
@@ -8064,7 +8211,7 @@ class CNC(commands.Cog):
                 enemy_ids = await get_enemy_ids(war, user_info['name'])
                 # fetch enemy army list
                 enemy_army_list = await conn.fetch(
-                    '''SELECT army_id FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2) 
+                    '''SELECT * FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2) 
                        ORDER BY troops DESC;''',
                     move_to, enemy_ids)
                 # if there are enemy armies, set battle = true
@@ -8072,16 +8219,16 @@ class CNC(commands.Cog):
                     battle = True
                     # update the movement and location
                     await conn.execute(
-                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
-                        move_to, movement_cost, army_info['army_id'])
+                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2, embark = False 
+                           WHERE army_id = $3;''', move_to, movement_cost, army_info['army_id'])
                 # otherwise, occupy
                 else:
                     # pull the occupier info
                     occupier_info = await user_db_info(conn=conn, user_id=prov_info['occupier_id'])
                     # update the movement and location
                     await conn.execute(
-                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
-                        move_to, movement_cost, army_info['army_id'])
+                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2, embark = False
+                           WHERE army_id = $3;''', move_to, movement_cost, army_info['army_id'])
                     # update the occupier id
                     await conn.execute('''UPDATE cnc_provinces SET occupier_id = $2 WHERE id = $1;''',
                                        move_to, user_info['user_id'])
@@ -8096,7 +8243,10 @@ class CNC(commands.Cog):
                                         hexcode=user_info['color'],
                                         conn=conn)
                     # get the score
-                    score = await apply_war_score(war, user_side)
+                    score = await war_score(war=war,
+                                            user_side=user_side,
+                                            action="province",
+                                            prov_info=prov_info)
                     # return
                     return await interaction.followup.send(
                         f"The {army_info['army_name']} has captured and occupied {prov_info['name']} "
@@ -8105,9 +8255,8 @@ class CNC(commands.Cog):
             # if there is no battle, just land
             if not battle:
                 # update the movement cost and location
-                await conn.execute('''UPDATE cnc_armies SET movement = movement - $2, location = $3 
-                                      WHERE army_id = $1;''',
-                                   army_info['army_id'], movement_cost, move_to)
+                await conn.execute('''UPDATE cnc_armies SET movement = movement - $2, location = $3, embark = False 
+                                      WHERE army_id = $1;''', army_info['army_id'], movement_cost, move_to)
                 # notify user
                 return await interaction.followup.send(
                     f"The {army_info['army_name']} has successfully landed at "
@@ -8158,11 +8307,13 @@ class CNC(commands.Cog):
                                                        WHERE ($1 = ANY (attackers) OR $1 = ANY (defenders))
                                                          AND active;''', user_info['name'])
                     if war_check:
+                        # define the war
+                        war = war_check
                         # get a list of enemy ids
                         enemy_ids = await get_enemy_ids(war_check, user_info['name'])
                         # fetch the enemy armies
                         enemy_army_list = await conn.fetch(
-                            '''SELECT army_id FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2) 
+                            '''SELECT * FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2) 
                                ORDER BY troops DESC;''',
                             move_to, enemy_ids)
                         # if there are any enemy armies, battle
@@ -8215,7 +8366,7 @@ class CNC(commands.Cog):
                     enemy_ids = await get_enemy_ids(war_check, user_info['name'])
                     # fetch any enemy armies present
                     enemy_army_list = await conn.fetch(
-                        '''SELECT army_id FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2) 
+                        '''SELECT * FROM cnc_armies WHERE location = $1 AND owner_id = ANY($2) 
                            ORDER BY troops DESC;''',
                         move_to, enemy_ids)
                     # if there are enemy armies, battle
@@ -8248,7 +8399,10 @@ class CNC(commands.Cog):
                                             hexcode=user_info['color'],
                                             conn=conn)
                         # update the war score
-                        score = await apply_war_score(war_check, user_side)
+                        score = await war_score(war=war_check,
+                                                user_side=user_side,
+                                                action="province",
+                                                prov_info=prov_info)
                         # return occupation message
                         return await interaction.followup.send(
                             f"The {army_info['army_name']} has captured and occupied {prov_info['name']} "
@@ -8366,6 +8520,8 @@ class CNC(commands.Cog):
 
             # otherwise, normal battle
             else:
+                # define global war score
+                score = 0
                 # get the defense modifier of the largest army
                 largest_defending_army = max(enemy_army_list, key=lambda army: army['troops'])
                 defense_mod = await conn.fetchval('''SELECT defense_effect FROM cnc_users WHERE user_id = $1;''',
@@ -8405,11 +8561,23 @@ class CNC(commands.Cog):
                                               WHERE id = $2;''',
                                            user_info['user_id'], move_to)
                         footer = f"{user_info['name']} has successfully occupied {prov_info['name']}."
+
                     else:
                         footer = (f"{user_info['name']} has successfully defeated its enemies at {prov_info['name']}.\n"
                                   f"All enemy armies have been forced to retreat to a friendly province.")
                     victor_string = f"{user_info['name']} is victorious!"
                     retreat_message = ""
+                    # war score
+                    score += await war_score(war=war,
+                                            user_side=user_side,
+                                            action="battle_victor",
+                                            casualties=defender_casualties,
+                                            enemy_armies=enemy_army_list)
+                    # province capture war score
+                    score += await war_score(war=war,
+                                            user_side=user_side,
+                                            action="province",
+                                            prov_info=prov_info)
 
                     # defender retreat, processed on a per army basis
                     for army in enemy_army_list:
@@ -8433,7 +8601,7 @@ class CNC(commands.Cog):
                             military_access = await conn.fetch('''SELECT * FROM cnc_military_access 
                                                                   WHERE $1 = ANY(members);''', army_owner_info['name'])
                             # define a list of all provinces
-                            all_provinces = owned_provinces
+                            all_provinces = list(owned_provinces)
                             # get the names of the other members of the ma
                             possible_mas = []
                             for ma in military_access:
@@ -8458,7 +8626,7 @@ class CNC(commands.Cog):
                                 if path is None:
                                     continue
                                 # add the cost to the tracker if the distance is greater than 3 provinces
-                                retreat_locations[p['id']] = cost if len(path) > 3 else float('inf')
+                                retreat_locations[p['id']] = cost if len(path) > 3 and army['troops'] >= 5000 else float('inf')
                             # if there are no possible retreat locations, destroy the army as overrun
                             if len(retreat_locations) == 0:
                                 # destroy the army
@@ -8500,6 +8668,12 @@ class CNC(commands.Cog):
                         footer = (f"The defenders at {prov_info['name']} have successfully defended their positions.\n"
                                   f"The {army_info['army_name']} has retreated to {depart_prov_info['name']}.")
 
+                    # calculate the war score
+                    score += await war_score(war=war,
+                                            user_side=user_side,
+                                            action="battle_defeat",
+                                            casualties=attacker_casualties)
+
                 # create the battle embed and send it
                 battle_embed = discord.Embed(title=f"The Battle of {prov_info['name']}",
                                              description=f"A battle between enemy armies "
@@ -8520,7 +8694,11 @@ class CNC(commands.Cog):
                                              +f"\nTotal Force: {sum(a['troops'] for a in enemy_army_list):,}")
                 battle_embed.add_field(name="\u200b", value="\u200b")
                 # outcome
-                battle_embed.add_field(name="Outcome", value=victor_string, inline=False)
+                battle_embed.add_field(name="Outcome", value=victor_string)
+                battle_embed.add_field(name="War Score",
+                                       value=f"{score} War Score - "
+                                             f"{'\U0001f6e1' if victor == 'defender' else '\U00002694'}")
+                battle_embed.add_field(name="\u200b", value="\u200b")
                 # casualties
                 battle_embed.add_field(name="Attacking Casualties", value=f"{attacker_casualties:,} troops")
                 battle_embed.add_field(name="Defending Casualties", value=f"{defender_casualties:,} troops")
