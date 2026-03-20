@@ -9016,10 +9016,10 @@ class CNC(commands.Cog):
                                              +f"\nTotal Force: {sum(a['troops'] for a in enemy_army_list):,}")
                 battle_embed.add_field(name="\u200b", value="\u200b")
                 # outcome
+                war_score_emoji = "\U0001f6e1" if victor == "defender" else "\U00002694"
                 battle_embed.add_field(name="Outcome", value=victor_string)
                 battle_embed.add_field(name="War Score",
-                                       value=f"{score} War Score - "
-                                             f"{"\U0001f6e1" if victor == 'defender' else "\U00002694"}")
+                                       value=f"{score} War Score - {war_score_emoji}")
                 battle_embed.add_field(name="\u200b", value="\u200b")
                 # casualties
                 battle_embed.add_field(name="Attacking Casualties", value=f"{attacker_casualties:,} troops")
