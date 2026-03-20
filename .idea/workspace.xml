@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding fort blocking mechanics to the move_army command&#10;Adding province resetting considerations to the peace_negotiation acceptance code">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battlesim.py" beforeDir="false" afterPath="$PROJECT_DIR$/battlesim.py" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding fort besieging button to appropriate province view">
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -564,7 +562,7 @@
       <workItem from="1773933918691" duration="13269000" />
       <workItem from="1773959934883" duration="2991000" />
       <workItem from="1773972637771" duration="801000" />
-      <workItem from="1774014954092" duration="354000" />
+      <workItem from="1774014954092" duration="671000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -909,7 +907,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1514" />
+    <option name="localTasksCounter" value="1515" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -928,7 +926,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Fixing a big where the name was added character by character to the military alliance rather than the whole name" />
     <MESSAGE value="Adding stop to the relations responses" />
     <MESSAGE value="Refactored `safe_dm` utility and integrated it across multiple diplomatic and military actions" />
     <MESSAGE value="Added Propose Subjugation option to relations" />
@@ -953,7 +950,8 @@
     <MESSAGE value="Adding manpower reduction to recruitment buttons" />
     <MESSAGE value="Adding proper war score to calculations to move_army command" />
     <MESSAGE value="Adding fort blocking mechanics to the move_army command&#10;Adding province resetting considerations to the peace_negotiation acceptance code" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding fort blocking mechanics to the move_army command&#10;Adding province resetting considerations to the peace_negotiation acceptance code" />
+    <MESSAGE value="Adding fort besieging button to appropriate province view" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding fort besieging button to appropriate province view" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_2.coverage" NAME="scratch_2 Coverage Results" MODIFIED="1761860961970" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

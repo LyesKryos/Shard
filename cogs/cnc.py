@@ -1325,7 +1325,7 @@ class UnownedProvince(View):
         self.siege = siege
 
         # check if the province is eligible for colonization
-        if self.prov_info['owner_id'] != 0:
+        if self.prov_info['owner_id'] == 0 and "Colonialism" in user_info['tech']:
             # create the colonize button
             self.colonize_button = discord.ui.Button(label="Colonize",
                                                      style=discord.ButtonStyle.blurple,
@@ -1340,8 +1340,9 @@ class UnownedProvince(View):
             self.siege_button = discord.ui.Button(label="Siege",
                                                      style=discord.ButtonStyle.danger,
                                                      emoji="\U0001f3f0")
-
-
+            self.siege_button.callback = self.siege_callback
+            # add button
+            self.add_item(self.siege_button)
 
 
     async def interaction_check(self, interaction: discord.Interaction):
@@ -1362,12 +1363,6 @@ class UnownedProvince(View):
         # define owned_province view
         prov_owned_view = OwnedProvinceModifiation(self.author, prov_info,
                                                    user_info, conn)
-        # ensure the user has researched the "Colonialism" tech
-        if "Colonialism" not in user_info['tech']:
-            return await interaction.followup.send("Colonization requires the Colonialism tech to be researched.")
-        # check if the province is owned
-        if prov_info['owner_id'] != 0:
-            return await interaction.response.send_message("You cannot colonize a province owned by any other nation.")
         # check if the user has more than 15 provinces
         prov_owned_count = await conn.fetchval('''SELECT count(id)
                                                   FROM cnc_provinces
@@ -9113,11 +9108,8 @@ class CNC(commands.Cog):
             troops = army['troops']
             location = await conn.fetchval('''SELECT name FROM cnc_provinces WHERE id = $1;''', army['location'])
             location = f"{location} (ID: {army['location']})"
-            general = army['general']
-            if general == 0:
-                general = "No"
-            else:
-                general = "Yes"
+            general = (await conn.fetchval('''SELECT name FROM cnc_generals WHERE army_id = $1;''', army['army_id'])
+                       or "None")
             armies_embed.add_field(name=f"{army_name} (ID: {army_id})", value=f"**Troops**: {troops}\n"
                                                                               f"**Location**: {location}\n"
                                                                               f"**General**: {general}")
