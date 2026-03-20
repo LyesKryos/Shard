@@ -1,11 +1,8 @@
 from __future__ import annotations
-
-import logging
 from random import randrange, randint, choice, uniform
 from typing import List
 import asyncpg
 from discord import app_commands, Interaction
-import importlib
 from ShardBot import Shard
 import discord
 from discord.ext import commands, tasks
@@ -484,7 +481,7 @@ async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int, moving_user_
     # once we have made it to the end of the previous dict, we will reverse the order of the pathway
     path.reverse()
     # return the path and the cost
-    return path, best_cost[end_id], army_block
+    return path, round(best_cost[end_id],2), army_block
 
 
 class MapButtons(View):
@@ -555,8 +552,8 @@ class MapButtons(View):
                       "image": img,
                       "expiration": 86400}
             # upload the map to imgbb
-            upload = await loop.run_in_executor(None, requests.post, "https://api.imgbb.com/1/upload",
-                                                params)
+            upload = await loop.run_in_executor(None, requests.post, ("https://api.imgbb.com/1/upload",
+                                                params))
             # get the response as a json string
             response = upload.json()
             # re-enable buttons
@@ -3787,7 +3784,7 @@ class PuppetManagement(discord.ui.View):
         # otherwise, carry on
         else:
             # create a response view
-            accept_view = Accept()
+            accept_view = Accept(interaction)
             # send a response to see if they actually want to release their puppet
             await interaction.followup.send(content=f"Are you sure you wish to release {self.recipient_info['name']}?", view=accept_view)
             # wait for a response
@@ -6234,7 +6231,7 @@ class WarOptionsView(discord.ui.View):
                                                               t_info['user_id'])
                         # for each province, color
                         for p in occupied_provinces:
-                            await map_color(p['id'], user_info['user_id'])
+                            await map_color(p['id'], user_info['user_id'], conn)
                         # update their provinces
                         return await conn.execute('''UPDATE cnc_provinces
                                               SET occupier_id   = owner_id,
@@ -7826,7 +7823,7 @@ class CNC(commands.Cog):
         else:
             return
 
-    async def province_autocomplete(self, interaction: discord.Interaction, province_typed: str) -> List[app_commands.Choice(str)]:
+    async def province_autocomplete(self, interaction: discord.Interaction, province_typed: str) -> List[app_commands.Choice]:
         """This function searches for current player nations and then returns them as a list for autocomplete."""
 
         # establish connection
@@ -7860,7 +7857,7 @@ class CNC(commands.Cog):
         # sort and return
         return matched_provinces[0:24]
 
-    async def owned_province_autocomplete(self, interaction: discord.Interaction, province_typed: str) -> List[app_commands.Choice(str)]:
+    async def owned_province_autocomplete(self, interaction: discord.Interaction, province_typed: str) -> List[app_commands.Choice]:
         """This function searches for owned provinces and then returns them as a list for autocomplete."""
 
         # establish connection
@@ -7946,7 +7943,7 @@ class CNC(commands.Cog):
 
     # === Army Commands ===
 
-    async def army_autocomplete(self, interaction: discord.Interaction, army_typing: str) -> List[app_commands.Choice(str)]:
+    async def army_autocomplete(self, interaction: discord.Interaction, army_typing: str) -> List[app_commands.Choice]:
         """This function searches for all existing armies and then returns them as a list for autocomplete."""
 
         # establish connection
@@ -7960,17 +7957,17 @@ class CNC(commands.Cog):
                                            interaction.user.id)
             # compile them into a list
             army_choices = [app_commands.Choice(name=f"=={army['army_name']} (ID: {army['army_id']})==",
-                                                value=army['army_id']) for army in user_armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])]
+                                                value=army['army_id']) for army in user_armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in str(army['army_id']))]
             # then pull and add the rest
             non_armies = await conn.fetch('''SELECT * FROM cnc_armies WHERE owner_id != $1;''', interaction.user.id)
             army_choices += ([app_commands.Choice(name=f"{army['army_name']} (ID: {army['army_id']})",
-                                                  value=army['army_id']) for army in non_armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])])
+                                                  value=army['army_id']) for army in non_armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in str(army['army_id']))])
         # if the user is not in the system, don't bother
         else:
             # pull all armies
             armies = await conn.fetchrow('''SELECT * FROM cnc_armies;''')
             army_choices = [app_commands.Choice(name=f"{army['army_name']} (ID: {army['army_id']})",
-                                                value=army['army_id']) for army in armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])]
+                                                value=army['army_id']) for army in armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in str(army['army_id']))]
         # return the choices
         return army_choices[0:24]
 
@@ -9438,11 +9435,7 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # pull user info
         user_id = interaction.user.id
-        user_info = await user_db_info(user_id=user_id)
-        # if the user does not exist
-        if user_info is None:
-            # return a message
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        user_info = await user_db_info(user_id=user_id, conn=conn)
         # check if that tech is an existing tech
         tech_info = await conn.fetchrow('''SELECT *
                                            FROM cnc_tech
