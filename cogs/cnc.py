@@ -7969,7 +7969,8 @@ class CNC(commands.Cog):
         else:
             # pull all armies
             armies = await conn.fetchrow('''SELECT * FROM cnc_armies;''')
-            army_choices = [app_commands.Choice(name=f"{army['army_name']} (ID: {army['army_id']})", value=army['army_id']) for army in armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])]
+            army_choices = [app_commands.Choice(name=f"{army['army_name']} (ID: {army['army_id']})",
+                                                value=army['army_id']) for army in armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])]
         # return the choices
         return army_choices[0:24]
 
@@ -9018,7 +9019,7 @@ class CNC(commands.Cog):
                 battle_embed.add_field(name="Outcome", value=victor_string)
                 battle_embed.add_field(name="War Score",
                                        value=f"{score} War Score - "
-                                             f"{'\U0001f6e1' if victor == 'defender' else '\U00002694'}")
+                                             f"{"\U0001f6e1" if victor == 'defender' else "\U00002694"}")
                 battle_embed.add_field(name="\u200b", value="\u200b")
                 # casualties
                 battle_embed.add_field(name="Attacking Casualties", value=f"{attacker_casualties:,} troops")
