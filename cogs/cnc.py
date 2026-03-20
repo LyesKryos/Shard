@@ -7956,19 +7956,22 @@ class CNC(commands.Cog):
         # if the user is in the system, compile their armies first and then add the rest
         if user_check:
             # pull all their armies
-            user_armies = await conn.fetch('''SELECT * FROM cnc_armies WHERE owner_id = $1;''', interaction.user.id)
+            user_armies = await conn.fetch('''SELECT * FROM cnc_armies WHERE owner_id = $1 ORDER BY troops DESC;''',
+                                           interaction.user.id)
             # compile them into a list
-            army_choices = [app_commands.Choice(name=f"**{army['army_name']} (ID: {army['army_id']})**", value=army['army_id']) for army in user_armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])]
+            army_choices = [app_commands.Choice(name=f"=={army['army_name']} (ID: {army['army_id']})==",
+                                                value=army['army_id']) for army in user_armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])]
             # then pull and add the rest
             non_armies = await conn.fetch('''SELECT * FROM cnc_armies WHERE owner_id != $1;''', interaction.user.id)
-            army_choices += ([app_commands.Choice(name=f"{army['army_name']} (ID: {army['army_id']})", value=army['army_id']) for army in non_armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])])
+            army_choices += ([app_commands.Choice(name=f"{army['army_name']} (ID: {army['army_id']})",
+                                                  value=army['army_id']) for army in non_armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])])
         # if the user is not in the system, don't bother
         else:
             # pull all armies
             armies = await conn.fetchrow('''SELECT * FROM cnc_armies;''')
             army_choices = [app_commands.Choice(name=f"{army['army_name']} (ID: {army['army_id']})", value=army['army_id']) for army in armies if (army_typing.lower() in army['army_name'].lower()) or (army_typing in army['army_id'])]
         # return the choices
-        return army_choices      
+        return army_choices[0:24]
 
     @cnc.command(name="create_army", description="Creates a new army.")
     @app_commands.autocomplete(posting=owned_province_autocomplete)
@@ -9115,41 +9118,41 @@ class CNC(commands.Cog):
                                                                               f"**General**: {general}")
         return await interaction.followup.send(embed=armies_embed)
 
-    @cnc.command(name="rename_army", description="Renames a given army to the selected user input.")
-    @app_commands.describe(rename_target="The ID of the army to rename.", rename_content="The new name of the army.")
-    @app_commands.autocomplete(rename_target=army_autocomplete)
-    async def rename_army(self, interaction: discord.Interaction, rename_target: int, rename_content: str):
-        # establish the connection
-        conn = self.bot.pool
-        # search for the user
-        user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
-        # if the user is not registered
-        if user_info is None:
-            return await interaction.response.send_message(content="You are not a registered member of the CNC system. Use </cnc register:1316831583159849021> to register.")
-        # otherwise, carry on
-        else:
-            # pull the army info
-            army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', rename_target)
-            # check if another army has that name already
-            same_name_check = await conn.fetchrow('''SELECT army_name FROM cnc_armies WHERE army_name = $1;''', rename_content)
-            # if that army does not exist
-            if army_info is None:
-                # reject
-                return await interaction.response.send_message(content=f"No army with the ID `{rename_target}` found.", ephemeral=True)
-            # if the user is not the owner of the army
-            elif army_info['owner_id'] != interaction.user.id:
-                # reject
-                return await interaction.response.send_message(content=f"{user_info['name']} does not command the {army_info['army_name']} and therefore cannot rename it.")
-            # if another army already exists with that name
-            elif same_name_check is not None:
-                # reject
-                return await interaction.response.send_message(content=f"The {army_info['army_name']} cannot be renamed to `{rename_content}` because another army with that name already exists.")
-            # otherwise, carry on
-            else:
-                # rename the army to the user's specified content
-                await conn.execute('''UPDATE cnc_armies SET army_name = $1 WHERE army_id = $2;''', rename_content, rename_target)
-                # notify the user
-                return await interaction.response.send_message(content=f"The {army_info['army_name']} has be renamed to the `{rename_content}`!")
+    # @cnc.command(name="rename_army", description="Renames a given army to the selected user input.")
+    # @app_commands.describe(rename_target="The ID of the army to rename.", rename_content="The new name of the army.")
+    # @app_commands.autocomplete(rename_target=army_autocomplete)
+    # async def rename_army(self, interaction: discord.Interaction, rename_target: int, rename_content: str):
+    #     # establish the connection
+    #     conn = self.bot.pool
+    #     # search for the user
+    #     user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+    #     # if the user is not registered
+    #     if user_info is None:
+    #         return await interaction.response.send_message(content="You are not a registered member of the CNC system. Use </cnc register:1316831583159849021> to register.")
+    #     # otherwise, carry on
+    #     else:
+    #         # pull the army info
+    #         army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', rename_target)
+    #         # check if another army has that name already
+    #         same_name_check = await conn.fetchrow('''SELECT army_name FROM cnc_armies WHERE army_name = $1;''', rename_content)
+    #         # if that army does not exist
+    #         if army_info is None:
+    #             # reject
+    #             return await interaction.response.send_message(content=f"No army with the ID `{rename_target}` found.", ephemeral=True)
+    #         # if the user is not the owner of the army
+    #         elif army_info['owner_id'] != interaction.user.id:
+    #             # reject
+    #             return await interaction.response.send_message(content=f"{user_info['name']} does not command the {army_info['army_name']} and therefore cannot rename it.")
+    #         # if another army already exists with that name
+    #         elif same_name_check is not None:
+    #             # reject
+    #             return await interaction.response.send_message(content=f"The {army_info['army_name']} cannot be renamed to `{rename_content}` because another army with that name already exists.")
+    #         # otherwise, carry on
+    #         else:
+    #             # rename the army to the user's specified content
+    #             await conn.execute('''UPDATE cnc_armies SET army_name = $1 WHERE army_id = $2;''', rename_content, rename_target)
+    #             # notify the user
+    #             return await interaction.response.send_message(content=f"The {army_info['army_name']} has be renamed to the `{rename_content}`!")
 
     # === War Commands ===
 
