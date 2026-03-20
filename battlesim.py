@@ -1,20 +1,12 @@
 from random import randint, choice, uniform
 import asyncpg
 from typing import Tuple
-import logging
-
-# initialize logger
-logger = logging.getLogger('battlesim')
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler('CNC/battlesim.log')
-handler.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
-logger.addHandler(handler)
 
 
 class Skirmish:
 
     def __init__(self, attacking_army: asyncpg.Record, defending_armies: list[asyncpg.Record] | list[dict],
-                 terrain_id: int, conn: asyncpg.Pool, attack_mod: float, defense_mod: float):
+                 terrain_id: int, conn: asyncpg.Pool, attack_mod: float, defense_mod: float, siege: bool = False):
         # define the class variables
         self.attacking_army = attacking_army
         self.defending_armies = defending_armies
@@ -22,6 +14,7 @@ class Skirmish:
         self.conn = conn
         self.attack_mod = attack_mod
         self.defense_mod = defense_mod
+        self.siege = siege
 
     async def skirmish(self) -> Tuple[str, float, float]:
         """Execute the skirmish using the attacking army, defending army(s), and terrain.
@@ -37,24 +30,32 @@ class Skirmish:
         # if either army = 0 troops at any point, defer the win automatically to them
         if self.attacking_army['troops'] <= 0:
             victor = "defender"
-            attack_casualties_percent, defense_casualties_percent = 0,0
-            # return all values
+            attack_casualties_percent, defense_casualties_percent = 0, 0
             return victor, attack_casualties_percent, defense_casualties_percent
         if sum(a['troops'] for a in self.defending_armies) <= 0:
             victor = "attacker"
-            attack_casualties_percent, defense_casualties_percent = 0,0
-            # return all values
+            attack_casualties_percent, defense_casualties_percent = 0, 0
             return victor, attack_casualties_percent, defense_casualties_percent
 
         # === GENERALS INFO ===
         # get the attacking general info
         attacking_general_level = 0
-        if not self.attacking_army['general']:
+        if self.attacking_army['general']:
             # pull the general level IF they are an attack general
             general_level = await conn.fetchval('''SELECT * FROM cnc_generals 
                                                    WHERE general_id = $1 AND type = 'Assault';''',
                                                 self.attacking_army['general'])
             attacking_general_level = general_level if general_level is not None else 0
+            # if this is a siege instead
+            if self.siege:
+                # pull the general level IF they are an siege general
+                general_level = await conn.fetchval('''SELECT *
+                                                       FROM cnc_generals
+                                                       WHERE general_id = $1
+                                                         AND type = 'Siege';''',
+                                                    self.attacking_army['general'])
+                attacking_general_level = general_level if general_level is not None else 0
+
         # add the general level to the attack roll
         attack_roll_mod += attacking_general_level
 
@@ -62,18 +63,18 @@ class Skirmish:
         defending_general_army = max(self.defending_armies, key=lambda army: army['troops'])
         # get the defending general info
         defending_general_level = 0
-        if defending_general_army['general'] is not None:
+        if defending_general_army['general']:
             # pull the general level IF they are a defensive general
             general_level = await conn.fetchval('''SELECT * FROM cnc_generals 
                                                    WHERE general_id = $1 AND type = 'Defensive';''',
                                                 defending_general_army['general'])
-            defending_general_level = general_level if not general_level else 0
+            defending_general_level = general_level if general_level is not None else 0
         # add the general level to the defense roll
         defense_roll_mod += defending_general_level
 
         # === TERRAIN CASUALTIES ===
         terrain_casualties = await conn.fetchval('''SELECT modifier FROM cnc_terrains WHERE id = $1;''',
-                                            self.terrain_id)
+                                                 self.terrain_id)
 
         # === ARMY SIZE CONSIDERATIONS ===
         total_defenders = sum(a['troops'] for a in self.defending_armies)
@@ -87,8 +88,8 @@ class Skirmish:
             defense_roll_mod += ((ratio - 1) if ratio - 1 > .25 else 0)
 
         # === ROLLS ===
-        attack_roll = randint(1,5) + (attack_roll_mod * self.attack_mod)
-        defense_roll = randint(1,5) + (defense_roll_mod * self.defense_mod)
+        attack_roll = randint(1, 5) + (attack_roll_mod * self.attack_mod)
+        defense_roll = randint(1, 5) + (defense_roll_mod * self.defense_mod)
         # determine the victor
         if attack_roll > defense_roll:
             victor = "attacker"
@@ -98,18 +99,10 @@ class Skirmish:
 
         # === CASUALTIES ===
         # the attacker casualties = anywhere from 1% to defender roll/10 percent times the terrain casualties potential
-        attack_casualties_percent = uniform(0.01, (defense_roll/10)) * uniform(1, 1+terrain_casualties)
+        attack_casualties_percent = uniform(0.01, (defense_roll / 10)) * uniform(1, 1 + terrain_casualties)
         # the defender casualties = same as above
-        defense_casualties_percent = uniform(0.01, (attack_roll/10)) * uniform(1, 0.95+terrain_casualties)
+        defense_casualties_percent = uniform(0.01, (attack_roll / 10)) * uniform(1, 0.95 + terrain_casualties)
 
-        # log results
-        logger.debug(f"attack_casualties_percent: {attack_casualties_percent}, \n"
-                     f"defense_roll: {defense_roll}, \n"
-                     f"attack_roll: {attack_roll} ({attacking_general_level} + {ratio} + dice), \n"
-                     f"terrain_casualties: {terrain_casualties}, \n"
-                     f"1-casualties: {1 - attack_casualties_percent}, \n"
-                     f"troops_before: {self.attacking_army['troops']}")
-        # return all values
         return victor, attack_casualties_percent, defense_casualties_percent
 
 
@@ -117,8 +110,7 @@ class Battle:
 
     def __init__(self, attacking_army: asyncpg.Record, defending_armies: list[asyncpg.Record] | list[dict],
                  province_info: asyncpg.Record, conn: asyncpg.Pool, attack_mod: float, defense_mod: float,
-                 landing: bool = False):
-
+                 landing: bool = False, siege: bool = False):
         # define the class variables
         self.attacking_army = attacking_army
         self.defending_armies = defending_armies
@@ -127,6 +119,7 @@ class Battle:
         self.attack_mod = attack_mod
         self.defense_mod = defense_mod
         self.landing = landing
+        self.siege = siege
 
     async def battle(self) -> Tuple[str, int, int]:
         """Simulates a battle based on given parameters. Internally updates armies based on casualties.
@@ -154,8 +147,7 @@ class Battle:
         # === NUMBER OF SKIRMISHES ===
         skirmishes = max(defending_general_level + base_terrain_rolls, 1)
 
-        # TERRAINS FOR SKIRMISH
-        # define the terrain(s) for the skirmish
+        # === TERRAIN OPTIONS ===
         terrain_options = [self.province_info['terrain']]
         # add options based on structures/geography
         if self.province_info['river']:
@@ -171,6 +163,14 @@ class Battle:
             # the id for landing is 6
             terrain_options.append(6)
 
+        # === SIEGE ===
+        if self.siege:
+            # set the terrain options only to 8 (fort)
+            terrain_options = [8]
+            # set the skirmishes to the fort level
+            skirmishes = self.province_info['fort_level']
+
+
         # === EXECUTE SKIRMISH ===
         # define casualties
         total_attack_casualties = 0
@@ -178,69 +178,52 @@ class Battle:
         # define victories
         attack_victory_tally = 0
         defense_victory_tally = 0
-        logger.debug(f"Total skirmishes to run: {skirmishes}")
+
         for skirm in range(skirmishes):
-            logger.debug(f"Starting skirmish iteration {skirm + 1} of {skirmishes}\n"
-                         f"troops at the top of skirmish {skirm}: {self.attacking_army}")
             # select a terrain
             terrain_id = choice(terrain_options)
             # initialize the skirmish class
             _skirmish = Skirmish(self.attacking_army, self.defending_armies, terrain_id,
-                                 conn, self.attack_mod, self.defense_mod)
+                                 conn, self.attack_mod, self.defense_mod, self.siege)
 
             victor, attack_casualties_percent, defense_casualties_percent = await _skirmish.skirmish()
-            logger.debug(f"step 1 - skirmish complete: victor={victor}, "
-                         f"attack_casualties_percent={attack_casualties_percent}, "
-                         f"defense_casualties_percent={defense_casualties_percent}")
 
             # update the casualty tracker
             total_attack_casualties += round(self.attacking_army['troops'] * attack_casualties_percent)
-            logger.debug(f"step 2 - casualty tracker updated: total_attack_casualties={total_attack_casualties}")
 
             # tally the victory
             if victor == "attacker":
                 attack_victory_tally += 1
             else:
                 defense_victory_tally += 1
-            logger.debug(f"step 3 - victory tallied: attack={attack_victory_tally}, defense={defense_victory_tally}")
 
             # update the attacking casualties in the db
-            logger.debug(f"step 4 - about to update DB troops: "
-                         f"multiplier={1 - attack_casualties_percent}, army_id={self.attacking_army['army_id']}")
             await conn.execute('''UPDATE cnc_armies
                                   SET troops = ROUND(troops::numeric * $1::numeric)
                                   WHERE army_id = $2;''',
                                1 - attack_casualties_percent, self.attacking_army['army_id'])
-            logger.debug("step 5 - DB update complete")
 
             # update the attacking army stats internally
             self.attacking_army = await conn.fetchrow('''SELECT *
                                                          FROM cnc_armies
                                                          WHERE army_id = $1;''',
                                                       self.attacking_army['army_id'])
-            logger.debug(
-                f"step 6 - army refreshed: {self.attacking_army['troops'] if self.attacking_army else 'NONE - RECORD IS GONE'}")
 
             # get the total defense casualties and add them to the tracker
             total_defense_casualties += round(
                 sum(a['troops'] for a in self.defending_armies) * defense_casualties_percent)
-            logger.debug(f"step 7 - defense casualties tracked: total_defense_casualties={total_defense_casualties}")
 
             # for each of the defending armies, share the casualties
             refreshed = []
             for army in self.defending_armies:
                 if army['army_id'] is None:
-                    logger.debug(f"step 8a - native army casualties: before={army['troops']}")
                     # manually reduce the synthetic troop count
                     updated = dict(army)
-                    updated['troops'] = army['troops'] * defense_casualties_percent
+                    updated['troops'] = army['troops'] * (1 - defense_casualties_percent)
                     refreshed.append(updated)
-                    logger.debug(f"step 8a - native army casualties: after={updated['troops']}")
                 else:
                     # divide the percentage of casualties caught by each defending army
                     defense_casualties_share = defense_casualties_percent / len(self.defending_armies)
-                    logger.debug(f"step 8b - real army casualties: army_id={army['army_id']}, "
-                                 f"share={defense_casualties_share}, multiplier={1 - defense_casualties_share}")
                     # execute casualties
                     await conn.execute('''UPDATE cnc_armies
                                           SET troops = ROUND(troops::numeric * $2::numeric)
@@ -251,23 +234,16 @@ class Battle:
                                                   WHERE army_id = $1;''',
                                                army['army_id'])
                     refreshed.append(army)
-                    logger.debug(f"step 8b - real army after casualties: {army['troops'] if army else 'NONE'}")
             self.defending_armies = refreshed
-            logger.debug(f"step 9 - defenders refreshed: total={sum(a['troops'] for a in self.defending_armies)}")
 
             # === TOTAL LOSS CHECK ===
-            logger.debug(f"step 10 - loss check: attacking={self.attacking_army['troops']}, "
-                         f"defending={sum(a['troops'] for a in self.defending_armies)}")
             # if any armies have 0, they are destroyed and removed from the battle
             if self.attacking_army['troops'] <= 0:
-                logger.debug("step 11 - ATTACKER TOTAL LOSS - breaking")
                 defense_victory_tally = float('inf')
                 break
             if sum(a['troops'] for a in self.defending_armies) <= 0:
-                logger.debug("step 11 - DEFENDER TOTAL LOSS - breaking")
                 attack_victory_tally = float('inf')
                 break
-            logger.debug(f"step 11 - loss checks passed, proceeding to iteration {skirm + 2}")
 
         # determine the victor
         if attack_victory_tally > defense_victory_tally:

@@ -1316,12 +1316,33 @@ class OwnedProvinceModifiation(View):
 class UnownedProvince(View):
 
     def __init__(self, author: discord.User, province_db: asyncpg.Record, user_info: asyncpg.Record,
-                 pool: asyncpg.Pool):
+                 pool: asyncpg.Pool, siege: asyncpg.Record = None):
         super().__init__(timeout=120)
         self.prov_info = province_db
         self.user_info = user_info
-        self.pool = pool
+        self.conn = pool
         self.author = author
+        self.siege = siege
+
+        # check if the province is eligible for colonization
+        if self.prov_info['owner_id'] != 0:
+            # create the colonize button
+            self.colonize_button = discord.ui.Button(label="Colonize",
+                                                     style=discord.ButtonStyle.blurple,
+                                                     emoji="\U0001f3d5")
+            self.colonize_button.callback = self.colonize
+            # add button
+            self.add_item(self.colonize_button)
+
+        # if the province needs to be besieged
+        if siege:
+            # create the siege button
+            self.siege_button = discord.ui.Button(label="Siege",
+                                                     style=discord.ButtonStyle.danger,
+                                                     emoji="\U0001f3f0")
+
+
+
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.author.id
@@ -1331,15 +1352,14 @@ class UnownedProvince(View):
             child.disabled = True
         return await self.interaction.edit_original_response(view=self)
 
-    @discord.ui.button(label="Colonize", style=discord.ButtonStyle.blurple, emoji="\U0001f3d5")
-    async def colonize(self, interaction: discord.Interaction, button: discord.Button):
+    async def colonize(self, interaction: discord.Interaction):
         # define everything
-        conn = self.pool
+        conn = self.conn
         user_info = self.user_info
         prov_info = self.prov_info
         province_id = prov_info['id']
         user_id = user_info['user_id']
-        # define OG view
+        # define owned_province view
         prov_owned_view = OwnedProvinceModifiation(self.author, prov_info,
                                                    user_info, conn)
         # ensure the user has researched the "Colonialism" tech
@@ -1409,6 +1429,101 @@ class UnownedProvince(View):
         return await interaction.followup.send(f"{prov_info['name']} (ID: {province_id}) "
                                                f"has been successfully colonized.")
 
+    async def siege_callback(self, interaction: discord.Interaction):
+        # defer response
+        await interaction.response.defer()
+        # establish connection
+        conn = self.conn
+
+        # check if the user currently owns an army in this province
+        besieging_army = await conn.fetchrow('''SELECT * FROM cnc_armies 
+                                                WHERE location = $1 AND owner_id = $2 ORDER BY troops DESC;''',
+                                             self.prov_info['id'], self.user_info['user_id'])
+        # if there is no army
+        if not besieging_army:
+            # reject
+            self.siege_button.disabled = True
+            await interaction.followup.send(f"There is no army at {self.prov_info['name']} to besiege the fort there.",
+                                            ephemeral=True)
+        # check if the army is large enough
+        elif besieging_army['troops'] < 1000:
+            # reject
+            self.siege_button.disabled = True
+            await interaction.followup.send(f"The {besieging_army['name']} does not have sufficient "
+                                            f"troops to besiege the fort at {self.prov_info['name']}.", ephemeral=True)
+
+        # otherwise, carry on
+        else:
+            # create the siege defense army from scratch
+            siege_army = {
+                'army_id': None,
+                'troops': max(int(self.prov_info['citizens'] *
+                                  min(self.prov_info['development'] / 50, 0.5)), randint(100, 500)),
+                'general': None,
+                'owner_id': 0,
+                'army_name': f"Defenders of Fort {self.province_info['name']}"
+            }
+            # call the siege
+            siege_victor, attacker_casualties, defender_casualties = Battle(attacking_army=besieging_army,
+                                                                          defending_armies=[siege_army],
+                                                                          province_info=self.prov_info,
+                                                                          conn=conn,
+                                                                          attack_mod=self.user_info['attack_effect'],
+                                                                          defense_mod=self.user_info['defense_effect'],
+                                                                          siege=True).battle()
+            # if the besiegers are victorious
+            if siege_victor == "attacker":
+                # update the province info with fort information
+                await conn.execute('''UPDATE cnc_provinces SET fort_level = 1, fort_besieged = True WHERE id = $1;''',
+                                   self.prov_info['id'])
+                # calculate war score
+                war_score = self.prov_info['fort_level'] * uniform(5, 11.5)
+                # update the war score for the war
+                user_side = 'attacker' if self.user_info['name'] in self.siege['attackers'] else 'defender'
+                war_score_index = 1 if user_side == 'attacker' else 2
+                await conn.execute(f'UPDATE cnc_wars '
+                                   f'SET war_score[{war_score_index}] = war_score[{war_score_index}] + $2 '
+                                   f'WHERE id = $1;',
+                                   self.siege['id'], war_score)
+                # pull general info
+                general_level = await conn.fetchval('''SELECT level FROM cnc_generals WHERE army_id = $1;''',
+                                                    besieging_army['army_id'])
+                # if the user has the gunpowder tech
+                if "Gunpowder" in self.user_info['tech']:
+                    # roll the chance to destroy the fort outright
+                    destroy_fort = False if randint(1, 100) > 15 else True
+                # if the siege general is high enough
+                elif general_level >= 2:
+                    # roll the chance to destroy the fort outright
+                    destroy_fort = False if randint(1, 100) > 7 * general_level else True
+                # otherwise, no
+                else:
+                    destroy_fort = False
+                # if the fort is to be destroyed
+                if destroy_fort:
+                    # delete the structure and remove the level
+                    await conn.execute('''UPDATE cnc_provinces 
+                                          SET structures = array_remove(structures, 'Fort'), fort_level = 0, 
+                                              fort_besieged = False 
+                                          WHERE id = $1;''', self.prov_info['id'])
+                # return the siege victory message
+                return await interaction.followup.send(f"The Siege of {self.prov_info['name']} has been won by the "
+                                                       f"{besieging_army['name']}. The siege has resulted in the "
+                                                       f"besiegers taking {attacker_casualties:,} casualties." +
+                                                       (f"The fort has been destroyed by the besiegers."
+                                                        if destroy_fort else ""))
+
+            # if the defenders are victorious
+            else:
+                # reduce the citizens by the casualty amount
+                await conn.execute('''UPDATE cnc_provinces SET citizens = citizens - $1 WHERE id = $2;''',
+                                   defender_casualties, self.prov_info['id'])
+                # return the siege defense message
+                return await interaction.followup.send(f"The Siege of {self.prov_info['name']} has been won by the "
+                                                       f"defenders, who have repulsed the {besieging_army['name']}. "
+                                                       f"The siege has resulted in the besiegers taking "
+                                                       f"{attacker_casualties:,} casualties.\nThe defenders have taken "
+                                                       f"{defender_casualties:,} casualties.")
 
 # === Dossier View ===
 
@@ -8629,13 +8744,11 @@ class CNC(commands.Cog):
             if prov_info['owner_id'] == 0 and len(enemy_army_list) == 0:
                 native_army = {
                     'army_id': None,  # no DB record
-                    'troops': int(prov_info['citizens'] * max(prov_info['development']/10, 0.9)),
+                    'troops': int(prov_info['citizens'] * min(prov_info['development']/10, 0.9)),
                     'general': None,
                     'owner_id': 0,
                     'army_name': f"Warriors of {prov_info['name']}"
                 }
-                logging.getLogger(__name__).debug(f"army param: {army}, army_info army_id: {army_info['army_id']}, troops in DB: "
-                f"{await conn.fetchval('SELECT troops FROM cnc_armies WHERE army_id = $1', army_info['army_id'])}")
                 # initialize battle
                 battle = Battle(
                     attacking_army=army_info,
