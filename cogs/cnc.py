@@ -68,7 +68,7 @@ def plus_minus(number: int) -> str:
     """Adds a plus and minus to a number, turning it into a string."""
     if number >= 0:
         return str(f"+{number}")
-    elif number < 0:
+    else:
         return str(f"-{number}")
 
 
@@ -1860,7 +1860,7 @@ class TaxManageView(View):
         # pull user info
         self.user_info = await user_db_info(self.author.id, conn)
         # if the user would decrease their tax below 0, stop them
-        if self.user_info['tax_level'] - .01 <= 0:
+        if self.user_info['tax_level'] - .01 < 0:
             await interaction.followup.send("You cannot decrease your taxation below 0%.")
             button.disabled = True
             await interaction.edit_original_response(view=self)
@@ -1896,8 +1896,8 @@ class TaxManageView(View):
         conn = self.conn
         # pull user info
         self.user_info = await user_db_info(self.author.id, conn)
-        # if the user would decrease their tax below 0, stop them
-        if self.user_info['tax_level'] + .01 >= 20:
+        # if the user would increase their tax above 20%
+        if self.user_info['tax_level'] + .01 > 20:
             await interaction.followup.send(f"You cannot increase your taxation above "
                                             f"{self.govt_info['tax_level'] + self.user_info['tax_level']:.0%}.")
             button.disabled = True
@@ -2068,14 +2068,14 @@ class MilUpkeepView(View):
         conn = self.conn
         # pull user info
         self.user_info = await user_db_info(self.author.id, conn)
-        # if the user is going to decrease below 0 spending, stop them
+        # if the user is going to exceed 10 spending, reject
         if self.user_info['mil_upkeep'] + 1 > 10:
             button.disabled = True
             await interaction.followup.send(f"You cannot increase your Military Upkeep "
                                             f"above 10 Military Authority.")
             await interaction.edit_original_response(view=self)
         else:
-            # update public spending level
+            # update mil upkeep spending level
             await conn.execute('''UPDATE cnc_users
                                   SET mil_upkeep = mil_upkeep + 1
                                   WHERE user_id = $1;''',
