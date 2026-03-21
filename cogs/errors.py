@@ -1,5 +1,4 @@
 import logging
-
 import discord
 import discord.errors
 from discord import app_commands

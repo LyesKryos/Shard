@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting int-string error in army autocomplete&#10;Correcting movement cost by rounding at output as correct">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting conditional logic for tax level and spending limits">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ShardBot.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShardBot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/errors.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/errors.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -563,7 +564,7 @@
       <workItem from="1773933918691" duration="13269000" />
       <workItem from="1773959934883" duration="2991000" />
       <workItem from="1773972637771" duration="801000" />
-      <workItem from="1774014954092" duration="3626000" />
+      <workItem from="1774014954092" duration="4504000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -908,7 +909,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1520" />
+    <option name="localTasksCounter" value="1521" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -927,7 +928,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding puppet and overlord to the nation view embed" />
     <MESSAGE value="Correcting province view bug" />
     <MESSAGE value="Correcting province view for non-players and nations without the colonialism tech" />
     <MESSAGE value="Adding the info command" />
@@ -952,7 +952,8 @@
     <MESSAGE value="Correcting error in move army" />
     <MESSAGE value="Correcting string error" />
     <MESSAGE value="Correcting int-string error in army autocomplete&#10;Correcting movement cost by rounding at output as correct" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting int-string error in army autocomplete&#10;Correcting movement cost by rounding at output as correct" />
+    <MESSAGE value="Correcting conditional logic for tax level and spending limits" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcting conditional logic for tax level and spending limits" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_2.coverage" NAME="scratch_2 Coverage Results" MODIFIED="1761860961970" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
