@@ -131,8 +131,6 @@ def rand_location_name_list(list_range: int) -> List[str]:
                 active_locales.remove(locale)
     # when you are all done with the list (or have run out of locales), return the list of results
     return results
-            
-
 
 async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> discord.Embed:
     # owner and occupier info
@@ -144,6 +142,8 @@ async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> di
     if prov_info['occupier_id'] != 0:
         occupier = await user_db_info(prov_info['occupier_id'], conn)
         occupier = occupier['name']
+    elif prov_info['occupier_id'] == 1:
+        occupier = "Rebels"
     else:
         occupier = "Natives"
     if prov_info['river'] is True:
@@ -189,7 +189,6 @@ async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> di
     prov_embed.add_field(name="Development", value=f"{prov_info['development']}")
     prov_embed.add_field(name="Structures", value=f"{structures}")
     return prov_embed
-
 
 async def user_db_info(user_id: int | str, conn: asyncpg.Pool) -> asyncpg.Record:
     """Pulls user info from the database using Discord user ID."""
@@ -249,9 +248,6 @@ async def map_color(province: int, hexcode: str, conn: asyncpg.Pool):
     prov = prov.convert("RGBA")
     map.paste(prov, box=cord, mask=prov)
     map.save(fr"{map_directory}wargame_provinces.png")
-
-
-
 
 # create modal input function
 async def demanding_provinces_wait_for_modal(parent_interaction: discord.Interaction, title: str, label: str):
@@ -1463,6 +1459,12 @@ class UnownedProvince(View):
                                                                           attack_mod=self.user_info['attack_effect'],
                                                                           defense_mod=self.user_info['defense_effect'],
                                                                           siege=True).battle()
+            # update war casualties
+            await conn.execute('''UPDATE cnc_wars
+                                  SET deaths = deaths + $2
+                                  WHERE id = $1;''',
+                               self.siege['id'], defender_casualties + attacker_casualties)
+
             # if the besiegers are victorious
             if siege_victor == "attacker":
                 # update the province info with fort information
@@ -8738,9 +8740,9 @@ class CNC(commands.Cog):
         if battle:
             # for natives and not when there is a real battle
             if prov_info['owner_id'] == 0 and len(enemy_army_list) == 0:
-                native_army = {
+                rebel_army = {
                     'army_id': None,  # no DB record
-                    'troops': int(prov_info['citizens'] * min(prov_info['development']/10, 0.9)),
+                    'troops': int(prov_info['citizens'] * min(prov_info['development']/10, 0.6)),
                     'general': None,
                     'owner_id': 0,
                     'army_name': f"Warriors of {prov_info['name']}"
@@ -8748,7 +8750,7 @@ class CNC(commands.Cog):
                 # initialize battle
                 battle = Battle(
                     attacking_army=army_info,
-                    defending_armies=[native_army],
+                    defending_armies=[rebel_army],
                     province_info=prov_info,
                     conn=conn,
                     attack_mod=user_info['attack_effect'],
@@ -8808,7 +8810,100 @@ class CNC(commands.Cog):
                 # define the defending attributes
                 battle_embed.add_field(name="Defenders", value="Natives")
                 battle_embed.add_field(name="Defending Army",
-                                       value=f"The {native_army['army_name']}\n{native_army['troops']:,} troops")
+                                       value=f"The {rebel_army['army_name']}\n{rebel_army['troops']:,} troops")
+                battle_embed.add_field(name="\u200b", value="\u200b")
+                # outcome
+                battle_embed.add_field(name="Outcome", value=victor_string, inline=False)
+                # casualties
+                battle_embed.add_field(name="Attacking Casualties", value=f"{attacker_casualties:,} troops")
+                battle_embed.add_field(name="Defending Casualties", value=f"{defender_casualties:,} troops")
+                battle_embed.add_field(name="\u200b", value="\u200b")
+                # footnote
+                battle_embed.set_footer(text=footer)
+                # return the battle embed
+                return await interaction.followup.send(embed=battle_embed)
+
+            # for rebellions/civil wars/revolutions
+            elif prov_info['occupier_id'] == 1 and prov_info['owner_id'] == user_info['user_id']:
+                # get type of army
+                if user_info['active_rebellion']:
+                    army_name = "Soldiers of the Rebellion"
+                elif user_info['active_civil_war']:
+                    army_name = "Anti-Government Militia"
+                else:
+                    army_name = "Revolutionary Army"
+                rebel_army = {
+                    'army_id': None,  # no DB record
+                    'troops': round(prov_info['citizens'] * max(uniform(0.1, (prov_info['development']/20)),.8)),
+                    'general': None,
+                    'owner_id': 0,
+                    'army_name': army_name
+                }
+                # initialize battle
+                battle = Battle(
+                    attacking_army=army_info,
+                    defending_armies=[rebel_army],
+                    province_info=prov_info,
+                    conn=conn,
+                    attack_mod=user_info['attack_effect'],
+                    defense_mod=0,
+                    landing=landing
+                )
+                # run battle and return results
+                victor, attacker_casualties, defender_casualties = await battle.battle()
+                # since this is directly attacking the province natives, reduce the citizenry by the casualties
+                await conn.execute('''UPDATE cnc_provinces SET citizens = citizens - $2 WHERE id = $1;''',
+                                   prov_info['id'], defender_casualties)
+
+                # === VICTORY ===
+                if victor == "attacker":
+                    # the army is already moved, so update the province owner
+                    await conn.execute('''UPDATE cnc_provinces SET occupier_id = $1 WHERE id = $2;''',
+                                       user_info['user_id'], move_to)
+                    victor_string = f"{user_info['name']} is victorious!"
+                    footer = (f"{user_info['name']} has successfully subdued the rebel forces in {prov_info['name']}.")
+                    # color the province properly
+                    await map_color(province=prov_info['id'],
+                                    hexcode=user_info['color'],
+                                    conn=conn)
+                # === DEFEAT ===
+                else:
+                    # check if the attacker army was destroyed or should be destroyed
+                    if attacker_casualties >= (.8 * army_info['troops']):
+                        # destroy the army
+                        await conn.execute('''DELETE FROM cnc_armies WHERE army_id = $1;''',
+                                           army_info['army_id'])
+                        # unassign any generals
+                        await conn.execute('''UPDATE cnc_generals SET army_id = NULL WHERE army_id = $1;''',
+                                           army_info['army_id'])
+                        victor_string = "The rebels are victorious!"
+                        footer = (
+                            f"The rebel forces at {prov_info['name']} have successfully crushed their loyalist "
+                            f"enemies.\nThe {army_info['army_name']} has been utterly destroyed.")
+                    # otherwise, normal defeat
+                    else:
+                        # retreat the attackers to whence they came
+                        await conn.execute('''UPDATE cnc_armies SET location = $2 WHERE army_id = $1;''',
+                                           army_info['army_id'], depart_prov_info['id'])
+                        victor_string = "The rebels are victorious!"
+                        footer = (f"The rebel forces at {prov_info['name']} have successfully repelled their "
+                                  f"loyalist enemies.\n The {army_info['army_name']} has retreated to "
+                                  f"{depart_prov_info['name']}.")
+
+                # create the battle embed and send it
+                battle_embed = discord.Embed(title=f"The Battle of {prov_info['name']}",
+                                             description=f"A battle to liberate {prov_info['name']} "
+                                                         f"from rebellious forces.",
+                                             color=discord.Color.red())
+                # define the attacking attributes
+                battle_embed.add_field(name="Attacker", value=user_info['name'])
+                battle_embed.add_field(name="Attacking Army",
+                                       value=f"The {army_info['army_name']}\n{army_info['troops']:,} troops")
+                battle_embed.add_field(name="\u200b", value="\u200b")
+                # define the defending attributes
+                battle_embed.add_field(name="Defenders", value="Natives")
+                battle_embed.add_field(name="Defending Army",
+                                       value=f"The {rebel_army['army_name']}\n{rebel_army['troops']:,} troops")
                 battle_embed.add_field(name="\u200b", value="\u200b")
                 # outcome
                 battle_embed.add_field(name="Outcome", value=victor_string, inline=False)
@@ -8841,6 +8936,9 @@ class CNC(commands.Cog):
                 )
                 # run battle and return results
                 victor, attacker_casualties, defender_casualties = await battle.battle()
+                # update war casualties
+                await conn.execute('''UPDATE cnc_wars SET deaths = deaths + $2 WHERE id = $1;''',
+                                   war['id'], defender_casualties+attacker_casualties)
 
                 # === VICTORY ===
                 if victor == "attacker":
@@ -10025,7 +10123,7 @@ class CNC(commands.Cog):
         if not destination_check:
             return await ctx.send(f"No such province as `{destination}`.")
         # execute the command
-        pathfinder = await find_path(conn=conn, start_id=origin, end_id=destination)
+        pathfinder = await find_path(conn=conn, start_id=origin, end_id=destination, moving_user_id=ctx.user.id)
         # check if the path cannot be found
         if pathfinder is None:
             return await ctx.send(f"No path from {origin} to {destination} can be found by land.")
