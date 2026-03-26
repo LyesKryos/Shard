@@ -7214,7 +7214,7 @@ class CommandAndConquest(commands.Cog):
         self.version = "version 3.0.a - The Overhaul"
         self.version_notes = ""
 
-    async def on_load(self):
+    async def cog_load(self):
         importlib.reload(turn)
         importlib.reload(battlesim)
 
