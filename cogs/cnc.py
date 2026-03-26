@@ -20,7 +20,7 @@ from faker.exceptions import UniquenessException
 import re
 from battlesim import Battle
 import battlesim
-import CNC
+import CNC.turn
 
 async def cnc_user_check(interaction: discord.Interaction) -> bool:
     # establish the conn
@@ -7202,7 +7202,7 @@ class GeneralSelectView(discord.ui.View):
         return await interaction.response.send_message(content="Processing...", ephemeral=True, delete_after=0.5)
 
 
-class CNC(commands.Cog):
+class CommandAndConquest(commands.Cog):
 
     def __init__(self, bot: Shard):
         self.map_directory = r"/root/Shard/CNC/Map Files/Maps/"
@@ -7215,10 +7215,9 @@ class CNC(commands.Cog):
         self.version_notes = ""
 
     async def on_load(self):
-        importlib.reload(CNC)
+        importlib.reload(CNC.turn)
         importlib.reload(battlesim)
         from battlesim import Battle
-        from CNC import turn
 
 
     async def interaction_check(self, interaction: discord.Interaction):
@@ -10195,5 +10194,5 @@ class CNC(commands.Cog):
 
 async def setup(bot: Shard):
     # define the cog and add the cog
-    cog = CNC(bot)
+    cog = CommandAndConquest(bot)
     await bot.add_cog(cog)
