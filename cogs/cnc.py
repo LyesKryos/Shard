@@ -7218,6 +7218,7 @@ class CommandAndConquest(commands.Cog):
         importlib.reload(CNC.turn)
         importlib.reload(battlesim)
         from battlesim import Battle
+        from CNC.turn import Turn
 
 
     async def interaction_check(self, interaction: discord.Interaction):
