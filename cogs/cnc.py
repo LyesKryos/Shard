@@ -18,6 +18,7 @@ from faker import Faker
 from faker.exceptions import UniquenessException
 import re
 from battlesim import Battle
+from turn import Turn
 
 async def cnc_user_check(interaction: discord.Interaction) -> bool:
     # establish the conn
@@ -2041,9 +2042,11 @@ class MilUpkeepView(View):
                                             f"below 0 Military Authority.")
             await interaction.edit_original_response(view=self)
         else:
-            # update public spending level
+            # update public spending level and fighting effect
             await conn.execute('''UPDATE cnc_users
-                                  SET mil_upkeep = mil_upkeep - 1
+                                  SET mil_upkeep = mil_upkeep - 1,
+                                      attack_effect = attack_effect - 0.01,
+                                      defense_effect = defense_effect - 0.01
                                   WHERE user_id = $1;''',
                                self.author.id)
             # update embed
@@ -2079,7 +2082,9 @@ class MilUpkeepView(View):
         else:
             # update mil upkeep spending level
             await conn.execute('''UPDATE cnc_users
-                                  SET mil_upkeep = mil_upkeep + 1
+                                  SET mil_upkeep = mil_upkeep + 1,
+                                      attack_effect = attack_effect + 0.01,
+                                      defense_effect = defense_effect + 0.01
                                   WHERE user_id = $1;''',
                                self.author.id)
             # update embed
@@ -2120,7 +2125,15 @@ class GovernmentReformMenu(View):
         user_info = await user_db_info(self.author.id, self.conn)
         # anarchist nations cannot change government type
         if user_info['govt_type'] == "Anarchy":
-            return await interaction.followup.send("Anarchist governments cannot voluntarily change government type.")
+            return await interaction.followup.send("Anarchist governments cannot voluntarily change government type.",
+                                                   ephemeral=True)
+        # check if the user can alter their type
+        if user_info['govt_type_countdown']:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"{user_info['name']} must wait an additional "
+                                                   f"`{user_info['govt_type_countdown']}` turns before changing "
+                                                   f"government type again.", ephemeral=True)
         # get development
         development = await self.conn.fetchval('''SELECT SUM(development)
                                                   FROM cnc_provinces
@@ -2166,12 +2179,20 @@ class GovernmentReformMenu(View):
         user_info = await user_db_info(self.author.id, self.conn)
         # anarchist nations cannot change government type
         if user_info['govt_type'] == "Anarchy":
-            return await interaction.followup.send("Anarchist governments cannot voluntarily change government type.")
+            return await interaction.followup.send("Anarchist governments cannot voluntarily change government type.",
+                                                   ephemeral=True)
         # tribal government has no subtypes
         if user_info['govt_type'] == "Tribal":
             button.disabled = True
             await interaction.edit_original_response(view=self)
-            return await interaction.followup.send("Tribal governments have no available subtypes.")
+            return await interaction.followup.send("Tribal governments have no available subtypes.", ephemeral=True)
+        # check if the user can alter their subtype
+        if user_info['govt_subtype_countdown']:
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"{user_info['name']} must wait an additional "
+                                                   f"`{user_info['govt_subtype_countdown']}` turns before changing "
+                                                   f"government subtype again.", ephemeral=True)
         # determine available government types
         govt_subtypes = await self.conn.fetch('''SELECT *
                                                  FROM cnc_govts
@@ -5454,7 +5475,7 @@ class WarOptionsView(discord.ui.View):
                     peace_embed.add_field(name="Reparations Demanded",
                                           value=f"{auth_demand_view.mil_authority} Military\n"
                                                 f"{auth_demand_view.econ_authority} Economic\n"
-                                                f"{auth_demand_view.diplo_authority} Diplomatic\n",
+                                                f"{auth_demand_view.pol_authority} Diplomatic\n",
                                           inline=False)
                     await self.interaction.edit_original_response(embed=peace_embed, view=None)
                     # add to total
@@ -6275,7 +6296,7 @@ class AuthDemandView(discord.ui.View):
 
         self.mil_authority = None
         self.econ_authority = None
-        self.diplo_authority = None
+        self.pol_authority = None
         self.auths_demanded = None
         self.war_score = 0
         self.cancelled = False
@@ -6339,16 +6360,16 @@ class AuthDemandView(discord.ui.View):
         # defer the interaction
         await interaction.response.defer()
         # if the user has not selected one of the options as is necessary
-        if None in (self.mil_authority, self.econ_authority, self.diplo_authority):
+        if None in (self.mil_authority, self.econ_authority, self.pol_authority):
             return await interaction.followup.send(
                 "You must select all three authority values first.",
                 ephemeral=True
             )
         # otherwise, define the auths demanded
         self.auths_demanded = [
-            int(self.mil_authority),
             int(self.econ_authority),
-            int(self.diplo_authority)
+            int(self.mil_authority),
+            int(self.pol_authority)
         ]
         # calculate the war score
         self.war_score = sum(self.auths_demanded) * 5
@@ -7460,7 +7481,7 @@ class CNC(commands.Cog):
         # establish conn
         conn = self.bot.pool
         # pull turn
-        turn = await conn.fetchval('''SELECT int FROM cnc_data WHERE name = 'Turn';''')
+        turn = await conn.fetchval('''SELECT number FROM cnc_data WHERE name = 'Turn';''')
         # pull number of players
         player_number = await conn.fetchval('''SELECT count(user_id) FROM cnc_users;''')
         # create an embed
@@ -9701,10 +9722,18 @@ class CNC(commands.Cog):
         govt_embed.add_field(name="Public Spending", value=f"{user_info['public_spend']} Economic Authority")
         # military upkeep
         govt_embed.add_field(name="Military Upkeep", value=f"{user_info['mil_upkeep']} Military Authority")
+        # pull the users treaties to ensure they can modify their government
+        peace_treaties = await conn.fetchrow('''SELECT * FROM cnc_peace_treaties WHERE government_mod_ban = TRUE AND
+                                             primary_target = $1;''', user_info['name'])
+        # if so, do not send the view
+        if peace_treaties:
+            # add a footer
+            govt_embed.set_footer(text="Government modification has been disabled by a treaty.")
+            return await interaction.followup.send(embed=govt_embed)
         # establish government modification view
         govt_view = GovernmentModView(interaction.user, interaction, conn, govt_info, govt_embed)
         # send embed and view
-        await interaction.followup.send(embed=govt_embed, view=govt_view)
+        return await interaction.followup.send(embed=govt_embed, view=govt_view)
 
     @cnc.command(name="reform_government", description="Opens the Government reform menu.")
     async def modify_government(self, interaction: discord.Interaction):
@@ -9714,9 +9743,6 @@ class CNC(commands.Cog):
         conn = self.bot.pool
         # pull userinfo
         user_info = await user_db_info(interaction.user.id, conn)
-        # check for registration
-        if user_info is None:
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
         # create government embed
         # pull government info
         govt_info = await conn.fetchrow('''SELECT *
@@ -9764,8 +9790,16 @@ class CNC(commands.Cog):
         govt_embed.add_field(name="Public Spending", value=f"{user_info['public_spend']} Economic Authority")
         # military upkeep
         govt_embed.add_field(name="Military Upkeep", value=f"{user_info['mil_upkeep']} Military Authority")
+        # pull the users treaties to ensure they can modify their government
+        peace_treaties = await conn.fetchrow('''SELECT * FROM cnc_peace_treaties WHERE government_mod_ban = TRUE AND
+                                             primary_target = $1;''', user_info['name'])
+        # if so, do not send the view
+        if peace_treaties:
+            # add a footer
+            govt_embed.set_footer(text="Government modification has been disabled by a treaty.")
+            return await interaction.followup.send(embed=govt_embed)
         # create view
-        await interaction.followup.send(embed=govt_embed,
+        return await interaction.followup.send(embed=govt_embed,
                                         view=GovernmentReformMenu(interaction.user, interaction, conn, govt_embed))
 
     @cnc.command(name="designate_capital", description="Designates a province as the national capital.")
@@ -10132,6 +10166,23 @@ class CNC(commands.Cog):
             path, cost = pathfinder
             return await ctx.send(f"The total cost of the path is {cost} Movement points.\nThe shortest path calculated is: {path}.")
 
+    @cnc.command(name="turn")
+    @commands.is_owner()
+    async def cnc_turn(self, ctx):
+        # establish connection
+        conn = self.bot.conn
+        # create turn
+        turn_update = Turn(conn=conn)
+        # execute the turn
+        dms = await turn_update.run_turn()
+        # for each user with a dm in the list, safe dm them
+        for user in dms:
+            # if the message isn't blank
+            if dms[user]:
+                # attempt to dm the user
+                await safe_dm(bot=self.bot, user_id=user, content=dms[user])
+        # update the channel
+        await ctx.send(f"It is now Turn #{turn_update.turn}!")
 
 async def setup(bot: Shard):
     # define the cog and add the cog

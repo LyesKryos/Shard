@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Spacing issues">
-      <change afterPath="$PROJECT_DIR$/CNC/Turn.py" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding rebel army handling for movement commands">
+      <change afterPath="$PROJECT_DIR$/CNC/turn.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -565,7 +565,11 @@
       <workItem from="1773959934883" duration="2991000" />
       <workItem from="1773972637771" duration="801000" />
       <workItem from="1774014954092" duration="9551000" />
-      <workItem from="1774135588016" duration="9853000" />
+      <workItem from="1774135588016" duration="9927000" />
+      <workItem from="1774184983029" duration="4221000" />
+      <workItem from="1774400629913" duration="277000" />
+      <workItem from="1774478262291" duration="7899000" />
+      <workItem from="1774542683949" duration="5738000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -910,7 +914,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1522" />
+    <option name="localTasksCounter" value="1523" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -929,7 +933,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting province view for non-players and nations without the colonialism tech" />
     <MESSAGE value="Adding the info command" />
     <MESSAGE value="Cosmetic changes to the info embed" />
     <MESSAGE value="Adding dynamic puppet management and subjucation proposal to the diplomatic menu" />
@@ -954,14 +957,15 @@
     <MESSAGE value="Correcting int-string error in army autocomplete&#10;Correcting movement cost by rounding at output as correct" />
     <MESSAGE value="Correcting conditional logic for tax level and spending limits" />
     <MESSAGE value="Spacing issues" />
-    <option name="LAST_COMMIT_MESSAGE" value="Spacing issues" />
+    <MESSAGE value="Adding rebel army handling for movement commands" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding rebel army handling for movement commands" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/cogs/cnc.py</url>
-          <line>7210</line>
+          <line>7231</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
