@@ -20,7 +20,7 @@ from faker.exceptions import UniquenessException
 import re
 from battlesim import Battle
 import battlesim
-from CNC import turn
+import CNC
 
 async def cnc_user_check(interaction: discord.Interaction) -> bool:
     # establish the conn
@@ -7215,9 +7215,10 @@ class CNC(commands.Cog):
         self.version_notes = ""
 
     async def on_load(self):
-        importlib.reload(turn)
+        importlib.reload(CNC)
         importlib.reload(battlesim)
         from battlesim import Battle
+        from CNC import turn
 
 
     async def interaction_check(self, interaction: discord.Interaction):
