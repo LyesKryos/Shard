@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding rebel army handling for movement commands">
-      <change afterPath="$PROJECT_DIR$/CNC/turn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding turn updating for initial testing" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -569,7 +565,7 @@
       <workItem from="1774184983029" duration="4221000" />
       <workItem from="1774400629913" duration="277000" />
       <workItem from="1774478262291" duration="7899000" />
-      <workItem from="1774542683949" duration="5738000" />
+      <workItem from="1774542683949" duration="6036000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -914,7 +910,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1523" />
+    <option name="localTasksCounter" value="1526" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -933,7 +929,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding the info command" />
     <MESSAGE value="Cosmetic changes to the info embed" />
     <MESSAGE value="Adding dynamic puppet management and subjucation proposal to the diplomatic menu" />
     <MESSAGE value="Correcting back button placement for cooperative diplo relations" />
@@ -958,7 +953,8 @@
     <MESSAGE value="Correcting conditional logic for tax level and spending limits" />
     <MESSAGE value="Spacing issues" />
     <MESSAGE value="Adding rebel army handling for movement commands" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding rebel army handling for movement commands" />
+    <MESSAGE value="Adding turn updating for initial testing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding turn updating for initial testing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

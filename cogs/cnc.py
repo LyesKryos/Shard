@@ -10170,7 +10170,7 @@ class CNC(commands.Cog):
     @commands.is_owner()
     async def cnc_turn(self, ctx):
         # establish connection
-        conn = self.bot.conn
+        conn = self.bot.pool
         # create turn
         turn_update = turn.Turn(conn=conn, bot=self.bot)
         # execute the turn
