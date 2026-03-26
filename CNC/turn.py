@@ -2,7 +2,7 @@ import asyncpg
 import discord
 from PIL import ImageColor, Image, ImageDraw
 from random import randint, choice
-from math import floor, ceil
+from math import floor
 
 async def user_db_info(user_id: int | str, conn: asyncpg.Pool) -> asyncpg.Record:
     """Pulls user info from the database using Discord user ID."""
