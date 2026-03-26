@@ -6,21 +6,21 @@ from discord import app_commands, Interaction
 import importlib
 from ShardBot import Shard
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 import asyncio
 from PIL import Image, ImageColor, ImageDraw
 from base64 import b64encode
 import requests
 from discord.ui import View
 import math
-import time
 import heapq
 from faker import Faker
 from faker.exceptions import UniquenessException
 import re
-from battlesim import Battle
-import battlesim
-import CNC.turn
+import CNC.battlesim as battlesim
+import CNC.turn as turn
+
+
 
 async def cnc_user_check(interaction: discord.Interaction) -> bool:
     # establish the conn
@@ -1455,13 +1455,13 @@ class UnownedProvince(View):
                 'army_name': f"Defenders of Fort {self.province_info['name']}"
             }
             # call the siege
-            siege_victor, attacker_casualties, defender_casualties = Battle(attacking_army=besieging_army,
-                                                                          defending_armies=[siege_army],
-                                                                          province_info=self.prov_info,
-                                                                          conn=conn,
-                                                                          attack_mod=self.user_info['attack_effect'],
-                                                                          defense_mod=self.user_info['defense_effect'],
-                                                                          siege=True).battle()
+            siege_victor, attacker_casualties, defender_casualties = battlesim.Battle(attacking_army=besieging_army,
+                                                                                      defending_armies=[siege_army],
+                                                                                      province_info=self.prov_info,
+                                                                                      conn=conn,
+                                                                                      attack_mod=self.user_info['attack_effect'],
+                                                                                      defense_mod=self.user_info['defense_effect'],
+                                                                                      siege=True).battle()
             # update war casualties
             await conn.execute('''UPDATE cnc_wars
                                   SET deaths = deaths + $2
@@ -7215,10 +7215,8 @@ class CommandAndConquest(commands.Cog):
         self.version_notes = ""
 
     async def on_load(self):
-        importlib.reload(CNC.turn)
+        importlib.reload(turn)
         importlib.reload(battlesim)
-        from battlesim import Battle
-        from CNC.turn import Turn
 
 
     async def interaction_check(self, interaction: discord.Interaction):
@@ -8778,7 +8776,7 @@ class CommandAndConquest(commands.Cog):
                     'army_name': f"Warriors of {prov_info['name']}"
                 }
                 # initialize battle
-                battle = Battle(
+                battle = battlesim.battlesim.Battle(
                     attacking_army=army_info,
                     defending_armies=[rebel_army],
                     province_info=prov_info,
@@ -8870,7 +8868,7 @@ class CommandAndConquest(commands.Cog):
                     'army_name': army_name
                 }
                 # initialize battle
-                battle = Battle(
+                battle = battlesim.Battle(
                     attacking_army=army_info,
                     defending_armies=[rebel_army],
                     province_info=prov_info,
@@ -8921,7 +8919,7 @@ class CommandAndConquest(commands.Cog):
                                   f"{depart_prov_info['name']}.")
 
                 # create the battle embed and send it
-                battle_embed = discord.Embed(title=f"The Battle of {prov_info['name']}",
+                battle_embed = discord.Embed(title=f"The battlesim.Battle of {prov_info['name']}",
                                              description=f"A battle to liberate {prov_info['name']} "
                                                          f"from rebellious forces.",
                                              color=discord.Color.red())
@@ -8955,7 +8953,7 @@ class CommandAndConquest(commands.Cog):
                 defense_mod = await conn.fetchval('''SELECT defense_effect FROM cnc_users WHERE user_id = $1;''',
                                                   largest_defending_army['owner_id'])
                 # initialize battle
-                battle = Battle(
+                battle = battlesim.Battle(
                     attacking_army=army_info,
                     defending_armies=enemy_army_list,
                     province_info=prov_info,
@@ -9122,7 +9120,7 @@ class CommandAndConquest(commands.Cog):
                                             casualties=attacker_casualties)
 
                 # create the battle embed and send it
-                battle_embed = discord.Embed(title=f"The Battle of {prov_info['name']}",
+                battle_embed = discord.Embed(title=f"The battlesim.Battle of {prov_info['name']}",
                                              description=f"A battle between enemy armies "
                                                          f"for the mastery of this province.",
                                              color=discord.Color.red())
@@ -10181,7 +10179,7 @@ class CommandAndConquest(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # create turn
-        turn_update = CNC.turn.Turn(conn=conn, bot=self.bot)
+        turn_update = turn.Turn(conn=conn, bot=self.bot)
         # execute the turn
         dms = await turn_update.run_turn()
         # for each user with a dm in the list, safe dm them
