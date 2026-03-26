@@ -10181,7 +10181,7 @@ class CommandAndConquest(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # create turn
-        turn_update = turn.Turn(conn=conn, bot=self.bot)
+        turn_update = CNC.turn.Turn(conn=conn, bot=self.bot)
         # execute the turn
         dms = await turn_update.run_turn()
         # for each user with a dm in the list, safe dm them
