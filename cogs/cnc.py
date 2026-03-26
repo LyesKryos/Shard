@@ -18,7 +18,7 @@ from faker import Faker
 from faker.exceptions import UniquenessException
 import re
 from battlesim import Battle
-from turn import Turn
+from CNC import turn
 
 async def cnc_user_check(interaction: discord.Interaction) -> bool:
     # establish the conn
@@ -10172,7 +10172,7 @@ class CNC(commands.Cog):
         # establish connection
         conn = self.bot.conn
         # create turn
-        turn_update = Turn(conn=conn)
+        turn_update = turn.Turn(conn=conn, bot=self.bot)
         # execute the turn
         dms = await turn_update.run_turn()
         # for each user with a dm in the list, safe dm them
