@@ -10166,7 +10166,7 @@ class CNC(commands.Cog):
             path, cost = pathfinder
             return await ctx.send(f"The total cost of the path is {cost} Movement points.\nThe shortest path calculated is: {path}.")
 
-    @cnc.command(name="turn")
+    @commands.command(name="cnc_turn")
     @commands.is_owner()
     async def cnc_turn(self, ctx):
         # establish connection
