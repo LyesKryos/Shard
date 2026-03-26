@@ -152,7 +152,7 @@ class Turn:
             tax_effect_boost = 0
             # get military alliances
             military_alliances = await conn.fetchval('''SELECT cardinality(members) FROM cnc_alliances 
-                                                        WHERE $1 = ANY(members);''', user['user_id'])
+                                                        WHERE $1 = ANY(members);''', user['name'])
             # get peace treaties
             peace_treaties = await conn.fetch('''SELECT * FROM cnc_peace_treaties WHERE primary_target = $1;''',
                                               user['name'])
