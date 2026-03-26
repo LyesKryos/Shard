@@ -3,6 +3,7 @@ from random import randrange, randint, choice, uniform
 from typing import List
 import asyncpg
 from discord import app_commands, Interaction
+import importlib
 from ShardBot import Shard
 import discord
 from discord.ext import commands, tasks
@@ -18,6 +19,7 @@ from faker import Faker
 from faker.exceptions import UniquenessException
 import re
 from battlesim import Battle
+import battlesim
 from CNC import turn
 
 async def cnc_user_check(interaction: discord.Interaction) -> bool:
@@ -7211,6 +7213,12 @@ class CNC(commands.Cog):
         self.banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2", "#999999", "#FF0000"]
         self.version = "version 3.0.a - The Overhaul"
         self.version_notes = ""
+
+    async def on_load(self):
+        importlib.reload(turn)
+        importlib.reload(battlesim)
+        from battlesim import Battle
+
 
     async def interaction_check(self, interaction: discord.Interaction):
         # establish connection
