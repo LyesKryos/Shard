@@ -160,7 +160,8 @@ class Turn:
             wars = await conn.fetch('''SELECT * FROM cnc_wars WHERE ($1 = ANY(attackers) OR $1 = ANY(defenders)) 
                                                                 AND active = True;''', user['name'])
             # get active diplomatic relations
-            diplomatic_relations = await conn.fetchval('''SELECT count(id) FROM cnc_drs WHERE $1 = ANY(members)''')
+            diplomatic_relations = await conn.fetchval('''SELECT count(id) FROM cnc_drs WHERE $1 = ANY(members);''',
+                                                       user['name'])
             # get government subtype
             govt_subtype = await conn.fetchrow('''SELECT * FROM cnc_govts WHERE govt_subtype = $1;''',
                                                user['govt_subtype'])
