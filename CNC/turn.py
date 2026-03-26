@@ -197,7 +197,7 @@ class Turn:
                 if user['govt_subtype'] == "Free City":
                     citizen_growth *= 1.25
                 # debuff for unrest
-                if user['national_unrest'] > 0:
+                if user['unrest'] > 0:
                     # exponentially increasing as unrest rises to a max of about 30% growth reduction
                     citizen_growth *= 1-((user['unrest']*0.1)**1.45)/100
                 # debuff for stability
@@ -246,7 +246,7 @@ class Turn:
                     # increase production by 50%
                     citizen_production *= 1.50
                 # debuff citizen production based on unrest
-                if user['national_unrest'] > 0:
+                if user['unrest'] > 0:
                     # exponentially decreasing as unrest rises to a max of about 35% production reduction
                     citizen_production *= 1-((user['unrest']*0.1)**1.55)/100
                 # add to the overall production
