@@ -586,7 +586,8 @@ class Turn:
                 econ_auth_gain += average_dev * ((user['tax_level'] + tax_effect_boost)/100)
                 # pull all mines
                 mines = await conn.fetchval('''SELECT COUNT(id) FROM cnc_provinces 
-                                               WHERE 'Mine' = ANY(structures) AND (owner_id = $1 AND occupier_id = $1;)''',
+                                               WHERE 'Mine' = ANY(structures) 
+                                                 AND (owner_id = $1 AND occupier_id = $1);''',
                                             user['user_id'])
                 # for every mine, add 0.5
                 econ_auth_gain += 0.5 * mines
