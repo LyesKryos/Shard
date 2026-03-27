@@ -572,7 +572,7 @@ class Turn:
 
             # === AUTHORITY UPDATES ===
             # pull average dev
-            average_dev = await conn.fetchval('''SELECT AGV(development) FROM cnc_provinces 
+            average_dev = await conn.fetchval('''SELECT AVERAGE(development) FROM cnc_provinces 
                                                  WHERE owner_id = $1 AND occupier_id = $1;''', user['user_id'])
 
             # === ECONOMIC AUTHORITY ===
