@@ -352,7 +352,7 @@ class Turn:
                 total_stability += 5
             # update stability
             await conn.execute('''UPDATE cnc_users SET stability = stability + $2 WHERE user_id = $1;''',
-                               total_stability, user['user_id'])
+                               user['user_id'], total_stability)
 
             # === REBELLION ===
             # if there is not currently a rebellion
