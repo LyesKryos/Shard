@@ -804,8 +804,8 @@ class Turn:
         # === GOVERNMENT MODIFICATION TIMERS ===
         # reduce all by one
         await conn.execute('''UPDATE cnc_users
-                              SET govt_type_countdown = CASE WHEN govt_type_countdown > 0 THEN govt_type_countdown = govt_type_countdown - 1 END,
-                                  govt_subtype_countdown = CASE WHEN govt_subtype_countdown > 0 THEN govt_subtype_countdown = govt_subtype_countdown - 1 END;''')
+                              SET govt_type_countdown = CASE WHEN govt_type_countdown > 0 THEN govt_type_countdown - 1 END,
+                                  govt_subtype_countdown = CASE WHEN govt_subtype_countdown > 0 THEN govt_subtype_countdown - 1 END;''')
 
 
     # TODO events
