@@ -643,8 +643,8 @@ class Turn:
                 # reduce from reparations
                 for peace in peace_treaties:
                     # if there is one with mil reparations, reduce
-                    if peace['reparations'][1] > 0:
-                        mil_auth_gain -= peace['reparations'][1]
+                    if peace['reparations']:
+                        mil_auth_gain -= peace['reparations'][1] if peace['reparations'][1] > 0 else 0
                     # there there is one with dismantle, reduce
                     if peace['dismantle'] > 0:
                         mil_auth_gain -= 3
@@ -685,8 +685,8 @@ class Turn:
             # reduce pol auth based on reparations
             for peace in peace_treaties:
                 # if there is one with pol reparations, reduce
-                if peace['reparations'][2] > 0:
-                    pol_auth_gain -= peace['reparations'][2]
+                if peace['reparations']:
+                    pol_auth_gain -= peace['reparations'][2] if peace['reparations'][2] > 0 else 0
                 # if there is one with dismantle, reduce
                 if peace['dismantle'] > 0:
                     pol_auth_gain -= 3
