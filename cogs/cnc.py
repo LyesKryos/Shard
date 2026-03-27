@@ -10208,10 +10208,11 @@ class CommandAndConquest(commands.Cog):
             for good in trade_goods:
                 # create good list
                 good_list = [good['name']] * good['weighted']
-                # add fish if river or coast
-                if p['river'] or p['coast']:
-                    good_list.extend(["Fish"] * good['weighted'])
                 trade_goods_weighted.extend(good_list)
+            # if there is a river or a coast
+            if p['river'] or p['coast']:
+                # add fish as an option
+                trade_goods_weighted.extend(["Fish"]*3)
             # choose a trade good
             trade_good_choice = choice(trade_goods_weighted)
             # update the province with the trade good
