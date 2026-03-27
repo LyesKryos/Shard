@@ -3,6 +3,7 @@ import discord
 from PIL import ImageColor, Image, ImageDraw
 from random import randint, choice
 from math import floor
+import logging
 
 async def user_db_info(user_id: int | str, conn: asyncpg.Pool) -> asyncpg.Record:
     """Pulls user info from the database using Discord user ID."""
@@ -616,6 +617,8 @@ class Turn:
                 # update econ auth
                 await conn.execute('''UPDATE cnc_users SET econ_auth = $2, last_econ_auth_gain = $2
                                       WHERE user_id = $1;''', user['user_id'], floor(econ_auth_gain))
+                # log
+                logging.getLogger(__name__).info(f"Economic auth gain for {user['name']} is {econ_auth_gain}")
             # otherwise, set at 0
             else:
                 await conn.execute('''UPDATE cnc_users SET econ_auth = 0, last_econ_auth_gain = 0
