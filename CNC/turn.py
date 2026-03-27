@@ -3,7 +3,6 @@ import discord
 from PIL import ImageColor, Image, ImageDraw
 from random import randint, choice
 from math import floor
-import logging
 
 async def user_db_info(user_id: int | str, conn: asyncpg.Pool) -> asyncpg.Record:
     """Pulls user info from the database using Discord user ID."""
@@ -135,7 +134,6 @@ class Turn:
         trade_good_values = {}
         for tg in trade_good_values_raw:
             trade_good_values[tg['name']] = tg['market_value']
-        logging.getLogger(__name__).info(f"Trade Goods: {trade_good_values}")
 
         # for each user, get a list of the provinces and update them as a batch
         for user in user_list:
@@ -222,7 +220,6 @@ class Turn:
                 # define citizen production
                 citizen_production = prov['citizens'] / 3872
                 # define trade good value
-                logging.getLogger(__name__).info(f"Trade Good for {prov['id']}: {prov['trade_good']}")
                 trade_good_value = trade_good_values[prov['trade_good']]
                 # get unique trade good value amount, if any
                 if prov['trade_good'] not in ['Gold', 'Silver', 'Precious Stones', 'Spices', 'Chocolate']:
@@ -572,7 +569,7 @@ class Turn:
 
             # === AUTHORITY UPDATES ===
             # pull average dev
-            average_dev = await conn.fetchval('''SELECT AVG(development)::numeric FROM cnc_provinces 
+            average_dev = await conn.fetchval('''SELECT AVG(development)::float FROM cnc_provinces 
                                                  WHERE owner_id = $1 AND occupier_id = $1;''', user['user_id'])
 
             # === ECONOMIC AUTHORITY ===
