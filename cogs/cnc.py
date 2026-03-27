@@ -10191,6 +10191,37 @@ class CommandAndConquest(commands.Cog):
         # update the channel
         await ctx.send(f"It is now Turn #{turn_update.turn}!")
 
+    @commands.command(brief="Sets all trade goods.")
+    @commands.is_owner()
+    async def cnc_set_trade_goods(self, ctx):
+        # establish connection
+        conn = self.bot.pool
+        # pull all provinces
+        all_provinces = await conn.fetch('''SELECT * FROM cnc_provinces;''')
+        # for each province
+        for p in all_provinces:
+            # get the trade good associated with the province
+            trade_goods = await conn.fetch('''SELECT name, weighted FROM cnc_trade_goods WHERE $1 = ANY(terrains);''',
+                                           p['terrain'])
+            # compile the weights into a list
+            trade_goods_weighted = []
+            for good in trade_goods:
+                # create good list
+                good_list = [good['name']] * good['weighted']
+                # add fish if river or coast
+                if p['river'] or p['coast']:
+                    good_list.extend(["Fish", "Fish", "Fish", "Fish"])
+                trade_goods_weighted.extend(good_list)
+            # choose a trade good
+            trade_good_choice = choice(trade_goods_weighted)
+            # update the province with the trade good
+            await conn.execute('''UPDATE cnc_provinces
+                                  SET trade_good = $1
+                                  WHERE id = $2;''', trade_good_choice, p['id'])
+        # send confirmation
+        return await ctx.send(f"{len(all_provinces)} provinces have had trade goods set.")
+
+
 async def setup(bot: Shard):
     # define the cog and add the cog
     cog = CommandAndConquest(bot)
