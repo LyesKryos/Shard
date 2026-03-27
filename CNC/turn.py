@@ -219,6 +219,7 @@ class Turn:
                 # define citizen production
                 citizen_production = prov['citizens'] / 3872
                 # define trade good value
+                logging.getLogger(__name__).info(f"Trade Good for {prov['id']}: {prov['trade_good']}")
                 trade_good_value = trade_good_values[prov['trade_good']]
                 # get unique trade good value amount, if any
                 if prov['trade_good'] not in ['Gold', 'Silver', 'Precious Stones', 'Spices', 'Chocolate']:
