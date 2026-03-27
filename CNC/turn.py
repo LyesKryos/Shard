@@ -527,7 +527,7 @@ class Turn:
                 # if they are not yet going to win, see if their ticker counts up
                 else:
                     # check if 20% of the user's provinces are occupied
-                    rebel_occupants_count = await conn.fetchval('''SELECT count(id) FROM cnc_provinces 
+                    rebel_occupants_count = await conn.fetchval('''SELECT COUNT(id) FROM cnc_provinces 
                                                                    WHERE occupier_id = 1 AND owner_id = $1;''',
                                                                 user['user_id'])
                     # if this counts for 20%
@@ -572,7 +572,7 @@ class Turn:
 
             # === AUTHORITY UPDATES ===
             # pull average dev
-            average_dev = await conn.fetchval('''SELECT AVG(development) FROM cnc_provinces 
+            average_dev = await conn.fetchval('''SELECT AVG(development)::numeric FROM cnc_provinces 
                                                  WHERE owner_id = $1 AND occupier_id = $1;''', user['user_id'])
 
             # === ECONOMIC AUTHORITY ===
@@ -588,7 +588,7 @@ class Turn:
                 # calculate tax income
                 econ_auth_gain += average_dev * ((user['tax_level'] + tax_effect_boost)/100)
                 # pull all mines
-                mines = await conn.fetchval('''SELECT count(id) FROM cnc_provinces 
+                mines = await conn.fetchval('''SELECT COUNT(id) FROM cnc_provinces 
                                                WHERE 'Mine' = ANY(structures) AND (owner_id = $1 AND occupier_id = $1;)''',
                                             user['user_id'])
                 # for every mine, add 0.5
