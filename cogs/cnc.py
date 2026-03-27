@@ -72,7 +72,7 @@ def plus_minus(number: int) -> str:
     if number >= 0:
         return str(f"+{number}")
     else:
-        return str(f"-{number}")
+        return str(f"{number}")
 
 
 def ordinal_suffix(number: int) -> str:
