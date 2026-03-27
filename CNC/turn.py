@@ -227,7 +227,12 @@ class Turn:
                 # get unique trade good value amount, if any
                 if prov['trade_good'] not in ['Gold', 'Silver', 'Precious Stones', 'Spices', 'Chocolate']:
                     trade_good_value += user['trade_good_value']
-                trade_good_value += user[f'{prov["trade_good"].lower().replace(" ", "_")}_value']
+                # get the user's trade good value, catching for if that doesn't exist
+                try:
+                    user_trade_good_value_boost = user[f'{prov["trade_good"].lower().replace(" ", "_")}_value']
+                    trade_good_value += user_trade_good_value_boost
+                except KeyError:
+                    pass
                 # if there is a manufactory (but not a quarry, as they exclude each other)
                 if "Manufactory" in prov['structures'] and not "Quarry" in prov['structures']:
                     # increase production by 7%
