@@ -709,28 +709,28 @@ class Turn:
                 # reduce by a quarter of the gain, min 1
                 await conn.execute('''UPDATE cnc_users 
                                       SET econ_auth             = econ_auth - $1, 
-                                          last_econ_auth_gained = last_econ_auth_gain - $1, 
+                                          last_econ_auth_gain = last_econ_auth_gain - $1, 
                                           mil_auth              = mil_auth - $2, 
-                                          last_mil_auth_gained  = last_mil_auth_gain - $2, 
+                                          last_mil_auth_gain  = last_mil_auth_gain - $2, 
                                           pol_auth              = pol_auth - $3, 
-                                          last_pol_auth_gained  = last_pol_auth_gain - $3 
+                                          last_pol_auth_gain  = last_pol_auth_gain - $3 
                                       WHERE user_id = $4;''',
-                                   min(floor(user['last_econ_auth_gained']/4), 1),
-                                   min(floor(user['last_mil_auth_gained']/4), 1),
-                                   min(floor(user['last_pol_auth_gained']/4), 1),
+                                   min(floor(user['last_econ_auth_gain']/4), 1),
+                                   min(floor(user['last_mil_auth_gain']/4), 1),
+                                   min(floor(user['last_pol_auth_gain']/4), 1),
                                    user['user_id'])
                 # update the overlord's gains
                 await conn.execute('''UPDATE cnc_users
                                       SET econ_auth             = econ_auth + $1,
-                                          last_econ_auth_gained = last_econ_auth_gain + $1,
+                                          last_econ_auth_gain = last_econ_auth_gain + $1,
                                           mil_auth              = mil_auth + $2,
-                                          last_mil_auth_gained  = last_mil_auth_gain + $2,
+                                          last_mil_auth_gain  = last_mil_auth_gain + $2,
                                           pol_auth              = pol_auth + $3,
-                                          last_pol_auth_gained  = last_pol_auth_gain + $3
+                                          last_pol_auth_gain  = last_pol_auth_gain + $3
                                       WHERE user_id = $4;''',
-                                   min(floor(user['last_econ_auth_gained'] / 4), 1),
-                                   min(floor(user['last_mil_auth_gained'] / 4), 1),
-                                   min(floor(user['last_pol_auth_gained'] / 4), 1),
+                                   min(floor(user['last_econ_auth_gain'] / 4), 1),
+                                   min(floor(user['last_mil_auth_gain'] / 4), 1),
+                                   min(floor(user['last_pol_auth_gain'] / 4), 1),
                                    user['overlord'])
 
 
