@@ -143,7 +143,7 @@ class Turn:
             # define the users full production
             trade_good_production = 0
             # define base production access
-            trade_good_production_access = 0.15
+            trade_good_production_access = 0.05
             # define total structure number
             structure_count = 0
             # total manpower count
