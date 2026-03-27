@@ -696,7 +696,7 @@ class Turn:
                                   WHERE user_id = $1;''', user['user_id'], floor(pol_auth_gain))
 
             # === ARMY MOVEMENT RESET ===
-            await conn.execute('''UPDATE cnc_armies SET movement = $2 WHERE onwer_id = $1;''',
+            await conn.execute('''UPDATE cnc_armies SET movement = $2 WHERE owner_id = $1;''',
                                user['user_id'], user['movement_cap'])
 
             # add user dm notifications to the list
