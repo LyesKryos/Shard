@@ -610,7 +610,7 @@ class Turn:
                     if peace['reparations']:
                         econ_auth_gain -= peace['reparations'][0] if peace['reparations'][0] > 0 else 0
                     # there there is one with dismantle, reduce
-                    if peace['dismantle'] > 0:
+                    if peace['dismantle']:
                         econ_auth_gain -= 3
 
                 # update econ auth
@@ -646,7 +646,7 @@ class Turn:
                     if peace['reparations']:
                         mil_auth_gain -= peace['reparations'][1] if peace['reparations'][1] > 0 else 0
                     # there there is one with dismantle, reduce
-                    if peace['dismantle'] > 0:
+                    if peace['dismantle']:
                         mil_auth_gain -= 3
 
                 # update mil auth
@@ -688,7 +688,7 @@ class Turn:
                 if peace['reparations']:
                     pol_auth_gain -= peace['reparations'][2] if peace['reparations'][2] > 0 else 0
                 # if there is one with dismantle, reduce
-                if peace['dismantle'] > 0:
+                if peace['dismantle']:
                     pol_auth_gain -= 3
 
             # add pol auth gain
