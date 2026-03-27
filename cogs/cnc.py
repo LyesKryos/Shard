@@ -10210,7 +10210,7 @@ class CommandAndConquest(commands.Cog):
                 good_list = [good['name']] * good['weighted']
                 # add fish if river or coast
                 if p['river'] or p['coast']:
-                    good_list.extend(["Fish", "Fish", "Fish"])
+                    good_list.extend(["Fish"] * good['weighted'])
                 trade_goods_weighted.extend(good_list)
             # choose a trade good
             trade_good_choice = choice(trade_goods_weighted)
