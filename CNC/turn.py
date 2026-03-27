@@ -339,6 +339,9 @@ class Turn:
             # stability gain from "strong army"
             manpower_usage_count = await conn.fetchval('''SELECT SUM(troops) FROM cnc_armies 
                                                           WHERE owner_id = $1;''', user['user_id'])
+            # protect against null
+            manpower_usage_count = 0 if manpower_usage_count is None else manpower_usage_count
+            # calculate stability gain from "strong army"
             strong_army_stab = round((manpower_usage_count/manpower_cap) * 10)
             # stability gain from "military alliances"
             military_alliance_stab = (1+(1*military_alliances)) if military_alliances > 0 else 0
