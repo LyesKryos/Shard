@@ -1626,7 +1626,7 @@ class DossierView(View):
         # populate tax and spending stats
         self.doss_embed.add_field(name="======================ECONOMY======================",
                                   value="Information about your nation's economy.", inline=False)
-        self.doss_embed.add_field(name="Taxation Level", value=f"{self.user_info['tax_level'] * 100}%")
+        self.doss_embed.add_field(name="Taxation Level", value=f"{self.user_info['tax_level']}%")
         self.doss_embed.add_field(name="Public Spending Cost",
                                   value=f"{self.user_info['public_spend']} Economic Authority per turn")
         self.doss_embed.add_field(name="Military Upkeep Cost",
@@ -1865,7 +1865,7 @@ class TaxManageView(View):
         # pull user info
         self.user_info = await user_db_info(self.author.id, conn)
         # if the user would decrease their tax below 0, stop them
-        if self.user_info['tax_level'] - .01 < 0:
+        if self.user_info['tax_level'] - 1 < 0:
             await interaction.followup.send("You cannot decrease your taxation below 0%.")
             button.disabled = True
             await interaction.edit_original_response(view=self)
@@ -1877,9 +1877,9 @@ class TaxManageView(View):
                                   WHERE user_id = $1;''',
                                self.author.id)
             # send confirmation
-            await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level'] - .01:.0%}!")
+            await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level'] - 1:.0%}!")
             # update embed
-            self.govt_embed.set_field_at(-4, name="Current Tax Level", value=f"{self.user_info['tax_level'] - .01:.0%}")
+            self.govt_embed.set_field_at(-4, name="Current Tax Level", value=f"{self.user_info['tax_level'] - 1:.0%}")
             # enable increase button
             self.increase.disabled = False
             # update embed
@@ -1902,7 +1902,7 @@ class TaxManageView(View):
         # pull user info
         self.user_info = await user_db_info(self.author.id, conn)
         # if the user would increase their tax above 20%
-        if self.user_info['tax_level'] + .01 > 20:
+        if self.user_info['tax_level'] + 1 > 20:
             await interaction.followup.send(f"You cannot increase your taxation above "
                                             f"{self.govt_info['tax_level'] + self.user_info['tax_level']:.0%}.")
             button.disabled = True
@@ -1915,9 +1915,9 @@ class TaxManageView(View):
                                   WHERE user_id = $1;''',
                                self.author.id)
             # send confirmation
-            await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level'] + .01:.0%}!")
+            await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level'] + 1:.0%}!")
             # update embed
-            self.govt_embed.set_field_at(-4, name="Current Tax Level", value=f"{self.user_info['tax_level'] + .01:.0%}")
+            self.govt_embed.set_field_at(-4, name="Current Tax Level", value=f"{self.user_info['tax_level'] + 1:.0%}")
             # enable decrease button
             self.decrease.disabled = False
             # update embed
@@ -9792,7 +9792,7 @@ class CommandAndConquest(commands.Cog):
         # current tax level
         govt_embed.add_field(name="Current Taxation", value=f"{user_info['tax_level']:.0%}")
         # max tax level
-        govt_embed.add_field(name="Maximum Taxation", value=f"{govt_info['tax_level'] + .2:.0%}")
+        govt_embed.add_field(name="Maximum Taxation", value=f"{govt_info['tax_level'] + 20:.0%}")
         # public spending
         govt_embed.add_field(name="Public Spending", value=f"{user_info['public_spend']} Economic Authority")
         # military upkeep

@@ -299,7 +299,7 @@ class Turn:
             # for each embargo, decrease the trade good production access exponentially up to a max of 35% reduction
             trade_good_production_access -= max((embargo_count * 0.05) ** 1.6, 0.35)
             # calculate total trade value for this nation, protecting against negative values
-            trade_value = min(trade_good_production * trade_good_production_access,0)
+            trade_value = max(trade_good_production * trade_good_production_access, 0)
 
             # === MANPOWER ===
             # peace treaty enforced manpower reduction
