@@ -303,7 +303,7 @@ class Turn:
                             treaty_enforced_manpower_reduction if treaty_enforced_manpower_reduction != 0 else 1)
             # update manpower set on manpower regen rate
             await conn.execute('''UPDATE cnc_users SET manpower = manpower + $2 WHERE user_id = $1;''',
-                               user['user_id'], round(manpower_cap * (user['manpower_regen_rate'] / 100)))
+                               user['user_id'], round(manpower_cap * (user['manpower_regen'] / 100)))
             # enforce manpower cap
             await conn.execute('''UPDATE cnc_users SET manpower = $2 WHERE user_id = $1 AND manpower > $2;''',
                                user['user_id'], manpower_cap)
