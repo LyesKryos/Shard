@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting plus minus display" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding turn updating for initial testing" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -568,7 +568,7 @@
       <workItem from="1774542683949" duration="8861000" />
       <workItem from="1774569981412" duration="4673000" />
       <workItem from="1774576385357" duration="14000" />
-      <workItem from="1774632063064" duration="1512000" />
+      <workItem from="1774632063064" duration="1841000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -913,7 +913,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1568" />
+    <option name="localTasksCounter" value="1569" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -955,9 +955,9 @@
     <MESSAGE value="Adding rebel army handling for movement commands" />
     <MESSAGE value="Adding custom module reloading" />
     <MESSAGE value="Adding trade good setting command" />
-    <MESSAGE value="Adding turn updating for initial testing" />
     <MESSAGE value="Correcting plus minus display" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting plus minus display" />
+    <MESSAGE value="Adding turn updating for initial testing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding turn updating for initial testing" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shard$scratch_2.coverage" NAME="scratch_2 Coverage Results" MODIFIED="1761860961970" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />

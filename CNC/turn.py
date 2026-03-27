@@ -737,13 +737,12 @@ class Turn:
                                    user['overlord'])
 
         # set stability, authority, and unrest max/mins
-        await conn.execute('''UPDATE cnc_users SET stability = CASE WHEN stability > 100 THEN 100 ELSE stability END, 
-                                                   stability = CASE WHEN stability < 0 THEN 0 ELSE stability END,  
-                                                   econ_auth = CASE WHEN econ_auth < 0 THEN 0 ELSE econ_auth END, 
-                                                   mil_auth = CASE WHEN mil_auth < 0 THEN 0 ELSE mil_auth END, 
-                                                   pol_auth = CASE WHEN pol_auth < 0 THEN 0 ELSE pol_auth END, 
-                                                   unrest = CASE WHEN unrest > 100 THEN 100 ELSE unrest END, 
-                                                   unrest = CASE WHEN unrest < 0 THEN 0 ELSE unrest END;''')
+        await conn.execute('''UPDATE cnc_users
+                              SET stability = LEAST(GREATEST(stability, 0), 100),
+                                  econ_auth = GREATEST(econ_auth, 0),
+                                  mil_auth  = GREATEST(mil_auth, 0),
+                                  pol_auth  = GREATEST(pol_auth, 0),
+                                  unrest    = LEAST(GREATEST(unrest, 0), 100);''')
 
 
     async def _timer_updates(self):
