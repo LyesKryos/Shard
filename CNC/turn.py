@@ -3,6 +3,7 @@ import discord
 from PIL import ImageColor, Image, ImageDraw
 from random import randint, choice
 from math import floor
+import logging
 
 async def user_db_info(user_id: int | str, conn: asyncpg.Pool) -> asyncpg.Record:
     """Pulls user info from the database using Discord user ID."""
@@ -103,6 +104,7 @@ class Turn:
         self.conn = conn
         self.user_dm_notifications = {}
         self.turn = 0
+        self.bot = bot
 
     async def run_turn(self) -> dict:
         # run the user updates
@@ -133,6 +135,7 @@ class Turn:
         trade_good_values = {}
         for tg in trade_good_values_raw:
             trade_good_values[tg['name']] = tg['market_value']
+        logging.getLogger(__name__).info(f"Trade Goods: {trade_good_values}")
 
         # for each user, get a list of the provinces and update them as a batch
         for user in user_list:
