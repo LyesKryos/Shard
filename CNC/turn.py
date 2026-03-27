@@ -581,10 +581,14 @@ class Turn:
                 econ_auth_gain += await conn.fetchval('''SELECT econ_auth FROM cnc_govts 
                                                                 WHERE govt_subtype = $1;''',
                                                              user['govt_subtype'])
+                logging.getLogger(__name__).info(f"{user['name']} base econ auth gain: {econ_auth_gain}")
                 # add the trade value
                 econ_auth_gain += trade_value
+                logging.getLogger(__name__).info(f"{user['name']} trade value: {trade_value}")
                 # calculate tax income
                 econ_auth_gain += average_dev * ((user['tax_level'] + tax_effect_boost)/100)
+                logging.getLogger(__name__).info(f"{user['name']} tax income: "
+                                                f"{average_dev * ((user['tax_level'] + tax_effect_boost)/100)}")
                 # pull all mines
                 mines = await conn.fetchval('''SELECT COUNT(id) FROM cnc_provinces 
                                                WHERE 'Mine' = ANY(structures) 
@@ -605,6 +609,7 @@ class Turn:
                 # calculate reductions
                 # reduce from public spending
                 econ_auth_gain -= user['public_spend']
+                logging.getLogger(__name__).info(f"{user['name']} public spend reduction: {user['public_spend']}")
                 # reduce from reparations
                 for peace in peace_treaties:
                     # if there is one with econ reparations, reduce
