@@ -211,7 +211,7 @@ class Turn:
                     citizen_growth *= 0.3+((user['stability']*1.5)/100)
                 # update citizenry
                 await conn.execute('''UPDATE cnc_provinces SET citizens = citizens + $1 WHERE id = $2;''',
-                                   round(citizen_growth), prov['id'])
+                                   round(citizen_growth*.5), prov['id'])
                 # cap if necessary
                 await conn.execute('''UPDATE cnc_provinces SET citizens = $1 WHERE citizens > $1 AND id = $2;''',
                                    prov['development'] * 1592 * (1.25 if "City" in prov['structures'] else 1),
