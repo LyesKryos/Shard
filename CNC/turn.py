@@ -156,6 +156,9 @@ class Turn:
             # get military alliances
             military_alliances = await conn.fetchval('''SELECT cardinality(members) FROM cnc_alliances 
                                                         WHERE $1 = ANY(members);''', user['name'])
+            # protect against none
+            if military_alliances is None:
+                military_alliances = 0
             # get peace treaties
             peace_treaties = await conn.fetch('''SELECT * FROM cnc_peace_treaties WHERE primary_target = $1;''',
                                               user['name'])
