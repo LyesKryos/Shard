@@ -614,11 +614,11 @@ class Turn:
                         econ_auth_gain -= 3
 
                 # update econ auth
-                await conn.execute('''UPDATE cnc_users SET econ_auth = $2, last_econ_auth_gained = $2
+                await conn.execute('''UPDATE cnc_users SET econ_auth = $2, last_econ_auth_gain = $2
                                       WHERE user_id = $1;''', user['user_id'], floor(econ_auth_gain))
             # otherwise, set at 0
             else:
-                await conn.execute('''UPDATE cnc_users SET econ_auth = 0, last_econ_auth_gained = 0
+                await conn.execute('''UPDATE cnc_users SET econ_auth = 0, last_econ_auth_gain = 0
                                       WHERE user_id = $1;''', user['user_id'])
 
             # === MILITARY AUTHORITY ===
@@ -650,11 +650,11 @@ class Turn:
                         mil_auth_gain -= 3
 
                 # update mil auth
-                await conn.execute('''UPDATE cnc_users SET mil_auth = $2, last_mil_auth_gained = $2
+                await conn.execute('''UPDATE cnc_users SET mil_auth = $2, last_mil_auth_gain = $2
                                       WHERE user_id = $1;''', user['user_id'], floor(mil_auth_gain))
             # otherwise, set at 0
             else:
-                await conn.execute('''UPDATE cnc_users SET mil_auth = 0, last_mil_auth_gained = 0
+                await conn.execute('''UPDATE cnc_users SET mil_auth = 0, last_mil_auth_gain = 0
                                       WHERE user_id = $1;''', user['user_id'])
 
             # === POLITICAL AUTHORITY ====
@@ -692,7 +692,7 @@ class Turn:
                     pol_auth_gain -= 3
 
             # add pol auth gain
-            await conn.execute('''UPDATE cnc_users SET pol_auth = $2, last_pol_auth_gained = $2 
+            await conn.execute('''UPDATE cnc_users SET pol_auth = $2, last_pol_auth_gain = $2 
                                   WHERE user_id = $1;''', user['user_id'], floor(pol_auth_gain))
 
             # === ARMY MOVEMENT RESET ===
@@ -709,11 +709,11 @@ class Turn:
                 # reduce by a quarter of the gain, min 1
                 await conn.execute('''UPDATE cnc_users 
                                       SET econ_auth             = econ_auth - $1, 
-                                          last_econ_auth_gained = last_econ_auth_gained - $1, 
+                                          last_econ_auth_gained = last_econ_auth_gain - $1, 
                                           mil_auth              = mil_auth - $2, 
-                                          last_mil_auth_gained  = last_mil_auth_gained - $2, 
+                                          last_mil_auth_gained  = last_mil_auth_gain - $2, 
                                           pol_auth              = pol_auth - $3, 
-                                          last_pol_auth_gained  = last_pol_auth_gained - $3 
+                                          last_pol_auth_gained  = last_pol_auth_gain - $3 
                                       WHERE user_id = $4;''',
                                    min(floor(user['last_econ_auth_gained']/4), 1),
                                    min(floor(user['last_mil_auth_gained']/4), 1),
@@ -722,11 +722,11 @@ class Turn:
                 # update the overlord's gains
                 await conn.execute('''UPDATE cnc_users
                                       SET econ_auth             = econ_auth + $1,
-                                          last_econ_auth_gained = last_econ_auth_gained + $1,
+                                          last_econ_auth_gained = last_econ_auth_gain + $1,
                                           mil_auth              = mil_auth + $2,
-                                          last_mil_auth_gained  = last_mil_auth_gained + $2,
+                                          last_mil_auth_gained  = last_mil_auth_gain + $2,
                                           pol_auth              = pol_auth + $3,
-                                          last_pol_auth_gained  = last_pol_auth_gained + $3
+                                          last_pol_auth_gained  = last_pol_auth_gain + $3
                                       WHERE user_id = $4;''',
                                    min(floor(user['last_econ_auth_gained'] / 4), 1),
                                    min(floor(user['last_mil_auth_gained'] / 4), 1),
