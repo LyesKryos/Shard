@@ -297,7 +297,7 @@ class Turn:
             embargo_count = await conn.fetchval('''SELECT count(id) FROM cnc_embargoes 
                                                    WHERE target = $1;''', user['name'])
             # for each embargo, decrease the trade good production access exponentially up to a max of 35% reduction
-            trade_good_production_access -= max((embargo_count * 0.05) ** 1.6, 0.35)
+            trade_good_production_access -= min((embargo_count * 0.05) ** 1.6, 0.35)
             # calculate total trade value for this nation, protecting against negative values
             trade_value = max(trade_good_production * trade_good_production_access, 0)
 
