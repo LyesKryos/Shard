@@ -607,8 +607,8 @@ class Turn:
                 # reduce from reparations
                 for peace in peace_treaties:
                     # if there is one with econ reparations, reduce
-                    if peace['reparations'][0] > 0:
-                        econ_auth_gain -= peace['reparations'][0]
+                    if peace['reparations']:
+                        econ_auth_gain -= peace['reparations'][0] if peace['reparations'][0] > 0 else 0
                     # there there is one with dismantle, reduce
                     if peace['dismantle'] > 0:
                         econ_auth_gain -= 3
