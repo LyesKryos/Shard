@@ -733,6 +733,15 @@ class Turn:
                                    min(floor(user['last_pol_auth_gain'] / 4), 1),
                                    user['overlord'])
 
+        # set stability, authority, and unrest max/mins
+        await conn.execute('''UPDATE cnc_users SET stability = CASE WHEN stability > 100 THEN 100 ELSE stability END, 
+                                                   stability = CASE WHEN stability < 0 THEN 0 ELSE stability END,  
+                                                   econ_auth = CASE WHEN econ_auth < 0 THEN 0 ELSE econ_auth END, 
+                                                   mil_auth = CASE WHEN mil_auth < 0 THEN 0 ELSE mil_auth END, 
+                                                   pol_auth = CASE WHEN pol_auth < 0 THEN 0 ELSE pol_auth END, 
+                                                   unrest = CASE WHEN unrest > 100 THEN 100 ELSE unrest END, 
+                                                   unrest = CASE WHEN unrest < 0 THEN 0 ELSE unrest END;''')
+
 
     async def _timer_updates(self):
         # define the connection
