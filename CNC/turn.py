@@ -581,14 +581,12 @@ class Turn:
                 econ_auth_gain += await conn.fetchval('''SELECT econ_auth FROM cnc_govts 
                                                                 WHERE govt_subtype = $1;''',
                                                              user['govt_subtype'])
-                logging.getLogger(__name__).info(f"{user['name']} base econ auth gain: {econ_auth_gain}")
                 # add the trade value
                 econ_auth_gain += trade_value
-                logging.getLogger(__name__).info(f"{user['name']} trade value: {trade_value}")
+                logging.getLogger(__name__).info(f"{user['name']} trade value: {trade_value} = "
+                                                 f"{trade_good_production} * {trade_good_production_access}")
                 # calculate tax income
                 econ_auth_gain += average_dev * ((user['tax_level'] + tax_effect_boost)/100)
-                logging.getLogger(__name__).info(f"{user['name']} tax income: "
-                                                f"{average_dev * ((user['tax_level'] + tax_effect_boost)/100)}")
                 # pull all mines
                 mines = await conn.fetchval('''SELECT COUNT(id) FROM cnc_provinces 
                                                WHERE 'Mine' = ANY(structures) 
@@ -609,7 +607,6 @@ class Turn:
                 # calculate reductions
                 # reduce from public spending
                 econ_auth_gain -= user['public_spend']
-                logging.getLogger(__name__).info(f"{user['name']} public spend reduction: {user['public_spend']}")
                 # reduce from reparations
                 for peace in peace_treaties:
                     # if there is one with econ reparations, reduce
@@ -622,8 +619,6 @@ class Turn:
                 # update econ auth
                 await conn.execute('''UPDATE cnc_users SET econ_auth = $2, last_econ_auth_gain = $2
                                       WHERE user_id = $1;''', user['user_id'], floor(econ_auth_gain))
-                # log
-                logging.getLogger(__name__).info(f"Economic auth gain for {user['name']} is {econ_auth_gain}")
             # otherwise, set at 0
             else:
                 await conn.execute('''UPDATE cnc_users SET econ_auth = 0, last_econ_auth_gain = 0
