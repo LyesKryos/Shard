@@ -222,7 +222,7 @@ class Turn:
                 citizen_production = prov['citizens'] / 3872
                 # define trade good value
                 trade_good_value = trade_good_values[prov['trade_good']]
-                # get unique trade good value amount, if any
+                # add the total trade good value booster provided by some techs
                 if prov['trade_good'] not in ['Gold', 'Silver', 'Precious Stones', 'Spices', 'Chocolate']:
                     trade_good_value += user['trade_good_value']
                 # get the user's trade good value, catching for if that doesn't exist
@@ -305,7 +305,7 @@ class Turn:
             # peace treaty enforced manpower reduction
             treaty_enforced_manpower_reduction = 1 - sum([pt['manpower_reduction'] for pt in peace_treaties])
             # enforce manpower cap
-            manpower_cap = (round(user['manpower_access'] * manpower_count) *
+            manpower_cap = (round((user['manpower_access']/100) * manpower_count) *
                             treaty_enforced_manpower_reduction if treaty_enforced_manpower_reduction != 0 else 1)
             # update manpower set on manpower regen rate
             await conn.execute('''UPDATE cnc_users SET manpower = manpower + $2 WHERE user_id = $1;''',
