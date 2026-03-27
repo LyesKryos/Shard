@@ -211,7 +211,7 @@ class Turn:
                     citizen_growth *= 0.3+((user['stability']*1.5)/100)
                 # update citizenry
                 await conn.execute('''UPDATE cnc_provinces SET citizens = citizens + $1 WHERE id = $2;''',
-                                   round(citizen_growth*.5), prov['id'])
+                                   round(citizen_growth*.3), prov['id'])
                 # cap if necessary
                 await conn.execute('''UPDATE cnc_provinces SET citizens = $1 WHERE citizens > $1 AND id = $2;''',
                                    prov['development'] * 1592 * (1.25 if "City" in prov['structures'] else 1),
@@ -261,6 +261,9 @@ class Turn:
                     citizen_production *= 1-((user['unrest']*0.1)**1.55)/100
                 # add to the overall production
                 trade_good_production += citizen_production * trade_good_value
+                # update the production from this province
+                await conn.execute('''UPDATE cnc_provinces SET production = $1 WHERE id = $2;''',
+                                   round(citizen_production), prov['id'])
 
                 # === NATIONAL UNREST ===
                 # define province's national unrest contribution
