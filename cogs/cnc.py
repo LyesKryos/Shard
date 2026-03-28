@@ -10382,6 +10382,21 @@ class CommandAndConquest(commands.Cog):
         # wait for the bot to be ready
         await self.bot.wait_until_ready()
 
+    @commands.command()
+    @commands.is_owner()
+    async def cnc_turn_cancel(self, ctx):
+        # cancel turn
+        await self.turn_loop.cancel()
+        await asyncio.sleep(3)
+        # send confirmation
+        if not self.turn_loop.is_running():
+            return await ctx.send("Turn loop cancelled.")
+        else:
+            return await ctx.send("Turn loop is still running.")
+
+
+
+
 
 async def setup(bot: Shard):
     # define the cog and add the cog

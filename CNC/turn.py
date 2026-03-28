@@ -748,6 +748,18 @@ class Turn:
                                   unrest    = LEAST(GREATEST(unrest, 0), 100);''')
 
 
+    async def _trade_market_updates(self):
+        # establish connection
+        conn = self.conn
+        # pull all the trade goods
+        trade_goods = {}
+        trade_goods_raw = await conn.fetch('''SELECT * FROM cnc_trade_goods;''')
+        # for each trade good, add it to the dict
+        for good in trade_goods_raw:
+            trade_goods[good['name']] = good['market_value']
+            # pull all the provinces that have that produce that good and then log
+
+
     async def _timer_updates(self):
         # define the connection
         conn = self.conn
@@ -823,7 +835,6 @@ class Turn:
 
 
     # TODO events
-    # TODO trade goods
 
 
 
