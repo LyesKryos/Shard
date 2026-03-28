@@ -7232,6 +7232,12 @@ class GeneralDismissView(discord.ui.View):
                                                                f"dismissed and has retired from national service.")
 
 
+# establish turn times every six hours
+est = ZoneInfo("America/New_York")
+times = [
+    datetime.time(hour=h, minute=0, second=0, tzinfo=est)
+    for h in (0, 6, 12, 18)
+    ]
 
 class CommandAndConquest(commands.Cog):
 
@@ -10351,12 +10357,6 @@ class CommandAndConquest(commands.Cog):
         return await ctx.send(f"{len(all_provinces)} provinces have had trade goods set.")
 
     # === TURN LOOP ===
-    # establish times every six hours
-    est = ZoneInfo("America/New_York")
-    times = [
-        datetime.time(hour=h, minute=0, second=0, tzinfo=est)
-        for h in (0, 6, 12, 18)
-    ]
 
     @tasks.loop(time=times)
     async def turn_loop(self):
