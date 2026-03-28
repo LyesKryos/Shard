@@ -10352,9 +10352,10 @@ class CommandAndConquest(commands.Cog):
 
     # === TURN LOOP ===
     # establish times every six hours
+    est = ZoneInfo("America/New_York")
     times = [
-        datetime.time(hour=h, minute=0, second=0, tzinfo=datetime.timezone.utc)
-        for h in (5, 11, 17, 23)  # UTC equivalents of EST 0/6/12/18
+        datetime.time(hour=h, minute=0, second=0, tzinfo=est)
+        for h in (0, 6, 12, 18)
     ]
     @tasks.loop(time=times)
     async def turn_loop(self):
