@@ -9300,7 +9300,7 @@ class CommandAndConquest(commands.Cog):
                 # create the view
                 general_view = GeneralDismissView(parent_interaction=interaction,
                                                   general_info=gen_info)
-                return await interaction.response.send_message(embed=gen_embed)
+                return await interaction.response.send_message(embed=gen_embed, view=general_view)
             # otherwise, just send the embed
             return await interaction.response.send_message(embed=gen_embed)
 
