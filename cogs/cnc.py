@@ -9295,6 +9295,13 @@ class CommandAndConquest(commands.Cog):
                                             gen_info['army_id'])
             gen_embed.add_field(name="Army Commanded", value=army_name if army_name else "None")
 
+            # if the user owns the general, add the dismiss view
+            if gen_info['owner_id'] == interaction.user.id:
+                # create the view
+                general_view = GeneralDismissView(parent_interaction=interaction,
+                                                  general_info=gen_info)
+                return await interaction.response.send_message(embed=gen_embed)
+            # otherwise, just send the embed
             return await interaction.response.send_message(embed=gen_embed)
 
 
