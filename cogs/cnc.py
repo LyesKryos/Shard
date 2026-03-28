@@ -7222,7 +7222,7 @@ class GeneralDismissView(discord.ui.View):
         # disable the button
         button.disabled = True
         # update the original message
-        await interaction.edit_original_response(view=self)
+        await self.parent_interaction.edit_original_response(view=self)
         # return reply
         return await interaction.response.send_message(content=f"General {self.general_info['name']} has been "
                                                                f"dismissed and has retired from national service.")
