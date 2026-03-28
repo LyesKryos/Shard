@@ -10395,9 +10395,6 @@ class CommandAndConquest(commands.Cog):
             return await ctx.send("Turn loop is still running.")
 
 
-
-
-
 async def setup(bot: Shard):
     # define the cog and add the cog
     cog = CommandAndConquest(bot)
