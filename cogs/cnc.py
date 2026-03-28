@@ -10386,7 +10386,7 @@ class CommandAndConquest(commands.Cog):
     @commands.is_owner()
     async def cnc_turn_cancel(self, ctx):
         # cancel turn
-        await self.turn_loop.cancel()
+        self.turn_loop.cancel()
         await asyncio.sleep(3)
         # send confirmation
         if not self.turn_loop.is_running():
