@@ -7570,11 +7570,11 @@ class CommandAndConquest(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # pull turn
-        turn = await conn.fetchval('''SELECT number FROM cnc_data WHERE name = 'Turn';''')
+        current_turn = await conn.fetchval('''SELECT number FROM cnc_data WHERE name = 'Turn';''')
         # get the next iteration
         next_turn_timestamp = self.turn_loop.next_iteration.timestamp()
         # send the next turn
-        return await interaction.response.send_message(f"It is currently Turn #{turn}.\n"
+        return await interaction.response.send_message(f"It is currently Turn #{current_turn}.\n"
                                                        f"Next turn will be in <t:{int(next_turn_timestamp)}:R>.")
 
 
