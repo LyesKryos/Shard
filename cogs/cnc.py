@@ -10357,6 +10357,7 @@ class CommandAndConquest(commands.Cog):
         datetime.time(hour=h, minute=0, second=0, tzinfo=est)
         for h in (0, 6, 12, 18)
     ]
+
     @tasks.loop(time=times)
     async def turn_loop(self):
         # establish connection
