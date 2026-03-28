@@ -7202,6 +7202,33 @@ class GeneralSelectView(discord.ui.View):
         return await interaction.response.send_message(content="Processing...", ephemeral=True, delete_after=0.5)
 
 
+class GeneralDismissView(discord.ui.View):
+
+    def __init__(self, parent_interaction: discord.Interaction, general_info: asyncpg.Record):
+        super().__init__(timeout=120)
+        # define variables
+        self.general_info = general_info
+        self.parent_interaction = parent_interaction
+
+    @discord.ui.button(label="Dismiss", style=discord.ButtonStyle.danger, emoji="\U0001fae1")
+    async def dismiss_general(self, interaction: discord.Interaction, button: discord.Button):
+        # establish connection
+        conn = interaction.client.pool
+        # delete general
+        await conn.execute('''DELETE FROM cnc_generals WHERE general_id = $1;''', self.general_info['general_id'])
+        # remove any general from the army if he exists
+        await conn.execute('''UPDATE cnc_armies SET general = NULL WHERE general = $1;''',
+                           self.general_info['general_id'])
+        # disable the button
+        button.disabled = True
+        # update the original message
+        await interaction.edit_original_response(view=self)
+        # return reply
+        return await interaction.response.send_message(content=f"General {self.general_info['name']} has been "
+                                                               f"dismissed and has retired from national service.")
+
+
+
 class CommandAndConquest(commands.Cog):
 
     def __init__(self, bot: Shard):
@@ -8011,7 +8038,8 @@ class CommandAndConquest(commands.Cog):
         # if the user is in the system, compile their armies first and then add the rest
         if user_check:
             # pull all their armies
-            user_generals = await conn.fetch('''SELECT * FROM cnc_generals WHERE owner_id = $1 ORDER BY level DESC;''',
+            user_generals = await conn.fetch('''SELECT * FROM cnc_generals WHERE owner_id = $1 
+                                                ORDER BY army_id DESC;''',
                                            interaction.user.id)
             # compile them into a list
             army_choices = [app_commands.Choice(name=f"=={general['name']} (ID: {general['general_id']})==",
@@ -9254,7 +9282,7 @@ class CommandAndConquest(commands.Cog):
             # create embed
             gen_embed = discord.Embed(title=f"General {gen_info['name']}",
                                       description=f"Basic information about the "
-                                                  f"general with the ID: `{gen_info['general_id']}",
+                                                  f"general with the ID: `{gen_info['general_id']}`",
                                       color=discord.Color.red())
             gen_embed.add_field(name="Type", value=f"{gen_info['type']}")
             gen_embed.add_field(name="Level", value=f"{gen_info['level']}")
