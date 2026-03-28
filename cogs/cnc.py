@@ -1,5 +1,6 @@
 from __future__ import annotations
 import datetime
+import time
 from random import randrange, randint, choice, uniform
 from typing import List
 from zoneinfo import ZoneInfo
@@ -7244,15 +7245,22 @@ class CommandAndConquest(commands.Cog):
         self.version = "version 3.0.a - The Overhaul"
         self.version_notes = ""
 
-        # start the turn loop
-        self.turn_loop.start()
-        # add the update message
-        self.bot.system_message += (f"From cnc.py: Turn loop running. Next iteration: "
-                                    f"{self.turn_loop.next_iteration.strftime('%d %b %Y at %H:%M %Z%z')}")
-
     async def cog_load(self):
+        # reload the dependencies
         importlib.reload(turn)
         importlib.reload(battlesim)
+
+        # start the turn loop
+        self.turn_loop.start()
+        # let the loop start
+        await asyncio.sleep(0)
+        # add the update message
+        self.bot.system_message += (f"From cnc.py: Turn loop running. Next iteration: "
+                                    f"{self.turn_loop.next_iteration.strftime('%d %b %Y at %H:%M %Z%z')}\n")
+
+    async def cog_unload(self) -> None:
+        # disable turn loop
+        self.turn_loop.cancel()
 
 
     async def interaction_check(self, interaction: discord.Interaction):
@@ -10344,17 +10352,12 @@ class CommandAndConquest(commands.Cog):
 
     # === TURN LOOP ===
     # establish times every six hours
-    est = ZoneInfo("America/New_York")
     times = [
-        datetime.time(hour=0, minute=0, second=0, tzinfo=est),
-        datetime.time(hour=6, minute=0, second=0, tzinfo=est),
-        datetime.time(hour=12, minute=0, second=0, tzinfo=est),
-        datetime.time(hour=18, minute=0, second=0, tzinfo=est)
+        datetime.time(hour=h, minute=0, second=0, tzinfo=datetime.timezone.utc)
+        for h in (5, 11, 17, 23)  # UTC equivalents of EST 0/6/12/18
     ]
     @tasks.loop(time=times)
     async def turn_loop(self):
-        # wait for the bot to be ready
-        await self.bot.wait_until_ready()
         # establish connection
         conn = self.bot.pool
         # establish the announcement channel
@@ -10371,6 +10374,11 @@ class CommandAndConquest(commands.Cog):
                 await safe_dm(bot=self.bot, user_id=user, content=dms[user])
         # update the channel
         await announcement_channel.send(f"It is now Turn #{turn_update.turn}!")
+
+    @turn_loop.before_loop
+    async def wait_to_start_turn_loop(self):
+        # wait for the bot to be ready
+        await self.bot.wait_until_ready()
 
 
 async def setup(bot: Shard):
