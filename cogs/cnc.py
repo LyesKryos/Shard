@@ -1,8 +1,11 @@
 from __future__ import annotations
+import datetime
 from random import randrange, randint, choice, uniform
 from typing import List
+from zoneinfo import ZoneInfo
 import asyncpg
 from discord import app_commands, Interaction
+from discord.ext import tasks
 import importlib
 from ShardBot import Shard
 import discord
@@ -7241,6 +7244,12 @@ class CommandAndConquest(commands.Cog):
         self.version = "version 3.0.a - The Overhaul"
         self.version_notes = ""
 
+        # start the turn loop
+        self.turn_loop.start()
+        # add the update message
+        self.bot.system_message += (f"From cnc.py: Turn loop running. Next iteration: "
+                                    f"{self.turn_loop.next_iteration.strftime('%d %b %Y at %H:%M %Z%z')}")
+
     async def cog_load(self):
         importlib.reload(turn)
         importlib.reload(battlesim)
@@ -10320,6 +10329,36 @@ class CommandAndConquest(commands.Cog):
                                   WHERE id = $2;''', trade_good_choice, p['id'])
         # send confirmation
         return await ctx.send(f"{len(all_provinces)} provinces have had trade goods set.")
+
+    # === TURN LOOP ===
+    # establish times every six hours
+    est = ZoneInfo("America/New_York")
+    times = [
+        datetime.time(hour=0, minute=0, second=0, tzinfo=est),
+        datetime.time(hour=6, minute=0, second=0, tzinfo=est),
+        datetime.time(hour=12, minute=0, second=0, tzinfo=est),
+        datetime.time(hour=18, minute=0, second=0, tzinfo=est)
+    ]
+    @tasks.loop(time=times)
+    async def turn_loop(self):
+        # wait for the bot to be ready
+        await self.bot.wait_until_ready()
+        # establish connection
+        conn = self.bot.pool
+        # establish the announcement channel
+        announcement_channel = self.bot.get_channel(835579413625569322)
+        # create turn
+        turn_update = turn.Turn(conn=conn, bot=self.bot)
+        # execute the turn
+        dms = await turn_update.run_turn()
+        # for each user with a dm in the list, safe dm them
+        for user in dms:
+            # if the message isn't blank
+            if dms[user]:
+                # attempt to dm the user
+                await safe_dm(bot=self.bot, user_id=user, content=dms[user])
+        # update the channel
+        await announcement_channel.send(f"It is now Turn #{turn_update.turn}!")
 
 
 async def setup(bot: Shard):
