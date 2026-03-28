@@ -7557,6 +7557,18 @@ class CommandAndConquest(commands.Cog):
         # send the embed
         await interaction.response.send_message(embed=info_embed)
 
+    @cnc.command(name="turn", description="Sends a relative timestamp of the time of the next turn update.")
+    async def send_turn(self, interaction: discord.Interaction):
+        # establish connection
+        conn = self.bot.pool
+        # pull turn
+        turn = await conn.fetchval('''SELECT number FROM cnc_data WHERE name = 'Turn';''')
+        # get the next iteration
+        next_turn_timestamp = self.turn_loop.next_iteration.timestamp()
+        # send the next turn
+        return await interaction.followup.send(f"It is currently Turn #{turn}.\n"
+                                               f"Next turn will be in <t:{int(next_turn_timestamp)}:R>.")
+
 
 
     # @cnc.command(name="change_color", description="Changes your nation's color on the map.")
