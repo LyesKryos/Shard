@@ -241,12 +241,12 @@ class Turn:
                     citizen_production *= 1.10
                 # if there is a trade post
                 if "Trading Post" in prov['structures']:
-                    # increase the value of the trade good by 2
-                    trade_good_value += 2
-                # if there is a port (but not a trading post, as they exclude each other)
-                if "Port" in prov['structures'] and "Trading Post" not in prov['structures']:
                     # increase the value of the trade good by 1
                     trade_good_value += 1
+                # if there is a port (but not a trading post, as they exclude each other)
+                if "Port" in prov['structures'] and "Trading Post" not in prov['structures']:
+                    # increase the value of the trade good by .5
+                    trade_good_value += 0.5
                 # if the user's government type is Wuxing
                 if user['govt_subtype'] == "Wuxing":
                     # increase production by 75%

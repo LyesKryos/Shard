@@ -8001,6 +8001,35 @@ class CommandAndConquest(commands.Cog):
         # return the choices
         return army_choices[0:24]
 
+    async def general_autocomplete(self, interaction: discord.Interaction, general_typing: str) -> List[app_commands.Choice]:
+        """This function searches for all existing generals and then returns them as a list for autocomplete."""
+
+        # establish connection
+        conn = self.bot.pool
+        # check if the user is in the system
+        user_check = await conn.fetchrow('''SELECT user_id FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        # if the user is in the system, compile their armies first and then add the rest
+        if user_check:
+            # pull all their armies
+            user_generals = await conn.fetch('''SELECT * FROM cnc_generals WHERE owner_id = $1 ORDER BY level DESC;''',
+                                           interaction.user.id)
+            # compile them into a list
+            army_choices = [app_commands.Choice(name=f"=={general['name']} (ID: {general['general_id']})==",
+                                                value=general['general_id']) for general in user_generals if (general_typing.lower() in general['name'].lower()) or (general_typing in str(general['general_id']))]
+            # then pull and add the rest
+            unowned_generals = await conn.fetch('''SELECT * FROM cnc_generals WHERE owner_id != $1;''', interaction.user.id)
+            army_choices += ([app_commands.Choice(name=f"{general['name']} (ID: {general['general_id']})",
+                                                  value=general['general_id']) for general in unowned_generals if (general_typing.lower() in general['name'].lower()) or (general_typing in str(general['general_id']))])
+        # if the user is not in the system, don't bother
+        else:
+            # pull all armies
+            armies = await conn.fetchrow('''SELECT * FROM cnc_armies;''')
+            army_choices = [app_commands.Choice(name=f"{gneral['name']} (ID: {gneral['general_id']})",
+                                                value=gneral['general_id']) for gneral in armies if (general_typing.lower() in gneral['name'].lower()) or (general_typing in str(gneral['general_id']))]
+        # return the choices
+        return army_choices[0:24]
+
+
     @cnc.command(name="create_army", description="Creates a new army.")
     @app_commands.autocomplete(posting=owned_province_autocomplete)
     @app_commands.describe(posting="The province to which the army should be posted.", recruit_troops="The number of troops to be recruited into the army upon creation. MUST be a round thousands.")
@@ -9157,7 +9186,7 @@ class CommandAndConquest(commands.Cog):
 
     @cnc.command(name="army", description="Displays information about a specific army.")
     @app_commands.autocomplete(army_id=army_autocomplete)
-    @app_commands.describe(army_id="The ID of the army")
+    @app_commands.describe(army_id="The ID of the army.")
     async def army_view(self, interaction: discord.Interaction, army_id: int):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -9205,6 +9234,41 @@ class CommandAndConquest(commands.Cog):
         # otherwise, return just the embed
         else:
             return await interaction.followup.send(embed=army_embed)
+
+    @cnc.command(name="general", description="Displays information about a specific general.")
+    @app_commands.autocomplete(general_id=general_autocomplete)
+    @app_commands.describe(general_id="The ID of the general.")
+    async def general_view(self, interaction: discord.Interaction, general_id: int):
+        # establish connection
+        conn = self.bot.pool
+        # pull general information
+        gen_info = await conn.fetchrow('''SELECT * FROM cnc_generals WHERE general_id = $1;''',
+                                       general_id)
+        # if the general does not exist
+        if not gen_info:
+            # reject
+            return await interaction.response.send_message(f"No such general with the ID `{general_id}`.",
+                                                           ephemeral=True)
+        # otherwise, carry on
+        else:
+            # create embed
+            gen_embed = discord.Embed(title=f"General {gen_info['name']}",
+                                      description=f"Basic information about the "
+                                                  f"general with the ID: `{gen_info['general_id']}",
+                                      color=discord.Color.red())
+            gen_embed.add_field(name="Type", value=f"{gen_info['type']}")
+            gen_embed.add_field(name="Level", value=f"{gen_info['level']}")
+            # get user name of loyal to
+            loyal_to = await conn.fetchval('''SELECT name FROM cnc_users WHERE user_id = $1;''',
+                                           gen_info['owner_id'])
+            gen_embed.add_field(name="Loyal To", value=loyal_to)
+            # get army name
+            army_name = await conn.fetchval('''SELECT army_name FROM cnc_armies WHERE army_id = $1;''',
+                                            gen_info['army_id'])
+            gen_embed.add_field(name="Army Commanded", value=army_name if army_name else "None")
+
+            return await interaction.response.send_message(embed=gen_embed)
+
 
     @cnc.command(name="army_report", description="Displays information about all of a nation's armies.")
     async def army_report(self, interaction: discord.Interaction):
@@ -9382,7 +9446,6 @@ class CommandAndConquest(commands.Cog):
         active_wars = await conn.fetch('''SELECT name, id FROM cnc_wars WHERE active = True;''')
         # construct list
         return [app_commands.Choice(name=f"{war['name']} (ID: {war['id']})", value=str(war['id'])) for war in active_wars if (war_typed.lower() in war['name'].lower()) or (war_typed in str(war['id']))][0:24]
-
 
     @cnc.command(name="war", description="Displays information about a specific war and option related to that war.")
     @app_commands.autocomplete(war_id=war_autocomplete)
@@ -9860,7 +9923,7 @@ class CommandAndConquest(commands.Cog):
     # === Moderator Commands ===
 
     @commands.command()
-    @commands.is_owner()
+    @commands.has_role(928889638888812586)
     async def cnc_give_province(self, ctx, user: discord.Member, province_id: int):
         # establish connection
         conn = self.bot.pool
@@ -9892,7 +9955,7 @@ class CommandAndConquest(commands.Cog):
         return await ctx.send(f"{user_info['name']} granted ownership of {prov_info['name']} (ID: {province_id}).")
 
     @commands.command()
-    @commands.is_owner()
+    @commands.has_role(928889638888812586)
     async def cnc_research_tech(self, ctx, user: discord.Member, tech: str):
         # establish connection
         conn = self.bot.pool
@@ -9929,7 +9992,7 @@ class CommandAndConquest(commands.Cog):
         return await ctx.send(f"{tech_info['name']} has been researched for {user_info['name']} ({user.display_name}).")
 
     @commands.command()
-    @commands.is_owner()
+    @commands.has_role(928889638888812586)
     async def cnc_forget_tech(self, ctx, user: discord.Member, tech: str):
         # establish connection
         conn = self.bot.pool
@@ -10030,6 +10093,7 @@ class CommandAndConquest(commands.Cog):
         return await ctx.send(f"{user.display_name} has been whitelisted.")
 
     # === Administrator Commands ===
+
     @commands.command()
     @commands.is_owner()
     async def cnc_reset_map(self, ctx):
