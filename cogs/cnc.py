@@ -7283,7 +7283,7 @@ class CommandAndConquest(commands.Cog):
         if self.turn_loop.is_running():
             self.turn_loop.cancel()
         self.turn_loop.start()
-        await asyncio.sleep(0)
+        await asyncio.sleep(2)
         # add the update message
         self.bot.system_message += (f"From cnc.py: Turn loop running. Next iteration: "
                                     f"{self.turn_loop.next_iteration.strftime('%d %b %Y at %H:%M %Z%z')}\n")

@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding trade good updates to turn updating" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Defending against loop double running">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -571,6 +574,7 @@
       <workItem from="1774632063064" duration="7121000" />
       <workItem from="1774716600749" duration="10811000" />
       <workItem from="1774744982193" duration="5708000" />
+      <workItem from="1774789205705" duration="252000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -915,7 +919,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1618" />
+    <option name="localTasksCounter" value="1619" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -934,7 +938,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding proper war score to calculations to move_army command" />
     <MESSAGE value="Adding fort blocking mechanics to the move_army command&#10;Adding province resetting considerations to the peace_negotiation acceptance code" />
     <MESSAGE value="Adding fort besieging button to appropriate province view" />
     <MESSAGE value="Updating army_report to properly display general" />
@@ -959,7 +962,8 @@
     <MESSAGE value="Adding prereq forcing to technology researching" />
     <MESSAGE value="Updating admin commands" />
     <MESSAGE value="Adding trade good updates to turn updating" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding trade good updates to turn updating" />
+    <MESSAGE value="Defending against loop double running" />
+    <option name="LAST_COMMIT_MESSAGE" value="Defending against loop double running" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
