@@ -109,6 +109,8 @@ class Turn:
     async def run_turn(self) -> dict:
         # run the user updates
         await self._user_updates()
+        # run the market update
+        await self._trade_market_updates()
         # run the timer updates
         await self._timer_updates()
         # update turn
