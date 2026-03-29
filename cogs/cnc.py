@@ -268,7 +268,7 @@ async def place_tech_gear(user: asyncpg.Record, conn: asyncpg.Pool):
         tech_cords = await conn.fetchval('''SELECT gear_cords FROM cnc_tech WHERE name = $1;''',
                                          tech)
         # put gear on cords
-        tech_image.paste(im=gear_icon, box=tech_cords, mask=gear_icon)
+        tech_image.paste(im=gear_icon, box=(int(tech_cords[0]), int(tech_cords[1])), mask=gear_icon)
     # return image
     return tech_image
 
