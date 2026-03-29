@@ -257,7 +257,7 @@ async def map_color(province: int, hexcode: str, conn: asyncpg.Pool):
     map.paste(prov, box=cord, mask=prov)
     map.save(fr"{map_directory}wargame_provinces.png")
 
-async def render_tech_tree_with_icons(user: asyncpg.Record, conn: asyncpg.Pool) -> bytes:
+async def render_tech_tree_with_icons(user: asyncpg.Record, conn: asyncpg.Pool) -> io.BytesIO:
     # define directories
     tech_tree = r"CNC/Tech Tree/CNC Tech Tree.png"
     tech_image = Image.open(tech_tree).convert("RGBA")
@@ -277,7 +277,7 @@ async def render_tech_tree_with_icons(user: asyncpg.Record, conn: asyncpg.Pool) 
     # get the image bytes
     tech_tree_bytes = stream.getvalue()
     # return image
-    return tech_tree_bytes
+    return io.BytesIO(tech_tree_bytes)
 
 # create modal input function
 async def demanding_provinces_wait_for_modal(parent_interaction: discord.Interaction, title: str, label: str):
