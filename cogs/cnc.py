@@ -9728,12 +9728,17 @@ class CommandAndConquest(commands.Cog):
                 return await interaction.followup.send(f"{user_info['name']} does not have the prerequisite "
                                                        f"technology to research: {tech}.", ephemeral=True)
         # check if the user has both prerequisites if it is "need both"
-        if "," in tech_info['prereqs']:
+        elif "," in tech_info['prereqs']:
             # check if the user has both techs
             if not any(tech in tech_info['prereqs'].split(',') for tech in techs):
                 # reject
                 return await interaction.followup.send(f"{user_info['name']} does not have both the prerequisite "
                                                        f"technology to research: {tech}.", ephemeral=True)
+        # otherwise, just check if the user has the flat prerequisite
+        elif tech_info['prereqs'] not in techs:
+            # reject
+            return await interaction.followup.send(f"{user_info['name']} does not have the prerequisite "
+                                                   f"technology to research: {tech}.", ephemeral=True)
         # check if a tech is already being researched
         researching_tech = await conn.fetchrow('''SELECT *
                                                   FROM cnc_researching
