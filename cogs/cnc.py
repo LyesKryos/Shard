@@ -7283,12 +7283,12 @@ class CommandAndConquest(commands.Cog):
         if self.turn_loop.is_running():
             self.turn_loop.cancel()
         self.turn_loop.start()
-        for _ in range(20):
-            if self.turn_loop.next_iteration is not None:
-                break
-            await asyncio.sleep(0)
-        self.bot.system_message += (f"From cnc.py: Turn loop running. Next iteration: "
-                                    f"{self.turn_loop.next_iteration.strftime('%d %b %Y at %H:%M %Z%z')}\n")
+        # check if the loop is running and post
+        if self.turn_loop.is_running():
+            self.bot.system_message += f"From cnc.py: Turn loop running.\n"
+        else:
+            self.bot.system_message += f"From cnc.py: **TURN LOOP NOT RUNNING**.\n"
+
 
     async def cog_unload(self) -> None:
         # disable turn loop
