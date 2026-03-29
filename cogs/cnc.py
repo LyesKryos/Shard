@@ -256,6 +256,22 @@ async def map_color(province: int, hexcode: str, conn: asyncpg.Pool):
     map.paste(prov, box=cord, mask=prov)
     map.save(fr"{map_directory}wargame_provinces.png")
 
+async def place_tech_gear(user: asyncpg.Record, conn: asyncpg.Pool):
+    # define directories
+    tech_tree = r"CNC/Tech Tree/CNC Tech Tree.png"
+    tech_image = Image.open(tech_tree).convert("RGBA")
+    gear_icon = r"CNC/Tech Tree/CNC Gear Tech Icon.png"
+    gear_icon = Image.open(gear_icon).convert("RGBA")
+    # for each tech the user has, pull the cord and put on the image
+    for tech in user['tech']:
+        # pull tech's coordinates
+        tech_cords = await conn.fetchval('''SELECT gear_cords FROM cnc_tech WHERE name = $1;''',
+                                         tech)
+        # put gear on cords
+        tech_image.paste(im=gear_icon, box=tech_cords, mask=gear_icon)
+    # return image
+    return tech_image
+
 # create modal input function
 async def demanding_provinces_wait_for_modal(parent_interaction: discord.Interaction, title: str, label: str):
     """
@@ -9663,26 +9679,12 @@ class CommandAndConquest(commands.Cog):
         await interaction.response.defer(thinking=True)
         # establish connection
         conn = self.bot.pool
-        # pull user's tech
-        techs = await conn.fetchval('''SELECT tech
-                                       FROM cnc_users
-                                       WHERE user_id = $1;''', interaction.user.id)
-        # map techs
-        tech_map = Image.open(fr"{self.tech_directory}CNC Tech Tree.png").convert('RGBA')
-        gear_icon = Image.open(fr"{self.tech_directory}CNC Gear Tech Icon.png").convert('RGBA')
-        # pull tech info
-        for tech in techs:
-            tech_info = await conn.fetchrow('''SELECT *
-                                               FROM cnc_tech
-                                               WHERE name = $1;''', tech)
-            gear_cords = tech_info['gear_cords']
-            tech_map.paste(gear_icon, (int(gear_cords[0]), int(gear_cords[1])), mask=gear_icon)
-        # save image
-        # get the running loop, crucial to the map command running without the world enfding
-        loop = asyncio.get_running_loop()
-        await loop.run_in_executor(None, tech_map.save, (fr"{self.tech_directory}CNC Tech Map Rendered.png"))
-
-        await interaction.followup.send(file=discord.File(fr"{self.tech_directory}CNC Tech Map Rendered.png"))
+        # pull user info
+        user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+        # get map
+        tech_tree = await place_tech_gear(user=user_info, conn=conn)
+        # send tech map
+        await interaction.followup.send(file=discord.File(tech_tree))
 
     @cnc.command(name="research", description="Begins researching a specified tech.")
     @app_commands.describe(tech="The tech to research.")
