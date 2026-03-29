@@ -760,18 +760,19 @@ class Turn:
             citizen_production = prov['citizens'] / 3872
             await conn.execute('''UPDATE cnc_provinces SET production = $2 WHERE id = $1;''',
                                prov['id'], floor(citizen_production))
+        # get turn number
+        turn = await conn.fetchval('''SELECT number FROM cnc_date WHERE name = 'Turn';''')
+        # get the turn-production coefficient: turn *
+        turn_production_coefficient = min(.1*(turn**.56), 1) * 1000
         # pull all the trade goods
-        trade_goods = {}
         trade_goods_raw = await conn.fetch('''SELECT * FROM cnc_trade_goods;''')
         # for each trade good
         for good in trade_goods_raw:
             # get the total production of all provinces that produce that trade good
             total_production = await conn.fetchval('''SELECT SUM(production) FROM cnc_provinces 
                                                       WHERE trade_good = $1;''', good['name'])
-            # log the total production in the dict
-            trade_goods[good['name']] = int(total_production)
             # calculate the proper market value of the good
-            new_market_value = (-min(trade_goods[good['name']]/10, 50)+50)**.42
+            new_market_value = min((turn_production_coefficient/total_production)**1.03, 5)
             # execute the update
             await conn.execute('''UPDATE cnc_trade_goods SET market_value = $2 WHERE name = $1;''',
                                good['name'], round(new_market_value,2))
