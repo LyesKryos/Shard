@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding prereq forcing to technology researching" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating admin commands">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CNC/turn.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/turn.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -570,7 +573,7 @@
       <workItem from="1774576385357" duration="14000" />
       <workItem from="1774632063064" duration="7121000" />
       <workItem from="1774716600749" duration="10811000" />
-      <workItem from="1774744982193" duration="1584000" />
+      <workItem from="1774744982193" duration="2653000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -915,7 +918,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1601" />
+    <option name="localTasksCounter" value="1603" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -934,7 +937,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding map coloring to successful native takeover" />
     <MESSAGE value="Adding manpower reduction to recruitment buttons" />
     <MESSAGE value="Adding proper war score to calculations to move_army command" />
     <MESSAGE value="Adding fort blocking mechanics to the move_army command&#10;Adding province resetting considerations to the peace_negotiation acceptance code" />
@@ -959,7 +961,8 @@
     <MESSAGE value="Correcing tech map rendering" />
     <MESSAGE value="Correcting tech map rendering" />
     <MESSAGE value="Adding prereq forcing to technology researching" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding prereq forcing to technology researching" />
+    <MESSAGE value="Updating admin commands" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updating admin commands" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

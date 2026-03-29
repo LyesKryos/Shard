@@ -751,14 +751,28 @@ class Turn:
     async def _trade_market_updates(self):
         # establish connection
         conn = self.conn
+        # production for unowned provinces
+        unowned_provinces = await conn.fetch('''SELECT * FROM cnc_provinces WHERE owner_id = 0;''')
+        # calculate flat production
+        for prov in unowned_provinces:
+            citizen_production = prov['citizens'] / 3872
+            await conn.execute('''UPDATE cnc_provinces SET production = $2 WHERE id = $1;''',
+                               prov['id'], floor(citizen_production))
         # pull all the trade goods
         trade_goods = {}
         trade_goods_raw = await conn.fetch('''SELECT * FROM cnc_trade_goods;''')
-        # for each trade good, add it to the dict
+        # for each trade good
         for good in trade_goods_raw:
-            trade_goods[good['name']] = good['market_value']
-            # pull all the provinces that have that produce that good and then log
-
+            # get the total production of all provinces that produce that trade good
+            total_production = await conn.fetchval('''SELECT SUM(production) FROM cnc_provinces 
+                                                      WHERE trade_good = $1;''', good['name'])
+            # log the total production in the dict
+            trade_goods[good['name']]['total_production'] = total_production
+            # calculate the proper market value of the good
+            new_market_value = (-(trade_goods[good['name']]['total_production']/10)+10)**.97
+            # execute the update
+            await conn.execute('''UPDATE cnc_trade_goods SET market_value = $2 WHERE name = $1;''',
+                               good['name'], new_market_value)
 
     async def _timer_updates(self):
         # define the connection
