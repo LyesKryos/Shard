@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding trade good updates to turn updating" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding trade good updates to turn updating">
+      <change beforePath="$PROJECT_DIR$/CNC/turn.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/turn.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -570,7 +572,7 @@
       <workItem from="1774576385357" duration="14000" />
       <workItem from="1774632063064" duration="7121000" />
       <workItem from="1774716600749" duration="10811000" />
-      <workItem from="1774744982193" duration="3282000" />
+      <workItem from="1774744982193" duration="3604000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -915,7 +917,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1609" />
+    <option name="localTasksCounter" value="1610" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
