@@ -769,7 +769,7 @@ class Turn:
             total_production = await conn.fetchval('''SELECT SUM(production) FROM cnc_provinces 
                                                       WHERE trade_good = $1;''', good['name'])
             # log the total production in the dict
-            trade_goods[good['name']]['total_production'] = total_production
+            trade_goods[good['name']] = total_production
             # calculate the proper market value of the good
             new_market_value = (-(trade_goods[good['name']]['total_production']/10)+10)**.97
             # execute the update
