@@ -771,10 +771,10 @@ class Turn:
             # log the total production in the dict
             trade_goods[good['name']] = int(total_production)
             # calculate the proper market value of the good
-            new_market_value = (-max((trade_goods[good['name']]/10),10)+9.5)**.97
+            new_market_value = (-max(trade_goods[good['name']]/10, 50)+50)**.42
             # execute the update
             await conn.execute('''UPDATE cnc_trade_goods SET market_value = $2 WHERE name = $1;''',
-                               good['name'], new_market_value)
+                               good['name'], round(new_market_value,2))
 
     async def _timer_updates(self):
         # define the connection
