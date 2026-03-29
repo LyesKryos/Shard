@@ -772,7 +772,7 @@ class Turn:
             total_production = await conn.fetchval('''SELECT SUM(production) FROM cnc_provinces 
                                                       WHERE trade_good = $1;''', good['name'])
             # calculate the proper market value of the good
-            new_market_value = min((turn_production_coefficient/total_production)**1.03, 5)
+            new_market_value = max(min((turn_production_coefficient/total_production)**1.03, 5), .5)
             # execute the update
             await conn.execute('''UPDATE cnc_trade_goods SET market_value = $2 WHERE name = $1;''',
                                good['name'], round(new_market_value,2))
