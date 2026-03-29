@@ -1,5 +1,6 @@
 from __future__ import annotations
 import datetime
+import io
 import time
 from random import randrange, randint, choice, uniform
 from typing import List
@@ -256,7 +257,7 @@ async def map_color(province: int, hexcode: str, conn: asyncpg.Pool):
     map.paste(prov, box=cord, mask=prov)
     map.save(fr"{map_directory}wargame_provinces.png")
 
-async def place_tech_gear(user: asyncpg.Record, conn: asyncpg.Pool):
+async def render_tech_tree_with_icons(user: asyncpg.Record, conn: asyncpg.Pool) -> bytes:
     # define directories
     tech_tree = r"CNC/Tech Tree/CNC Tech Tree.png"
     tech_image = Image.open(tech_tree).convert("RGBA")
@@ -269,8 +270,14 @@ async def place_tech_gear(user: asyncpg.Record, conn: asyncpg.Pool):
                                          tech)
         # put gear on cords
         tech_image.paste(im=gear_icon, box=(int(tech_cords[0]), int(tech_cords[1])), mask=gear_icon)
+    # get the bytes io stream
+    stream = io.BytesIO()
+    # save the image to the stream
+    tech_image.save(stream, format="PNG")
+    # get the image bytes
+    tech_tree_bytes = stream.getvalue()
     # return image
-    return tech_image
+    return tech_tree_bytes
 
 # create modal input function
 async def demanding_provinces_wait_for_modal(parent_interaction: discord.Interaction, title: str, label: str):
@@ -9682,7 +9689,7 @@ class CommandAndConquest(commands.Cog):
         # pull user info
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # get map
-        tech_tree = await place_tech_gear(user=user_info, conn=conn)
+        tech_tree = await render_tech_tree_with_icons(user=user_info, conn=conn)
         # send tech map
         await interaction.followup.send(file=discord.File(tech_tree))
 
