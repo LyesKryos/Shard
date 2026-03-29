@@ -9711,20 +9711,37 @@ class CommandAndConquest(commands.Cog):
         # if it is not an existing tech
         if tech_info is None:
             # return denial
-            return await interaction.followup.send("That is not a recognized tech.")
+            return await interaction.followup.send("That is not a recognized technology.", ephemeral=True)
         # pull techs
         techs = user_info['tech']
         # check if the requested tech is already researched
         if tech.lower() in [t.lower() for t in techs]:
             # return denial
-            return await interaction.followup.send("Your scientists have already researched that tech.")
+            return await interaction.followup.send(f"Our scientists have already researched that technology.",
+                                                   ephemeral=True)
+        # check if the user has the prerequisite tech if they are "need one"
+        if ";" in tech_info['prereqs']:
+            # check if the user has either tech
+            prereq_techs = tech_info['prereqs'].split(";")
+            if not any(tech in prereq_techs for tech in techs):
+                # reject
+                return await interaction.followup.send(f"{user_info['name']} does not have the prerequisite "
+                                                       f"technology to research: {tech}.", ephemeral=True)
+        # check if the user has both prerequisites if it is "need both"
+        if "," in tech_info['prereqs']:
+            # check if the user has both techs
+            if not any(tech in tech_info['prereqs'].split(',') for tech in techs):
+                # reject
+                return await interaction.followup.send(f"{user_info['name']} does not have both the prerequisite "
+                                                       f"technology to research: {tech}.", ephemeral=True)
         # check if a tech is already being researched
         researching_tech = await conn.fetchrow('''SELECT *
                                                   FROM cnc_researching
                                                   WHERE user_id = $1;''', user_id)
         if researching_tech is not None:
             # return denial
-            return await interaction.followup.send("Your scientists are already researching another tech.")
+            return await interaction.followup.send("Oour scientists are already researching another tech.",
+                                                   ephemeral=True)
         # if the tech is not yet unlocked and another tech is not already being researched, add the tech to the research queue
         # determine research time
         # set base research time as four turns
