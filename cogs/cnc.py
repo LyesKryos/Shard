@@ -9745,7 +9745,7 @@ class CommandAndConquest(commands.Cog):
                                                   WHERE user_id = $1;''', user_id)
         if researching_tech is not None:
             # return denial
-            return await interaction.followup.send("Oour scientists are already researching another tech.",
+            return await interaction.followup.send("Our scientists are already researching another tech.",
                                                    ephemeral=True)
         # if the tech is not yet unlocked and another tech is not already being researched, add the tech to the research queue
         # determine research time
@@ -10057,7 +10057,7 @@ class CommandAndConquest(commands.Cog):
 
     @commands.command()
     @commands.has_role(928889638888812586)
-    async def cnc_research_tech(self, ctx, user: discord.Member, tech: str):
+    async def cnc_grant_tech(self, ctx, user: discord.Member, tech: str):
         # establish connection
         conn = self.bot.pool
         # call user info
