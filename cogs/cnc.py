@@ -7279,9 +7279,10 @@ class CommandAndConquest(commands.Cog):
         importlib.reload(turn)
         importlib.reload(battlesim)
 
-        # start the turn loop
+        # force a clean start
+        if self.turn_loop.is_running():
+            self.turn_loop.cancel()
         self.turn_loop.start()
-        # let the loop start
         await asyncio.sleep(0)
         # add the update message
         self.bot.system_message += (f"From cnc.py: Turn loop running. Next iteration: "
