@@ -9691,7 +9691,7 @@ class CommandAndConquest(commands.Cog):
         # get map
         tech_tree = await render_tech_tree_with_icons(user=user_info, conn=conn)
         # send tech map
-        await interaction.followup.send(file=discord.File(tech_tree), filename="tech_tree.png")
+        await interaction.followup.send(file=discord.File(tech_tree, filename="tech_tree.png"))
 
     @cnc.command(name="research", description="Begins researching a specified tech.")
     @app_commands.describe(tech="The tech to research.")
