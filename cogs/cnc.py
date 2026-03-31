@@ -10145,47 +10145,46 @@ class CommandAndConquest(commands.Cog):
         gp_embed = discord.Embed(title="Great Powers Score",
                                  description="The table below displays the Great Power Score of all current nations.")
         # construct embed
-        table = "`"
         counter = 1
         # if gps is blank, add three buffers
         if len(gps) == 0:
-            table += f"#1. None" + (" "*(40-len("None"))) + "50 points\n"
-            table += f"#2. None" + (" " * (40 - len("None"))) + "50 points\n"
-            table += f"#3. None" + (" " * (40 - len("None"))) + "50 points\n"
+            table += f"`#1. None" + (" "*(40-len("None"))) + "50 points`\n"
+            table += f"`#2. None" + (" " * (40 - len("None"))) + "50 points`\n"
+            table += f"`#3. None" + (" " * (40 - len("None"))) + "50 points`\n"
         # otherwise add gps
         else:
             # add gps
             for gp in gps:
                 # add name
-                table += f"#{counter}. {gp['name']}"
+                table += f"`#{counter}. {gp['name']}"
                 # add spaces
                 table += " " * (40-len(gp['name'])) if len(gp['name']) < 40 else 0
                 # add score
-                table += f"{gp['gp_score']} points\n"
+                table += f"{gp['gp_score']} points`\n"
                 # update counter
                 counter += 1
 
             # if there are fewer than 3 gps
             if len(gps) < 3:
                 for _ in range(3-len(gps)):
-                    table += f"#{counter}. None" + (" " * (40 - len("None"))) + "50 points\n"
+                    table += f"`#{counter}. None" + (" " * (40 - len("None"))) + "50 points`\n"
                     counter += 1
 
         # carry on for the rest
         for nation in non_gps:
             # add name
-            table += f"#{counter}. {nation['name']}"
+            table += f"`#{counter}. {nation['name']}"
             # add spaces
             table += " " * (40 - len(nation['name'])) if len(nation['name']) < 40 else 0
             # add score
-            table += f"{nation['gp_score']} points\n"
+            table += f"{nation['gp_score']} points`\n"
             # update counter
             counter += 1
 
         # finish table
         table += "`"
         # add to embed
-        gp_embed.add_field(name="Great Power Score", value=table)
+        gp_embed.add_field(name="\u200b", value=table)
         gp_embed.set_footer(text="Nations must attain at least 50 Great Power Score to be considered a Great Power.")
         # send embed
         return await interaction.response.send_message(embed=gp_embed)
