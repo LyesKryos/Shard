@@ -890,8 +890,9 @@ class Turn:
             # count diplomatic relations
             dr_count = await conn.fetchval('''SELECT count(id) FROM cnc_drs WHERE $1 = ANY(members);''', user['name'])
             # add scores
-            gp_score += alliances_count + pacts_count + dr_count
-            
+            gp_score += alliances_count if alliances_count is not None else 0
+            gp_score += pacts_count if pacts_count is not None else 0
+            gp_score += dr_count if dr_count is not None else 0
             # update score for user
             await conn.execute('''UPDATE cnc_users SET gp_score = $2 WHERE user_id = $1;''', user['user_id'], gp_score)
         # once all users are done, check to define the top 3, if they have more than 50 GP score
