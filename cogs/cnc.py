@@ -10185,7 +10185,7 @@ class CommandAndConquest(commands.Cog):
         # finish table
         table += "`"
         # add to embed
-        gp_embed.add_field(name="\u200b", value=table)
+        gp_embed.add_field(name="Great Power Score", value=table)
         gp_embed.set_footer(text="Nations must attain at least 50 Great Power Score to be considered a Great Power.")
         # send embed
         return await interaction.response.send_message(embed=gp_embed)
