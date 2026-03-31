@@ -10035,7 +10035,7 @@ class CommandAndConquest(commands.Cog):
         conn = self.bot.pool
 
         # create gp calculation function
-        async def gp_calc(user: asyncpg.Record:
+        async def gp_calc(user: asyncpg.Record)
             # define base gp score
             gp_score = 0
             # get development and citizens
