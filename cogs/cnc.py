@@ -7238,7 +7238,7 @@ class GeneralDismissView(discord.ui.View):
         self.parent_interaction = parent_interaction
 
     async def interaction_check(self, interaction: discord.Interaction):
-        return interaction.user.id == self.user_id
+        return interaction.user.id == self.parent_interaction.user.id
 
     async def on_timout(self):
         # disable button
@@ -7272,7 +7272,7 @@ class ResearchingCancelView(discord.ui.View):
         self.parent_interaction = parent_interaction
 
     async def interaction_check(self, interaction: discord.Interaction):
-        return interaction.user.id == self.user_id
+        return interaction.user.id == self.parent_interaction.user.id
 
     async def on_timout(self):
         # disable button
