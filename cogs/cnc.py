@@ -10107,7 +10107,7 @@ class CommandAndConquest(commands.Cog):
         # build embed
         gp_score_embed = discord.Embed(title=f"Great Power Score - {user_info['name']}", description="The calculation of the nation's Great Power Score.", color=discord.Color.red())
         # create fields
-        gp_score_embed.add_field(name="Total", value=f"{sum(citizen_score, dev_score, auth_score, stability_score, troop_count_score, general_score, tech_score, alliances_score, pacts_score, dr_score)} points", inline=False)
+        gp_score_embed.add_field(name="Total", value=f"{sum((citizen_score, dev_score, auth_score, stability_score, troop_count_score, general_score, tech_score, alliances_score, pacts_score, dr_score))} points", inline=False)
         gp_score_embed.add_field(name="Citizens", value=f"{citizen_score} points")
         gp_score_embed.add_field(name="Development", value=f"{dev_score} points")
         gp_score_embed.add_field(name="Authority", value=f"{auth_score} points")
@@ -10115,7 +10115,7 @@ class CommandAndConquest(commands.Cog):
         gp_score_embed.add_field(name="Troops", value=f"{troop_count_score} points")
         gp_score_embed.add_field(name="General(s)", value=f"{general_score} points")
         gp_score_embed.add_field(name="Technology", value=f"{tech_score} points")
-        gp_score_embed.add_field(name="Relations", value=f"{sum(alliances_score, pacts_score, dr_score)} points")
+        gp_score_embed.add_field(name="Relations", value=f"{sum((alliances_score, pacts_score, dr_score))} points")
         # send embed and wrap
         return await interaction.response.send_message(embed=gp_score_embed)
 
