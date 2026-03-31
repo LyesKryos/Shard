@@ -877,8 +877,8 @@ class Turn:
             army_troop_count = await conn.fetchval('''SELECT SUM(troops) FROM cnc_armies WHERE owner_id = $1;''', user['user_id'])
             general_score = await conn.fetchval('''SELECT SUM(general_id) * AVG(level) FROM cnc_generals WHERE owner_id = $1;''', user['user_id'])
             # add troop count and general score
-            gp_score += int(army_troop_count)/3000
-            gp_score += float(general_score)
+            gp_score += int(army_troop_count)/3000 if army_troop_count is not None else 0
+            gp_score += float(general_score) if general_score is not None else 0
             # add techs
             tech_count = await conn.fetchval('''SELECT cardinality(tech) FROM cnc_users WHERE user_id = $1;''', user['user_id'])
             # add score
@@ -891,6 +891,7 @@ class Turn:
             dr_count = await conn.fetchval('''SELECT count(id) FROM cnc_drs WHERE $1 = ANY(members);''', user['name'])
             # add scores
             gp_score += alliances_count + pacts_count + dr_count
+            
             # update score for user
             await conn.execute('''UPDATE cnc_users SET gp_score = $2 WHERE user_id = $1;''', user['user_id'], gp_score)
         # once all users are done, check to define the top 3, if they have more than 50 GP score
