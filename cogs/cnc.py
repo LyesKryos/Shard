@@ -10168,7 +10168,7 @@ class CommandAndConquest(commands.Cog):
             # if there are fewer than 3 gps
             if len(gps) < 3:
                 for _ in range(3-len(gps)):
-                    table += f"`#{counter}. None" + (" " * (40 - len("None"))) + "50 points`\n"
+                    table += f"`#{counter}. None" + (" " * (50 - len("None"))) + "50 points`\n"
                     counter += 1
 
         # carry on for the rest
