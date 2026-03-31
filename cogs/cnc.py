@@ -10067,7 +10067,7 @@ class CommandAndConquest(commands.Cog):
             pacts_score = pacts_count if pacts_count is not None else 0
             dr_score = dr_count if dr_count is not None else 0
             # return the score
-            return round(citizen_score,2), round(dev_score,2), round(auth_score,2), round(stability_score,2), rpund(troop_count_score,2), round(general_score,2), round(tech_score,2), round(alliances_score,2), round(pacts_score,2), round(dr_score,2)
+            return round(citizen_score,2), round(dev_score,2), round(auth_score,2), round(stability_score,2), round(troop_count_score,2), round(general_score,2), round(tech_score,2), round(alliances_score,2), round(pacts_score,2), round(dr_score,2)
 
         # if both options are none
         if user is None and nation is None:
