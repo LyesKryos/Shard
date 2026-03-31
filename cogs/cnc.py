@@ -7288,7 +7288,7 @@ class ResearchingCancelView(discord.ui.View):
         # delete active research
         await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', interaction.user.id)
         # disable the button
-        button.disabled = truce_check
+        button.disabled = True
         # update the original message
         await self.parent_interaction.edit_original_response(view=self)
         # return reply
