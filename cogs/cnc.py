@@ -7237,6 +7237,16 @@ class GeneralDismissView(discord.ui.View):
         self.general_info = general_info
         self.parent_interaction = parent_interaction
 
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.user_id
+
+    async def on_timout(self):
+        # disable button
+        for child in self.children:
+            child.disabled = True
+        # update view
+        return await self.parent_interaction.edit_original_response(view=self)
+
     @discord.ui.button(label="Dismiss", style=discord.ButtonStyle.danger, emoji="\U0001fae1")
     async def dismiss_general(self, interaction: discord.Interaction, button: discord.Button):
         # establish connection
@@ -7253,6 +7263,36 @@ class GeneralDismissView(discord.ui.View):
         # return reply
         return await interaction.response.send_message(content=f"General {self.general_info['name']} has been "
                                                                f"dismissed and has retired from national service.")
+
+class ResearchingCancelView(discord.ui.View):
+    
+    def __init__(self, parent_interaction: discord.Interaction):
+        super().__init__(timeout=120)
+        # define variables
+        self.parent_interaction = parent_interaction
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.user_id
+
+    async def on_timout(self):
+        # disable button
+        for child in self.children:
+            child.disabled = True
+        # update view
+        return await self.parent_interaction.edit_original_response(view=self)
+
+    @discord.ui.button(label="Cancel Research", style=discord.ButtonStyle.danger)
+    async def cancel_research(self, interaction: discord.Interaction, button: discord.Button):
+        # establish connection
+        conn = interaction.client.pool
+        # delete active research
+        await conn.execute('''DELETE FROM cnc_researching WHERE user_id = $1;''', interaction.user.id)
+        # disable the button
+        button.disabled = truce_check
+        # update the original message
+        await self.parent_interaction.edit_original_response(view=self)
+        # return reply
+        return await interaction.response.send_message(content=f"Our scientists are no longer researching the technology.")
 
 
 # establish turn times every six hours
@@ -9804,38 +9844,11 @@ class CommandAndConquest(commands.Cog):
             return await interaction.followup.send(f"{user_info['name']} is not currently researching any technology.")
         # if there is a tech being researched, send the info
         if researching is not None:
-            # return info
+            # create cancel view
+            cancel_research = ResearchingCancelView(parent_interaction=interaction)
+            # return info with cancel button
             return await interaction.followup.send(f"Scientists are currently researching the {researching['tech']} "
-                                                   f"tech. Research will be complete in {researching['turns']} turns.")
-
-    @cnc.command(name="cancel_research", description="Cancels the tech currently being researched.")
-    async def cancel_research(self, interaction: discord.Interaction):
-        # defer interaction
-        await interaction.response.defer(thinking=True)
-        # establish connection
-        conn = self.bot.pool
-        # check if the user exist
-        user_id = interaction.user.id
-        user_info = await user_db_info(user_id, self.bot.pool)
-        # if the user doesn't exist
-        if user_info is None:
-            # return denial
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
-        # pull researching information
-        researching = await conn.fetchrow('''SELECT *
-                                             FROM cnc_researching
-                                             WHERE user_id = $1;''', user_id)
-        # if there is no tech being researched currently
-        if researching is None:
-            # return message
-            return await interaction.followup.send(f"{user_info['name']} is not currently researching any technology.")
-        # cancel the research currently underway
-        if researching is not None:
-            # send cancel to db
-            await conn.execute('''DELETE
-                                  FROM cnc_researching
-                                  WHERE user_id = $1;''', user_id)
-            return await interaction.followup.send(f"{user_info['name']} is no longer researching {researching['tech']}.")
+                                                   f"tech. Research will be complete in {researching['turns']} turns.", view=cancel_research)
 
     # === Government Commands ===
 
