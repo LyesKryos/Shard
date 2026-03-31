@@ -710,8 +710,8 @@ class Turn:
                                user['user_id'], user['movement_cap'])
 
             # add user dm notifications to the list
-            self.user_dm_notifications[user['user_id']] = dm_notification if dm_notification != "" else None
-
+            self.user_dm_notifications[user['user_id']] = dm_notification
+            
         # for each user, update their auth depending on overlordship/subjection
         for user in user_list:
             # calculate puppets/overlords loss/gain

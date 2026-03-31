@@ -10503,7 +10503,7 @@ class CommandAndConquest(commands.Cog):
         # for each user with a dm in the list, safe dm them
         for user in dms:
             # if the message isn't blank
-            if dms[user]:
+            if dms[user] != "":
                 # attempt to dm the user
                 await safe_dm(bot=self.bot, user_id=user, content=dms[user])
         # update the channel
