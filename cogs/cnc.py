@@ -10067,7 +10067,7 @@ class CommandAndConquest(commands.Cog):
             pacts_score = pacts_count if pacts_count is not None else 0
             dr_score = dr_count if dr_count is not None else 0
             # return the score
-            return int(citizen_score), int(dev_score), int(auth_score), int(stability_score), int(troop_count_score), int(general_score), int(tech_score), int(alliances_score), int(pacts_score), int(dr_score)
+            return round(citizen_score,2), round(dev_score,2), round(auth_score,2), round(stability_score,2), rpund(troop_count_score,2), round(general_score,2), round(tech_score,2), round(alliances_score,2), round(pacts_score,2), round(dr_score,2)
 
         # if both options are none
         if user is None and nation is None:
@@ -10107,7 +10107,7 @@ class CommandAndConquest(commands.Cog):
         # build embed
         gp_score_embed = discord.Embed(title=f"Great Power Score - {user_info['name']}", description="The calculation of the nation's Great Power Score.", color=discord.Color.red())
         # create fields
-        gp_score_embed.add_field(name="Total", value=f"{sum((citizen_score, dev_score, auth_score, stability_score, troop_count_score, general_score, tech_score, alliances_score, pacts_score, dr_score))} points", inline=False)
+        gp_score_embed.add_field(name="Total", value=f"{user_info['gp_score']} points", inline=False)
         gp_score_embed.add_field(name="Citizens", value=f"{citizen_score} points")
         gp_score_embed.add_field(name="Development", value=f"{dev_score} points")
         gp_score_embed.add_field(name="Authority", value=f"{auth_score} points")
