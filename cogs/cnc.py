@@ -10149,9 +10149,9 @@ class CommandAndConquest(commands.Cog):
         counter = 1
         # if gps is blank, add three buffers
         if len(gps) == 0:
-            table += f"`#1. None" + (" "*(50-len("None"))) + "50 points`\n"
-            table += f"`#2. None" + (" " * (50 - len("None"))) + "50 points`\n"
-            table += f"`#3. None" + (" " * (50 - len("None"))) + "50 points`\n"
+            table += f"`#1. NONE" + (" "*(50-len("None"))) + "50 points`\n"
+            table += f"`#2. NONE" + (" " * (50 - len("None"))) + "50 points`\n"
+            table += f"`#3. NONE" + (" " * (50 - len("None"))) + "50 points`\n"
         # otherwise add gps
         else:
             # add gps
@@ -10168,7 +10168,7 @@ class CommandAndConquest(commands.Cog):
             # if there are fewer than 3 gps
             if len(gps) < 3:
                 for _ in range(3-len(gps)):
-                    table += f"`#{counter}. None" + (" " * (50 - len("None"))) + "50 points`\n"
+                    table += f"`#{counter}. NONE" + (" " * (50 - len("None"))) + "50 points`\n"
                     counter += 1
 
         # carry on for the rest
