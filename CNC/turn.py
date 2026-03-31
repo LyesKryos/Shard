@@ -834,7 +834,7 @@ class Turn:
         for tech in completed_research:
             # update the user's techs
             await conn.execute('''UPDATE cnc_users SET tech = tech || $2 WHERE user_id = $1;''',
-                               tech['user_id'], tech['tech'])
+                               tech['user_id'], [tech['tech']])
             # pull the db call of the tech
             tech_call = await conn.fetchval('''SELECT db_call FROM cnc_tech WHERE name = $1;''',
                                             tech['tech'])
