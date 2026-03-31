@@ -10145,6 +10145,7 @@ class CommandAndConquest(commands.Cog):
         gp_embed = discord.Embed(title="Great Powers Score",
                                  description="The table below displays the Great Power Score of all current nations.")
         # construct embed
+        table = ""
         counter = 1
         # if gps is blank, add three buffers
         if len(gps) == 0:
