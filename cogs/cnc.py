@@ -10024,6 +10024,101 @@ class CommandAndConquest(commands.Cog):
         # send confirmation
         return await interaction.followup.send(f"{prov_info['name']} is now the Capital of {user_info['name']}.")
 
+    # === GREAT POWER COMMANDS ===
+
+    @cnc.command(name="gp_score", description="Calculates a nation's current GP score.")
+    @app_commands.describe(user="The user you wish to query.", nation="The name of the nation you wish to query.")
+    @app_commands.autocomplete(nation=nation_autocomplete)
+    @app_commands.check(cnc_user_check)
+    async def calculate_gp_score(self, interaction: discord.Interaction, user: discord.Member = None, nation: str = None):
+        # establish connection
+        conn = self.bot.pool
+
+        # create gp calculation function
+        async def gp_calc(user: asyncpg.Record:
+            # define base gp score
+            gp_score = 0
+            # get development and citizens
+            citizens = await conn.fetchval('''SELECT SUM(citizens) FROM cnc_provinces WHERE owner_id = $1 AND occupier_id = $1;''', user['user_id'])
+            development = await conn.fetchval('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1 AND occupier_id = $1;''', user['user_id']) 
+            # add citizen and development score
+            citizen_score = citizens/10000
+            dev_score = float(development)/7.5
+            # add auth gains
+            auth_score = user['econ_auth'] + user['pol_auth'] + user['mil_auth']
+            # stability score gain
+            stability_score = user['stability']/10
+            # get number of armies and generals/quality
+            army_troop_count = await conn.fetchval('''SELECT SUM(troops) FROM cnc_armies WHERE owner_id = $1;''', user['user_id'])
+            general_score = await conn.fetchval('''SELECT SUM(general_id) * AVG(level) FROM cnc_generals WHERE owner_id = $1;''', user['user_id'])
+            # add troop count and general score
+            troop_count_score = int(army_troop_count)/3000 if army_troop_count is not None else 0
+            general_score = float(general_score) if general_score is not None else 0
+            # add techs
+            tech_score = await conn.fetchval('''SELECT cardinality(tech) FROM cnc_users WHERE user_id = $1;''', user['user_id'])
+            # count military alliances
+            alliances_count = await conn.fetchval('''SELECT cardinality(members) FROM cnc_alliances WHERE $1 = ANY(members);''', user['name'])
+            # count trade pacts
+            pacts_count = await conn.fetchval('''SELECT count(id) FROM cnc_trade_pacts WHERE $1 = ANY(members);''', user['name'])
+            # count diplomatic relations
+            dr_count = await conn.fetchval('''SELECT count(id) FROM cnc_drs WHERE $1 = ANY(members);''', user['name'])
+            # add scores
+            alliances_score = alliances_count if alliances_count is not None else 0
+            pacts_score = pacts_count if pacts_count is not None else 0
+            dr_score = dr_count if dr_count is not None else 0
+            # return the score
+            return citizen_score, dev_score, auth_score, stability_score, troop_count_score, general_score, tech_score, alliances_score, pacts_score, dr_score
+
+        # if both options are none
+        if user is None and nation is None:
+            # the user is querying themselves
+            user_info = await user_db_info(user_id=interaction.user.id, conn=conn)
+            # run calc
+            citizen_score, dev_score, auth_score, stability_score, troop_count_score, general_score, tech_score, alliances_score, pacts_score, dr_score = await gp_calc(user_info)
+
+        # otherwise, query the other options
+        elif user is not None and nation is None:
+            # pull the user info
+            user_info = await user_db_info(user_id=user.id, conn=conn)
+            # if the user doesn't exist
+            if user_info is None:
+                # reject
+                return await interaction.response.send_message(content="That user is not a registered member of the Command & Conquest system.", ephemeral=True)
+            # otherwise, carry on
+            else:
+                # run calc
+                citizen_score, dev_score, auth_score, stability_score, troop_count_score, general_score, tech_score, alliances_score, pacts_score, dr_score = await gp_calc(user_info) 
+        elif nation is not None and user is None:
+                        # pull the user info
+            user_info = await user_db_info(user_id=nation, conn=conn)
+            # if the user doesn't exist
+            if user_info is None:
+                # reject
+                return await interaction.response.send_message(content=f"`{nation}` not found.", ephemeral=True)
+            # otherwise, carry on
+            else:
+                # run calc
+                citizen_score, dev_score, auth_score, stability_score, troop_count_score, general_score, tech_score, alliances_score, pacts_score, dr_score = await gp_calc(user_info) 
+        # if all that fails or is not true, reject
+        else:
+            # reject
+            return app_commands.errors.TransformerError
+
+        # build embed
+        gp_score_embed = discord.Embed(title=f"Great Power Score - {user_info['name']}", description="The calculation of the nation's Great Power Score.", color=discord.Color.red())
+        # create fields
+        gp_score_embed.add_field(name="Total", value=f"{sum(citizen_score, dev_score, auth_score, stability_score, troop_count_score, general_score, tech_score, alliances_score, pacts_score, dr_score)} points", inline=False)
+        gp_score_embed.add_field(name="Citizens", value=f"{citizen_score} points")
+        gp_score_embed.add_field(name="Development", value=f"{dev_score} points")
+        gp_score_embed.add_field(name="Authority", value=f"{auth_score} points")
+        gp_score_embed.add_field(name="Stability", value=f"{stability_score} points")
+        gp_score_embed.add_field(name="Troops", value=f"{troop_count_score} points")
+        gp_score_embed.add_field(name="General(s)", value=f"{general_score} points")
+        gp_score_embed.add_field(name="Technology", value=f"{tech_score} points")
+        gp_score_embed.add_field(name="Relations", value=f"{sum(alliances_score, pacts_score, dr_score)} points")
+        # send embed and wrap
+        return await interaction.response.send_message(embed=gp_score_embed)
+
 
     # TODO add gp view commands
 
