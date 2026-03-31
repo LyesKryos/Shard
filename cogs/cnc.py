@@ -10149,9 +10149,9 @@ class CommandAndConquest(commands.Cog):
         counter = 1
         # if gps is blank, add three buffers
         if len(gps) == 0:
-            table += f"`#1. None" + (" "*(40-len("None"))) + "50 points`\n"
-            table += f"`#2. None" + (" " * (40 - len("None"))) + "50 points`\n"
-            table += f"`#3. None" + (" " * (40 - len("None"))) + "50 points`\n"
+            table += f"`#1. None" + (" "*(50-len("None"))) + "50 points`\n"
+            table += f"`#2. None" + (" " * (50 - len("None"))) + "50 points`\n"
+            table += f"`#3. None" + (" " * (50 - len("None"))) + "50 points`\n"
         # otherwise add gps
         else:
             # add gps
@@ -10159,7 +10159,7 @@ class CommandAndConquest(commands.Cog):
                 # add name
                 table += f"`#{counter}. {gp['name']}"
                 # add spaces
-                table += " " * (40-len(gp['name'])) if len(gp['name']) < 40 else 0
+                table += " " * (50-len(gp['name'])) if len(gp['name']) < 50 else 0
                 # add score
                 table += f"{gp['gp_score']} points`\n"
                 # update counter
@@ -10176,14 +10176,11 @@ class CommandAndConquest(commands.Cog):
             # add name
             table += f"`#{counter}. {nation['name']}"
             # add spaces
-            table += " " * (40 - len(nation['name'])) if len(nation['name']) < 40 else 0
+            table += " " * (50 - len(nation['name'])) if len(nation['name']) < 50 else 0
             # add score
             table += f"{nation['gp_score']} points`\n"
             # update counter
             counter += 1
-
-        # finish table
-        table += "`"
         # add to embed
         gp_embed.add_field(name="\u200b", value=table)
         gp_embed.set_footer(text="Nations must attain at least 50 Great Power Score to be considered a Great Power.")
