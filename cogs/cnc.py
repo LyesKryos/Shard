@@ -10145,7 +10145,7 @@ class CommandAndConquest(commands.Cog):
         gp_embed = discord.Embed(title="Great Powers Score",
                                  description="The table below displays the Great Power Score of all current nations.")
         # construct embed
-        table = "`"
+        table = "```"
         counter = 1
         # if gps is blank, add three buffers
         if len(gps) == 0:
@@ -10183,7 +10183,7 @@ class CommandAndConquest(commands.Cog):
             counter += 1
 
         # finish table
-        table += "`"
+        table += "```"
         # add to embed
         gp_embed.add_field(name="\u200b", value=table)
         gp_embed.set_footer(text="Nations must attain at least 50 Great Power Score to be considered a Great Power.")
