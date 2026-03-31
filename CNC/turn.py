@@ -111,6 +111,8 @@ class Turn:
         await self._user_updates()
         # run the market update
         await self._trade_market_updates()
+        # run the GP updates
+        await self._great_power_score()
         # run the timer updates
         await self._timer_updates()
         # update turn
@@ -850,6 +852,59 @@ class Turn:
                               SET govt_type_countdown = CASE WHEN govt_type_countdown > 0 THEN govt_type_countdown - 1 END,
                                   govt_subtype_countdown = CASE WHEN govt_subtype_countdown > 0 THEN govt_subtype_countdown - 1 END;''')
 
+    async def _great_power_score(self):
+        # establish connection
+        conn = self.conn
+        # set all nations to non-gp
+        await conn.execute('''UPDATE cnc_users SET gp = FALSE;''')
+        # pull each user's info
+        all_users = await conn.fetch('''SELECT * FROM cnc_users;''')
+        # for each user
+        for user in all_users:
+            # define base gp score
+            gp_score = 0
+            # get development and citizens
+            citizens = await conn.fetchval('''SELECT SUM(citizens) FROM cnc_provinces WHERE owner_id = $1 AND occupier_id = $1;''', user['user_id'])
+            development = await conn.fetchval('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1 AND occupier_id = $1;''', user['user_id']) 
+            # add citizen and development score
+            gp_score += citizens/10000
+            gp_score += development/7.5
+            # add auth gains
+            gp_score += user['econ_auth'] + user['pol_auth'] + user['mil_auth']
+            # stability score gain
+            gp_score += user['stability']/10
+            # get number of armies and generals/quality
+            army_troop_count = await conn.fetchval('''SELECT SUM(troops) FROM cnc_armies WHERE owner_id = $1;''', user['user_id'])
+            general_score = await conn.fetchval('''SELECT SUM(general_id) * AVG(level) FROM cnc_generals WHERE owner_id = $1;''', user['user_id'])
+            # add troop count and general score
+            gp_score += army_troop_count/3000
+            gp_score += general_score
+            # add techs
+            tech_count = await conn.fetchval('''SELECT cardinality(tech) FROM cnc_users WHERE user_id = $1;''', user['user_id'])
+            # add score
+            gp_score += tech_count
+            # count military alliances
+            alliances_count = await conn.fetchval('''SELECT cardinality(members) FROM cnc_alliances WHERE $1 = ANY(members);''', user['name'])
+            # count trade pacts
+            pacts_count = await conn.fetchval('''SELECT count(id) FROM cnc_trade_pacts WHERE $1 = ANY(members);''', user['name'])
+            # count diplomatic relations
+            dr_count = await conn.fetchval('''SELECT count(id) FROM cnc_drs WHERE $1 = ANY(members);''', user['name'])
+            # add scores
+            gp_score += alliances_count + pacts_count + dr_count
+            # update score for user
+            await conn.execute('''UPDATE cnc_users SET gp_score = $2 WHERE user_id = $1;''', user['user_id'], gp_score)
+        # once all users are done, check to define the top 3, if they have more than 50 GP score
+        gp_check = await conn.fetch('''SELECT * FROM cnc_users WHERE gp_score > 50 LIMIT 3 ORDER BY gp_score DESC;''')
+        # if none are above 50, set no one
+        if len(gp_check) == 0:
+            return
+        # otherwise, set the top three (or fewer)
+        else:
+            # for each gp, set the value
+            for gp in gp_check:
+                await conn.execute('''UPDATE cnc_users SET gp = TRUE WHERE user_id = $1;''', user['user_id'])
+            # wrap up
+            return
 
     # TODO events
 

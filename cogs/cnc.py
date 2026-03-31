@@ -10024,6 +10024,9 @@ class CommandAndConquest(commands.Cog):
         # send confirmation
         return await interaction.followup.send(f"{prov_info['name']} is now the Capital of {user_info['name']}.")
 
+
+    # TODO add gp view commands
+
     # === Moderator Commands ===
 
     @commands.command()
