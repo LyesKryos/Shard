@@ -896,7 +896,7 @@ class Turn:
             # update score for user
             await conn.execute('''UPDATE cnc_users SET gp_score = $2 WHERE user_id = $1;''', user['user_id'], gp_score)
         # once all users are done, check to define the top 3, if they have more than 50 GP score
-        gp_check = await conn.fetch('''SELECT * FROM cnc_users WHERE gp_score > 50 LIMIT 3 ORDER BY gp_score DESC;''')
+        gp_check = await conn.fetch('''SELECT * FROM cnc_users WHERE gp_score > 50 ORDER BY gp_score DESC LIMIT 3;''')
         # if none are above 50, set no one
         if len(gp_check) == 0:
             return
