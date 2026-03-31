@@ -877,12 +877,12 @@ class Turn:
             army_troop_count = await conn.fetchval('''SELECT SUM(troops) FROM cnc_armies WHERE owner_id = $1;''', user['user_id'])
             general_score = await conn.fetchval('''SELECT SUM(general_id) * AVG(level) FROM cnc_generals WHERE owner_id = $1;''', user['user_id'])
             # add troop count and general score
-            gp_score += army_troop_count/3000
+            gp_score += int(army_troop_count)/3000
             gp_score += float(general_score)
             # add techs
             tech_count = await conn.fetchval('''SELECT cardinality(tech) FROM cnc_users WHERE user_id = $1;''', user['user_id'])
             # add score
-            gp_score += tech_count
+            gp_score += int(tech_count)
             # count military alliances
             alliances_count = await conn.fetchval('''SELECT cardinality(members) FROM cnc_alliances WHERE $1 = ANY(members);''', user['name'])
             # count trade pacts
