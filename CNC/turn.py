@@ -868,7 +868,7 @@ class Turn:
             development = await conn.fetchval('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1 AND occupier_id = $1;''', user['user_id']) 
             # add citizen and development score
             gp_score += citizens/10000
-            gp_score += development/7.5
+            gp_score += float(development)/7.5
             # add auth gains
             gp_score += user['econ_auth'] + user['pol_auth'] + user['mil_auth']
             # stability score gain
@@ -878,7 +878,7 @@ class Turn:
             general_score = await conn.fetchval('''SELECT SUM(general_id) * AVG(level) FROM cnc_generals WHERE owner_id = $1;''', user['user_id'])
             # add troop count and general score
             gp_score += army_troop_count/3000
-            gp_score += general_score
+            gp_score += float(general_score)
             # add techs
             tech_count = await conn.fetchval('''SELECT cardinality(tech) FROM cnc_users WHERE user_id = $1;''', user['user_id'])
             # add score
