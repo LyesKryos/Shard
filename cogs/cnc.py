@@ -9808,6 +9808,10 @@ class CommandAndConquest(commands.Cog):
         # if the government type is Equalism, reduce time by one
         if user_info['govt_type'] == "Equalism":
             research_time -= 1
+        # for every University owned by this nation, reduce time by one
+        universities = await conn.fetchval('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1 AND 'University' = ANY(structures);''', 
+                                          user_info['user_id'])
+        research_time -= universities if universities is not None else 0
         # ensure the research time is at least 4
         if research_time < 4:
             research_time = 4
