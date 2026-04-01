@@ -10153,7 +10153,7 @@ class CommandAndConquest(commands.Cog):
         counter = 1
         # if gps is blank, add three buffers
         if len(gps) == 0:
-            table += f"`#1. NONE" + (" "*(50-len("None"))) + "50 points`\n"
+            table += f"`#1. NONE" + (" " * (50-len("None"))) + "50 points`\n"
             table += f"`#2. NONE" + (" " * (50 - len("None"))) + "50 points`\n"
             table += f"`#3. NONE" + (" " * (50 - len("None"))) + "50 points`\n"
         # otherwise add gps
@@ -10185,11 +10185,14 @@ class CommandAndConquest(commands.Cog):
             table += f"{nation['gp_score']} points`\n"
             # update counter
             counter += 1
+
         # add to embed
         gp_embed.add_field(name="\u200b", value=table)
         gp_embed.set_footer(text="Nations must attain at least 50 Great Power Score to be considered a Great Power.")
         # send embed
         return await interaction.response.send_message(embed=gp_embed)
+    
+    # TODO add trade good market view
 
 
     # === Moderator Commands ===
