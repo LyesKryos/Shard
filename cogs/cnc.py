@@ -1868,7 +1868,6 @@ class TaxManageView(View):
     def __init__(self, author: discord.User, interaction, conn: asyncpg.Pool,
                  govt_info: asyncpg.Record, govt_embed: discord.Embed):
         super().__init__(timeout=120)
-        self.user_info = None
         self.govt_info = govt_info
         self.conn = conn
         self.interaction = interaction
@@ -1890,9 +1889,9 @@ class TaxManageView(View):
         # establish connection
         conn = self.conn
         # pull user info
-        self.user_info = await user_db_info(self.author.id, conn)
+        user_info = await user_db_info(self.author.id, conn)
         # if the user would decrease their tax below 0, stop them
-        if self.user_info['tax_level'] - 1 < 0:
+        if user_info['tax_level'] - 1 < 0:
             await interaction.followup.send("You cannot decrease your taxation below 0%.")
             button.disabled = True
             await interaction.edit_original_response(view=self)
@@ -1900,13 +1899,13 @@ class TaxManageView(View):
         else:
             # update tax level
             await conn.execute('''UPDATE cnc_users
-                                  SET tax_level = tax_level - .01
+                                  SET tax_level = tax_level - 1
                                   WHERE user_id = $1;''',
                                self.author.id)
             # send confirmation
-            await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level'] - 1:.0%}!")
+            await interaction.followup.send(f"Your tax rate is now {user_info['tax_level'] - 1}%!")
             # update embed
-            self.govt_embed.set_field_at(-4, name="Current Tax Level", value=f"{self.user_info['tax_level'] - 1:.0%}")
+            self.govt_embed.set_field_at(-4, name="Current Tax Level", value=f"{user_info['tax_level'] - 1}%")
             # enable increase button
             self.increase.disabled = False
             # update embed
@@ -1927,24 +1926,24 @@ class TaxManageView(View):
         # establish connection
         conn = self.conn
         # pull user info
-        self.user_info = await user_db_info(self.author.id, conn)
-        # if the user would increase their tax above 20%
-        if self.user_info['tax_level'] + 1 > 20:
+        user_info = await user_db_info(self.author.id, conn)
+        # if the user would increase their tax above their limit
+        if user_info['tax_level'] + + 1 > 20 + user_info['tax_level']:
             await interaction.followup.send(f"You cannot increase your taxation above "
-                                            f"{self.govt_info['tax_level'] + self.user_info['tax_level']:.0%}.")
+                                            f"{self.govt_info['tax_level'] + user_info['tax_level']}%.")
             button.disabled = True
             await interaction.edit_original_response(view=self)
         # otherwise, carry on
         else:
             # update tax level
             await conn.execute('''UPDATE cnc_users
-                                  SET tax_level = tax_level + .01
+                                  SET tax_level = tax_level + 1
                                   WHERE user_id = $1;''',
                                self.author.id)
             # send confirmation
-            await interaction.followup.send(f"Your tax rate is now {self.user_info['tax_level'] + 1:.0%}!")
+            await interaction.followup.send(f"Your tax rate is now {user_info['tax_level'] + 1}%!")
             # update embed
-            self.govt_embed.set_field_at(-4, name="Current Tax Level", value=f"{self.user_info['tax_level'] + 1:.0%}")
+            self.govt_embed.set_field_at(-4, name="Current Tax Level", value=f"{user_info['tax_level'] + 1}%")
             # enable decrease button
             self.decrease.disabled = False
             # update embed

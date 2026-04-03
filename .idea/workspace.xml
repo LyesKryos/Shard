@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Add gp table command">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Minor formatting fixes in GP table generation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -19,7 +19,7 @@
     </colors>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="1268" />
+    <option name="cachedIndexableFilesCount" value="1270" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -576,7 +576,8 @@
       <workItem from="1774744982193" duration="5708000" />
       <workItem from="1774789205705" duration="3120000" />
       <workItem from="1774975980733" duration="1768000" />
-      <workItem from="1775061279830" duration="3556000" />
+      <workItem from="1775061279830" duration="4193000" />
+      <workItem from="1775235161986" duration="814000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -921,7 +922,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1623" />
+    <option name="localTasksCounter" value="1624" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -940,7 +941,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting army autocomplete" />
     <MESSAGE value="Correcting error in move army" />
     <MESSAGE value="Correcting string error" />
     <MESSAGE value="Correcting int-string error in army autocomplete&#10;Correcting movement cost by rounding at output as correct" />
@@ -965,7 +965,8 @@
     <MESSAGE value="Adding protection for next running to permit the loop to start" />
     <MESSAGE value="Add turn loop verifying" />
     <MESSAGE value="Add gp table command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add gp table command" />
+    <MESSAGE value="Minor formatting fixes in GP table generation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Minor formatting fixes in GP table generation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
