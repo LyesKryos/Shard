@@ -7498,6 +7498,8 @@ class CommandAndConquest(commands.Cog):
 
     # the CnC command group
     cnc = app_commands.Group(name="cnc", description="...")
+    # the CnC "view" subgroup
+    view = app_commands.Group(name="view", description"...", parent=cnc)
 
     # === User Commands and View Commands === #
 
@@ -7609,8 +7611,8 @@ class CommandAndConquest(commands.Cog):
         # create an embed
         info_embed = discord.Embed(title="Command & Conquest System",
                                    description="This is a brief description about the system and basic information.\n"
-                                               "Read more by visiting the [**Command & Conquest Manual**]"
-                                               "(https://1drv.ms/w/c/5dd599eb776372c8/IQDIcmN365nVIIBd-BwDAAAAAcd5un34oydMgcopdUCOLNU?e=cGhQDY).",
+                                               "Read more by visiting the [**Command & Conquest site**]"
+                                               "(https://lyeskryos.github.io/cnc.io/).",
                                    color=discord.Color.red())
         info_embed.set_thumbnail(url="https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png")
         info_embed.add_field(name="About",
@@ -7636,7 +7638,7 @@ class CommandAndConquest(commands.Cog):
         # send the embed
         await interaction.response.send_message(embed=info_embed)
 
-    @cnc.command(name="turn", description="Sends a relative timestamp of the time of the next turn update.")
+    @view.command(name="turn", description="Sends a relative timestamp of the time of the next turn update.")
     async def send_turn(self, interaction: discord.Interaction):
         # establish connection
         conn = self.bot.pool
@@ -7648,77 +7650,7 @@ class CommandAndConquest(commands.Cog):
         return await interaction.response.send_message(f"It is currently Turn #{current_turn}.\n"
                                                        f"Next turn will be in <t:{int(next_turn_timestamp)}:R>.")
 
-
-
-    # @cnc.command(name="change_color", description="Changes your nation's color on the map.")
-    # @app_commands.checks.cooldown(1, 30)
-    # @app_commands.describe(color="The hex code of your new map color. Include the '#'.")
-    # async def recolor(self, interaction: discord.Interaction, color: str):
-    #     # defer interaction
-    #     await interaction.response.defer(thinking=True)
-    #     # deny access if in DMs
-    #     if not interaction.guild:
-    #         return commands.NoPrivateMessage
-    #     # establish connection
-    #     conn = self.bot.pool
-    #     # pull userinfo
-    #     user_info = await user_db_info(interaction.user.id)
-    #     # check for registration
-    #     if user_info is None:
-    #         return await interaction.followup.send("You are not a registered member of the CNC system.")
-    #     # check if the color is taken, banned, or even a color
-    #     check_color_taken = await conn.fetchrow('''SELECT *
-    #                                                FROM cnc_users
-    #                                                WHERE color = $1;''', color)
-    #     if check_color_taken is not None:
-    #         return await interaction.followup.send("That color is already taken. "
-    #                                                "Please select a different color.")
-    #     # pull all colors
-    #     pull_all_colors = await conn.fetch('''SELECT name, color
-    #                                           FROM cnc_users;''')
-    #     # check each color
-    #     for c in pull_all_colors:
-    #         color_check = c['color']
-    #         if self.color_difference(color_check, color) < 50:
-    #             return await interaction.followup.send(f"Your selected color, {color}, is too similar to an "
-    #                                                    f"existing color, registered to {c['name']} ({c['color']}).")
-    #
-    #     if color in self.banned_colors:
-    #         return await interaction.followup.send("That color is a restricted color. "
-    #                                                "Please select a different color.")
-    #     for c in self.banned_colors:
-    #         if self.color_difference(c, color) < 50:
-    #             return await interaction.followup.send(f"That color is too similar to a banned color, {c}.")
-    #     # try and get the color from the hex code
-    #     try:
-    #         ImageColor.getrgb(color)
-    #     except ValueError:
-    #         # if the color isn't a real hex code, return that they need to get the right hex code
-    #         return await interaction.followup.send(
-    #             "That doesn't appear to be a valid hex color code. Include the `#` symbol.")
-    #     # if the color is valid, update the database
-    #     await conn.execute('''UPDATE cnc_users
-    #                           SET color = $1
-    #                           WHERE user_id = $2;''', color, interaction.user.id)
-    #     # get all provinces
-    #     all_provinces = await conn.fetch('''SELECT *
-    #                                         FROM cnc_provinces
-    #                                         WHERE owner_id = $1;''', interaction.user.id)
-    #     for p in all_provinces:
-    #         p_id = p['id']
-    #         if p['occupier_id'] == user_info['user_id']:
-    #             await map_color(p_id, color, conn)
-    #         elif p['occupier_id'] == 0:
-    #             await self.occupy_color(p_id, '#000000', color)
-    #         elif p['occupier_id'] != user_info['user_id']:
-    #             occupier_color = await conn.fetchrow('''SELECT color
-    #                                                     FROM cnc_users
-    #                                                     WHERE user_id = $1;''',
-    #                                                  p['occupier_id'])
-    #             await self.occupy_color(p_id, occupier_color, color)
-    #     return await interaction.followup.send(f"Color successfully changed to {color}!")
-
-    @cnc.command(name="map", description="Opens the map for viewing.")
+    @view.command(name="map", description="Opens the map for viewing.")
     async def map(self, interaction: discord.Interaction):
         # defer the interaction
         await interaction.response.defer(thinking=True)
@@ -7730,7 +7662,7 @@ class CommandAndConquest(commands.Cog):
         map_buttons = MapButtons(map, author=interaction.user)
         await map.edit(view=map_buttons)
 
-    @cnc.command(name="locate_province", description="Highlights a province on the map.")
+    @view.command(name="locate_province", description="Highlights a province on the map.")
     @app_commands.describe(province="The ID of the province to locate.")
     async def locate_province(self, interaction: discord.Interaction, province: int):
         # defer interaction
@@ -7970,9 +7902,9 @@ class CommandAndConquest(commands.Cog):
             sv_embed.add_field(name=f"{p['name']} ({p['id']})",
                                value=f"Terrain: {await terrain_name(p['terrain'], self.bot.pool)}\n"
                                      f"Citizens: {p['citizens']:,}\n"
-                                     f"Trade Good: {p['trade_good']}\n"
-                                     f"Production: {p['production']:,.3}\n"
-                                     f"Structures: {p['structures']}\n"
+                                     f"Trade Good: {p['trade_good']}\nDevelopment: {p['development']}\n"
+                                     f"Production: {p['production']:,}\n"
+                                     f"Structures: {p['structures'] if len(p['structures'])>0 else 'None'}\n"
                                      f"Fort Level: {p['fort_level']}")
             count += 1
         if count != 0:
@@ -9440,42 +9372,6 @@ class CommandAndConquest(commands.Cog):
                                                                               f"**Location**: {location}\n"
                                                                               f"**General**: {general}")
         return await interaction.followup.send(embed=armies_embed)
-
-    # @cnc.command(name="rename_army", description="Renames a given army to the selected user input.")
-    # @app_commands.describe(rename_target="The ID of the army to rename.", rename_content="The new name of the army.")
-    # @app_commands.autocomplete(rename_target=army_autocomplete)
-    # async def rename_army(self, interaction: discord.Interaction, rename_target: int, rename_content: str):
-    #     # establish the connection
-    #     conn = self.bot.pool
-    #     # search for the user
-    #     user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
-    #     # if the user is not registered
-    #     if user_info is None:
-    #         return await interaction.response.send_message(content="You are not a registered member of the CNC system. Use </cnc register:1316831583159849021> to register.")
-    #     # otherwise, carry on
-    #     else:
-    #         # pull the army info
-    #         army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', rename_target)
-    #         # check if another army has that name already
-    #         same_name_check = await conn.fetchrow('''SELECT army_name FROM cnc_armies WHERE army_name = $1;''', rename_content)
-    #         # if that army does not exist
-    #         if army_info is None:
-    #             # reject
-    #             return await interaction.response.send_message(content=f"No army with the ID `{rename_target}` found.", ephemeral=True)
-    #         # if the user is not the owner of the army
-    #         elif army_info['owner_id'] != interaction.user.id:
-    #             # reject
-    #             return await interaction.response.send_message(content=f"{user_info['name']} does not command the {army_info['army_name']} and therefore cannot rename it.")
-    #         # if another army already exists with that name
-    #         elif same_name_check is not None:
-    #             # reject
-    #             return await interaction.response.send_message(content=f"The {army_info['army_name']} cannot be renamed to `{rename_content}` because another army with that name already exists.")
-    #         # otherwise, carry on
-    #         else:
-    #             # rename the army to the user's specified content
-    #             await conn.execute('''UPDATE cnc_armies SET army_name = $1 WHERE army_id = $2;''', rename_content, rename_target)
-    #             # notify the user
-    #             return await interaction.response.send_message(content=f"The {army_info['army_name']} has be renamed to the `{rename_content}`!")
 
     # === War Commands ===
 
