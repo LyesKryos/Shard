@@ -270,8 +270,8 @@ class Turn:
                                    round(citizen_production), prov['id'])
 
                 # === NATIONAL UNREST ===
-                # define province's national unrest contribution based on citizens
-                prov_nat_unrest = (prov['citizens'] + citizen_growth)//randint(9781, 12381)
+                # define province's national unrest contribution based on the number of citizens
+                prov_nat_unrest = ((prov['citizens'] + citizen_growth)/1500)**1.22
                 # for every level of taxation above 8%, exponentially increase
                 if user['tax_level']/100 > .08:
                     # if the user is Unitary
@@ -909,13 +909,3 @@ class Turn:
             return
 
     # TODO events
-
-
-
-
-
-
-
-
-
-
