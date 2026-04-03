@@ -271,7 +271,7 @@ class Turn:
 
                 # === NATIONAL UNREST ===
                 # define province's national unrest contribution based on the number of citizens
-                prov_nat_unrest = max(((prov['citizens'] + citizen_growth)/1500)**1.22, 0)
+                prov_nat_unrest = max(((prov['citizens'] + citizen_growth)/1500),0)**1.22
                 # for every level of taxation above 8%, exponentially increase
                 if user['tax_level']/100 > .08:
                     # if the user is Unitary
