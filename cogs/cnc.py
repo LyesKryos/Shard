@@ -7708,6 +7708,7 @@ class CommandAndConquest(commands.Cog):
             if count >= 5:
                 market_embed.add_field(name="\u200b", value=market_text, inline=False)
                 market_text = ""
+                count = 0
         # send embed
         return await interaction.response.send_message(embed=market_embed)
 
