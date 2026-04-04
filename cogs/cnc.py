@@ -7697,7 +7697,7 @@ class CommandAndConquest(commands.Cog):
         # for each good, add to the list
         for good in trade_goods:
             # calculate spaces
-            spaces = 20-len(good['name'])-len(good['market_value'])
+            spaces = 20-len(good['name'])-len(str(good['market_value']))
             # add name
             market_text += f"``{good['name']}"
             # add spaces
