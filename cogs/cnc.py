@@ -7501,7 +7501,7 @@ class CommandAndConquest(commands.Cog):
     # the CnC "view" subgroup
     view = app_commands.Group(name="view", description="...", parent=cnc)
 
-    # === User Commands and View Commands === #
+    # === REGISTER AND VIEW COMMANDS === #
 
     @cnc.command(name="register", description="Registers a new player nation.")
     @app_commands.describe(nation_name="The name of your new nation.",
@@ -7546,7 +7546,7 @@ class CommandAndConquest(commands.Cog):
                                                        "Please register with a different color.")
             for c in self.banned_colors:
                 if self.color_difference(c, color) < 25:
-                    return await interaction.followup.send(f"That color is too similar to a banned color, {c}.")
+                    return await interaction.followup.send(f"That color is too similar to a restricted color, {c}.")
             # try and get the color from the hex code
             try:
                 ImageColor.getrgb(color)
@@ -7679,6 +7679,33 @@ class CommandAndConquest(commands.Cog):
         cords = prov_info['cord']
         url = await self.locate_color(province, cords)
         return await interaction.followup.send(url)
+
+    @view.command(name="trade_market", description="Lists all trade goods and their current market value.")
+    async def trade_goods_market_list(self, interaction: discord.Interaction):
+        # establish the connection
+        conn = self.bot.pool
+        # pull all trade goods
+        trade_goods = await conn.fetch('''SELECT * FROM cnc_trade_goods ORDER BY market_value DESC;''')
+        # create the text block
+        market_text = ""
+        # for each good, add to the list
+        for good in trade_goods:
+            # add name
+            market_text += good['name']
+            # add spaces
+            market_text += " "*(40-len(good['name']))
+            # add value
+            market_text += f"{good['market_value']}\n"
+        #  build the embed
+        market_embed = discord.Embed(title="Current Market Values",
+                                     description="The current market values of each trade good.",
+                                     color=discord.Color.red())
+        market_embed.add_field(name="\u200b", value=market_text)
+        # send embed
+        return await interaction.response.send_message(embed=market_embed)
+
+
+    # === NATION AND PROVINCE COMMANDS ===
 
     async def nation_autocomplete(self, interaction: discord.Interaction, current_nation: str) -> List[app_commands.Choice[str]]:
         """This function searches for current player nations and then returns them as a list for autocomplete."""
@@ -8030,7 +8057,7 @@ class CommandAndConquest(commands.Cog):
         else:
             return await interaction.followup.send(embed=await create_prov_embed(prov_info, conn))
 
-    # === Army Commands ===
+    # === ARMY COMMANDS ===
 
     async def army_autocomplete(self, interaction: discord.Interaction, army_typing: str) -> List[app_commands.Choice]:
         """This function searches for all existing armies and then returns them as a list for autocomplete."""
@@ -8088,7 +8115,6 @@ class CommandAndConquest(commands.Cog):
                                                 value=gneral['general_id']) for gneral in armies if (general_typing.lower() in gneral['name'].lower()) or (general_typing in str(gneral['general_id']))]
         # return the choices
         return army_choices[0:24]
-
 
     @cnc.command(name="create_army", description="Creates a new army.")
     @app_commands.autocomplete(posting=owned_province_autocomplete)
@@ -9336,7 +9362,6 @@ class CommandAndConquest(commands.Cog):
             # otherwise, just send the embed
             return await interaction.response.send_message(embed=gen_embed)
 
-
     @cnc.command(name="army_report", description="Displays information about all of a nation's armies.")
     async def army_report(self, interaction: discord.Interaction):
         # defer interaction
@@ -9373,7 +9398,7 @@ class CommandAndConquest(commands.Cog):
                                                                               f"**General**: {general}")
         return await interaction.followup.send(embed=armies_embed)
 
-    # === War Commands ===
+    # === WAR COMMANDS ===
 
     @cnc.command(name="view_wars", description="Displays information about all ongoing wars.")
     @app_commands.describe(view_all="Optional: select True for viewing all ongoing wars.")
@@ -9468,7 +9493,7 @@ class CommandAndConquest(commands.Cog):
             all_wars_pages = WarsPaginator(interaction, user_wars, all_wars_embed)
             return await interaction.followup.send(embed=all_wars_embed, view=all_wars_pages)
 
-    async def war_autocomplete(self, interaction: discord.Interaction, war_typed: str) -> List[discord.Choice(str)]:
+    async def war_autocomplete(self, interaction: discord.Interaction, war_typed: str) -> List[app_commands.Choice[str]]:
         """This function searches for current player nations and then returns them as a list for autocomplete."""
 
         # establish connection
@@ -9574,7 +9599,7 @@ class CommandAndConquest(commands.Cog):
         else:
             return await interaction.followup.send(embed=war_embed)
 
-    # === Tech Commands === #
+    # === TECH COMMANDS === #
 
     async def tech_autocomplete(self, interaction: discord.Interaction, tech_typed: str) -> List[app_commands.Choice[str]]:
         """This function searches for technology names and then returns them as a list for autocomplete."""
@@ -9582,7 +9607,6 @@ class CommandAndConquest(commands.Cog):
         conn = self.bot.pool
         techs = await conn.fetchval('''SELECT ARRAY_AGG(name) FROM cnc_tech ORDER BY random();''')
         return [app_commands.Choice(name=tech, value=tech) for tech in techs if tech_typed.lower() in tech.lower()][0:24]
-
 
     @cnc.command(name="tech", description="Displays information about a specified technology.")
     @app_commands.autocomplete(tech=tech_autocomplete)
@@ -9749,7 +9773,7 @@ class CommandAndConquest(commands.Cog):
             return await interaction.followup.send(f"Scientists are currently researching the {researching['tech']} "
                                                    f"tech. Research will be complete in {researching['turns']} turns.", view=cancel_research)
 
-    # === Government Commands ===
+    # === GOVERNMENT COMMANDS ===
 
     @cnc.command(name="government", description="Opens the Government menu.")
     async def manage_government(self, interaction: discord.Interaction):
@@ -10087,10 +10111,7 @@ class CommandAndConquest(commands.Cog):
         # send embed
         return await interaction.response.send_message(embed=gp_embed)
     
-    # TODO add trade good market view
-
-
-    # === Moderator Commands ===
+    # === MODERATOR COMMANDS ===
 
     @commands.command()
     @commands.has_role(928889638888812586)
