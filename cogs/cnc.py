@@ -7697,11 +7697,11 @@ class CommandAndConquest(commands.Cog):
         # for each good, add to the list
         for good in trade_goods:
             # add name
-            market_text += good['name']
+            market_text += f"``{good['name']}"
             # add spaces
             market_text += " "*(40-len(good['name']))
             # add value
-            market_text += f"{good['market_value']}\n"
+            market_text += f"{good['market_value']}``\n"
             # add count
             count += 1
             # if the count is above five, add to the embed and then clear text
