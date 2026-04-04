@@ -3841,7 +3841,7 @@ class PuppetManagement(discord.ui.View):
                                                                       f"{self.recipient_info['name']}?",
                                             view=accept_view)
             # wait for a response
-            release_response = await accept_view.wait()
+            await accept_view.wait()
             # if they accept, release the puppet
             if accept_view.value:
                 # delete the message
