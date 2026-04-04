@@ -312,7 +312,8 @@ class Turn:
 
             # === MANPOWER ===
             # peace treaty enforced manpower reduction
-            treaty_enforced_manpower_reduction = sum([pt['manpower_reduction'] for pt in peace_treaties])
+            treaty_enforced_manpower_reduction = sum([pt['manpower_reduction'] if pt['manpower_reduction'] else 0
+                                                      for pt in peace_treaties])
             # enforce manpower cap
             manpower_cap = (round((user['manpower_access']/100) * manpower_count) *
                             (1-treaty_enforced_manpower_reduction) if treaty_enforced_manpower_reduction else 1)
