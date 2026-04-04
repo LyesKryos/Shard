@@ -787,14 +787,14 @@ class Turn:
                                           last_pol_auth_gain    = last_pol_auth_gain - $3, 
                                           pol_auth_gain         = pol_auth_gain - $3
                                       WHERE user_id = $4;''',
-                                   min(floor(user['last_econ_auth_gain']/4), 1),
-                                   min(floor(user['last_mil_auth_gain']/4), 1),
-                                   min(floor(user['last_pol_auth_gain']/4), 1),
+                                   max(floor(user['last_econ_auth_gain']/4), 1),
+                                   max(floor(user['last_mil_auth_gain']/4), 1),
+                                   max(floor(user['last_pol_auth_gain']/4), 1),
                                    user['user_id'])
                 logging.getLogger(__name__).info(f"{user['name']} | puppet status loss: "
-                                                 f"{min(floor(user['last_econ_auth_gain']/4), 1),
-                                                   min(floor(user['last_mil_auth_gain']/4), 1),
-                                                   min(floor(user['last_pol_auth_gain']/4), 1)}")
+                                                 f"{max(floor(user['last_econ_auth_gain']/4), 1),
+                                                   max(floor(user['last_mil_auth_gain']/4), 1),
+                                                   max(floor(user['last_pol_auth_gain']/4), 1)}")
                 # update the overlord's gains
                 await conn.execute('''UPDATE cnc_users
                                       SET econ_auth             = econ_auth + $1,
@@ -807,13 +807,14 @@ class Turn:
                                           last_pol_auth_gain    = last_pol_auth_gain + $3,
                                           pol_auth_gain         = pol_auth_gain + $3
                                       WHERE user_id = $4;''',
-                                   min(floor(user['last_econ_auth_gain'] / 4), 1),
-                                   min(floor(user['last_mil_auth_gain'] / 4), 1),
-                                   min(floor(user['last_pol_auth_gain'] / 4), 1),
+                                   max(floor(user['last_econ_auth_gain'] / 4), 1),
+                                   max(floor(user['last_mil_auth_gain'] / 4), 1),
+                                   max(floor(user['last_pol_auth_gain'] / 4), 1),
                                    user['overlord'])
-                logging.getLogger(__name__).info(f"{user['name']} | puppet status gain: {min(floor(user['last_econ_auth_gain']/4), 1),
-                                                   min(floor(user['last_mil_auth_gain']/4), 1),
-                                                   min(floor(user['last_pol_auth_gain']/4), 1)}")
+                logging.getLogger(__name__).info(f"{user['overlord']} | overlord status gain: "
+                                                 f"{max(floor(user['last_econ_auth_gain']/4), 1),
+                                                   max(floor(user['last_mil_auth_gain']/4), 1),
+                                                   max(floor(user['last_pol_auth_gain']/4), 1)}")
 
         # set stability, authority, and unrest max/mins
         await conn.execute('''UPDATE cnc_users
