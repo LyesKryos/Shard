@@ -7499,7 +7499,7 @@ class CommandAndConquest(commands.Cog):
     # the CnC command group
     cnc = app_commands.Group(name="cnc", description="...")
     # the CnC "view" subgroup
-    view = app_commands.Group(name="view", description"...", parent=cnc)
+    view = app_commands.Group(name="view", description="...", parent=cnc)
 
     # === User Commands and View Commands === #
 
