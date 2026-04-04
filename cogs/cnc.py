@@ -7706,7 +7706,7 @@ class CommandAndConquest(commands.Cog):
             count += 1
             # if the count is above five, add to the embed and then clear text
             if count >= 10:
-                market_embed.add_field(name="\u200b", value=market_text, inline=False)
+                market_embed.add_field(name="\u200b", value=market_text)
                 market_text = ""
                 count = 0
         # send embed

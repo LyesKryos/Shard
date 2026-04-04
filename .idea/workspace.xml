@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting view group creation">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding market value display command" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -585,7 +582,7 @@
       <workItem from="1774975980733" duration="1768000" />
       <workItem from="1775061279830" duration="4193000" />
       <workItem from="1775235161986" duration="2817000" />
-      <workItem from="1775304820862" duration="734000" />
+      <workItem from="1775304820862" duration="1058000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -930,7 +927,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1627" />
+    <option name="localTasksCounter" value="1632" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -949,7 +946,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting conditional logic for tax level and spending limits" />
     <MESSAGE value="Spacing issues" />
     <MESSAGE value="Adding rebel army handling for movement commands" />
     <MESSAGE value="Adding custom module reloading" />
@@ -974,7 +970,8 @@
     <MESSAGE value="Refactor tax level logic to remove redundant `self.user_info` attribute usage" />
     <MESSAGE value="Adjust national unrest calculation to factor in citizen growth dynamics" />
     <MESSAGE value="Correcting view group creation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting view group creation" />
+    <MESSAGE value="Adding market value display command" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding market value display command" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
