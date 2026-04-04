@@ -587,49 +587,65 @@ class Turn:
                 # calculate economic authority
                 econ_auth_gain = 0
                 # pull base economic amount from govt type
-                econ_auth_gain += await conn.fetchval('''SELECT econ_auth FROM cnc_govts 
-                                                                WHERE govt_subtype = $1;''',
-                                                             user['govt_subtype'])
+                govt_gain = await conn.fetchval('''SELECT econ_auth
+                                       FROM cnc_govts
+                                       WHERE govt_subtype = $1;''',
+                                    user['govt_subtype'])
+                econ_auth_gain += govt_gain
+                logging.getLogger(__name__).info(f"econ auth\n{user['name']} | government type gain: {econ_auth_gain}")
                 # add the trade value
                 econ_auth_gain += trade_value
-                logging.getLogger(__name__).info(f"{user['name']} trade value: {trade_value} = "
+                logging.getLogger(__name__).info(f"{user['name']} | trade value: {trade_value} = "
                                                  f"{trade_good_production} * {trade_good_production_access}")
                 # calculate tax income
-                econ_auth_gain += average_dev * ((user['tax_level'] + tax_effect_boost)/100)
+                tax_income = average_dev * ((user['tax_level'] + tax_effect_boost)/100)
+                econ_auth_gain += tax_income
+                logging.getLogger(__name__).info(f"{user['name']} | tax income: {tax_income}")
                 # pull all mines
                 mines = await conn.fetchval('''SELECT COUNT(id) FROM cnc_provinces 
                                                WHERE 'Mine' = ANY(structures) 
                                                  AND (owner_id = $1 AND occupier_id = $1);''',
                                             user['user_id'])
                 # for every mine, add 0.5
-                econ_auth_gain += 0.5 * mines
+                mine_gain = 0.5 * mines
+                econ_auth_gain += mine_gain
+                logging.getLogger(__name__).info(f"{user['name']} | mine gain: {mine_gain}")
                 # check for techs
                 if "Currency" in user['tech']:
                     econ_auth_gain += 1
+                    logging.getLogger(__name__).info(f"{user['name']} | currency gain: {1}")
                 if "Economics" in user['tech']:
                     econ_auth_gain += 1
+                    logging.getLogger(__name__).info(f"{user['name']} | economics gain: {1}")
                 if "Banking and Investment" in user['tech']:
                     econ_auth_gain += 1
+                    logging.getLogger(__name__).info(f"{user['name']} | banking gain: {1}")
                 if "Guilds" in user['tech']:
                     econ_auth_gain += 1
+                    logging.getLogger(__name__).info(f"{user['name']} | guilds gain: {1}")
 
                 # calculate reductions
                 # reduce from public spending
                 econ_auth_gain -= user['public_spend']
+                logging.getLogger(__name__).info(f"{user['name']} | public spend reduction: {user['public_spend']}")
                 # reduce from reparations
                 for peace in peace_treaties:
                     # if there is one with econ reparations, reduce
                     if peace['reparations']:
-                        econ_auth_gain -= peace['reparations'][0] if peace['reparations'][0] > 0 else 0
-                    # there there is one with dismantle, reduce
+                        reparations = peace['reparations'][0] if peace['reparations'][0] > 0 else 0
+                        econ_auth_gain -= reparations
+                        logging.getLogger(__name__).info(f"{user['name']} | reparations reduction: {reparations}")
+                    # if there is one with dismantle, reduce
                     if peace['dismantle']:
                         econ_auth_gain -= 3
+                        logging.getLogger(__name__).info(f"{user['name']} | dismantle reduction: 3")
 
                 # update econ auth
                 await conn.execute('''UPDATE cnc_users 
                                       SET econ_auth = $2, last_econ_auth_gain = $2, econ_auth_gain = $3 
                                       WHERE user_id = $1;''', user['user_id'], floor(econ_auth_gain),
                                    floor(econ_auth_gain)-user['last_econ_auth_gain'])
+                logging.getLogger(__name__).info(f"{user['name']} | econ auth gain: {floor(econ_auth_gain)}")
             # otherwise, set at 0
             else:
                 await conn.execute('''UPDATE cnc_users 
@@ -641,81 +657,115 @@ class Turn:
                 # calculate military authority gain
                 mil_auth_gain = 0
                 # add mil auth based on govt subtype
-                mil_auth_gain += await conn.fetchval('''SELECT mil_auth FROM cnc_govts 
-                                                        WHERE govt_subtype = $1;''', user['govt_subtype'])
+                govt_gain = await conn.fetchval('''SELECT mil_auth
+                                       FROM cnc_govts
+                                       WHERE govt_subtype = $1;''', user['govt_subtype'])
+                mil_auth_gain += govt_gain
+                logging.getLogger(__name__).info(f"mil auth\n{user['name']} | government type gain: {mil_auth_gain}")
                 # for each military alliance, add 1 + x^1.25
-                mil_auth_gain += (military_alliances**1.25) + military_alliances
+                mil_alliance_gain = (military_alliances**1.25) + military_alliances
+                mil_auth_gain += mil_alliance_gain
+                logging.getLogger(__name__).info(f"{user['name']} | military alliance gain: {mil_alliance_gain}")
                 # based on the average development, add dev/5
+                dev_gain = average_dev/5
                 mil_auth_gain += average_dev/5
-
+                logging.getLogger(__name__).info(f"{user['name']} | dev gain: {dev_gain}")
                 # calculate reductions
                 # reduce from military upkeep
                 mil_auth_gain -= user['mil_upkeep']
+                logging.getLogger(__name__).info(f"{user['name']} | mil upkeep reduction: {user['mil_upkeep']}")
                 # reduce from wars if primary attacker
                 for war in wars:
                     if war['primary_attacker'] == user['name']:
                         mil_auth_gain -= 2
+                        logging.getLogger(__name__).info(f"{user['name']} | war reduction: 2")
                 # reduce from reparations
                 for peace in peace_treaties:
                     # if there is one with mil reparations, reduce
                     if peace['reparations']:
-                        mil_auth_gain -= peace['reparations'][1] if peace['reparations'][1] > 0 else 0
+                        reparations = peace['reparations'][1] if peace['reparations'][1] > 0 else 0
+                        mil_auth_gain -= reparations
+                        logging.getLogger(__name__).info(f"{user['name']} | reparations reduction: {reparations}")
                     # there there is one with dismantle, reduce
                     if peace['dismantle']:
                         mil_auth_gain -= 3
+                        logging.getLogger(__name__).info(f"{user['name']} | dismantle reduction: 3")
 
                 # update mil auth
                 await conn.execute('''UPDATE cnc_users 
                                       SET mil_auth = $2, last_mil_auth_gain = $2, mil_auth_gain = $3
                                       WHERE user_id = $1;''', user['user_id'], floor(mil_auth_gain),
                                    floor(mil_auth_gain)-user['last_mil_auth_gain'])
+                logging.getLogger(__name__).info(f"{user['name']} | mil auth gain: {floor(mil_auth_gain)}")
             # otherwise, set at 0
             else:
                 await conn.execute('''UPDATE cnc_users SET mil_auth = 0, last_mil_auth_gain = 0, mil_auth_gain = $2
                                       WHERE user_id = $1;''', user['user_id'], 0-user['last_mil_auth_gain'])
+                logging.getLogger(__name__).info(f"{user['name']} | mil auth gain: 0")
 
             # === POLITICAL AUTHORITY ====
             pol_auth_gain = 0
             # add pol auth based on govt subtype
-            pol_auth_gain += await conn.fetchval('''SELECT pol_auth FROM cnc_govts WHERE govt_subtype = $1;''',
+            govt_gain = await conn.fetchval('''SELECT pol_auth FROM cnc_govts WHERE govt_subtype = $1;''',
                                                 user['govt_subtype'])
+            pol_auth_gain += govt_gain
+            logging.getLogger(__name__).info(f"pol auth\n{user['name']} | government type gain: {pol_auth_gain}")
             # for each diplomatic relation, add x^1.35 + x/2
-            pol_auth_gain += (diplomatic_relations**1.15) + (diplomatic_relations/2)
+            relations_gain =(diplomatic_relations**1.15) + (diplomatic_relations/2)
+            pol_auth_gain += relations_gain
+            logging.getLogger(__name__).info(f"{user['name']} | diplomatic relations gain: {relations_gain}")
             # based on the average development, add dev/5
-            pol_auth_gain += average_dev/5
+            dev_gain = average_dev/5
+            pol_auth_gain += dev_gain
+            logging.getLogger(__name__).info(f"{user['name']} | dev gain: {dev_gain}")
             # add pol auth based on techs
             if "Basic Government" in user['tech']:
                 pol_auth_gain += 1
+                logging.getLogger(__name__).info(f"{user['name']} | basic gov gain: {1}")
 
             # calculate reductions
             # reduce pol auth based on national unrest
-            pol_auth_gain -= total_national_unrest/15
+            nat_unrest_reduction = total_national_unrest/15
+            pol_auth_gain -= nat_unrest_reduction
+            logging.getLogger(__name__).info(f"{user['name']} | national unrest reduction: {nat_unrest_reduction}")
             # reduce pol auth based on the number of OTHER members in the military alliance
-            pol_auth_gain -= military_alliances - 1
+            military_alliance_reduction = military_alliances - 1
+            pol_auth_gain -= military_alliance_reduction
+            logging.getLogger(__name__).info(f"{user['name']} | military alliance reduction: {military_alliance_reduction}")
             # reduce pol auth based on issued relations
             pol_auth_gain -= trade_pact_count
-            pol_auth_gain -= await conn.fetchval('''SELECT count(id) FROM cnc_embargoes WHERE sender = $1;''',
+            logging.getLogger(__name__).info(f"{user['name']} | trade pact reduction: {trade_pact_count}")
+            embargo_reduction = await conn.fetchval('''SELECT count(id) FROM cnc_embargoes WHERE sender = $1;''',
                                                  user['name'])
+            pol_auth_gain -= embargo_reduction
+            logging.getLogger(__name__).info(f"{user['name']} | embargo reduction: {embargo_reduction}")
             # if there is a capital, reduce by 1
             if user['capital']:
                 pol_auth_gain -= 1
+                logging.getLogger(__name__).info(f"{user['name']} | capital reduction: 1")
             # reduce pol auth based on reparations
             for peace in peace_treaties:
                 # if there is one with pol reparations, reduce
                 if peace['reparations']:
-                    pol_auth_gain -= peace['reparations'][2] if peace['reparations'][2] > 0 else 0
+                    reparations = peace['reparations'][2] if peace['reparations'][2] > 0 else 0
+                    pol_auth_gain -= logging.getLogger(__name__).info(f"{user['name']} | reparations reduction: {reparations}")
                 # if there is one with dismantle, reduce
                 if peace['dismantle']:
                     pol_auth_gain -= 3
+                    logging.getLogger(__name__).info(f"{user['name']} | dismantle reduction: 3")
 
             # add pol auth gain
             await conn.execute('''UPDATE cnc_users SET pol_auth = $2, last_pol_auth_gain = $2, pol_auth_gain = $3 
                                   WHERE user_id = $1;''', user['user_id'], floor(pol_auth_gain),
                                floor(pol_auth_gain)-user['last_pol_auth_gain'])
+            logging.getLogger(__name__).info(f"{user['name']} | pol auth gain: {floor(pol_auth_gain)}")
 
-            # === ARMY MOVEMENT RESET ===
+            # === ARMY/FORT RESET ===
             await conn.execute('''UPDATE cnc_armies SET movement = $2 WHERE owner_id = $1;''',
                                user['user_id'], user['movement_cap'])
+            await conn.execute('''UPDATE cnc_provinces SET fort_level = $2 WHERE owner_id = $1 AND occupier_id = $1;''',
+                               user['user_id'], user['fort_level'])
+
 
             # add user dm notifications to the list
             self.user_dm_notifications[user['user_id']] = dm_notification
