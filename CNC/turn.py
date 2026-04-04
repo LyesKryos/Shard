@@ -730,7 +730,7 @@ class Turn:
             pol_auth_gain -= nat_unrest_reduction
             logging.getLogger(__name__).info(f"{user['name']} | national unrest reduction: {nat_unrest_reduction}")
             # reduce pol auth based on the number of OTHER members in the military alliance
-            military_alliance_reduction = military_alliances - 1
+            military_alliance_reduction = military_alliances - 1 if military_alliances != 0 else 0
             pol_auth_gain -= military_alliance_reduction
             logging.getLogger(__name__).info(f"{user['name']} | military alliance reduction: {military_alliance_reduction}")
             # reduce pol auth based on issued relations
