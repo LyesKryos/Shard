@@ -624,12 +624,15 @@ class Turn:
                         econ_auth_gain -= 3
 
                 # update econ auth
-                await conn.execute('''UPDATE cnc_users SET econ_auth = $2, last_econ_auth_gain = $2
-                                      WHERE user_id = $1;''', user['user_id'], floor(econ_auth_gain))
+                await conn.execute('''UPDATE cnc_users 
+                                      SET econ_auth = $2, last_econ_auth_gain = $2, econ_auth_gain = $3 
+                                      WHERE user_id = $1;''', user['user_id'], floor(econ_auth_gain),
+                                   floor(econ_auth_gain)-user['last_econ_auth_gain'])
             # otherwise, set at 0
             else:
-                await conn.execute('''UPDATE cnc_users SET econ_auth = 0, last_econ_auth_gain = 0
-                                      WHERE user_id = $1;''', user['user_id'])
+                await conn.execute('''UPDATE cnc_users 
+                                      SET econ_auth = 0, last_econ_auth_gain = 0, econ_auth_gain = $2 
+                                      WHERE user_id = $1;''', user['user_id'], 0-user['last_econ_auth_gain'])
 
             # === MILITARY AUTHORITY ===
             if user['govt_subtype'] != "Pacifistic":
@@ -660,12 +663,14 @@ class Turn:
                         mil_auth_gain -= 3
 
                 # update mil auth
-                await conn.execute('''UPDATE cnc_users SET mil_auth = $2, last_mil_auth_gain = $2
-                                      WHERE user_id = $1;''', user['user_id'], floor(mil_auth_gain))
+                await conn.execute('''UPDATE cnc_users 
+                                      SET mil_auth = $2, last_mil_auth_gain = $2, mil_auth_gain = $3
+                                      WHERE user_id = $1;''', user['user_id'], floor(mil_auth_gain),
+                                   floor(mil_auth_gain)-user['last_mil_auth_gain'])
             # otherwise, set at 0
             else:
-                await conn.execute('''UPDATE cnc_users SET mil_auth = 0, last_mil_auth_gain = 0
-                                      WHERE user_id = $1;''', user['user_id'])
+                await conn.execute('''UPDATE cnc_users SET mil_auth = 0, last_mil_auth_gain = 0, mil_auth_gain = $2
+                                      WHERE user_id = $1;''', user['user_id'], 0-user['last_mil_auth_gain'])
 
             # === POLITICAL AUTHORITY ====
             pol_auth_gain = 0
@@ -702,8 +707,9 @@ class Turn:
                     pol_auth_gain -= 3
 
             # add pol auth gain
-            await conn.execute('''UPDATE cnc_users SET pol_auth = $2, last_pol_auth_gain = $2 
-                                  WHERE user_id = $1;''', user['user_id'], floor(pol_auth_gain))
+            await conn.execute('''UPDATE cnc_users SET pol_auth = $2, last_pol_auth_gain = $2, pol_auth_gain = $3 
+                                  WHERE user_id = $1;''', user['user_id'], floor(pol_auth_gain),
+                               floor(pol_auth_gain)-user['last_pol_auth_gain'])
 
             # === ARMY MOVEMENT RESET ===
             await conn.execute('''UPDATE cnc_armies SET movement = $2 WHERE owner_id = $1;''',

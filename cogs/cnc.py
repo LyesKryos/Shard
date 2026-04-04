@@ -1597,11 +1597,11 @@ class DossierView(View):
         self.doss_embed.add_field(name="=====================AUTHORITY=====================",
                                   value="Information known about your nation's authority.", inline=False)
         self.doss_embed.add_field(name="Political Authority (Change Last Turn)",
-                                  value=f"{self.user_info['pol_auth']} ({plus_minus(self.user_info['last_pol_auth_gain'])})")
+                                  value=f"{self.user_info['pol_auth']} ({plus_minus(self.user_info['pol_auth_gain'])})")
         self.doss_embed.add_field(name="Military Authority (Change Last Turn)",
-                                  value=f"{self.user_info['mil_auth']} ({plus_minus(self.user_info['last_mil_auth_gain'])})")
+                                  value=f"{self.user_info['mil_auth']} ({plus_minus(self.user_info['mil_auth_gain'])})")
         self.doss_embed.add_field(name="Economic Authority (Change Last Turn)",
-                                  value=f"{self.user_info['econ_auth']} ({plus_minus(self.user_info['last_econ_auth_gain'])})")
+                                  value=f"{self.user_info['econ_auth']} ({plus_minus(self.user_info['econ_auth_gain'])})")
         await interaction.edit_original_response(embed=self.doss_embed)
 
     @discord.ui.button(label="Military", style=discord.ButtonStyle.blurple)
