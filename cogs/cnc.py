@@ -7688,6 +7688,12 @@ class CommandAndConquest(commands.Cog):
         trade_goods = await conn.fetch('''SELECT * FROM cnc_trade_goods ORDER BY market_value DESC;''')
         # create the text block
         market_text = ""
+        # count
+        count = 0
+        #  build the embed
+        market_embed = discord.Embed(title="Current Market Values",
+                                     description="The current market values of each trade good.",
+                                     color=discord.Color.red())
         # for each good, add to the list
         for good in trade_goods:
             # add name
@@ -7696,11 +7702,12 @@ class CommandAndConquest(commands.Cog):
             market_text += " "*(40-len(good['name']))
             # add value
             market_text += f"{good['market_value']}\n"
-        #  build the embed
-        market_embed = discord.Embed(title="Current Market Values",
-                                     description="The current market values of each trade good.",
-                                     color=discord.Color.red())
-        market_embed.add_field(name="\u200b", value=market_text)
+            # add count
+            count += 1
+            # if the count is above five, add to the embed and then clear text
+            if count >= 5:
+                market_embed.add_field(name="\u200b", value=market_text, inline=False)
+                market_text = ""
         # send embed
         return await interaction.response.send_message(embed=market_embed)
 
