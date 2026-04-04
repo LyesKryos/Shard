@@ -615,14 +615,12 @@ class Accept(View):
     @discord.ui.button(label='Accept', style=discord.ButtonStyle.success)
     async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.value = True
-        await interaction.response.send_message(content="Processing...", ephemeral=True, delete_after=0.5)
         self.stop()
 
     # This one is similar to the confirmation button except sets the inner value to `False`
     @discord.ui.button(label='Decline', style=discord.ButtonStyle.danger)
     async def decline(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.value = False
-        await interaction.response.send_message(content="Processing...", ephemeral=True, delete_after=0.5)
         self.stop()
 
 
@@ -3845,7 +3843,7 @@ class PuppetManagement(discord.ui.View):
             # wait for a response
             release_response = await accept_view.wait()
             # if they accept, release the puppet
-            if release_response:
+            if release_response.value:
                 # delete the message
                 await confirm_message.delete()
                 # update the overlord status of the recipient
@@ -3869,6 +3867,8 @@ class PuppetManagement(discord.ui.View):
                 return await self.interaction.edit_original_response(view=diplo_menu)
             # if they do not
             else:
+                # delete the message
+                await confirm_message.delete()
                 # return to menu
                 diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
                 # stop listening
