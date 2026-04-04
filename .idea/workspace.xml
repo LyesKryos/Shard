@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting puppet release issue" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting puppet release" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -582,7 +582,7 @@
       <workItem from="1774975980733" duration="1768000" />
       <workItem from="1775061279830" duration="4193000" />
       <workItem from="1775235161986" duration="2817000" />
-      <workItem from="1775304820862" duration="5446000" />
+      <workItem from="1775304820862" duration="5795000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -927,7 +927,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1643" />
+    <option name="localTasksCounter" value="1645" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -946,8 +946,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding turn updating for initial testing" />
-    <MESSAGE value="Adding general information command for vewing information about army generals" />
     <MESSAGE value="Adding dismiss functionality for generals, including database updates and button integration" />
     <MESSAGE value="Adding turn looping to cnc.py via task" />
     <MESSAGE value="Adding turn query command" />
@@ -971,7 +969,9 @@
     <MESSAGE value="Adding auth logging amounts to turn calc" />
     <MESSAGE value="Correcting pol auth to use correct unrest calc" />
     <MESSAGE value="Correcting puppet release issue" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting puppet release issue" />
+    <MESSAGE value="Responding to accept/deny" />
+    <MESSAGE value="Correcting puppet release" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcting puppet release" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

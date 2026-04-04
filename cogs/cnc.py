@@ -3843,7 +3843,7 @@ class PuppetManagement(discord.ui.View):
             # wait for a response
             release_response = await accept_view.wait()
             # if they accept, release the puppet
-            if release_response.value:
+            if accept_view.value:
                 # delete the message
                 await confirm_message.delete()
                 # update the overlord status of the recipient
