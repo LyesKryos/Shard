@@ -312,10 +312,10 @@ class Turn:
 
             # === MANPOWER ===
             # peace treaty enforced manpower reduction
-            treaty_enforced_manpower_reduction = 1 - sum([pt['manpower_reduction'] if pt else 0 for pt in peace_treaties])
+            treaty_enforced_manpower_reduction = sum([pt['manpower_reduction'] for pt in peace_treaties])
             # enforce manpower cap
             manpower_cap = (round((user['manpower_access']/100) * manpower_count) *
-                            treaty_enforced_manpower_reduction if treaty_enforced_manpower_reduction != 0 else 1)
+                            treaty_enforced_manpower_reduction if treaty_enforced_manpower_reduction else 1)
             # update manpower set on manpower regen rate
             await conn.execute('''UPDATE cnc_users SET manpower = manpower + $2 WHERE user_id = $1;''',
                                user['user_id'], round(manpower_cap * (user['manpower_regen'] / 100)))
