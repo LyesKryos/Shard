@@ -615,12 +615,14 @@ class Accept(View):
     @discord.ui.button(label='Accept', style=discord.ButtonStyle.success)
     async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.value = True
+        await interaction.response.send_message(content="Processing...", ephemeral=True, delete_after=0.5)
         self.stop()
 
     # This one is similar to the confirmation button except sets the inner value to `False`
     @discord.ui.button(label='Decline', style=discord.ButtonStyle.danger)
     async def decline(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.value = False
+        await interaction.response.send_message(content="Processing...", ephemeral=True, delete_after=0.5)
         self.stop()
 
 
