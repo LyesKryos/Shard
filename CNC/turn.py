@@ -904,7 +904,7 @@ class Turn:
         else:
             # for each gp, set the value
             for gp in gp_check:
-                await conn.execute('''UPDATE cnc_users SET gp = TRUE WHERE user_id = $1;''', user['user_id'])
+                await conn.execute('''UPDATE cnc_users SET gp = TRUE WHERE user_id = $1;''', gp['user_id'])
             # wrap up
             return
 

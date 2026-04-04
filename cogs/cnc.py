@@ -7696,10 +7696,12 @@ class CommandAndConquest(commands.Cog):
                                      color=discord.Color.red())
         # for each good, add to the list
         for good in trade_goods:
+            # calculate spaces
+            spaces = 20-len(good['name'])-len(good['market_value'])
             # add name
             market_text += f"``{good['name']}"
             # add spaces
-            market_text += " "*(18-len(good['name']))
+            market_text += " "*spaces
             # add value
             market_text += f"{good['market_value']}``\n"
             # add count
