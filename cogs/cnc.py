@@ -7689,8 +7689,8 @@ class CommandAndConquest(commands.Cog):
         url = await self.locate_color(province, cords)
         return await interaction.followup.send(url)
 
-    @view.command(name="trade_market", description="Lists all trade goods and their current market value.")
-    async def trade_goods_market_list(self, interaction: discord.Interaction):
+    @view.command(name="market_values", description="Lists all trade goods and their current market value.")
+    async def trade_goods_market_values(self, interaction: discord.Interaction):
         # establish the connection
         conn = self.bot.pool
         # pull all trade goods
@@ -7723,6 +7723,43 @@ class CommandAndConquest(commands.Cog):
         # send embed
         return await interaction.response.send_message(embed=market_embed)
 
+    @view.command(name="good_production", description="Lists all trade goods and their total production last turn.")
+    async def trade_goods_market_production(self, interaction: discord.Interaction):
+        # establish conn
+        conn = self.bot.pool
+        # pull all trade goods
+        trade_goods = await conn.fetch('''SELECT * FROM cnc_trade_goods;''')
+        # create the text block
+        market_text = ""
+        # count
+        count = 0
+        #  build the embed
+        market_embed = discord.Embed(title="Current Good Production",
+                                     description="The current global production of each trade good.",
+                                     color=discord.Color.red())
+
+        # for each trade good, get total production
+        for good in trade_goods:
+            # get the sum of the trade good production
+            all_good_production = await conn.fetchval('''SELECT sum(production) FROM cnc_provinces 
+                                                         WHERE trade_good = $1;''', good['name'])
+            # calculate spaces
+            spaces = 20-len(good['name'])-len(f"{all_good_production:,}")
+            # add name
+            market_text += f"``{good['name']}"
+            # add spaces
+            market_text += " " * spaces
+            # add value
+            market_text += f"{all_good_production:,}``\n"
+            # add count
+            count += 1
+            # if the count is above five, add to the embed and then clear text
+            if count >= 10:
+                market_embed.add_field(name="\u200b", value=market_text)
+                market_text = ""
+                count = 0
+        # send embed
+        return await interaction.response.send_message(embed=market_embed)
 
     # === NATION AND PROVINCE COMMANDS ===
 
