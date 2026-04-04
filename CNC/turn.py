@@ -724,8 +724,8 @@ class Turn:
                 logging.getLogger(__name__).info(f"{user['name']} | basic gov gain: {1}")
 
             # calculate reductions
-            # reduce pol auth based on national unrest
-            nat_unrest_reduction = total_national_unrest/15
+            # reduce pol auth based on average national unrest
+            nat_unrest_reduction = average_national_unrest/15
             pol_auth_gain -= nat_unrest_reduction
             logging.getLogger(__name__).info(f"{user['name']} | national unrest reduction: {nat_unrest_reduction}")
             # reduce pol auth based on the number of OTHER members in the military alliance

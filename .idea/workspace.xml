@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding the tidy system to remove blank relations and correct databases">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CNC/turn.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/turn.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding auth logging amounts to turn calc" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -585,7 +582,7 @@
       <workItem from="1774975980733" duration="1768000" />
       <workItem from="1775061279830" duration="4193000" />
       <workItem from="1775235161986" duration="2817000" />
-      <workItem from="1775304820862" duration="3297000" />
+      <workItem from="1775304820862" duration="4471000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -930,7 +927,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1640" />
+    <option name="localTasksCounter" value="1641" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -949,7 +946,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding custom module reloading" />
     <MESSAGE value="Adding trade good setting command" />
     <MESSAGE value="Correcting plus minus display" />
     <MESSAGE value="Adding turn updating for initial testing" />
@@ -974,7 +970,8 @@
     <MESSAGE value="Adding market value display command" />
     <MESSAGE value="Update authority gain tracking for more detailed calculations" />
     <MESSAGE value="Adding the tidy system to remove blank relations and correct databases" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding the tidy system to remove blank relations and correct databases" />
+    <MESSAGE value="Adding auth logging amounts to turn calc" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding auth logging amounts to turn calc" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
