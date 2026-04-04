@@ -7699,7 +7699,7 @@ class CommandAndConquest(commands.Cog):
             # add name
             market_text += f"``{good['name']}"
             # add spaces
-            market_text += " "*(25-len(good['name']))
+            market_text += " "*(15-len(good['name']))
             # add value
             market_text += f"{good['market_value']}``\n"
             # add count
