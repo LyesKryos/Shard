@@ -3837,22 +3837,29 @@ class PuppetManagement(discord.ui.View):
             # create a response view
             accept_view = Accept(interaction)
             # send a response to see if they actually want to release their puppet
-            await interaction.followup.send(content=f"Are you sure you wish to release {self.recipient_info['name']}?", view=accept_view)
+            confirm_message = await interaction.followup.send(content=f"Are you sure you wish to release "
+                                                                      f"{self.recipient_info['name']}?",
+                                            view=accept_view)
             # wait for a response
             release_response = await accept_view.wait()
             # if they accept, release the puppet
             if release_response:
+                # delete the message
+                await confirm_message.delete()
                 # update the overlord status of the recipient
-                await conn.execute('''UPDATE cnc_users SET overlord = NULL WHERE user_id = $1;''', self.recipient_info['user_id'])
+                await conn.execute('''UPDATE cnc_users SET overlord = NULL WHERE user_id = $1;''',
+                                   self.recipient_info['user_id'])
                 # create a truce
                 await conn.execute('''INSERT INTO cnc_peace_treaties(members, truce_length, end_embargo, end_ma, end_tp, reparations_length, humiliate, dismantle) 
                 VALUES($1, 12, 0, 0, 0, 0, 0, 0);''', [sender_info['name'], self.recipient_info['name']])
                 # notify recipient
-                await safe_dm(bot=interaction.user.id,
+                await safe_dm(bot=interaction.client,
                 user_id=self.recipient_info['user_id'],
-                content=f"{self.recipient_info['name']} has been released from their subjugation obligations by {sender_info['name']}!")
+                content=f"{self.recipient_info['name']} has been released from their subjugation obligations by "
+                        f"{sender_info['name']}!")
                 # notify sender
-                await interaction.followup.send(f"{self.recipient_info['name']} has been released from their subjugation obligations by {sender_info['name']}!")
+                await interaction.followup.send(f"{self.recipient_info['name']} has been released from their "
+                                                f"subjugation obligations by {sender_info['name']}!")
                 # return to menu
                 diplo_menu = DiplomaticMenuView(self.interaction, self.conn, self.recipient_info)
                 # stop listening
