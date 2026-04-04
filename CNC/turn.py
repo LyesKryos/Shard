@@ -115,6 +115,8 @@ class Turn:
         await self._great_power_score()
         # run the timer updates
         await self._timer_updates()
+        # run the tidy system
+        await self._tidy_system()
         # update turn
         self.turn = await self.conn.fetchval('''SELECT number FROM cnc_data WHERE name = 'Turn';''')
         # return the dm notifications
@@ -913,5 +915,14 @@ class Turn:
                 await conn.execute('''UPDATE cnc_users SET gp = TRUE WHERE user_id = $1;''', gp['user_id'])
             # wrap up
             return
+
+    async def _tidy_system(self):
+        # establish connection
+        conn = self.conn
+        # update all relations to remove blank relations
+        await conn.execute('''DELETE FROM cnc_alliances WHERE cardinality(members) < 2;''')
+        await conn.execute('''DELETE FROM cnc_trade_pacts WHERE cardinality(members) < 2;''')
+        await conn.execute('''DELETE FROM cnc_drs WHERE cardinality(members) < 2;''')
+        await conn.execute('''DELETE FROM cnc_military_access WHERE cardinality(members) < 2;''')
 
     # TODO events
