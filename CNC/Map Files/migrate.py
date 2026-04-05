@@ -47,7 +47,6 @@ PROVINCE_TY = 1432.499
 # Tolerances (SVG units)
 NEIGHBOR_TOLERANCE = 4.0
 RIVER_BUFFER       = 4.0
-OCEAN_BUFFER       = 4.0
 
 
 # ---------------------------------------------------------------------------
@@ -209,13 +208,40 @@ def river_group_to_geometry(group: etree._Element):
     return unary_union(geoms) if geoms else None
 
 
-def ocean_to_geometry(ocean_layer: etree._Element):
-    geoms = []
-    for p in ocean_layer.findall(f"{{{SVG_NS}}}path"):
-        poly = svg_d_to_polygon(p.get("d", ""), 0, 0)
-        if poly:
-            geoms.append(poly)
-    return unary_union(geoms).buffer(OCEAN_BUFFER) if geoms else None
+def detect_coastal(polygons: dict, bordering: dict) -> set[str]:
+    """
+    A province is coastal if it has boundary not shared with any neighbor —
+    i.e. it sits on the outer edge of the landmass facing open water.
+
+    Works purely from province geometry with no reference to the ocean layer.
+    Note: will produce false positives around lakes (holes in the landmass)
+    which should be corrected manually in the DB after migration.
+    """
+    print("  Building landmass union (this may take a moment)...")
+    all_land  = unary_union(list(polygons.values()))
+    coastline = all_land.boundary
+
+    coastal = set()
+    for pid, poly in polygons.items():
+        # Quick pre-check: does this province touch the outer coastline at all?
+        if not poly.boundary.intersects(coastline):
+            continue
+
+        # Confirm the exposed boundary isn't just touching a neighbor's edge —
+        # subtract all neighbor boundaries and check what's left
+        neighbors = bordering.get(pid, [])
+        if neighbors:
+            neighbor_union = unary_union(
+                [polygons[n] for n in neighbors if n in polygons]
+            )
+            exposed = poly.boundary.difference(neighbor_union.boundary)
+        else:
+            exposed = poly.boundary
+
+        if not exposed.is_empty and exposed.length > 2.0:
+            coastal.add(pid)
+
+    return coastal
 
 
 # ---------------------------------------------------------------------------
@@ -228,15 +254,12 @@ async def migrate(svg_path: str, dsn: str, dry_run: bool = False):
 
     province_layer = get_layer(root, "Provinces")
     river_layer    = get_layer(root, "Rivers")
-    ocean_layer    = get_layer(root, "Ocean")
 
     if province_layer is None:
         print("ERROR: 'Provinces' layer not found.", file=sys.stderr)
         sys.exit(1)
     if river_layer is None:
         print("WARNING: 'Rivers' layer not found — river=False for all.")
-    if ocean_layer is None:
-        print("WARNING: 'Ocean' layer not found — coast=False for all.")
 
     # ------------------------------------------------------------------
     # Parse provinces
@@ -302,25 +325,14 @@ async def migrate(svg_path: str, dsn: str, dry_run: bool = False):
     print(f"  Neighbor pairs: {checked}")
 
     # ------------------------------------------------------------------
-    # Coastal detection
+    # Coastal detection — boundary-based, no ocean layer needed
     # ------------------------------------------------------------------
-    coast: dict[str, bool] = {pid: False for pid in polygons}
-    if ocean_layer is not None:
-        print("Detecting coastal provinces...")
-        ocean_geom = ocean_to_geometry(ocean_layer)
-        if ocean_geom:
-            ocean_tree = STRtree(polys)
-            candidates = ocean_tree.query(ocean_geom)
-            for j in candidates:
-                pid = ids[j]
-                try:
-                    if polys[j].intersects(ocean_geom):
-                        coast[pid] = True
-                except Exception:
-                    continue
-            print(f"  Coastal: {sum(coast.values())}")
-        else:
-            print("  WARNING: Could not build ocean geometry.")
+    print("Detecting coastal provinces...")
+    coastal_ids = detect_coastal(polygons, bordering)
+    coast: dict[str, bool] = {pid: (pid in coastal_ids) for pid in polygons}
+    print(f"  Coastal: {sum(coast.values())}")
+    print(f"  NOTE: Provinces bordering lakes may be false positives.")
+    print(f"        Correct these manually in the DB after migration.")
 
     # ------------------------------------------------------------------
     # River detection
