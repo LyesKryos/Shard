@@ -208,38 +208,38 @@ def river_group_to_geometry(group: etree._Element):
     return unary_union(geoms) if geoms else None
 
 
-def detect_coastal(polygons: dict, bordering: dict) -> set[str]:
+def detect_coastal(polygons: dict) -> set[str]:
     """
-    A province is coastal if it has boundary not shared with any neighbor —
-    i.e. it sits on the outer edge of the landmass facing open water.
+    A province is coastal if its boundary touches the exterior outline of the
+    landmass — i.e. it faces open water rather than other provinces.
 
-    Works purely from province geometry with no reference to the ocean layer.
-    Note: will produce false positives around lakes (holes in the landmass)
-    which should be corrected manually in the DB after migration.
+    Uses the exterior rings of the landmass union only, ignoring internal
+    province borders. This correctly identifies coastal provinces without
+    needing the ocean layer at all.
+
+    Note: will produce false positives around lake holes in the landmass.
+    Correct these manually in the DB after migration.
     """
+    from shapely.geometry import MultiLineString
+
     print("  Building landmass union (this may take a moment)...")
-    all_land  = unary_union(list(polygons.values()))
-    coastline = all_land.boundary
+    all_land = unary_union(list(polygons.values()))
+
+    # Extract only the exterior outlines — not internal province borders
+    if all_land.geom_type == "Polygon":
+        exterior = all_land.exterior
+    elif all_land.geom_type == "MultiPolygon":
+        exterior = MultiLineString([g.exterior for g in all_land.geoms])
+    else:
+        exterior = all_land.boundary  # fallback
 
     coastal = set()
     for pid, poly in polygons.items():
-        # Quick pre-check: does this province touch the outer coastline at all?
-        if not poly.boundary.intersects(coastline):
+        try:
+            if poly.boundary.intersects(exterior):
+                coastal.add(pid)
+        except Exception:
             continue
-
-        # Confirm the exposed boundary isn't just touching a neighbor's edge —
-        # subtract all neighbor boundaries and check what's left
-        neighbors = bordering.get(pid, [])
-        if neighbors:
-            neighbor_union = unary_union(
-                [polygons[n] for n in neighbors if n in polygons]
-            )
-            exposed = poly.boundary.difference(neighbor_union.boundary)
-        else:
-            exposed = poly.boundary
-
-        if not exposed.is_empty and exposed.length > 2.0:
-            coastal.add(pid)
 
     return coastal
 
@@ -328,11 +328,11 @@ async def migrate(svg_path: str, dsn: str, dry_run: bool = False):
     # Coastal detection — boundary-based, no ocean layer needed
     # ------------------------------------------------------------------
     print("Detecting coastal provinces...")
-    coastal_ids = detect_coastal(polygons, bordering)
+    coastal_ids = detect_coastal(polygons)
     coast: dict[str, bool] = {pid: (pid in coastal_ids) for pid in polygons}
     print(f"  Coastal: {sum(coast.values())}")
-    print(f"  NOTE: Provinces bordering lakes may be false positives.")
-    print(f"        Correct these manually in the DB after migration.")
+    print(f"  NOTE: Provinces bordering lakes may be false positives —")
+    print(f"        correct these manually with: UPDATE cnc_provinces SET coast = false WHERE id IN (...)")
 
     # ------------------------------------------------------------------
     # River detection
