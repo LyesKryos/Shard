@@ -7728,7 +7728,7 @@ class CommandAndConquest(commands.Cog):
         # establish conn
         conn = self.bot.pool
         # pull all trade goods
-        trade_goods = await conn.fetch('''SELECT * FROM cnc_trade_goods;''')
+        trade_goods = await conn.fetch('''SELECT * FROM cnc_trade_goods ORDER BY market_value DESC;''')
         # create the text block
         market_text = ""
         # count
