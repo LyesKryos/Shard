@@ -571,9 +571,10 @@ class MapButtons(View):
             else:
                 style += f";fill:{color}"
 
-            # No stroke needed — base map handles borders
-            style = re.sub(r"stroke:[^;]+", "stroke:none", style)
-            style = re.sub(r"fill-opacity:[^;]+", "fill-opacity:0.6", style)
+            # Disable ALL stroke properties individually
+            style = re.sub(r"stroke:#[^;]+", "stroke:none", style)
+            style = re.sub(r"stroke-opacity:[^;]+", "stroke-opacity:0", style)
+            style = re.sub(r"stroke-width:[^;]+", "stroke-width:0", style)
 
             elem.set("style", style)
 
