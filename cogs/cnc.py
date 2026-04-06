@@ -7477,7 +7477,7 @@ class CommandAndConquest(commands.Cog):
                                         WHERE owner_id = $1;''', user_id)
         return provinces
 
-    async def province_db_info(self, province_id: int = None, province_name: str = None):
+    async def province_db_info(self, province_id: str = None, province_name: str = None):
         """Pulls info from the database about a particular province using province ID."""
         # establish connection
         conn = self.bot.pool
@@ -7491,6 +7491,8 @@ class CommandAndConquest(commands.Cog):
                                               FROM cnc_provinces
                                               WHERE name = $1;''', province_name)
         else:
+            raise TypeError
+        if province is None:
             raise TypeError
         return province
 
@@ -7509,6 +7511,98 @@ class CommandAndConquest(commands.Cog):
     cnc = app_commands.Group(name="cnc", description="...")
     # the CnC "view" subgroup
     view = app_commands.Group(name="view", description="...", parent=cnc)
+
+    # === AUTOCOMPLETES ===
+    async def province_autocomplete(self, interaction: discord.Interaction, province_typed: str) -> List[
+        app_commands.Choice]:
+        """This function searches for provinces and then returns them as a list for autocomplete."""
+
+        # establish connection
+        conn = self.bot.pool
+        # pull all province names and ids
+        provinces = await conn.fetch('''SELECT id, name
+                                        FROM cnc_provinces
+                                        ORDER BY id DESC;''')
+
+        def match_priority(province):
+            """This function attempts to create a priority list of the most accurately matching ID/name for the province"""
+
+            # define the terms
+            province_id = str(province['id'])
+            province_name = province['name'].lower()
+            typed = province_typed.lower()
+            # if they are an exact match, give them priority 0
+            if province_id == typed or province_name == typed:
+                return 0
+            # if they start with, give them priority 1
+            elif province_id.startswith(typed) or province_name.startswith(typed):
+                return 1
+            # otherwise, give them lowest priorty
+            else:
+                return 2
+
+        # then match the provinces
+        matched_provinces = [
+            app_commands.Choice(name=f"{province['name']} (ID: {province['id']})", value=str(province['id'])) for
+            province in provinces if
+            (province_typed.lower() in province['name'].lower()) or (province_typed in str(province['id']))]
+
+        # prioritize
+        matched_provinces.sort(
+            key=lambda m: (match_priority(next(p for p in provinces if str(p['id']) == m.value)), m.value))
+
+        # sort and return
+        return matched_provinces[0:24]
+
+    async def owned_province_autocomplete(self, interaction: discord.Interaction, province_typed: str) -> List[
+        app_commands.Choice]:
+        """This function searches for owned provinces and then returns them as a list for autocomplete."""
+
+        # establish connection
+        conn = self.bot.pool
+        # pull all province names and ids
+        provinces = await conn.fetch('''SELECT id, name
+                                        FROM cnc_provinces
+                                        WHERE owner_id = $1
+                                          AND occupier_id = $1
+                                        ORDER BY id DESC;''', interaction.user.id)
+
+        def match_priority(province):
+            """This function attempts to create a priority list of the most accurately matching ID/name for the province"""
+
+            # define the terms
+            province_id = str(province['id'])
+            province_name = province['name'].lower()
+            typed = province_typed.lower()
+            # if they are an exact match, give them priority 0
+            if province_id == typed or province_name == typed:
+                return 0
+            # if they start with, give them priority 1
+            elif province_id.startswith(typed) or province_name.startswith(typed):
+                return 1
+            # otherwise, give them lowest priorty
+            else:
+                return 2
+
+        # then match the provinces
+        matched_provinces = [
+            app_commands.Choice(name=f"{province['name']} (ID: {province['id']})", value=str(province['id'])) for
+            province in provinces if
+            (province_typed.lower() in province['name'].lower()) or (province_typed in str(province['id']))]
+
+        # prioritize
+        matched_provinces.sort(
+            key=lambda m: (match_priority(next(p for p in provinces if str(p['id']) == m.value)), int(m.value)))
+
+        # sort and return
+        return matched_provinces[0:24]
+
+    async def nation_autocomplete(self, interaction: discord.Interaction, current_nation: str) -> List[app_commands.Choice[str]]:
+        """This function searches for current player nations and then returns them as a list for autocomplete."""
+
+        conn = self.bot.pool
+        current_nations = await conn.fetchval('''SELECT ARRAY_AGG(name) FROM cnc_users;''')
+        return [app_commands.Choice(name=n, value=n) for n in current_nations if current_nation.lower() in n.lower()][0:24]
 
     # === REGISTER AND VIEW COMMANDS === #
 
@@ -7574,11 +7668,20 @@ class CommandAndConquest(commands.Cog):
             starting_province = await conn.fetchrow('''SELECT *
                                                        FROM cnc_provinces
                                                        WHERE owner_id = 0
-                                                         and id NOT IN
-                                                             (130, 441, 442, 621, 622, 623, 65, 486, 215, 923, 926, 924,
-                                                              925, 771, 772, 770, 769, 768, 909, 761, 762, 763, 764,
-                                                              765, 766, 767, 1207,
-                                                              1208, 1209, 1210, 1211, 1212, 1213, 1214, 744)
+                                                         AND id NOT IN
+                                                             ('193b','195b','272a','271a','270a','268a','269a','267a',
+                                                              '134a','135a','136a','137a','138a','206b','205b','211b',
+                                                              '207b','208b','209b','210b','100c','101c','102c','103c',
+                                                              '104c','105c','109c','106c','107c','108c','110c','111c',
+                                                              '112c','113c','114c','115c','194b','436b','453b','454b',
+                                                              '455b','12f','456b','457b','42f','43f','176c','65f','66f',
+                                                              '177c','178c','179c','67f','68f','180c','181c','191c',
+                                                              '192c','193c','194c','79f','80f','81f','78f','187c',
+                                                              '188c','189c','190c','205c','95f','94f','96f','97f','98f',
+                                                              '99f','1g','2g','470d','471d','208d','207d','209d','210d',
+                                                              '211d','212d','213d','214d','215d','216d','217d','218d',
+                                                              '219d','220d','221d','222d','487d','488d','472d','474d',
+                                                              '480d','481d','267e','268e','269e')
                                                        ORDER BY random();''')
             # update the provinces database to set the player as the new owner and occupier
             await conn.execute('''UPDATE cnc_provinces
@@ -7673,7 +7776,8 @@ class CommandAndConquest(commands.Cog):
 
     @view.command(name="locate_province", description="Highlights a province on the map.")
     @app_commands.describe(province="The ID of the province to locate.")
-    async def locate_province(self, interaction: discord.Interaction, province: int):
+    @app_commands.autocomplete(province=province_autocomplete)
+    async def locate_province(self, interaction: discord.Interaction, province: str):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # deny access if in DMs
@@ -7762,13 +7866,6 @@ class CommandAndConquest(commands.Cog):
         return await interaction.response.send_message(embed=market_embed)
 
     # === NATION AND PROVINCE COMMANDS ===
-
-    async def nation_autocomplete(self, interaction: discord.Interaction, current_nation: str) -> List[app_commands.Choice[str]]:
-        """This function searches for current player nations and then returns them as a list for autocomplete."""
-
-        conn = self.bot.pool
-        current_nations = await conn.fetchval('''SELECT ARRAY_AGG(name) FROM cnc_users;''')
-        return [app_commands.Choice(name=n, value=n) for n in current_nations if current_nation.lower() in n.lower()][0:24] 
 
     @cnc.command(name="nation", description="Displays nation information for specified nation or player.")
     @app_commands.autocomplete(nation=nation_autocomplete)
@@ -7995,74 +8092,6 @@ class CommandAndConquest(commands.Cog):
         else:
             return
 
-    async def province_autocomplete(self, interaction: discord.Interaction, province_typed: str) -> List[app_commands.Choice]:
-        """This function searches for current player nations and then returns them as a list for autocomplete."""
-
-        # establish connection
-        conn = self.bot.pool
-        # pull all province names and ids
-        provinces = await conn.fetch('''SELECT id, name FROM cnc_provinces ORDER BY id DESC;''')
-
-        def match_priority(province):
-            """This function attempts to create a priority list of the most accurately matching ID/name for the province"""
-            
-            # define the terms
-            province_id = str(province['id'])
-            province_name = province['name'].lower()
-            typed = province_typed.lower()
-            # if they are an exact match, give them priority 0
-            if province_id == typed or province_name == typed:
-                return 0
-            # if they start with, give them priority 1
-            elif province_id.startswith(typed) or province_name.startswith(typed):
-                return 1
-            # otherwise, give them lowest priorty
-            else:
-                return 2
-
-        # then match the provinces
-        matched_provinces = [app_commands.Choice(name=f"{province['name']} (ID: {province['id']})", value=str(province['id'])) for province in provinces if (province_typed.lower() in province['name'].lower()) or (province_typed in str(province['id']))]
-
-        # prioritize
-        matched_provinces.sort(key=lambda m: (match_priority(next(p for p in provinces if str(p['id']) == m.value)), int(m.value)))
-
-        # sort and return
-        return matched_provinces[0:24]
-
-    async def owned_province_autocomplete(self, interaction: discord.Interaction, province_typed: str) -> List[app_commands.Choice]:
-        """This function searches for owned provinces and then returns them as a list for autocomplete."""
-
-        # establish connection
-        conn = self.bot.pool
-        # pull all province names and ids
-        provinces = await conn.fetch('''SELECT id, name FROM cnc_provinces WHERE owner_id = $1 AND occupier_id = $1 ORDER BY id DESC;''', interaction.user.id)
-
-        def match_priority(province):
-            """This function attempts to create a priority list of the most accurately matching ID/name for the province"""
-            
-            # define the terms
-            province_id = str(province['id'])
-            province_name = province['name'].lower()
-            typed = province_typed.lower()
-            # if they are an exact match, give them priority 0
-            if province_id == typed or province_name == typed:
-                return 0
-            # if they start with, give them priority 1
-            elif province_id.startswith(typed) or province_name.startswith(typed):
-                return 1
-            # otherwise, give them lowest priorty
-            else:
-                return 2
-
-        # then match the provinces
-        matched_provinces = [app_commands.Choice(name=f"{province['name']} (ID: {province['id']})", value=str(province['id'])) for province in provinces if (province_typed.lower() in province['name'].lower()) or (province_typed in str(province['id']))]
-
-        # prioritize
-        matched_provinces.sort(key=lambda m: (match_priority(next(p for p in provinces if str(p['id']) == m.value)), int(m.value)))
-
-        # sort and return
-        return matched_provinces[0:24]
-
     @cnc.command(name="province", description="Displays basic information about a province.")
     @app_commands.autocomplete(province=province_autocomplete)
     @app_commands.describe(province="The ID or name of the province.")
@@ -8073,10 +8102,8 @@ class CommandAndConquest(commands.Cog):
         conn = self.bot.pool
         # check province id or name
         try:
-            province_id = int(province)
             prov_info = await self.province_db_info(province_id=province_id)
         except ValueError:
-            province_name = str(province)
             prov_info = await self.province_db_info(province_name=province_name)
         # if the province doesn't exist
         if prov_info is None:
@@ -10385,11 +10412,11 @@ class CommandAndConquest(commands.Cog):
                                         f"from the Command and Conquest System?")
 
         # wait for a confirmation message
-        def confirmation_check(reaction, user):
-            return user == ctx.message.author and str(reaction.emoji)
+        def confirmation_check(reaction, mod):
+            return mod == ctx.message.author and str(reaction.emoji)
 
         try:
-            reaction, user = await self.bot.wait_for('reaction_add', timeout=30, check=confirmation_check)
+            reaction, mod = await self.bot.wait_for(event='reaction_add', timeout=30, check=confirmation_check)
             if str(reaction.emoji) != "\U00002705":
                 return await ctx.send("Must confirm deletion with: \U00002705")
         except asyncio.TimeoutError:
