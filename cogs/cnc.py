@@ -71,14 +71,12 @@ async def safe_dm(bot: discord.Client, user_id: int, *, content: str | None = No
                 f"<@{user_id}>, I was unable to send an important Command & Conquest notification to you! Be sure you permit DMs from me.")
         return False
 
-
 def plus_minus(number: int) -> str:
     """Adds a plus and minus to a number, turning it into a string."""
     if number >= 0:
         return str(f"+{number}")
     else:
         return str(f"{number}")
-
 
 def ordinal_suffix(number: int) -> str:
     """
@@ -90,7 +88,6 @@ def ordinal_suffix(number: int) -> str:
     else:
         suffix = {1: "st", 2: "nd", 3: "rd"}.get(number % 10, "th")
     return f"{number}{suffix}"
-
 
 def rand_name() -> str:
     """Pulls a random name from the available locales, returning a more diverse spread."""
@@ -212,7 +209,6 @@ async def user_db_info(user_id: int | str, conn: asyncpg.Pool) -> asyncpg.Record
                                            WHERE lower(name) = $1;''', user_id.lower())
     return user_info
 
-
 async def terrain_name(terrain_id: int, conn: asyncpg.Pool) -> str:
     # make terrain db call
     terrain_name = await conn.fetchval('''SELECT name
@@ -220,7 +216,6 @@ async def terrain_name(terrain_id: int, conn: asyncpg.Pool) -> str:
                                           WHERE id = $1;''', terrain_id)
     # return name string
     return str(terrain_name)
-
 
 async def map_color(province: int, hexcode: str, conn: asyncpg.Pool):
     map_directory = r"/root/Shard/CNC/Map Files/Maps/"
@@ -7689,8 +7684,6 @@ class CommandAndConquest(commands.Cog):
                                       occupier_id = $1
                                   WHERE id = $2;''',
                                user.id, starting_province['id'])
-            # color the map using the province coordinates and the ID
-            await map_color(starting_province['id'], color, conn)
             # create an army of 3,000 troops in the starting province
             await conn.execute('''INSERT INTO cnc_armies(owner_id, troops, location, army_name)
                                   VALUES ($1, $2, $3, $4);''', user.id, 3000, starting_province['id'],
@@ -8102,9 +8095,9 @@ class CommandAndConquest(commands.Cog):
         conn = self.bot.pool
         # check province id or name
         try:
-            prov_info = await self.province_db_info(province_id=province_id)
+            prov_info = await self.province_db_info(province_id=province)
         except ValueError:
-            prov_info = await self.province_db_info(province_name=province_name)
+            prov_info = await self.province_db_info(province_name=province)
         # if the province doesn't exist
         if prov_info is None:
             return await interaction.followup.send("That province does not appear to exist.")
