@@ -10524,7 +10524,7 @@ class CommandAndConquest(commands.Cog):
         # update each province's citizenry based on development
         await conn.execute('''UPDATE cnc_provinces SET citizens = (development/2)*(random()*(1678-901+1)+901)::int;''')
         # return
-        return ctx.send("Provinces populated!")
+        return await ctx.send("Provinces populated!")
 
     @commands.command()
     @commands.is_owner()
