@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating with new province id handling" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding province naming command to name new provinces">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -586,7 +589,7 @@
       <workItem from="1775061279830" duration="4193000" />
       <workItem from="1775235161986" duration="2817000" />
       <workItem from="1775304820862" duration="13009000" />
-      <workItem from="1775497303399" duration="2137000" />
+      <workItem from="1775497303399" duration="3031000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -931,7 +934,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1662" />
+    <option name="localTasksCounter" value="1663" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -950,7 +953,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding protection for next running to permit the loop to start" />
     <MESSAGE value="Add turn loop verifying" />
     <MESSAGE value="Add gp table command" />
     <MESSAGE value="Minor formatting fixes in GP table generation" />
@@ -975,7 +977,8 @@
     <MESSAGE value="Updating permanent delete and some province id handling" />
     <MESSAGE value="Updating permanent delete" />
     <MESSAGE value="Updating with new province id handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating with new province id handling" />
+    <MESSAGE value="Adding province naming command to name new provinces" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding province naming command to name new provinces" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

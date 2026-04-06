@@ -144,6 +144,7 @@ async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> di
         owner = owner['name']
     else:
         owner = "Natives"
+
     if prov_info['occupier_id'] != 0:
         occupier = await user_db_info(prov_info['occupier_id'], conn)
         occupier = occupier['name']
@@ -151,10 +152,13 @@ async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> di
         occupier = "Rebels"
     else:
         occupier = "Natives"
+
+    # river data
     if prov_info['river'] is True:
         river = ", River"
     else:
         river = ""
+
     # troops and armies
     troop_count = await conn.fetchval('''SELECT SUM(troops)
                                          FROM cnc_armies
@@ -10511,6 +10515,16 @@ class CommandAndConquest(commands.Cog):
                                   WHERE id = $2;''', total_dev, p['id'])
             total_p += 1
         return await ctx.send(f"{total_p} provinces have been set.")
+
+    @commands.command()
+    @commands.is_owner()
+    async def cnc_populate_world(self, ctx):
+        # establish connection
+        conn = self.bot.pool
+        # update each province's citizenry based on development
+        await conn.execute('''UPDATE cnc_provinces SET citizenry = (development/2)*(random()*(1678-901+1)+901)::int;''')
+        # return
+        return ctx.send("Provinces populated!")
 
     @commands.command()
     @commands.is_owner()
