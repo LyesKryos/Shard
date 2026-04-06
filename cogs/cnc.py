@@ -10444,7 +10444,7 @@ class CommandAndConquest(commands.Cog):
                                       occupier_id = 0,
                                       development = floor((random() * 9) + 1),
                                       citizens    = floor((random() * 10000) + 1000),
-                                      structures  = text[],
+                                      structures  = '{}',
                                       fort_level  = 0
                                   WHERE owner_id = $1
                                     AND occupier_id = $1;''', user.id)
