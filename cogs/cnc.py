@@ -568,7 +568,7 @@ class MapButtons(View):
             if should_skip(pid):
                 continue
             style = elem.get("style", "")
-            color = province_colors.get(pid, UNOWNED_COLOR)
+            color = province_colors.get(pid, "#808080")
             if "fill:" in style:
                 style = re.sub(r"fill:[^;]+", f"fill:{color}", style)
             else:
