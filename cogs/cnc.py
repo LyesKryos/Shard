@@ -1,7 +1,6 @@
 from __future__ import annotations
 import datetime
 import io
-import time
 from random import randrange, randint, choice, uniform
 from typing import List
 from zoneinfo import ZoneInfo
@@ -13,7 +12,7 @@ from ShardBot import Shard
 import discord
 from discord.ext import commands
 import asyncio
-from PIL import Image, ImageColor, ImageDraw
+from PIL import Image, ImageColor
 from base64 import b64encode
 import requests
 from discord.ui import View
@@ -220,41 +219,6 @@ async def terrain_name(terrain_id: int, conn: asyncpg.Pool) -> str:
                                           WHERE id = $1;''', terrain_id)
     # return name string
     return str(terrain_name)
-
-async def map_color(province: int, hexcode: str, conn: asyncpg.Pool):
-    map_directory = r"/root/Shard/CNC/Map Files/Maps/"
-    province_directory = r"/root/Shard/CNC/Map Files/Province Layers/"
-    # pull province information
-    province_info = await conn.fetchrow('''SELECT *
-                                           FROM cnc_provinces
-                                           WHERE id = $1;''', province)
-    province_cord = province_info['cord']
-    # obtain the coordinate information
-    province_cord = ((int(province_cord[0])), (int(province_cord[1])))
-    # get color
-    try:
-        color = ImageColor.getrgb(hexcode)
-    except ValueError:
-        return ValueError("Hex code issue")
-    # open the map and the province images
-    map = Image.open(fr"{map_directory}wargame_provinces.png").convert("RGBA")
-    prov = Image.open(fr"{province_directory}{province}.png").convert("RGBA")
-    # obtain size and coordinate information
-    width = prov.size[0]
-    height = prov.size[1]
-    cord = (province_cord[0], province_cord[1])
-    # for every pixel, change the color to the owners
-    for x in range(0, width):
-        for y in range(0, height):
-            data = prov.getpixel((x, y))
-            if data != color:
-                if data != (0, 0, 0, 0):
-                    if data != (255, 255, 255, 0):
-                        prov.putpixel((x, y), color)
-    # convert, paste, and save the image
-    prov = prov.convert("RGBA")
-    map.paste(prov, box=cord, mask=prov)
-    map.save(fr"{map_directory}wargame_provinces.png")
 
 async def render_tech_tree_with_icons(user: asyncpg.Record, conn: asyncpg.Pool) -> io.BytesIO:
     # define directories
@@ -1220,8 +1184,6 @@ class AbandonConfirm(View):
                                   structures  = '{}',
                                   fort_level  = 0
                               WHERE id = $1;''', province_id)
-        # color the province
-        await map_color(province_id, "#808080", self.pool)
         await interaction.response.edit_message(content=f"{self.prov_info['name']} (ID: {province_id}) "
                                                         f"has been successfully abandoned.", view=None)
 
@@ -1439,7 +1401,6 @@ class UnownedProvince(View):
                                   occupier_id = $1,
                                   development = $3
                               WHERE id = $2;''', interaction.user.id, province_id, dev)
-        await map_color(province_id, user_info['color'], conn)
         await interaction.response.edit_message(content=None,
                                                 view=prov_owned_view,
                                                 embed=await create_prov_embed(prov_info, conn))
@@ -6137,9 +6098,6 @@ class WarOptionsView(discord.ui.View):
                                                                  FROM cnc_provinces
                                                                  WHERE occupier_id != owner_id AND owner_id = $1;''',
                                                               t_info['user_id'])
-                        # for each province, color
-                        for p in occupied_provinces:
-                            await map_color(p['id'], user_info['user_id'], conn)
                         # update their provinces
                         await conn.execute('''UPDATE cnc_provinces
                                               SET occupier_id   = owner_id,
@@ -6157,9 +6115,6 @@ class WarOptionsView(discord.ui.View):
                                                                  FROM cnc_provinces
                                                                  WHERE occupier_id != owner_id AND owner_id = $1;''',
                                                               t_info['user_id'])
-                        # for each province, color
-                        for p in occupied_provinces:
-                            await map_color(p['id'], user_info['user_id'], conn)
                         # update their provinces
                         await conn.execute('''UPDATE cnc_provinces
                                               SET occupier_id   = owner_id,
@@ -6179,9 +6134,6 @@ class WarOptionsView(discord.ui.View):
                             occupied_provinces = await conn.fetch('''SELECT * FROM cnc_provinces 
                                                                      WHERE occupier_id != owner_id AND owner_id = $1;''',
                                                                   t_info['user_id'])
-                            # for each province, color
-                            for p in occupied_provinces:
-                                await map_color(p['id'], user_info['user_id'], conn)
                             # update their provinces
                             await conn.execute('''UPDATE cnc_provinces 
                                                   SET occupier_id = owner_id, fort_besieged = False, fort_level = $2 
@@ -6288,9 +6240,6 @@ class WarOptionsView(discord.ui.View):
                                                                  FROM cnc_provinces
                                                                  WHERE occupier_id != owner_id AND owner_id = $1;''',
                                                               t_info['user_id'])
-                        # for each province, color
-                        for p in occupied_provinces:
-                            await map_color(p['id'], user_info['user_id'], conn)
                         # update their provinces
                         return await conn.execute('''UPDATE cnc_provinces
                                               SET occupier_id   = owner_id,
@@ -7341,7 +7290,6 @@ class CommandAndConquest(commands.Cog):
         # disable turn loop
         self.turn_loop.cancel()
 
-
     async def interaction_check(self, interaction: discord.Interaction):
         # establish connection
         conn = self.bot.pool
@@ -7358,84 +7306,6 @@ class CommandAndConquest(commands.Cog):
         # otherwise, return true
         else:
             return True
-
-    async def occupy_color(self, province: int, occupy_color: str, owner_color: str):
-        # establish connection
-        conn = self.bot.pool
-        # pull province information
-        province_info = await conn.fetchrow('''SELECT *
-                                               FROM cnc_provinces
-                                               WHERE id = $1;''', province)
-        province_cord = province_info['cord']
-        # obtain the coordinate information
-        province_cord = ((int(province_cord[0])), (int(province_cord[1])))
-        # get colors
-        try:
-            occupyer = ImageColor.getrgb(occupy_color)
-            owner = ImageColor.getrgb(owner_color)
-        except ValueError:
-            return ValueError("Hex code issue")
-        # open map, create draw object, and obtain province information
-        map = Image.open(fr"{self.map_directory}wargame_provinces.png").convert("RGBA")
-        prov = Image.open(fr"{self.province_directory}{province}.png").convert("RGBA")
-        prov_draw = ImageDraw.Draw(prov)
-        width = prov.size[0]
-        height = prov.size[1]
-        cord = (province_cord[0], province_cord[1])
-        # set spacing and list of blank pixels
-        space = 20
-        not_colored = list()
-        # for every non-colored pixel, add it to the list
-        for x in range(0, width):
-            for y in range(0, height):
-                pixel = prov.getpixel((x, y))
-                if pixel == (0, 0, 0, 0) or pixel == (255, 255, 255, 0):
-                    not_colored.append((x, y))
-                else:
-                    prov.putpixel((x, y), owner)
-        # draw lines every 20 pixels with the occupier color
-        for x in range(0, 1000 * 2, space):
-            prov_draw.line([x, 0, x - 1000, 1000], width=5, fill=occupyer)
-        # for every pixel in the non-colored list, remove that pixel
-        for pix in not_colored:
-            prov.putpixel(pix, (0, 0, 0, 0))
-        map.paste(prov, box=cord, mask=prov)
-        map.save(fr"{self.map_directory}wargame_provinces.png")
-
-    async def locate_color(self, province: int, prov_cords: tuple):
-        # define loop
-        loop = self.bot.loop
-        # fetch map and province
-        map_image = Image.open(fr"{self.map_directory}wargame_blank_save.png").convert("RGBA")
-        prov = Image.open(fr"{self.province_directory}{province}.png").convert("RGBA")
-        # get color
-        color = ImageColor.getrgb("#FF00DC")
-        # obtain size and coordinate information
-        width = prov.size[0]
-        height = prov.size[1]
-        cord = (int(prov_cords[0]), int(prov_cords[1]))
-        # for every pixel, change the color to the owners
-        for x in range(0, width):
-            for y in range(0, height):
-                data = prov.getpixel((x, y))
-                if data != color:
-                    if data != (0, 0, 0, 0):
-                        if data != (255, 255, 255, 0):
-                            prov.putpixel((x, y), color)
-        # convert, paste, and save the image
-        prov = prov.convert("RGBA")
-        map_image.paste(prov, box=cord, mask=prov)
-        map_image.save(fr"{self.map_directory}highlight_map.png")
-
-        with open(fr"{self.map_directory}highlight_map.png", "rb") as preimg:
-            img = b64encode(preimg.read())
-        params = {"key": "a64d9505a13854ff660980db67ee3596",
-                  "image": img}
-        await asyncio.sleep(1)
-        upload = await loop.run_in_executor(None, requests.post, "https://api.imgbb.com/1/upload",
-                                            params)
-        response = upload.json()
-        return response['data']['url']
 
     async def nation_db_info(self, nation_name: str):
         """Pulls user info from the database using the nation name."""
@@ -8656,10 +8526,6 @@ class CommandAndConquest(commands.Cog):
                                               SET occupier_id = owner_id
                                               WHERE id = $1;''',
                                            depart_prov_info['id'])
-                        # color the map with the owner color
-                        await map_color(province=depart_prov_info['id'],
-                                        hexcode=fort_owner_info['color'],
-                                        conn=conn)
                     # pull the occupier info
                     occupier_info = await user_db_info(conn=conn, user_id=prov_info['occupier_id'])
                     # update the movement and location
@@ -8669,16 +8535,6 @@ class CommandAndConquest(commands.Cog):
                     # update the occupier id
                     await conn.execute('''UPDATE cnc_provinces SET occupier_id = $2 WHERE id = $1;''',
                                        move_to, user_info['user_id'])
-                    # occupy color if the owner is not the user
-                    if prov_info['owner_id'] != user_info['user_id']:
-                        await self.occupy_color(province=move_to,
-                                                occupy_color=user_info['color'],
-                                                owner_color=occupier_info['color'])
-                    # regular color if the owner is a user (basically resetting)
-                    else:
-                        await map_color(province=move_to,
-                                        hexcode=user_info['color'],
-                                        conn=conn)
                     # get the score
                     score = await war_score(war=war,
                                             user_side=user_side,
@@ -8699,10 +8555,6 @@ class CommandAndConquest(commands.Cog):
                     # revert the province
                     await conn.execute('''UPDATE cnc_provinces SET occupier_id = owner_id WHERE id = $1;''',
                                        depart_prov_info['id'])
-                    # color the map with the owner color
-                    await map_color(province=depart_prov_info['id'],
-                                    hexcode=fort_owner_info['color'],
-                                    conn=conn)
 
                 # update the movement cost and location
                 await conn.execute('''UPDATE cnc_armies SET movement = movement - $2, location = $3, embark = False 
@@ -8790,10 +8642,6 @@ class CommandAndConquest(commands.Cog):
                                                       SET occupier_id = owner_id
                                                       WHERE id = $1;''',
                                                    depart_prov_info['id'])
-                                # color the map with the owner color
-                                await map_color(province=depart_prov_info['id'],
-                                                hexcode=fort_owner_info['color'],
-                                                conn=conn)
                             # update movement and location
                             await conn.execute(
                                 '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
@@ -8816,10 +8664,6 @@ class CommandAndConquest(commands.Cog):
                                                   SET occupier_id = owner_id
                                                   WHERE id = $1;''',
                                                depart_prov_info['id'])
-                            # color the map with the owner color
-                            await map_color(province=depart_prov_info['id'],
-                                            hexcode=fort_owner_info['color'],
-                                            conn=conn)
                         # update movement and location
                         await conn.execute(
                             '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
@@ -8875,10 +8719,6 @@ class CommandAndConquest(commands.Cog):
                                                   SET occupier_id = owner_id
                                                   WHERE id = $1;''',
                                                depart_prov_info['id'])
-                            # color the map with the owner color
-                            await map_color(province=depart_prov_info['id'],
-                                            hexcode=fort_owner_info['color'],
-                                            conn=conn)
                         # update movement and location
                         await conn.execute(
                             '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
@@ -8886,16 +8726,6 @@ class CommandAndConquest(commands.Cog):
                         # update the occupier
                         await conn.execute('''UPDATE cnc_provinces SET occupier_id = $2 WHERE id = $1;''',
                                            move_to, user_info['user_id'])
-                        # occupy color if the owner is not the user
-                        if prov_info['owner_id'] != user_info['user_id']:
-                            await self.occupy_color(province=move_to,
-                                                    occupy_color=user_info['color'],
-                                                    owner_color=occupier_info['color'])
-                        # regular color if the owner is a user (basically resetting)
-                        else:
-                            await map_color(province=move_to,
-                                            hexcode=user_info['color'],
-                                            conn=conn)
                         # update the war score
                         score = await war_score(war=war_check,
                                                 user_side=user_side,
@@ -8919,10 +8749,6 @@ class CommandAndConquest(commands.Cog):
                                               SET occupier_id = owner_id
                                               WHERE id = $1;''',
                                            depart_prov_info['id'])
-                        # color the map with the owner color
-                        await map_color(province=depart_prov_info['id'],
-                                        hexcode=fort_owner_info['color'],
-                                        conn=conn)
                     # update movement and location
                     await conn.execute(
                         '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
@@ -8946,10 +8772,6 @@ class CommandAndConquest(commands.Cog):
                                           SET occupier_id = owner_id
                                           WHERE id = $1;''',
                                        depart_prov_info['id'])
-                    # color the map with the owner color
-                    await map_color(province=depart_prov_info['id'],
-                                    hexcode=fort_owner_info['color'],
-                                    conn=conn)
                 # update movement and location
                 await conn.execute(
                     '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
@@ -8993,10 +8815,6 @@ class CommandAndConquest(commands.Cog):
                     victor_string = f"{user_info['name']} is victorious!"
                     footer = (f"{user_info['name']} has successfully subdued and "
                               f"conquered the natives of {prov_info['name']}.")
-                    # color the province properly
-                    await map_color(province=prov_info['id'],
-                                    hexcode=user_info['color'],
-                                    conn=conn)
                 # === DEFEAT ===
                 else:
                     # check if the attacker army was destroyed or should be destroyed
@@ -9085,10 +8903,6 @@ class CommandAndConquest(commands.Cog):
                                        user_info['user_id'], move_to)
                     victor_string = f"{user_info['name']} is victorious!"
                     footer = (f"{user_info['name']} has successfully subdued the rebel forces in {prov_info['name']}.")
-                    # color the province properly
-                    await map_color(province=prov_info['id'],
-                                    hexcode=user_info['color'],
-                                    conn=conn)
                 # === DEFEAT ===
                 else:
                     # check if the attacker army was destroyed or should be destroyed
@@ -9179,23 +8993,6 @@ class CommandAndConquest(commands.Cog):
                                                   SET occupier_id = owner_id
                                                   WHERE id = $1;''',
                                                depart_prov_info['id'])
-                            # color the map with the owner color
-                            await map_color(province=depart_prov_info['id'],
-                                            hexcode=fort_owner_info['color'],
-                                            conn=conn)
-                        # occupy color if the owner is not the user
-                        if prov_info['owner_id'] != user_info['user_id']:
-                            # get the occupier info
-                            occupier_info = await user_db_info(conn=conn, user_id=prov_info['owner_id'])
-                            # execute occupy coloring
-                            await self.occupy_color(province=move_to,
-                                                    occupy_color=user_info['color'],
-                                                    owner_color=occupier_info['color'])
-                        # regular color if the owner is a user (basically resetting)
-                        else:
-                            await map_color(province=move_to,
-                                            hexcode=user_info['color'],
-                                            conn=conn)
                         await conn.execute('''UPDATE cnc_provinces
                                               SET occupier_id = $1
                                               WHERE id = $2;''',
@@ -10220,7 +10017,6 @@ class CommandAndConquest(commands.Cog):
                                       occupier_id = $1
                                   WHERE id = $2;''',
                                user.id, province_id)
-            await map_color(province_id, user_info['color'], conn)
         except asyncpg.PostgresError as e:
             raise e
         return await ctx.send(f"{user_info['name']} granted ownership of {prov_info['name']} (ID: {province_id}).")
@@ -10389,7 +10185,6 @@ class CommandAndConquest(commands.Cog):
                 for p in owned_provinces:
                     p_id = p['id']
                     if p['occupier_id'] == u['user_id']:
-                        await map_color(p_id, color, conn)
                         await ctx.send(f"{p['name']} colored.")
                     elif p['occupier_id'] == 0:
                         await self.occupy_color(p_id, '#000000', color)
