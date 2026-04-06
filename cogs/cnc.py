@@ -518,41 +518,36 @@ class MapButtons(View):
 
     @discord.ui.button(label="Nations", emoji="\U0001f3f3", style=discord.ButtonStyle.blurple)
     async def nation_map(self, interaction: discord.Interaction, nation_map: discord.ui.Button):
-        # define connection
+        # define conn
         conn = interaction.client.pool
         # defer interaction
         await interaction.response.defer()
-        # disable button so people don't keep clicking them if the map is loading
+        # disable button to force waiting
         for button in self.children:
             button.disabled = True
         await self.message.edit(content="Loading...", view=self)
 
-        # define skipping logic
+        # deinfe the skipping function
         def should_skip(pid: str) -> bool:
             return (
                 pid.startswith("impassable_terrain_")
                 or "LAKE" in pid.upper()
             )
 
-        # Get all provinces and their owners
-        all_provinces = await conn.fetch("SELECT id, owner_id FROM cnc_provinces;")
-        # Get all user colors
-        users_colors  = await conn.fetch("SELECT user_id, color FROM cnc_users;")
+        # Only fetch owned provinces — unowned don't need touching
+        owned_provinces = await conn.fetch("""
+            SELECT p.id, u.color 
+            FROM cnc_provinces p
+            JOIN cnc_users u ON u.user_id = p.owner_id
+            WHERE p.owner_id != 0 AND u.color IS NOT NULL
+        """)
+        province_colors = {row["id"]: row["color"] for row in owned_provinces}
 
-        # Build id -> color lookup
-        # owner_id 0 = unowned, falls back to grey
-        user_color_dict = {row["user_id"]: row["color"] for row in users_colors}
-        province_colors = {
-            row["id"]: user_color_dict.get(row["owner_id"], "#808080")
-            for row in all_provinces}
-
-        # Parse SVG in memory
         tree = etree.parse(f"{self.map_directory}C&C Map.svg")
         root = tree.getroot()
-        ns   = "http://www.w3.org/2000/svg"
+        ns          = "http://www.w3.org/2000/svg"
         INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
 
-        # Find the Provinces layer
         province_layer = None
         for g in root.findall(f".//{{{ns}}}g"):
             if g.get(f"{{{INKSCAPE_NS}}}label") == "Provinces":
@@ -563,76 +558,60 @@ class MapButtons(View):
             await self.message.edit(content="Error: Provinces layer not found.")
             return
 
-        # update filles
         for elem in province_layer.findall(f"{{{ns}}}path"):
             pid = elem.get("id", "")
-            if should_skip(pid):
-                continue
-            color = province_colors.get(pid, "#808080")
+            if should_skip(pid) or pid not in province_colors:
+                continue  # unowned — leave untouched, base map shows through
+
+            color = province_colors[pid]
             style = elem.get("style", "")
 
-            # Update fill
             if "fill:" in style:
                 style = re.sub(r"fill:[^;]+", f"fill:{color}", style)
             else:
                 style += f";fill:{color}"
 
-            # Force full opacity and no stroke
-            style = re.sub(r"stroke:[^;]+", "stroke:#00000033", style)  # black at ~20% opacity
-            if "stroke-width:" in style:
-                style = re.sub(r"stroke-width:[^;]+", "stroke-width:0.3", style)
-            else:
-                style += ";stroke-width:0.3"
+            # No stroke needed — base map handles borders
+            style = re.sub(r"stroke:[^;]+", "stroke:none", style)
+            style = re.sub(r"fill-opacity:[^;]+", "fill-opacity:0.6", style)
 
             elem.set("style", style)
 
-        # Find the Province Numbers layer
+        # Province numbers
         numbers_layer = None
         for g in root.findall(f".//{{{ns}}}g"):
             if g.get(f"{{{INKSCAPE_NS}}}label") == "Province Numbers":
                 numbers_layer = g
                 break
 
-        # update numbers to all be the same
         if numbers_layer is not None:
             for elem in numbers_layer.findall(f"{{{ns}}}text"):
                 style = elem.get("style", "")
-                
-                # Set white fill
                 if "fill:" in style:
                     style = re.sub(r"fill:[^;]+", "fill:#ffffff", style)
                 else:
                     style += ";fill:#ffffff"
-                
-                # Set black outline — stroke-width as percentage isn't native SVG,
-                # so we use a relative em value instead (0.05em ≈ 5% of font size)
                 if "stroke:" in style:
                     style = re.sub(r"stroke:[^;]+", "stroke:#000000", style)
                 else:
                     style += ";stroke:#000000"
-                
                 if "stroke-width:" in style:
                     style = re.sub(r"stroke-width:[^;]+", "stroke-width:0.05em", style)
                 else:
                     style += ";stroke-width:0.05em"
-
-                # Make sure stroke renders behind the text fill, not on top
                 style += ";paint-order:stroke fill"
-
                 elem.set("style", style)
 
-        # Render to PNG bytes — SVG file on disk is never modified
-        svg_bytes  = etree.tostring(root)
+        svg_bytes = etree.tostring(root)
         for width in [5000, 4000, 3000, 2000]:
             png_bytes = cairosvg.svg2png(
                 bytestring=svg_bytes,
                 output_width=width,
                 output_height=int(width * 3375 / 4500)
             )
-            if len(png_bytes) < 10 * 1024 * 1024:  # 10MB free tier limit
+            if len(png_bytes) < 10 * 1024 * 1024:
                 break
 
-        # Send the image and restore buttons
         file = discord.File(io.BytesIO(png_bytes), filename="map.png")
         for button in self.children:
             button.disabled = False
