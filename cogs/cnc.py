@@ -563,17 +563,24 @@ class MapButtons(View):
             await self.message.edit(content="Error: Provinces layer not found.")
             return
 
-        # Update fills
+        # update filles
         for elem in province_layer.findall(f"{{{ns}}}path"):
             pid = elem.get("id", "")
             if should_skip(pid):
                 continue
+            color = province_colors.get(pid, UNOWNED_COLOR)
             style = elem.get("style", "")
-            color = province_colors.get(pid, "#808080")
+
+            # Update fill
             if "fill:" in style:
                 style = re.sub(r"fill:[^;]+", f"fill:{color}", style)
             else:
                 style += f";fill:{color}"
+
+            # Force full opacity and no stroke
+            style = re.sub(r"fill-opacity:[^;]+", "fill-opacity:1", style)
+            style = re.sub(r"stroke:[^;]+", "stroke:none", style)
+
             elem.set("style", style)
 
         # Render to PNG bytes — SVG file on disk is never modified
