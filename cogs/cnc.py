@@ -568,7 +568,7 @@ class MapButtons(View):
             pid = elem.get("id", "")
             if should_skip(pid):
                 continue
-            color = province_colors.get(pid, UNOWNED_COLOR)
+            color = province_colors.get(pid, "#808080")
             style = elem.get("style", "")
 
             # Update fill
@@ -582,6 +582,41 @@ class MapButtons(View):
             style = re.sub(r"stroke:[^;]+", "stroke:none", style)
 
             elem.set("style", style)
+
+        # Find the Province Numbers layer
+        numbers_layer = None
+        for g in root.findall(f".//{{{ns}}}g"):
+            if g.get(f"{{{INKSCAPE_NS}}}label") == "Province Numbers":
+                numbers_layer = g
+                break
+                
+        # update numbers to all be the same
+        if numbers_layer is not None:
+            for elem in numbers_layer.findall(f"{{{ns}}}text"):
+                style = elem.get("style", "")
+                
+                # Set white fill
+                if "fill:" in style:
+                    style = re.sub(r"fill:[^;]+", "fill:#ffffff", style)
+                else:
+                    style += ";fill:#ffffff"
+                
+                # Set black outline — stroke-width as percentage isn't native SVG,
+                # so we use a relative em value instead (0.05em ≈ 5% of font size)
+                if "stroke:" in style:
+                    style = re.sub(r"stroke:[^;]+", "stroke:#000000", style)
+                else:
+                    style += ";stroke:#000000"
+                
+                if "stroke-width:" in style:
+                    style = re.sub(r"stroke-width:[^;]+", "stroke-width:0.05em", style)
+                else:
+                    style += ";stroke-width:0.05em"
+
+                # Make sure stroke renders behind the text fill, not on top
+                style += ";paint-order:stroke fill"
+
+                elem.set("style", style)
 
         # Render to PNG bytes — SVG file on disk is never modified
         svg_bytes  = etree.tostring(root)
