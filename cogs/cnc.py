@@ -578,8 +578,11 @@ class MapButtons(View):
                 style += f";fill:{color}"
 
             # Force full opacity and no stroke
-            style = re.sub(r"fill-opacity:[^;]+", "fill-opacity:1", style)
-            style = re.sub(r"stroke:[^;]+", "stroke:none", style)
+            style = re.sub(r"stroke:[^;]+", "stroke:#00000033", style)  # black at ~20% opacity
+            if "stroke-width:" in style:
+                style = re.sub(r"stroke-width:[^;]+", "stroke-width:0.3", style)
+            else:
+                style += ";stroke-width:0.3"
 
             elem.set("style", style)
 
@@ -589,7 +592,7 @@ class MapButtons(View):
             if g.get(f"{{{INKSCAPE_NS}}}label") == "Province Numbers":
                 numbers_layer = g
                 break
-                
+
         # update numbers to all be the same
         if numbers_layer is not None:
             for elem in numbers_layer.findall(f"{{{ns}}}text"):
