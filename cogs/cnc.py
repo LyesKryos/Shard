@@ -25,7 +25,6 @@ import CNC.battlesim as battlesim
 import CNC.turn as turn
 from lxml import etree
 import cairosvg
-import BytesIO
 
 
 
@@ -582,7 +581,7 @@ class MapButtons(View):
         png_bytes  = cairosvg.svg2png(bytestring=svg_bytes, output_width=2000)
 
         # Send the image and restore buttons
-        file = discord.File(BytesIO(png_bytes), filename="map.png")
+        file = discord.File(io.BytesIO(png_bytes), filename="map.png")
         for button in self.children:
             button.disabled = False
         await self.message.edit(content="", view=self, attachments=[file])
