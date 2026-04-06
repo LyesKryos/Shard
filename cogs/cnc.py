@@ -495,12 +495,6 @@ class MapButtons(View):
         # ensures that the person using the interaction is the original author
         return interaction.user.id == self.author.id
 
-    def add_ids(self):
-        # open map, open ids image, paste, and save
-        bmap = Image.open(fr"{self.map_directory}wargame_provinces.png").convert("RGBA")
-        ids = Image.open(fr"{self.map_directory}wargame numbers.png").convert("RGBA")
-        bmap.paste(ids, box=(0, 0), mask=ids)
-        bmap.save(fr"{self.map_directory}wargame_nations_map.png")
 
     @discord.ui.button(label="Main", emoji="\U0001f5fa", style=discord.ButtonStyle.blurple)
     async def main_map(self, interaction: discord.Interaction, main: discord.Button):
@@ -523,9 +517,11 @@ class MapButtons(View):
 
     @discord.ui.button(label="Nations", emoji="\U0001f3f3", style=discord.ButtonStyle.blurple)
     async def nation_map(self, interaction: discord.Interaction, nation_map: discord.ui.Button):
+        # define connection
         conn = interaction.client.pool
+        # defer interaction
         await interaction.response.defer()
-
+        # disable button so people don't keep clicking them if the map is loading
         for button in self.children:
             button.disabled = True
         await self.message.edit(content="Loading...", view=self)
@@ -536,18 +532,17 @@ class MapButtons(View):
         users_colors  = await conn.fetch("SELECT user_id, color FROM cnc_users;")
 
         # Build id -> color lookup
-        # owner_id 0 = unowned, falls back to terrain color (no override)
+        # owner_id 0 = unowned, falls back to grey
         user_color_dict = {row["user_id"]: row["color"] for row in users_colors}
         province_colors = {
             row["id"]: user_color_dict.get(row["owner_id"], "#808080")
-            for row in all_provinces
-}
-        # Provinces not in province_colors are unowned — their fill is left untouched
+            for row in all_provinces}
 
         # Parse SVG in memory
         tree = etree.parse(f"{self.map_directory}C&C Map.svg")
         root = tree.getroot()
         ns   = "http://www.w3.org/2000/svg"
+        INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
 
         # Find the Provinces layer
         province_layer = None
