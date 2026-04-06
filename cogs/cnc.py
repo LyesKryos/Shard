@@ -528,10 +528,10 @@ class MapButtons(View):
 
         # define skipping logic
         def should_skip(pid: str) -> bool:
-        return (
-            pid.startswith("impassable_terrain_")
-            or "LAKE" in pid.upper()
-        )
+            return (
+                pid.startswith("impassable_terrain_")
+                or "LAKE" in pid.upper()
+            )
 
         # Get all provinces and their owners
         all_provinces = await conn.fetch("SELECT id, owner_id FROM cnc_provinces;")
