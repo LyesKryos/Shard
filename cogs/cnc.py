@@ -521,35 +521,64 @@ class MapButtons(View):
         await self.message.edit(content="https://i.ibb.co/XDmDKn3/CNC-name-map.png")
 
     @discord.ui.button(label="Nations", emoji="\U0001f3f3", style=discord.ButtonStyle.blurple)
-    async def nation_map(self, interaction: discord.Interaction, nation_map: discord.Button):
-        # defer response
+    async def nation_map(self, interaction: discord.Interaction, nation_map: discord.ui.Button):
+        conn = interaction.client.pool
         await interaction.response.defer()
-        # disable all buttons so people don't keep trying to hit it because IT TAKES A SECOND
+
         for button in self.children:
             button.disabled = True
         await self.message.edit(content="Loading...", view=self)
-        # get the running loop, crucial to the map command running without the world ending
-        loop = asyncio.get_running_loop()
-        await loop.run_in_executor(None, self.add_ids)
-        # open the nations map from the directory in "reading-binary" mode
-        with open(fr"{self.map_directory}wargame_nations_map.png", "rb") as preimg:
-            # read the image using 64-bit encoding
-            img = b64encode(preimg.read())
-            # set the parameters for imgbb's API call
-            params = {"key": "a64d9505a13854ff660980db67ee3596",
-                      "name": "Nations Map",
-                      "image": img,
-                      "expiration": 86400}
-            # upload the map to imgbb
-            upload = await loop.run_in_executor(None, requests.post, ("https://api.imgbb.com/1/upload",
-                                                params))
-            # get the response as a json string
-            response = upload.json()
-            # re-enable buttons
-            for button in self.children:
-                button.disabled = False
-            # parse out the map url and then edit the message accordingly
-            await self.message.edit(content=response["data"]["url"], view=self)
+
+        # Get all provinces and their owners
+        all_provinces = await conn.fetch("SELECT id, owner_id FROM cnc_provinces;")
+        # Get all user colors
+        users_colors  = await conn.fetch("SELECT user_id, color FROM cnc_users;")
+
+        # Build id -> color lookup
+        # owner_id 0 = unowned, falls back to terrain color (no override)
+        user_color_dict = {row["user_id"]: row["color"] for row in users_colors}
+        province_colors = {
+            row["id"]: user_color_dict.get(row["owner_id"], "#808080")
+            for row in all_provinces
+}
+        # Provinces not in province_colors are unowned — their fill is left untouched
+
+        # Parse SVG in memory
+        tree = etree.parse(f"{self.map_directory}C&C Map.svg")
+        root = tree.getroot()
+        ns   = "http://www.w3.org/2000/svg"
+
+        # Find the Provinces layer
+        province_layer = None
+        for g in root.findall(f".//{{{ns}}}g"):
+            if g.get(f"{{{INKSCAPE_NS}}}label") == "Provinces":
+                province_layer = g
+                break
+
+        if province_layer is None:
+            await self.message.edit(content="Error: Provinces layer not found.")
+            return
+
+        # Update fills
+        for elem in province_layer.findall(f"{{{ns}}}path"):
+            pid = elem.get("id", "")
+            color = province_colors[pid]
+            style = elem.get("style", "")
+            if "fill:" in style:
+                style = re.sub(r"fill:[^;]+", f"fill:{color}", style)
+            else:
+                style += f";fill:{color}"
+            elem.set("style", style)
+
+        # Render to PNG bytes — SVG file on disk is never modified
+        svg_bytes  = etree.tostring(root)
+        png_bytes  = cairosvg.svg2png(bytestring=svg_bytes, output_width=2000)
+
+        # Send the image and restore buttons
+        file = discord.File(BytesIO(png_bytes), filename="map.png")
+        for button in self.children:
+            button.disabled = False
+        await self.message.edit(content="", view=self, attachments=[file])
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
     async def close(self, interaction: discord.Interaction, close: discord.Button):
