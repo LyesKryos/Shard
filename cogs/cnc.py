@@ -23,6 +23,7 @@ from faker.exceptions import UniquenessException
 import re
 import CNC.battlesim as battlesim
 import CNC.turn as turn
+from lxml import etree
 
 
 
