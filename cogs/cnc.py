@@ -10399,6 +10399,22 @@ class CommandAndConquest(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
+    async def cnc_name_provinces(self, ctx):
+        # establish connection
+        conn = self.bot.pool
+        # get all provinces
+        all_provinces = await conn.fetch('''SELECT * FROM cnc_provinces;''')
+        # get a list of names
+        names = rand_location_name_list(len(all_provinces))
+        # for each province, get the next name
+        for p in all_provinces:
+            # assign the name
+            await conn.execute('''UPDATE cnc_provinces SET name = $2 WHERE id = $1;''', p['id'], names.pop(0))
+        # announce all provinces named
+        return await ctx.send(f"`{len(all_provinces)}` provinces named successfully!")
+
+    @commands.command()
+    @commands.is_owner()
     async def cnc_permanent_delete_user(self, ctx, user: discord.Member):
         # sent a confirmation message
         delete_confirm = await ctx.send(f"Are you certain you would like to delete {user.name} "
