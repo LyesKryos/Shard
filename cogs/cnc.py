@@ -578,7 +578,14 @@ class MapButtons(View):
 
         # Render to PNG bytes — SVG file on disk is never modified
         svg_bytes  = etree.tostring(root)
-        png_bytes  = cairosvg.svg2png(bytestring=svg_bytes, output_width=2000)
+        for width in [5000, 4000, 3000, 2000]:
+            png_bytes = cairosvg.svg2png(
+                bytestring=svg_bytes,
+                output_width=width,
+                output_height=int(width * 3375 / 4500)
+            )
+            if len(png_bytes) < 10 * 1024 * 1024:  # 10MB free tier limit
+                break
 
         # Send the image and restore buttons
         file = discord.File(io.BytesIO(png_bytes), filename="map.png")
