@@ -526,6 +526,13 @@ class MapButtons(View):
             button.disabled = True
         await self.message.edit(content="Loading...", view=self)
 
+        # define skipping logic
+        def should_skip(pid: str) -> bool:
+        return (
+            pid.startswith("impassable_terrain_")
+            or "LAKE" in pid.upper()
+        )
+
         # Get all provinces and their owners
         all_provinces = await conn.fetch("SELECT id, owner_id FROM cnc_provinces;")
         # Get all user colors
@@ -558,8 +565,10 @@ class MapButtons(View):
         # Update fills
         for elem in province_layer.findall(f"{{{ns}}}path"):
             pid = elem.get("id", "")
-            color = province_colors[pid]
+            if should_skip(pid):
+                continue
             style = elem.get("style", "")
+            color = province_colors.get(pid, UNOWNED_COLOR)
             if "fill:" in style:
                 style = re.sub(r"fill:[^;]+", f"fill:{color}", style)
             else:
