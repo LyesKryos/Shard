@@ -10416,7 +10416,7 @@ class CommandAndConquest(commands.Cog):
             return mod == ctx.message.author and str(reaction.emoji)
 
         try:
-            reaction, mod = await self.bot.wait_for(event='reaction_add', timeout=30, check=confirmation_check)
+            reaction, mod = await self.bot.wait_for('reaction_add', timeout=30, check=confirmation_check)
             if str(reaction.emoji) != "\U00002705":
                 return await ctx.send("Must confirm deletion with: \U00002705")
         except asyncio.TimeoutError:
@@ -10429,12 +10429,16 @@ class CommandAndConquest(commands.Cog):
         if usercheck is None:
             return await ctx.send("No such user in the CNC system.")
         try:
+            # remove their user data
             await conn.execute('''DELETE
                                   FROM cnc_users
                                   WHERE user_id = $1;''', user.id)
+            # remove their armies and generals
             await conn.execute('''DELETE
                                   FROM cnc_armies
                                   WHERE owner_id = $1;''', user.id)
+            await conn.execute('''DELETE FROM cnc_generals WHERE owner_id = $1;''', user.id)
+            # reset provinces
             await conn.execute('''UPDATE cnc_provinces
                                   SET owner_id    = 0,
                                       occupier_id = 0,
@@ -10444,9 +10448,19 @@ class CommandAndConquest(commands.Cog):
                                       fort_level  = 0
                                   WHERE owner_id = $1
                                     AND occupier_id = $1;''', user.id)
+            # delete researching
             await conn.execute('''DELETE
                                   FROM cnc_researching
                                   WHERE user_id = $1;''', user.id)
+            # delete all relations
+            await conn.execute('''DELETE FROM cnc_drs WHERE $1 = ANY(members);''', usercheck['name'])
+            await conn.execute('''DELETE FROM cnc_trade_pacts WHERE $1 = ANY(members);''', usercheck['name'])
+            await conn.execute('''DELETE FROM cnc_embargoes WHERE (sender = $1) OR (target = $1);''',
+                               usercheck['name'])
+            # remove from alliances
+            await conn.execute('''UPDATE cnc_alliances SET members = array_remove(members, $1) 
+                                  WHERE $1 = ANY(members);''', usercheck['name'])
+
             await delete_confirm.delete()
         except asyncpg.PostgresError as error:
             raise error
