@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding populate command" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Removing map color command for">
+      <change beforePath="$PROJECT_DIR$/CNC/turn.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/turn.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -586,7 +588,7 @@
       <workItem from="1775061279830" duration="4193000" />
       <workItem from="1775235161986" duration="2817000" />
       <workItem from="1775304820862" duration="13009000" />
-      <workItem from="1775497303399" duration="3457000" />
+      <workItem from="1775497303399" duration="4013000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -931,7 +933,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1666" />
+    <option name="localTasksCounter" value="1667" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -950,7 +952,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Add gp table command" />
     <MESSAGE value="Minor formatting fixes in GP table generation" />
     <MESSAGE value="Refactor tax level logic to remove redundant `self.user_info` attribute usage" />
     <MESSAGE value="Adjust national unrest calculation to factor in citizen growth dynamics" />
@@ -975,7 +976,8 @@
     <MESSAGE value="Updating with new province id handling" />
     <MESSAGE value="Adding province naming command to name new provinces" />
     <MESSAGE value="Adding populate command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding populate command" />
+    <MESSAGE value="Removing map color command for" />
+    <option name="LAST_COMMIT_MESSAGE" value="Removing map color command for" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

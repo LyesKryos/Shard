@@ -19,85 +19,6 @@ async def user_db_info(user_id: int | str, conn: asyncpg.Pool) -> asyncpg.Record
                                            WHERE lower(name) = $1;''', user_id.lower())
     return user_info
 
-async def map_color(province: int, hexcode: str, conn: asyncpg.Pool):
-    map_directory = r"/root/Shard/CNC/Map Files/Maps/"
-    province_directory = r"/root/Shard/CNC/Map Files/Province Layers/"
-    # pull province information
-    province_info = await conn.fetchrow('''SELECT *
-                                           FROM cnc_provinces
-                                           WHERE id = $1;''', province)
-    province_cord = province_info['cord']
-    # obtain the coordinate information
-    province_cord = ((int(province_cord[0])), (int(province_cord[1])))
-    # get color
-    try:
-        color = ImageColor.getrgb(hexcode)
-    except ValueError:
-        return ValueError("Hex code issue")
-    # open the map and the province images
-    map = Image.open(fr"{map_directory}wargame_provinces.png").convert("RGBA")
-    prov = Image.open(fr"{province_directory}{province}.png").convert("RGBA")
-    # obtain size and coordinate information
-    width = prov.size[0]
-    height = prov.size[1]
-    cord = (province_cord[0], province_cord[1])
-    # for every pixel, change the color to the owners
-    for x in range(0, width):
-        for y in range(0, height):
-            data = prov.getpixel((x, y))
-            if data != color:
-                if data != (0, 0, 0, 0):
-                    if data != (255, 255, 255, 0):
-                        prov.putpixel((x, y), color)
-    # convert, paste, and save the image
-    prov = prov.convert("RGBA")
-    map.paste(prov, box=cord, mask=prov)
-    return map.save(fr"{map_directory}wargame_provinces.png")
-
-async def occupy_color(province: int, occupy_color: str, owner_color: str, conn: asyncpg.Pool):
-    map_directory = r"/root/Shard/CNC/Map Files/Maps/"
-    province_directory = r"/root/Shard/CNC/Map Files/Province Layers/"
-    # pull province information
-    province_info = await conn.fetchrow('''SELECT *
-                                           FROM cnc_provinces
-                                           WHERE id = $1;''', province)
-    province_cord = province_info['cord']
-    # obtain the coordinate information
-    province_cord = ((int(province_cord[0])), (int(province_cord[1])))
-    # get colors
-    try:
-        occupyer = ImageColor.getrgb(occupy_color)
-        owner = ImageColor.getrgb(owner_color)
-    except ValueError:
-        return ValueError("Hex code issue")
-    # open map, create draw object, and obtain province information
-    map = Image.open(fr"{map_directory}wargame_provinces.png").convert("RGBA")
-    prov = Image.open(fr"{province_directory}{province}.png").convert("RGBA")
-    prov_draw = ImageDraw.Draw(prov)
-    width = prov.size[0]
-    height = prov.size[1]
-    cord = (province_cord[0], province_cord[1])
-    # set spacing and list of blank pixels
-    space = 20
-    not_colored = list()
-    # for every non-colored pixel, add it to the list
-    for x in range(0, width):
-        for y in range(0, height):
-            pixel = prov.getpixel((x, y))
-            if pixel == (0, 0, 0, 0) or pixel == (255, 255, 255, 0):
-                not_colored.append((x, y))
-            else:
-                prov.putpixel((x, y), owner)
-    # draw lines every 20 pixels with the occupier color
-    for x in range(0, 1000 * 2, space):
-        prov_draw.line([x, 0, x - 1000, 1000], width=5, fill=occupyer)
-    # for every pixel in the non-colored list, remove that pixel
-    for pix in not_colored:
-        prov.putpixel(pix, (0, 0, 0, 0))
-    map.paste(prov, box=cord, mask=prov)
-    return map.save(fr"{map_directory}wargame_provinces.png")
-
-
 class Turn:
 
     def __init__(self, conn: asyncpg.Pool, bot: discord.Client):
@@ -404,11 +325,6 @@ class Turn:
                             await conn.execute('''UPDATE cnc_provinces
                                                   SET occupier_id = 1
                                                   WHERE id = $1;''', prov['id'])
-                            # set the occupy color to black
-                            await occupy_color(province=prov['id'],
-                                               occupy_color="#000000",
-                                               owner_color=user['color'],
-                                               conn=conn)
                         # add to DM notification
                         dm_notification += (f"**A revolution has begun in our nation!** Rebels supporting a new "
                                             f"Government Type, {revolution_type}, have risen up in "
@@ -445,11 +361,6 @@ class Turn:
                             # update the db to set occupier = 1 (aka rebels)
                             await conn.execute('''UPDATE cnc_provinces SET occupier_id = 1 
                                                   WHERE id = $1;''', prov['id'])
-                            # set the occupy color to black
-                            await occupy_color(province=prov['id'],
-                                               occupy_color="#000000",
-                                               owner_color=user['color'],
-                                               conn=conn)
                         # add to DM notification
                         dm_notification += (f"**A Civil War has begun in our nation!** An armed faction of citizens "
                                             f"that supports a *{civil_war_type}* {user['govt_type']} have risen up and "
@@ -481,11 +392,6 @@ class Turn:
                             # update the db to set occupier = 1 (aka rebels)
                             await conn.execute('''UPDATE cnc_provinces SET occupier_id = 1 
                                                   WHERE id = $1;''', prov['id'])
-                            # set the occupy color to black
-                            await occupy_color(province=prov['id'],
-                                               occupy_color="#000000",
-                                               owner_color=user['color'],
-                                               conn=conn)
                         # add to DM notification
                         dm_notification += (f"**Rebellious factions** have risen up in "
                                             f"arms against the {user['pretitle']} of {user['name']}! "
@@ -568,11 +474,6 @@ class Turn:
                                 await conn.execute('''UPDATE cnc_provinces
                                                       SET occupier_id = 1
                                                       WHERE id = $1;''', prov['id'])
-                                # set the occupy color to black
-                                await occupy_color(province=prov['id'],
-                                                   occupy_color="#000000",
-                                                   owner_color=user['color'],
-                                                   conn=conn)
                             # add to DM notification
                             dm_notification += (f"The ongoing rebellion against the {user['pretitle']} of "
                                                 f"{user['name']} has further developed. Additional rebels have arisen in "
