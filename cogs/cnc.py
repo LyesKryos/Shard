@@ -23,6 +23,8 @@ from faker.exceptions import UniquenessException
 import re
 import CNC.battlesim as battlesim
 import CNC.turn as turn
+from lxml import etree
+import cairosvg
 
 
 
@@ -494,12 +496,6 @@ class MapButtons(View):
         # ensures that the person using the interaction is the original author
         return interaction.user.id == self.author.id
 
-    def add_ids(self):
-        # open map, open ids image, paste, and save
-        bmap = Image.open(fr"{self.map_directory}wargame_provinces.png").convert("RGBA")
-        ids = Image.open(fr"{self.map_directory}wargame numbers.png").convert("RGBA")
-        bmap.paste(ids, box=(0, 0), mask=ids)
-        bmap.save(fr"{self.map_directory}wargame_nations_map.png")
 
     @discord.ui.button(label="Main", emoji="\U0001f5fa", style=discord.ButtonStyle.blurple)
     async def main_map(self, interaction: discord.Interaction, main: discord.Button):
@@ -521,35 +517,106 @@ class MapButtons(View):
         await self.message.edit(content="https://i.ibb.co/XDmDKn3/CNC-name-map.png")
 
     @discord.ui.button(label="Nations", emoji="\U0001f3f3", style=discord.ButtonStyle.blurple)
-    async def nation_map(self, interaction: discord.Interaction, nation_map: discord.Button):
-        # defer response
+    async def nation_map(self, interaction: discord.Interaction, nation_map: discord.ui.Button):
+        # define conn
+        conn = interaction.client.pool
+        # defer interaction
         await interaction.response.defer()
-        # disable all buttons so people don't keep trying to hit it because IT TAKES A SECOND
+        # disable button to force waiting
         for button in self.children:
             button.disabled = True
         await self.message.edit(content="Loading...", view=self)
-        # get the running loop, crucial to the map command running without the world ending
-        loop = asyncio.get_running_loop()
-        await loop.run_in_executor(None, self.add_ids)
-        # open the nations map from the directory in "reading-binary" mode
-        with open(fr"{self.map_directory}wargame_nations_map.png", "rb") as preimg:
-            # read the image using 64-bit encoding
-            img = b64encode(preimg.read())
-            # set the parameters for imgbb's API call
-            params = {"key": "a64d9505a13854ff660980db67ee3596",
-                      "name": "Nations Map",
-                      "image": img,
-                      "expiration": 86400}
-            # upload the map to imgbb
-            upload = await loop.run_in_executor(None, requests.post, ("https://api.imgbb.com/1/upload",
-                                                params))
-            # get the response as a json string
-            response = upload.json()
-            # re-enable buttons
-            for button in self.children:
-                button.disabled = False
-            # parse out the map url and then edit the message accordingly
-            await self.message.edit(content=response["data"]["url"], view=self)
+
+        # deinfe the skipping function
+        def should_skip(pid: str) -> bool:
+            return (
+                pid.startswith("impassable_terrain_")
+                or "LAKE" in pid.upper()
+            )
+
+        # Only fetch owned provinces — unowned don't need touching
+        owned_provinces = await conn.fetch("""
+            SELECT p.id, u.color 
+            FROM cnc_provinces p
+            JOIN cnc_users u ON u.user_id = p.owner_id
+            WHERE p.owner_id != 0 AND u.color IS NOT NULL
+        """)
+        province_colors = {row["id"]: row["color"] for row in owned_provinces}
+
+        tree = etree.parse(f"{self.map_directory}C&C Map.svg")
+        root = tree.getroot()
+        ns          = "http://www.w3.org/2000/svg"
+        INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
+
+        province_layer = None
+        for g in root.findall(f".//{{{ns}}}g"):
+            if g.get(f"{{{INKSCAPE_NS}}}label") == "Provinces":
+                province_layer = g
+                break
+
+        if province_layer is None:
+            await self.message.edit(content="Error: Provinces layer not found.")
+            return
+
+        for elem in province_layer.findall(f"{{{ns}}}path"):
+            pid = elem.get("id", "")
+            if should_skip(pid) or pid not in province_colors:
+                continue  # unowned — leave untouched, base map shows through
+
+            color = province_colors[pid]
+            style = elem.get("style", "")
+
+            if "fill:" in style:
+                style = re.sub(r"fill:[^;]+", f"fill:{color}", style)
+            else:
+                style += f";fill:{color}"
+
+            # Disable ALL stroke properties individually
+            style = re.sub(r"stroke:#[^;]+", "stroke:none", style)
+            style = re.sub(r"stroke-opacity:[^;]+", "stroke-opacity:0", style)
+            style = re.sub(r"stroke-width:[^;]+", "stroke-width:0", style)
+
+            elem.set("style", style)
+
+        # Province numbers
+        numbers_layer = None
+        for g in root.findall(f".//{{{ns}}}g"):
+            if g.get(f"{{{INKSCAPE_NS}}}label") == "Province Numbers":
+                numbers_layer = g
+                break
+
+        if numbers_layer is not None:
+            for elem in numbers_layer.findall(f"{{{ns}}}text"):
+                style = elem.get("style", "")
+                if "fill:" in style:
+                    style = re.sub(r"fill:[^;]+", "fill:#ffffff", style)
+                else:
+                    style += ";fill:#ffffff"
+                if "stroke:" in style:
+                    style = re.sub(r"stroke:[^;]+", "stroke:#000000", style)
+                else:
+                    style += ";stroke:#000000"
+                if "stroke-width:" in style:
+                    style = re.sub(r"stroke-width:[^;]+", "stroke-width:0.05em", style)
+                else:
+                    style += ";stroke-width:0.05em"
+                style += ";paint-order:stroke fill"
+                elem.set("style", style)
+
+        svg_bytes = etree.tostring(root)
+        for width in [5000, 4000, 3000, 2000]:
+            png_bytes = cairosvg.svg2png(
+                bytestring=svg_bytes,
+                output_width=width,
+                output_height=int(width * 3375 / 4500)
+            )
+            if len(png_bytes) < 10 * 1024 * 1024:
+                break
+
+        file = discord.File(io.BytesIO(png_bytes), filename="map.png")
+        for button in self.children:
+            button.disabled = False
+        await self.message.edit(content="", view=self, attachments=[file])
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
     async def close(self, interaction: discord.Interaction, close: discord.Button):
