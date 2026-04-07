@@ -13,8 +13,7 @@ import discord
 from discord.ext import commands
 import asyncio
 from PIL import Image, ImageColor
-from base64 import b64encode
-import requests
+import os
 from discord.ui import View
 import math
 import heapq
@@ -25,6 +24,7 @@ import CNC.battlesim as battlesim
 import CNC.turn as turn
 from lxml import etree
 import cairosvg
+import tempfile
 
 
 
@@ -518,97 +518,138 @@ class MapButtons(View):
 
     @discord.ui.button(label="Nations", emoji="\U0001f3f3", style=discord.ButtonStyle.blurple)
     async def nation_map(self, interaction: discord.Interaction, nation_map: discord.ui.Button):
-        # define conn
+        # establish interaction
         conn = interaction.client.pool
         # defer interaction
-        await interaction.response.defer()
-        # disable button to force waiting
+        await interaction.response.defer(thinking=True)
+
+        # disable buttons
         for button in self.children:
             button.disabled = True
         await self.message.edit(content="Loading...", view=self)
 
-        # deinfe the skipping function
         def should_skip(pid: str) -> bool:
             return (
-                pid.startswith("impassable_terrain_")
-                or "LAKE" in pid.upper()
+                    pid.startswith("impassable_terrain_")
+                    or "LAKE" in pid.upper()
             )
 
-        # Only fetch owned provinces — unowned don't need touching
+        # precompile regex once (module-level ideally)
+        fill_re = re.compile(r"fill:[^;]+")
+        stroke_re = re.compile(r"stroke:[^;]+")
+        opacity_re = re.compile(r"stroke-opacity:[^;]+")
+        width_re = re.compile(r"stroke-width:[^;]+")
+
+        # fetch province data (async, keep outside thread)
         owned_provinces = await conn.fetch("""
-            SELECT p.id, u.color 
-            FROM cnc_provinces p
-            JOIN cnc_users u ON u.user_id = p.owner_id
-            WHERE p.owner_id != 0 AND u.color IS NOT NULL
-        """)
+                                           SELECT p.id, u.color
+                                           FROM cnc_provinces p
+                                                    JOIN cnc_users u ON u.user_id = p.owner_id
+                                           WHERE p.owner_id != 0 AND u.color IS NOT NULL
+                                           """)
         province_colors = {row["id"]: row["color"] for row in owned_provinces}
 
-        # parse the large map properly
-        parser = etree.XMLParser(huge_tree=True)
-        tree = etree.parse(fr"{self.map_directory}C&C Map.svg", parser)
-        root = tree.getroot()
-        ns          = "http://www.w3.org/2000/svg"
-        INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
+        # 👇 heavy work function (runs in thread)
+        def generate_map():
+            parser = etree.XMLParser(huge_tree=True)
+            tree = etree.parse(fr"{self.map_directory}C&C Map.svg", parser)
+            root = tree.getroot()
 
-        province_layer = None
-        for g in root.findall(f".//{{{ns}}}g"):
-            if g.get(f"{{{INKSCAPE_NS}}}label") == "Provinces":
-                province_layer = g
-                break
+            ns = "http://www.w3.org/2000/svg"
+            INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
 
-        if province_layer is None:
-            await self.message.edit(content="Error: Provinces layer not found.")
-            return
+            # find province layer
+            province_layer = None
+            for g in root.findall(f".//{{{ns}}}g"):
+                if g.get(f"{{{INKSCAPE_NS}}}label") == "Provinces":
+                    province_layer = g
+                    break
 
-        for elem in province_layer.findall(f"{{{ns}}}path"):
-            pid = elem.get("id", "")
-            if should_skip(pid) or pid not in province_colors:
-                continue  # unowned — leave untouched, base map shows through
+            if province_layer is None:
+                raise ValueError("Provinces layer not found")
 
-            color = province_colors[pid]
-            style = elem.get("style", "")
+            # modify provinces
+            for elem in province_layer.iter(f"{{{ns}}}path"):
+                pid = elem.get("id", "")
 
-            if "fill:" in style:
-                style = re.sub(r"fill:[^;]+", f"fill:{color}", style)
-            else:
-                style += f";fill:{color}"
+                color = province_colors.get(pid)
+                if not color or should_skip(pid):
+                    continue
 
-            # add 2px stroke to path
-            if "stroke:" in style:
-                style = re.sub(r"stroke:[^;]+", "stroke:#000000", style)
-            else:
-                style += ";stroke:#000000"
+                style = elem.get("style", "")
 
-            if "stroke-opacity:" in style:
-                style = re.sub(r"stroke-opacity:[^;]+", "stroke-opacity:1", style)
-            else:
-                style += ";stroke-opacity:1"
+                if "fill:" in style:
+                    style = fill_re.sub(f"fill:{color}", style)
+                else:
+                    style += f";fill:{color}"
 
-            if "stroke-width:" in style:
-                style = re.sub(r"stroke-width:[^;]+", "stroke-width:2px", style)
-            else:
-                style += ";stroke-width:2px"
+                if "stroke:" in style:
+                    style = stroke_re.sub("stroke:#000000", style)
+                else:
+                    style += ";stroke:#000000"
 
-            # optional: cleaner joins where borders touch
-            if "stroke-linejoin:" not in style:
-                style += ";stroke-linejoin:round"
+                if "stroke-opacity:" in style:
+                    style = opacity_re.sub("stroke-opacity:1", style)
+                else:
+                    style += ";stroke-opacity:1"
 
-            elem.set("style", style)
+                if "stroke-width:" in style:
+                    style = width_re.sub("stroke-width:2px", style)
+                else:
+                    style += ";stroke-width:2px"
 
-        svg_bytes = etree.tostring(root)
-        for width in [5000, 4000, 3000, 2000]:
-            png_bytes = cairosvg.svg2png(
-                bytestring=svg_bytes,
-                output_width=width,
-                output_height=int(width * 3375 / 4500)
-            )
-            if len(png_bytes) < 10 * 1024 * 1024:
-                break
+                if "stroke-linejoin:" not in style:
+                    style += ";stroke-linejoin:round"
 
-        file = discord.File(io.BytesIO(png_bytes), filename="map.png")
-        for button in self.children:
-            button.disabled = False
-        await self.message.edit(content="", view=self, attachments=[file])
+                elem.set("style", style)
+
+            # remove metadata only (safe)
+            for elem in root.xpath("//svg:metadata", namespaces={"svg": ns}):
+                elem.getparent().remove(elem)
+
+            # write to temp file (avoids RAM duplication)
+            with tempfile.NamedTemporaryFile(suffix=".svg", delete=False) as tmp:
+                temp_svg_path = tmp.name
+
+            tree.write(temp_svg_path)
+
+            try:
+                png_bytes = cairosvg.svg2png(
+                    url=temp_svg_path,
+                    output_width=3000
+                )
+
+                # downscale if too large
+                if len(png_bytes) > 10 * 1024 * 1024:
+                    img = Image.open(io.BytesIO(png_bytes))
+                    img.thumbnail((2000, 2000))
+                    img = img.convert("RGBA")
+
+                    out = io.BytesIO()
+                    img.save(out, format="PNG")
+                    png_bytes = out.getvalue()
+
+            finally:
+                os.remove(temp_svg_path)
+
+            return png_bytes
+
+        try:
+            # background thread
+            png_bytes = await asyncio.to_thread(generate_map)
+
+            file = discord.File(io.BytesIO(png_bytes), filename="map.png")
+
+            for button in self.children:
+                button.disabled = False
+
+            await self.message.edit(content="", view=self, attachments=[file])
+
+        except Exception as e:
+            for button in self.children:
+                button.disabled = False
+
+            await self.message.edit(content=f"Error generating map: {e}", view=self)
 
     @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
     async def close(self, interaction: discord.Interaction, close: discord.Button):

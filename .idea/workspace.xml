@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating reference to map">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Properly handling large map file parsing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
@@ -590,7 +590,7 @@
       <workItem from="1775235161986" duration="2817000" />
       <workItem from="1775304820862" duration="13009000" />
       <workItem from="1775497303399" duration="9228000" />
-      <workItem from="1775586336274" duration="896000" />
+      <workItem from="1775586336274" duration="2171000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -935,7 +935,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1677" />
+    <option name="localTasksCounter" value="1678" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -954,7 +954,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding the tidy system to remove blank relations and correct databases" />
     <MESSAGE value="Adding auth logging amounts to turn calc" />
     <MESSAGE value="Correcting pol auth to use correct unrest calc" />
     <MESSAGE value="Correcting puppet release issue" />
@@ -979,7 +978,8 @@
     <MESSAGE value="Updating .svg of map" />
     <MESSAGE value="Updaing reference to map" />
     <MESSAGE value="Updating reference to map" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating reference to map" />
+    <MESSAGE value="Properly handling large map file parsing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Properly handling large map file parsing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
