@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating .svg of map" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updaing reference to map" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -587,6 +587,7 @@
       <workItem from="1775235161986" duration="2817000" />
       <workItem from="1775304820862" duration="13009000" />
       <workItem from="1775497303399" duration="9228000" />
+      <workItem from="1775586336274" duration="291000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -931,7 +932,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1674" />
+    <option name="localTasksCounter" value="1676" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -950,7 +951,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding market value display command" />
     <MESSAGE value="Update authority gain tracking for more detailed calculations" />
     <MESSAGE value="Adding the tidy system to remove blank relations and correct databases" />
     <MESSAGE value="Adding auth logging amounts to turn calc" />
@@ -975,7 +975,8 @@
     <MESSAGE value="Removing unused map color imports from turn.py&#10;Updating .svg of map to have accurate background/base" />
     <MESSAGE value="Updating .svg of map&#10;Adding proper map rendering code to nation map" />
     <MESSAGE value="Updating .svg of map" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating .svg of map" />
+    <MESSAGE value="Updaing reference to map" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updaing reference to map" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
