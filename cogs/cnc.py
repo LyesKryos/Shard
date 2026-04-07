@@ -571,37 +571,27 @@ class MapButtons(View):
             else:
                 style += f";fill:{color}"
 
-            # Disable ALL stroke properties individually
-            style = re.sub(r"stroke:#[^;]+", "stroke:none", style)
-            style = re.sub(r"stroke-opacity:[^;]+", "stroke-opacity:0", style)
-            style = re.sub(r"stroke-width:[^;]+", "stroke-width:0", style)
+            # add 2px stroke to path
+            if "stroke:" in style:
+                style = re.sub(r"stroke:[^;]+", "stroke:#000000", style)
+            else:
+                style += ";stroke:#000000"
+
+            if "stroke-opacity:" in style:
+                style = re.sub(r"stroke-opacity:[^;]+", "stroke-opacity:1", style)
+            else:
+                style += ";stroke-opacity:1"
+
+            if "stroke-width:" in style:
+                style = re.sub(r"stroke-width:[^;]+", "stroke-width:2px", style)
+            else:
+                style += ";stroke-width:2px"
+
+            # optional: cleaner joins where borders touch
+            if "stroke-linejoin:" not in style:
+                style += ";stroke-linejoin:round"
 
             elem.set("style", style)
-
-        # Province numbers
-        numbers_layer = None
-        for g in root.findall(f".//{{{ns}}}g"):
-            if g.get(f"{{{INKSCAPE_NS}}}label") == "Province Numbers":
-                numbers_layer = g
-                break
-
-        if numbers_layer is not None:
-            for elem in numbers_layer.findall(f"{{{ns}}}text"):
-                style = elem.get("style", "")
-                if "fill:" in style:
-                    style = re.sub(r"fill:[^;]+", "fill:#ffffff", style)
-                else:
-                    style += ";fill:#ffffff"
-                if "stroke:" in style:
-                    style = re.sub(r"stroke:[^;]+", "stroke:#000000", style)
-                else:
-                    style += ";stroke:#000000"
-                if "stroke-width:" in style:
-                    style = re.sub(r"stroke-width:[^;]+", "stroke-width:0.05em", style)
-                else:
-                    style += ";stroke-width:0.05em"
-                style += ";paint-order:stroke fill"
-                elem.set("style", style)
 
         svg_bytes = etree.tostring(root)
         for width in [5000, 4000, 3000, 2000]:
