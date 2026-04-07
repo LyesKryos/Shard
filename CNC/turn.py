@@ -1,6 +1,5 @@
 import asyncpg
 import discord
-from PIL import ImageColor, Image, ImageDraw
 from random import randint, choice
 from math import floor
 import logging
