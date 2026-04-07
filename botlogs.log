@@ -1,4 +1,534 @@
-[2024-11-12 02:10:14] [INFO    ] discord.client: logging in using static token
-2024-11-12 02:10:14 INFO: logging in using static token
-[2024-11-12 02:10:27] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 29245b743b989307434c6aef5db532dc).
-2024-11-12 02:10:27 INFO: Shard ID None has connected to Gateway (Session ID: 29245b743b989307434c6aef5db532dc).
+[2026-04-06 19:48:08] [WARNING ] discord.gateway: Shard ID None heartbeat blocked for more than 10 seconds.
+Loop thread traceback (most recent call last):
+  File "/root/Shard/main.py", line 103, in <module>
+    main(Shard())
+  File "/root/Shard/main.py", line 97, in main
+    bot.run(token, log_handler=handler)
+  File "/usr/local/lib/python3.12/dist-packages/discord/client.py", line 933, in run
+    asyncio.run(runner())
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 674, in run_until_complete
+    self.run_forever()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1987, in _run_once
+    handle._run()
+  File "/usr/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/usr/local/lib/python3.12/dist-packages/discord/ui/view.py", line 598, in _scheduled_task
+    await item.callback(interaction)
+  File "/root/Shard/cogs/cnc.py", line 627, in nation_map
+    png_bytes = cairosvg.svg2png(
+  File "/usr/local/lib/python3.12/dist-packages/cairosvg/__init__.py", line 54, in svg2png
+    return surface.PNGSurface.convert(
+  File "/usr/local/lib/python3.12/dist-packages/cairosvg/surface.py", line 142, in convert
+    instance.finish()
+  File "/usr/local/lib/python3.12/dist-packages/cairosvg/surface.py", line 537, in finish
+    self.cairo.write_to_png(self.output)
+  File "/usr/local/lib/python3.12/dist-packages/cairocffi/surfaces.py", line 656, in write_to_png
+    _check_status(cairo.cairo_surface_write_to_png_stream(
+
+[2026-04-06 20:49:54] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session c6e1e8b23a86867eb127fe1a2658e53d.
+[2026-04-06 20:49:54] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session c6e1e8b23a86867eb127fe1a2658e53d.
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: econ auth
+Testland | government type gain: 3
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | trade value: 0.6223427245428617 = 12.446854490857232 * 0.05
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | tax income: 0.285
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | mine gain: 0.0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | public spend reduction: 0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | econ auth gain: 3
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: mil auth
+Testland | government type gain: 4
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | military alliance gain: 0.0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | dev gain: 1.9
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | mil upkeep reduction: 0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | mil auth gain: 5
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: pol auth
+Testland | government type gain: 3
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | diplomatic relations gain: 0.0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | dev gain: 1.9
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | national unrest reduction: 0.33509970313969195
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | military alliance reduction: 0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | trade pact reduction: 0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | embargo reduction: 0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | pol auth gain: 4
+[2026-04-06 22:00:26] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session c6e1e8b23a86867eb127fe1a2658e53d.
+[2026-04-06 22:00:26] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session c6e1e8b23a86867eb127fe1a2658e53d.
+[2026-04-07 00:51:23] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session c6e1e8b23a86867eb127fe1a2658e53d.
+[2026-04-07 00:51:23] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session c6e1e8b23a86867eb127fe1a2658e53d.
+[2026-04-07 01:03:59] [ERROR   ] cogs.errors: Unhandled UI error in View=MapButtons Item=XMLSyntaxError Cmd=N/A
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/ui/view.py", line 598, in _scheduled_task
+    await item.callback(interaction)
+  File "/root/Shard/cogs/cnc.py", line 546, in nation_map
+    tree = etree.parse(f"{self.map_directory}C&C Map.svg")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "src/lxml/etree.pyx", line 3711, in lxml.etree.parse
+  File "src/lxml/parser.pxi", line 2031, in lxml.etree._parseDocument
+  File "src/lxml/parser.pxi", line 2057, in lxml.etree._parseDocumentFromURL
+  File "src/lxml/parser.pxi", line 1958, in lxml.etree._parseDocFromFile
+  File "src/lxml/parser.pxi", line 1230, in lxml.etree._BaseParser._parseDocFromFile
+  File "src/lxml/parser.pxi", line 647, in lxml.etree._ParserContext._handleParseResultDoc
+  File "src/lxml/parser.pxi", line 765, in lxml.etree._handleParseResult
+  File "src/lxml/parser.pxi", line 689, in lxml.etree._raiseParseError
+  File "/root/Shard/CNC/Map Files/Maps/C&C Map.svg", line 38672
+lxml.etree.XMLSyntaxError: AttValue: ' expected, line 38672, column 4239
+nohup: ignoring input
+2026-04-07 01:39:50,711 DEBUG: Global logging initialized successfully.
+2026-04-07 01:39:50,711 DEBUG: Global logging initialized successfully.
+/root/Shard/main.py:51: DeprecationWarning: There is no current event loop
+  asyncio.get_event_loop().set_exception_handler(handle_async_exception)
+2026-04-07 01:39:50,712 DEBUG: Using selector: EpollSelector
+2026-04-07 01:39:50,712 DEBUG: Using selector: EpollSelector
+2026-04-07 01:39:50,713 WARNING: davey is not installed, voice will NOT be supported
+2026-04-07 01:39:50,713 WARNING: davey is not installed, voice will NOT be supported
+[2026-04-07 01:39:50] [DEBUG   ] asyncio: Using selector: EpollSelector
+2026-04-07 01:39:50,748 DEBUG: Using selector: EpollSelector
+[2026-04-07 01:39:50] [INFO    ] discord.client: logging in using static token
+[2026-04-07 01:39:50] [INFO    ] discord.client: logging in using static token
+2026-04-07 01:39:50,749 INFO: logging in using static token
+[2026-04-07 01:39:52] [DEBUG   ] faker.factory: Not in REPL -> leaving logger event level as is.
+2026-04-07 01:39:52,807 DEBUG: Not in REPL -> leaving logger event level as is.
+[2026-04-07 01:39:57] [ERROR   ] ShardBot: Cog loading error
+Traceback (most recent call last):
+  File "/root/Shard/ShardBot.py", line 36, in setup_hook
+    self.pool: asyncpg.Pool = await asyncpg.create_pool(self.config["dsn"])
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 439, in _async__init__
+    await self._initialize()
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 466, in _initialize
+    await first_ch.connect()
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 153, in connect
+    self._con = await self._pool._get_new_connection()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 538, in _get_new_connection
+    con = await self._connect(
+          ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connection.py", line 2443, in connect
+    return await connect_utils._connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connect_utils.py", line 1218, in _connect
+    conn = await _connect_addr(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connect_utils.py", line 1059, in _connect_addr
+    return await __connect_addr(params_retry, False, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connect_utils.py", line 1102, in __connect_addr
+    await connected
+asyncpg.exceptions.InvalidPasswordError: password authentication failed for user "shard"
+2026-04-07 01:39:57,622 ERROR: Cog loading error
+Traceback (most recent call last):
+  File "/root/Shard/ShardBot.py", line 36, in setup_hook
+    self.pool: asyncpg.Pool = await asyncpg.create_pool(self.config["dsn"])
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 439, in _async__init__
+    await self._initialize()
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 466, in _initialize
+    await first_ch.connect()
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 153, in connect
+    self._con = await self._pool._get_new_connection()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 538, in _get_new_connection
+    con = await self._connect(
+          ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connection.py", line 2443, in connect
+    return await connect_utils._connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connect_utils.py", line 1218, in _connect
+    conn = await _connect_addr(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connect_utils.py", line 1059, in _connect_addr
+    return await __connect_addr(params_retry, False, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connect_utils.py", line 1102, in __connect_addr
+    await connected
+asyncpg.exceptions.InvalidPasswordError: password authentication failed for user "shard"
+[2026-04-07 01:39:58] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: f9b54cac6cb6354f7f46302623432f3b).
+[2026-04-07 01:39:58] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: f9b54cac6cb6354f7f46302623432f3b).
+2026-04-07 01:39:58,647 INFO: Shard ID None has connected to Gateway (Session ID: f9b54cac6cb6354f7f46302623432f3b).
+[2026-04-07 01:40:00] [INFO    ] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-07 01:40:00,673 INFO: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2026-04-07 01:40:00] [INFO    ] apscheduler.scheduler: Added job "Dispatch.__init__.<locals>.waupdate" to job store "default"
+2026-04-07 01:40:00,675 INFO: Added job "Dispatch.__init__.<locals>.waupdate" to job store "default"
+[2026-04-07 01:40:00] [INFO    ] apscheduler.scheduler: Scheduler started
+2026-04-07 01:40:00,675 INFO: Scheduler started
+[2026-04-07 01:40:00] [DEBUG   ] apscheduler.scheduler: Looking for jobs to run
+2026-04-07 01:40:00,676 DEBUG: Looking for jobs to run
+[2026-04-07 01:40:00] [DEBUG   ] apscheduler.scheduler: Next wakeup is due at 2026-04-07 02:05:00-04:00 (in 15899.323269 seconds)
+2026-04-07 01:40:00,676 DEBUG: Next wakeup is due at 2026-04-07 02:05:00-04:00 (in 15899.323269 seconds)
+[2026-04-07 01:40:05] [ERROR   ] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py:1136> exception=AttributeError("'NoneType' object has no attribute 'fetchrow'")>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1302, in _call
+    await command._invoke_with_namespace(interaction, namespace)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 880, in _invoke_with_namespace
+    if not await self._check_can_run(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 1010, in _check_can_run
+    ret = await maybe_coroutine(check, interaction)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/utils.py", line 713, in maybe_coroutine
+    return await value
+           ^^^^^^^^^^^
+  File "/root/Shard/cogs/cnc.py", line 7354, in interaction_check
+    user_data = await conn.fetchrow('''SELECT *
+                      ^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'fetchrow'
+2026-04-07 01:40:05,886 ERROR: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py:1136> exception=AttributeError("'NoneType' object has no attribute 'fetchrow'")>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1302, in _call
+    await command._invoke_with_namespace(interaction, namespace)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 880, in _invoke_with_namespace
+    if not await self._check_can_run(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 1010, in _check_can_run
+    ret = await maybe_coroutine(check, interaction)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/utils.py", line 713, in maybe_coroutine
+    return await value
+           ^^^^^^^^^^^
+  File "/root/Shard/cogs/cnc.py", line 7354, in interaction_check
+    user_data = await conn.fetchrow('''SELECT *
+                      ^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'fetchrow'
+[2026-04-07 01:40:14] [ERROR   ] cogs.errors: Unhandled error in command: load
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/core.py", line 266, in wrapped
+    ret = await coro(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/Shard/cogs/base.py", line 77, in load
+    await self.bot.load_extension(f"cogs.{extension}")
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/bot.py", line 1034, in load_extension
+    raise errors.ExtensionAlreadyLoaded(name)
+discord.ext.commands.errors.ExtensionAlreadyLoaded: Extension 'cogs.cnc' is already loaded.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/bot.py", line 1376, in invoke
+    await ctx.command.invoke(ctx)
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/core.py", line 1064, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/core.py", line 275, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: ExtensionAlreadyLoaded: Extension 'cogs.cnc' is already loaded.
+2026-04-07 01:40:14,394 ERROR: Unhandled error in command: load
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/core.py", line 266, in wrapped
+    ret = await coro(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/Shard/cogs/base.py", line 77, in load
+    await self.bot.load_extension(f"cogs.{extension}")
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/bot.py", line 1034, in load_extension
+    raise errors.ExtensionAlreadyLoaded(name)
+discord.ext.commands.errors.ExtensionAlreadyLoaded: Extension 'cogs.cnc' is already loaded.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/bot.py", line 1376, in invoke
+    await ctx.command.invoke(ctx)
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/core.py", line 1064, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/core.py", line 275, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: ExtensionAlreadyLoaded: Extension 'cogs.cnc' is already loaded.
+[2026-04-07 01:40:34] [ERROR   ] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py:1136> exception=AttributeError("'NoneType' object has no attribute 'fetchrow'")>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1302, in _call
+    await command._invoke_with_namespace(interaction, namespace)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 880, in _invoke_with_namespace
+    if not await self._check_can_run(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 1010, in _check_can_run
+    ret = await maybe_coroutine(check, interaction)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/utils.py", line 713, in maybe_coroutine
+    return await value
+           ^^^^^^^^^^^
+  File "/root/Shard/cogs/cnc.py", line 7354, in interaction_check
+    user_data = await conn.fetchrow('''SELECT *
+                      ^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'fetchrow'
+2026-04-07 01:40:34,528 ERROR: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py:1136> exception=AttributeError("'NoneType' object has no attribute 'fetchrow'")>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1302, in _call
+    await command._invoke_with_namespace(interaction, namespace)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 880, in _invoke_with_namespace
+    if not await self._check_can_run(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 1010, in _check_can_run
+    ret = await maybe_coroutine(check, interaction)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/utils.py", line 713, in maybe_coroutine
+    return await value
+           ^^^^^^^^^^^
+  File "/root/Shard/cogs/cnc.py", line 7354, in interaction_check
+    user_data = await conn.fetchrow('''SELECT *
+                      ^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'fetchrow'
+[2026-04-07 01:41:30] [INFO    ] apscheduler.scheduler: Scheduler has been shut down
+2026-04-07 01:41:30,346 INFO: Scheduler has been shut down
+Nighty night
+[2026-04-07 01:41:30] [CRITICAL] bot: Bot process exiting unexpectedly (atexit triggered).
+2026-04-07 01:41:30,350 CRITICAL: Bot process exiting unexpectedly (atexit triggered).
+[2026-04-07 01:41:30] [CRITICAL] bot: Unhandled asyncio exception: Task was destroyed but it is pending!
+2026-04-07 01:41:30,412 CRITICAL: Unhandled asyncio exception: Task was destroyed but it is pending!
+sys:1: RuntimeWarning: coroutine 'watchdog_task' was never awaited
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+[2026-04-07 01:41:30] [ERROR   ] asyncio: Task exception was never retrieved
+future: <Task finished name='discord.py: on_message' coro=<Client._run_event() done, defined at /usr/local/lib/python3.12/dist-packages/discord/client.py:500> exception=SystemExit('Nighty night')>
+Traceback (most recent call last):
+  File "/root/Shard/main.py", line 103, in <module>
+    main(Shard())
+  File "/root/Shard/main.py", line 97, in main
+    bot.run(token, log_handler=handler)
+  File "/usr/local/lib/python3.12/dist-packages/discord/client.py", line 933, in run
+    asyncio.run(runner())
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 674, in run_until_complete
+    self.run_forever()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1987, in _run_once
+    handle._run()
+  File "/usr/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/usr/local/lib/python3.12/dist-packages/discord/client.py", line 508, in _run_event
+    await coro(*args, **kwargs)
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/bot.py", line 1421, in on_message
+    await self.process_commands(message)
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/bot.py", line 1418, in process_commands
+    await self.invoke(ctx)  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/bot.py", line 1376, in invoke
+    await ctx.command.invoke(ctx)
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/core.py", line 1064, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/core.py", line 266, in wrapped
+    ret = await coro(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/Shard/cogs/base.py", line 61, in nap
+    exit("Nighty night")
+  File "<frozen _sitebuiltins>", line 26, in __call__
+SystemExit: Nighty night
+2026-04-07 01:41:30,427 ERROR: Task exception was never retrieved
+future: <Task finished name='discord.py: on_message' coro=<Client._run_event() done, defined at /usr/local/lib/python3.12/dist-packages/discord/client.py:500> exception=SystemExit('Nighty night')>
+Traceback (most recent call last):
+  File "/root/Shard/main.py", line 103, in <module>
+    main(Shard())
+  File "/root/Shard/main.py", line 97, in main
+    bot.run(token, log_handler=handler)
+  File "/usr/local/lib/python3.12/dist-packages/discord/client.py", line 933, in run
+    asyncio.run(runner())
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 674, in run_until_complete
+    self.run_forever()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1987, in _run_once
+    handle._run()
+  File "/usr/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/usr/local/lib/python3.12/dist-packages/discord/client.py", line 508, in _run_event
+    await coro(*args, **kwargs)
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/bot.py", line 1421, in on_message
+    await self.process_commands(message)
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/bot.py", line 1418, in process_commands
+    await self.invoke(ctx)  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/bot.py", line 1376, in invoke
+    await ctx.command.invoke(ctx)
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/core.py", line 1064, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/core.py", line 266, in wrapped
+    ret = await coro(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/Shard/cogs/base.py", line 61, in nap
+    exit("Nighty night")
+  File "<frozen _sitebuiltins>", line 26, in __call__
+SystemExit: Nighty night
+nohup: ignoring input
+2026-04-07 01:41:35,556 DEBUG: Global logging initialized successfully.
+2026-04-07 01:41:35,556 DEBUG: Global logging initialized successfully.
+/root/Shard/main.py:51: DeprecationWarning: There is no current event loop
+  asyncio.get_event_loop().set_exception_handler(handle_async_exception)
+2026-04-07 01:41:35,556 DEBUG: Using selector: EpollSelector
+2026-04-07 01:41:35,556 DEBUG: Using selector: EpollSelector
+2026-04-07 01:41:35,557 WARNING: davey is not installed, voice will NOT be supported
+2026-04-07 01:41:35,557 WARNING: davey is not installed, voice will NOT be supported
+[2026-04-07 01:41:35] [DEBUG   ] asyncio: Using selector: EpollSelector
+2026-04-07 01:41:35,558 DEBUG: Using selector: EpollSelector
+[2026-04-07 01:41:35] [INFO    ] discord.client: logging in using static token
+[2026-04-07 01:41:35] [INFO    ] discord.client: logging in using static token
+2026-04-07 01:41:35,559 INFO: logging in using static token
+[2026-04-07 01:41:36] [DEBUG   ] faker.factory: Not in REPL -> leaving logger event level as is.
+2026-04-07 01:41:36,372 DEBUG: Not in REPL -> leaving logger event level as is.
+[2026-04-07 01:41:36] [ERROR   ] ShardBot: Cog loading error
+Traceback (most recent call last):
+  File "/root/Shard/ShardBot.py", line 36, in setup_hook
+    self.pool: asyncpg.Pool = await asyncpg.create_pool(self.config["dsn"])
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 439, in _async__init__
+    await self._initialize()
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 466, in _initialize
+    await first_ch.connect()
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 153, in connect
+    self._con = await self._pool._get_new_connection()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 538, in _get_new_connection
+    con = await self._connect(
+          ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connection.py", line 2443, in connect
+    return await connect_utils._connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connect_utils.py", line 1218, in _connect
+    conn = await _connect_addr(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connect_utils.py", line 1059, in _connect_addr
+    return await __connect_addr(params_retry, False, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connect_utils.py", line 1102, in __connect_addr
+    await connected
+asyncpg.exceptions.InvalidPasswordError: password authentication failed for user "shard"
+2026-04-07 01:41:36,965 ERROR: Cog loading error
+Traceback (most recent call last):
+  File "/root/Shard/ShardBot.py", line 36, in setup_hook
+    self.pool: asyncpg.Pool = await asyncpg.create_pool(self.config["dsn"])
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 439, in _async__init__
+    await self._initialize()
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 466, in _initialize
+    await first_ch.connect()
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 153, in connect
+    self._con = await self._pool._get_new_connection()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/pool.py", line 538, in _get_new_connection
+    con = await self._connect(
+          ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connection.py", line 2443, in connect
+    return await connect_utils._connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connect_utils.py", line 1218, in _connect
+    conn = await _connect_addr(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connect_utils.py", line 1059, in _connect_addr
+    return await __connect_addr(params_retry, False, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/asyncpg/connect_utils.py", line 1102, in __connect_addr
+    await connected
+asyncpg.exceptions.InvalidPasswordError: password authentication failed for user "shard"
+[2026-04-07 01:41:37] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 7b4ef77fb5db6363385d5a0e48778357).
+[2026-04-07 01:41:37] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 7b4ef77fb5db6363385d5a0e48778357).
+2026-04-07 01:41:37,259 INFO: Shard ID None has connected to Gateway (Session ID: 7b4ef77fb5db6363385d5a0e48778357).
+[2026-04-07 01:41:39] [INFO    ] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-07 01:41:39,283 INFO: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2026-04-07 01:41:39] [INFO    ] apscheduler.scheduler: Added job "Dispatch.__init__.<locals>.waupdate" to job store "default"
+2026-04-07 01:41:39,284 INFO: Added job "Dispatch.__init__.<locals>.waupdate" to job store "default"
+[2026-04-07 01:41:39] [INFO    ] apscheduler.scheduler: Scheduler started
+2026-04-07 01:41:39,284 INFO: Scheduler started
+[2026-04-07 01:41:39] [DEBUG   ] apscheduler.scheduler: Looking for jobs to run
+2026-04-07 01:41:39,285 DEBUG: Looking for jobs to run
+[2026-04-07 01:41:39] [DEBUG   ] apscheduler.scheduler: Next wakeup is due at 2026-04-07 02:05:00-04:00 (in 15800.714146 seconds)
+2026-04-07 01:41:39,285 DEBUG: Next wakeup is due at 2026-04-07 02:05:00-04:00 (in 15800.714146 seconds)
+[2026-04-07 01:41:50] [ERROR   ] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py:1136> exception=AttributeError("'NoneType' object has no attribute 'fetchrow'")>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1302, in _call
+    await command._invoke_with_namespace(interaction, namespace)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 880, in _invoke_with_namespace
+    if not await self._check_can_run(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 1010, in _check_can_run
+    ret = await maybe_coroutine(check, interaction)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/utils.py", line 713, in maybe_coroutine
+    return await value
+           ^^^^^^^^^^^
+  File "/root/Shard/cogs/cnc.py", line 7354, in interaction_check
+    user_data = await conn.fetchrow('''SELECT *
+                      ^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'fetchrow'
+2026-04-07 01:41:50,556 ERROR: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py:1136> exception=AttributeError("'NoneType' object has no attribute 'fetchrow'")>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1302, in _call
+    await command._invoke_with_namespace(interaction, namespace)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 880, in _invoke_with_namespace
+    if not await self._check_can_run(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 1010, in _check_can_run
+    ret = await maybe_coroutine(check, interaction)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/utils.py", line 713, in maybe_coroutine
+    return await value
+           ^^^^^^^^^^^
+  File "/root/Shard/cogs/cnc.py", line 7354, in interaction_check
+    user_data = await conn.fetchrow('''SELECT *
+                      ^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'fetchrow'
+[2026-04-07 01:44:50] [ERROR   ] discord.app_commands.tree: Ignoring exception in autocomplete for 'cnc province' (Guild: 728444080908140575, User: 293518673417732098)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1289, in _call
+    await command._invoke_autocomplete(interaction, focused, namespace)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 919, in _invoke_autocomplete
+    choices = await param.autocomplete(binding, interaction, value)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/Shard/cogs/cnc.py", line 7449, in province_autocomplete
+    provinces = await conn.fetch('''SELECT id, name
+                      ^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'fetch'
+[2026-04-07 01:44:50] [ERROR   ] discord.app_commands.tree: Ignoring exception in autocomplete for 'cnc province' (Guild: 728444080908140575, User: 293518673417732098)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1289, in _call
+    await command._invoke_autocomplete(interaction, focused, namespace)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 919, in _invoke_autocomplete
+    choices = await param.autocomplete(binding, interaction, value)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/Shard/cogs/cnc.py", line 7449, in province_autocomplete
+    provinces = await conn.fetch('''SELECT id, name
+                      ^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'fetch'
+2026-04-07 01:44:50,675 ERROR: Ignoring exception in autocomplete for 'cnc province' (Guild: 728444080908140575, User: 293518673417732098)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/tree.py", line 1289, in _call
+    await command._invoke_autocomplete(interaction, focused, namespace)
+  File "/usr/local/lib/python3.12/dist-packages/discord/app_commands/commands.py", line 919, in _invoke_autocomplete
+    choices = await param.autocomplete(binding, interaction, value)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/Shard/cogs/cnc.py", line 7449, in province_autocomplete
+    provinces = await conn.fetch('''SELECT id, name
+                      ^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'fetch'
