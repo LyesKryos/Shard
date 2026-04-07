@@ -532,3 +532,175 @@ Traceback (most recent call last):
     provinces = await conn.fetch('''SELECT id, name
                       ^^^^^^^^^^
 AttributeError: 'NoneType' object has no attribute 'fetch'
+[2026-04-07 15:00:46] [CRITICAL] bot: Unhandled asyncio exception: Task was destroyed but it is pending!
+[2026-04-07 15:00:46] [ERROR   ] asyncio: Task exception was never retrieved
+future: <Task finished name='discord.py: on_message' coro=<Client._run_event() done, defined at /usr/local/lib/python3.12/dist-packages/discord/client.py:500> exception=SystemExit('Nighty night')>
+Traceback (most recent call last):
+  File "/root/Shard/main.py", line 103, in <module>
+    main(Shard())
+  File "/root/Shard/main.py", line 97, in main
+    bot.run(token, log_handler=handler)
+  File "/usr/local/lib/python3.12/dist-packages/discord/client.py", line 933, in run
+    asyncio.run(runner())
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 674, in run_until_complete
+    self.run_forever()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1987, in _run_once
+    handle._run()
+  File "/usr/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/usr/local/lib/python3.12/dist-packages/discord/client.py", line 508, in _run_event
+    await coro(*args, **kwargs)
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/bot.py", line 1421, in on_message
+    await self.process_commands(message)
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/bot.py", line 1418, in process_commands
+    await self.invoke(ctx)  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/bot.py", line 1376, in invoke
+    await ctx.command.invoke(ctx)
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/core.py", line 1064, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/discord/ext/commands/core.py", line 266, in wrapped
+    ret = await coro(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/Shard/cogs/base.py", line 61, in nap
+    exit("Nighty night")
+  File "<frozen _sitebuiltins>", line 26, in __call__
+SystemExit: Nighty night
+nohup: ignoring input
+2026-04-07 15:00:52,913 DEBUG: Global logging initialized successfully.
+2026-04-07 15:00:52,913 DEBUG: Global logging initialized successfully.
+/root/Shard/main.py:51: DeprecationWarning: There is no current event loop
+  asyncio.get_event_loop().set_exception_handler(handle_async_exception)
+2026-04-07 15:00:52,913 DEBUG: Using selector: EpollSelector
+2026-04-07 15:00:52,913 DEBUG: Using selector: EpollSelector
+2026-04-07 15:00:52,914 WARNING: davey is not installed, voice will NOT be supported
+2026-04-07 15:00:52,914 WARNING: davey is not installed, voice will NOT be supported
+[2026-04-07 15:00:52] [DEBUG   ] asyncio: Using selector: EpollSelector
+2026-04-07 15:00:52,927 DEBUG: Using selector: EpollSelector
+[2026-04-07 15:00:52] [INFO    ] discord.client: logging in using static token
+[2026-04-07 15:00:52] [INFO    ] discord.client: logging in using static token
+2026-04-07 15:00:52,928 INFO: logging in using static token
+[2026-04-07 15:00:54] [DEBUG   ] faker.factory: Not in REPL -> leaving logger event level as is.
+2026-04-07 15:00:54,151 DEBUG: Not in REPL -> leaving logger event level as is.
+[2026-04-07 15:00:55] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 3e88f6f8fc7471e1f4ab075d9f40d04a).
+[2026-04-07 15:00:55] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 3e88f6f8fc7471e1f4ab075d9f40d04a).
+2026-04-07 15:00:55,819 INFO: Shard ID None has connected to Gateway (Session ID: 3e88f6f8fc7471e1f4ab075d9f40d04a).
+[2026-04-07 15:00:57] [INFO    ] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-07 15:00:57,865 INFO: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2026-04-07 15:00:57] [INFO    ] apscheduler.scheduler: Added job "Dispatch.__init__.<locals>.waupdate" to job store "default"
+2026-04-07 15:00:57,868 INFO: Added job "Dispatch.__init__.<locals>.waupdate" to job store "default"
+[2026-04-07 15:00:57] [INFO    ] apscheduler.scheduler: Scheduler started
+2026-04-07 15:00:57,868 INFO: Scheduler started
+[2026-04-07 15:00:57] [DEBUG   ] apscheduler.scheduler: Looking for jobs to run
+2026-04-07 15:00:57,869 DEBUG: Looking for jobs to run
+[2026-04-07 15:00:57] [DEBUG   ] apscheduler.scheduler: Next wakeup is due at 2026-04-08 02:05:00-04:00 (in 54242.129926 seconds)
+2026-04-07 15:00:57,870 DEBUG: Next wakeup is due at 2026-04-08 02:05:00-04:00 (in 54242.129926 seconds)
+[2026-04-07 15:01:18] [ERROR   ] cogs.errors: Unhandled UI error in View=MapButtons Item=XMLSyntaxError Cmd=N/A
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/ui/view.py", line 598, in _scheduled_task
+    await item.callback(interaction)
+  File "/root/Shard/cogs/cnc.py", line 546, in nation_map
+    tree = etree.parse(fr"{self.map_directory}CNC Map.svg")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "src/lxml/etree.pyx", line 3711, in lxml.etree.parse
+  File "src/lxml/parser.pxi", line 2031, in lxml.etree._parseDocument
+  File "src/lxml/parser.pxi", line 2057, in lxml.etree._parseDocumentFromURL
+  File "src/lxml/parser.pxi", line 1958, in lxml.etree._parseDocFromFile
+  File "src/lxml/parser.pxi", line 1230, in lxml.etree._BaseParser._parseDocFromFile
+  File "src/lxml/parser.pxi", line 647, in lxml.etree._ParserContext._handleParseResultDoc
+  File "src/lxml/parser.pxi", line 765, in lxml.etree._handleParseResult
+  File "src/lxml/parser.pxi", line 689, in lxml.etree._raiseParseError
+  File "/root/Shard/CNC/Map Files/Maps/CNC Map.svg", line 2
+lxml.etree.XMLSyntaxError: Start tag expected, '<' not found, line 2, column 1
+2026-04-07 15:01:18,724 ERROR: Unhandled UI error in View=MapButtons Item=XMLSyntaxError Cmd=N/A
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/ui/view.py", line 598, in _scheduled_task
+    await item.callback(interaction)
+  File "/root/Shard/cogs/cnc.py", line 546, in nation_map
+    tree = etree.parse(fr"{self.map_directory}CNC Map.svg")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "src/lxml/etree.pyx", line 3711, in lxml.etree.parse
+  File "src/lxml/parser.pxi", line 2031, in lxml.etree._parseDocument
+  File "src/lxml/parser.pxi", line 2057, in lxml.etree._parseDocumentFromURL
+  File "src/lxml/parser.pxi", line 1958, in lxml.etree._parseDocFromFile
+  File "src/lxml/parser.pxi", line 1230, in lxml.etree._BaseParser._parseDocFromFile
+  File "src/lxml/parser.pxi", line 647, in lxml.etree._ParserContext._handleParseResultDoc
+  File "src/lxml/parser.pxi", line 765, in lxml.etree._handleParseResult
+  File "src/lxml/parser.pxi", line 689, in lxml.etree._raiseParseError
+  File "/root/Shard/CNC/Map Files/Maps/CNC Map.svg", line 2
+lxml.etree.XMLSyntaxError: Start tag expected, '<' not found, line 2, column 1
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: econ auth
+Testland | government type gain: 3
+2026-04-07 16:00:00,502 INFO: econ auth
+Testland | government type gain: 3
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | trade value: 0.6599929824842571 = 13.199859649685141 * 0.05
+2026-04-07 16:00:00,537 INFO: Testland | trade value: 0.6599929824842571 = 13.199859649685141 * 0.05
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | tax income: 0.285
+2026-04-07 16:00:00,537 INFO: Testland | tax income: 0.285
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | mine gain: 0.0
+2026-04-07 16:00:00,540 INFO: Testland | mine gain: 0.0
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | public spend reduction: 0
+2026-04-07 16:00:00,540 INFO: Testland | public spend reduction: 0
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | econ auth gain: 3
+2026-04-07 16:00:00,543 INFO: Testland | econ auth gain: 3
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: mil auth
+Testland | government type gain: 4
+2026-04-07 16:00:00,544 INFO: mil auth
+Testland | government type gain: 4
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | military alliance gain: 0.0
+2026-04-07 16:00:00,545 INFO: Testland | military alliance gain: 0.0
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | dev gain: 1.9
+2026-04-07 16:00:00,545 INFO: Testland | dev gain: 1.9
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | mil upkeep reduction: 0
+2026-04-07 16:00:00,545 INFO: Testland | mil upkeep reduction: 0
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | mil auth gain: 5
+2026-04-07 16:00:00,547 INFO: Testland | mil auth gain: 5
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: pol auth
+Testland | government type gain: 3
+2026-04-07 16:00:00,549 INFO: pol auth
+Testland | government type gain: 3
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | diplomatic relations gain: 0.0
+2026-04-07 16:00:00,549 INFO: Testland | diplomatic relations gain: 0.0
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | dev gain: 1.9
+2026-04-07 16:00:00,549 INFO: Testland | dev gain: 1.9
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | national unrest reduction: 0.3336830983721829
+2026-04-07 16:00:00,549 INFO: Testland | national unrest reduction: 0.3336830983721829
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | military alliance reduction: 0
+2026-04-07 16:00:00,549 INFO: Testland | military alliance reduction: 0
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | trade pact reduction: 0
+2026-04-07 16:00:00,549 INFO: Testland | trade pact reduction: 0
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | embargo reduction: 0
+2026-04-07 16:00:00,550 INFO: Testland | embargo reduction: 0
+[2026-04-07 16:00:00] [INFO    ] CNC.turn: Testland | pol auth gain: 4
+2026-04-07 16:00:00,553 INFO: Testland | pol auth gain: 4
+[2026-04-07 16:12:26] [DEBUG   ] PIL.PngImagePlugin: STREAM b'IHDR' 16 13
+2026-04-07 16:12:26,494 DEBUG: STREAM b'IHDR' 16 13
+[2026-04-07 16:12:26] [DEBUG   ] PIL.PngImagePlugin: STREAM b'pHYs' 41 9
+2026-04-07 16:12:26,495 DEBUG: STREAM b'pHYs' 41 9
+[2026-04-07 16:12:26] [DEBUG   ] PIL.PngImagePlugin: STREAM b'tEXt' 62 25
+2026-04-07 16:12:26,495 DEBUG: STREAM b'tEXt' 62 25
+[2026-04-07 16:12:26] [DEBUG   ] PIL.PngImagePlugin: STREAM b'IDAT' 99 8192
+2026-04-07 16:12:26,495 DEBUG: STREAM b'IDAT' 99 8192
+[2026-04-07 16:12:26] [DEBUG   ] PIL.PngImagePlugin: STREAM b'IHDR' 16 13
+2026-04-07 16:12:26,703 DEBUG: STREAM b'IHDR' 16 13
+[2026-04-07 16:12:26] [DEBUG   ] PIL.PngImagePlugin: STREAM b'pHYs' 41 9
+2026-04-07 16:12:26,703 DEBUG: STREAM b'pHYs' 41 9
+[2026-04-07 16:12:26] [DEBUG   ] PIL.PngImagePlugin: STREAM b'tEXt' 62 25
+2026-04-07 16:12:26,704 DEBUG: STREAM b'tEXt' 62 25
+[2026-04-07 16:12:26] [DEBUG   ] PIL.PngImagePlugin: STREAM b'IDAT' 99 435
+2026-04-07 16:12:26,704 DEBUG: STREAM b'IDAT' 99 435
+[2026-04-07 16:55:34] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session 3e88f6f8fc7471e1f4ab075d9f40d04a.
+[2026-04-07 16:55:34] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session 3e88f6f8fc7471e1f4ab075d9f40d04a.
+2026-04-07 16:55:34,914 INFO: Shard ID None has successfully RESUMED session 3e88f6f8fc7471e1f4ab075d9f40d04a.
+[2026-04-07 18:20:14] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session 3e88f6f8fc7471e1f4ab075d9f40d04a.
+[2026-04-07 18:20:14] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session 3e88f6f8fc7471e1f4ab075d9f40d04a.
+2026-04-07 18:20:14,620 INFO: Shard ID None has successfully RESUMED session 3e88f6f8fc7471e1f4ab075d9f40d04a.
