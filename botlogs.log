@@ -1,4 +1,78 @@
-[2024-11-12 02:10:14] [INFO    ] discord.client: logging in using static token
-2024-11-12 02:10:14 INFO: logging in using static token
-[2024-11-12 02:10:27] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 29245b743b989307434c6aef5db532dc).
-2024-11-12 02:10:27 INFO: Shard ID None has connected to Gateway (Session ID: 29245b743b989307434c6aef5db532dc).
+[2026-04-06 19:48:08] [WARNING ] discord.gateway: Shard ID None heartbeat blocked for more than 10 seconds.
+Loop thread traceback (most recent call last):
+  File "/root/Shard/main.py", line 103, in <module>
+    main(Shard())
+  File "/root/Shard/main.py", line 97, in main
+    bot.run(token, log_handler=handler)
+  File "/usr/local/lib/python3.12/dist-packages/discord/client.py", line 933, in run
+    asyncio.run(runner())
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 674, in run_until_complete
+    self.run_forever()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1987, in _run_once
+    handle._run()
+  File "/usr/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/usr/local/lib/python3.12/dist-packages/discord/ui/view.py", line 598, in _scheduled_task
+    await item.callback(interaction)
+  File "/root/Shard/cogs/cnc.py", line 627, in nation_map
+    png_bytes = cairosvg.svg2png(
+  File "/usr/local/lib/python3.12/dist-packages/cairosvg/__init__.py", line 54, in svg2png
+    return surface.PNGSurface.convert(
+  File "/usr/local/lib/python3.12/dist-packages/cairosvg/surface.py", line 142, in convert
+    instance.finish()
+  File "/usr/local/lib/python3.12/dist-packages/cairosvg/surface.py", line 537, in finish
+    self.cairo.write_to_png(self.output)
+  File "/usr/local/lib/python3.12/dist-packages/cairocffi/surfaces.py", line 656, in write_to_png
+    _check_status(cairo.cairo_surface_write_to_png_stream(
+
+[2026-04-06 20:49:54] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session c6e1e8b23a86867eb127fe1a2658e53d.
+[2026-04-06 20:49:54] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session c6e1e8b23a86867eb127fe1a2658e53d.
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: econ auth
+Testland | government type gain: 3
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | trade value: 0.6223427245428617 = 12.446854490857232 * 0.05
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | tax income: 0.285
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | mine gain: 0.0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | public spend reduction: 0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | econ auth gain: 3
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: mil auth
+Testland | government type gain: 4
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | military alliance gain: 0.0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | dev gain: 1.9
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | mil upkeep reduction: 0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | mil auth gain: 5
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: pol auth
+Testland | government type gain: 3
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | diplomatic relations gain: 0.0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | dev gain: 1.9
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | national unrest reduction: 0.33509970313969195
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | military alliance reduction: 0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | trade pact reduction: 0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | embargo reduction: 0
+[2026-04-06 22:00:00] [INFO    ] CNC.turn: Testland | pol auth gain: 4
+[2026-04-06 22:00:26] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session c6e1e8b23a86867eb127fe1a2658e53d.
+[2026-04-06 22:00:26] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session c6e1e8b23a86867eb127fe1a2658e53d.
+[2026-04-07 00:51:23] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session c6e1e8b23a86867eb127fe1a2658e53d.
+[2026-04-07 00:51:23] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session c6e1e8b23a86867eb127fe1a2658e53d.
+[2026-04-07 01:03:59] [ERROR   ] cogs.errors: Unhandled UI error in View=MapButtons Item=XMLSyntaxError Cmd=N/A
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/discord/ui/view.py", line 598, in _scheduled_task
+    await item.callback(interaction)
+  File "/root/Shard/cogs/cnc.py", line 546, in nation_map
+    tree = etree.parse(f"{self.map_directory}C&C Map.svg")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "src/lxml/etree.pyx", line 3711, in lxml.etree.parse
+  File "src/lxml/parser.pxi", line 2031, in lxml.etree._parseDocument
+  File "src/lxml/parser.pxi", line 2057, in lxml.etree._parseDocumentFromURL
+  File "src/lxml/parser.pxi", line 1958, in lxml.etree._parseDocFromFile
+  File "src/lxml/parser.pxi", line 1230, in lxml.etree._BaseParser._parseDocFromFile
+  File "src/lxml/parser.pxi", line 647, in lxml.etree._ParserContext._handleParseResultDoc
+  File "src/lxml/parser.pxi", line 765, in lxml.etree._handleParseResult
+  File "src/lxml/parser.pxi", line 689, in lxml.etree._raiseParseError
+  File "/root/Shard/CNC/Map Files/Maps/C&C Map.svg", line 38672
+lxml.etree.XMLSyntaxError: AttValue: ' expected, line 38672, column 4239
