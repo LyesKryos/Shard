@@ -1,5 +1,6 @@
 from __future__ import annotations
 import datetime
+import gc
 import io
 from random import randrange, randint, choice, uniform
 from typing import List
@@ -8,6 +9,9 @@ import asyncpg
 from discord import app_commands, Interaction
 from discord.ext import tasks
 import importlib
+
+from pycparser import preprocess_file
+
 from ShardBot import Shard
 import discord
 from discord.ext import commands
@@ -7358,6 +7362,7 @@ times = [
     for h in (0, 6, 12, 18)
     ]
 
+
 class CommandAndConquest(commands.Cog):
 
     def __init__(self, bot: Shard):
@@ -7369,6 +7374,10 @@ class CommandAndConquest(commands.Cog):
         self.banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2", "#999999", "#FF0000"]
         self.version = "version 3.0.a - The Overhaul"
         self.version_notes = ""
+        self.tree = None
+        self.root = None
+        self.province_paths = None
+
 
     async def cog_load(self):
         # reload the dependencies
@@ -7384,6 +7393,13 @@ class CommandAndConquest(commands.Cog):
             self.bot.system_message += f"From cnc.py: Turn loop running.\n"
         else:
             self.bot.system_message += f"From cnc.py: **TURN LOOP NOT RUNNING**.\n"
+
+        # preprocess svg
+        await self.preprocess_svg()
+        if self.province_paths is None:
+            self.bot.system_message += f"From cnc.py: **PROVINCE PATHS NOT FOUND**.\n"
+        else:
+            self.bot.system_message += "From cnc.py: Map successfully initialized."
 
 
     async def cog_unload(self) -> None:
@@ -7406,6 +7422,47 @@ class CommandAndConquest(commands.Cog):
         # otherwise, return true
         else:
             return True
+
+    async def preprocess_svg(self):
+        """
+        Load and pre-process the large SVG in memory once.
+        """
+        try:
+            parser = etree.XMLParser(huge_tree=True)
+            svg_path = f"{self.map_directory}C&C Map.svg"
+            self.tree = etree.parse(svg_path, parser)
+            self.root = self.tree.getroot()
+
+            ns = "http://www.w3.org/2000/svg"
+            INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
+
+
+            # Strip metadata/defs to reduce memory
+            for elem in self.root.xpath("//svg:metadata", namespaces={"svg": ns}):
+                elem.getparent().remove(elem)
+            for elem in self.root.xpath("//svg:defs", namespaces={"svg": ns}):
+                elem.getparent().remove(elem)
+
+            # Find province layer
+            province_layer = None
+            for g in self.root.findall(f".//{{{ns}}}g"):
+                if g.get(f"{{{INKSCAPE_NS}}}label") == "Provinces":
+                    province_layer = g
+                    break
+            if province_layer is None:
+                raise RuntimeError("Provinces layer not found in SVG.")
+
+            # Map province IDs → path elements
+            self.province_paths = {p.get("id"): p for p in province_layer.iter(f"{{{ns}}}path")}
+
+            # Force garbage collection just in case
+            gc.collect()
+
+        except Exception as e:
+            print(f"[Cog] Error during SVG preprocessing: {e}")
+            self.tree = None
+            self.root = None
+            self.province_paths = None
 
     async def nation_db_info(self, nation_name: str):
         """Pulls user info from the database using the nation name."""
