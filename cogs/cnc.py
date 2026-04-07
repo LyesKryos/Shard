@@ -633,7 +633,7 @@ class MapButtons(View):
 
         try:
             # locked background thread
-            async with self.cog.render_lock:
+            async with self.CNC.render_lock:
                 png_bytes = await asyncio.to_thread(generate_map)
 
             file = discord.File(io.BytesIO(png_bytes), filename="map.png")
