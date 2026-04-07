@@ -543,7 +543,9 @@ class MapButtons(View):
         """)
         province_colors = {row["id"]: row["color"] for row in owned_provinces}
 
-        tree = etree.parse(fr"{self.map_directory}C&C Map.svg")
+        # parse the large map properly
+        parser = etree.XMLParser(huge_tree=True)
+        tree = etree.parse(fr"{self.map_directory}C&C Map.svg", parser)
         root = tree.getroot()
         ns          = "http://www.w3.org/2000/svg"
         INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
