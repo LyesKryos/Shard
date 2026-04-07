@@ -488,6 +488,7 @@ class MapButtons(View):
         self.message = message
         self.author = author
         self.map_directory = r"/root/Shard/CNC/Map Files/Maps/"
+        self.CNC = CommandAndConquest
 
     async def on_timeout(self) -> None:
         # for all buttons, disable
@@ -553,31 +554,25 @@ class MapButtons(View):
                                            """)
         province_colors = {row["id"]: row["color"] for row in owned_provinces}
 
-        # 👇 heavy work function (runs in thread)
         def generate_map():
-            parser = etree.XMLParser(huge_tree=True)
-            tree = etree.parse(fr"{self.map_directory}C&C Map.svg", parser)
-            root = tree.getroot()
+            if not self.cog.root:
+                raise ValueError("SVG not preloaded")
 
-            ns = "http://www.w3.org/2000/svg"
-            INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
+            # ✅ Clone preloaded SVG instead of reparsing
+            working_root = deepcopy(self.cog.root)
 
-            # find province layer
-            province_layer = None
-            for g in root.findall(f".//{{{ns}}}g"):
-                if g.get(f"{{{INKSCAPE_NS}}}label") == "Provinces":
-                    province_layer = g
-                    break
+            ns = self.cog.ns
 
-            if province_layer is None:
-                raise ValueError("Provinces layer not found")
+            # Build path map from cloned tree
+            province_paths = {
+                p.get("id"): p
+                for p in working_root.iter(f"{{{ns}}}path")
+            }
 
             # modify provinces
-            for elem in province_layer.iter(f"{{{ns}}}path"):
-                pid = elem.get("id", "")
-
-                color = province_colors.get(pid)
-                if not color or should_skip(pid):
+            for pid, color in province_colors.items():
+                elem = province_paths.get(pid)
+                if not elem or should_skip(pid):
                     continue
 
                 style = elem.get("style", "")
@@ -607,11 +602,9 @@ class MapButtons(View):
 
                 elem.set("style", style)
 
-            # remove metadata only (safe)
-            for elem in root.xpath("//svg:metadata", namespaces={"svg": ns}):
-                elem.getparent().remove(elem)
+            # ✅ Write cloned SVG to temp file
+            tree = etree.ElementTree(working_root)
 
-            # write to temp file (avoids RAM duplication)
             with tempfile.NamedTemporaryFile(suffix=".svg", delete=False) as tmp:
                 temp_svg_path = tmp.name
 
@@ -620,7 +613,7 @@ class MapButtons(View):
             try:
                 png_bytes = cairosvg.svg2png(
                     url=temp_svg_path,
-                    output_width=3000
+                    output_width=2500  # 🔽 lowered from 3000 for memory safety
                 )
 
                 # downscale if too large
@@ -639,8 +632,9 @@ class MapButtons(View):
             return png_bytes
 
         try:
-            # background thread
-            png_bytes = await asyncio.to_thread(generate_map)
+            # locked background thread
+            async with self.cog.render_lock:
+                png_bytes = await asyncio.to_thread(generate_map)
 
             file = discord.File(io.BytesIO(png_bytes), filename="map.png")
 
@@ -7377,6 +7371,7 @@ class CommandAndConquest(commands.Cog):
         self.tree = None
         self.root = None
         self.province_paths = None
+        self.render_lock = asyncio.Lock()
 
 
     async def cog_load(self):
@@ -7399,7 +7394,7 @@ class CommandAndConquest(commands.Cog):
         if self.province_paths is None:
             self.bot.system_message += f"From cnc.py: **PROVINCE PATHS NOT FOUND**.\n"
         else:
-            self.bot.system_message += "From cnc.py: Map successfully initialized."
+            self.bot.system_message += "From cnc.py: Map successfully initialized.\n"
 
 
     async def cog_unload(self) -> None:
