@@ -9377,8 +9377,8 @@ class CommandAndConquest(commands.Cog):
 
     # === WAR COMMANDS ===
 
-    @cnc.command(name="view_wars", description="Displays information about all ongoing wars.")
-    @app_commands.describe(view_all="Optional: select True for viewing all ongoing wars.")
+    @view.command(name="wars", description="Displays information about all of a nation's wars.")
+    @app_commands.describe(view_all="Select True for viewing all ongoing wars.")
     async def view_wars(self, interaction: discord.Interaction, view_all: bool = False):
         # defer interaction
         await interaction.response.defer(thinking=True)
@@ -9619,7 +9619,7 @@ class CommandAndConquest(commands.Cog):
         tech_embed.add_field(name="Exclusive with", value=f"{tech['exclusive']}")
         return await interaction.followup.send(embed=tech_embed)
 
-    @cnc.command(name="view_tech_tree", description="Displays researched techs.")
+    @view.command(name="tech_tree", description="Displays researched techs.")
     async def view_tech_tree(self, interaction: discord.Interaction):
         # defer interaction
         await interaction.response.defer(thinking=True)
