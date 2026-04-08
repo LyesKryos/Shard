@@ -566,14 +566,6 @@ class MapButtons(View):
             if province_layer is None:
                 raise RuntimeError("Provinces layer not found in cloned tree")
 
-            # DEBUG
-            logging.getLogger(__name__).debug(f"[MAP DEBUG] province_colors has {len(province_colors)} entries")
-            logging.getLogger(__name__).debug(f"[MAP DEBUG] 201e in province_colors: {'201e' in province_colors}")
-            logging.getLogger(__name__).debug(f"[MAP DEBUG] 322c in province_colors: {'322c' in province_colors}")
-
-            found_count = 0
-            missing_from_svg = []
-
             for pid, color in province_colors.items():
                 if should_skip(pid):
                     continue
@@ -585,30 +577,29 @@ class MapButtons(View):
                         break
 
                 if elem is None:
-                    missing_from_svg.append(pid)
                     continue
 
-                found_count += 1
-
-                elem.set("stroke", "#000000")
-                elem.set("stroke-width", "1")
-                elem.set("stroke-opacity", "1")
-                elem.set("stroke-linejoin", "round")
-
                 fill_elem = deepcopy(elem)
-                fill_elem.set("fill", color)
-                fill_elem.set("stroke", "none")
+
+                # Update fill INSIDE the style string
+                style = fill_elem.get("style", "")
+                if "fill:" in style:
+                    style = re.sub(r"fill:[^;]+", f"fill:{color}", style)
+                else:
+                    style += f";fill:{color}"
+
+                # Disable stroke on fill copy, set opacity
+                style = re.sub(r"stroke:[^;]+", "stroke:none", style)
+                style = re.sub(r"stroke-opacity:[^;]+", "stroke-opacity:0", style)
+                style = re.sub(r"stroke-width:[^;]+", "stroke-width:0", style)
+                style = re.sub(r"fill-opacity:[^;]+", "fill-opacity:0.75", style)
+
+                fill_elem.set("style", style)
+                fill_elem.attrib.pop("fill", None)  # remove any stray fill attribute
                 fill_elem.set("id", f"{pid}_fill")
 
                 parent = elem.getparent()
                 parent.insert(parent.index(elem) + 1, fill_elem)
-
-            with open("/tmp/map_debug.txt", "w") as f:
-                f.write(f"province_colors has {len(province_colors)} entries\n")
-                f.write(f"201e in province_colors: {'201e' in province_colors}\n")
-                f.write(f"322c in province_colors: {'322c' in province_colors}\n")
-                f.write(f"Found and colored: {found_count}\n")
-                f.write(f"Missing from SVG: {missing_from_svg}\n")
 
             svg_bytes = etree.tostring(
                 working_root,
