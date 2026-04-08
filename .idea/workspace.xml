@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Properly handling large map file parsing and adding to background task since it is a blocking hazard">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Properly handling large map file parsing and adding to background task since it is a blocking hazard&#10;Reducing map size" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -935,7 +932,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1682" />
+    <option name="localTasksCounter" value="1683" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -954,7 +951,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting pol auth to use correct unrest calc" />
     <MESSAGE value="Correcting puppet release issue" />
     <MESSAGE value="Responding to accept/deny" />
     <MESSAGE value="Correcting puppet release" />
@@ -979,7 +975,8 @@
     <MESSAGE value="Updating reference to map" />
     <MESSAGE value="Properly handling large map file parsing" />
     <MESSAGE value="Properly handling large map file parsing and adding to background task since it is a blocking hazard" />
-    <option name="LAST_COMMIT_MESSAGE" value="Properly handling large map file parsing and adding to background task since it is a blocking hazard" />
+    <MESSAGE value="Properly handling large map file parsing and adding to background task since it is a blocking hazard&#10;Reducing map size" />
+    <option name="LAST_COMMIT_MESSAGE" value="Properly handling large map file parsing and adding to background task since it is a blocking hazard&#10;Reducing map size" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -533,7 +533,7 @@ class MapButtons(View):
             button.disabled = True
         await self.message.edit(content="Loading...", view=self)
 
-        async def should_skip(pid: str) -> bool:
+        def should_skip(pid: str) -> bool:
             return (
                     pid.startswith("impassable_terrain_")
                     or "LAKE" in pid.upper()
@@ -573,6 +573,7 @@ class MapButtons(View):
             }
 
             # Modify only owned provinces
+            # Modify only owned provinces
             for pid, color in province_colors.items():
                 if should_skip(pid):
                     continue
@@ -581,12 +582,13 @@ class MapButtons(View):
                 if elem is None:
                     continue
 
-                # Set attributes directly (cleaner than regex on style string)
+                # Set attributes directly
                 elem.set("fill", color)
                 elem.set("stroke", "#000000")
                 elem.set("stroke-width", "2")
                 elem.set("stroke-opacity", "1")
                 elem.set("stroke-linejoin", "round")
+                elem.set("paint-order", "stroke fill")  # ← This makes fill render on top
 
             # Write cloned SVG to temp file
             tree = etree.ElementTree(working_root)
