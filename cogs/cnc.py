@@ -553,12 +553,10 @@ class MapButtons(View):
             if not self.cog.root or not self.cog.province_paths:
                 raise ValueError("SVG not preloaded")
 
-            # Clone preloaded SVG
             working_root = deepcopy(self.cog.root)
             ns = self.cog.ns
-
-            # Build path map from cloned tree (only iterate Provinces layer)
             INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
+
             province_layer = None
             for g in working_root.findall(f".//{{{ns}}}g"):
                 if g.get(f"{{{INKSCAPE_NS}}}label") == "Provinces":
@@ -568,15 +566,18 @@ class MapButtons(View):
             if province_layer is None:
                 raise RuntimeError("Provinces layer not found in cloned tree")
 
-            # ⚠DON'T build a full province_paths dict
-            # Instead, iterate ONLY the provinces we need to modify
+            # DEBUG
+            logging.getLogger(__name__).info(f"[MAP DEBUG] province_colors has {len(province_colors)} entries")
+            logging.getLogger(__name__).info(f"[MAP DEBUG] 201e in province_colors: {'201e' in province_colors}")
+            logging.getLogger(__name__).info(f"[MAP DEBUG] 322c in province_colors: {'322c' in province_colors}")
 
-            # Modify only owned provinces
+            found_count = 0
+            missing_from_svg = []
+
             for pid, color in province_colors.items():
                 if should_skip(pid):
                     continue
 
-                # Find this specific province in the layer
                 elem = None
                 for p in province_layer.iter(f"{{{ns}}}path"):
                     if p.get("id") == pid:
@@ -584,42 +585,14 @@ class MapButtons(View):
                         break
 
                 if elem is None:
-                    continue  # Province not found in SVG
+                    missing_from_svg.append(pid)
+                    continue
 
-                # Don't use paint-order - instead set stroke only
-                elem.set("stroke", "#000000")
-                elem.set("stroke-width", "1")
-                elem.set("stroke-opacity", "1")
-                elem.set("stroke-linejoin", "round")
+                found_count += 1
+                # ... rest of your coloring logic
 
-                # Create a duplicate path element for the fill (rendered after = on top)
-                fill_elem = deepcopy(elem)
-                fill_elem.set("fill", color)
-                fill_elem.set("stroke", "none")  # No stroke on the fill layer
-                fill_elem.set("id", f"{pid}_fill")  # Give it a unique ID
-
-                # Insert the fill element right after the stroke element
-                parent = elem.getparent()
-                parent.insert(parent.index(elem) + 1, fill_elem)
-
-                province_layer.insert(province_layer.index(elem) + 1, fill_elem)
-
-            # Serialize to bytes instead of file
-            svg_bytes = etree.tostring(
-                working_root,
-                encoding="utf-8",
-                xml_declaration=True,
-                method="xml",
-                pretty_print=False
-            )
-
-            png_bytes = cairosvg.svg2png(
-                bytestring=svg_bytes,
-                dpi=142.25
-            )
-
-            return png_bytes
-
+            logging.getLogger(__name__).info(f"[MAP DEBUG] Found and colored: {found_count}")
+            logging.getLogger(__name__).info(f"[MAP DEBUG] Missing from SVG: {missing_from_svg}")
         try:
             # Run in background thread with lock
             async with self.cog.render_lock:
