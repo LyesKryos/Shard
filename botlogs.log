@@ -1,4 +1,23 @@
-[2024-11-12 02:10:14] [INFO    ] discord.client: logging in using static token
-2024-11-12 02:10:14 INFO: logging in using static token
-[2024-11-12 02:10:27] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 29245b743b989307434c6aef5db532dc).
-2024-11-12 02:10:27 INFO: Shard ID None has connected to Gateway (Session ID: 29245b743b989307434c6aef5db532dc).
+[2026-04-08 16:30:34] [INFO    ] CNC.turn: mil auth
+Testland | government type gain: 4
+[2026-04-08 16:30:34] [INFO    ] CNC.turn: Testland | military alliance gain: 0.0
+[2026-04-08 16:30:34] [INFO    ] CNC.turn: Testland | dev gain: 1.9
+[2026-04-08 16:30:34] [INFO    ] CNC.turn: Testland | mil upkeep reduction: 0
+[2026-04-08 16:30:34] [INFO    ] CNC.turn: Testland | mil auth gain: 5
+[2026-04-08 16:30:34] [INFO    ] CNC.turn: pol auth
+Testland | government type gain: 3
+[2026-04-08 16:30:34] [INFO    ] CNC.turn: Testland | diplomatic relations gain: 0.0
+[2026-04-08 16:30:34] [INFO    ] CNC.turn: Testland | dev gain: 1.9
+[2026-04-08 16:30:34] [INFO    ] CNC.turn: Testland | national unrest reduction: 0.5207670361614339
+[2026-04-08 16:30:34] [INFO    ] CNC.turn: Testland | military alliance reduction: 0
+[2026-04-08 16:30:34] [INFO    ] CNC.turn: Testland | trade pact reduction: 0
+[2026-04-08 16:30:34] [INFO    ] CNC.turn: Testland | embargo reduction: 0
+[2026-04-08 16:30:34] [INFO    ] CNC.turn: Testland | pol auth gain: 4
+[2026-04-08 17:51:01] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session 04c5c883f42db0462ee3e142d31bc49c.
+[2026-04-08 17:51:01] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session 04c5c883f42db0462ee3e142d31bc49c.
+[2026-04-08 18:01:08] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session 04c5c883f42db0462ee3e142d31bc49c.
+[2026-04-08 18:01:08] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session 04c5c883f42db0462ee3e142d31bc49c.
+[2026-04-08 18:20:49] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session 04c5c883f42db0462ee3e142d31bc49c.
+[2026-04-08 18:20:49] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session 04c5c883f42db0462ee3e142d31bc49c.
+[2026-04-08 19:49:02] [WARNING ] discord.gateway: Can't keep up, shard ID None websocket is 13.2s behind.
+[2026-04-08 19:49:02] [WARNING ] discord.gateway: Can't keep up, shard ID None websocket is 13.2s behind.
