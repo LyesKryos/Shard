@@ -555,7 +555,7 @@ class MapButtons(View):
             # Clone preloaded SVG
             working_root = deepcopy(self.cog.root)
             ns = self.cog.ns
-    
+
             # Build path map from cloned tree (only iterate Provinces layer)
             INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
             province_layer = None
@@ -585,17 +585,21 @@ class MapButtons(View):
                 if elem is None:
                     continue  # Province not found in SVG
 
-                # Add stroke
+                # Don't use paint-order - instead set stroke only
                 elem.set("stroke", "#000000")
                 elem.set("stroke-width", "2")
                 elem.set("stroke-opacity", "1")
                 elem.set("stroke-linejoin", "round")
 
-                # Create fill overlay
+                # Create a duplicate path element for the fill (rendered after = on top)
                 fill_elem = deepcopy(elem)
                 fill_elem.set("fill", color)
-                fill_elem.set("stroke", "none")
-                fill_elem.set("id", f"{pid}_fill")
+                fill_elem.set("stroke", "none")  # No stroke on the fill layer
+                fill_elem.set("id", f"{pid}_fill")  # Give it a unique ID
+
+                # Insert the fill element right after the stroke element
+                parent = elem.getparent()
+                parent.insert(parent.index(elem) + 1, fill_elem)
 
                 province_layer.insert(province_layer.index(elem) + 1, fill_elem)
 
