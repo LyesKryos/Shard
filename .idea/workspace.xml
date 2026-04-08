@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Increasing map quality">
-      <change afterPath="$PROJECT_DIR$/CNC/Map Files/Maps/C&amp;C Map.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Setting map to largest possible quality">
+      <change beforePath="$PROJECT_DIR$/CNC/Map Files/Maps/C&amp;C Map.svg" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/Map Files/Maps/C&amp;C Map.svg" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -276,9 +274,6 @@
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
       <option name="IS_MODULE_SDK" value="false" />
@@ -592,7 +587,7 @@
       <workItem from="1775304820862" duration="13009000" />
       <workItem from="1775497303399" duration="9228000" />
       <workItem from="1775586336274" duration="4534000" />
-      <workItem from="1775677687978" duration="368000" />
+      <workItem from="1775677687978" duration="1872000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -937,7 +932,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1697" />
+    <option name="localTasksCounter" value="1701" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -956,8 +951,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Add market good production view command" />
-    <MESSAGE value="Archiving old map&#10;Importing new map&#10;Creating migration script for new map" />
     <MESSAGE value="Update and correct for mass ocean false positives; calculating based on lack of borders instead." />
     <MESSAGE value="Increasing polygon count for better border and coastal detection" />
     <MESSAGE value="Updating permanent delete and some province id handling" />
@@ -981,7 +974,9 @@
     <MESSAGE value="Upping quality" />
     <MESSAGE value="Testing map fix: update map" />
     <MESSAGE value="Increasing map quality" />
-    <option name="LAST_COMMIT_MESSAGE" value="Increasing map quality" />
+    <MESSAGE value="Increasing map quality and updating for proper line handling" />
+    <MESSAGE value="Setting map to largest possible quality" />
+    <option name="LAST_COMMIT_MESSAGE" value="Setting map to largest possible quality" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
