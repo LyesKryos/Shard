@@ -737,8 +737,8 @@ class Turn:
                                prov['id'], max(floor(citizen_production),1))
         # get turn number
         turn = await conn.fetchval('''SELECT number::INTEGER FROM cnc_data WHERE name = 'Turn';''')
-        # get the turn-production coefficient: turn *
-        turn_production_coefficient = min(.1*(turn**.56), 1) * 1000
+        # get the turn-production coefficient:
+        turn_production_coefficient = min(.1*(turn**.56), 1) * 500
         # pull all the trade goods
         trade_goods_raw = await conn.fetch('''SELECT * FROM cnc_trade_goods;''')
         # for each trade good
