@@ -2,6 +2,7 @@ from __future__ import annotations
 import datetime
 import gc
 import io
+import logging
 from random import randrange, randint, choice, uniform
 from typing import List
 from zoneinfo import ZoneInfo
@@ -602,9 +603,6 @@ class MapButtons(View):
                 parent.insert(parent.index(elem) + 1, fill_elem)
 
                 province_layer.insert(province_layer.index(elem) + 1, fill_elem)
-
-            # Write cloned SVG to temp file
-            working_root = deepcopy(self.cog.root)
 
             # Serialize to bytes instead of file
             svg_bytes = etree.tostring(
