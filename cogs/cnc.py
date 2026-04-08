@@ -603,8 +603,12 @@ class MapButtons(View):
                 parent = elem.getparent()
                 parent.insert(parent.index(elem) + 1, fill_elem)
 
-            logging.getLogger(__name__).debug(f"[MAP DEBUG] Found and colored: {found_count}")
-            logging.getLogger(__name__).debug(f"[MAP DEBUG] Missing from SVG: {missing_from_svg}")
+            with open("/tmp/map_debug.txt", "w") as f:
+                f.write(f"province_colors has {len(province_colors)} entries\n")
+                f.write(f"201e in province_colors: {'201e' in province_colors}\n")
+                f.write(f"322c in province_colors: {'322c' in province_colors}\n")
+                f.write(f"Found and colored: {found_count}\n")
+                f.write(f"Missing from SVG: {missing_from_svg}\n")
 
             svg_bytes = etree.tostring(
                 working_root,
@@ -622,10 +626,9 @@ class MapButtons(View):
             return png_bytes
 
         try:
-            print("[MAP DEBUG] About to call generate_map")
+            # Run in background thread with lock
             async with self.cog.render_lock:
                 png_bytes = await asyncio.to_thread(generate_map)
-            print("[MAP DEBUG] generate_map finished")
 
             file = discord.File(io.BytesIO(png_bytes), filename="CNC Map.png")
 
