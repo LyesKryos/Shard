@@ -622,9 +622,10 @@ class MapButtons(View):
             return png_bytes
 
         try:
-            # Run in background thread with lock
+            print("[MAP DEBUG] About to call generate_map")
             async with self.cog.render_lock:
                 png_bytes = await asyncio.to_thread(generate_map)
+            print("[MAP DEBUG] generate_map finished")
 
             file = discord.File(io.BytesIO(png_bytes), filename="CNC Map.png")
 
@@ -634,6 +635,8 @@ class MapButtons(View):
             await self.message.edit(content="", view=self, attachments=[file])
 
         except Exception as e:
+            logging.getLogger(__name__).warning(f"[MAP DEBUG] Exception caught: {e}", exc_info=True)
+
             for button in self.children:
                 button.disabled = False
 
