@@ -526,26 +526,20 @@ class MapButtons(View):
         # establish interaction
         conn = interaction.client.pool
         # defer interaction
-        await interaction.response.defer(thinking=True)
+        await interaction.response.defer()
 
         # disable buttons
         for button in self.children:
             button.disabled = True
         await self.message.edit(content="Loading...", view=self)
 
-        def should_skip(pid: str) -> bool:
+        async def should_skip(pid: str) -> bool:
             return (
                     pid.startswith("impassable_terrain_")
                     or "LAKE" in pid.upper()
             )
 
-        # precompile regex once (module-level ideally)
-        fill_re = re.compile(r"fill:[^;]+")
-        stroke_re = re.compile(r"stroke:[^;]+")
-        opacity_re = re.compile(r"stroke-opacity:[^;]+")
-        width_re = re.compile(r"stroke-width:[^;]+")
-
-        # fetch province data (async, keep outside thread)
+        # Fetch province data (async, keep outside thread)
         owned_provinces = await conn.fetch("""
                                            SELECT p.id, u.color
                                            FROM cnc_provinces p
@@ -555,56 +549,59 @@ class MapButtons(View):
         province_colors = {row["id"]: row["color"] for row in owned_provinces}
 
         def generate_map():
-            if not self.cog.root:
+            if not self.cog.root or not self.cog.province_paths:
                 raise ValueError("SVG not preloaded")
 
-            # clone preloaded SVG instead of reparsing
+            # Clone preloaded SVG
             working_root = deepcopy(self.cog.root)
-            # define the namespace
             ns = self.cog.ns
 
-            # Build path map from cloned tree
+            # Build path map from cloned tree (only iterate Provinces layer)
+            INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
+            province_layer = None
+            for g in working_root.findall(f".//{{{ns}}}g"):
+                if g.get(f"{{{INKSCAPE_NS}}}label") == "Provinces":
+                    province_layer = g
+                    break
+
+            if province_layer is None:
+                raise RuntimeError("Provinces layer not found in cloned tree")
+
             province_paths = {
                 p.get("id"): p
-                for p in working_root.iter(f"{{{ns}}}path")
+                for p in province_layer.iter(f"{{{ns}}}path")
             }
 
-            # modify provinces
+            # Modify only owned provinces
             for pid, color in province_colors.items():
-                elem = province_paths.get(pid)
-                if not elem or should_skip(pid):
+                if should_skip(pid):
                     continue
 
-                # define the styles
-                style = elem.get("style", "")
-                style = fill_re.sub(f"fill:{color}", style) if "fill:" in style else style + f";fill:{color}"
-                style = stroke_re.sub("stroke:#000000", style) if "stroke:" in style else style + ";stroke:#000000"
-                style = opacity_re.sub("stroke-opacity:1",
-                                       style) if "stroke-opacity:" in style else style + ";stroke-opacity:1"
-                style = width_re.sub("stroke-width:2px",
-                                     style) if "stroke-width:" in style else style + ";stroke-width:2px"
-                if "stroke-linejoin:" not in style:
-                    style += ";stroke-linejoin:round"
+                elem = province_paths.get(pid)
+                if elem is None:
+                    continue
 
-                elem.set("style", style)
+                # Set attributes directly (cleaner than regex on style string)
+                elem.set("fill", color)
+                elem.set("stroke", "#000000")
+                elem.set("stroke-width", "2")
+                elem.set("stroke-opacity", "1")
+                elem.set("stroke-linejoin", "round")
 
-
-            # write cloned SVG to temp file
+            # Write cloned SVG to temp file
             tree = etree.ElementTree(working_root)
 
             with tempfile.NamedTemporaryFile(suffix=".svg", delete=False) as tmp:
                 temp_svg_path = tmp.name
 
-            tree.write(temp_svg_path)
-
             try:
-                tree.write(temp_svg_path)
+                tree.write(temp_svg_path, encoding="utf-8", xml_declaration=True)
                 png_bytes = cairosvg.svg2png(
                     url=temp_svg_path,
-                    output_width=2500  # 🔽 lowered from 3000 for memory safety
+                    output_width=2500
                 )
 
-                # downscale if too large
+                # Downscale if too large
                 if len(png_bytes) > 10 * 1024 * 1024:
                     img = Image.open(io.BytesIO(png_bytes))
                     img.thumbnail((2000, 2000))
@@ -615,14 +612,14 @@ class MapButtons(View):
                     png_bytes = out.getvalue()
 
             finally:
-                # remove the temp path
+                # Remove temp file
                 if os.path.exists(temp_svg_path):
                     os.remove(temp_svg_path)
 
             return png_bytes
 
         try:
-            # locked background thread
+            # Run in background thread with lock
             async with self.cog.render_lock:
                 png_bytes = await asyncio.to_thread(generate_map)
 
