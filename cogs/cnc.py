@@ -555,7 +555,7 @@ class MapButtons(View):
             # Clone preloaded SVG
             working_root = deepcopy(self.cog.root)
             ns = self.cog.ns
-
+    
             # Build path map from cloned tree (only iterate Provinces layer)
             INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
             province_layer = None
@@ -567,28 +567,37 @@ class MapButtons(View):
             if province_layer is None:
                 raise RuntimeError("Provinces layer not found in cloned tree")
 
-            province_paths = {
-                p.get("id"): p
-                for p in province_layer.iter(f"{{{ns}}}path")
-            }
+            # ⚠DON'T build a full province_paths dict
+            # Instead, iterate ONLY the provinces we need to modify
 
-            # Modify only owned provinces
             # Modify only owned provinces
             for pid, color in province_colors.items():
                 if should_skip(pid):
                     continue
 
-                elem = province_paths.get(pid)
-                if elem is None:
-                    continue
+                # Find this specific province in the layer
+                elem = None
+                for p in province_layer.iter(f"{{{ns}}}path"):
+                    if p.get("id") == pid:
+                        elem = p
+                        break
 
-                # Set attributes directly
-                elem.set("fill", color)
+                if elem is None:
+                    continue  # Province not found in SVG
+
+                # Add stroke
                 elem.set("stroke", "#000000")
                 elem.set("stroke-width", "2")
                 elem.set("stroke-opacity", "1")
                 elem.set("stroke-linejoin", "round")
-                elem.set("paint-order", "stroke fill")  # ← This makes fill render on top
+
+                # Create fill overlay
+                fill_elem = deepcopy(elem)
+                fill_elem.set("fill", color)
+                fill_elem.set("stroke", "none")
+                fill_elem.set("id", f"{pid}_fill")
+
+                province_layer.insert(province_layer.index(elem) + 1, fill_elem)
 
             # Write cloned SVG to temp file
             working_root = deepcopy(self.cog.root)
