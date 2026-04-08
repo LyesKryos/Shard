@@ -567,9 +567,9 @@ class MapButtons(View):
                 raise RuntimeError("Provinces layer not found in cloned tree")
 
             # DEBUG
-            logging.getLogger(__name__).info(f"[MAP DEBUG] province_colors has {len(province_colors)} entries")
-            logging.getLogger(__name__).info(f"[MAP DEBUG] 201e in province_colors: {'201e' in province_colors}")
-            logging.getLogger(__name__).info(f"[MAP DEBUG] 322c in province_colors: {'322c' in province_colors}")
+            logging.getLogger(__name__).debug(f"[MAP DEBUG] province_colors has {len(province_colors)} entries")
+            logging.getLogger(__name__).debug(f"[MAP DEBUG] 201e in province_colors: {'201e' in province_colors}")
+            logging.getLogger(__name__).debug(f"[MAP DEBUG] 322c in province_colors: {'322c' in province_colors}")
 
             found_count = 0
             missing_from_svg = []
@@ -589,10 +589,38 @@ class MapButtons(View):
                     continue
 
                 found_count += 1
-                # ... rest of your coloring logic
 
-            logging.getLogger(__name__).info(f"[MAP DEBUG] Found and colored: {found_count}")
-            logging.getLogger(__name__).info(f"[MAP DEBUG] Missing from SVG: {missing_from_svg}")
+                elem.set("stroke", "#000000")
+                elem.set("stroke-width", "1")
+                elem.set("stroke-opacity", "1")
+                elem.set("stroke-linejoin", "round")
+
+                fill_elem = deepcopy(elem)
+                fill_elem.set("fill", color)
+                fill_elem.set("stroke", "none")
+                fill_elem.set("id", f"{pid}_fill")
+
+                parent = elem.getparent()
+                parent.insert(parent.index(elem) + 1, fill_elem)
+
+            logging.getLogger(__name__).debug(f"[MAP DEBUG] Found and colored: {found_count}")
+            logging.getLogger(__name__).debug(f"[MAP DEBUG] Missing from SVG: {missing_from_svg}")
+
+            svg_bytes = etree.tostring(
+                working_root,
+                encoding="utf-8",
+                xml_declaration=True,
+                method="xml",
+                pretty_print=False
+            )
+
+            png_bytes = cairosvg.svg2png(
+                bytestring=svg_bytes,
+                dpi=142.25
+            )
+
+            return png_bytes
+
         try:
             # Run in background thread with lock
             async with self.cog.render_lock:
