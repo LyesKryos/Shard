@@ -9906,15 +9906,15 @@ class CommandAndConquest(commands.Cog):
         govt_embed.add_field(name="Base Military Authority Gain", value=govt_info['mil_auth'])
         govt_embed.add_field(name="Base Political Authority Gain", value=govt_info['pol_auth'])
         # unrest modifier
-        govt_embed.add_field(name="Base Unrest Gain", value=f"{govt_info['unrest_mod']:.0%}")
+        govt_embed.add_field(name="Base Unrest Gain", value=f"{govt_info['unrest_mod']}")
         # manpower modifier
-        govt_embed.add_field(name="Base Manpower Access", value=f"{govt_info['manpower']:.0%}")
+        govt_embed.add_field(name="Base Manpower Access", value=f"{govt_info['manpower']}")
         # development cost
-        govt_embed.add_field(name="Base Development Cost", value=f"{govt_info['dev_cost']:.0%}")
+        govt_embed.add_field(name="Base Development Cost", value=f"{govt_info['dev_cost']}")
         # base taxation
         govt_embed.add_field(name="Base Taxation", value=f"{govt_info['tax_level']:.0%}")
         # current tax level
-        govt_embed.add_field(name="Current Taxation", value=f"{user_info['tax_level']:.0%}")
+        govt_embed.add_field(name="Current Taxation", value=f"{user_info['tax_level']}%")
         # max tax level
         govt_embed.add_field(name="Maximum Taxation", value=f"{govt_info['tax_level'] + 20:.0%}")
         # public spending

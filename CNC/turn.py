@@ -734,7 +734,7 @@ class Turn:
         for prov in unowned_provinces:
             citizen_production = prov['citizens'] / 3872
             await conn.execute('''UPDATE cnc_provinces SET production = $2 WHERE id = $1;''',
-                               prov['id'], floor(citizen_production))
+                               prov['id'], max(floor(citizen_production),1))
         # get turn number
         turn = await conn.fetchval('''SELECT number::INTEGER FROM cnc_data WHERE name = 'Turn';''')
         # get the turn-production coefficient: turn *
