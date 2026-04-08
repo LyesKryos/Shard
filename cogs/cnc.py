@@ -9935,7 +9935,8 @@ class CommandAndConquest(commands.Cog):
 
     @cnc.command(name="designate_capital", description="Designates a province as the national capital.")
     @app_commands.describe(province_id="The province to be designated as the capital.")
-    async def designate_capital(self, interaction: discord.Interaction, province_id: int):
+    @app_commands.autocomplete(province_id=owned_province_autocomplete)
+    async def designate_capital(self, interaction: discord.Interaction, province_id: str):
         # defer interaction
         await interaction.response.defer(thinking=True)
         # establish connection
