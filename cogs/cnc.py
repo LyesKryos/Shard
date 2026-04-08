@@ -617,7 +617,7 @@ class MapButtons(View):
 
             png_bytes = cairosvg.svg2png(
                 bytestring=svg_bytes,
-                output_width=interaction.filesize_limit
+                dpi=168
             )
 
             return png_bytes
