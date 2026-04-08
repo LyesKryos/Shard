@@ -29,7 +29,7 @@ import CNC.turn as turn
 from lxml import etree
 import cairosvg
 import tempfile
-
+from copy import deepcopy
 
 
 async def cnc_user_check(interaction: discord.Interaction) -> bool:
@@ -481,14 +481,14 @@ async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int, moving_user_
 
 class MapButtons(View):
 
-    def __init__(self, message: discord.InteractionMessage, author):
+    def __init__(self, message: discord.InteractionMessage, author, cog: CommandAndConquest):
         # set the timeout to two minutes
         super().__init__(timeout=120)
         # define the original map message
         self.message = message
         self.author = author
         self.map_directory = r"/root/Shard/CNC/Map Files/Maps/"
-        self.CNC = CommandAndConquest
+        self.cog = cog
 
     async def on_timeout(self) -> None:
         # for all buttons, disable
@@ -558,9 +558,9 @@ class MapButtons(View):
             if not self.cog.root:
                 raise ValueError("SVG not preloaded")
 
-            # ✅ Clone preloaded SVG instead of reparsing
+            # clone preloaded SVG instead of reparsing
             working_root = deepcopy(self.cog.root)
-
+            # define the namespace
             ns = self.cog.ns
 
             # Build path map from cloned tree
@@ -575,34 +575,21 @@ class MapButtons(View):
                 if not elem or should_skip(pid):
                     continue
 
+                # define the styles
                 style = elem.get("style", "")
-
-                if "fill:" in style:
-                    style = fill_re.sub(f"fill:{color}", style)
-                else:
-                    style += f";fill:{color}"
-
-                if "stroke:" in style:
-                    style = stroke_re.sub("stroke:#000000", style)
-                else:
-                    style += ";stroke:#000000"
-
-                if "stroke-opacity:" in style:
-                    style = opacity_re.sub("stroke-opacity:1", style)
-                else:
-                    style += ";stroke-opacity:1"
-
-                if "stroke-width:" in style:
-                    style = width_re.sub("stroke-width:2px", style)
-                else:
-                    style += ";stroke-width:2px"
-
+                style = fill_re.sub(f"fill:{color}", style) if "fill:" in style else style + f";fill:{color}"
+                style = stroke_re.sub("stroke:#000000", style) if "stroke:" in style else style + ";stroke:#000000"
+                style = opacity_re.sub("stroke-opacity:1",
+                                       style) if "stroke-opacity:" in style else style + ";stroke-opacity:1"
+                style = width_re.sub("stroke-width:2px",
+                                     style) if "stroke-width:" in style else style + ";stroke-width:2px"
                 if "stroke-linejoin:" not in style:
                     style += ";stroke-linejoin:round"
 
                 elem.set("style", style)
 
-            # ✅ Write cloned SVG to temp file
+
+            # write cloned SVG to temp file
             tree = etree.ElementTree(working_root)
 
             with tempfile.NamedTemporaryFile(suffix=".svg", delete=False) as tmp:
@@ -611,6 +598,7 @@ class MapButtons(View):
             tree.write(temp_svg_path)
 
             try:
+                tree.write(temp_svg_path)
                 png_bytes = cairosvg.svg2png(
                     url=temp_svg_path,
                     output_width=2500  # 🔽 lowered from 3000 for memory safety
@@ -627,16 +615,18 @@ class MapButtons(View):
                     png_bytes = out.getvalue()
 
             finally:
-                os.remove(temp_svg_path)
+                # remove the temp path
+                if os.path.exists(temp_svg_path):
+                    os.remove(temp_svg_path)
 
             return png_bytes
 
         try:
             # locked background thread
-            async with self.CNC.render_lock:
+            async with self.cog.render_lock:
                 png_bytes = await asyncio.to_thread(generate_map)
 
-            file = discord.File(io.BytesIO(png_bytes), filename="map.png")
+            file = discord.File(io.BytesIO(png_bytes), filename="CNC Map.png")
 
             for button in self.children:
                 button.disabled = False
@@ -7372,6 +7362,7 @@ class CommandAndConquest(commands.Cog):
         self.root = None
         self.province_paths = None
         self.render_lock = asyncio.Lock()
+        self.ns = "http://www.w3.org/2000/svg"
 
 
     async def cog_load(self):
@@ -7790,8 +7781,8 @@ class CommandAndConquest(commands.Cog):
             return commands.NoPrivateMessage
         # send the map
         map = await interaction.followup.send("https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
-        map_buttons = MapButtons(map, author=interaction.user)
-        await map.edit(view=map_buttons)
+        map_buttons = MapButtons(map, author=interaction.user, cog=self)
+        return await map.edit(view=map_buttons)
 
     @view.command(name="locate_province", description="Highlights a province on the map.")
     @app_commands.describe(province="The ID of the province to locate.")
