@@ -587,7 +587,7 @@ class MapButtons(View):
 
                 # Don't use paint-order - instead set stroke only
                 elem.set("stroke", "#000000")
-                elem.set("stroke-width", "2")
+                elem.set("stroke-width", "1")
                 elem.set("stroke-opacity", "1")
                 elem.set("stroke-linejoin", "round")
 
@@ -617,7 +617,7 @@ class MapButtons(View):
 
             png_bytes = cairosvg.svg2png(
                 bytestring=svg_bytes,
-                output_width=7500
+                output_width=7800
             )
 
             return png_bytes
