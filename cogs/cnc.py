@@ -591,32 +591,31 @@ class MapButtons(View):
                 elem.set("paint-order", "stroke fill")  # ← This makes fill render on top
 
             # Write cloned SVG to temp file
-            tree = etree.ElementTree(working_root)
+            working_root = deepcopy(self.cog.root)
 
-            with tempfile.NamedTemporaryFile(suffix=".svg", delete=False) as tmp:
-                temp_svg_path = tmp.name
+            # Serialize to bytes instead of file
+            svg_bytes = etree.tostring(
+                working_root,
+                encoding="utf-8",
+                xml_declaration=True,
+                method="xml",
+                pretty_print=False
+            )
 
-            try:
-                tree.write(temp_svg_path, encoding="utf-8", xml_declaration=True)
-                png_bytes = cairosvg.svg2png(
-                    url=temp_svg_path,
-                    output_width=2500
-                )
+            png_bytes = cairosvg.svg2png(
+                bytestring=svg_bytes,
+                output_width=2500
+            )
 
-                # Downscale if too large
-                if len(png_bytes) > 10 * 1024 * 1024:
-                    img = Image.open(io.BytesIO(png_bytes))
-                    img.thumbnail((2000, 2000))
-                    img = img.convert("RGBA")
+            # Downscale if too large
+            if len(png_bytes) > 10 * 1024 * 1024:
+                img = Image.open(io.BytesIO(png_bytes))
+                img.thumbnail((2000, 2000))
+                img = img.convert("RGBA")
 
-                    out = io.BytesIO()
-                    img.save(out, format="PNG")
-                    png_bytes = out.getvalue()
-
-            finally:
-                # Remove temp file
-                if os.path.exists(temp_svg_path):
-                    os.remove(temp_svg_path)
+                out = io.BytesIO()
+                img.save(out, format="PNG")
+                png_bytes = out.getvalue()
 
             return png_bytes
 
