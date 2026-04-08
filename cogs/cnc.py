@@ -617,18 +617,8 @@ class MapButtons(View):
 
             png_bytes = cairosvg.svg2png(
                 bytestring=svg_bytes,
-                output_width=2500
+                output_width=3000
             )
-
-            # Downscale if too large
-            if len(png_bytes) > 10 * 1024 * 1024:
-                img = Image.open(io.BytesIO(png_bytes))
-                img.thumbnail((2000, 2000))
-                img = img.convert("RGBA")
-
-                out = io.BytesIO()
-                img.save(out, format="PNG")
-                png_bytes = out.getvalue()
 
             return png_bytes
 
