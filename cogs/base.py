@@ -168,6 +168,9 @@ class BaseCommands(commands.Cog):
     async def role_assign(self, interaction: discord.Interaction, role: int):
         # get thegye server
         thegye_server = self.bot.get_guild(674259612580446230)
+        # check to make sure this is theyge
+        if interaction.guild != thegye_server:
+            return await interaction.response.send_message("This command is only available in Thegye.", ephemeral=True)
         # check the role against the list
         legal_roles = [674339122491424789, 674339122491424789, 674339578102153216, 950950836006187018, 970643811913048084]
         # if the role isn't in the list, reject
