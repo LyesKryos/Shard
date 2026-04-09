@@ -61,7 +61,7 @@ class VerificationDropdown(discord.ui.Select):
         ]
 
         super().__init__(placeholder="Choose which option best describes you...",
-                         min_values=1, max_values=4, options=options)
+                         min_values=1, max_values=5, options=options)
 
     def sanitize_links_underscore(self, userinput: str) -> str:
         """Replaces spaces with proper, url-friendly underscores"""
