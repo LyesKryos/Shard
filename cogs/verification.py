@@ -52,6 +52,9 @@ class VerificationDropdown(discord.ui.Select):
             discord.SelectOption(label="Grand Senate of Thegye Roleplay",
                                  description="You're here to roleplay as a Senator of the United Kingdom of Thegye!",
                                  emoji="\U0001f3e6"),
+            discord.SelectOption(label="Command & Conquest",
+                                 description="You're here to play Command & Conquest!",
+                                 emoji="<:CnC:974340706913124453>"),
             discord.SelectOption(label="Other",
                                  description="You're here to just explore the server!",
                                  emoji="\U0001f575")
@@ -202,6 +205,7 @@ class VerificationDropdown(discord.ui.Select):
                         code_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
                     except asyncio.TimeoutError:
                         await user.add_role(traveler_role)
+                        await user.remove_roles(nationstates_role, unverified_role)
                         return await verify_dm.send("Verification timed out. Please answer me next time!")
                     # define headers and parameters
                     params = {'a': 'verify',
@@ -292,7 +296,7 @@ class VerificationDropdown(discord.ui.Select):
             await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
                                    f"and introduce yourself!")
         except Exception:
-           logging.getLogger(__name__).exception("Verification dropdown error")
+            logging.getLogger(__name__).exception("Verification dropdown error")
 
 class Verification(commands.Cog):
 

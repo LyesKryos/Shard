@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating map with cleanest version">
-      <change beforePath="$PROJECT_DIR$/CNC/Map Files/Maps/C&amp;C Map.svg" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/Map Files/Maps/C&amp;C Map.svg" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting map render error">
+      <change afterPath="$PROJECT_DIR$/CNC/Map Files/clean_svg.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,7 +19,7 @@
     </colors>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="1272" />
+    <option name="cachedIndexableFilesCount" value="1274" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -136,11 +137,11 @@
       <recent name="C:\Users\jaedo\OneDrive\Documents\GitHub\Shard\CNC\Tech Tree" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\jaedo\PycharmProjects\Shard\CNC\Map Files" />
       <recent name="C:\Users\jaedo\PycharmProjects\Shard\!Archive" />
       <recent name="C:\Users\jaedo\PycharmProjects\Shard\CNC" />
       <recent name="C:\Users\jaedo\PycharmProjects\Shard" />
       <recent name="C:\Users\jaedo\PycharmProjects\Shard\cogs" />
-      <recent name="C:\Users\jaedo\PycharmProjects\Shard\CNC\Modules" />
     </key>
   </component>
   <component name="RunManager" selected="Python.scratch_2">
@@ -587,7 +588,7 @@
       <workItem from="1775304820862" duration="13009000" />
       <workItem from="1775497303399" duration="9228000" />
       <workItem from="1775586336274" duration="4534000" />
-      <workItem from="1775677687978" duration="2317000" />
+      <workItem from="1775677687978" duration="4859000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -932,7 +933,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1702" />
+    <option name="localTasksCounter" value="1710" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -951,7 +952,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Increasing polygon count for better border and coastal detection" />
     <MESSAGE value="Updating permanent delete and some province id handling" />
     <MESSAGE value="Updating permanent delete" />
     <MESSAGE value="Updating with new province id handling" />
@@ -976,7 +976,8 @@
     <MESSAGE value="Increasing map quality and updating for proper line handling" />
     <MESSAGE value="Setting map to largest possible quality" />
     <MESSAGE value="Updating map with cleanest version" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating map with cleanest version" />
+    <MESSAGE value="Correcting map render error" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcting map render error" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
