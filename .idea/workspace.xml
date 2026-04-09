@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting map render error">
-      <change afterPath="$PROJECT_DIR$/CNC/Map Files/clean_svg.py" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating map links&#10;Saving the clean_svg.py code&#10;Adding C&amp;C to verification dropdown at welcome.">
+      <change beforePath="$PROJECT_DIR$/cogs/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/base.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -588,7 +589,7 @@
       <workItem from="1775304820862" duration="13009000" />
       <workItem from="1775497303399" duration="9228000" />
       <workItem from="1775586336274" duration="4534000" />
-      <workItem from="1775677687978" duration="4859000" />
+      <workItem from="1775677687978" duration="8015000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -933,7 +934,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1710" />
+    <option name="localTasksCounter" value="1712" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -952,7 +953,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Updating permanent delete and some province id handling" />
     <MESSAGE value="Updating permanent delete" />
     <MESSAGE value="Updating with new province id handling" />
     <MESSAGE value="Adding province naming command to name new provinces" />
@@ -977,7 +977,8 @@
     <MESSAGE value="Setting map to largest possible quality" />
     <MESSAGE value="Updating map with cleanest version" />
     <MESSAGE value="Correcting map render error" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting map render error" />
+    <MESSAGE value="Updating map links&#10;Saving the clean_svg.py code&#10;Adding C&amp;C to verification dropdown at welcome." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updating map links&#10;Saving the clean_svg.py code&#10;Adding C&amp;C to verification dropdown at welcome." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

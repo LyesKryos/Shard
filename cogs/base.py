@@ -165,7 +165,6 @@ class BaseCommands(commands.Cog):
     @app_commands.describe(role="The role you'd like to assign.")
     @app_commands.autocomplete(role=assignable_role_autocomplete)
     @app_commands.guild_only()
-    @app_commands.guilds(674259612580446230)
     async def role_assign(self, interaction: discord.Interaction, role: int):
         # get thegye server
         thegye_server = self.bot.get_guild(674259612580446230)
