@@ -79,6 +79,7 @@ class VerificationDropdown(discord.ui.Select):
             nationstates_role = thegye_server.get_role(1150861314424573992)
             roleplay_role = thegye_server.get_role(674339122491424789)
             traveler_role = thegye_server.get_role(674280677268652047)
+            command_conquest_role = thegye_server.get_role(970643811913048084)
             gatehouse = thegye_server.get_channel(674284159128043530)
             user = self.member
             # delete message
@@ -98,7 +99,7 @@ class VerificationDropdown(discord.ui.Select):
                                         f" and our [**iiWiki page**](<https://iiwiki.us/wiki/Portal:Thegye>) for more "
                                         f"information! Feel free to let us know if you have any questions.")
                 # assign roles for Senate RP
-                elif response == "Grand Senate of Thegye Roleplay" in self.values:
+                elif response == "Grand Senate of Thegye Roleplay":
                     await user.remove_roles(unverified_role)
                     await user.add_roles(traveler_role)
                     backroom_channel = thegye_server.get_channel(1112080185949437983)
@@ -110,7 +111,7 @@ class VerificationDropdown(discord.ui.Select):
                                                 f"(<https://thegye.miraheze.org/wiki/Main_Page>) where you can find helpful"
                                                 f" information and more! Be sure to let us know if you have any questions.")
                 # assign roles for other
-                elif response == "Other" in self.values:
+                elif response == "Other":
                     await user.add_roles(traveler_role)
                 elif response == "NationStates":
                     # add the nationstates role
@@ -291,6 +292,8 @@ class VerificationDropdown(discord.ui.Select):
                                 await user.remove_roles(nationstates_role, unverified_role)
                                 await verify_dm.send("That is not a valid or correct verification code. "
                                                      "You have not been verified, but you may try again later.")
+                elif response == "Command & Conquest":
+                    await user.add_roles(command_conquest_role)
             await user.remove_roles(unverified_role)
             open_square = thegye_server.get_channel(674335095628365855)
             await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "

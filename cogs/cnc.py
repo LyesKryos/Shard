@@ -7777,7 +7777,7 @@ class CommandAndConquest(commands.Cog):
         if not interaction.guild:
             return commands.NoPrivateMessage
         # send the map
-        map = await interaction.followup.send("https://i.ibb.co/6RtH47v/Terrain-with-Numbers-Map.png")
+        map = await interaction.followup.send("https://i.ibb.co/Qj6b0sVs/Terrain-Map.png")
         map_buttons = MapButtons(map, author=interaction.user, cog=self)
         return await map.edit(view=map_buttons)
 

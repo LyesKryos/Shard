@@ -151,31 +151,38 @@ class BaseCommands(commands.Cog):
         channel = self.bot.get_channel(835579413625569322)
         await channel.send("We are online.")
 
-    @app_commands.command(name="manage_roles", description="Adds a legal role to a user.")
-    @app_commands.describe(role="The role you wish to add.", user="MODERATORS ONLY")
-    async def manage_roles(self, interaction: discord.Interaction, role: discord.Role, user: discord.User = None):
-        # defer interaction
-        await interaction.response.defer(thinking=True)
-        moderator = interaction.guild.get_role(798416884462387220)
-        admin = interaction.guild.get_role(674278353204674598)
-        # if the user tries to assign a role to someone else and they are not a moderator, refuse
-        if moderator not in interaction.user.roles:
-            if admin not in interaction.user.roles:
-                return interaction.followup.send("You do not have the permissions to assign roles to other users.")
-        # make connection
-        conn = self.bot.pool
-        # fetch all the role IDs
-        roles = await conn.fetchrow('''SELECT * FROM info WHERE name='roles';''')
-        roles = roles['number_list']
-        if role.id not in roles:
-            return await interaction.followup.send("That role cannot be self-assigned.")
+    async def assignable_role_autocomplete(self, interaction: discord.Interaction, role_string: str) -> list[app_commands.Choice]:
+        # make list of roles
+        role_list = {"Recruitment": 674339122491424789, "Games": 674339122491424789, "Recruiter": 674339578102153216,
+                     "Retention": 950950836006187018, "Command & Conquest": 970643811913048084}
+        # return and filder based on typing
+        return [
+            app_commands.Choice(name=role, value=role_list[role])
+            for role in role_list if role_string.lower() in role.lower()
+        ][:25]
+
+    @app_commands.command(name="role", description="Assigns you a role, if legal.")
+    @app_commands.describe(role="The role you'd like to assign.")
+    @app_commands.autocomplete(role=assignable_role_autocomplete)
+    @app_commands.guild_only()
+    @app_commands.guilds(674259612580446230)
+    async def role_assign(self, interaction: discord.Interaction, role: int):
+        # get thegye server
+        thegye_server = self.bot.get_guild(674259612580446230)
+        # check the role against the list
+        legal_roles = [674339122491424789, 674339122491424789, 674339578102153216, 950950836006187018, 970643811913048084]
+        # if the role isn't in the list, reject
+        if role not in legal_roles:
+            return await interaction.response.send_message("That role is not assignable.", ephemeral=True)
+        # otherwise, carry on
         else:
-            if role in interaction.user.roles:
-                await interaction.user.remove_roles(role)
-                return await interaction.followup.send(f"You have removed the `{role.name}` role.")
-            else:
-                await interaction.user.add_roles(role)
-                return await interaction.followup.send(f"You have added the `{role.name}` role.")
+            # get the user as a member
+            user = thegye_server.get_member(interaction.user.id)
+            # assign the user the role requested
+            await user.add_roles(thegye_server.get_role(role))
+            return await interaction.response.send_message(f"You have been assigned the role: <@&{role}>")
+
+
 
     @app_commands.command(name="edit_message", description="Edits a message sent by the bot.")
     @app_commands.describe(message="The ID of the message you'd like to edit", content="The new message content.")
