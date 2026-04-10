@@ -547,7 +547,22 @@ class MapButtons(View):
                                                     JOIN cnc_users u ON u.user_id = p.owner_id
                                            WHERE p.owner_id != 0 AND u.color IS NOT NULL
                                            """)
+        owned_provinces = await conn.fetch("""
+                                           SELECT p.id,
+                                                  u.color,
+                                                  p.occupier_id,
+                                                  occ.color as occupier_color
+                                           FROM cnc_provinces p
+                                                    JOIN cnc_users u ON u.user_id = p.owner_id
+                                                    LEFT JOIN cnc_users occ ON occ.user_id = p.occupier_id
+                                           WHERE p.owner_id != 0 AND u.color IS NOT NULL
+                                           """)
         province_colors = {row["id"]: row["color"] for row in owned_provinces}
+        province_occupiers = {
+            row["id"]: ("#000000" if row["occupier_id"] == 1 else row["occupier_color"])
+            for row in owned_provinces
+            if row["occupier_id"] and row["occupier_id"] != 0
+        }
 
         def generate_map():
             if not self.cog.root or not self.cog.province_paths:
@@ -566,6 +581,44 @@ class MapButtons(View):
             if province_layer is None:
                 raise RuntimeError("Provinces layer not found in cloned tree")
 
+            # Build SVG defs for stripe patterns — one per unique occupier color
+            defs = etree.SubElement(working_root, f"{{{ns}}}defs")
+            defined_patterns = {}  # color -> pattern_id
+
+            def get_stripe_pattern(stripe_color: str) -> str:
+                if stripe_color in defined_patterns:
+                    return defined_patterns[stripe_color]
+                pattern_id = f"stripe_{stripe_color.replace('#', '')}"
+                pattern = etree.SubElement(defs, f"{{{ns}}}pattern", {
+                    "id": pattern_id,
+                    "patternUnits": "userSpaceOnUse",
+                    "width": "10",
+                    "height": "10",
+                    "patternTransform": "rotate(45)",
+                })
+                # First stripe
+                etree.SubElement(pattern, f"{{{ns}}}line", {
+                    "x1": "0",
+                    "y1": "0",
+                    "x2": "0",
+                    "y2": "10",
+                    "stroke": stripe_color,
+                    "stroke-width": "3",
+                    "stroke-opacity": "0.9",
+                })
+                # Second stripe offset by half the tile width
+                etree.SubElement(pattern, f"{{{ns}}}line", {
+                    "x1": "5",
+                    "y1": "0",
+                    "x2": "5",
+                    "y2": "10",
+                    "stroke": stripe_color,
+                    "stroke-width": "3",
+                    "stroke-opacity": "0.9",
+                })
+                defined_patterns[stripe_color] = pattern_id
+                return pattern_id
+
             for pid, color in province_colors.items():
                 if should_skip(pid):
                     continue
@@ -579,27 +632,40 @@ class MapButtons(View):
                 if elem is None:
                     continue
 
+                # --- Fill layer ---
                 fill_elem = deepcopy(elem)
-
-                # Update fill INSIDE the style string
                 style = fill_elem.get("style", "")
                 if "fill:" in style:
                     style = re.sub(r"fill:[^;]+", f"fill:{color}", style)
                 else:
                     style += f";fill:{color}"
-
-                # Disable stroke on fill copy, set opacity
                 style = re.sub(r"stroke:[^;]+", "stroke:none", style)
                 style = re.sub(r"stroke-opacity:[^;]+", "stroke-opacity:0", style)
                 style = re.sub(r"stroke-width:[^;]+", "stroke-width:0", style)
                 style = re.sub(r"fill-opacity:[^;]+", "fill-opacity:0.75", style)
-
                 fill_elem.set("style", style)
-                fill_elem.attrib.pop("fill", None)  # remove any stray fill attribute
+                fill_elem.attrib.pop("fill", None)
                 fill_elem.set("id", f"{pid}_fill")
 
                 parent = elem.getparent()
-                parent.insert(parent.index(elem) + 1, fill_elem)
+                insert_idx = parent.index(elem) + 1
+                parent.insert(insert_idx, fill_elem)
+
+                # --- Occupation stripe layer ---
+                occupier_color = province_occupiers.get(pid)
+                if occupier_color:
+                    pattern_id = get_stripe_pattern(occupier_color)
+                    stripe_elem = deepcopy(elem)
+                    stripe_style = stripe_elem.get("style", "")
+                    stripe_style = re.sub(r"fill:[^;]+", f"fill:url(#{pattern_id})", stripe_style)
+                    stripe_style = re.sub(r"fill-opacity:[^;]+", "fill-opacity:1", stripe_style)
+                    stripe_style = re.sub(r"stroke:[^;]+", "stroke:none", stripe_style)
+                    stripe_style = re.sub(r"stroke-opacity:[^;]+", "stroke-opacity:0", stripe_style)
+                    stripe_style = re.sub(r"stroke-width:[^;]+", "stroke-width:0", stripe_style)
+                    stripe_elem.set("style", stripe_style)
+                    stripe_elem.attrib.pop("fill", None)
+                    stripe_elem.set("id", f"{pid}_occupation")
+                    parent.insert(insert_idx + 1, stripe_elem)
 
             svg_bytes = etree.tostring(
                 working_root,
