@@ -2026,7 +2026,7 @@ class TaxManageView(View):
         # pull user info
         user_info = await user_db_info(self.author.id, conn)
         # if the user would increase their tax above their limit
-        if user_info['tax_level'] + + 1 > 20 + user_info['tax_level']:
+        if user_info['tax_level'] + 1 > 20 + user_info['tax_level']:
             await interaction.followup.send(f"You cannot increase your taxation above "
                                             f"{self.govt_info['tax_level'] + user_info['tax_level']}%.")
             button.disabled = True
@@ -2487,7 +2487,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         # pull random subtype
         subtype = await conn.fetchrow('''SELECT *
                                          FROM cnc_govts
-                                         WHERE govt_type = $1
+                                         WHERE govt_type = $1 AND govt_subtype != 'Free City'
                                          ORDER BY random();''',
                                       govt_info['govt_type'])
         # update the user's government type, subtype, pretitle, government info, increase unrest, and reduce pol auth
@@ -2499,10 +2499,14 @@ class GovernmentReformTypeEnact(discord.ui.View):
                                   govt_type_countdown = 10,
                                   temp_unrest         = '{10,8}',
                                   unrest              = unrest + 10,
-                                  pol_auth            = pol_auth - $5
+                                  pol_auth            = pol_auth - $5,
+                                  overextend_limit    = 45
                               WHERE user_id = $6;''', subtype['pretitle'], govt_info['govt_type'],
                            subtype['govt_subtype'],
                            subtype['manpower'], total_cost, self.interaction.user.id)
+        # if the subtype selected is Tusail, remove econ auth
+        if subtype['govt_subtype'] == "Tusail":
+            await conn.execute('''UPDATE cnc_users SET econ_auth = 0 WHERE user_id = $1;''', self.interaction.user.id)
         # edit embed
         govt_embed = self.govt_embed
         # update authority gains
@@ -2585,6 +2589,14 @@ class GovernmentReformSubtypeDropdown(discord.ui.Select):
         selected_subtype = await self.conn.fetchrow('''SELECT *
                                                        FROM cnc_govts
                                                        WHERE govt_subtype = $1;''', subtype)
+        # specific subtype limitations
+        if subtype == "Free City":
+            # count all user's city structures
+            city_count = await conn.fetchval('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1 AND 'City' = ANY(structures);''')
+            # if the count is above one, remind user they must destroy down to one
+            if city_count > 1:
+                # reject
+                return await interaction.followup.send(f"The `Free City` Government Subtype permits only a **single** city to be built. Deconstruct any cities over this amount.", ephemeral=True)
         # build embed
         subtype_embed = discord.Embed(title=f"{selected_subtype['govt_subtype']} {selected_subtype['govt_type']}",
                                       color=discord.Color.dark_red(), description=f"*{selected_subtype['type_quote']}*")
@@ -2672,6 +2684,12 @@ class GovernmentReformSubtypeEnact(discord.ui.View):
                               WHERE user_id = $5;''', subtype_info['pretitle'], subtype_info['govt_type'],
                            subtype_info['govt_subtype'],
                            subtype_info['manpower'], total_cost, self.interaction.user.id)
+        # if the subtype is the Free City, set their overextend limit
+        if subtype_info['govt_subtype'] == "Free City":
+            await conn.execute('''UPDATE cnc_users SET overextend_limit = 20 WHERE user_id = $1;''', self.interaction.user.id)
+        # if the subtype is Tusail, remove all economic authority
+        if subtype_info['govt_subtype'] == "Tusail":
+            await conn.execute('''UPDATE cnc_users SET econ_auth = 0 WHERE user_id = $1;''', self.interaction.user.id)
         # edit embed
         govt_embed = self.govt_embed
         # update authority gains
@@ -9969,7 +9987,7 @@ class CommandAndConquest(commands.Cog):
         # base taxation
         govt_embed.add_field(name="Base Taxation", value=f"{govt_info['tax_level']:.0%}")
         # current tax level
-        govt_embed.add_field(name="Current Taxation", value=f"{user_info['tax_level']:.0%}")
+        govt_embed.add_field(name="Current Tax Level", value=f"{user_info['tax_level']}%")
         # max tax level
         govt_embed.add_field(name="Maximum Taxation", value=f"{govt_info['tax_level'] + .2:.0%}")
         # public spending

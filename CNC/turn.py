@@ -285,15 +285,18 @@ class Turn:
             # === REBELLION ===
             # set total national unrest as an integer 
             total_national_unrest = int(total_national_unrest)
-            # if there is not currently a rebellion
-            if not user['active_rebellion'] and not user['active_civil_war'] and not user['active_revolution']:
+            # if there is not currently a rebellion; also, tribal governments cannot have an uprising
+            if not user['active_rebellion'] and not user['active_civil_war'] and not user['active_revolution'] and user['govt_type'] != 'Tribal':
                 # calculate the chance for a revolution based on the unrest
                 if total_national_unrest > 70:
                     # roll the dice
                     revolution_chance = randint(1, total_national_unrest)
+                    # if the user govt type is anarchy, increase chance by 25%
+                    if user['govt_type'] == "Anarchy":
+                        revolution_chance *= 1.25
                     # if the roll is greater than 60
                     if revolution_chance > 60:
-                        # define list of possible revolutions
+                        # define list of possible revolutions; anarchy is always an option!
                         revolution_choices = ["Anarchy"]
                         if "Divine Right" in user['tech']:
                             revolution_choices.append("Monarchy")
@@ -315,7 +318,7 @@ class Turn:
                                                                      AND id != $2
                                                                    ORDER BY RANDOM() limit $3;''',
                                                                 user['user_id'], user['capital'],
-                                                                max(total_national_unrest / 100, .75))
+                                                                max(total_national_unrest / 10, len(controlled_provs)*.75))
                         # define rebel provinces as a list
                         rebel_provinces = []
                         # update the rebellious provinces
@@ -337,6 +340,15 @@ class Turn:
                 elif total_national_unrest > 65:
                     # roll the dice
                     civil_war_chance = randint(1, total_national_unrest)
+                    # if the user is anarchist, reduce civil war chance by 100
+                    if user['govt_type'] == "Anarchy":
+                        civil_war_chance -= 100
+                    # if the user is an elective monarchy, reduce chance by 25%
+                    if user['govt_subtype'] == "Elective":
+                        civil_war_chance *= .75
+                    # if the user is a direct democracy, reduce chance by 75%
+                    if user['govt_subtype'] == "Direct":
+                        civil_war_chance *= .25
                     # if the roll is greater than 55
                     if civil_war_chance > 55:
                         # define list of possible civil war types
@@ -347,12 +359,12 @@ class Turn:
                         # trigger a civil war
                         await conn.execute('''UPDATE cnc_users SET active_civil_war = $2 WHERE user_id = $1;''',
                                            user['user_id'], civil_war_type)
-                        #  set a number of provinces as rebellious on national unrest
+                        #  set a number of provinces as rebellious based on national unrest
                         rebellious_provinces = await conn.fetch('''SELECT * FROM cnc_provinces 
                                                                    WHERE owner_id = $1 AND id != $2 
                                                                    ORDER BY RANDOM() limit $3;''',
                                                                 user['user_id'], user['capital'],
-                                                                max(total_national_unrest/100,.75))
+                                                                max(total_national_unrest/10,len(controlled_provs)*.75))
                         # define rebel provinces as a list
                         rebel_provinces = []
                         # update the rebellious provinces
@@ -383,7 +395,7 @@ class Turn:
                                                                    WHERE owner_id = $1 AND id != $2 
                                                                    ORDER BY RANDOM() limit $3;''',
                                                                 user['user_id'], user['capital'],
-                                                                max(total_national_unrest/100,.75))
+                                                                max(total_national_unrest/10,len(controlled_provs)*.75))
                         # define rebel provinces as a list
                         rebel_provinces = []
                         # update the rebellious provinces
@@ -668,6 +680,9 @@ class Turn:
                                user['user_id'], user['movement_cap'])
             await conn.execute('''UPDATE cnc_provinces SET fort_level = $2 WHERE owner_id = $1 AND occupier_id = $1;''',
                                user['user_id'], user['fort_level'])
+            # if the user's govt type is Monarchy and they have a capital, add one fort level for free
+            if user['captial'] and user['govt_type'] == "Monarchy":
+                await conn.execute('''UPDATE cnc_provinces SET fort_level = fort_level + 1 WHERE id = $1;''', user['capital'])
 
 
             # add user dm notifications to the list
