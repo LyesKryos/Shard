@@ -7406,7 +7406,7 @@ class CommandAndConquest(commands.Cog):
         self.tech_directory = r"/root/Shard/CNC/Tech Tree/"
         self.bot = bot
         self.banned_colors = ["#000000", "#ffffff", "#808080", "#0071BC", "#0084E2", "#2BA5E2", "#999999", "#FF0000"]
-        self.version = "version 3.0.a - The Overhaul"
+        self.version = "version 3.0.b - The Overhaul"
         self.version_notes = ""
         self.tree = None
         self.root = None
@@ -7805,6 +7805,7 @@ class CommandAndConquest(commands.Cog):
                              value=f"Read the FAQ in the linked manual above or contact "
                                    f"{self.bot.get_user(293518673417732098).mention}.",
                              inline=False)
+        info_embed.add_field(name="Donate", value="The Command & Conquest system operates entirely funded by your donations! Please consider donating by using this link: [Ko-fi: Shard](https://ko-fi.com/shardbot)", inline=False)
         info_embed.set_footer(icon_url="https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png",
                               text="Created by lieskryos")
         # send the embed
