@@ -162,7 +162,7 @@ class BaseCommands(commands.Cog):
         if interaction.guild != thegye_server:
             return await interaction.response.send_message("This command is only available in Thegye.", ephemeral=True)
         # check the role against the list
-        legal_roles = [674339122491424789, 674339122491424789, 674339578102153216, 950950836006187018, 970643811913048084]
+        legal_roles = [970643811913048084, 674339122491424789, 674339372912476164, 674339578102153216, 950950836006187018]
         # if the role isn't in the list, reject
         if role.id not in legal_roles:
             return await interaction.response.send_message("That role is not assignable.", ephemeral=True)
