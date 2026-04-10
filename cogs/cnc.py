@@ -542,12 +542,6 @@ class MapButtons(View):
 
         # Fetch province data (async, keep outside thread)
         owned_provinces = await conn.fetch("""
-                                           SELECT p.id, u.color
-                                           FROM cnc_provinces p
-                                                    JOIN cnc_users u ON u.user_id = p.owner_id
-                                           WHERE p.owner_id != 0 AND u.color IS NOT NULL
-                                           """)
-        owned_provinces = await conn.fetch("""
                                            SELECT p.id,
                                                   u.color,
                                                   p.occupier_id,
@@ -7851,9 +7845,82 @@ class CommandAndConquest(commands.Cog):
         if prov_info is None:
             # return error message
             return await interaction.followup.send("No such province.")
-        cords = prov_info['cord']
-        url = await self.locate_color(province, cords)
-        return await interaction.followup.send(url)
+
+        # define the locate province color
+        color = r"#ff00a6"
+
+        # generate the map
+        def generate_map():
+            if not self.root or not self.province_paths:
+                raise ValueError("SVG not preloaded")
+
+            working_root = deepcopy(self.root)
+            ns = self.ns
+            INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
+
+            province_layer = None
+            for g in working_root.findall(f".//{{{ns}}}g"):
+                if g.get(f"{{{INKSCAPE_NS}}}label") == "Provinces":
+                    province_layer = g
+                    break
+
+            if province_layer is None:
+                raise RuntimeError("Provinces layer not found in cloned tree")
+
+            # define and get the element
+            elem = None
+            for p in province_layer.iter(f"{{{ns}}}path"):
+                if p.get("id") == prov_info['id']:
+                    elem = p
+
+            # --- Fill layer ---
+            fill_elem = deepcopy(elem)
+            style = fill_elem.get("style", "")
+            if "fill:" in style:
+                style = re.sub(r"fill:[^;]+", f"fill:{color}", style)
+            else:
+                style += f";fill:{color}"
+            style = re.sub(r"stroke:[^;]+", "stroke:none", style)
+            style = re.sub(r"stroke-opacity:[^;]+", "stroke-opacity:0", style)
+            style = re.sub(r"stroke-width:[^;]+", "stroke-width:0", style)
+            style = re.sub(r"fill-opacity:[^;]+", "fill-opacity:0.75", style)
+            fill_elem.set("style", style)
+            fill_elem.attrib.pop("fill", None)
+            fill_elem.set("id", f"{prov_info['id']}_fill")
+
+            parent = elem.getparent()
+            insert_idx = parent.index(elem) + 1
+            parent.insert(insert_idx, fill_elem)
+
+            svg_bytes = etree.tostring(
+                working_root,
+                encoding="utf-8",
+                xml_declaration=True,
+                method="xml",
+                pretty_print=False
+            )
+
+            png_bytes = cairosvg.svg2png(
+                bytestring=svg_bytes,
+                dpi=142.25
+            )
+
+            return png_bytes
+
+        try:
+            # Run in background thread with lock
+            async with self.render_lock:
+                png_bytes = await asyncio.to_thread(generate_map)
+
+            file = discord.File(io.BytesIO(png_bytes), filename="C&C Locate Map.png")
+
+            await interaction.followup.send(attachments=[file])
+
+        except Exception as e:
+            logging.getLogger(__name__).warning(f"[MAP DEBUG] Exception caught: {e}", exc_info=True)
+
+            await interaction.followup.send(content=f"Error generating map: {e}")
+
 
     @view.command(name="market_values", description="Lists all trade goods and their current market value.")
     async def trade_goods_market_values(self, interaction: discord.Interaction):
