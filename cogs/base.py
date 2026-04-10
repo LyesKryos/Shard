@@ -151,21 +151,11 @@ class BaseCommands(commands.Cog):
         channel = self.bot.get_channel(835579413625569322)
         await channel.send("We are online.")
 
-    async def assignable_role_autocomplete(self, interaction: discord.Interaction, role_string: str) -> list[app_commands.Choice]:
-        # make list of roles
-        role_list = {"Recruitment": 674339122491424789, "Games": 674339122491424789, "Recruiter": 674339578102153216,
-                     "Retention": 950950836006187018, "Command & Conquest": 970643811913048084}
-        # return and filder based on typing
-        return [
-            app_commands.Choice(name=role, value=role_list[role])
-            for role in role_list if role_string.lower() in role.lower()
-        ][:25]
 
     @app_commands.command(name="role", description="Assigns you a role, if legal.")
-    @app_commands.describe(role="The role you'd like to assign.")
-    @app_commands.autocomplete(role=assignable_role_autocomplete)
+    @app_commands.describe(role="The role you'd like to assign: Roleplay, Games, Recruiter, Retention, and Command & Conquest.")
     @app_commands.guild_only()
-    async def role_assign(self, interaction: discord.Interaction, role: int):
+    async def role_assign(self, interaction: discord.Interaction, role: discord.Role):
         # get thegye server
         thegye_server = self.bot.get_guild(674259612580446230)
         # check to make sure this is theyge
@@ -174,14 +164,14 @@ class BaseCommands(commands.Cog):
         # check the role against the list
         legal_roles = [674339122491424789, 674339122491424789, 674339578102153216, 950950836006187018, 970643811913048084]
         # if the role isn't in the list, reject
-        if role not in legal_roles:
+        if role.id not in legal_roles:
             return await interaction.response.send_message("That role is not assignable.", ephemeral=True)
         # otherwise, carry on
         else:
             # get the user as a member
             user = thegye_server.get_member(interaction.user.id)
             # assign the user the role requested
-            await user.add_roles(thegye_server.get_role(role))
+            await user.add_roles(role, reason=f"Requested by {interaction.user.name}.")
             return await interaction.response.send_message(f"You have been assigned the role: <@&{role}>")
 
 
