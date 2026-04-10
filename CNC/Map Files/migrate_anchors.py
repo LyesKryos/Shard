@@ -22,7 +22,7 @@ INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
 PROVINCE_TX = 1316.7823
 PROVINCE_TY = 1432.499
 
-TERRAIN_COLORS = {"#267f00", "#d3b000", "#0b6127", "#5a5b5e", "#283b1b", "#c1c1eb"}
+TERRAIN_COLORS = {"#267f00", "#d3b000", "#0b6127", "#5a5b5e", "#283b1b", "#c1c1eb", "#808080"}
 
 _TOKEN_RE = re.compile(
     r'[MmLlHhVvCcSsQqTtAaZz]'
