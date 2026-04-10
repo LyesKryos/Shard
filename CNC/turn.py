@@ -283,6 +283,8 @@ class Turn:
                                user['user_id'], total_stability)
 
             # === REBELLION ===
+            # set total national unrest as an integer 
+            total_national_unrest = int(total_national_unrest)
             # if there is not currently a rebellion
             if not user['active_rebellion'] and not user['active_civil_war'] and not user['active_revolution']:
                 # calculate the chance for a revolution based on the unrest
