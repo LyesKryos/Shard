@@ -7914,7 +7914,7 @@ class CommandAndConquest(commands.Cog):
 
             file = discord.File(io.BytesIO(png_bytes), filename="C&C Locate Map.png")
 
-            await interaction.followup.send(attachments=[file])
+            await interaction.followup.send(file=file)
 
         except Exception as e:
             logging.getLogger(__name__).warning(f"[MAP DEBUG] Exception caught: {e}", exc_info=True)
