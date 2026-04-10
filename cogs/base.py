@@ -174,12 +174,12 @@ class BaseCommands(commands.Cog):
             if role not in user.roles:
                 # assign the user the role requested
                 await user.add_roles(role, reason=f"Requested by {interaction.user.name}.")
-                return await interaction.response.send_message(f"You have been assigned the role: <@&{role}>")
+                return await interaction.response.send_message(f"You have been assigned the role: <@&{role.id}>")
             # otherwise, remove the role
             else:
                 # remove the role requested
                 await user.remove_roles(role, reason=f"Requested by {interaction.user.name}.")
-                return await interaction.response.send_message(f"You have been removed from the role: <@&{role}>")
+                return await interaction.response.send_message(f"You have been removed from the role: <@&{role.id}>")
 
 
 
