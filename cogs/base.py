@@ -170,9 +170,17 @@ class BaseCommands(commands.Cog):
         else:
             # get the user as a member
             user = thegye_server.get_member(interaction.user.id)
-            # assign the user the role requested
-            await user.add_roles(role, reason=f"Requested by {interaction.user.name}.")
-            return await interaction.response.send_message(f"You have been assigned the role: <@&{role}>")
+            # if the user does not already have the role
+            if role not in user.roles:
+                # assign the user the role requested
+                await user.add_roles(role, reason=f"Requested by {interaction.user.name}.")
+                return await interaction.response.send_message(f"You have been assigned the role: <@&{role}>")
+            # otherwise, remove the role
+            else:
+                # remove the role requested
+                await user.remove_roles(role, reason=f"Requested by {interaction.user.name}.")
+                return await interaction.response.send_message(f"You have been removed from the role: <@&{role}>")
+
 
 
 
