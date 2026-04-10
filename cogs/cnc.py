@@ -592,28 +592,17 @@ class MapButtons(View):
                 pattern = etree.SubElement(defs, f"{{{ns}}}pattern", {
                     "id": pattern_id,
                     "patternUnits": "userSpaceOnUse",
-                    "width": "10",
-                    "height": "10",
+                    "width": "6",
+                    "height": "6",
                     "patternTransform": "rotate(45)",
                 })
-                # First stripe
                 etree.SubElement(pattern, f"{{{ns}}}line", {
                     "x1": "0",
                     "y1": "0",
                     "x2": "0",
-                    "y2": "10",
+                    "y2": "6",
                     "stroke": stripe_color,
-                    "stroke-width": "3",
-                    "stroke-opacity": "0.9",
-                })
-                # Second stripe offset by half the tile width
-                etree.SubElement(pattern, f"{{{ns}}}line", {
-                    "x1": "5",
-                    "y1": "0",
-                    "x2": "5",
-                    "y2": "10",
-                    "stroke": stripe_color,
-                    "stroke-width": "3",
+                    "stroke-width": "2",
                     "stroke-opacity": "0.9",
                 })
                 defined_patterns[stripe_color] = pattern_id

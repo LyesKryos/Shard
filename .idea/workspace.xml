@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding self-roleing for certain roles">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding occupier color striping">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -591,7 +591,7 @@
       <workItem from="1775497303399" duration="9228000" />
       <workItem from="1775586336274" duration="4534000" />
       <workItem from="1775677687978" duration="8336000" />
-      <workItem from="1775781383615" duration="946000" />
+      <workItem from="1775781383615" duration="1483000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -936,7 +936,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1720" />
+    <option name="localTasksCounter" value="1721" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -955,7 +955,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding province naming command to name new provinces" />
     <MESSAGE value="Adding populate command" />
     <MESSAGE value="Removing map color command for" />
     <MESSAGE value="Removing map color command from turn.py as well" />
@@ -980,7 +979,8 @@
     <MESSAGE value="Updating map links&#10;Saving the clean_svg.py code&#10;Adding C&amp;C to verification dropdown at welcome." />
     <MESSAGE value="Adding self-roleing for certain roles&#10;Adding the C&amp;C option to verification&#10;Updating the map base link" />
     <MESSAGE value="Adding self-roleing for certain roles" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding self-roleing for certain roles" />
+    <MESSAGE value="Adding occupier color striping" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding occupier color striping" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
