@@ -245,6 +245,45 @@ def detect_coastal(polygons: dict) -> set[str]:
 
 
 # ---------------------------------------------------------------------------
+# Icons
+# ---------------------------------------------------------------------------
+def compute_icon_anchors(polygon) -> dict:
+    """
+    Compute fixed anchor points for each icon slot.
+    Each slot has a permanent position inside the province.
+    """
+    from shapely.geometry import Point
+    import numpy as np
+
+    # Primary anchor — guaranteed inside the polygon
+    center = polygon.representative_point()
+    cx, cy = center.x, center.y
+
+    # Compute a safe offset distance based on province size
+    # (smaller provinces get smaller offsets)
+    area = polygon.area
+    offset = min(max(np.sqrt(area) * 0.15, 8), 30)
+
+    # Define candidate positions for each slot
+    candidates = {
+        "capital": (cx,          cy),           # always center
+        "fort":    (cx - offset, cy + offset),  # bottom left
+        "army":    (cx + offset, cy + offset),  # bottom right
+    }
+
+    # Validate each candidate is actually inside the polygon
+    # If not, fall back to representative_point
+    anchors = {}
+    for slot, (x, y) in candidates.items():
+        pt = Point(x, y)
+        if polygon.contains(pt):
+            anchors[slot] = (x, y)
+        else:
+            anchors[slot] = (cx, cy)  # fallback to center
+
+    return anchors
+
+# ---------------------------------------------------------------------------
 # Migration
 # ---------------------------------------------------------------------------
 
@@ -267,6 +306,7 @@ async def migrate(svg_path: str, dsn: str, dry_run: bool = False):
     print("Parsing province polygons...")
     polygons: dict[str, Polygon] = {}
     terrain:  dict[str, int]     = {}
+    anchors:  dict               = {}
     skipped = 0
 
     for elem in province_layer.findall(f"{{{SVG_NS}}}path"):
@@ -292,6 +332,7 @@ async def migrate(svg_path: str, dsn: str, dry_run: bool = False):
 
         polygons[pid] = poly
         terrain[pid]  = tid
+        anchors[pid] = compute_icon_anchors(poly)
 
     print(f"  Valid: {len(polygons)}  |  Skipped: {skipped}")
 
@@ -369,6 +410,7 @@ async def migrate(svg_path: str, dsn: str, dry_run: bool = False):
     print(f"  Neighbors  : {checked} pairs")
     print(f"  Coastal    : {sum(coast.values())}")
     print(f"  River      : {sum(river.values())}")
+    print(f"  Anchors    : {len(anchors)}")
 
     if dry_run:
         print("\nDry run — no DB writes.")
@@ -393,13 +435,16 @@ async def migrate(svg_path: str, dsn: str, dry_run: bool = False):
         ]
 
         await db.executemany("""
-            INSERT INTO cnc_provinces (id, terrain, bordering, coast, river)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO cnc_provinces (id, terrain, bordering, coast, river, fort_cords, capital_cords, army_cords)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             ON CONFLICT (id) DO UPDATE SET
                 terrain   = EXCLUDED.terrain,
                 bordering = EXCLUDED.bordering,
                 coast     = EXCLUDED.coast,
-                river     = EXCLUDED.river
+                river     = EXCLUDED.river,
+                fort_cords = EXCLUDED.fort_cords, 
+                capital_cords = EXCLUDED.capital_cords, 
+                army_cords = EXCLUDED.army_cords
         """, rows)
 
         print(f"  Done — {len(rows)} rows written.")

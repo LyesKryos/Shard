@@ -562,6 +562,44 @@ class MapButtons(View):
             if row["occupier_id"] and row["occupier_id"] != 0
         }
 
+        # Icons
+        icon_rows = await conn.fetch("""
+                                     SELECT p.id,
+                                            p.capital_cords,
+                                            p.fort_cords,
+                                            p.army_cords,
+                                            p.fort_level,
+                                            p.structures,
+                                            u.capital                                                   as user_capital,
+                                            (SELECT COUNT(*) FROM cnc_armies a WHERE a.location = p.id) as army_count
+                                     FROM cnc_provinces p
+                                              LEFT JOIN cnc_users u ON u.user_id = p.owner_id
+                                     WHERE p.owner_id != 0
+              AND (
+                  u.capital = p.id::text
+                  OR p.fort_level > 0
+                  OR 'Fort' = ANY(p.structures)
+                  OR EXISTS (SELECT 1 FROM cnc_armies a WHERE a.location = p.id)
+              )
+                                     """)
+
+        # Build icon data dict
+        province_icons = {}
+        for row in icon_rows:
+            icons = {}
+            # Capital — province ID matches the user's capital
+            if str(row["user_capital"]) == row["id"] and row["capital_cords"]:
+                icons["capital"] = row["capital_cords"]
+            # Fort — fort_level > 0 or 'Fort' in structures
+            if (row["fort_level"] or 0) > 0 or ("Fort" in (row["structures"] or [])):
+                if row["fort_cords"]:
+                    icons["fort"] = row["fort_cords"]
+            # Army — any army present in this province
+            if row["army_count"] > 0 and row["army_cords"]:
+                icons["army"] = row["army_cords"]
+            if icons:
+                province_icons[row["id"]] = icons
+
         def generate_map():
             if not self.cog.root or not self.cog.province_paths:
                 raise ValueError("SVG not preloaded")
@@ -653,6 +691,34 @@ class MapButtons(View):
                     stripe_elem.attrib.pop("fill", None)
                     stripe_elem.set("id", f"{pid}_occupation")
                     parent.insert(insert_idx + 1, stripe_elem)
+
+                # --- Icon layer ---
+                ICONS = {
+                    "capital": "★",
+                    "fort": "🏰",
+                    "army": "⚑",
+                }
+
+                # PostgreSQL point type comes back as asyncpg Point object (x, y)
+                # Apply the same province translation offset
+                icon_layer = etree.SubElement(working_root, f"{{{ns}}}g", {"id": "icons"})
+
+                for pid, icons in province_icons.items():
+                    for slot, glyph in ICONS.items():
+                        if slot not in icons:
+                            continue
+                        point = icons[slot]
+                        # asyncpg returns point as a named tuple with x and y
+                        x = point[0] + 1316.7823  # PROVINCE_TX
+                        y = point[1] + 1432.499  # PROVINCE_TY
+                        etree.SubElement(icon_layer, f"{{{ns}}}text", {
+                            "x": str(x),
+                            "y": str(y),
+                            "text-anchor": "middle",
+                            "dominant-baseline": "middle",
+                            "font-size": "20",
+                            "style": "fill:#ffffff;stroke:#000000;stroke-width:0.05em;paint-order:stroke fill",
+                        }).text = glyph
 
             svg_bytes = etree.tostring(
                 working_root,
