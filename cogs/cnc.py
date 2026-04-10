@@ -7806,7 +7806,7 @@ class CommandAndConquest(commands.Cog):
                                    f"{self.bot.get_user(293518673417732098).mention}.",
                              inline=False)
         info_embed.add_field(name="Donate", value="The Command & Conquest system operates entirely funded by your donations! Please consider donating by using this link: [Ko-fi: Shard](https://ko-fi.com/shardbot)", inline=False)
-        info_embed.set_footer(icon_url="https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png",
+        info_embed.set_footer(icon_url="https://raw.githubusercontent.com/LyesKryos/cnc.io/refs/heads/main/assets/favicon.png",
                               text="Created by lieskryos")
         # send the embed
         await interaction.response.send_message(embed=info_embed)
