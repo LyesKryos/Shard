@@ -165,6 +165,9 @@ async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> di
     else:
         river = ""
 
+    # bordering definition
+    bordering = ', '.join([str(b) for b in prov_info['bordering']]) if len(prov_info['bordering']) > 0 else "None"
+
     # troops and armies
     troop_count = await conn.fetchval('''SELECT SUM(troops)
                                          FROM cnc_armies
@@ -185,13 +188,14 @@ async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> di
     army_count = await conn.fetchval('''SELECT COUNT(*)
                                         FROM cnc_armies
                                         WHERE location = $1''', prov_info['id'])
+
     # build embed for province and populate name and ID
     prov_embed = discord.Embed(title=f"Province of {prov_info['name']}",
                                description=f"Province #{prov_info['id']}",
                                color=discord.Color.red())
     # populate bordering
     prov_embed.add_field(name="Bordering Provinces",
-                         value=f"{', '.join([str(b) for b in prov_info['bordering']])}",
+                         value=f"{bordering}",
                          inline=False)
     prov_embed.add_field(name="Core Owner", value=owner)
     prov_embed.add_field(name="Occupier", value=occupier)
