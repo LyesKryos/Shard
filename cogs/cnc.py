@@ -602,8 +602,8 @@ class MapButtons(View):
                     "x2": "0",
                     "y2": "6",
                     "stroke": stripe_color,
-                    "stroke-width": "2",
-                    "stroke-opacity": "0.9",
+                    "stroke-width": "4",
+                    "stroke-opacity": "1",
                 })
                 defined_patterns[stripe_color] = pattern_id
                 return pattern_id
