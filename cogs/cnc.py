@@ -8428,7 +8428,7 @@ class CommandAndConquest(commands.Cog):
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # grab posting info
         try:
-            post_info = await self.province_db_info(province_id=int(posting))
+            post_info = await self.province_db_info(province_id=posting)
         except ValueError:
             return await interaction.followup.send(f"No such province as `{posting}`.\nNote: if additional spaces/characters were added to the autocomplete suggestion, the posting may appear invalid.", ephemeral=True)
         # define tusail mil charge
