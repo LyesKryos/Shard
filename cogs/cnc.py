@@ -548,12 +548,13 @@ class MapButtons(View):
         owned_provinces = await conn.fetch("""
                                            SELECT p.id,
                                                   u.color,
-                                                  p.occupier_id,
+                                                  p.occupier_id, 
+                                                  p.owner_id,
                                                   occ.color as occupier_color
                                            FROM cnc_provinces p
                                                     JOIN cnc_users u ON u.user_id = p.owner_id
                                                     LEFT JOIN cnc_users occ ON occ.user_id = p.occupier_id
-                                           WHERE p.owner_id != 0 AND u.color IS NOT NULL
+                                           WHERE p.owner_id != 0 AND u.color IS NOT NULL;
                                            """)
         province_colors = {row["id"]: row["color"] for row in owned_provinces}
         province_occupiers = {
