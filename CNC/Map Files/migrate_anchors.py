@@ -70,7 +70,7 @@ def compute_icon_anchors(polygon: Polygon) -> dict[str, tuple[float, float]]:
 
     # Compute offset based on province size
     area   = polygon.area
-    offset = min(max(math.sqrt(area) * 0.25, 10), 50)
+    offset = min(max(math.sqrt(area) * 0.35, 10), 50)
 
     # Find the orientation of the province's longest axis
     # using the minimum rotated bounding rectangle
