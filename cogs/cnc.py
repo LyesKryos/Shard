@@ -1793,12 +1793,12 @@ class DossierView(View):
         # populate troops and armies
         self.doss_embed.add_field(name="=======================MILITARY======================",
                                   value="Information about your nation's military.", inline=False)
-        self.doss_embed.add_field(name="Troops", value=f"{troops:,}")
+        self.doss_embed.add_field(name="Troops", value=f"{troops:,.0f}")
         self.doss_embed.add_field(name="Armies", value=f"{armies}")
         self.doss_embed.add_field(name="Generals", value=f"{generals}")
         # populate manpower
         self.doss_embed.add_field(name="Manpower \n(Manpower Access)", value=f"{self.user_info['manpower']:,} "
-                                                                             f"({self.user_info['manpower_access']}%)")
+                                                                             f"({self.user_info['manpower_access']:%})")
         self.doss_embed.add_field(name="Manpower Regen",
                                   value=f"{math.floor(total_manpower * (self.user_info['manpower_regen'] / 100)):,} "
                                         f"({self.user_info['manpower_regen']}%)")
