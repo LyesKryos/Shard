@@ -626,7 +626,11 @@ class MapButtons(View):
                     break
 
             # get and define the icon layer, inserting it UNDER the id layer
-            icon_layer = etree.Element(f"{{{ns}}}g", {"id": "icons"})
+            # and giving it the same transform as the provinces layer
+            icon_layer = etree.Element(f"{{{ns}}}g", {
+                "id": "icons",
+                "transform": f"translate({1316.7823},{1432.499})",
+            })
             working_root.insert(insert_at, icon_layer)
 
             # Build SVG defs for stripe patterns
@@ -707,7 +711,7 @@ class MapButtons(View):
                     parent.insert(insert_idx + 1, stripe_elem)
 
             # Icons — appended to icon_layer which was already inserted in correct position
-            ICON_FONT_SIZE = 0  # set to 0 because otherwise the offset puts them outside of the province area
+            ICON_FONT_SIZE = 20
             ICONS = {
                 "capital": ("★", 0),  # centered
                 "fort": ("⌂", ICON_FONT_SIZE),  # planted
@@ -719,8 +723,8 @@ class MapButtons(View):
                     if slot not in icons:
                         continue
                     point = icons[slot]
-                    x = point[0]
-                    y = point[1] - y_offset
+                    x = point[0] - 1316.7823
+                    y = point[1] - 1432.499 - y_offset
                     etree.SubElement(icon_layer, f"{{{ns}}}text", {
                         "x": str(x),
                         "y": str(y),
