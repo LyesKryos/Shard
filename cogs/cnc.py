@@ -691,7 +691,7 @@ class MapButtons(View):
                     parent.insert(insert_idx + 1, stripe_elem)
 
                 # --- Icon layer ---
-                ICON_FONT_SIZE = 20
+                ICON_FONT_SIZE = 5
 
                 ICONS = {
                     "capital": ("★", 0),  # centered — star looks better centered
