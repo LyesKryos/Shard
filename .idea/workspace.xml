@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fix spacing issue in prohibited peace treaties list display">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CNC/turn.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/turn.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding the proper free government change calculation to the turn update" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -594,7 +591,7 @@
       <workItem from="1775677687978" duration="8336000" />
       <workItem from="1775781383615" duration="2429000" />
       <workItem from="1775839691776" duration="5225000" />
-      <workItem from="1775911138228" duration="11566000" />
+      <workItem from="1775911138228" duration="11942000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -939,7 +936,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1756" />
+    <option name="localTasksCounter" value="1757" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -958,7 +955,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding self-roleing for certain roles" />
     <MESSAGE value="Adding occupier color striping" />
     <MESSAGE value="Adding locate province operation to commands" />
     <MESSAGE value="Adding icon anchors to migrate.py and map commands rendering&#10;Adding icons layer to the map file" />
@@ -983,7 +979,8 @@
     <MESSAGE value="Correcting map button bug" />
     <MESSAGE value="Adding development production boost to citizen production calculation" />
     <MESSAGE value="Fix spacing issue in prohibited peace treaties list display" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix spacing issue in prohibited peace treaties list display" />
+    <MESSAGE value="Adding the proper free government change calculation to the turn update" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding the proper free government change calculation to the turn update" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

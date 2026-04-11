@@ -120,7 +120,7 @@ def rand_location_name_list(list_range: int) -> List[str]:
     # while the results are not long enough, loop through the locales and get unique names
     while len(results) < list_range:
         # if there are no active locales left to look through
-        if not active_locales:            
+        if not active_locales:
             raise RuntimeError(f"All locales exhausted at length: {len(results)}. Results are as follows:\n{results}")
         # cycle through active locales, dropping any that are exhausted
         for locale in list(active_locales):
@@ -1131,6 +1131,8 @@ class DevelopmentBoostView(View):
         # add modifiers from structures
         if "Lumber Mill" in structures:
             boost_cost *= .85
+        # subtract econ boost cost
+        boost_cost -= user_info['econ_boost_cost']
         # round boost cost up
         boost_cost = math.ceil(boost_cost)
         # check if user has sufficient authority
@@ -1178,13 +1180,15 @@ class DevelopmentBoostView(View):
         # add modifiers from structures
         if "Lumber Mill" in structures:
             boost_cost *= .85
+        # subtract pol boost coost
+        boost_cost -= user_info['pol_boost_cost']
         # round boost cost up
         boost_cost = math.ceil(boost_cost)
         # check if user has sufficient authority
         if user_info['pol_auth'] < boost_cost:
             return await interaction.response.send_message(
                 f"You do not have sufficient Political authority to boost in this "
-                f"province. You are missing {boost_cost - user_info['econ_auth']} "
+                f"province. You are missing {boost_cost - user_info['pol_auth']} "
                 f"Political authority.")
         # execute orders
         await conn.execute('''UPDATE cnc_users
@@ -1225,13 +1229,15 @@ class DevelopmentBoostView(View):
         # add modifiers from structures
         if "Lumber Mill" in structures:
             boost_cost *= .85
+        # subtract mil boost coost
+        boost_cost -= user_info['mil_boost_cost']
         # round boost cost up
         boost_cost = math.ceil(boost_cost)
         # check if user has sufficient authority
         if user_info['mil_auth'] < boost_cost:
             return await interaction.response.send_message(
                 f"You do not have sufficient Military authority to boost in this "
-                f"province. You are missing {boost_cost - user_info['econ_auth']} "
+                f"province. You are missing {boost_cost - user_info['mil_aith']} "
                 f"Military authority.")
         # execute orders
         await conn.execute('''UPDATE cnc_users
@@ -3436,7 +3442,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                            FROM cnc_military_access
                                            WHERE id = $1;''', mil_access['id'])
                 await remove_msg.edit(view=None)
-                await safe_dm(bot=interaction.client, user_id=self.recipient_info['user_id'], 
+                await safe_dm(bot=interaction.client, user_id=self.recipient_info['user_id'],
                               content=f"{user_info['name']} has ended our Military Access Agreement. "
                                       f"All armies within their territory shall return to one of our provinces.")
                 # return to menu
@@ -3553,9 +3559,9 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                              f"to establish an Overlordship over {self.recipient_info['name']}. "
                                              f"Please use the buttons below within 24 hours to respond to the request.")
         # create the response view
-        subjugation_response = ProposeSubjugationResponseView(interaction=interaction, 
-                                                     conn=self.conn, 
-                                                     sender_info=user_info, 
+        subjugation_response = ProposeSubjugationResponseView(interaction=interaction,
+                                                     conn=self.conn,
+                                                     sender_info=user_info,
                                                      recipient_info=self.recipient_info,
                                                      dm=recipient_dm,
                                                      bot=self.bot)
@@ -3681,7 +3687,7 @@ class HostileDiplomaticActions(discord.ui.View):
                                                             AND type = ANY ($3);''',
                                                        user_info['name'], self.recipient_info['name'],
                                                        ["Military Alliance, Trade Pact, Diplomatic Relations"])
-        # if any of them are not empty 
+        # if any of them are not empty
         if (alliances is not None) or (trade_pacts is not None) or (pending_cooperation is not None):
             button.disabled = True
             await interaction.edit_original_response(view=self)
@@ -4002,7 +4008,7 @@ class PuppetManagement(discord.ui.View):
             # notify recipient
             await safe_dm(bot=interaction.client,
                 user_id=self.recipient_info['user_id'],
-                content=f"{self.recipient_info['name']} has been forced to change their Government Subtype to **{sender_info['govt_subtype']}** {sender_info['govt_type']} by their overlord, {sender_info['name']}!")  
+                content=f"{self.recipient_info['name']} has been forced to change their Government Subtype to **{sender_info['govt_subtype']}** {sender_info['govt_type']} by their overlord, {sender_info['name']}!")
             # notify sender
             await interaction.response.send_message(f"{self.recipient_info['name']} has been forced to change their Government Subtype to **{sender_info['govt_subtype']}** {sender_info['govt_type']} by their overlord, {sender_info['name']}!")
             # return to menu
@@ -4340,7 +4346,7 @@ class TradePactRespondView(discord.ui.View):
         # close out the buttons
         self.stop()
         return await interaction.edit_original_response(view=None)
-    
+
 class ProposeSubjugationResponseView(discord.ui.View):
 
     def __init__(self, interaction: discord.Interaction, conn: asyncpg.Pool, sender_info: asyncpg.Record,
@@ -6192,7 +6198,7 @@ class WarOptionsView(discord.ui.View):
                                                                                            f"{target_info['name']}"
                                                                                            f" has been ended by "
                                                                                            f"a Peace Treaty.")
-                
+
                 # if there are end military alliance demands, update the military alliance
                 elif peace_negotiation['end_ma']:
                     # pull ma info
@@ -6574,7 +6580,7 @@ class AuthDemandView(discord.ui.View):
 
         async def callback(self, interaction: discord.Interaction):
             self.view.diplo_authority = self.values[0]
-            await interaction.response.defer() 
+            await interaction.response.defer()
 
     # create submit and cancel buttons
 
@@ -6675,29 +6681,29 @@ class ArmyActionsView(View):
         self.parent_interaction = parent_interaction
         self.conn = conn
         self.army_info = army_info
-        
+
         # if the army is not embarked already, add the embark button
         if not army_info['embark']:
             # create the button and add it
             self.embark_button = discord.ui.Button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
             self.embark_button.callback = self.embark_army
             self.add_item(self.embark_button)
-        # if the army is already embarked, add the disembarked button 
+        # if the army is already embarked, add the disembarked button
         else:
             # create the button and add it
             self.disembark_button = discord.ui.Button(label="Disembark", style=discord.ButtonStyle.blurple,
                                                       emoji="\U00002693")
             self.disembark_button.callback = self.disembark_army
             self.add_item(self.disembark_button)
-            
-    
+
+
     async def on_timeout(self):
         # disable all buttons
         for child in self.children:
             child.disabled = True
         # update view
         return await self.parent_interaction.edit_original_response(view=self)
-    
+
     async def interaction_check(self, interaction: discord.Interaction):
         # pull the user's data to ensure they are not pacifistic
         govt_subtype = await self.conn.fetchval('''SELECT govt_subtype FROM cnc_users WHERE user_id = $1;''',
@@ -6725,7 +6731,7 @@ class ArmyActionsView(View):
         await self.parent_interaction.edit_original_response(view=army_recruit_menu)
         # stop listening
         self.stop()
-    
+
     @discord.ui.button(label="Disband", style=discord.ButtonStyle.danger, emoji="\U0001f4a4")
     async def disband_soldiers(self, interaction: discord.Interaction, button: discord.ui.Button):
         # respond to the interaction
@@ -6781,7 +6787,7 @@ class ArmyActionsView(View):
             # set the embark to "true"
             await conn.execute('''UPDATE cnc_armies SET embark = TRUE WHERE army_id = $1;''',
                                self.army_info['army_id'])
-            # notify 
+            # notify
             return await interaction.response.send_message(content=f"The {self.army_info['army_name']} is prepared to "
                                                                    f"embark! When moved, it will attempt to reach its "
                                                                    f"destination by sea.")
@@ -6812,17 +6818,17 @@ class ArmyRecruitMenu(discord.ui.View):
         self.parent_interaction = parent_interaction
         self.army_info = army_info
         self.conn = parent_interaction.client.pool
-    
+
     async def on_timeout(self):
         # disable all buttons
         for child in self.children:
             child.disabled = True
         # update the view
         return await self.parent_interaction.edit_original_response(view=self)
-    
+
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.parent_interaction.user.id
-    
+
     @discord.ui.button(label="Recruit 1,000", style=discord.ButtonStyle.blurple)
     async def recruit_onek(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
@@ -6917,7 +6923,7 @@ class ArmyRecruitMenu(discord.ui.View):
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # check if the user has the correct amount of the authority required
         if "Tusail" in user_info['govt_subtype']:
-            # set the mil charge 
+            # set the mil charge
             tusail_mil_charge = True
             # check the amount of military authority
             if user_info['mil_auth'] < 5:
@@ -7066,7 +7072,7 @@ class ArmyRecruitMenu(discord.ui.View):
                                             f"10,000 troops!")
             # stop listening
             return self.stop()
-    
+
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
@@ -7074,11 +7080,11 @@ class ArmyRecruitMenu(discord.ui.View):
         # reset menu
         army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
                                             conn=self.conn, army_info=self.army_info)
-        # update the parent 
+        # update the parent
         await self.parent_interaction.edit_original_response(view=army_actions_view)
         # stop listening
         return self.stop()
-    
+
 
 class ArmyDisbandMenu(discord.ui.View):
 
@@ -7097,7 +7103,7 @@ class ArmyDisbandMenu(discord.ui.View):
             child.disabled = True
         # update the view
         await self.parent_interaction.edit_original_response(view=self)
-    
+
     @discord.ui.button(label="Disband 1,000", style=discord.ButtonStyle.danger)
     async def disband_onek(self, interaction: discord.Interaction, button: discord.Button):
         # defer the interaction
@@ -7109,7 +7115,7 @@ class ArmyDisbandMenu(discord.ui.View):
         # get user info
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # if the army has less than 1000, confirm if the user wishes to disband the army
-        if army_info['troops'] - 1000 <= 0: 
+        if army_info['troops'] - 1000 <= 0:
             # create accept view
             accept_view = Accept(interaction)
             # send message
@@ -7170,7 +7176,7 @@ class ArmyDisbandMenu(discord.ui.View):
         # get user info
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # if the army has less than 1000, confirm if the user wishes to disband the army
-        if army_info['troops'] - 5000 <= 0: 
+        if army_info['troops'] - 5000 <= 0:
             # create accept view
             accept_view = Accept(interaction)
             # send message
@@ -7218,8 +7224,8 @@ class ArmyDisbandMenu(discord.ui.View):
             # update the original
             await self.parent_interaction.edit_original_response(embed=army_embed, view=army_actions_view)
             # stop listening
-            return self.stop()  
-           
+            return self.stop()
+
     @discord.ui.button(label="Disband 10,000", style=discord.ButtonStyle.danger)
     async def disband_tenk(self, interaction: discord.Interaction, button: discord.Button):
         # defer the interaction
@@ -7231,7 +7237,7 @@ class ArmyDisbandMenu(discord.ui.View):
         # get user info
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
         # if the army has less than 1000, confirm if the user wishes to disband the army
-        if army_info['troops'] - 10000 <= 0: 
+        if army_info['troops'] - 10000 <= 0:
             # create accept view
             accept_view = Accept(interaction)
             # send message
@@ -7278,7 +7284,7 @@ class ArmyDisbandMenu(discord.ui.View):
             # update the original
             await self.parent_interaction.edit_original_response(embed=army_embed, view=army_actions_view)
             # stop listening
-            return self.stop()  
+            return self.stop()
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -7287,10 +7293,10 @@ class ArmyDisbandMenu(discord.ui.View):
         # reset menu
         army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
                                             conn=self.conn, army_info=self.army_info)
-        # update the parent 
+        # update the parent
         await self.parent_interaction.edit_original_response(view=army_actions_view)
         # stop listening
-        return self.stop()        
+        return self.stop()
 
 
 class GeneralSelectMenu(discord.ui.Select):
@@ -7462,7 +7468,7 @@ class GeneralDismissView(discord.ui.View):
                                                                f"dismissed and has retired from national service.")
 
 class ResearchingCancelView(discord.ui.View):
-    
+
     def __init__(self, parent_interaction: discord.Interaction):
         super().__init__(timeout=120)
         # define variables
@@ -7874,7 +7880,7 @@ class CommandAndConquest(commands.Cog):
                 f"guide, and an overview of all commands, mechanics, and concepts.\n\n"
                 f"**\"I came, I saw, I conquered.\" -Julius Caesar**"
             )
-        
+
     @cnc.command(name="info", description="Sends information about the Command & Conquest system.")
     async def send_info(self, interaction: discord.Interaction):
         # establish conn
@@ -8523,7 +8529,7 @@ class CommandAndConquest(commands.Cog):
                     await conn.execute('''INSERT INTO cnc_armies(owner_id, troops, location, army_name) VALUES ($1, $2, $3, $4);''', user_info['user_id'], recruit_troops, post_info['id'], army_name)
                     # notify
                     return await interaction.followup.send(f"The {army_name} has been created in {post_info['name']} (ID: {post_info['id']}). It currently has `{recruit_troops:,}` troops. It is not commanded by a General.", ephemeral=False)
-    
+
     @cnc.command(name="move_army",
                  description="Moves an army to a new location, initiating army combat or siege where applicable.")
     @app_commands.autocomplete(army=army_autocomplete, move_to=province_autocomplete)
@@ -9177,7 +9183,7 @@ class CommandAndConquest(commands.Cog):
                 # run battle and return results
                 victor, attacker_casualties, defender_casualties = await battle.battle()
                 # since this is directly attacking the province natives, reduce the citizenry by the casualties
-                await conn.execute('''UPDATE cnc_provinces SET citizens = citizens - $2 WHERE id = $1;''', 
+                await conn.execute('''UPDATE cnc_provinces SET citizens = citizens - $2 WHERE id = $1;''',
                                    prov_info['id'], defender_casualties)
                 # === VICTORY ===
                 if victor == "attacker":
@@ -9495,7 +9501,7 @@ class CommandAndConquest(commands.Cog):
                 battle_embed.add_field(name="\u200b", value="\u200b")
                 # define the primary defender
                 primary_defender = await user_db_info(conn=conn, user_id=enemy_army_list[0]['owner_id'])
-                battle_embed.add_field(name="Defender", 
+                battle_embed.add_field(name="Defender",
                                        value=f"The {primary_defender['pretitle']} of {primary_defender['name']}")
                 # define the defending attributes
                 battle_embed.add_field(name="Defending Army(s)",
@@ -9977,7 +9983,7 @@ class CommandAndConquest(commands.Cog):
         if user_info['govt_type'] == "Equalism":
             research_time -= 1
         # for every University owned by this nation, reduce time by one
-        universities = await conn.fetchval('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1 AND 'University' = ANY(structures);''', 
+        universities = await conn.fetchval('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1 AND 'University' = ANY(structures);''',
                                           user_info['user_id'])
         research_time -= universities if universities is not None else 0
         # ensure the research time is at least 4
@@ -10226,7 +10232,7 @@ class CommandAndConquest(commands.Cog):
             gp_score = 0
             # get development and citizens
             citizens = await conn.fetchval('''SELECT SUM(citizens) FROM cnc_provinces WHERE owner_id = $1 AND occupier_id = $1;''', user['user_id'])
-            development = await conn.fetchval('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1 AND occupier_id = $1;''', user['user_id']) 
+            development = await conn.fetchval('''SELECT AVG(development) FROM cnc_provinces WHERE owner_id = $1 AND occupier_id = $1;''', user['user_id'])
             # add citizen and development score
             citizen_score = citizens/10000
             dev_score = float(development)/7.5
@@ -10273,7 +10279,7 @@ class CommandAndConquest(commands.Cog):
             # otherwise, carry on
             else:
                 # run calc
-                citizen_score, dev_score, auth_score, stability_score, troop_count_score, general_score, tech_score, alliances_score, pacts_score, dr_score = await gp_calc(user_info) 
+                citizen_score, dev_score, auth_score, stability_score, troop_count_score, general_score, tech_score, alliances_score, pacts_score, dr_score = await gp_calc(user_info)
         elif nation is not None and user is None:
                         # pull the user info
             user_info = await user_db_info(user_id=nation, conn=conn)
@@ -10284,7 +10290,7 @@ class CommandAndConquest(commands.Cog):
             # otherwise, carry on
             else:
                 # run calc
-                citizen_score, dev_score, auth_score, stability_score, troop_count_score, general_score, tech_score, alliances_score, pacts_score, dr_score = await gp_calc(user_info) 
+                citizen_score, dev_score, auth_score, stability_score, troop_count_score, general_score, tech_score, alliances_score, pacts_score, dr_score = await gp_calc(user_info)
         # if all that fails or is not true, reject
         else:
             # reject
@@ -10362,7 +10368,7 @@ class CommandAndConquest(commands.Cog):
         gp_embed.set_footer(text="Nations must attain at least 50 Great Power Score to be considered a Great Power.")
         # send embed
         return await interaction.response.send_message(embed=gp_embed)
-    
+
     # === MODERATOR COMMANDS ===
 
     @commands.command()
