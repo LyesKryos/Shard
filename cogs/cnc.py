@@ -691,10 +691,12 @@ class MapButtons(View):
                     parent.insert(insert_idx + 1, stripe_elem)
 
                 # --- Icon layer ---
+                ICON_FONT_SIZE = 20
+
                 ICONS = {
-                    "capital": "★",
-                    "fort": "🏰",
-                    "army": "⚑",
+                    "capital": ("★", 0),  # centered — star looks better centered
+                    "fort": ("🏰", ICON_FONT_SIZE),  # planted — bottom on anchor
+                    "army": ("⚑", ICON_FONT_SIZE),  # planted — bottom on anchor
                 }
 
                 # PostgreSQL point type comes back as asyncpg Point object (x, y)
@@ -702,18 +704,19 @@ class MapButtons(View):
                 icon_layer = etree.SubElement(working_root, f"{{{ns}}}g", {"id": "icons"})
 
                 for pid, icons in province_icons.items():
-                    for slot, glyph in ICONS.items():
+                    for slot, (glyph, y_offset) in ICONS.items():
                         if slot not in icons:
                             continue
                         point = icons[slot]
                         # asyncpg returns point as a named tuple with x and y
                         x = point[0]  # PROVINCE_TX
-                        y = point[1]  # PROVINCE_TY
+                        y = point[1] - y_offset # PROVINCE_TY
+
                         etree.SubElement(icon_layer, f"{{{ns}}}text", {
                             "x": str(x),
                             "y": str(y),
                             "text-anchor": "middle",
-                            "dominant-baseline": "middle",
+                            "dominant-baseline": "auto",
                             "font-size": "20",
                             "style": "fill:#ffffff;stroke:#000000;stroke-width:0.05em;paint-order:stroke fill",
                         }).text = glyph
@@ -1798,7 +1801,7 @@ class DossierView(View):
         self.doss_embed.add_field(name="Generals", value=f"{generals}")
         # populate manpower
         self.doss_embed.add_field(name="Manpower \n(Manpower Access)", value=f"{self.user_info['manpower']:,} "
-                                                                             f"({self.user_info['manpower_access']:%})")
+                                                                             f"({self.user_info['manpower_access']:.0%f})")
         self.doss_embed.add_field(name="Manpower Regen",
                                   value=f"{math.floor(total_manpower * (self.user_info['manpower_regen'] / 100)):,} "
                                         f"({self.user_info['manpower_regen']}%)")
