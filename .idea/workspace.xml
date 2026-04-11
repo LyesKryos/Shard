@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding icons to the map" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcing move_to with correct province id system" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -590,7 +590,7 @@
       <workItem from="1775586336274" duration="4534000" />
       <workItem from="1775677687978" duration="8336000" />
       <workItem from="1775781383615" duration="2429000" />
-      <workItem from="1775839691776" duration="3088000" />
+      <workItem from="1775839691776" duration="3385000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -935,7 +935,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1730" />
+    <option name="localTasksCounter" value="1732" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -954,7 +954,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Updating .svg of map" />
     <MESSAGE value="Updaing reference to map" />
     <MESSAGE value="Updating reference to map" />
     <MESSAGE value="Properly handling large map file parsing" />
@@ -979,7 +978,8 @@
     <MESSAGE value="Adding icon anchors script" />
     <MESSAGE value="Correcing map discrepancies" />
     <MESSAGE value="Adding icons to the map" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding icons to the map" />
+    <MESSAGE value="Correcing move_to with correct province id system" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcing move_to with correct province id system" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

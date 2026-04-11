@@ -10,15 +10,11 @@ import asyncpg
 from discord import app_commands, Interaction
 from discord.ext import tasks
 import importlib
-
-from pycparser import preprocess_file
-
 from ShardBot import Shard
 import discord
 from discord.ext import commands
 import asyncio
 from PIL import Image, ImageColor
-import os
 from discord.ui import View
 import math
 import heapq
@@ -29,7 +25,6 @@ import CNC.battlesim as battlesim
 import CNC.turn as turn
 from lxml import etree
 import cairosvg
-import tempfile
 from copy import deepcopy
 
 
@@ -2661,7 +2656,8 @@ class GovernmentReformSubtypeDropdown(discord.ui.Select):
         # specific subtype limitations
         if subtype == "Free City":
             # count all user's city structures
-            city_count = await conn.fetchval('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1 AND 'City' = ANY(structures);''')
+            city_count = await self.conn.fetchval('''SELECT count(id) FROM cnc_provinces 
+                                                     WHERE owner_id = $1 AND 'City' = ANY(structures);''')
             # if the count is above one, remind user they must destroy down to one
             if city_count > 1:
                 # reject
@@ -9147,7 +9143,7 @@ class CommandAndConquest(commands.Cog):
                     'army_name': f"Warriors of {prov_info['name']}"
                 }
                 # initialize battle
-                battle = battlesim.battlesim.Battle(
+                battle = battlesim.Battle(
                     attacking_army=army_info,
                     defending_armies=[rebel_army],
                     province_info=prov_info,
