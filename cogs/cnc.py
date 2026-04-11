@@ -413,8 +413,8 @@ async def find_path(conn: asyncpg.Pool, start_id: str, end_id: str, moving_user_
             # if the army blocks, skip this tile
             if hostile_found:
                 continue
-            # if the tile is occupier by someone other than 0
-            if occupier_map.get(neighbor, 0) != 0:
+            # if the tile is occupier by someone other than 0 or the user
+            if occupier_map.get(neighbor, 0) != 0 and occupier_map.get(neighbor, 0) != user_info['user_id']:
                 # get the occupier info
                 occupier_info = await user_db_info(conn=conn, user_id=occupier_map[neighbor])
                 # war check

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting icon display for putting the bottom frame on the point rather than centering it." />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting pathfinder province id use" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,7 +16,7 @@
     </colors>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="1273" />
+    <option name="cachedIndexableFilesCount" value="1274" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -591,6 +591,7 @@
       <workItem from="1775677687978" duration="8336000" />
       <workItem from="1775781383615" duration="2429000" />
       <workItem from="1775839691776" duration="5225000" />
+      <workItem from="1775911138228" duration="300000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -935,7 +936,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1739" />
+    <option name="localTasksCounter" value="1740" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -954,7 +955,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Properly handling large map file parsing and adding to background task since it is a blocking hazard&#10;Reducing map size" />
     <MESSAGE value="Correcting slight errors in code&#10;Updating fill handling over stroke to avoid the broken lines&#10;Updating map with impassable terrain colors" />
     <MESSAGE value="Correcting map file tree handling" />
     <MESSAGE value="Correcting stroke handling" />
@@ -979,7 +979,8 @@
     <MESSAGE value="Correcting leftover province number ids" />
     <MESSAGE value="Correcting dossier display" />
     <MESSAGE value="Correcting icon display for putting the bottom frame on the point rather than centering it." />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting icon display for putting the bottom frame on the point rather than centering it." />
+    <MESSAGE value="Correcting pathfinder province id use" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcting pathfinder province id use" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
