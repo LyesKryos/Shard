@@ -145,7 +145,7 @@ class Turn:
 
                 # === PRODUCTION ===
                 # define citizen production
-                citizen_production = prov['citizens'] / 3872
+                citizen_production = max(prov['citizens'] / 3872, 1)
                 # define trade good value
                 trade_good_value = trade_good_values[prov['trade_good']]
                 # add the total trade good value booster provided by some techs
