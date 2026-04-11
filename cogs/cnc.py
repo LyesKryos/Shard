@@ -559,7 +559,9 @@ class MapButtons(View):
         province_occupiers = {
             row["id"]: ("#000000" if row["occupier_id"] == 1 else row["occupier_color"])
             for row in owned_provinces
-            if row["occupier_id"] and row["occupier_id"] != 0
+            if row["occupier_id"]
+               and row["occupier_id"] != 0
+               and row["occupier_id"] != row["owner_id"]
         }
 
         # Icons
@@ -709,8 +711,8 @@ class MapButtons(View):
                             continue
                         point = icons[slot]
                         # asyncpg returns point as a named tuple with x and y
-                        x = point[0] + 1316.7823  # PROVINCE_TX
-                        y = point[1] + 1432.499  # PROVINCE_TY
+                        x = point[0]  # PROVINCE_TX
+                        y = point[1]  # PROVINCE_TY
                         etree.SubElement(icon_layer, f"{{{ns}}}text", {
                             "x": str(x),
                             "y": str(y),
