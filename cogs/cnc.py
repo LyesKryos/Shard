@@ -6874,7 +6874,8 @@ class ArmyRecruitMenu(discord.ui.View):
         else:
             if tusail_mil_charge:
                 # subtract one military authority
-                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 1 WHERE user_id = $1;''',
+                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 1, manpower = manpower - 1000
+                                      WHERE user_id = $1;''',
                                    interaction.user.id)
             else:
                 # subtract one economic authority
@@ -6956,7 +6957,8 @@ class ArmyRecruitMenu(discord.ui.View):
         else:
             if tusail_mil_charge:
                 # subtract five military authority
-                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 5 WHERE user_id = $1;''',
+                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 5, manpower = manpower - 5000
+                                      WHERE user_id = $1;''',
                                    interaction.user.id)
             else:
                 # subtract five economic authority
@@ -7036,7 +7038,8 @@ class ArmyRecruitMenu(discord.ui.View):
         else:
             if tusail_mil_charge:
                 # subtract ten military authority
-                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 10 WHERE user_id = $1;''',
+                await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 10, manpower = manpower - 10000
+                                      WHERE user_id = $1;''',
                                    interaction.user.id)
             else:
                 # subtract ten economic authority
