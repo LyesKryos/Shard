@@ -599,13 +599,16 @@ class MapButtons(View):
                 province_icons[row["id"]] = icons
 
         def generate_map():
+            # ensure svg is loaded
             if not self.cog.root or not self.cog.province_paths:
                 raise ValueError("SVG not preloaded")
 
+            # get the working copy and define the name spaces
             working_root = deepcopy(self.cog.root)
             ns = self.cog.ns
             INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
 
+            # get and define the province layer
             province_layer = None
             for g in working_root.findall(f".//{{{ns}}}g"):
                 if g.get(f"{{{INKSCAPE_NS}}}label") == "Provinces":
@@ -615,10 +618,22 @@ class MapButtons(View):
             if province_layer is None:
                 raise RuntimeError("Provinces layer not found in cloned tree")
 
-            # Build SVG defs for stripe patterns — one per unique occupier color
-            defs = etree.SubElement(working_root, f"{{{ns}}}defs")
-            defined_patterns = {}  # color -> pattern_id
+            # insert icon layer just before Province IDs
+            insert_at = len(working_root)  # fallback: end
+            for i, g in enumerate(working_root):
+                if g.get(f"{{{INKSCAPE_NS}}}label") == "Province IDs":
+                    insert_at = i
+                    break
 
+            # get and define the icon layer, inserting it UNDER the id layer
+            icon_layer = etree.Element(f"{{{ns}}}g", {"id": "icons"})
+            working_root.insert(insert_at, icon_layer)
+
+            # Build SVG defs for stripe patterns
+            defs = etree.SubElement(working_root, f"{{{ns}}}defs")
+            defined_patterns = {}
+
+            # define the stripe pattern where necessary
             def get_stripe_pattern(stripe_color: str) -> str:
                 if stripe_color in defined_patterns:
                     return defined_patterns[stripe_color]
@@ -642,6 +657,7 @@ class MapButtons(View):
                 defined_patterns[stripe_color] = pattern_id
                 return pattern_id
 
+            # Province fills and occupation stripes
             for pid, color in province_colors.items():
                 if should_skip(pid):
                     continue
@@ -655,7 +671,7 @@ class MapButtons(View):
                 if elem is None:
                     continue
 
-                # --- Fill layer ---
+                # Fill layer
                 fill_elem = deepcopy(elem)
                 style = fill_elem.get("style", "")
                 if "fill:" in style:
@@ -674,7 +690,7 @@ class MapButtons(View):
                 insert_idx = parent.index(elem) + 1
                 parent.insert(insert_idx, fill_elem)
 
-                # --- Occupation stripe layer ---
+                # Occupation stripe layer
                 occupier_color = province_occupiers.get(pid)
                 if occupier_color:
                     pattern_id = get_stripe_pattern(occupier_color)
@@ -690,36 +706,29 @@ class MapButtons(View):
                     stripe_elem.set("id", f"{pid}_occupation")
                     parent.insert(insert_idx + 1, stripe_elem)
 
-                # --- Icon layer ---
-                ICON_FONT_SIZE = 0
+            # Icons — appended to icon_layer which was already inserted in correct position
+            ICON_FONT_SIZE = 20
+            ICONS = {
+                "capital": ("★", 0),  # centered
+                "fort": ("⌂", ICON_FONT_SIZE),  # planted
+                "army": ("⚑", ICON_FONT_SIZE),  # planted
+            }
 
-                ICONS = {
-                    "capital": ("★", 0),  # centered — star looks better centered
-                    "fort": ("🏰", ICON_FONT_SIZE),  # planted — bottom on anchor
-                    "army": ("⚑", ICON_FONT_SIZE),  # planted — bottom on anchor
-                }
-
-                # PostgreSQL point type comes back as asyncpg Point object (x, y)
-                # Apply the same province translation offset
-                icon_layer = etree.SubElement(working_root, f"{{{ns}}}g", {"id": "icons"})
-
-                for pid, icons in province_icons.items():
-                    for slot, (glyph, y_offset) in ICONS.items():
-                        if slot not in icons:
-                            continue
-                        point = icons[slot]
-                        # asyncpg returns point as a named tuple with x and y
-                        x = point[0]  # PROVINCE_TX
-                        y = point[1] - y_offset # PROVINCE_TY
-
-                        etree.SubElement(icon_layer, f"{{{ns}}}text", {
-                            "x": str(x),
-                            "y": str(y),
-                            "text-anchor": "middle",
-                            "dominant-baseline": "auto",
-                            "font-size": "20",
-                            "style": "fill:#ffffff;stroke:#000000;stroke-width:0.05em;paint-order:stroke fill",
-                        }).text = glyph
+            for pid, icons in province_icons.items():
+                for slot, (glyph, y_offset) in ICONS.items():
+                    if slot not in icons:
+                        continue
+                    point = icons[slot]
+                    x = point[0]
+                    y = point[1] - y_offset
+                    etree.SubElement(icon_layer, f"{{{ns}}}text", {
+                        "x": str(x),
+                        "y": str(y),
+                        "text-anchor": "middle",
+                        "dominant-baseline": "auto",
+                        "font-size": str(ICON_FONT_SIZE),
+                        "style": "fill:#ffffff;stroke:#000000;stroke-width:0.05em;paint-order:stroke fill",
+                    }).text = glyph
 
             svg_bytes = etree.tostring(
                 working_root,
@@ -7352,8 +7361,8 @@ class GeneralSelectMenu(discord.ui.Select):
                                    self.army_id, general_name)
                 # notify user
                 await interaction.response.send_message(f"General {general_name} has been recruited and assigned to "
-                                                        f"command the {army_name}."
-                                                        f"\nTo view their stats, use /cnc general_info.")
+                                                        f"command the {army_name}.\n"
+                                                        f"To view their stats, use </cnc general:1489815761919803423>.")
                 # go back to the army menu
                 army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', self.army_id)
                  # call embed
