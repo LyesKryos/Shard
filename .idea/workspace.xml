@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting turn update for fort level&#10;Correcting icon offset to 0 so that they are actually in the province area instead of outside it" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting offset and font size of icons">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CNC/Map Files/migrate_anchors.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/Map Files/migrate_anchors.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -591,7 +594,7 @@
       <workItem from="1775677687978" duration="8336000" />
       <workItem from="1775781383615" duration="2429000" />
       <workItem from="1775839691776" duration="5225000" />
-      <workItem from="1775911138228" duration="2341000" />
+      <workItem from="1775911138228" duration="2985000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -936,7 +939,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1743" />
+    <option name="localTasksCounter" value="1745" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -955,7 +958,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Upping quality" />
     <MESSAGE value="Testing map fix: update map" />
     <MESSAGE value="Increasing map quality" />
     <MESSAGE value="Increasing map quality and updating for proper line handling" />
@@ -980,7 +982,8 @@
     <MESSAGE value="Correcting pathfinder to accept that users can move to their own provinces" />
     <MESSAGE value="Correcting map display with new fort icon AND proper icon display" />
     <MESSAGE value="Correcting turn update for fort level&#10;Correcting icon offset to 0 so that they are actually in the province area instead of outside it" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting turn update for fort level&#10;Correcting icon offset to 0 so that they are actually in the province area instead of outside it" />
+    <MESSAGE value="Correcting offset and font size of icons" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcting offset and font size of icons" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -994,6 +997,11 @@
           <url>file://$PROJECT_DIR$/cogs/dispatch.py</url>
           <line>11</line>
           <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/cogs/cnc.py</url>
+          <line>641</line>
+          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

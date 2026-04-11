@@ -62,18 +62,69 @@ def svg_d_to_polygon(d: str, tx: float = 0.0, ty: float = 0.0) -> Polygon | None
 
 
 def compute_icon_anchors(polygon: Polygon) -> dict[str, tuple[float, float]]:
+    import math
+    from shapely.geometry import Point, LineString
+
     center = polygon.representative_point()
     cx, cy = center.x, center.y
-    offset = min(max(math.sqrt(polygon.area) * 0.15, 8), 30)
+
+    # Compute offset based on province size
+    area   = polygon.area
+    offset = min(max(math.sqrt(area) * 0.25, 10), 50)
+
+    # Find the orientation of the province's longest axis
+    # using the minimum rotated bounding rectangle
+    try:
+        rect   = polygon.minimum_rotated_rectangle
+        coords = list(rect.exterior.coords)
+        # Get the two edge vectors
+        dx1 = coords[1][0] - coords[0][0]
+        dy1 = coords[1][1] - coords[0][1]
+        dx2 = coords[2][0] - coords[1][0]
+        dy2 = coords[2][1] - coords[1][1]
+        # Pick the longer edge as the main axis
+        if (dx1**2 + dy1**2) >= (dx2**2 + dy2**2):
+            angle = math.atan2(dy1, dx1)
+        else:
+            angle = math.atan2(dy2, dx2)
+    except Exception:
+        angle = 0.0  # fallback: horizontal
+
+    # Unit vector along the longest axis
+    ux = math.cos(angle)
+    uy = math.sin(angle)
+
+    # Place three candidates evenly spaced along the axis
+    # capital: center, fort: left along axis, army: right along axis
     candidates = {
-        "capital": (cx,          cy),
-        "fort":    (cx - offset, cy + offset),
-        "army":    (cx + offset, cy + offset),
+        "capital": (cx,                   cy),
+        "fort":    (cx - ux * offset,     cy - uy * offset),
+        "army":    (cx + ux * offset,     cy + uy * offset),
     }
-    return {
-        slot: (x, y) if polygon.contains(Point(x, y)) else (cx, cy)
-        for slot, (x, y) in candidates.items()
-    }
+
+    # Validate each point is inside the polygon, shrink offset until it fits
+    anchors = {}
+    for slot, (x, y) in candidates.items():
+        pt = Point(x, y)
+        if polygon.contains(pt):
+            anchors[slot] = (x, y)
+        else:
+            # Binary search for the furthest point along the axis that's still inside
+            lo, hi = 0.0, offset
+            best   = (cx, cy)
+            sign   = -1.0 if slot == "fort" else 1.0
+            for _ in range(10):
+                mid  = (lo + hi) / 2
+                tx   = cx + sign * ux * mid
+                ty   = cy + sign * uy * mid
+                if polygon.contains(Point(tx, ty)):
+                    best = (tx, ty)
+                    lo   = mid
+                else:
+                    hi   = mid
+            anchors[slot] = best
+
+    return anchors
 
 
 def should_skip(pid: str, fill: str) -> bool:
