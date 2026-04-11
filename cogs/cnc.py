@@ -300,7 +300,7 @@ async def demanding_provinces_wait_for_modal(parent_interaction: discord.Interac
     # return the value
     return modal.value
 
-async def find_path(conn: asyncpg.Pool, start_id: int, end_id: int, moving_user_id: int) -> tuple:
+async def find_path(conn: asyncpg.Pool, start_id: str, end_id: str, moving_user_id: int) -> tuple:
     """This program utilizes Dijkstra's algorithm to find the shortest path between two provinces."""
 
     # define the province map
@@ -7851,10 +7851,10 @@ class CommandAndConquest(commands.Cog):
                 f"of the world? Will your people flourish under your hand or cower under "
                 f"your iron fist? Only the future can tell.\n\n"
                 f"To get started, be sure to check out the "
-                f"[**Command and Conquest Manual**]"
-                f"(<https://1drv.ms/w/s!AtjcebV95AZNgWR1RbfSyx_0ln31?e=tD0eHa>). This "
-                f"document has all the information you need to get started, a new players' "
-                f"guide, and an overview of all commands.\n\n"
+                f"[**Command & Conquest site**]"
+                f"(<https://lyeskryos.github.io/cnc.io/>). This "
+                f"site has all the information you need to get started, a new players' "
+                f"guide, and an overview of all commands, mechanics, and concepts.\n\n"
                 f"**\"I came, I saw, I conquered.\" -Julius Caesar**"
             )
         
@@ -7874,7 +7874,7 @@ class CommandAndConquest(commands.Cog):
                                    color=discord.Color.red())
         info_embed.set_thumbnail(url="https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png")
         info_embed.add_field(name="About",
-                             value="The Command & Conquest (CnC) system is a simulated battle royale "
+                             value="The Command & Conquest system is a simulated battle royale "
                                     "strategy game. The system makes use of combat between armies, "
                                     "international relationships and intrigue, resources, trade, "
                                     "and more to bring players a fun and immersive experience. "
@@ -7891,7 +7891,9 @@ class CommandAndConquest(commands.Cog):
                              value=f"Read the FAQ in the linked manual above or contact "
                                    f"{self.bot.get_user(293518673417732098).mention}.",
                              inline=False)
-        info_embed.add_field(name="Donate", value="The Command & Conquest system operates entirely funded by your donations! Please consider donating by using this link: [Ko-fi: Shard](https://ko-fi.com/shardbot)", inline=False)
+        info_embed.add_field(name="Donate", value="The Command & Conquest system operates entirely funded by your "
+                                                  "donations! Please consider donating by using this link: "
+                                                  "[Ko-fi: Shard](https://ko-fi.com/shardbot)", inline=False)
         info_embed.set_footer(icon_url="https://raw.githubusercontent.com/LyesKryos/cnc.io/refs/heads/main/assets/favicon.png",
                               text="Created by lieskryos")
         # send the embed
@@ -10677,7 +10679,7 @@ class CommandAndConquest(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def cnc_pathfinder_test(self, ctx, origin: int, destination: int):
+    async def cnc_pathfinder_test(self, ctx, origin: str, destination: str):
         # establish the connection
         conn = self.bot.pool
         # querry if either province isn't real
