@@ -10292,7 +10292,9 @@ class CommandAndConquest(commands.Cog):
         # build embed
         gp_score_embed = discord.Embed(title=f"Great Power Score - {user_info['name']}", description="The calculation of the nation's Great Power Score.", color=discord.Color.red())
         # create fields
-        gp_score_embed.add_field(name="Total", value=f"{user_info['gp_score']} points", inline=False)
+        gp_score_embed.add_field(name="Total", value=f"{sum((citizen_score, dev_score, auth_score, stability_score, 
+                                                             troop_count_score, general_score, tech_score, 
+                                                             alliances_score, pacts_score, dr_score)):.0f} points", inline=False)
         gp_score_embed.add_field(name="Citizens", value=f"{citizen_score} points")
         gp_score_embed.add_field(name="Development", value=f"{dev_score} points")
         gp_score_embed.add_field(name="Authority", value=f"{auth_score} points")

@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Fixing dossier military view command">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Update movement display in armies">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CNC/turn.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/turn.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -595,7 +594,7 @@
       <workItem from="1775677687978" duration="8336000" />
       <workItem from="1775781383615" duration="2429000" />
       <workItem from="1775839691776" duration="5225000" />
-      <workItem from="1775911138228" duration="6572000" />
+      <workItem from="1775911138228" duration="7949000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -940,7 +939,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1749" />
+    <option name="localTasksCounter" value="1751" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -959,8 +958,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Increasing map quality and updating for proper line handling" />
-    <MESSAGE value="Setting map to largest possible quality" />
     <MESSAGE value="Updating map with cleanest version" />
     <MESSAGE value="Correcting map render error" />
     <MESSAGE value="Updating map links&#10;Saving the clean_svg.py code&#10;Adding C&amp;C to verification dropdown at welcome." />
@@ -984,7 +981,9 @@
     <MESSAGE value="Correcting offset and font size of icons" />
     <MESSAGE value="Updating icon offset" />
     <MESSAGE value="Fixing dossier military view command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing dossier military view command" />
+    <MESSAGE value="Setting the minimum good production = 1&#10;Removing file attachments from maps" />
+    <MESSAGE value="Update movement display in armies" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update movement display in armies" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
