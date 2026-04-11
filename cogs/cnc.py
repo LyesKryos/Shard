@@ -507,19 +507,19 @@ class MapButtons(View):
         # defer the interaction because otherwise stuff crashes
         await interaction.response.defer()
         # edit the original message with the numbers map
-        await self.message.edit(content="https://i.ibb.co/Qj6b0sVs/Terrain-Map.png", file=None)
+        await self.message.edit(content="https://i.ibb.co/Qj6b0sVs/Terrain-Map.png", attachments=None)
 
     @discord.ui.button(label="Terrain", emoji="\U000026f0", style=discord.ButtonStyle.blurple)
     async def terrain_map(self, interaction: discord.Interaction, terrain: discord.Button):
         # defer the interaction because otherwise stuff crashes
         await interaction.response.defer()
-        await self.message.edit(content="https://i.ibb.co/wZ4FzJYQ/Terrain-Only.png", file=None)
+        await self.message.edit(content="https://i.ibb.co/wZ4FzJYQ/Terrain-Only.png", attachments=None)
 
     @discord.ui.button(label="Cartography", emoji="\U0001f4cc", style=discord.ButtonStyle.blurple)
     async def carto_map(self, interaction: discord.Interaction, carto: discord.Button):
         # defer the interaction because otherwise stuff crashes
         await interaction.response.defer()
-        await self.message.edit(content="https://i.ibb.co/x8j56fxy/Geography-Map.png", file=None)
+        await self.message.edit(content="https://i.ibb.co/x8j56fxy/Geography-Map.png", attachments=None)
 
     @discord.ui.button(label="Nations", emoji="\U0001f3f3", style=discord.ButtonStyle.blurple)
     async def nation_map(self, interaction: discord.Interaction, nation_map: discord.ui.Button):
