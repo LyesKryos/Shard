@@ -9560,7 +9560,7 @@ class CommandAndConquest(commands.Cog):
         army_embed.add_field(name="Troops", value=troops)
         army_embed.add_field(name="Province Location", value=location, inline=False)
         army_embed.add_field(name="General", value=general)
-        army_embed.add_field(name="Movement Available", value=movement)
+        army_embed.add_field(name="Movement Available", value=round(movement,2))
         # if the caller is the user, add the army management menu
         if army_info['owner_id'] == interaction.user.id:
             army_menu = ArmyActionsView(parent_interaction=interaction, conn=conn, army_info=army_info)
