@@ -1814,7 +1814,7 @@ class DossierView(View):
         self.doss_embed.add_field(name="Generals", value=f"{generals}")
         # populate manpower
         self.doss_embed.add_field(name="Manpower \n(Manpower Access)", value=f"{self.user_info['manpower']:,} "
-                                                                             f"({self.user_info['manpower_access']:.0%f})")
+                                                                             f"({self.user_info['manpower_access']:.0%})")
         self.doss_embed.add_field(name="Manpower Regen",
                                   value=f"{math.floor(total_manpower * (self.user_info['manpower_regen'] / 100)):,} "
                                         f"({self.user_info['manpower_regen']}%)")
