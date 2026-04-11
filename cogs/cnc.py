@@ -2350,7 +2350,8 @@ class GovernmentReformMenu(View):
             button.disabled = True
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"{user_info['name']} does not have enough development "
-                                                   f"to change government types.")
+                                                   f"to change government types. Nations must have at least 50 total "
+                                                   f"development to change government types.")
         # determine available government types
         govt_types = []
         # find monarchy

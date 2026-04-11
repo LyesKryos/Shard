@@ -42,7 +42,6 @@ class Turn:
         # return the dm notifications
         return self.user_dm_notifications
 
-
     async def _user_updates(self):
         # define the connection
         conn = self.conn
@@ -688,6 +687,16 @@ class Turn:
                 await conn.execute('''UPDATE cnc_provinces SET fort_level = fort_level + 1 WHERE id = $1;''',
                                    user['capital'])
 
+            # === FREE GOVERNMENT CHANGE CHECK ===
+            # pull the total development
+            total_dev = await conn.fetchval('''SELECT sum(development) FROM cnc_provinces 
+                                               WHERE owner_id = $1 AND occupier_id = $1;''', user['user_id'])
+            # if the total dev is above 50 and the user's govt type is Tribal, give free government change
+            if total_dev > 50 and user['govt_type'] == "Tribal":
+                await conn.execute('''UPDATE cnc_users SET free_govt_change = TRUE WHERE user_id = $1;''',
+                                   user['user_id'])
+                dm_notification += f"{user['name']} has gained free government change!\n"
+
 
             # add user dm notifications to the list
             self.user_dm_notifications[user['user_id']] = dm_notification
@@ -744,7 +753,6 @@ class Turn:
                                   mil_auth  = GREATEST(mil_auth, 0),
                                   pol_auth  = GREATEST(pol_auth, 0),
                                   unrest    = LEAST(GREATEST(unrest, 0), 100);''')
-
 
     async def _trade_market_updates(self):
         # establish connection
