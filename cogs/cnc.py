@@ -724,7 +724,7 @@ class MapButtons(View):
                         continue
                     point = icons[slot]
                     x = point[0] - 1316.7823
-                    y = point[1] - 1432.499 - y_offset
+                    y = point[1] - 1432.499
                     etree.SubElement(icon_layer, f"{{{ns}}}text", {
                         "x": str(x),
                         "y": str(y),
