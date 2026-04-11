@@ -7737,7 +7737,7 @@ class CommandAndConquest(commands.Cog):
 
         # prioritize
         matched_provinces.sort(
-            key=lambda m: (match_priority(next(p for p in provinces if str(p['id']) == m.value)), int(m.value)))
+            key=lambda m: (match_priority(next(p for p in provinces if str(p['id']) == m.value)), m.value))
 
         # sort and return
         return matched_provinces[0:24]
