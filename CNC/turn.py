@@ -678,11 +678,13 @@ class Turn:
             # === ARMY/FORT RESET ===
             await conn.execute('''UPDATE cnc_armies SET movement = $2 WHERE owner_id = $1;''',
                                user['user_id'], user['movement_cap'])
-            await conn.execute('''UPDATE cnc_provinces SET fort_level = $2 WHERE owner_id = $1 AND occupier_id = $1;''',
+            await conn.execute('''UPDATE cnc_provinces SET fort_level = $2 
+                                  WHERE owner_id = $1 AND occupier_id = $1 AND 'Fort' = ANY(structures);''',
                                user['user_id'], user['fort_level'])
             # if the user's govt type is Monarchy and they have a capital, add one fort level for free
             if user['capital'] and user['govt_type'] == "Monarchy":
-                await conn.execute('''UPDATE cnc_provinces SET fort_level = fort_level + 1 WHERE id = $1;''', user['capital'])
+                await conn.execute('''UPDATE cnc_provinces SET fort_level = fort_level + 1 WHERE id = $1;''',
+                                   user['capital'])
 
 
             # add user dm notifications to the list

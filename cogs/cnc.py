@@ -707,7 +707,7 @@ class MapButtons(View):
                     parent.insert(insert_idx + 1, stripe_elem)
 
             # Icons — appended to icon_layer which was already inserted in correct position
-            ICON_FONT_SIZE = 20
+            ICON_FONT_SIZE = 0  # set to 0 because otherwise the offset puts them outside of the province area
             ICONS = {
                 "capital": ("★", 0),  # centered
                 "fort": ("⌂", ICON_FONT_SIZE),  # planted
