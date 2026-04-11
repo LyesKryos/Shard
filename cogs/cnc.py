@@ -8512,7 +8512,7 @@ class CommandAndConquest(commands.Cog):
     @app_commands.describe(army="The ID of the army you wish to move.",
                            move_to="The ID of the province to move the army to.")
     @app_commands.check(cnc_user_check)
-    async def move_army(self, interaction: discord.Interaction, army: int, move_to: int):
+    async def move_army(self, interaction: discord.Interaction, army: int, move_to: str):
         # defer response
         await interaction.response.defer()
         conn = self.bot.pool
