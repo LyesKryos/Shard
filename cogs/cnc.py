@@ -6677,25 +6677,28 @@ class PeaceNegotiationGiveProvincesDropdown(discord.ui.Select):
 
 class ArmyActionsView(View):
 
-    def __init__(self, parent_interaction: discord.Interaction, conn: asyncpg.Pool, army_info: asyncpg.Record):
+    def __init__(self, parent_interaction: discord.Interaction, conn: asyncpg.Pool,
+                 army_info: asyncpg.Record, sailing_capable: bool):
         super().__init__(timeout=120)
         self.parent_interaction = parent_interaction
         self.conn = conn
         self.army_info = army_info
 
-        # if the army is not embarked already, add the embark button
-        if not army_info['embark']:
-            # create the button and add it
-            self.embark_button = discord.ui.Button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
-            self.embark_button.callback = self.embark_army
-            self.add_item(self.embark_button)
-        # if the army is already embarked, add the disembarked button
-        else:
-            # create the button and add it
-            self.disembark_button = discord.ui.Button(label="Disembark", style=discord.ButtonStyle.blurple,
-                                                      emoji="\U00002693")
-            self.disembark_button.callback = self.disembark_army
-            self.add_item(self.disembark_button)
+        # if the army can sail
+        if sailing_capable:
+            # if the army is not embarked already, add the embark button
+            if not army_info['embark']:
+                # create the button and add it
+                self.embark_button = discord.ui.Button(label="Embark", style=discord.ButtonStyle.blurple, emoji="\U000026f5")
+                self.embark_button.callback = self.embark_army
+                self.add_item(self.embark_button)
+            # if the army is already embarked, add the disembarked button
+            else:
+                # create the button and add it
+                self.disembark_button = discord.ui.Button(label="Disembark", style=discord.ButtonStyle.blurple,
+                                                          emoji="\U00002693")
+                self.disembark_button.callback = self.disembark_army
+                self.add_item(self.disembark_button)
 
 
     async def on_timeout(self):
@@ -6903,7 +6906,8 @@ class ArmyRecruitMenu(discord.ui.View):
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
                                                 conn=conn,
-                                                army_info=new_army_info)
+                                                army_info=new_army_info,
+                                                sailing_capable=False if "Sailing" not in user_info['tech'] else True)
             await self.parent_interaction.edit_original_response(view=army_actions_view,
                                                                  embed=army_embed)
             # notify user
@@ -6984,7 +6988,10 @@ class ArmyRecruitMenu(discord.ui.View):
             # update embed
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
-            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction, conn=conn, army_info=new_army_info)
+            army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
+                                                conn=conn,
+                                                army_info=new_army_info,
+                                                sailing_capable=False if "Sailing" not in user_info['tech'] else True)
             await self.parent_interaction.edit_original_response(view=army_actions_view, embed=army_embed)
             # notify user
             await interaction.followup.send(f"The {army_info['army_name']} has successfully recruited an additional "
@@ -7066,7 +7073,9 @@ class ArmyRecruitMenu(discord.ui.View):
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
-                                                conn=conn, army_info=new_army_info)
+                                                conn=conn,
+                                                army_info=new_army_info,
+                                                sailing_capable=False if "Sailing" not in user_info['tech'] else True)
             await self.parent_interaction.edit_original_response(view=army_actions_view, embed=army_embed)
             # notify user
             await interaction.followup.send(f"The {army_info['army_name']} has successfully recruited an additional "
@@ -7080,7 +7089,9 @@ class ArmyRecruitMenu(discord.ui.View):
         await interaction.response.defer()
         # reset menu
         army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
-                                            conn=self.conn, army_info=self.army_info)
+                                            conn=self.conn,
+                                            army_info=self.army_info,
+                                            sailing_capable=False if "Sailing" not in user_info['tech'] else True)
         # update the parent
         await self.parent_interaction.edit_original_response(view=army_actions_view)
         # stop listening
@@ -7160,7 +7171,9 @@ class ArmyDisbandMenu(discord.ui.View):
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
-                                                conn=conn, army_info=new_army_info)
+                                                conn=conn,
+                                                army_info=new_army_info,
+                                                sailing_capable=False if "Sailing" not in user_info['tech'] else True)
             # update the original
             await self.parent_interaction.edit_original_response(embed=army_embed, view=army_actions_view)
             # stop listening
@@ -7221,7 +7234,9 @@ class ArmyDisbandMenu(discord.ui.View):
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
-                                                conn=conn, army_info=new_army_info)
+                                                conn=conn,
+                                                army_info=new_army_info,
+                                                sailing_capable=False if "Sailing" not in user_info['tech'] else True)
             # update the original
             await self.parent_interaction.edit_original_response(embed=army_embed, view=army_actions_view)
             # stop listening
@@ -7281,7 +7296,9 @@ class ArmyDisbandMenu(discord.ui.View):
             army_embed.set_field_at(1, name="Troops", value=f"{new_army_info['troops']:,}")
             # reset menu
             army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
-                                                conn=conn, army_info=new_army_info)
+                                                conn=conn,
+                                                army_info=new_army_info,
+                                                sailing_capable=False if "Sailing" not in user_info['tech'] else True)
             # update the original
             await self.parent_interaction.edit_original_response(embed=army_embed, view=army_actions_view)
             # stop listening
@@ -7293,7 +7310,9 @@ class ArmyDisbandMenu(discord.ui.View):
         await interaction.response.defer()
         # reset menu
         army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
-                                            conn=self.conn, army_info=self.army_info)
+                                            conn=self.conn,
+                                            army_info=self.army_info,
+                                            sailing_capable=False if "Sailing" not in user_info['tech'] else True)
         # update the parent
         await self.parent_interaction.edit_original_response(view=army_actions_view)
         # stop listening
@@ -7344,7 +7363,10 @@ class GeneralSelectMenu(discord.ui.Select):
             # update embed
             army_embed.set_field_at(3, name="General", value=f"{general_name}")
             # return to the army menu
-            army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction, conn=interaction.client.pool, army_info=army_info)
+            army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction,
+                                               conn=interaction.client.pool,
+                                               army_info=army_info,
+                                               sailing_capable=False if "Sailing" not in user_info['tech'] else True)
             # update the interaction
             return await self.parent_interaction.edit_original_response(view=army_action_menu, embed=army_embed)
 
@@ -7387,7 +7409,9 @@ class GeneralSelectMenu(discord.ui.Select):
                 army_embed.set_field_at(3, name="General", value=f"{general_name}")
                 # return to the army menu
                 army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction,
-                                                   conn=interaction.client.pool, army_info=army_info)
+                                                   conn=interaction.client.pool,
+                                                   army_info=army_info,
+                                                   sailing_capable=False if "Sailing" not in user_info['tech'] else True)
                 # update the interaction
                 return await self.parent_interaction.edit_original_response(view=army_action_menu, embed=army_embed)
 
@@ -7426,7 +7450,8 @@ class GeneralSelectView(discord.ui.View):
         # return to the army menu
         army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction,
                                            conn=interaction.client.pool,
-                                           army_info=army_info)
+                                           army_info=army_info,
+                                           sailing_capable=False if "Sailing" not in user_info['tech'] else True)
         # update the interaction
         await self.parent_interaction.edit_original_response(view=army_action_menu)
         # reply
@@ -9571,8 +9596,11 @@ class CommandAndConquest(commands.Cog):
         army_embed.add_field(name="Movement Available", value=round(movement,2))
         # if the caller is the user, add the army management menu
         if army_info['owner_id'] == interaction.user.id:
-            army_menu = ArmyActionsView(parent_interaction=interaction, conn=conn, army_info=army_info)
-            await interaction.followup.send(embed=army_embed, view=army_menu)
+            army_menu = ArmyActionsView(parent_interaction=interaction,
+                                        conn=conn,
+                                        army_info=army_info,
+                                        sailing_capable=False if "Sailing" not in user_info['tech'] else True)
+            return await interaction.followup.send(embed=army_embed, view=army_menu)
         # otherwise, return just the embed
         else:
             return await interaction.followup.send(embed=army_embed)

@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating turn manpower calculations">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating dossier to properly display all members of all relations">
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -591,7 +591,7 @@
       <workItem from="1775781383615" duration="2429000" />
       <workItem from="1775839691776" duration="5225000" />
       <workItem from="1775911138228" duration="12395000" />
-      <workItem from="1775955771117" duration="2530000" />
+      <workItem from="1775955771117" duration="3089000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -936,7 +936,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1759" />
+    <option name="localTasksCounter" value="1760" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -955,7 +955,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Adding icon anchors to migrate.py and map commands rendering&#10;Adding icons layer to the map file" />
     <MESSAGE value="Adding icon anchors script" />
     <MESSAGE value="Correcing map discrepancies" />
     <MESSAGE value="Adding icons to the map" />
@@ -980,7 +979,8 @@
     <MESSAGE value="Adding the proper free government change calculation to the turn update" />
     <MESSAGE value="Adding dev boosting cost modifiers to dev boosting cost calculations" />
     <MESSAGE value="Updating turn manpower calculations" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating turn manpower calculations" />
+    <MESSAGE value="Updating dossier to properly display all members of all relations" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updating dossier to properly display all members of all relations" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
