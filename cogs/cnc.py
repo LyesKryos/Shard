@@ -6890,7 +6890,8 @@ class ArmyRecruitMenu(discord.ui.View):
                                    interaction.user.id)
             else:
                 # subtract one economic authority
-                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 1 WHERE user_id = $1;''',
+                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 1, manpower = manpower - 1000
+                                      WHERE user_id = $1;''',
                                    interaction.user.id)
             # add troops
             await conn.execute('''UPDATE cnc_armies SET troops = troops + 1000 WHERE army_id = $1;''',
@@ -6974,7 +6975,8 @@ class ArmyRecruitMenu(discord.ui.View):
                                    interaction.user.id)
             else:
                 # subtract five economic authority
-                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 5 WHERE user_id = $1;''',
+                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 5, manpower = manpower - 5000
+                                      WHERE user_id = $1;''',
                                    interaction.user.id)
             # add troops
             await conn.execute('''UPDATE cnc_armies SET troops = troops + 5000 WHERE army_id = $1;''',
@@ -7058,7 +7060,8 @@ class ArmyRecruitMenu(discord.ui.View):
                                    interaction.user.id)
             else:
                 # subtract ten economic authority
-                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 10 WHERE user_id = $1;''',
+                await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - 10, manpower = manpower - 10000
+                                      WHERE user_id = $1;''',
                                    interaction.user.id)
             # add 10000 troops to the army
             await conn.execute('''UPDATE cnc_armies SET troops = troops + 10000 WHERE army_id = $1;''',
