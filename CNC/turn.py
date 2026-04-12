@@ -243,7 +243,8 @@ class Turn:
                                user['user_id'], 3000 + round(manpower_cap * (user['manpower_regen'] / 100)))
             # enforce manpower cap
             await conn.execute('''UPDATE cnc_users SET manpower = $2 WHERE user_id = $1 AND manpower > $2;''',
-                               user['user_id'], max(manpower_cap, 3000))
+                               user['user_id'],
+                               max(manpower_cap, 3000+round(manpower_cap * (user['manpower_regen'] / 100))))
 
             # === UNREST/STABILITY FACTORING ===
             average_national_unrest = total_national_unrest / len(controlled_provs)
