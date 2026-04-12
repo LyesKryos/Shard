@@ -7087,6 +7087,8 @@ class ArmyRecruitMenu(discord.ui.View):
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer()
+        # get user info
+        user_info = await user_db_info(conn=self.conn, user_id=interaction.user.id)
         # reset menu
         army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
                                             conn=self.conn,
@@ -7308,6 +7310,8 @@ class ArmyDisbandMenu(discord.ui.View):
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer interaction
         await interaction.response.defer()
+        # get user info
+        user_info = await user_db_info(conn=self.conn, user_id=interaction.user.id)
         # reset menu
         army_actions_view = ArmyActionsView(parent_interaction=self.parent_interaction,
                                             conn=self.conn,
@@ -7447,6 +7451,8 @@ class GeneralSelectView(discord.ui.View):
         # pull the army info
         army_info = await interaction.client.pool.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
                                                            self.army_id)
+        # get user info
+        user_info = await user_db_info(conn=interaction.client.pool, user_id=interaction.user.id)
         # return to the army menu
         army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction,
                                            conn=interaction.client.pool,
@@ -9599,7 +9605,7 @@ class CommandAndConquest(commands.Cog):
             army_menu = ArmyActionsView(parent_interaction=interaction,
                                         conn=conn,
                                         army_info=army_info,
-                                        sailing_capable=False if "Sailing" not in user_info['tech'] else True)
+                                        sailing_capable=False if "Sailing" not in userinfo['tech'] else True)
             return await interaction.followup.send(embed=army_embed, view=army_menu)
         # otherwise, return just the embed
         else:
