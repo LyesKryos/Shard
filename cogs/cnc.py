@@ -1896,6 +1896,10 @@ class DossierView(View):
                                               FROM cnc_military_access
                                               WHERE $1 = ANY (members);''',
                                            self.user_info['name'])
+        embargoes_recieved = await conn.fetch('''SELECT sender FROM cnc_embargoes WHERE target = $1;''',
+                                              self.user_info['name'])
+        embargoes_sent = await conn.fetch('''SELECT target FROM cnc_embargoes WHERE sender = $1;''',
+                                          self.user_info['name'])
 
         def parse_relations(relations: list, name: str, wars: bool = False) -> str:
             """
@@ -1936,6 +1940,8 @@ class DossierView(View):
         self.doss_embed.add_field(name="Wars", value=f"{wars}")
         self.doss_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
         self.doss_embed.add_field(name="Military Access", value=f"{military_access}")
+        self.doss_embed.add_field(name="Embargoes Sent", value=", ".join([s['target'] for s in embargoes_sent]))
+        self.doss_embed.add_field(name="Embargoes Recieved", value=", ".join([s['sender'] for s in embargoes_recieved]))
         # update
         await interaction.edit_original_response(embed=self.doss_embed)
 
@@ -9928,7 +9934,8 @@ class CommandAndConquest(commands.Cog):
         # replace the ; with a newline and bullet
         effects = "- " + effects_raw.replace(";", ".\n- ")
         # create tech embed
-        tech_embed = discord.Embed(title=f"{tech['name']}", description=f"{tech['description']}")
+        tech_embed = discord.Embed(title=f"{tech['name']}", description=f"{tech['description']}",
+                                   color=discord.Color.red())
         tech_embed.set_thumbnail(url=f"{tech['image']}")
         tech_embed.add_field(name="Effect", value=f"{effects}", inline=False)
         tech_embed.add_field(name="Prerequisites", value=f"{prereqs}")
@@ -10362,7 +10369,8 @@ class CommandAndConquest(commands.Cog):
         gps = await conn.fetch('''SELECT name, gp_score FROM cnc_users WHERE gp = TRUE ORDER BY gp_score DESC;''')
         # construct embed with gps
         gp_embed = discord.Embed(title="Great Powers Score",
-                                 description="The table below displays the Great Power Score of all current nations.")
+                                 description="The table below displays the Great Power Score of all current nations.",
+                                 color=discord.Color.red())
         # construct embed
         table = ""
         counter = 1
