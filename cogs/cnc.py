@@ -1896,7 +1896,7 @@ class DossierView(View):
                                               FROM cnc_military_access
                                               WHERE $1 = ANY (members);''',
                                            self.user_info['name'])
-        embargoes_recieved = await conn.fetch('''SELECT sender FROM cnc_embargoes WHERE target = $1;''',
+        embargoes_received = await conn.fetch('''SELECT sender FROM cnc_embargoes WHERE target = $1;''',
                                               self.user_info['name'])
         embargoes_sent = await conn.fetch('''SELECT target FROM cnc_embargoes WHERE sender = $1;''',
                                           self.user_info['name'])
@@ -1941,7 +1941,7 @@ class DossierView(View):
         self.doss_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
         self.doss_embed.add_field(name="Military Access", value=f"{military_access}")
         self.doss_embed.add_field(name="Embargoes Sent", value=", ".join([s['target'] for s in embargoes_sent]))
-        self.doss_embed.add_field(name="Embargoes Recieved", value=", ".join([s['sender'] for s in embargoes_recieved]))
+        self.doss_embed.add_field(name="Embargoes Received", value=", ".join([s['sender'] for s in embargoes_received]))
         # update
         await interaction.edit_original_response(embed=self.doss_embed)
 
@@ -7484,7 +7484,7 @@ class GeneralDismissView(discord.ui.View):
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.parent_interaction.user.id
 
-    async def on_timout(self):
+    async def on_timeout(self):
         # disable button
         for child in self.children:
             child.disabled = True
@@ -7518,7 +7518,7 @@ class ResearchingCancelView(discord.ui.View):
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.parent_interaction.user.id
 
-    async def on_timout(self):
+    async def on_timeout(self):
         # disable button
         for child in self.children:
             child.disabled = True

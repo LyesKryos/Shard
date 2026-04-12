@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting alliance adding bug&#10;Adding maps back to map">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding colors to some embeds&#10;Adding embargoes to dossier relations view">
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -596,7 +595,7 @@
       <workItem from="1775839691776" duration="5225000" />
       <workItem from="1775911138228" duration="12395000" />
       <workItem from="1775955771117" duration="3737000" />
-      <workItem from="1775996340527" duration="1758000" />
+      <workItem from="1775996340527" duration="2078000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -941,7 +940,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1765" />
+    <option name="localTasksCounter" value="1766" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -960,7 +959,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting move_to with correct province id system" />
     <MESSAGE value="Correcting leftover province number ids" />
     <MESSAGE value="Correcting dossier display" />
     <MESSAGE value="Correcting icon display for putting the bottom frame on the point rather than centering it." />
@@ -985,7 +983,8 @@
     <MESSAGE value="Properly subtracting manpower when recruiting" />
     <MESSAGE value="Updating manpower gain to include the 3000 base and regeneration factor in the cap" />
     <MESSAGE value="Correcting alliance adding bug&#10;Adding maps back to map" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting alliance adding bug&#10;Adding maps back to map" />
+    <MESSAGE value="Adding colors to some embeds&#10;Adding embargoes to dossier relations view" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding colors to some embeds&#10;Adding embargoes to dossier relations view" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
