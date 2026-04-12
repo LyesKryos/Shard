@@ -1917,11 +1917,12 @@ class DossierView(View):
                 output = ", ".join(combined_names)
                 return output
             else:
-                output = ""
+                relations_list = []
                 # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
                 for relation in relations:
-                    buffer_output = ", ".join([r for r in relation['members'] if r != name])
-                    output += buffer_output
+                    relations_list += (r for r in relation['members'] if r != name)
+                # parse output
+                output = ", ".join(relations_list)
                 return output
 
         allies = parse_relations(alliances, self.user_info['name'])
