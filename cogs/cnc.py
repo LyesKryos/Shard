@@ -1898,8 +1898,10 @@ class DossierView(View):
                                            self.user_info['name'])
         embargoes_received = await conn.fetch('''SELECT sender FROM cnc_embargoes WHERE target = $1;''',
                                               self.user_info['name'])
+        embargoes_received = ", ".join([s['target'] for s in embargoes_received]) if len(embargoes_received) > 0 else "None"
         embargoes_sent = await conn.fetch('''SELECT target FROM cnc_embargoes WHERE sender = $1;''',
                                           self.user_info['name'])
+        embargoes_sent = ", ".join([s['target'] for s in embargoes_sent]) if len(embargoes_sent) > 0 else "None"
 
         def parse_relations(relations: list, name: str, wars: bool = False) -> str:
             """
@@ -1940,8 +1942,8 @@ class DossierView(View):
         self.doss_embed.add_field(name="Wars", value=f"{wars}")
         self.doss_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
         self.doss_embed.add_field(name="Military Access", value=f"{military_access}")
-        self.doss_embed.add_field(name="Embargoes Sent", value=", ".join([s['target'] for s in embargoes_sent]))
-        self.doss_embed.add_field(name="Embargoes Received", value=", ".join([s['sender'] for s in embargoes_received]))
+        self.doss_embed.add_field(name="Embargoes Sent", value=embargoes_sent)
+        self.doss_embed.add_field(name="Embargoes Received", value=embargoes_received)
         # update
         await interaction.edit_original_response(embed=self.doss_embed)
 
@@ -10379,7 +10381,7 @@ class CommandAndConquest(commands.Cog):
             # add to the counter
             counter += 3
             # define the table
-            table += f"`#1. NONE" + (" " * (50-len("None"))) + "50 points`\n"
+            table += f"`#1. NONE" + (" " * (50 - len("None"))) + "50 points`\n"
             table += f"`#2. NONE" + (" " * (50 - len("None"))) + "50 points`\n"
             table += f"`#3. NONE" + (" " * (50 - len("None"))) + "50 points`\n"
         # otherwise add gps
