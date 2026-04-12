@@ -4212,7 +4212,7 @@ class MilitaryAllianceRespondView(discord.ui.View):
             return await interaction.followup.send("You do not have enough Military Authority to accept that request.")
         # if the sender is already in a military alliance, add the recipient to that alliance
         existing_alliance = await self.conn.execute('''UPDATE cnc_alliances
-                                                       SET members = APPEND_ARRAY(members, $1)
+                                                       SET members = ARRAY_APPEND(members, $1)
                                                        WHERE $2 = ANY (members);''',
                                                     self.recipient_info['name'], self.sender_info['name'])
         # if there is no exising alliance, indicated by an UPDATE 0, create a new alliance
@@ -6219,7 +6219,7 @@ class WarOptionsView(discord.ui.View):
                                                                                  f"due to a Peace Treaty.")
                     # remove the target from the alliance
                     await conn.execute('''UPDATE cnc_alliances
-                                          SET members = array_remove(members, $1)
+                                          SET members = ARRAY_REMOVE(members, $1)
                                           WHERE id = $2;''', target_info['name'], ma_info['id'])
 
                 # if there are end trade pact demands, update the trade pacts
@@ -10685,7 +10685,7 @@ class CommandAndConquest(commands.Cog):
             await conn.execute('''DELETE FROM cnc_embargoes WHERE (sender = $1) OR (target = $1);''',
                                usercheck['name'])
             # remove from alliances
-            await conn.execute('''UPDATE cnc_alliances SET members = array_remove(members, $1) 
+            await conn.execute('''UPDATE cnc_alliances SET members = ARRAY_REMOVE(members, $1) 
                                   WHERE $1 = ANY(members);''', usercheck['name'])
 
             await delete_confirm.delete()
