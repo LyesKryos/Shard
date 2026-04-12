@@ -10780,7 +10780,7 @@ class CommandAndConquest(commands.Cog):
         # establish connection
         conn = self.bot.pool
         # establish the announcement channel
-        announcement_channel = self.bot.get_channel(835579413625569322)
+        announcement_channel = self.bot.get_channel(1492162871944286279)
         # create turn
         turn_update = turn.Turn(conn=conn, bot=self.bot)
         # execute the turn

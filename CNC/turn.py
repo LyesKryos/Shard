@@ -236,14 +236,14 @@ class Turn:
             treaty_enforced_manpower_reduction = sum([pt['manpower_reduction'] if pt['manpower_reduction'] else 0
                                                       for pt in peace_treaties])
             # enforce manpower cap
-            manpower_cap = (round((user['manpower_access']/100) * manpower_count) *
+            manpower_cap = (round((user['manpower_access']) * manpower_count) *
                             (1-treaty_enforced_manpower_reduction) if treaty_enforced_manpower_reduction else 1)
             # update manpower set on manpower regen rate
             await conn.execute('''UPDATE cnc_users SET manpower = manpower + $2 WHERE user_id = $1;''',
-                               user['user_id'], round(manpower_cap * (user['manpower_regen'] / 100)))
+                               user['user_id'], 3000 + round(manpower_cap * (user['manpower_regen'] / 100)))
             # enforce manpower cap
             await conn.execute('''UPDATE cnc_users SET manpower = $2 WHERE user_id = $1 AND manpower > $2;''',
-                               user['user_id'], manpower_cap)
+                               user['user_id'], max(manpower_cap, 3000))
 
             # === UNREST/STABILITY FACTORING ===
             average_national_unrest = total_national_unrest / len(controlled_provs)
