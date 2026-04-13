@@ -7978,7 +7978,7 @@ class CommandAndConquest(commands.Cog):
         next_turn_timestamp = self.turn_loop.next_iteration.timestamp()
         # send the next turn
         return await interaction.response.send_message(f"It is currently Turn #{current_turn}.\n"
-                                                       f"Next turn will be in <t:{int(next_turn_timestamp)}:R>.")
+                                                       f"Next turn will be <t:{int(next_turn_timestamp)}:R>.")
 
     @view.command(name="map", description="Opens the map for viewing.")
     async def map(self, interaction: discord.Interaction):
