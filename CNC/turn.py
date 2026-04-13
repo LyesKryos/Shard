@@ -236,15 +236,18 @@ class Turn:
             treaty_enforced_manpower_reduction = sum([pt['manpower_reduction'] if pt['manpower_reduction'] else 0
                                                       for pt in peace_treaties])
             # enforce manpower cap
-            manpower_cap = (round((user['manpower_access']) * manpower_count) *
+            manpower_cap = 3000 + (round((user['manpower_access']) * manpower_count) *
                             (1-treaty_enforced_manpower_reduction) if treaty_enforced_manpower_reduction else 1)
+            # log the manpower
+            logging.getLogger(__name__).info(f"{user['name']} | manpower total: {manpower_cap*(user['manpower_regen'] / 100)}")
             # update manpower set on manpower regen rate
             await conn.execute('''UPDATE cnc_users SET manpower = manpower + $2 WHERE user_id = $1;''',
                                user['user_id'], 3000 + round(manpower_cap * (user['manpower_regen'] / 100)))
             # enforce manpower cap
             await conn.execute('''UPDATE cnc_users SET manpower = $2 WHERE user_id = $1 AND manpower > $2;''',
-                               user['user_id'],
-                               max(manpower_cap, 3000+round(manpower_cap * (user['manpower_regen'] / 100))))
+                               user['user_id'], manpower_cap)
+            # log the manpower cap
+            logging.getLogger(__name__).info(f"{user['name']} | manpower cap: {manpower_cap*}")
 
             # === UNREST/STABILITY FACTORING ===
             average_national_unrest = total_national_unrest / len(controlled_provs)
@@ -268,7 +271,7 @@ class Turn:
             mil_stab_loss = ((user['last_mil_auth_gain']*2)-8) if user['last_mil_auth_gain'] > 4 else 0
             # stability gain from "strong army"
             manpower_usage_count = await conn.fetchval('''SELECT SUM(troops)::INT FROM cnc_armies 
-                                                          WHERE owner_id = $1;''', user['user_id'])
+                                                       WHERE owner_id = $1;''', user['user_id'])
             # protect against null
             manpower_usage_count = 0 if manpower_usage_count is None else manpower_usage_count
             # calculate stability gain from "strong army"
