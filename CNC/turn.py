@@ -247,7 +247,7 @@ class Turn:
             await conn.execute('''UPDATE cnc_users SET manpower = $2 WHERE user_id = $1 AND manpower > $2;''',
                                user['user_id'], manpower_cap)
             # log the manpower cap
-            logging.getLogger(__name__).info(f"{user['name']} | manpower cap: {manpower_cap*}")
+            logging.getLogger(__name__).info(f"{user['name']} | manpower cap: {manpower_cap}")
 
             # === UNREST/STABILITY FACTORING ===
             average_national_unrest = total_national_unrest / len(controlled_provs)
