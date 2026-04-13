@@ -1917,8 +1917,8 @@ class DossierView(View):
                 # for each relation, join to a comma-separated list if the relation "member" isn't the user's nation
                 for relation in relations:
                     # define all names
-                    defenders_names = [r for r in relation['defenders'] if r != name]
-                    attackers_names = [r for r in relation['attackers'] if r != name]
+                    defenders_names = [r for r in relation['defenders'] if r != name and name in relation['attackers']]
+                    attackers_names = [r for r in relation['attackers'] if r != name and name in relation['defenders']]
                     combined_names += defenders_names + attackers_names
                 output = ", ".join(combined_names)
                 return output
@@ -1939,7 +1939,7 @@ class DossierView(View):
         self.doss_embed.add_field(name="=====================RELATIONS=====================",
                                   value="Information about your nation's diplomatic relationships.", inline=False)
         self.doss_embed.add_field(name="Allies", value=f"{allies}")
-        self.doss_embed.add_field(name="Wars", value=f"{wars}")
+        self.doss_embed.add_field(name="Enemies", value=f"{wars}")
         self.doss_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
         self.doss_embed.add_field(name="Military Access", value=f"{military_access}")
         self.doss_embed.add_field(name="Embargoes Sent", value=embargoes_sent)
