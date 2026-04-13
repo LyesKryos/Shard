@@ -250,7 +250,7 @@ class Turn:
                                user['user_id'], manpower_cap)
             # log the manpower cap
             logging.getLogger(__name__).info(f"{user['name']} | manpower cap: {manpower_cap}")
-
+    
             # === UNREST/STABILITY FACTORING ===
             average_national_unrest = total_national_unrest / len(controlled_provs)
             # reduce by 5 if the user has a capital
@@ -584,8 +584,8 @@ class Turn:
                                        WHERE govt_subtype = $1;''', user['govt_subtype'])
                 mil_auth_gain += govt_gain
                 logging.getLogger(__name__).info(f"mil auth\n{user['name']} | government type gain: {mil_auth_gain}")
-                # for each military alliance, add 1 + x^1.25
-                mil_alliance_gain = (military_alliances**1.25) + military_alliances
+                # for each military alliance, add 1 + x^0.625
+                mil_alliance_gain = (military_alliances**1.05)+1
                 mil_auth_gain += mil_alliance_gain
                 logging.getLogger(__name__).info(f"{user['name']} | military alliance gain: {mil_alliance_gain}")
                 # based on the average development, add dev/5

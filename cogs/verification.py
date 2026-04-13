@@ -307,7 +307,16 @@ class VerificationDropdown(discord.ui.Select):
                                                      "You have not been verified, but you may try again later.")
                 elif response == "Command & Conquest":
                     await user.add_roles(command_conquest_role)
-                    await cnc_chatter_channel.send(f"Welcome to the Command & Conquest system, {user.mention}!\n\nTo begin playing, check out the game's website: [**Command & Conquqest**](https://lyeskryos.github.io/cnc.io/index). Then, you can use the </cnc register:1489815761919803423> command in #command_and_conquest to get started. We also recommend reading the [**New Player's Guide**](https://lyeskryos.github.io/cnc.io/guide) and the [**Manual**](https://lyeskryos.github.io/cnc.io/manual).\n\n*All men are born to rule, but few have the chance to. You have the chance. Will you squander it like so many others, or will you sieze your chance to change the world? Only you can say...")
+                    await cnc_chatter_channel.send(f"Welcome to the Command & Conquest system, {user.mention}!\n\n"
+                                                   f"To begin playing, check out the game's website: "
+                                                   f"[**Command & Conquqest**](<https://lyeskryos.github.io/cnc.io/index>). "
+                                                   f"Then, you can use the </cnc register:1489815761919803423> command "
+                                                   f"in #command_and_conquest to get started. We also recommend reading "
+                                                   f"the [**New Player's Guide**](<https://lyeskryos.github.io/cnc.io/guide>) "
+                                                   f"and the [**Manual**](https://lyeskryos.github.io/cnc.io/manual)."
+                                                   f"\n\n*All men are born to rule, but few have the chance to. "
+                                                   f"You have the chance. Will you squander it like so many others, or "
+                                                   f"will you sieze your chance to change the world? Only you can say...*")
                     await user.remove_roles(unverified_role)
             open_square = thegye_server.get_channel(674335095628365855)
             await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "

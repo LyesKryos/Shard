@@ -8504,32 +8504,44 @@ class CommandAndConquest(commands.Cog):
         try:
             post_info = await self.province_db_info(province_id=posting)
         except ValueError:
-            return await interaction.followup.send(f"No such province as `{posting}`.\nNote: if additional spaces/characters were added to the autocomplete suggestion, the posting may appear invalid.", ephemeral=True)
+            return await interaction.followup.send(f"No such province as `{posting}`.\n"
+                                                   f"Note: if additional spaces/characters were added to the "
+                                                   f"autocomplete suggestion, the posting may appear invalid.",
+                                                   ephemeral=True)
         # define tusail mil charge
         tusail_mil_charge = False
         # if they are not a user, reject
         if user_info is None:
-            return await interaction.followup.send("You are not a registered member of the Command & Conquest system. Click here to register: </cnc register:1316831583159849021>.")
+            return await interaction.followup.send("You are not a registered member of the Command & Conquest system. "
+                                                   "Click here to register: </cnc register:1316831583159849021>.")
         # if the number of recruit troops is not divisible evenly by 1000 (1000 = 1 auth cost)
         elif recruit_troops % 1000 != 0:
-            return await interaction.followup.send(f"`{recruit_troops}` is not a valid troop amount. Troops must be recruited in the thousands evenly (e.g., 1,000, not 1,234).", ephemeral=True)
+            return await interaction.followup.send(f"`{recruit_troops}` is not a valid troop amount. Troops must be "
+                                                   f"recruited in the thousands evenly (e.g., 1,000, not 1,234).",
+                                                   ephemeral=True)
         # otherwise, carry on
         else:
             # check to see if they are able to create an army
             if (user_info['govt_type'] == "Anarchy") and (user_info['govt_subtype'] == "Postcolonial"):
-                return await interaction.followup.send("Nations with the Anarchy Government Type (excepting Postcolonial) cannot create new armies.", ephemeral=True)
+                return await interaction.followup.send("Nations with the Anarchy Government Type "
+                                                       "(excepting Postcolonial) cannot create new armies.",
+                                                       ephemeral=True)
             # otherwise, carry on
             else:
                 # count all current armies
-                army_count = await conn.fetchval('''SELECT count(army_id) FROM cnc_armies WHERE owner_id = $1;''', interaction.user.id)
+                army_count = await conn.fetchval('''SELECT count(army_id) FROM cnc_armies WHERE owner_id = $1;''',
+                                                 interaction.user.id)
                 # check if the user has sufficient army space
                 if army_count + 1 > user_info['army_limit']:
                     # deny
-                    return await interaction.followup.send(f"{user_info['name']} cannot create another army, as doing so would exceed its current Army Limit.", ephemeral=True)
+                    return await interaction.followup.send(f"{user_info['name']} cannot create another army, "
+                                                           f"as doing so would exceed its current Army Limit.",
+                                                           ephemeral=True)
                 # check if the user has sufficient mil auth
                 elif user_info['mil_auth'] < 4:
                     # deny
-                    return await interaction.followup.send(f"{user_info['name']} does not have sufficient Military Authority to create a new army.", ephemeral=True)
+                    return await interaction.followup.send(f"{user_info['name']} does not have sufficient Military "
+                                                           f"Authority to create a new army.", ephemeral=True)
                 # check if the user has sufficient econ auth/mil auth
                 elif user_info['econ_auth'] < (recruit_troops / 1000):
                     # check if the user is tusail
@@ -8539,42 +8551,58 @@ class CommandAndConquest(commands.Cog):
                         # check if they have enough
                         if user_info['mil_auth'] < 4 + (recruit_troops / 1000):
                             # deny
-                            return await interaction.followup.send(f"{user_info['name']} does not have sufficient Military Authority to create a new army with {recruit_troops:,} troops.", ephemeral=True)
+                            return await interaction.followup.send(f"{user_info['name']} does not have sufficient "
+                                                                   f"Military Authority to create a new army with "
+                                                                   f"{recruit_troops:,} troops.", ephemeral=True)
                     # otherwise
                     else:
                         # deny
-                        return await interaction.followup.send(f"{user_info['name']} does not have sufficient Economic Authority to create a new army with {recruit_troops:,} troops.", ephemeral=True)
+                        return await interaction.followup.send(f"{user_info['name']} does not have sufficient "
+                                                               f"Economic Authority to create a new army with "
+                                                               f"{recruit_troops:,} troops.", ephemeral=True)
                 # check of the recruitment amount is over the army limit
                 elif recruit_troops > user_info['army_size']:
                     # deny
-                    return await interaction.followup.send(f"{recruit_troops:,} exceeds the Army Size limit of {user_info['name']}.", ephemeral=True)
+                    return await interaction.followup.send(f"{recruit_troops:,} exceeds the Army Size limit of "
+                                                           f"{user_info['name']}.", ephemeral=True)
                 # check if the posting location is owned and occupied by the user
                 elif (user_info['user_id'] != post_info['owner_id']) and (user_info['user_id'] != post_info['occupier_id']):
                     # deny
-                    return await interaction.followup.send("Armies cannot be posted to provinces their owner does not both own and occupy.", ephemeral=True)
+                    return await interaction.followup.send("Armies cannot be posted to provinces their owner does not "
+                                                           "both own and occupy.", ephemeral=True)
                 # otherwise, carry on
                 else:
                     # subtract the mil auth
-                    await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 4 WHERE user_id = $1;''', user_info['user_id'])
+                    await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - 4 WHERE user_id = $1;''',
+                                       user_info['user_id'])
                     # if there is a troop cost
                     if recruit_troops != 0:
                         # if the tusail mil charge is active
                         if tusail_mil_charge:
-                            await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - $2 WHERE user_id = $1;''', user_info['user_id'], (recruit_troops/1000))
+                            await conn.execute('''UPDATE cnc_users SET mil_auth = mil_auth - $2 WHERE user_id = $1;''',
+                                               user_info['user_id'], (recruit_troops/1000))
                         # otherwise, its econ
                         else:
-                            await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $2 WHERE user_id = $1;''', user_info['user_id'], (recruit_troops/1000))
+                            await conn.execute('''UPDATE cnc_users SET econ_auth = econ_auth - $2 
+                                                  WHERE user_id = $1;''', user_info['user_id'], (recruit_troops/1000))
                     # figure out the army name
-                    army_name_count = await conn.fetchval('''SELECT count(army_name) FROM cnc_armies WHERE owner_id = $2 AND army_name LIKE $1;''', f"%Army of {post_info['name']}%", user_info['user_id'])
+                    army_name_count = await conn.fetchval('''SELECT count(army_name) FROM cnc_armies 
+                                                             WHERE owner_id = $2 AND army_name LIKE $1;''',
+                                                          f"%Army of {post_info['name']}%", user_info['user_id'])
                     if army_name_count != 0:
                         army_name_number = ordinal_suffix(army_name_count+1)
                         army_name = f"{army_name_number} Army of {post_info['name']}"
                     else:
                         army_name = f"Army of {post_info['name']}"
                     # create the army
-                    await conn.execute('''INSERT INTO cnc_armies(owner_id, troops, location, army_name) VALUES ($1, $2, $3, $4);''', user_info['user_id'], recruit_troops, post_info['id'], army_name)
+                    await conn.execute('''INSERT INTO cnc_armies(owner_id, troops, location, army_name) 
+                                          VALUES ($1, $2, $3, $4);''', user_info['user_id'],
+                                       recruit_troops, post_info['id'], army_name)
                     # notify
-                    return await interaction.followup.send(f"The {army_name} has been created in {post_info['name']} (ID: {post_info['id']}). It currently has `{recruit_troops:,}` troops. It is not commanded by a General.", ephemeral=False)
+                    return await interaction.followup.send(f"The {army_name} has been created in {post_info['name']} "
+                                                           f"(ID: {post_info['id']}). It currently has "
+                                                           f"`{recruit_troops:,}` troops. It is not commanded by a "
+                                                           f"General.", ephemeral=False)
 
     @cnc.command(name="move_army",
                  description="Moves an army to a new location, initiating army combat or siege where applicable.")
@@ -8906,11 +8934,11 @@ class CommandAndConquest(commands.Cog):
                     # if there are enemy armies, set the battle = true
                     if len(enemy_army_list) > 0:
                         battle = True
-                # check if the user already has 15 provinces
+                # check if the user already has 25 provinces
                 prov_count = await conn.fetchval(
                     '''SELECT COUNT(id) FROM cnc_provinces WHERE owner_id = $1;''', user_info['user_id'])
-                # if they have fewer than 15, battle
-                if prov_count <= 15:
+                # if they have fewer than 25, battle
+                if prov_count <= 25:
                     battle = True
 
                 # update the movement and location

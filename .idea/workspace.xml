@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting GP table buffer display">
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting embargoes display on dossier">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CNC/turn.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/turn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,7 +20,7 @@
     </colors>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="1274" />
+    <option name="cachedIndexableFilesCount" value="1276" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -595,7 +597,8 @@
       <workItem from="1775839691776" duration="5225000" />
       <workItem from="1775911138228" duration="12395000" />
       <workItem from="1775955771117" duration="3737000" />
-      <workItem from="1775996340527" duration="2474000" />
+      <workItem from="1775996340527" duration="5471000" />
+      <workItem from="1776118194228" duration="443000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -940,7 +943,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1768" />
+    <option name="localTasksCounter" value="1769" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -959,7 +962,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting icon display for putting the bottom frame on the point rather than centering it." />
     <MESSAGE value="Correcting pathfinder province id use" />
     <MESSAGE value="Correcting pathfinder to accept that users can move to their own provinces" />
     <MESSAGE value="Correcting map display with new fort icon AND proper icon display" />
@@ -984,7 +986,8 @@
     <MESSAGE value="Adding colors to some embeds&#10;Adding embargoes to dossier relations view" />
     <MESSAGE value="Adding colors to some embeds&#10;Adding embargoes to dossier relations view&#10;Correcting on_timeout for certain buttons" />
     <MESSAGE value="Correcting GP table buffer display" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting GP table buffer display" />
+    <MESSAGE value="Correcting embargoes display on dossier" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcting embargoes display on dossier" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
