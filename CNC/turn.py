@@ -697,8 +697,8 @@ class Turn:
             # pull the total development
             total_dev = await conn.fetchval('''SELECT sum(development) FROM cnc_provinces 
                                                WHERE owner_id = $1 AND occupier_id = $1;''', user['user_id'])
-            # if the total dev is above 50 and the user's govt type is Tribal, give free government change
-            if total_dev > 50 and user['govt_type'] == "Tribal":
+            # if the total dev is above 50 and the user's govt type is Tribal, give free government change if they have not already gotten it
+            if total_dev > 50 and user['govt_type'] == "Tribal" and not user['free_govt_change']:
                 await conn.execute('''UPDATE cnc_users SET free_govt_change = TRUE WHERE user_id = $1;''',
                                    user['user_id'])
                 dm_notification += f"{user['name']} has gained free government change!\n"

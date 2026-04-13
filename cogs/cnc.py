@@ -2559,7 +2559,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
                 return await interaction.followup.send(
                     "You do not have enough Political Authority to Reform your government.\n"
                     f"To reform your government, you need a total of {total_cost} Political Authority.")
-        # if the user has the free government change, set the total cost = 0
+        # if the user has the free government change, set the total cost = 0 and remove their free change
         else:
             await self.conn.execute('''UPDATE cnc_users
                                        SET free_govt_change = False
