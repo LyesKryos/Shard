@@ -106,6 +106,9 @@ class Turn:
                 structure_count += len(prov['structures'])
                 # add all manpower
                 manpower_count += prov['citizens']
+                # if the user has Livestock Farming, increase by 3%
+                if "Livestock Farming" in user['tech']:
+                    manpower_count *= 1.03
                 # if there is a Fishery, increase taxation effectiveness
                 if 'Fishery' in prov['structures']:
                     tax_effect_boost += 1
@@ -235,15 +238,14 @@ class Turn:
             # peace treaty enforced manpower reduction
             treaty_enforced_manpower_reduction = sum([pt['manpower_reduction'] if pt['manpower_reduction'] else 0
                                                       for pt in peace_treaties])
+            # log the manpower
+            logging.getLogger(__name__).info(f"{user['name']} | manpower total: {manpower_count+3000}")
+            # update manpower set on manpower regen rate
+            await conn.execute('''UPDATE cnc_users SET manpower = manpower + $2 WHERE user_id = $1;''',
+                               user['user_id'], 3000 + round(manpower_count * (user['manpower_regen'] / 100)))
             # enforce manpower cap
             manpower_cap = 3000 + (round((user['manpower_access']) * manpower_count) *
                             (1-treaty_enforced_manpower_reduction) if treaty_enforced_manpower_reduction else 1)
-            # log the manpower
-            logging.getLogger(__name__).info(f"{user['name']} | manpower total: {manpower_cap*(user['manpower_regen'] / 100)}")
-            # update manpower set on manpower regen rate
-            await conn.execute('''UPDATE cnc_users SET manpower = manpower + $2 WHERE user_id = $1;''',
-                               user['user_id'], 3000 + round(manpower_cap * (user['manpower_regen'] / 100)))
-            # enforce manpower cap
             await conn.execute('''UPDATE cnc_users SET manpower = $2 WHERE user_id = $1 AND manpower > $2;''',
                                user['user_id'], manpower_cap)
             # log the manpower cap
@@ -701,6 +703,23 @@ class Turn:
                                    user['user_id'])
                 dm_notification += f"{user['name']} has gained free government change!\n"
 
+            # === OVEREXTENSION CALCULATIONS ===
+            overextension_limit = 0
+            # if the government is tribal, set to 25
+            if user['govt_type'] == "Tribal":
+                overextension_limit = 25
+            # if the government subtype is free city set to 20
+            if user['govt_subtype'] == "Free City":
+                overextension_limit = 20
+            # otherwise, set it to 45
+            else:
+                overextension_limit = 45
+            # if user has the imperialism tech, set to +10
+            if "Imperialism" in user['tech']:
+                overextension_limit += 10
+            # set overextension
+            await conn.execute('''UPDATE cnc_users SET overextend_limit = $2 WHERE user_id = $1;''', user['user_id'], overextension_limit)
+
 
             # add user dm notifications to the list
             self.user_dm_notifications[user['user_id']] = dm_notification
@@ -908,9 +927,9 @@ class Turn:
             return
         # otherwise, set the top three (or fewer)
         else:
-            # for each gp, set the value
+            # for each gp, set the value and update their extension limit
             for gp in gp_check:
-                await conn.execute('''UPDATE cnc_users SET gp = TRUE WHERE user_id = $1;''', gp['user_id'])
+                await conn.execute('''UPDATE cnc_users SET gp = TRUE, overextend_limit = overextend_limit + 15 WHERE user_id = $1;''', gp['user_id'])
             # wrap up
             return
 

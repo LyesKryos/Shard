@@ -1898,7 +1898,7 @@ class DossierView(View):
                                            self.user_info['name'])
         embargoes_received = await conn.fetch('''SELECT sender FROM cnc_embargoes WHERE target = $1;''',
                                               self.user_info['name'])
-        embargoes_received = ", ".join([s['target'] for s in embargoes_received]) if len(embargoes_received) > 0 else "None"
+        embargoes_received = ", ".join([s['sender'] for s in embargoes_received]) if len(embargoes_received) > 0 else "None"
         embargoes_sent = await conn.fetch('''SELECT target FROM cnc_embargoes WHERE sender = $1;''',
                                           self.user_info['name'])
         embargoes_sent = ", ".join([s['target'] for s in embargoes_sent]) if len(embargoes_sent) > 0 else "None"
@@ -3123,8 +3123,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
                 await self.conn.execute('''DELETE
                                            FROM cnc_drs
                                            WHERE $1 = ANY (members)
-                                             AND $2 = ANY (members)
-                                             AND pending = False;''',
+                                             AND $2 = ANY (members);''',
                                         user_info['name'], self.recipient_info['name'])
                 await remove_msg.edit(view=None)
                 await recipient_user.send(f"{user_info['name']} has ended diplomatic relations with "
@@ -3140,6 +3139,8 @@ class CooperativeDiplomaticActions(discord.ui.View):
                 await interaction.edit_original_response(view=self)
                 # remove accept/deny buttons
                 return await remove_msg.edit(view=None)
+
+        # check for any pending requests of this type
         pending_check = await self.conn.fetchrow('''SELECT *
                                                     FROM cnc_pending_requests
                                                     WHERE $1 = ANY (members)
@@ -3158,6 +3159,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send("You do not have sufficient Political Authority to send that "
                                                    "proposal.")
+
         # otherwise, send the message
         recipient_dm = await safe_dm(bot=self.bot, user_id=self.recipient_info['user_id'],
                                      content=f"The {user_info['pretitle']} of "
@@ -3264,6 +3266,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
                 await interaction.edit_original_response(view=self)
                 # remove accept/deny buttons
                 return await remove_msg.edit(view=None)
+
         # check if the user is in another alliance
         other_ma_check = await self.conn.fetchrow('''SELECT *
                                                      FROM cnc_alliances
@@ -9259,6 +9262,8 @@ class CommandAndConquest(commands.Cog):
                         footer = (f"The natives of {prov_info['name']} have successfully repelled the foreign invaders.\n"
                                   f"The {army_info['army_name']} has retreated to {depart_prov_info['name']}.")
 
+                # get the attacking general name
+                general_name = await conn.fetchval('''SELECT name FROM cnc_generals WHERE army_id = $1;''', army_info['army_id'])
                 # create the battle embed and send it
                 battle_embed = discord.Embed(title=f"The Conquest of {prov_info['name']}",
                                              description=f"A battle to conquer the province of "
@@ -9268,12 +9273,12 @@ class CommandAndConquest(commands.Cog):
                 battle_embed.add_field(name="Attacker", value=user_info['name'])
                 battle_embed.add_field(name="Attacking Army",
                                        value=f"The {army_info['army_name']}\n{army_info['troops']:,} troops")
-                battle_embed.add_field(name="\u200b", value="\u200b")
+                battle_embed.add_field(name="General", value=(general_name if general_name is not None else "None"))
                 # define the defending attributes
                 battle_embed.add_field(name="Defenders", value="Natives")
                 battle_embed.add_field(name="Defending Army",
                                        value=f"The {rebel_army['army_name']}\n{rebel_army['troops']:,} troops")
-                battle_embed.add_field(name="\u200b", value="\u200b")
+                battle_embed.add_field(name="General", value=rand_name())
                 # outcome
                 battle_embed.add_field(name="Outcome", value=victor_string, inline=False)
                 # casualties
@@ -9348,8 +9353,11 @@ class CommandAndConquest(commands.Cog):
                                   f"loyalist enemies.\n The {army_info['army_name']} has retreated to "
                                   f"{depart_prov_info['name']}.")
 
+                # get the attacking general name
+                attacking_general = await conn.fetchval('''SELECT name FROM cnc_generals WHERE army_id = $1;''', army_info['army_id'])
+
                 # create the battle embed and send it
-                battle_embed = discord.Embed(title=f"The battlesim.Battle of {prov_info['name']}",
+                battle_embed = discord.Embed(title=f"The Battle of {prov_info['name']}",
                                              description=f"A battle to liberate {prov_info['name']} "
                                                          f"from rebellious forces.",
                                              color=discord.Color.red())
@@ -9357,12 +9365,12 @@ class CommandAndConquest(commands.Cog):
                 battle_embed.add_field(name="Attacker", value=user_info['name'])
                 battle_embed.add_field(name="Attacking Army",
                                        value=f"The {army_info['army_name']}\n{army_info['troops']:,} troops")
-                battle_embed.add_field(name="\u200b", value="\u200b")
+                battle_embed.add_field(name="General", value=(attacking_general if attacking_general is not None else "None"))
                 # define the defending attributes
                 battle_embed.add_field(name="Defenders", value="Natives")
                 battle_embed.add_field(name="Defending Army",
                                        value=f"The {rebel_army['army_name']}\n{rebel_army['troops']:,} troops")
-                battle_embed.add_field(name="\u200b", value="\u200b")
+                battle_embed.add_field(name="General", value=rand_name())
                 # outcome
                 battle_embed.add_field(name="Outcome", value=victor_string, inline=False)
                 # casualties
@@ -9532,6 +9540,11 @@ class CommandAndConquest(commands.Cog):
                                             action="battle_defeat",
                                             casualties=attacker_casualties)
 
+                # get the attacking general name
+                attacking_general = await conn.fetchval('''SELECT name FROM cnc_generals WHERE army_id = $1;''', army_info['army_id'])
+                # get the defending general name
+                defending_general = await conn.fetchval('''SELECT name FROM cnc_generals WHERE army_id = $1;''', enemy_army_list[0]['army_id'])
+
                 # create the battle embed and send it
                 battle_embed = discord.Embed(title=f"The battlesim.Battle of {prov_info['name']}",
                                              description=f"A battle between enemy armies "
@@ -9541,7 +9554,7 @@ class CommandAndConquest(commands.Cog):
                 battle_embed.add_field(name="Attacker", value=f"The {user_info['pretitle']} of {user_info['name']}")
                 battle_embed.add_field(name="Attacking Army",
                                        value=f"The {army_info['army_name']}\n{army_info['troops']:,}")
-                battle_embed.add_field(name="\u200b", value="\u200b")
+                battle_embed.add_field(name="General", value=(attacking_general if attacking_general is not None else "None"))
                 # define the primary defender
                 primary_defender = await user_db_info(conn=conn, user_id=enemy_army_list[0]['owner_id'])
                 battle_embed.add_field(name="Defender",
@@ -9550,7 +9563,7 @@ class CommandAndConquest(commands.Cog):
                 battle_embed.add_field(name="Defending Army(s)",
                                        value=(", ".join([a['army_name'] for a in enemy_army_list]))
                                              +f"\nTotal Force: {sum(a['troops'] for a in enemy_army_list):,}")
-                battle_embed.add_field(name="\u200b", value="\u200b")
+                battle_embed.add_field(name="General", value=(defending_general if defending_general is not None else "None"))
                 # outcome
                 war_score_emoji = "\U0001f6e1" if victor == "defender" else "\U00002694"
                 battle_embed.add_field(name="Outcome", value=victor_string)
