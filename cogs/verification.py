@@ -81,6 +81,7 @@ class VerificationDropdown(discord.ui.Select):
             traveler_role = thegye_server.get_role(674280677268652047)
             command_conquest_role = thegye_server.get_role(970643811913048084)
             gatehouse = thegye_server.get_channel(674284159128043530)
+            cnc_chatter_channel = thegye_server.get_channel(974663465115451474)
             user = self.member
             # delete message
             await self.message.delete()
@@ -149,13 +150,17 @@ class VerificationDropdown(discord.ui.Select):
                     try:
                         nation_reply = await self.bot.wait_for('message', check=authorcheck, timeout=300)
                     except asyncio.TimeoutError:
-                        await user.add_role(traveler_role)
+                        await user.add_roles(traveler_role)
                         return await verify_dm.send("Timed out. Please answer me next time!")
                     # get the content
                     nation = nation_reply.content
                     # if content is cancel, cancel
                     if nation.lower() == "cancel":
-                        await user.add_role(traveler_role)
+                        await user.add_roles(traveler_role)
+                        await user.remove_roles(nationstates_role, unverified_role)
+                        open_square = thegye_server.get_channel(674335095628365855)
+                        await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
+                                   f"and introduce yourself!")
                         return await verify_dm.send("Cancelling!")
                     # checks to see if the user has already verified yet or not
                     verified_check = await conn.fetchrow('''SELECT * FROM verified_nations WHERE user_id = $1;''',
@@ -183,6 +188,11 @@ class VerificationDropdown(discord.ui.Select):
                         await verify_dm.send(
                             f"No such nation as `{nation}`. Please check that you are using only the nation's"
                             f" name, without the pretitle. **You will need to use the `/verify` command again.**")
+                        await user.add_role(traveler_role)
+                        await user.remove_roles(nationstates_role, unverified_role)
+                        open_square = thegye_server.get_channel(674335095628365855)
+                        await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
+                                   f"and introduce yourself!")
                         return await user.add_role(traveler_role)
                     # get official nation name
                     nation_raw = nation_exist.text
@@ -207,6 +217,9 @@ class VerificationDropdown(discord.ui.Select):
                     except asyncio.TimeoutError:
                         await user.add_role(traveler_role)
                         await user.remove_roles(nationstates_role, unverified_role)
+                        open_square = thegye_server.get_channel(674335095628365855)
+                        await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
+                                   f"and introduce yourself!")
                         return await verify_dm.send("Verification timed out. Please answer me next time!")
                     # define headers and parameters
                     params = {'a': 'verify',
@@ -294,7 +307,8 @@ class VerificationDropdown(discord.ui.Select):
                                                      "You have not been verified, but you may try again later.")
                 elif response == "Command & Conquest":
                     await user.add_roles(command_conquest_role)
-            await user.remove_roles(unverified_role)
+                    await cnc_chatter_channel.send(f"Welcome to the Command & Conquest system, {user.mention}!\n\nTo begin playing, check out the game's website: [**Command & Conquqest**](https://lyeskryos.github.io/cnc.io/index). Then, you can use the </cnc register:1489815761919803423> command in #command_and_conquest to get started. We also recommend reading the [**New Player's Guide**](https://lyeskryos.github.io/cnc.io/guide) and the [**Manual**](https://lyeskryos.github.io/cnc.io/manual).\n\n*All men are born to rule, but few have the chance to. You have the chance. Will you squander it like so many others, or will you sieze your chance to change the world? Only you can say...")
+                    await user.remove_roles(unverified_role)
             open_square = thegye_server.get_channel(674335095628365855)
             await open_square.send(f"The gods have sent us {user.mention}! Welcome, traveler, "
                                    f"and introduce yourself!")
