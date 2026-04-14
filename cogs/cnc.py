@@ -1844,7 +1844,7 @@ class DossierView(View):
                                   value=f"{self.user_info['mil_upkeep']} Economic Authority per turn")
         # get total production and average development
         total_production = await conn.fetchval('''SELECT sum(production) FROM cnc_provinces WHERE owner_id = $1;''', self.user_info['user_id'])
-        average_development await conn.fetchval('''SELECT avg(development) FROM cnc_provinces WHERE owner_id = $1;''', self.user_info['user_id'])
+        average_development = await conn.fetchval('''SELECT avg(development) FROM cnc_provinces WHERE owner_id = $1;''', self.user_info['user_id'])
         trade_goods_produced = await conn.fetchval('''SELECT array_agg(trade_good) FROM cnc_provinces WHERE owner_id = $1;''', self.user_info['user_id'])
         self.doss_embed.add_field(name="Production Last Turn", value=f"{total_production} production")
         self.doss_embed.add_field(name="Average Development", value=f"{average_development:.2f} development")
