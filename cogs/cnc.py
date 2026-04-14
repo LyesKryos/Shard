@@ -2617,7 +2617,7 @@ class GovernmentReformTypeEnact(discord.ui.View):
         govt_embed.set_field_at(-6, name="Base Development Cost", value=f"{subtype['dev_cost']:.0%}")
         # update taxation
         govt_embed.set_field_at(-5, name="Base Taxation", value=f"{subtype['tax_level']:.0%}")
-        govt_embed.set_field_at(-3, name="Maximum Taxation", value=f"{subtype['tax_level'] + 20:.0%}")
+        govt_embed.set_field_at(-3, name="Maximum Taxation", value=f"{subtype['tax_level'] + .2:.0%}")
         # set up government view
         govt_reform_view = GovernmentReformMenu(self.interaction.user, self.interaction, self.conn, self.govt_embed)
         # send updates
@@ -2801,7 +2801,7 @@ class GovernmentReformSubtypeEnact(discord.ui.View):
         govt_embed.set_field_at(-6, name="Base Development Cost", value=f"{subtype_info['dev_cost']:.0%}")
         # update taxation
         govt_embed.set_field_at(-5, name="Base Taxation", value=f"{subtype_info['tax_level']:.0%}")
-        govt_embed.set_field_at(-3, name="Maximum Taxation", value=f"{subtype_info['tax_level'] + 20:.0%}")
+        govt_embed.set_field_at(-3, name="Maximum Taxation", value=f"{subtype_info['tax_level'] + .2:.0%}")
         # set up government view
         govt_reform_view = GovernmentReformMenu(self.interaction.user, self.interaction, self.conn, self.govt_embed)
         # send updates
@@ -3297,6 +3297,20 @@ class CooperativeDiplomaticActions(discord.ui.View):
             button.disabled = True
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send("You do not have sufficient Military Authority.")
+
+        # check if adding the recipient would exceed the great power limit
+        gp_excess_check = await self.conn.fetchrow('''SELECT * FROM cnc_alliances a 
+                                                   WHERE (SELECT count(*) FROM 
+                                                       UNNEST(a.members) AS nation 
+                                                           JOIN cnc_users u ON nation = u.name AND u.gp = TRUE ) > 0 
+                                                     AND $1 = ANY(members);''', user_info['name'])
+        # if there is any such or if creating one would violate the limit
+        if (gp_excess_check) or (user_info['gp'] and self.recipient_info['gp']):
+            # disable button
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send("Alliances cannot have more than one Great Power.")
+
         # otherwise, send the dm
         recipient_dm = await safe_dm(bot=self.bot, user_id=self.recipient_info['user_id'],
                                      content=f"The {user_info['pretitle']} of {user_info['name']} has proposed that "
@@ -10238,7 +10252,7 @@ class CommandAndConquest(commands.Cog):
         # current tax level
         govt_embed.add_field(name="Current Taxation", value=f"{user_info['tax_level']}%")
         # max tax level
-        govt_embed.add_field(name="Maximum Taxation", value=f"{govt_info['tax_level'] + 20:.0%}")
+        govt_embed.add_field(name="Maximum Taxation", value=f"{govt_info['tax_level'] + .2:.0%}")
         # public spending
         govt_embed.add_field(name="Public Spending", value=f"{user_info['public_spend']} Economic Authority")
         # military upkeep

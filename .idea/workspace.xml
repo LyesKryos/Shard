@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting embargoes display on dossier">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Improving &quot;Command &amp; Conquest&quot; role assignment message formatting&#10;Nerfing military alliance gain&#10;Increasing the limit of conquerable provinces to 25">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CNC/turn.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/turn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/verification.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/verification.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -598,7 +598,7 @@
       <workItem from="1775911138228" duration="12395000" />
       <workItem from="1775955771117" duration="3737000" />
       <workItem from="1775996340527" duration="5471000" />
-      <workItem from="1776118194228" duration="443000" />
+      <workItem from="1776118194228" duration="4153000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -943,7 +943,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1769" />
+    <option name="localTasksCounter" value="1770" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -962,7 +962,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting pathfinder province id use" />
     <MESSAGE value="Correcting pathfinder to accept that users can move to their own provinces" />
     <MESSAGE value="Correcting map display with new fort icon AND proper icon display" />
     <MESSAGE value="Correcting turn update for fort level&#10;Correcting icon offset to 0 so that they are actually in the province area instead of outside it" />
@@ -987,7 +986,8 @@
     <MESSAGE value="Adding colors to some embeds&#10;Adding embargoes to dossier relations view&#10;Correcting on_timeout for certain buttons" />
     <MESSAGE value="Correcting GP table buffer display" />
     <MESSAGE value="Correcting embargoes display on dossier" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting embargoes display on dossier" />
+    <MESSAGE value="Improving &quot;Command &amp; Conquest&quot; role assignment message formatting&#10;Nerfing military alliance gain&#10;Increasing the limit of conquerable provinces to 25" />
+    <option name="LAST_COMMIT_MESSAGE" value="Improving &quot;Command &amp; Conquest&quot; role assignment message formatting&#10;Nerfing military alliance gain&#10;Increasing the limit of conquerable provinces to 25" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
