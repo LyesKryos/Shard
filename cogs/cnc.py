@@ -1808,7 +1808,7 @@ class DossierView(View):
         generals = await conn.fetchval('''SELECT COUNT(*)
                                           FROM cnc_generals
                                           WHERE owner_id = $1;''', user_id)
-        total_manpower = await conn.fetchval('''SELECT SUM(citizens)
+        total_manpower = await conn.fetchval('''SELECT SUM(citizens) + 3000
                                                 FROM cnc_provinces
                                                 WHERE owner_id = $1;''',
                                              user_id)
@@ -8832,7 +8832,7 @@ class CommandAndConquest(commands.Cog):
                     # get army owner info
                     enemy_info = await user_db_info(conn=conn, user_id=army['owner_id'])
                     # get the total possible manpower of the enemy
-                    total_possible_manpower = await conn.fetchval('''SELECT SUM(citizens)
+                    total_possible_manpower = await conn.fetchval('''SELECT SUM(citizens) + 3000
                                                                      FROM cnc_provinces
                                                                      WHERE owner_id = $1;''', enemy_info['user_id'])
                     # calculate the total manpower
@@ -8868,7 +8868,7 @@ class CommandAndConquest(commands.Cog):
                     war_goal = []
 
                 # get the total possible manpower of the defeated
-                total_possible_manpower = await conn.fetchval('''SELECT SUM(citizens)
+                total_possible_manpower = await conn.fetchval('''SELECT SUM(citizens) + 3000
                                                                  FROM cnc_provinces
                                                                  WHERE owner_id = $1;''', user_info['user_id'])
                 # calculate the total manpower
