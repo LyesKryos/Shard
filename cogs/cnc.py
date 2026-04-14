@@ -1848,7 +1848,7 @@ class DossierView(View):
         trade_goods_produced = await self.conn.fetchval('''SELECT array_agg(trade_good) FROM cnc_provinces WHERE owner_id = $1;''', self.user_info['user_id'])
         self.doss_embed.add_field(name="Production Last Turn", value=f"{total_production} production")
         self.doss_embed.add_field(name="Average Development", value=f"{average_development:.2f} development")
-        self.doss_embed.add_field(name="Trade Goods Produced", value=f"{', '.join(trade_goods_produced)}")
+        self.doss_embed.add_field(name="Trade Goods Produced", value=f"{', '.join(trade_goods_produced)}", inline=False)
         # update
         await interaction.edit_original_response(embed=self.doss_embed)
 
