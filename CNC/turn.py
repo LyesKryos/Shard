@@ -236,7 +236,7 @@ class Turn:
 
             # === MANPOWER ===
             # peace treaty enforced manpower reduction
-            treaty_enforced_manpower_reduction = sum([pt['manpower_reduction'] if pt['manpower_reduction'] else 0
+            treaty_enforced_manpower_reduction = 1 - sum([pt['manpower_reduction'] if pt['manpower_reduction'] else 0
                                                       for pt in peace_treaties])
             # log the manpower
             logging.getLogger(__name__).info(f"{user['name']} | manpower total: {manpower_count+3000}")
@@ -244,12 +244,11 @@ class Turn:
             await conn.execute('''UPDATE cnc_users SET manpower = manpower + $2 WHERE user_id = $1;''',
                                user['user_id'], 3000 + round(manpower_count * (user['manpower_regen'] / 100)))
             # enforce manpower cap
-            manpower_cap = 3000 + (round((user['manpower_access']) * manpower_count) *
-                            (1-treaty_enforced_manpower_reduction) if treaty_enforced_manpower_reduction else 1)
+            manpower_cap = 3000 + (round((user['manpower_access']) * manpower_count) * treaty_enforced_manpower_reduction)
             await conn.execute('''UPDATE cnc_users SET manpower = $2 WHERE user_id = $1 AND manpower > $2;''',
                                user['user_id'], manpower_cap)
             # log the manpower cap
-            logging.getLogger(__name__).info(f"{user['name']} | manpower cap: {manpower_cap}")
+            logging.getLogger(__name__).info(f"{user['name']} | manpower cap: {manpower_cap} = {manpower_count} * {user['manpower_access']}")
     
             # === UNREST/STABILITY FACTORING ===
             average_national_unrest = total_national_unrest / len(controlled_provs)
