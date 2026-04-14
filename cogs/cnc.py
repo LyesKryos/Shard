@@ -8955,7 +8955,7 @@ class CommandAndConquest(commands.Cog):
                 prov_count = await conn.fetchval(
                     '''SELECT COUNT(id) FROM cnc_provinces WHERE owner_id = $1;''', user_info['user_id'])
                 # if they have fewer than 25, battle
-                if prov_count <= 25:
+                if prov_count < 25:
                     battle = True
 
                 # update the movement and location
@@ -9064,8 +9064,8 @@ class CommandAndConquest(commands.Cog):
             if prov_info['owner_id'] == 0:
                 province_count = await conn.fetchval(
                     '''SELECT COUNT(id) FROM cnc_provinces WHERE owner_id = $1;''', user_info['user_id'])
-                # if the owner has fewer than 15 provinces, battle for the province
-                if province_count < 15:
+                # if the owner has fewer than 25 provinces, battle for the province
+                if province_count < 25:
                     battle = True
                     # update the movement and location
                     await conn.execute(
