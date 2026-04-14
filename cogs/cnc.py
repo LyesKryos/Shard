@@ -3537,9 +3537,26 @@ class CooperativeDiplomaticActions(discord.ui.View):
         if self.recipient_info['overlord'] is not None:
             self.propose_subjugation_button.disabled = True
             await interaction.edit_original_response(view=self)
-            await interaction.followup.send(f"{self.recipient_info['name']} already has an Overlord.")
+            return await interaction.followup.send(f"{self.recipient_info['name']} already has an Overlord.")
+        
+        # if the other user is a great power, deny
+        if self.recipient_info['gp']:
+            self.propose_subjugation_button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"{self.recipient_info['name']} is a Great Power and cannot be subjugated.") 
 
-        # TODO add puppet limit enforcement
+        # check if the user has other puppets
+        puppet_count = await conn.fetchval('''SELECT COUNT(user_id) FROM cnc_users WHERE overlord = $1;''', user_info['user_id'])
+        # if the count is 2 and the user is not a gp, deny
+        if puppet_count >= 2 and not user_info['gp']:
+            self.propose_subjugation_button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"{user_info['name']} already has two puppets and cannot maintain more.")
+        # if the user is a great power but already has 3 puppets, deny
+        elif puppet_count >= 3 and user_info['gp']:
+            self.propose_subjugation_button.disabled = True
+            await interaction.edit_original_response(view=self)
+            return await interaction.followup.send(f"{user_info['name']} already has three puppets and cannot maintain more.")
 
         # check for pending offers
         pending_check = await self.conn.fetchrow('''SELECT *
@@ -10347,7 +10364,7 @@ class CommandAndConquest(commands.Cog):
             stability_score = user['stability']/10
             # get number of armies and generals/quality
             army_troop_count = await conn.fetchval('''SELECT SUM(troops) FROM cnc_armies WHERE owner_id = $1;''', user['user_id'])
-            general_score = await conn.fetchval('''SELECT SUM(general_id) * AVG(level) FROM cnc_generals WHERE owner_id = $1;''', user['user_id'])
+            general_score = await conn.fetchval('''SELECT COUNT(general_id) * AVG(level) FROM cnc_generals WHERE owner_id = $1;''', user['user_id'])
             # add troop count and general score
             troop_count_score = int(army_troop_count)/3000 if army_troop_count is not None else 0
             general_score = float(general_score) if general_score is not None else 0

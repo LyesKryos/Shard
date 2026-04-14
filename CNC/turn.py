@@ -899,7 +899,7 @@ class Turn:
             gp_score += user['stability']/10
             # get number of armies and generals/quality
             army_troop_count = await conn.fetchval('''SELECT SUM(troops) FROM cnc_armies WHERE owner_id = $1;''', user['user_id'])
-            general_score = await conn.fetchval('''SELECT SUM(general_id) * AVG(level) FROM cnc_generals WHERE owner_id = $1;''', user['user_id'])
+            general_score = await conn.fetchval('''SELECT COUNT(general_id) * AVG(level) FROM cnc_generals WHERE owner_id = $1;''', user['user_id'])
             # add troop count and general score
             gp_score += int(army_troop_count)/3000 if army_troop_count is not None else 0
             gp_score += float(general_score) if general_score is not None else 0
@@ -969,7 +969,7 @@ class Turn:
                     self.user_dm_notifications[user_id] += (
                         f"Your ally(s), {', '.join(alliance['removed_nations'])}, have "
                         f"been removed from your alliance. They have become a "
-                        f"Great Power, but the alliance already contains a Great Power.")
+                        f"Great Power, but the alliance already contains a Great Power.\n")
                 for member in alliance['removed_nations']:
                     # get their user id
                     user_id = await conn.fetchval('''SELECT user_id
@@ -978,10 +978,30 @@ class Turn:
                     # add to the dm notification
                     self.user_dm_notifications[user_id] += (
                         f"You have been removed from your alliance because you exceeded"
-                        f" the Great Power alliance limit.")
+                        f" the Great Power alliance limit.\n")
 
-            # TODO add puppet removal when over limit
-
+            # get the number of puppets each user has (if any)
+            puppet_count = await conn.fetch('''SELECT u.user_id, u.name, u.gp, COUNT(p.user_id) as puppet_count, array_agg(p.user_id) as puppet_ids FROM cnc_users u INNER JOIN cnc_users p ON p.overlord = u.user_id GROUP BY u.user_id, u.name, u.gp;''')
+            # check that the count is correct
+            for overlord in puppet_count:
+                # if the overlord has more than two puppets and is not a gp, 
+                if overlord['puppet_count'] > 2 and not overlord['gp']:
+                    # remove a random one
+                    freed_puppet = choice(overlord['puppet_ids'])
+                    # remove that puppet
+                    puppet_name = await conn.execute('''UPDATE cnc_users SET overlord = NULL WHERE user_id = $1 RETURNING name;''', freed_puppet)
+                    # notify both users
+                    self.user_dm_notifications[overlord['user_id']] += (f"{puppet_name['name']} has been freed from subjugation under {overlord['name']} because we held too many puppets!\n")
+                    self.user_dm_notifications[freed_puppet] += f"{puppet_name['name']} has been freed from subjugation under {overlord['name']} because they held too many puppets! Our age of liberation has begun.\n"
+                # if the overlord has more than three puppets while being a gp
+                if overlord['puppet_count'] > 3 and overlord['gp']:
+                    # remove a random one
+                    freed_puppet = choice(overlord['puppet_ids'])
+                    # remove that puppet
+                    puppet_name = await conn.execute('''UPDATE cnc_users SET overlord = NULL WHERE user_id = $1 RETURNING name;''', freed_puppet)
+                    # notify both users
+                    self.user_dm_notifications[overlord['user_id']] += (f"{puppet_name['name']} has been freed from subjugation under {overlord['name']} because we held too many puppets!\n")
+                    self.user_dm_notifications[freed_puppet] += f"{puppet_name['name']} has been freed from subjugation under {overlord['name']} because they held too many puppets! Our age of liberation has begun.\n"
             # wrap up
             return
 
