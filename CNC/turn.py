@@ -920,59 +920,7 @@ class Turn:
             gp_score += dr_count if dr_count is not None else 0
             # update score for user
             await conn.execute('''UPDATE cnc_users SET gp_score = $2 WHERE user_id = $1;''', user['user_id'], gp_score)
-        # remove all great powers that were in an alliance and notify them
-        removed_great_powers = await conn.fetch('''WITH nations_to_remove AS (
-                                                    SELECT 
-                                                        a.id,
-                                                        a.members as old_alliance,
-                                                        ARRAY(
-                                                            SELECT elem
-                                                            FROM unnest(a.members) WITH ORDINALITY AS t(elem, ord)
-                                                            JOIN cnc_users u ON t.elem = u.name AND u.gp = TRUE
-                                                            ORDER BY ord
-                                                            OFFSET 1
-                                                        ) as removed
-                                                    FROM cnc_alliances a
-                                                    WHERE (
-                                                        SELECT COUNT(*)
-                                                        FROM unnest(a.members) AS nation
-                                                        JOIN cnc_users u ON nation = u.name AND u.gp = TRUE
-                                                    ) > 1
-                                                ),
-                                                updated AS (
-                                                    UPDATE cnc_alliances a
-                                                    SET members = ARRAY(
-                                                        SELECT elem
-                                                        FROM unnest(a.members) WITH ORDINALITY AS t(elem, ord)
-                                                        WHERE elem NOT IN (SELECT unnest(n.removed) FROM nations_to_remove n WHERE n.id = a.id)
-                                                        ORDER BY ord
-                                                    )
-                                                    FROM nations_to_remove n
-                                                    WHERE a.id = n.id
-                                                    RETURNING a.id, a.members as new_alliance
-                                                )
-                                                SELECT 
-                                                    u.id,
-                                                    n.old_alliance,
-                                                    u.new_alliance,
-                                                    n.removed as removed_nations
-                                                FROM updated u
-                                                JOIN nations_to_remove n ON u.id = n.id;''')
-        # for each removed great power, notify all members of the alliance
-        for alliance in removed_great_powers:
-            for member in alliance['new_alliance']:
-                # get their user id
-                user_id = await conn.fetchval('''SELECT user_id FROM cnc_users WHERE name = $1;''', member)
-                # add to the dm notification
-                self.user_dm_notifications[user_id] += (f"Your ally(s), {', '.join(alliance['removed_nations'])}, have "
-                                                        f"been removed from your alliance. They have become a "
-                                                        f"Great Power, but the alliance already contains a Great Power.")
-            for member in alliance['removed_nations']:
-                # get their user id
-                user_id = await conn.fetchval('''SELECT user_id FROM cnc_users WHERE name = $1;''', member)
-                # add to the dm notification
-                self.user_dm_notifications[user_id] += (f"You have been removed from your alliance because you exceeded"
-                                                        f" the Great Power alliance limit.")
+
         # remove all great powers
         await conn.execute('''UPDATE cnc_users SET gp = FALSE;''')
         # once all users are done, check to define the top 3, if they have more than 50 GP score
@@ -984,7 +932,57 @@ class Turn:
         else:
             # for each gp, set the value and update their extension limit
             for gp in gp_check:
-                await conn.execute('''UPDATE cnc_users SET gp = TRUE, overextend_limit = overextend_limit + 15 WHERE user_id = $1;''', gp['user_id'])
+                await conn.execute('''UPDATE cnc_users 
+                                      SET gp = TRUE, overextend_limit = overextend_limit + 15 
+                                      WHERE user_id = $1;''', gp['user_id'])
+            # now check all alliances to remove unpermitted gps
+            # remove all great powers that were in an alliance and notify them
+            removed_great_powers = await conn.fetch('''WITH nations_to_remove AS 
+                                                                (SELECT a.id,a.members as old_alliance, 
+                                                                        ARRAY(SELECT elem FROM unnest(a.members) 
+                                                                        WITH ORDINALITY AS t(elem, ord) 
+                                                                        JOIN cnc_users u ON t.elem = u.name 
+                                                                        AND u.gp = TRUE ORDER BY ord OFFSET 1) as removed 
+                                                                 FROM cnc_alliances a 
+                                                                 WHERE (SELECT COUNT(*) 
+                                                                        FROM unnest(a.members) 
+                                                                                 AS nation JOIN cnc_users u 
+                                                                                                ON nation = u.name 
+                                                                                                    AND u.gp = TRUE) > 1), 
+                                                            updated AS (UPDATE cnc_alliances a 
+                                                       SET members = ARRAY(SELECT elem 
+                                                           FROM unnest(a.members) WITH ORDINALITY AS t(elem, ord) 
+                                                           WHERE elem NOT IN (SELECT unnest(n.removed) 
+                                                           FROM nations_to_remove n WHERE n.id = a.id) ORDER BY ord) 
+                                                       FROM nations_to_remove n 
+                                                       WHERE a.id = n.id RETURNING a.id, a.members as new_alliance) 
+            SELECT u.id, n.old_alliance, u.new_alliance, n.removed as removed_nations 
+            FROM updated u JOIN nations_to_remove n ON u.id = n.id;''')
+
+            # for each removed great power, notify all members of the alliance
+            for alliance in removed_great_powers:
+                for member in alliance['new_alliance']:
+                    # get their user id
+                    user_id = await conn.fetchval('''SELECT user_id
+                                                     FROM cnc_users
+                                                     WHERE name = $1;''', member)
+                    # add to the dm notification
+                    self.user_dm_notifications[user_id] += (
+                        f"Your ally(s), {', '.join(alliance['removed_nations'])}, have "
+                        f"been removed from your alliance. They have become a "
+                        f"Great Power, but the alliance already contains a Great Power.")
+                for member in alliance['removed_nations']:
+                    # get their user id
+                    user_id = await conn.fetchval('''SELECT user_id
+                                                     FROM cnc_users
+                                                     WHERE name = $1;''', member)
+                    # add to the dm notification
+                    self.user_dm_notifications[user_id] += (
+                        f"You have been removed from your alliance because you exceeded"
+                        f" the Great Power alliance limit.")
+
+            # TODO add puppet removal when over limit
+
             # wrap up
             return
 

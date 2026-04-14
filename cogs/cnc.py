@@ -3538,6 +3538,9 @@ class CooperativeDiplomaticActions(discord.ui.View):
             self.propose_subjugation_button.disabled = True
             await interaction.edit_original_response(view=self)
             await interaction.followup.send(f"{self.recipient_info['name']} already has an Overlord.")
+
+        # TODO add puppet limit enforcement
+
         # check for pending offers
         pending_check = await self.conn.fetchrow('''SELECT *
                                                     FROM cnc_pending_requests
