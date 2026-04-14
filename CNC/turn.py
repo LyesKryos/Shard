@@ -708,7 +708,7 @@ class Turn:
             if user['govt_type'] == "Tribal":
                 overextension_limit = 25
             # if the government subtype is free city set to 20
-            if user['govt_subtype'] == "Free City":
+            elif user['govt_subtype'] == "Free City":
                 overextension_limit = 20
             # otherwise, set it to 45
             else:
