@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Improving &quot;Command &amp; Conquest&quot; role assignment message formatting&#10;Nerfing military alliance gain&#10;Increasing the limit of conquerable provinces to 25">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Improving &quot;Command &amp; Conquest&quot; role assignment message formatting&#10;Nerfing military alliance gain&#10;Increasing the limit of conquerable provinces to 25&#10;Correcting maximum taxation typo&#10;Removing additional great powers from alliances as per the manual&#10;Disabling the ability for great powers to ally with one another">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CNC/turn.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/turn.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
@@ -598,7 +598,7 @@
       <workItem from="1775911138228" duration="12395000" />
       <workItem from="1775955771117" duration="3737000" />
       <workItem from="1775996340527" duration="5471000" />
-      <workItem from="1776118194228" duration="4153000" />
+      <workItem from="1776118194228" duration="4443000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -962,7 +962,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting pathfinder to accept that users can move to their own provinces" />
     <MESSAGE value="Correcting map display with new fort icon AND proper icon display" />
     <MESSAGE value="Correcting turn update for fort level&#10;Correcting icon offset to 0 so that they are actually in the province area instead of outside it" />
     <MESSAGE value="Correcting offset and font size of icons" />
@@ -987,7 +986,8 @@
     <MESSAGE value="Correcting GP table buffer display" />
     <MESSAGE value="Correcting embargoes display on dossier" />
     <MESSAGE value="Improving &quot;Command &amp; Conquest&quot; role assignment message formatting&#10;Nerfing military alliance gain&#10;Increasing the limit of conquerable provinces to 25" />
-    <option name="LAST_COMMIT_MESSAGE" value="Improving &quot;Command &amp; Conquest&quot; role assignment message formatting&#10;Nerfing military alliance gain&#10;Increasing the limit of conquerable provinces to 25" />
+    <MESSAGE value="Improving &quot;Command &amp; Conquest&quot; role assignment message formatting&#10;Nerfing military alliance gain&#10;Increasing the limit of conquerable provinces to 25&#10;Correcting maximum taxation typo&#10;Removing additional great powers from alliances as per the manual&#10;Disabling the ability for great powers to ally with one another" />
+    <option name="LAST_COMMIT_MESSAGE" value="Improving &quot;Command &amp; Conquest&quot; role assignment message formatting&#10;Nerfing military alliance gain&#10;Increasing the limit of conquerable provinces to 25&#10;Correcting maximum taxation typo&#10;Removing additional great powers from alliances as per the manual&#10;Disabling the ability for great powers to ally with one another" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
