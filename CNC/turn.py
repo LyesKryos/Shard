@@ -864,6 +864,7 @@ class Turn:
                                             tech['tech'])
             # execute the db call if it is not none
             if tech_call is not None:
+                logging.getLogger(__name__).info(tech_call)
                 await conn.execute(tech_call, tech['user_id'])
             # add to the dm notification
             self.user_dm_notifications[tech['user_id']] += (f"Scholars have completed researching the "
