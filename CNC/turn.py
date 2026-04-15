@@ -69,6 +69,9 @@ class Turn:
             trade_good_production = 0
             # define base production access
             trade_good_production_access = 0.05
+            # if the user is a federal republic, increase the trade good access by an additional 5%
+            if user['govt_subtype'] == "Federal":
+                trade_good_production_access += 0.05
             # define total structure number
             structure_count = 0
             # total manpower count
@@ -293,6 +296,16 @@ class Turn:
             total_national_unrest = int(total_national_unrest)
             # if there is not currently a rebellion; also, tribal governments cannot have an uprising
             if not user['active_rebellion'] and not user['active_civil_war'] and not user['active_revolution'] and user['govt_type'] != 'Tribal':
+                # define list of possible revolutions; anarchy is always an option!
+                revolution_choices = ["Anarchy"]
+                if "Divine Right" in user['tech'] and user['govt_type'] != "Monarchy":
+                    revolution_choices.append("Monarchy")
+                if "Patrician Values" in user['tech'] and user['govt_type'] != "Republic":
+                    revolution_choices.append("Republic")
+                if "Democratic Ideals" in user['tech'] and user['govt_type'] != "Democracy":
+                    revolution_choices.append("Democracy")
+                if "Revolutionary Ideals" in user['tech'] and user['govt_type'] != "Equalism":
+                    revolution_choices.append("Equalism")
                 # calculate the chance for a revolution based on the unrest
                 if total_national_unrest > 70:
                     # roll the dice
@@ -302,44 +315,30 @@ class Turn:
                         revolution_chance *= 1.25
                     # if the roll is greater than 60
                     if revolution_chance > 60:
-                        # define list of possible revolutions; anarchy is always an option!
-                        revolution_choices = ["Anarchy"]
-                        if "Divine Right" in user['tech']:
-                            revolution_choices.append("Monarchy")
-                        if "Patrician Values" in user['tech']:
-                            revolution_choices.append("Republic")
-                        if "Democratic Ideals" in user['tech']:
-                            revolution_choices.append("Democracy")
-                        if "Revolutionary Ideals" in user['tech']:
-                            revolution_choices.append("Equalism")
                         # choose a random revolution
                         revolution_type = choice(revolution_choices)
                         # trigger a revolution
                         await conn.execute('''UPDATE cnc_users SET active_revolution = $2 WHERE user_id = $1;''',
                                            user['user_id'], revolution_type)
                         # set a number of provinces as rebellious on national unrest
-                        rebellious_provinces = await conn.fetch('''SELECT *
+                        rebellious_provinces = await conn.fetchval('''SELECT array_agg(id)
                                                                    FROM cnc_provinces
                                                                    WHERE owner_id = $1
                                                                      AND id != $2
                                                                    ORDER BY RANDOM() limit $3;''',
                                                                 user['user_id'], user['capital'],
-                                                                max(total_national_unrest / 10, len(controlled_provs)*.75))
-                        # define rebel provinces as a list
-                        rebel_provinces = []
+                                                                min(total_national_unrest / 10, len(controlled_provs)*.75))
                         # update the rebellious provinces
                         for prov in rebellious_provinces:
-                            # add to the list
-                            rebel_provinces.append(prov['id'])
                             # update the db to set occupier = 1 (aka rebels)
                             await conn.execute('''UPDATE cnc_provinces
                                                   SET occupier_id = 1
-                                                  WHERE id = $1;''', prov['id'])
+                                                  WHERE id = $1;''', prov)
                         # add to DM notification
                         dm_notification += (f"**A revolution has begun in our nation!** Rebels supporting a new "
                                             f"Government Type, {revolution_type}, have risen up in "
                                             f"arms against the {user['pretitle']} of {user['name']}! "
-                                            f"They have occupied these provinces: {', '.join(rebel_provinces)}."
+                                            f"They have occupied these provinces: {', '.join(rebellious_provinces)}."
                                             f"We must react quickly, or they may overwhelm our nation!\n")
 
                 # calculate the chance for a civil war based on the unrest
@@ -365,27 +364,26 @@ class Turn:
                         # trigger a civil war
                         await conn.execute('''UPDATE cnc_users SET active_civil_war = $2 WHERE user_id = $1;''',
                                            user['user_id'], civil_war_type)
-                        #  set a number of provinces as rebellious based on national unrest
-                        rebellious_provinces = await conn.fetch('''SELECT * FROM cnc_provinces 
-                                                                   WHERE owner_id = $1 AND id != $2 
-                                                                   ORDER BY RANDOM() limit $3;''',
+                        # set a number of provinces as rebellious on national unrest
+                        rebellious_provinces = await conn.fetchval('''SELECT array_agg(id)
+                                                                   FROM cnc_provinces
+                                                                   WHERE owner_id = $1
+                                                                     AND id != $2
+                                                                   ORDER BY RANDOM() LIMIT $3;''',
                                                                 user['user_id'], user['capital'],
-                                                                max(total_national_unrest/10,len(controlled_provs)*.75))
-                        # define rebel provinces as a list
-                        rebel_provinces = []
+                                                                min(total_national_unrest / 10, len(controlled_provs)*.75))
                         # update the rebellious provinces
                         for prov in rebellious_provinces:
-                            # add to the list
-                            rebel_provinces.append(prov['id'])
                             # update the db to set occupier = 1 (aka rebels)
-                            await conn.execute('''UPDATE cnc_provinces SET occupier_id = 1 
-                                                  WHERE id = $1;''', prov['id'])
+                            await conn.execute('''UPDATE cnc_provinces
+                                                  SET occupier_id = 1
+                                                  WHERE id = $1;''', prov)
                         # add to DM notification
                         dm_notification += (f"**A Civil War has begun in our nation!** An armed faction of citizens "
                                             f"that supports a *{civil_war_type}* {user['govt_type']} have risen up and "
                                             f"threaten to overthrow the legitimate government of the "
                                             f"{user['pretitle']} of {user['name']}! They have occupied these provinces:"
-                                            f" {', '.join(rebel_provinces)}.\n")
+                                            f" {', '.join(rebellious_provinces)}.\n")
 
                 # calculate the chance for a rebellion based on the unrest
                 elif total_national_unrest > 50:
@@ -397,24 +395,23 @@ class Turn:
                         await conn.execute('''UPDATE cnc_users SET active_rebellion = TRUE WHERE user_id = $1;''',
                                            user['user_id'])
                         # set a number of provinces as rebellious on national unrest
-                        rebellious_provinces = await conn.fetch('''SELECT * FROM cnc_provinces 
-                                                                   WHERE owner_id = $1 AND id != $2 
-                                                                   ORDER BY RANDOM() limit $3;''',
+                        rebellious_provinces = await conn.fetchval('''SELECT array_agg(id)
+                                                                   FROM cnc_provinces
+                                                                   WHERE owner_id = $1
+                                                                     AND id != $2
+                                                                   ORDER BY RANDOM() LIMIT $3;''',
                                                                 user['user_id'], user['capital'],
-                                                                max(total_national_unrest/10,len(controlled_provs)*.75))
-                        # define rebel provinces as a list
-                        rebel_provinces = []
+                                                                min(total_national_unrest / 10, len(controlled_provs)*.75))
                         # update the rebellious provinces
                         for prov in rebellious_provinces:
-                            # add to the list
-                            rebel_provinces.append(prov['id'])
                             # update the db to set occupier = 1 (aka rebels)
-                            await conn.execute('''UPDATE cnc_provinces SET occupier_id = 1 
-                                                  WHERE id = $1;''', prov['id'])
+                            await conn.execute('''UPDATE cnc_provinces
+                                                  SET occupier_id = 1
+                                                  WHERE id = $1;''', prov)
                         # add to DM notification
                         dm_notification += (f"**Rebellious factions** have risen up in "
                                             f"arms against the {user['pretitle']} of {user['name']}! "
-                                            f"They have occupied these provinces: {', '.join(rebel_provinces)}."
+                                            f"They have occupied these provinces: {', '.join(rebellious_provinces)}."
                                             f"If we are not careful, they may overwhelm our nation!\n")
 
             # if there is currently a rebellion
@@ -647,18 +644,23 @@ class Turn:
             # calculate reductions
             # reduce pol auth based on average national unrest
             nat_unrest_reduction = average_national_unrest/15
-            pol_auth_gain -= nat_unrest_reduction
+            pol_auth_gain -= nat_unrest_reduction * (.9 if user['govt_subtype'] == "Constitutional" else 1)
             logging.getLogger(__name__).info(f"{user['name']} | national unrest reduction: {nat_unrest_reduction}")
             # reduce pol auth based on the number of OTHER members in the military alliance
             military_alliance_reduction = military_alliances - 1 if military_alliances != 0 else 0
-            pol_auth_gain -= military_alliance_reduction
             logging.getLogger(__name__).info(f"{user['name']} | military alliance reduction: {military_alliance_reduction}")
             # reduce pol auth based on issued relations
-            pol_auth_gain -= trade_pact_count
             logging.getLogger(__name__).info(f"{user['name']} | trade pact reduction: {trade_pact_count}")
             embargo_reduction = await conn.fetchval('''SELECT count(id) FROM cnc_embargoes WHERE sender = $1;''',
                                                  user['name'])
-            pol_auth_gain -= embargo_reduction
+            # add together
+            pol_auth_gain -= embargo_reduction + trade_pact_count + military_alliance_reduction
+            # modify if republic
+            if user['govt_type'] == "Republic":
+                # relation reduction definition
+                relation_reduction = embargo_reduction + trade_pact_count + military_alliance_reduction
+                # reduce impact
+                pol_auth_gain += 2 if relation_reduction >= 2 else 0
             logging.getLogger(__name__).info(f"{user['name']} | embargo reduction: {embargo_reduction}")
             # if there is a capital, reduce by 1
             if user['capital']:
@@ -703,7 +705,6 @@ class Turn:
                 dm_notification += f"{user['name']} has gained free government change!\n"
 
             # === OVEREXTENSION CALCULATIONS ===
-            overextension_limit = 0
             # if the government is tribal, set to 25
             if user['govt_type'] == "Tribal":
                 overextension_limit = 25
@@ -723,7 +724,7 @@ class Turn:
             # add user dm notifications to the list
             self.user_dm_notifications[user['user_id']] = dm_notification
             
-        # for each user, update their auth depending on overlordship/subjection
+        # outside the loop functions
         for user in user_list:
             # calculate puppets/overlords loss/gain
             if user['overlord']:
@@ -767,6 +768,25 @@ class Turn:
                                                  f"{max(floor(user['last_econ_auth_gain']/4), 1),
                                                    max(floor(user['last_mil_auth_gain']/4), 1),
                                                    max(floor(user['last_pol_auth_gain']/4), 1)}")
+
+            # === GOVERNMENT TYPE/SUBTYPE ENFORCEMENTS ===
+            # if the user is a merchant republic, remove all embargoes
+            if user['govt_subtype'] == "Merchant":
+                removed_embargoes = await conn.execute('''DELETE FROM cnc_embargoes WHERE sender = $1 RETURNING target;''',
+                                                       user['name'])
+                # notify users
+                for embargoed_user in removed_embargoes:
+                    # get the user id
+                    unembargoed_user = await conn.fetchval('''SELECT user_id FROM cnc_users WHERE name = $1;''',
+                                                           embargoed_user['target'])
+                    # add to the user's dm
+                    self.user_dm_notifications[unembargoed_user] += (f"{user['name']} has removed all "
+                                                                     f"embargoes from {embargoed_user['target']} "
+                                                                     f"because they are a Merchant Republic.\n")
+                # notify republic
+                self.user_dm_notifications[user['user_id']] += (f"{user['name']} has been obliged to end all embargoes "
+                                                                f"against other nations because they are a "
+                                                                f"Merchant Republic.\n")
 
         # set stability, authority, and unrest max/mins
         await conn.execute('''UPDATE cnc_users
@@ -864,7 +884,6 @@ class Turn:
                                             tech['tech'])
             # execute the db call if it is not none
             if tech_call is not None:
-                logging.getLogger(__name__).info(tech_call)
                 await conn.execute(tech_call, tech['user_id'])
             # add to the dm notification
             self.user_dm_notifications[tech['user_id']] += (f"Scholars have completed researching the "

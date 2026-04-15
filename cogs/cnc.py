@@ -1590,15 +1590,18 @@ class UnownedProvince(View):
         cost = 1
         # cost of colonization = (5 + provinces count) - 25, minimum 1, maximum 10
         cost += (5 + prov_owned_count) - 25
-        # if the user has the "Manifest Destiny" tech, reduce cost by 2
-        if "Manifest Destiny" in user_info['tech']:
-            cost -= 2
         # enforce minimum
         if cost < 1:
             cost = 1
         # enforce maximum
-        if cost > 10:
+        elif cost > 10:
             cost = 10
+        # if the user has the "Manifest Destiny" tech, reduce cost by 2
+        if "Manifest Destiny" in user_info['tech']:
+            cost -= 2
+        # if the user is the confederal republic type, reduce cost by 1
+        if user_info['govt_subtype'] == "Confederal":
+            cost -= 1
         # if the nation is overextended, increase cost by 50%
         if prov_owned_count > user_info['overextend_limit']:
             cost *= 1.5
@@ -3680,6 +3683,14 @@ class HostileDiplomaticActions(discord.ui.View):
         # create the recipient user
         recipient_user = self.bot.get_user(self.recipient_info['user_id'])
 
+        # if the user is a merchant republic, they cannot issue embargoes
+        if user_info['govt_subtype'] == "Merchant":
+            # disable button
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            # reject
+            return await interaction.followup.send(f"{user_info['name']} is a Merchant Republic and "
+                                                   f"cannot issue embargoes.")
         # check if the user is already embargoing
         embargo_check = await self.conn.fetchrow('''SELECT *
                                                     FROM cnc_embargoes
@@ -4601,9 +4612,16 @@ class WarDeclarationView(discord.ui.View):
         cnc_channel = self.bot.get_channel(927288304301387816)
         # establish the connection
         conn = self.conn
+        # determine if the user is a direct democracy
+        if self.sender_info['govt_subtype'] == "Direct":
+            # disable the button
+            button.disabled = True
+            await interaction.edit_original_response(view=self)
+            # reject
+            return await interaction.followup.send(f"Direct Democracies cannot declare war.", ephemeral=True)
         # if no option has been selected, send message
         if self.cb_option is None:
-            return await interaction.followup.send("You have not selected a Casus Belli!")
+            return await interaction.followup.send("You have not selected a Casus Belli!", ephemeral=True)
         # if an option has been selected, declare the war
         # pull information about the cb type
         cb_info = await self.conn.fetchrow('''SELECT *
@@ -7381,7 +7399,7 @@ class ArmyDisbandMenu(discord.ui.View):
 
 class GeneralSelectMenu(discord.ui.Select):
 
-    def __init__(self, generals_info: asyncpg.Record, army_id: int, parent_interaction: discord.Interaction):
+    def __init__(self, generals_info: list[asyncpg.Record], army_id: int, parent_interaction: discord.Interaction):
         # define the variables
         self.army_id = army_id
         self.generals_info = generals_info
@@ -7432,13 +7450,18 @@ class GeneralSelectMenu(discord.ui.Select):
 
         # if the option was recruit, attempt to recruit a new general
         else:
+            # define cost
+            recruitment_cost = 2
+            # define cost for feudal
+            if user_info['govt_subtype'] == "Feudal":
+                recruitment_cost = 0
             # check to ensure that the user has sufficient space for a new general
             if len(self.generals_info) >= user_info['gen_limit']:
                 # deny
                 return await interaction.response.send_message(content=f"{user_info['name']} "
                                                                        f"cannot recruit another General.")
             # check to ensure that the user has sufficient military authority
-            elif user_info['mil_auth'] < 2:
+            elif user_info['mil_auth'] < recruitment_cost:
                 # deny
                 return await interaction.response.send_message(content=f"{user_info['name']} does not have sufficient "
                                                                        f"Military Authority to recruit a General.")
@@ -8232,13 +8255,9 @@ class CommandAndConquest(commands.Cog):
         # pull province data
         province_list, province_count = await self.nation_provinces_db_sort(user_info['user_id'])
         # pull the name of the capital
-        capital = await conn.fetchrow('''SELECT *
+        capital = (await conn.fetchval('''SELECT name
                                          FROM cnc_provinces
-                                         WHERE id = $1;''', user_info['capital'])
-        if capital is None:
-            capital = "None"
-        else:
-            capital = capital['name']
+                                         WHERE id = $1;''', user_info['capital']) if user_info['capital'] else "None")
         # pull relations information
         alliances = await conn.fetch('''SELECT *
                                         FROM cnc_alliances
@@ -10109,16 +10128,23 @@ class CommandAndConquest(commands.Cog):
         # if the government subtype is Technocratic, reduce time by one
         if user_info['govt_subtype'] == "Technocratic":
             research_time -= 1
-        # if the government type is Equalism, reduce time by one
-        if user_info['govt_type'] == "Equalism":
-            research_time -= 1
         # for every University owned by this nation, reduce time by one
         universities = await conn.fetchval('''SELECT count(id) FROM cnc_provinces WHERE owner_id = $1 AND 'University' = ANY(structures);''',
                                           user_info['user_id'])
         research_time -= universities if universities is not None else 0
+        # reduce political technology research time
+        if (tech_info['tech_type'] == "political") and (user_info['govt_subtype'] == "Representative"):
+            research_time -= 2
+        # reduce military technology research time
+        if (tech_info['tech_type'] == "military") and (user_info['govt_subtype'] == "Military"):
+            research_time -= 2
+
         # ensure the research time is at least 4
         if research_time < 4:
             research_time = 4
+        # if the government type is Equalism, reduce time by one, even if that would be less than 4
+        if user_info['govt_type'] == "Equalism":
+            research_time -= 1
         # add to researching database
         await conn.execute('''INSERT INTO cnc_researching
                               VALUES ($1, $2, $3);''',
