@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding TODOs">
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Updating many items and debuffing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CNC/turn.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/turn.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -599,6 +598,7 @@
       <workItem from="1775955771117" duration="3737000" />
       <workItem from="1775996340527" duration="5471000" />
       <workItem from="1776118194228" duration="5887000" />
+      <workItem from="1776170206901" duration="1218000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -943,7 +943,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1772" />
+    <option name="localTasksCounter" value="1773" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -962,7 +962,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting turn update for fort level&#10;Correcting icon offset to 0 so that they are actually in the province area instead of outside it" />
     <MESSAGE value="Correcting offset and font size of icons" />
     <MESSAGE value="Updating icon offset" />
     <MESSAGE value="Fixing dossier military view command" />
@@ -987,7 +986,8 @@
     <MESSAGE value="Improving &quot;Command &amp; Conquest&quot; role assignment message formatting&#10;Nerfing military alliance gain&#10;Increasing the limit of conquerable provinces to 25" />
     <MESSAGE value="Improving &quot;Command &amp; Conquest&quot; role assignment message formatting&#10;Nerfing military alliance gain&#10;Increasing the limit of conquerable provinces to 25&#10;Correcting maximum taxation typo&#10;Removing additional great powers from alliances as per the manual&#10;Disabling the ability for great powers to ally with one another" />
     <MESSAGE value="Adding TODOs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding TODOs" />
+    <MESSAGE value="Updating many items and debuffing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updating many items and debuffing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

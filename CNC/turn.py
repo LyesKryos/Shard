@@ -862,8 +862,9 @@ class Turn:
             # pull the db call of the tech
             tech_call = await conn.fetchval('''SELECT db_call FROM cnc_tech WHERE name = $1;''',
                                             tech['tech'])
-            # execute the db call
-            await conn.execute(tech_call, tech['user_id'])
+            # execute the db call if it is not none
+            if tech_call is not None:
+                await conn.execute(tech_call, tech['user_id'])
             # add to the dm notification
             self.user_dm_notifications[tech['user_id']] += (f"Scholars have completed researching the "
                                                             f"{tech['tech']} technology!\n")

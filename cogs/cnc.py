@@ -3553,7 +3553,8 @@ class CooperativeDiplomaticActions(discord.ui.View):
             return await interaction.followup.send(f"{self.recipient_info['name']} is a Great Power and cannot be subjugated.") 
 
         # check if the user has other puppets
-        puppet_count = await conn.fetchval('''SELECT COUNT(user_id) FROM cnc_users WHERE overlord = $1;''', user_info['user_id'])
+        puppet_count = await self.conn.fetchval('''SELECT COUNT(user_id) FROM cnc_users WHERE overlord = $1;''',
+                                                user_info['user_id'])
         # if the count is 2 and the user is not a gp, deny
         if puppet_count >= 2 and not user_info['gp']:
             self.propose_subjugation_button.disabled = True
