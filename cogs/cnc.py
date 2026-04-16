@@ -10064,7 +10064,7 @@ class CommandAndConquest(commands.Cog):
                     alliance_button = True
             # get puppets if any
             puppets = await conn.fetchval('''SELECT array_agg(name) FROM cnc_users WHERE overlord = $1;''', user_info['user_id'])
-            if puppets > 0:
+            if puppets:
                 # if the overlord is the attacker, check if the puppets are not in the attackers
                 if user_info['name'] in war_info['attackers'] and set(puppets).difference(set(war_info['attackers'])):
                     alliance_button = True
