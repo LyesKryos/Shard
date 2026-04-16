@@ -231,7 +231,7 @@ class Turn:
             trade_pact_count = await conn.fetchval('''SELECT count(id) FROM cnc_trade_pacts 
                                                       WHERE $1 = ANY(members)''', user['name'])
             # for each trade pact, increase the trade access amount by 5%
-            trade_good_production_access += 0.05 * (trade_pact_count * (1.05 if "International Trade" in user['tech'] else 1)
+            trade_good_production_access += 0.05 * (trade_pact_count * (1.05 if "International Trade" in user['tech'] else 1))
             # get a count of all the embargoes issued against this user
             embargo_count = await conn.fetchval('''SELECT count(id) FROM cnc_embargoes 
                                                    WHERE target = $1;''', user['name'])
