@@ -571,15 +571,13 @@ class MapButtons(View):
                                             u.capital                                                   as user_capital,
                                             (SELECT COUNT(*) FROM cnc_armies a WHERE a.location = p.id) as army_count
                                      FROM cnc_provinces p
-                                              LEFT JOIN cnc_users u ON u.user_id = p.owner_id
-                                     WHERE p.owner_id != 0
-              AND (
-                  u.capital = p.id::text
-                  OR p.fort_level > 0
-                  OR 'Fort' = ANY(p.structures)
-                  OR EXISTS (SELECT 1 FROM cnc_armies a WHERE a.location = p.id)
-              )
-                                     """)
+                                     WHERE (
+                                          u.capital = p.id::text
+                                          OR p.fort_level > 0
+                                          OR 'Fort' = ANY(p.structures)
+                                          OR EXISTS (SELECT 1 FROM cnc_armies a WHERE a.location = p.id)
+                                      )
+                                                             """)
 
         # Build icon data dict
         province_icons = {}

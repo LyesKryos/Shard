@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Government subtype/type mechanics enforcement" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting development boosting confirmation display" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,7 +16,7 @@
     </colors>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="1276" />
+    <option name="cachedIndexableFilesCount" value="1274" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -272,9 +272,6 @@
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
       <option name="IS_MODULE_SDK" value="false" />
@@ -597,6 +594,7 @@
       <workItem from="1776118194228" duration="5887000" />
       <workItem from="1776170206901" duration="1218000" />
       <workItem from="1776270597016" duration="7966000" />
+      <workItem from="1776355783705" duration="1971000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -941,7 +939,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1778" />
+    <option name="localTasksCounter" value="1782" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -960,8 +958,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Update movement display in armies" />
-    <MESSAGE value="Update gp score calculation command to display total as the total of the points" />
     <MESSAGE value="Correcting map button bug" />
     <MESSAGE value="Adding development production boost to citizen production calculation" />
     <MESSAGE value="Fix spacing issue in prohibited peace treaties list display" />
@@ -985,7 +981,9 @@
     <MESSAGE value="Adding tech check for db calls" />
     <MESSAGE value="Multiple government type/subtype enforcement and tech&#10;Testing new capital enforcement&#10;Correcting several syntax blunders in turn update" />
     <MESSAGE value="Government subtype/type mechanics enforcement" />
-    <option name="LAST_COMMIT_MESSAGE" value="Government subtype/type mechanics enforcement" />
+    <MESSAGE value="Correcting the calling puppets to war" />
+    <MESSAGE value="Correcting development boosting confirmation display" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcting development boosting confirmation display" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
