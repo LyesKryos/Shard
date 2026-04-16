@@ -1131,7 +1131,7 @@ class DevelopmentBoostView(View):
         prov_info = self.province_db
         user_info = self.user_info
         conn = self.pool
-        province_id = prov_info['id']
+        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', prov_info['id'])
         structures = [] if prov_info['structures'] is None else list(prov_info['structures'])
         # calculate dev boosting cost. base cost = current development * .75
         boost_cost = prov_info['development'] * .75
@@ -1164,14 +1164,14 @@ class DevelopmentBoostView(View):
         await conn.execute('''UPDATE cnc_provinces
                               SET development = development + 1
                               WHERE id = $1;''',
-                           province_id)
+                           prov_info['id'])
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
                                                 view=self.prov_owned_view,
                                                 embed=await create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"Successfully boosted Development at a cost of "
                                                f"{boost_cost} Economic authority! "
-                                               f"The total development of {prov_info['name']} (ID: {province_id}) "
+                                               f"The total development of {prov_info['name']} (ID: {prov_info['id']}) "
                                                f"is now **{prov_info['development'] + 1}**.")
 
     @discord.ui.button(label="Political", style=discord.ButtonStyle.blurple)
@@ -1180,7 +1180,9 @@ class DevelopmentBoostView(View):
         prov_info = self.province_db
         user_info = self.user_info
         conn = self.pool
-        province_id = prov_info['id']
+        prov_info = await conn.fetchrow('''SELECT *
+                                           FROM cnc_provinces
+                                           WHERE id = $1;''', prov_info['id'])
         structures = [] if prov_info['structures'] is None else list(prov_info['structures'])
         # calculate dev boosting cost. base cost = current development * .75
         boost_cost = prov_info['development'] * .75
@@ -1216,14 +1218,14 @@ class DevelopmentBoostView(View):
         await conn.execute('''UPDATE cnc_provinces
                               SET development = development + 1
                               WHERE id = $1;''',
-                           province_id)
+                           prov_info['id'])
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
                                                 view=self.prov_owned_view,
                                                 embed=await create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"Successfully boosted Development at a cost of "
                                                f"{boost_cost} Political authority! "
-                                               f"The total development of {prov_info['name']} (ID: {province_id}) "
+                                               f"The total development of {prov_info['name']} (ID: {prov_info['id']}) "
                                                f"is now **{prov_info['development'] + 1}**.")
 
     @discord.ui.button(label="Military", style=discord.ButtonStyle.blurple)
@@ -1232,7 +1234,9 @@ class DevelopmentBoostView(View):
         prov_info = self.province_db
         user_info = self.user_info
         conn = self.pool
-        province_id = prov_info['id']
+        prov_info = await conn.fetchrow('''SELECT *
+                                           FROM cnc_provinces
+                                           WHERE id = $1;''', prov_info['id'])
         structures = [] if prov_info['structures'] is None else list(prov_info['structures'])
         # calculate dev boosting cost. base cost = current development * .75
         boost_cost = prov_info['development'] * .75
@@ -1265,14 +1269,14 @@ class DevelopmentBoostView(View):
         await conn.execute('''UPDATE cnc_provinces
                               SET development = development + 1
                               WHERE id = $1;''',
-                           province_id)
+                           prov_info['id'])
         # define and reset to owned province
         await interaction.response.edit_message(content=None,
                                                 view=self.prov_owned_view,
                                                 embed=await create_prov_embed(prov_info, conn))
         return await interaction.followup.send(f"Successfully boosted Development at a cost of "
                                                f"{boost_cost} Military authority! "
-                                               f"The total development of {prov_info['name']} (ID: {province_id}) "
+                                               f"The total development of {prov_info['name']} (ID: {prov_info['id']}) "
                                                f"is now **{prov_info['development'] + 1}**.")
 
     @discord.ui.button(label="Back", emoji="\U000023ea", style=discord.ButtonStyle.blurple)
@@ -5222,7 +5226,7 @@ class MilitaryAllianceButton(discord.ui.Button):
             # also look for any puppets/overlords not currently in the war
             overlord = await conn.fetchval('''SELECT name FROM cnc_users WHERE user_id = $1;''', self.user_info['overlord'])
             puppets = await conn.fetchrow('''SELECT array_agg(name) FROM cnc_users WHERE overlord = $1;''', self.user_info['user_id'])
-            # if the user has an overlord and they are not in the defenders
+            # if the user has an overlord, and they are not in the defenders
             if overlord:
                 # if they are not in the defender list, add them to the non_participants
                 if overlord not in war_info['attackers']:
