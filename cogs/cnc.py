@@ -1259,7 +1259,7 @@ class DevelopmentBoostView(View):
         if user_info['mil_auth'] < boost_cost:
             return await interaction.response.send_message(
                 f"You do not have sufficient Military authority to boost in this "
-                f"province. You are missing {boost_cost - user_info['mil_aith']} "
+                f"province. You are missing {boost_cost - user_info['mil_auth']} "
                 f"Military authority.")
         # execute orders
         await conn.execute('''UPDATE cnc_users
@@ -5232,7 +5232,7 @@ class MilitaryAllianceButton(discord.ui.Button):
                 if overlord not in war_info['attackers']:
                     non_participants.append(overlord)
             # if there are puppets
-            if puppets > 0:
+            if puppets:
                 # get the list of puppets who are not present in the war
                 puppets_to_invite = list(set(puppets).difference(set(war_info['attackers'])))
                 # if there are puppets to invite, add them to the list of invitees
