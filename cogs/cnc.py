@@ -5170,7 +5170,7 @@ class MilitaryAllianceButton(discord.ui.Button):
                 if overlord not in war_info['defenders']:
                     non_participants.append(overlord)
             # if there are puppets
-            if len(puppets) > 0:
+            if puppets:
                 # get the list of puppets who are not present in the war
                 puppets_to_invite = list(set(puppets).difference(set(war_info['defenders'])))
                 # if there are puppets to invite, add them to the list of invitees
@@ -5228,7 +5228,7 @@ class MilitaryAllianceButton(discord.ui.Button):
                 if overlord not in war_info['attackers']:
                     non_participants.append(overlord)
             # if there are puppets
-            if len(puppets) > 0:
+            if puppets > 0:
                 # get the list of puppets who are not present in the war
                 puppets_to_invite = list(set(puppets).difference(set(war_info['attackers'])))
                 # if there are puppets to invite, add them to the list of invitees
@@ -10064,7 +10064,7 @@ class CommandAndConquest(commands.Cog):
                     alliance_button = True
             # get puppets if any
             puppets = await conn.fetchval('''SELECT array_agg(name) FROM cnc_users WHERE overlord = $1;''', user_info['user_id'])
-            if len(puppets) > 0:
+            if puppets > 0:
                 # if the overlord is the attacker, check if the puppets are not in the attackers
                 if user_info['name'] in war_info['attackers'] and set(puppets).difference(set(war_info['attackers'])):
                     alliance_button = True

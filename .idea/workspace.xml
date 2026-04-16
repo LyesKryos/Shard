@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding tech check for db calls">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CNC/turn.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/turn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Government subtype/type mechanics enforcement" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -600,7 +596,7 @@
       <workItem from="1775996340527" duration="5471000" />
       <workItem from="1776118194228" duration="5887000" />
       <workItem from="1776170206901" duration="1218000" />
-      <workItem from="1776270597016" duration="1649000" />
+      <workItem from="1776270597016" duration="7966000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -945,7 +941,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1776" />
+    <option name="localTasksCounter" value="1778" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -964,8 +960,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Fixing dossier military view command" />
-    <MESSAGE value="Setting the minimum good production = 1&#10;Removing file attachments from maps" />
     <MESSAGE value="Update movement display in armies" />
     <MESSAGE value="Update gp score calculation command to display total as the total of the points" />
     <MESSAGE value="Correcting map button bug" />
@@ -989,7 +983,9 @@
     <MESSAGE value="Updating many items and debuffing" />
     <MESSAGE value="Enforcing puppet limits and adding checks for tech database calls" />
     <MESSAGE value="Adding tech check for db calls" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding tech check for db calls" />
+    <MESSAGE value="Multiple government type/subtype enforcement and tech&#10;Testing new capital enforcement&#10;Correcting several syntax blunders in turn update" />
+    <MESSAGE value="Government subtype/type mechanics enforcement" />
+    <option name="LAST_COMMIT_MESSAGE" value="Government subtype/type mechanics enforcement" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
