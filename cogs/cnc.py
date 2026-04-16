@@ -5158,8 +5158,25 @@ class MilitaryAllianceButton(discord.ui.Button):
                                             self.user_info['name'])
         # if the user is the defender, pull the defenders
         if self.user_info['name'] == self.war_info['primary_defender']:
+
             # get a list of any allied nations that are not in the war
             non_participants = list(set(alliance_info['members']).difference(set(war_info['defenders'])))
+            # also look for any puppets/overlords not currently in the war
+            overlord = await conn.fetchval('''SELECT name FROM cnc_users WHERE user_id = $1;''', self.user_info['overlord'])
+            puppets = await conn.fetchrow('''SELECT array_agg(name) FROM cnc_users WHERE overlord = $1;''', self.user_info['user_id'])
+            # if the user has an overlord and they are not in the defenders
+            if overlord:
+                # if they are not in the defender list, add them to the non_participants
+                if overlord not in war_info['defenders']:
+                    non_participants.append(overlord)
+            # if there are puppets
+            if len(puppets) > 0:
+                # get the list of puppets who are not present in the war
+                puppets_to_invite = list(set(puppets).difference(set(war_info['defenders'])))
+                # if there are puppets to invite, add them to the list of invitees
+                if len(puppets_to_invite) > 0:
+                    non_participants.append(puppets_to_invite)
+
             # for each non-participant
             for np in non_participants:
                 # get their user object
@@ -5196,10 +5213,28 @@ class MilitaryAllianceButton(discord.ui.Button):
                 # send the DM safely
                 await safe_dm(interaction.client, ally_user_info['user_id'], content=war_invitation_message,
                               embed=war_embed, view=war_invitation_view)
+
         # if the user is not the defender, they must be the attacker
         else:
+            
             # get a list of any allied nations that are not in the war
             non_participants = list(set(alliance_info['members']).difference(set(war_info['attackers'])))
+            # also look for any puppets/overlords not currently in the war
+            overlord = await conn.fetchval('''SELECT name FROM cnc_users WHERE user_id = $1;''', self.user_info['overlord'])
+            puppets = await conn.fetchrow('''SELECT array_agg(name) FROM cnc_users WHERE overlord = $1;''', self.user_info['user_id'])
+            # if the user has an overlord and they are not in the defenders
+            if overlord:
+                # if they are not in the defender list, add them to the non_participants
+                if overlord not in war_info['attackers']:
+                    non_participants.append(overlord)
+            # if there are puppets
+            if len(puppets) > 0:
+                # get the list of puppets who are not present in the war
+                puppets_to_invite = list(set(puppets).difference(set(war_info['attackers'])))
+                # if there are puppets to invite, add them to the list of invitees
+                if len(puppets_to_invite) > 0:
+                    non_participants.append(puppets_to_invite)
+
             # for each non-participant
             for np in non_participants:
                 # get their user object
