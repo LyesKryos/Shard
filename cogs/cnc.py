@@ -571,26 +571,27 @@ class MapButtons(View):
                                             u.capital                                                   as user_capital,
                                             (SELECT COUNT(*) FROM cnc_armies a WHERE a.location = p.id) as army_count
                                      FROM cnc_provinces p
+                                              LEFT JOIN cnc_users u ON u.user_id = p.owner_id
                                      WHERE (
-                                          u.capital = p.id::text
-                                          OR p.fort_level > 0
-                                          OR 'Fort' = ANY(p.structures)
-                                          OR EXISTS (SELECT 1 FROM cnc_armies a WHERE a.location = p.id)
-                                      )
-                                                             """)
+                                               (u.capital IS NOT NULL AND u.capital = p.id::text)
+                                                   OR p.fort_level > 0
+                                                   OR 'Fort' = ANY (p.structures)
+                                                   OR EXISTS (SELECT 1 FROM cnc_armies a WHERE a.location = p.id)
+                                               )
+                                     """)
 
         # Build icon data dict
         province_icons = {}
         for row in icon_rows:
             icons = {}
-            # Capital — province ID matches the user's capital
-            if str(row["user_capital"]) == row["id"] and row["capital_cords"]:
+            # Capital — only if province has an owner with this as capital
+            if row["user_capital"] and str(row["user_capital"]) == row["id"] and row["capital_cords"]:
                 icons["capital"] = row["capital_cords"]
             # Fort — fort_level > 0 or 'Fort' in structures
             if (row["fort_level"] or 0) > 0 or ("Fort" in (row["structures"] or [])):
                 if row["fort_cords"]:
                     icons["fort"] = row["fort_cords"]
-            # Army — any army present in this province
+            # Army — any army present, regardless of ownership
             if row["army_count"] > 0 and row["army_cords"]:
                 icons["army"] = row["army_cords"]
             if icons:
