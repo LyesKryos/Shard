@@ -5160,7 +5160,7 @@ class MilitaryAllianceButton(discord.ui.Button):
         if self.user_info['name'] == self.war_info['primary_defender']:
 
             # get a list of any allied nations that are not in the war
-            non_participants = list(set(alliance_info['members']).difference(set(war_info['defenders'])))
+            non_participants = list(set(alliance_info['members']).difference(set(war_info['defenders']))) if alliance_info is not None else []
             # also look for any puppets/overlords not currently in the war
             overlord = await conn.fetchval('''SELECT name FROM cnc_users WHERE user_id = $1;''', self.user_info['overlord'])
             puppets = await conn.fetchrow('''SELECT array_agg(name) FROM cnc_users WHERE overlord = $1;''', self.user_info['user_id'])
@@ -5218,7 +5218,7 @@ class MilitaryAllianceButton(discord.ui.Button):
         else:
             
             # get a list of any allied nations that are not in the war
-            non_participants = list(set(alliance_info['members']).difference(set(war_info['attackers'])))
+            non_participants = list(set(alliance_info['members']).difference(set(war_info['attackers']))) if alliance_info is not None else []
             # also look for any puppets/overlords not currently in the war
             overlord = await conn.fetchval('''SELECT name FROM cnc_users WHERE user_id = $1;''', self.user_info['overlord'])
             puppets = await conn.fetchrow('''SELECT array_agg(name) FROM cnc_users WHERE overlord = $1;''', self.user_info['user_id'])
