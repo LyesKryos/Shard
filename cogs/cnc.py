@@ -8424,7 +8424,7 @@ class CommandAndConquest(commands.Cog):
         user_embed.add_field(name="Military Access", value=f"{military_access}")
         user_embed.add_field(name="Diplomatic Relations", value=diplomatic_relations)
         user_embed.add_field(name="Trade Pacts", value=f"{trade_pacts}")
-        user_embed.add_field(name="Embargoes", value=embargoes)
+        user_embed.add_field(name="Embargoes Received", value=embargoes)
         # if the user has called their own nation, add a footnote to show that relations are disabled with their own nation
         if user_info['user_id'] == interaction.user.id:
             user_embed.set_footer(text="Diplomatic actions are disabled for your own nation.")
