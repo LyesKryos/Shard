@@ -405,7 +405,7 @@ class Turn:
                         # update the rebellious provinces
                         for prov in rebellious_provinces:
                             # update the db to set occupier = 1 (aka rebels)
-                            await conn.execute('''UPDATE cnc_provinces
+                            await conn.execute('''UPDATE cnc_provinces  
                                                   SET occupier_id = 1
                                                   WHERE id = $1;''', prov)
                         # add to DM notification

@@ -887,12 +887,18 @@ class ConstructDropdown(discord.ui.Select):
             # if the government is absolute monarchy, reduce cost by 1
             if user_info['govt_subtype'] == "Absolute":
                 structure_cost -= 1
+            # if the subtype is Nigmatūllic, reject
+            if user_info['govt_subtype'] == "Nigmatūllic":
+                return await interaction.response.send_message("Nigmatūllic governments cannot construct forts.")
         # if Machines is researched, subtract 1 from the cost, minimum 1
         if "Machines" in user_info['tech']:
             structure_cost -= 1
         # if the structure is a temple and the government subtype is Theocratic, reduce by 2
         if (structure == "Temples") and (user_info['govt_subtype'] == "Theocratic"):
             structure_cost -= 2
+        # if the structure is a temple and the government subtype is Nigmatūllic, reduce by 1
+        if (structure == "Temples") and (user_info['govt_subtype'] == "Nigmatūllic"):
+            structure_cost -= 1
         # if the structure is a city and the government subtype is Patrician, reduce by 1
         if (structure == "City") and (user_info['govt_subtype'] == "Patrician"):
             structure_cost -= 2
@@ -902,6 +908,9 @@ class ConstructDropdown(discord.ui.Select):
         # if the structure is a port or a bridge and the government subtype is Populist, reduce by 50%
         if (structure == "Port" or structure == "Bridge") and (user_info['govt_subtype'] == "Populist"):
             structure_cost *= .5
+        # if the structure is a port or a bridge and the government subtype is Tusail, reduce by 1
+        if (structure == "Port" or structure == "Bridge") and (user_info['govt_subtype'] == "Tusail"):
+            structure_cost -= 1
         # structures must cost at least one power
         if structure_cost < 0:
             structure_cost = 1
@@ -909,8 +918,8 @@ class ConstructDropdown(discord.ui.Select):
         if user_info['govt_type'] == "Tusail":
             if user_info['pol_auth'] < structure_cost:
                 return await interaction.response.send_message(content="You do not have enough "
-                                                                       "Political Authority to build that structure. You are lacking "
-                                                                       f"{structure_cost - user_info['pol_auth']} authority.")
+                                                                       "Political Authority to build that structure. "
+                                                                       f"You are lacking {structure_cost - user_info['pol_auth']} authority.")
         # check if the user has enough military authority
         elif structure_info['authority'] == "Military":
             if user_info['mil_auth'] < structure_cost:
@@ -938,6 +947,11 @@ class ConstructDropdown(discord.ui.Select):
                 return await interaction.response.send_message(content=f"You cannot build a {structure} in "
                                                                        f"{prov_info['name']}'s improper terrain.")
         if structure == "University":
+            # if the user is tusail, they cannot build universities
+            if user_info['govt_subtype'] == "Wuxing":
+                # reject
+                return await interaction.response.send_message(content=f"Wuxing governments cannot construct any "
+                                                                       f"Universities.")
             if "City" not in prov_info['structures']:
                 return await interaction.response.send_message(content=f"You must construct a City in "
                                                                        f"{prov_info['name']} before constructing a "
@@ -1088,6 +1102,7 @@ class DeconstructView(View):
 
 
 class DevelopmentBoostView(View):
+
     def __init__(self, author, province_db: asyncpg.Record, user_info: asyncpg.Record, pool: asyncpg.Pool):
         super().__init__(timeout=120)
         self.author = author
@@ -1180,7 +1195,10 @@ class DevelopmentBoostView(View):
         # add modifiers from structures
         if "Lumber Mill" in structures:
             boost_cost *= .85
-        # subtract pol boost coost
+        # add modifier from govt subtype
+        if user_info['govt_subtype'] == "Parish":
+            boost_cost *= .75
+        # subtract pol boost cost
         boost_cost -= user_info['pol_boost_cost']
         # round boost cost up
         boost_cost = math.ceil(boost_cost)
@@ -1533,7 +1551,9 @@ class UnownedProvince(View):
         self.siege = siege
 
         # check if the province is eligible for colonization
-        if self.prov_info['owner_id'] == 0 and "Colonialism" in user_info['tech']:
+        if ((self.prov_info['owner_id'] == 0) and ("Colonialism" in user_info['tech'])
+                and (user_info['govt_subtype'] not in ["Tusail", "Anarchic"])
+                and (user_info['govt_type'] != "Anarchy")):
             # create the colonize button
             self.colonize_button = discord.ui.Button(label="Colonize",
                                                      style=discord.ButtonStyle.blurple,
@@ -1602,6 +1622,9 @@ class UnownedProvince(View):
         # if the user is the confederal republic type, reduce cost by 1
         if user_info['govt_subtype'] == "Confederal":
             cost -= 1
+        # if the user is the Wuxing government type, reduce cost by 50%
+        if user_info['govt_subtype'] == "Wuxing":
+            cost *= .5
         # if the nation is overextended, increase cost by 50%
         if prov_owned_count > user_info['overextend_limit']:
             cost *= 1.5
@@ -1617,6 +1640,8 @@ class UnownedProvince(View):
         # if the user has Predatory Ethnology, add 2 to dev
         if 'Predatory Ethnology' in user_info['tech']:
             dev += 2
+        # enforce minimum of 1 cost
+        cost = max(cost, 1)
         # if all the checks pass, execute the operations
         await conn.execute('''UPDATE cnc_users
                               SET econ_auth = econ_auth - $1,
@@ -4613,12 +4638,13 @@ class WarDeclarationView(discord.ui.View):
         # establish the connection
         conn = self.conn
         # determine if the user is a direct democracy
-        if self.sender_info['govt_subtype'] == "Direct":
+        if self.sender_info['govt_subtype'] in ['Direct', 'Populist']:
             # disable the button
             button.disabled = True
             await interaction.edit_original_response(view=self)
             # reject
-            return await interaction.followup.send(f"Direct Democracies cannot declare war.", ephemeral=True)
+            return await interaction.followup.send(f"{self.sender_info['govt_subtype']} governments "
+                                                   f"cannot declare war.", ephemeral=True)
         # if no option has been selected, send message
         if self.cb_option is None:
             return await interaction.followup.send("You have not selected a Casus Belli!", ephemeral=True)
@@ -10319,12 +10345,18 @@ class CommandAndConquest(commands.Cog):
             # add a footer
             govt_embed.set_footer(text="Government modification has been disabled by a treaty.")
             return await interaction.followup.send(embed=govt_embed)
+        # if the user has the subtype in the list, do not send the view
+        if user_info['govt_subtype'] in ["Wuxing", "Populist", "Parish", "Anarchic", "Radical", "Primitivist", "Postcolonial"]:
+            # add a footer
+            govt_embed.set_footer(text=f"Government modification has been disabled your government type.")
+            return await interaction.followup.send(embed=govt_embed)
         # create view
         return await interaction.followup.send(embed=govt_embed,
                                         view=GovernmentReformMenu(interaction.user, interaction, conn, govt_embed))
 
     @cnc.command(name="designate_capital", description="Designates a province as the national capital.")
     @app_commands.describe(province_id="The province to be designated as the capital.")
+    @app_commands.check(cnc_user_check)
     @app_commands.autocomplete(province_id=owned_province_autocomplete)
     async def designate_capital(self, interaction: discord.Interaction, province_id: str):
         # defer interaction
@@ -10333,9 +10365,10 @@ class CommandAndConquest(commands.Cog):
         conn = self.bot.pool
         # pull userinfo
         user_info = await user_db_info(interaction.user.id, conn)
-        # check for registration
-        if user_info is None:
-            return await interaction.followup.send("You are not a registered member of the CNC system.")
+        # if the user is in any of the following govt subtypes
+        if user_info['govt_subtype'] in ["Wuxing", "Radical", "Primitivist", "Postcolonial"]:
+            # reject
+            return await interaction.followup.send(f"{user_info['govt_subtype']} governments cannot designate a capital.")
         # pull province info
         prov_info = await conn.fetchrow('''SELECT *
                                            FROM cnc_provinces
