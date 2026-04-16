@@ -272,7 +272,7 @@ class Turn:
             # stability losses
             econ_stab_loss = ((user['last_econ_auth_gain']*3)-9) if user['last_econ_auth_gain'] < 3 else 0
             pol_stab_loss = ((user['last_pol_auth_gain']*2)-10) if user['last_pol_auth_gain'] < 5 else 0
-            mil_stab_loss = ((user['last_mil_auth_gain']*2)-8) if user['last_mil_auth_gain'] > 4 else 0
+            mil_stab_loss = ((user['last_mil_auth_gain']*2)-8) if user['last_mil_auth_gain'] < 4 else 0
             # stability gain from "strong army"
             manpower_usage_count = await conn.fetchval('''SELECT SUM(troops)::INT FROM cnc_armies 
                                                        WHERE owner_id = $1;''', user['user_id'])

@@ -3340,7 +3340,7 @@ class CooperativeDiplomaticActions(discord.ui.View):
                                                            JOIN cnc_users u ON nation = u.name AND u.gp = TRUE ) > 0 
                                                      AND $1 = ANY(members);''', user_info['name'])
         # if there is any such or if creating one would violate the limit
-        if gp_excess_check or (user_info['gp'] and self.recipient_info['gp']):
+        if (gp_excess_check and self.recipient_info['gp']) or (user_info['gp'] and self.recipient_info['gp']):
             # disable button
             button.disabled = True
             await interaction.edit_original_response(view=self)
