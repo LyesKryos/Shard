@@ -194,12 +194,12 @@ async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> di
                          inline=False)
     prov_embed.add_field(name="Core Owner", value=owner)
     prov_embed.add_field(name="Occupier", value=occupier)
-    prov_embed.add_field(name="Troops and Armies", value=f"{troop_count} troops "
+    prov_embed.add_field(name="Troops and Armies", value=f"{troop_count:,f} troops "
                                                          f"in {army_count} armies.")
     prov_embed.add_field(name="Terrain", value=f"{await terrain_name(prov_info['terrain'], conn)}" + river)
     prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
     prov_embed.add_field(name="Citizens", value=f"{prov_info['citizens']:,}")
-    prov_embed.add_field(name="Production\n(last turn)", value=f"{prov_info['production']:,.3}")
+    prov_embed.add_field(name="Production\n(last turn)", value=f"{prov_info['production']:,}")
     prov_embed.add_field(name="Development", value=f"{prov_info['development']}")
     prov_embed.add_field(name="Structures", value=f"{structures}")
     return prov_embed
