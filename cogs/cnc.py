@@ -172,7 +172,7 @@ async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> di
     if troop_count is None:
         troop_count = 0
     else:
-        troop_count = f"{troop_count:,}"
+        troop_count = f"{troop_count:,f}"
     # parse structures
     if prov_info['structures'] is None:
         structures = "None"
@@ -194,7 +194,7 @@ async def create_prov_embed(prov_info: asyncpg.Record, conn: asyncpg.Pool) -> di
                          inline=False)
     prov_embed.add_field(name="Core Owner", value=owner)
     prov_embed.add_field(name="Occupier", value=occupier)
-    prov_embed.add_field(name="Troops and Armies", value=f"{troop_count:,f} troops "
+    prov_embed.add_field(name="Troops and Armies", value=f"{troop_count} troops "
                                                          f"in {army_count} armies.")
     prov_embed.add_field(name="Terrain", value=f"{await terrain_name(prov_info['terrain'], conn)}" + river)
     prov_embed.add_field(name="Trade Good", value=f"{prov_info['trade_good']}")
