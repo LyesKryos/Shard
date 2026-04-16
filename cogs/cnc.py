@@ -8971,6 +8971,13 @@ class CommandAndConquest(commands.Cog):
 
             # calculate and check movement cost
             movement_cost = 0.5 if 'Port' in (depart_prov_info['structures'] or []) else 1
+            # if the proper techs are included
+            if "Navigation" in user_info['tech']:
+                # reduce movement cost by 25%
+                movement_cost *= .75
+            if "Water Transportation" in user_info['tech']:
+                # reduce movement cost by 10%
+                movement_cost *= .9
             if army_info['movement'] < movement_cost:
                 return await interaction.followup.send(
                     f"The {army_info['army_name']} does not have sufficient movement to sail to "
