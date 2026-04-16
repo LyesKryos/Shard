@@ -3085,8 +3085,8 @@ class CooperativeDiplomaticActions(discord.ui.View):
             self.puppet_management_button.callback = self.puppet_callback
             self.add_item(self.puppet_management_button)
 
-        # otherwise, add the propose subjugation button
-        else:
+        # otherwise, add the propose subjugation button if the recipient is also not a great power
+        elif not puppet and not recipient_info['gp']:
             self.propose_subjugation_button = discord.ui.Button(label="Propose Subjugation",
                                                                 style=discord.ButtonStyle.blurple,
                                                                 emoji="\U0000265f")
@@ -3571,17 +3571,18 @@ class CooperativeDiplomaticActions(discord.ui.View):
         await interaction.response.defer()
         # pull user info
         user_info = await user_db_info(interaction.user.id, self.conn)
-        # if the user already has an overlord, deny
+
+        # if the recipient already has an overlord, deny
         if self.recipient_info['overlord'] is not None:
             self.propose_subjugation_button.disabled = True
             await interaction.edit_original_response(view=self)
             return await interaction.followup.send(f"{self.recipient_info['name']} already has an Overlord.")
-        
-        # if the other user is a great power, deny
-        if self.recipient_info['gp']:
+
+        # if the user is a puppet, deny
+        if user_info['overlord']:
             self.propose_subjugation_button.disabled = True
             await interaction.edit_original_response(view=self)
-            return await interaction.followup.send(f"{self.recipient_info['name']} is a Great Power and cannot be subjugated.") 
+            return await interaction.followup.send(f"{user_info['name']} is a puppet and cannot propose subjugation.")
 
         # check if the user has other puppets
         puppet_count = await self.conn.fetchval('''SELECT COUNT(user_id) FROM cnc_users WHERE overlord = $1;''',

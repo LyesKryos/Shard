@@ -1026,6 +1026,20 @@ class Turn:
                     # notify both users
                     self.user_dm_notifications[overlord['user_id']] += (f"{puppet_name['name']} has been freed from subjugation under {overlord['name']} because we held too many puppets!\n")
                     self.user_dm_notifications[freed_puppet] += f"{puppet_name['name']} has been freed from subjugation under {overlord['name']} because they held too many puppets! Our age of liberation has begun.\n"
+
+            # if a player has become a great power, remove all overlords and notify both
+            removed_overlords = await conn.fetch('''UPDATE cnc_users SET overlord = NULL 
+                                                    WHERE gp = TRUE AND overlord is not NULL 
+                                                        RETURNING user_id, name, overlord;''')
+            # for each removed overlord, notify the overlord and user
+            for overlord in removed_overlords:
+                self.user_dm_notifications[overlord['overlord']] += (f"{overlord['name']} has been removed from "
+                                                                     f"subjugation under our glorious nation "
+                                                                     f"because they became a Great Power!\n")
+                self.user_dm_notifications[overlord['user_id']] += (f"You have been removed from subjugation under "
+                                                                    f"your previous overlord because you are now "
+                                                                    f"a Great Power!\n")
+
             # wrap up
             return
 
