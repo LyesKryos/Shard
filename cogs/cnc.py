@@ -10051,6 +10051,27 @@ class CommandAndConquest(commands.Cog):
                     defensio_belli_button = False
             else:
                 defensio_belli_button = False
+
+            # check for puppets/overlord to turn on the alliance button
+            # get the overlord, if any
+            overlord = await conn.fetchval('''SELECT name FROM cnc_users WHERE user_id = $1;''', user_info['overlord'])
+            if overlord is not None:
+                # if the overlord is not in the attackers and the user is
+                if user_info['name'] in war_info['attackers'] and overlord not in war_info['attackers']:
+                    alliance_button = True
+                # same, but for the defenders
+                elif user_info['name'] in war_info['defenders'] and overlord not in war_info['defenders']:
+                    alliance_button = True
+            # get puppets if any
+            puppets = await conn.fetchval('''SELECT array_agg(name) FROM cnc_users WHERE overlord = $1;''', user_info['user_id'])
+            if len(puppets) > 0:
+                # if the overlord is the attacker, check if the puppets are not in the attackers
+                f user_info['name'] in war_info['attackers'] and set(puppets).difference(set(war_info['attackers'])):
+                    alliance_button = True
+                # same, but for the defenders
+                elif user_info['name'] in war_info['defenders'] and not set(puppets).difference(set(war_info['defenders'])):
+                    alliance_button = True
+
             # add the appropriate buttons, including the peace negotiation button
             war_options_view = WarOptionsView(interaction, conn, war_info,
                                               alliance_button, defensio_belli_button, user_info, war_embed)
