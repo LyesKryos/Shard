@@ -5186,7 +5186,7 @@ class MilitaryAllianceButton(discord.ui.Button):
                 # get their user object
                 ally_user_info = await user_db_info(np, conn)
                 # get the name of the alliance or set it as "your alliance"
-                alliance_name = alliance_info['name'] or "your alliance"
+                alliance_name = alliance_info['name'] if alliance_info is not None else "your alliance"
                 # create a small embed about the war
                 war_embed = discord.Embed(title=f"The {war_info['name']}", color=discord.Color.red(),
                                           description="An invitation to the following war has been received.")
@@ -5244,7 +5244,7 @@ class MilitaryAllianceButton(discord.ui.Button):
                 # get their user object
                 ally_user_info = await user_db_info(np, conn)
                 # get the name of the alliance or set it as "your alliance"
-                alliance_name = alliance_info['name'] or "your alliance"
+                alliance_name = alliance_info['name'] if alliance_info is not None else "your alliance"
                 # create a small embed about the war
                 war_embed = discord.Embed(title=f"The {war_info['name']}", color=discord.Color.red(),
                                           description="An invitation to the following war has been received.")
