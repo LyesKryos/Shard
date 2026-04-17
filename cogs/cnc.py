@@ -1806,12 +1806,17 @@ class DossierView(View):
         population = sum(p['citizens'] for p in province_list)
         province_count = len(province_list)
         province_list = ", ".join(str(p) for p in province_list)
+        # get city count
+        city_count = await conn.fetchval('''SELECT COUNT(id) FROM cnc_provinces 
+                                            WHERE 'City' = ANY(structures) AND owner_id = $1;''',
+                                         self.user_info['user_id'])
         # populate summary
         self.doss_embed.add_field(name="Government",
                                   value=f"{self.user_info['govt_subtype']} {self.user_info['govt_type']}")
         # populate territory and count on its own line
         self.doss_embed.add_field(name=f"Territory (Total: {province_count})", value=f"{province_list}", inline=False)
         self.doss_embed.add_field(name="Citizens", value=f"{population:,f}")
+        self.doss_embed.add_field(name="Cities", value=f"{city_count} cities")
         # send update
         await interaction.edit_original_response(embed=self.doss_embed)
 
