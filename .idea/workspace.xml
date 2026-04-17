@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Attempting to correct the tech prerequisites problem">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding transfer_troops button" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -600,7 +598,7 @@
       <workItem from="1776170206901" duration="1218000" />
       <workItem from="1776270597016" duration="7966000" />
       <workItem from="1776355783705" duration="6248000" />
-      <workItem from="1776448448076" duration="918000" />
+      <workItem from="1776448448076" duration="1181000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -945,7 +943,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1791" />
+    <option name="localTasksCounter" value="1792" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -964,7 +962,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Updating manpower gain to include the 3000 base and regeneration factor in the cap" />
     <MESSAGE value="Correcting alliance adding bug&#10;Adding maps back to map" />
     <MESSAGE value="Adding colors to some embeds&#10;Adding embargoes to dossier relations view" />
     <MESSAGE value="Adding colors to some embeds&#10;Adding embargoes to dossier relations view&#10;Correcting on_timeout for certain buttons" />
@@ -989,7 +986,8 @@
     <MESSAGE value="Adding citizens to dossier summary" />
     <MESSAGE value="Adding cities to dossier summary" />
     <MESSAGE value="Attempting to correct the tech prerequisites problem" />
-    <option name="LAST_COMMIT_MESSAGE" value="Attempting to correct the tech prerequisites problem" />
+    <MESSAGE value="Adding transfer_troops button" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding transfer_troops button" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

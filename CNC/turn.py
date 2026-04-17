@@ -1030,7 +1030,7 @@ class Turn:
             # if a player has become a great power, remove all overlords and notify both
             removed_overlords = await conn.fetch('''UPDATE cnc_users SET overlord = NULL 
                                                     WHERE gp = TRUE AND overlord is not NULL 
-                                                        RETURNING user_id, name, overlord;''')
+                                                        RETURNING OLD.user_id, OLD.name, OLD.overlord;''')
             # for each removed overlord, notify the overlord and user
             for overlord in removed_overlords:
                 self.user_dm_notifications[overlord['overlord']] += (f"{overlord['name']} has been removed from "
