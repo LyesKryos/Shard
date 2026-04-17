@@ -1807,7 +1807,7 @@ class DossierView(View):
         province_count = len(province_list)
         province_list = ", ".join(str(p) for p in province_list)
         # get city count
-        city_count = await conn.fetchval('''SELECT COUNT(id) FROM cnc_provinces 
+        city_count = await self.conn.fetchval('''SELECT COUNT(id) FROM cnc_provinces 
                                             WHERE 'City' = ANY(structures) AND owner_id = $1;''',
                                          self.user_info['user_id'])
         # populate summary
@@ -10200,7 +10200,7 @@ class CommandAndConquest(commands.Cog):
             return await interaction.followup.send(f"Our scientists have already researched that technology.",
                                                    ephemeral=True)
         # check if the user has the prerequisite tech if they are "need one"
-        if ";" in tech_info['prereqs']:
+        if "/" in tech_info['prereqs']:
             # check if the user has either tech
             prereq_techs = tech_info['prereqs'].split("/")
             if not any(tech in prereq_techs for tech in techs):

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting development boosting confirmation display" />
+    <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding cities to dossier summary" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -272,6 +272,9 @@
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
       <option name="IS_MODULE_SDK" value="false" />
@@ -594,7 +597,7 @@
       <workItem from="1776118194228" duration="5887000" />
       <workItem from="1776170206901" duration="1218000" />
       <workItem from="1776270597016" duration="7966000" />
-      <workItem from="1776355783705" duration="1971000" />
+      <workItem from="1776355783705" duration="6248000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -939,7 +942,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1782" />
+    <option name="localTasksCounter" value="1790" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -958,14 +961,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CODE_SMELLS_PROFILE" value="Default" />
-    <MESSAGE value="Correcting map button bug" />
-    <MESSAGE value="Adding development production boost to citizen production calculation" />
-    <MESSAGE value="Fix spacing issue in prohibited peace treaties list display" />
-    <MESSAGE value="Adding the proper free government change calculation to the turn update" />
-    <MESSAGE value="Adding dev boosting cost modifiers to dev boosting cost calculations" />
-    <MESSAGE value="Updating turn manpower calculations" />
-    <MESSAGE value="Updating dossier to properly display all members of all relations" />
-    <MESSAGE value="Adding proper &quot;embark&quot; calculations for army view command" />
     <MESSAGE value="Properly subtracting manpower when recruiting" />
     <MESSAGE value="Updating manpower gain to include the 3000 base and regeneration factor in the cap" />
     <MESSAGE value="Correcting alliance adding bug&#10;Adding maps back to map" />
@@ -983,7 +978,15 @@
     <MESSAGE value="Government subtype/type mechanics enforcement" />
     <MESSAGE value="Correcting the calling puppets to war" />
     <MESSAGE value="Correcting development boosting confirmation display" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting development boosting confirmation display" />
+    <MESSAGE value="Adding icons regardless of if the province is owned" />
+    <MESSAGE value="Adding propose subjugation button control" />
+    <MESSAGE value="Adding propose subjugation button control&#10;Adding great power puppet releasing on turn update" />
+    <MESSAGE value="Slightly altering nation display to show embargoes received instead of the more ambigious &quot;embargoes&quot;" />
+    <MESSAGE value="Getting only distinct trade goods for the dossier" />
+    <MESSAGE value="Updating various views and displays" />
+    <MESSAGE value="Adding citizens to dossier summary" />
+    <MESSAGE value="Adding cities to dossier summary" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding cities to dossier summary" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
