@@ -6918,13 +6918,6 @@ class ArmyActionsView(View):
         # stop listening
         self.stop()
 
-    @discord.ui.button(label="Transfer Troops", style=discord.ButtonStyle.blurple, emoji="\U0001f501")
-    async def transfer_troops(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # defer interaction
-        await interaction.response.defer()
-        # establish connection
-        conn = self.conn
-
     async def embark_army(self, interaction: discord.Interaction):
         # establish the connection
         conn = self.conn
@@ -9769,6 +9762,42 @@ class CommandAndConquest(commands.Cog):
                 battle_embed.set_footer(text=footer)
                 # return the battle embed
                 return await interaction.followup.send(embed=battle_embed)
+    
+    @cnc.command(name="transfer_troops", description="Transfers a set number of troops from one army to the other.")
+    @app_commands.autocomplete(from_army=army_autocomplete, to_army=army_autocomplete)
+    @app_commands.describe(from_army="The army to transfer troops from.", to_army="The army to transfer troops to.", transfer_amount="Amount of troops to transfer.")
+    @app_commands.check(cnc_user_check)
+    async def transfer_troops(self, interaction: discord.Interaction, from_army: int, to_army: int, transfer_amount: int):
+        # establish connection
+        conn = self.bot.pool
+        # pull user info
+        user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+        # pull army info
+        from_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', from_army)
+        # check if it exists or if the user owns it
+        if (not from_army_info) or (from_army_info['owner_id'] != interaction.user.id):
+            # reject
+            return await interaction.response.send_message(content=f"The army with the ID `{from_army}` does not exist or is not controlled by {user_info['name']}.", ephemeral=True)
+        # pull army info
+        to_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', to_army)
+        # check if it exists or if the user owns it
+        if (not to_army_info) or (to_army_info['owner_id'] != interaction.user.id):
+            # reject
+            return await interaction.response.send_message(content=f"The army with the ID `{to_army}` does not exist or is not controlled by {user_info['name']}.", ephemeral=True)
+        # check if the from army has the number of troops provided
+        if transfer_amount > from_army_info['troops']:
+            # reject
+            return await interaction.response.send_message(content=f"The {from_army_info['army_name']} does not have {transfer_amount:,f} troops to transfer.", ephemeral=True)
+        # check if the new troop amount with violate the troop limit
+        if to_army_info['troops'] + transfer_amount > user_info['army_size']:
+            # reject
+            return await interaction.response.send_message(content=f"The {to_army_info['army_name']} cannot receive {transfer_amount:,f} additional troops, as doing so would exceed the army size limit.", ephemeral=True)
+        
+        # if everything checks out, continue
+        new_amount = await conn.execute('''UPDATE cnc_armies SET troops = troops + $2 WHERE army_id = $1 RETURNING troops;''', to_army, transfer_amount)
+        # reply with new amount
+        return await interaction.response.send_message(content=f"The {from_army_info['army_name']} has received transfer orders. {transfer_amount:,f} troops have successfully arrived and reported for duty with the {to_army_info['army_name']}, increasing its strength to {new_amount['troops']:,f}.")
+
 
     @cnc.command(name="army", description="Displays information about a specific army.")
     @app_commands.autocomplete(army_id=army_autocomplete)
