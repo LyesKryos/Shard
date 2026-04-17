@@ -6918,6 +6918,13 @@ class ArmyActionsView(View):
         # stop listening
         self.stop()
 
+    @discord.ui.button(label="Transfer Troops", style=discord.ButtonStyle.blurple, emoji="\U0001f501")
+    async def transfer_troops(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer interaction
+        await interaction.response.defer()
+        # establish connection
+        conn = self.conn
+
     async def embark_army(self, interaction: discord.Interaction):
         # establish the connection
         conn = self.conn
