@@ -9772,6 +9772,10 @@ class CommandAndConquest(commands.Cog):
         conn = self.bot.pool
         # pull user info
         user_info = await user_db_info(conn=conn, user_id=interaction.user.id)
+        # check if army ids are the same
+        if from_army == to_army:
+            # reject
+            return await interaction.response.send_message(content="Your commanding officers are confused, having received orders to transfer troops to the same army in which they already serve.", ephemeral=True)
         # pull army info
         from_army_info = await conn.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''', from_army)
         # check if it exists or if the user owns it
