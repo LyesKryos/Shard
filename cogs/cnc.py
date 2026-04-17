@@ -10202,7 +10202,7 @@ class CommandAndConquest(commands.Cog):
         # check if the user has the prerequisite tech if they are "need one"
         if ";" in tech_info['prereqs']:
             # check if the user has either tech
-            prereq_techs = tech_info['prereqs'].split("; ")
+            prereq_techs = tech_info['prereqs'].split("/")
             if not any(tech in prereq_techs for tech in techs):
                 # reject
                 return await interaction.followup.send(f"{user_info['name']} does not have the prerequisite "
