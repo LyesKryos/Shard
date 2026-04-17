@@ -9791,16 +9791,16 @@ class CommandAndConquest(commands.Cog):
         # check if the from army has the number of troops provided
         if transfer_amount > from_army_info['troops']:
             # reject
-            return await interaction.response.send_message(content=f"The {from_army_info['army_name']} does not have {transfer_amount:,f} troops to transfer.", ephemeral=True)
+            return await interaction.response.send_message(content=f"The {from_army_info['army_name']} does not have {transfer_amount:,.0f} troops to transfer.", ephemeral=True)
         # check if the new troop amount with violate the troop limit
         if to_army_info['troops'] + transfer_amount > user_info['army_size']:
             # reject
-            return await interaction.response.send_message(content=f"The {to_army_info['army_name']} cannot receive {transfer_amount:,f} additional troops, as doing so would exceed the army size limit.", ephemeral=True)
+            return await interaction.response.send_message(content=f"The {to_army_info['army_name']} cannot receive {transfer_amount:,.0f} additional troops, as doing so would exceed the army size limit.", ephemeral=True)
         
         # if everything checks out, continue
         new_amount = await conn.execute('''UPDATE cnc_armies SET troops = troops + $2 WHERE army_id = $1 RETURNING troops;''', to_army, transfer_amount)
         # reply with new amount
-        return await interaction.response.send_message(content=f"The {from_army_info['army_name']} has received transfer orders. {transfer_amount:,f} troops have successfully arrived and reported for duty with the {to_army_info['army_name']}, increasing its strength to {new_amount['troops']:,f}.")
+        return await interaction.response.send_message(content=f"The {from_army_info['army_name']} has received transfer orders. {transfer_amount:,.0f} troops have successfully arrived and reported for duty with the {to_army_info['army_name']}, increasing its strength to {new_amount['troops']:,.0f}.")
 
 
     @cnc.command(name="army", description="Displays information about a specific army.")
