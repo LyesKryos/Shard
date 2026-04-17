@@ -1338,7 +1338,7 @@ class DevelopmentAppropriateView(View):
                                                 embed=await create_prov_embed(prov_info, conn))
         await interaction.followup.send(f"{auth_return} Economic authority appropriated from the "
                                         f"development of {prov_info['name']} (ID: {province_id}).")
-        self.stop()
+        return self.stop()
 
     @discord.ui.button(label="Political", style=discord.ButtonStyle.blurple)
     async def political(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -1362,8 +1362,9 @@ class DevelopmentAppropriateView(View):
         await interaction.response.edit_message(content=None,
                                                 view=self.prov_owned_view,
                                                 embed=await create_prov_embed(prov_info, conn))
-        return await interaction.followup.send(f"{auth_return} Political authority appropriated from the "
+        await interaction.followup.send(f"{auth_return} Political authority appropriated from the "
                                                f"development of {prov_info['name']} (ID: {province_id}).")
+        return self.stop()
 
     @discord.ui.button(label="Military", style=discord.ButtonStyle.blurple)
     async def military(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -1387,8 +1388,9 @@ class DevelopmentAppropriateView(View):
         await interaction.response.edit_message(content=None,
                                                 view=self.prov_owned_view,
                                                 embed=await create_prov_embed(prov_info, conn))
-        return await interaction.followup.send(f"{auth_return} Military authority appropriated from the "
+        await interaction.followup.send(f"{auth_return} Military authority appropriated from the "
                                                f"development of {prov_info['name']} (ID: {province_id}).")
+        return self.stop()
 
     @discord.ui.button(label="Back", emoji="\U000023ea", style=discord.ButtonStyle.blurple)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -1401,6 +1403,7 @@ class DevelopmentAppropriateView(View):
         for child in self.children:
             child.disabled = True
         await interaction.response.edit_message(view=self)
+        return self.stop()
 
 
 class AbandonConfirm(View):
@@ -1431,6 +1434,7 @@ class AbandonConfirm(View):
                               WHERE id = $1;''', province_id)
         await interaction.response.edit_message(content=f"{self.prov_info['name']} (ID: {province_id}) "
                                                         f"has been successfully abandoned.", view=None)
+        return self.stop()
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
     async def abandon_province_cancelled(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -1438,6 +1442,7 @@ class AbandonConfirm(View):
         await interaction.response.edit_message(content=None, embed=await create_prov_embed(self.prov_info, self.pool),
                                                 view=OwnedProvinceModifiation(self.author, self.prov_info,
                                                                               self.user_info, self.pool))
+        return self.stop()
 
 
 class OwnedProvinceModifiation(View):
@@ -1464,6 +1469,7 @@ class OwnedProvinceModifiation(View):
         # set view to the construction dropdown
         construct_view.interaction = interaction
         await interaction.response.edit_message(view=construct_view)
+        return self.stop()
 
     @discord.ui.button(label="Deconstruct", emoji="\U0001f3da", style=discord.ButtonStyle.blurple, row=1)
     async def deconstruct(self, interaction: discord.Interaction, button: discord.Button):
@@ -1477,6 +1483,7 @@ class OwnedProvinceModifiation(View):
         deconstruct_view = DeconstructView(self.author, self.prov_info, self.user_info, self.pool)
         deconstruct_view.interaction = interaction
         await interaction.response.edit_message(view=deconstruct_view)
+        return self.stop()
 
     @discord.ui.button(label="Boost Development", emoji="\U0001f4c8", style=discord.ButtonStyle.blurple, row=2)
     async def boost_dev(self, interaction: discord.Interaction, button: discord.Button):
@@ -1491,6 +1498,7 @@ class OwnedProvinceModifiation(View):
         await interaction.response.edit_message(content="**Select the type of authority to "
                                                         "spend using the buttons below.**",
                                                 view=dev_boost_view)
+        return self.stop()
 
     @discord.ui.button(label="Appropriate Development", emoji="\U0001f4c9", style=discord.ButtonStyle.blurple, row=2)
     async def appropriate_dev(self, interaction: discord.Interaction, button: discord.Button):
@@ -1515,6 +1523,7 @@ class OwnedProvinceModifiation(View):
         dev_appropriate_view.interaction = interaction
         await interaction.response.edit_message(view=dev_appropriate_view, content="**Select the type of authority to "
                                                                                    "gain using the buttons below.**")
+        return self.stop()
 
     @discord.ui.button(label="Abandon Province", emoji="\U0001f6ab", style=discord.ButtonStyle.danger, row=3)
     async def abandon_province(self, interaction: discord.Interaction, button: discord.Button):
@@ -1540,6 +1549,7 @@ class OwnedProvinceModifiation(View):
         abandon_province_view = AbandonConfirm(interaction.user, prov_info, user_info, conn)
         abandon_province_view.interaction = interaction
         await interaction.response.edit_message(view=abandon_province_view, embed=None, content="**Confirm below.**")
+        return self.stop()
 
 
 class UnownedProvince(View):
@@ -1659,6 +1669,7 @@ class UnownedProvince(View):
         await interaction.response.edit_message(content=None,
                                                 view=prov_owned_view,
                                                 embed=await create_prov_embed(prov_info, conn))
+        self.stop()
         return await interaction.followup.send(f"{prov_info['name']} (ID: {province_id}) "
                                                f"has been successfully colonized.")
 
@@ -1676,13 +1687,13 @@ class UnownedProvince(View):
         if not besieging_army:
             # reject
             self.siege_button.disabled = True
-            await interaction.followup.send(f"There is no army at {self.prov_info['name']} to besiege the fort there.",
-                                            ephemeral=True)
+            return await interaction.followup.send(f"There is no army at {self.prov_info['name']} to besiege the "
+                                                   f"fort there.", ephemeral=True)
         # check if the army is large enough
         elif besieging_army['troops'] < 1000:
             # reject
             self.siege_button.disabled = True
-            await interaction.followup.send(f"The {besieging_army['name']} does not have sufficient "
+            return await interaction.followup.send(f"The {besieging_army['name']} does not have sufficient "
                                             f"troops to besiege the fort at {self.prov_info['name']}.", ephemeral=True)
 
         # otherwise, carry on
@@ -1694,7 +1705,7 @@ class UnownedProvince(View):
                                   min(self.prov_info['development'] / 50, 0.5)), randint(100, 500)),
                 'general': None,
                 'owner_id': 0,
-                'army_name': f"Defenders of Fort {self.province_info['name']}"
+                'army_name': f"Defenders of Fort {self.prov_info['name']}",
             }
             # call the siege
             siege_victor, attacker_casualties, defender_casualties = battlesim.Battle(attacking_army=besieging_army,
@@ -1872,7 +1883,7 @@ class DossierView(View):
         self.doss_embed.add_field(name="Public Spending Cost",
                                   value=f"{self.user_info['public_spend']} Economic Authority per turn")
         self.doss_embed.add_field(name="Military Upkeep Cost",
-                                  value=f"{self.user_info['mil_upkeep']} Economic Authority per turn")
+                                  value=f"{self.user_info['mil_upkeep']} Military Authority per turn")
         # get total production and average development
         total_production = await self.conn.fetchval('''SELECT sum(production) FROM cnc_provinces 
                                                        WHERE owner_id = $1;''', self.user_info['user_id'])
