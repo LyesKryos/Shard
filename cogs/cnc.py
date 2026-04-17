@@ -5200,7 +5200,7 @@ class MilitaryAllianceButton(discord.ui.Button):
                 puppets_to_invite = list(set(puppets).difference(set(war_info['defenders'])))
                 # if there are puppets to invite, add them to the list of invitees
                 if len(puppets_to_invite) > 0:
-                    non_participants.append(puppets_to_invite)
+                    non_participants += (puppets_to_invite)
 
             # for each non-participant
             for np in non_participants:
@@ -5258,7 +5258,7 @@ class MilitaryAllianceButton(discord.ui.Button):
                 puppets_to_invite = list(set(puppets).difference(set(war_info['attackers'])))
                 # if there are puppets to invite, add them to the list of invitees
                 if len(puppets_to_invite) > 0:
-                    non_participants.append(puppets_to_invite)
+                    non_participants += (puppets_to_invite)
 
             # for each non-participant
             for np in non_participants:
@@ -10202,7 +10202,7 @@ class CommandAndConquest(commands.Cog):
         # check if the user has the prerequisite tech if they are "need one"
         if ";" in tech_info['prereqs']:
             # check if the user has either tech
-            prereq_techs = tech_info['prereqs'].split(";")
+            prereq_techs = tech_info['prereqs'].split("; ")
             if not any(tech in prereq_techs for tech in techs):
                 # reject
                 return await interaction.followup.send(f"{user_info['name']} does not have the prerequisite "
