@@ -1028,9 +1028,9 @@ class Turn:
                     self.user_dm_notifications[freed_puppet] += f"{puppet_name['name']} has been freed from subjugation under {overlord['name']} because they held too many puppets! Our age of liberation has begun.\n"
 
             # if a player has become a great power, remove all overlords and notify both
-            removed_overlords = await conn.fetch('''UPDATE cnc_users SET overlord = NULL 
-                                                    WHERE gp = TRUE AND overlord is not NULL 
-                                                        RETURNING OLD.user_id, OLD.name, OLD.overlord FROM cnc_users;''')
+            removed_overlords = await conn.fetch('''SELECT * FROM cnc_users WHERE overlord IS NOT NULL AND gp = TRUE;''')
+            await conn.fetch('''UPDATE cnc_users SET overlord = NULL 
+                                                    WHERE gp = TRUE AND overlord is not NULL;''')
             # for each removed overlord, notify the overlord and user
             for overlord in removed_overlords:
                 self.user_dm_notifications[overlord['overlord']] += (f"{overlord['name']} has been removed from "
