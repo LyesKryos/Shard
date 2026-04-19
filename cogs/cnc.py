@@ -8850,10 +8850,10 @@ class CommandAndConquest(commands.Cog):
                 # if the user does not own the province
                 if prov_info['owner_id'] != user_info['user_id']:
                     # get the user's cb
-                    cb_key = war['cb'] if user_side == 'attacker' else war.get('db')
+                    cb_key = war['cb'] if user_side == 'attacker' else war['db']
                     # get the purpose from the cb
                     if cb_key and cb_key != 'Status Quo':
-                        war_goal = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE war_goal = $1;', cb_key)
+                        war_goal = await conn.fetchval('''SELECT purpose FROM cnc_cbs WHERE war_goal = $1;''', cb_key)
                         war_goal = war_goal.lower().split(",")
                     else:
                         war_goal = []
@@ -8885,7 +8885,7 @@ class CommandAndConquest(commands.Cog):
                 # if the user does own the province
                 elif prov_info['owner_id'] == user_info['user_id']:
                     # get the enemy's cb
-                    cb_key = war['db'] if user_side == 'attacker' else war.get('cb')
+                    cb_key = war['db'] if user_side == 'attacker' else war['db']
                     # get the purpose from the cb
                     if cb_key and cb_key != 'Status Quo':
                         war_goal = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE war_goal = $1;', cb_key)
@@ -8949,7 +8949,7 @@ class CommandAndConquest(commands.Cog):
                 total_manpower = 0
 
                 # get the user's cb
-                cb_key = war['cb'] if user_side == 'attacker' else war.get('db')
+                cb_key = war['cb'] if user_side == 'attacker' else war['db']
                 # get the purpose from the cb
                 if cb_key and cb_key != 'Status Quo':
                     war_goal = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE war_goal = $1;', cb_key)
@@ -8989,7 +8989,7 @@ class CommandAndConquest(commands.Cog):
                 total_manpower = 0
 
                 # get the user's cb
-                cb_key = war['cb'] if user_side == 'attacker' else war.get('db')
+                cb_key = war['cb'] if user_side == 'attacker' else war['db']
                 # get the purpose from the cb
                 if cb_key and cb_key != 'Status Quo':
                     war_goal = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE war_goal = $1;', cb_key)
