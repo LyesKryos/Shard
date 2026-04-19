@@ -9024,7 +9024,7 @@ class CommandAndConquest(commands.Cog):
             landing = True
 
             # check if target is coastal
-            if not prov_info['coastal']:
+            if not prov_info['coast']:
                 return await interaction.followup.send(
                     f"The {army_info['army_name']} is embarked and cannot navigate to non-coastal provinces.",
                     ephemeral=True)

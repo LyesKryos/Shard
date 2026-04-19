@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Correcting the manner in which puppets are removed.">
-      <change beforePath="$PROJECT_DIR$/CNC/turn.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/turn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -600,7 +600,8 @@
       <workItem from="1776170206901" duration="1218000" />
       <workItem from="1776270597016" duration="7966000" />
       <workItem from="1776355783705" duration="6248000" />
-      <workItem from="1776448448076" duration="2006000" />
+      <workItem from="1776448448076" duration="2361000" />
+      <workItem from="1776629608514" duration="15000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -945,7 +946,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1794" />
+    <option name="localTasksCounter" value="1795" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
