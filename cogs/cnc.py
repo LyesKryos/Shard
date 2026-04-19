@@ -9292,6 +9292,8 @@ class CommandAndConquest(commands.Cog):
                                                 user_info['name'], occupier_info['name'])
                 # if there is a war between the occupier and the user
                 if war_check:
+                    # define the war
+                    war = war_check
                     # get the user's side
                     user_side = 'attacker' if user_info['name'] in war_check['attackers'] else 'defender'
                     # check the enemy ids
