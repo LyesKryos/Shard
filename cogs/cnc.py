@@ -6857,6 +6857,19 @@ class ArmyActionsView(View):
                 self.disembark_button.callback = self.disembark_army
                 self.add_item(self.disembark_button)
 
+        if self.army_info['attached']:
+            # create the detach button and add
+            self.detach_button = discord.ui.Button(label="Detach", style=discord.ButtonStyle.blurple,
+                                                   emoji="\U000026d3\U0000fe0f\U0000200d\U0001f4a5")
+            self.detach_button.callback = self.detach_army
+            self.add_item(self.detach_button)
+        else:
+            # create the attach button and add
+            self.attach_button = discord.ui.Button(label="Attach", style=discord.ButtonStyle.blurple,
+                                                   emoji="\U0001f517")
+            self.attach_button.callback = self.attach_army
+            self.add_item(self.attach_button)
+
 
     async def on_timeout(self):
         # disable all buttons
@@ -6934,13 +6947,27 @@ class ArmyActionsView(View):
             return await interaction.response.send_message(f"The {self.army_info['name']} cannot be attached to another"
                                                            f" army as it currently has attached armies.")
 
-        # defer the response and create the menu
-        await interaction.response.defer()
         # get all the user's armies
         army_list = await conn.fetch('''SELECT * FROM cnc_armies WHERE owner_id = $1;''',
                                      interaction.user.id)
+        # add and create the dropdown
+        attach_view = ArmyAttachView(parent_interaction=self.parent_interaction,
+                                     owned_armies_info=army_list,
+                                     army_id=self.army_info['army_id'],
+                                     user_id=interaction.user.id)
+        await self.parent_interaction.edit_original_response(view=attach_view)
+        # stop listening
+        self.stop()
 
-
+    async def detach_army(self, interaction: discord.Interaction):
+        # establish connection
+        conn = self.conn
+        # set the attached to none
+        await conn.execute('''UPDATE cnc_armies SET attached = NULL WHERE army_id = $1;''',
+                           self.army_info['army_id'])
+        # return to user
+        return await interaction.response.send_message(content=f"The {self.army_info['army_name']} is no longer "
+                                                               f"attached to any other army and will move independently.")
 
     async def embark_army(self, interaction: discord.Interaction):
         # establish the connection
@@ -7687,15 +7714,13 @@ class GeneralDismissView(discord.ui.View):
         return await interaction.response.send_message(content=f"General {self.general_info['name']} has been "
                                                                f"dismissed and has retired from national service.")
 
-class ArmyAttachView(discord.ui.Select):
+class ArmyAttachDropdown(discord.ui.Select):
 
-    def __init__(self, parent_interaction: discord.Interaction, owned_armies_info: list[asyncpg.Record],
-                 army_id: int, user_id: int):
+    def __init__(self, parent_interaction: discord.Interaction, owned_armies_info: list[asyncpg.Record], army_id: int):
         # define the variables
         self.parent_interaction = parent_interaction
         self.owned_armies_info = owned_armies_info
         self.army_id = army_id
-        self.user_id = user_id
 
         # create the options
         options = [discord.SelectOption(label=f"{army['army_name']} (ID: {army['army_id']})",
@@ -7704,10 +7729,77 @@ class ArmyAttachView(discord.ui.Select):
         # define the super
         super().__init__(placeholder="Select an army to attach to...", min_values=1, max_values=1, options=options)
 
+    async def callback(self, interaction: discord.Interaction):
+        # get connection
+        conn = interaction.client.pool
+        # define the option
+        host_army = self.values[0]
+        # attach to the host army
+        await conn.execute('''UPDATE cnc_armies SET attached = $2 WHERE army_id = $1;''',
+                           self.army_id, host_army)
+        # pull host army name
+        host_army_name = await conn.fetchval('''SELECT army_name FROM cnc_armies WHERE army_id = $1;''',
+                                             host_army)
+        # pull the army info
+        army_info = await interaction.client.pool.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
+                                                           self.army_id)
+        # get user info
+        user_info = await user_db_info(conn=interaction.client.pool, user_id=interaction.user.id)
+        # return to the army menu
+        army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction,
+                                           conn=interaction.client.pool,
+                                           army_info=army_info,
+                                           sailing_capable=False if "Sailing" not in user_info['tech'] else True)
+        # update the interaction
+        await self.parent_interaction.edit_original_response(view=army_action_menu)
+        # notify user and return to menu
+        return await interaction.response.send_message(content=f"The {army_info['army_name']} has been "
+                                                               f"successfully attached to the {host_army_name} (ID: "
+                                                               f"{host_army})! These armies will attempt to move and "
+                                                               f"fight together.")
 
+class ArmyAttachView(discord.ui.View):
 
+    def __init__(self, parent_interaction: discord.Interaction, owned_armies_info: list[asyncpg.Record],
+                 army_id: int, user_id: int):
+        super().__init__(timeout=120)
+        # define variables
+        self.owned_armies_info = owned_armies_info
+        self.army_id = army_id
+        self.parent_interaction = parent_interaction
+        self.user_id = user_id
 
-class ArmyAttachDropdown(discord.ui.View):
+        # add the item
+        self.add_item(ArmyAttachDropdown(parent_interaction=parent_interaction,
+                                         army_id=army_id,
+                                         owned_armies_info=owned_armies_info))
+
+    async def on_timeout(self):
+        # disable all children
+        for child in self.children:
+            child.disabled = True
+        # update view
+        return await self.parent_interaction.edit_original_response(view=self)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user.id == self.user_id
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.danger)
+    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # pull the army info
+        army_info = await interaction.client.pool.fetchrow('''SELECT * FROM cnc_armies WHERE army_id = $1;''',
+                                                           self.army_id)
+        # get user info
+        user_info = await user_db_info(conn=interaction.client.pool, user_id=interaction.user.id)
+        # return to the army menu
+        army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction,
+                                           conn=interaction.client.pool,
+                                           army_info=army_info,
+                                           sailing_capable=False if "Sailing" not in user_info['tech'] else True)
+        # update the interaction
+        await self.parent_interaction.edit_original_response(view=army_action_menu)
+        # reply
+        return await interaction.response.send_message(content="Processing...", ephemeral=True, delete_after=0.5)
 
 class ResearchingCancelView(discord.ui.View):
 
