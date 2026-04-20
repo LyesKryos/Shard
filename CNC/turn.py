@@ -326,7 +326,8 @@ class Turn:
                         # set a number of provinces as rebellious on national unrest
                         rebellious_provinces = await conn.fetchval('''SELECT array_agg(id)
                                                                    FROM cnc_provinces
-                                                                   WHERE owner_id = $1
+                                                                   WHERE owner_id = $1 
+                                                                     AND occupier_id = $1 
                                                                      AND id != $2
                                                                    ORDER BY RANDOM() limit $3;''',
                                                                 user['user_id'], user['capital'],
@@ -370,7 +371,8 @@ class Turn:
                         # set a number of provinces as rebellious on national unrest
                         rebellious_provinces = await conn.fetchval('''SELECT array_agg(id)
                                                                    FROM cnc_provinces
-                                                                   WHERE owner_id = $1
+                                                                   WHERE owner_id = $1 
+                                                                     AND occupier_id = $1
                                                                      AND id != $2
                                                                    ORDER BY RANDOM() LIMIT $3;''',
                                                                 user['user_id'], user['capital'],
@@ -387,6 +389,8 @@ class Turn:
                                             f"threaten to overthrow the legitimate government of the "
                                             f"{user['pretitle']} of {user['name']}! They have occupied these provinces:"
                                             f" {', '.join(rebellious_provinces)}.\n")
+                        # log
+                        logging.getLogger(__name__).info(f"{user['name']} | civil war triggered: {national}")
 
                 # calculate the chance for a rebellion based on the unrest
                 elif total_national_unrest > 50:
@@ -400,7 +404,8 @@ class Turn:
                         # set a number of provinces as rebellious on national unrest
                         rebellious_provinces = await conn.fetchval('''SELECT array_agg(id)
                                                                    FROM cnc_provinces
-                                                                   WHERE owner_id = $1
+                                                                   WHERE owner_id = $1 
+                                                                     AND occupier_id = $1
                                                                      AND id != $2
                                                                    ORDER BY RANDOM() LIMIT $3;''',
                                                                 user['user_id'], user['capital'],
