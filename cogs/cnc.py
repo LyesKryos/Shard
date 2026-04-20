@@ -1146,7 +1146,7 @@ class DevelopmentBoostView(View):
         if "Lumber Mill" in structures:
             boost_cost *= .85
         # subtract econ boost cost
-        boost_cost -= user_info['econ_boost_cost']
+        boost_cost += user_info['econ_boost_cost']
         # round boost cost up
         boost_cost = math.ceil(boost_cost)
         # check if user has sufficient authority
@@ -1156,9 +1156,9 @@ class DevelopmentBoostView(View):
                 f"province. You are missing {boost_cost - user_info['econ_auth']} "
                 f"Economic authority.")
         # execute orders
-        await conn.execute('''UPDATE cnc_users
+        self.user_info = await conn.execute('''UPDATE cnc_users
                               SET econ_auth = econ_auth - $1
-                              WHERE user_id = $2;''',
+                              WHERE user_id = $2 RETURNING  *;''',
                            int(boost_cost), interaction.user.id)
         await conn.execute('''UPDATE cnc_provinces
                               SET development = development + 1
@@ -1200,7 +1200,7 @@ class DevelopmentBoostView(View):
         if user_info['govt_subtype'] == "Parish":
             boost_cost *= .75
         # subtract pol boost cost
-        boost_cost -= user_info['pol_boost_cost']
+        boost_cost += user_info['pol_boost_cost']
         # round boost cost up
         boost_cost = math.ceil(boost_cost)
         # check if user has sufficient authority
@@ -1210,9 +1210,9 @@ class DevelopmentBoostView(View):
                 f"province. You are missing {boost_cost - user_info['pol_auth']} "
                 f"Political authority.")
         # execute orders
-        await conn.execute('''UPDATE cnc_users
+        self.user_info = await conn.execute('''UPDATE cnc_users
                               SET pol_auth = pol_auth - $1
-                              WHERE user_id = $2;''',
+                              WHERE user_id = $2 RETURNING *;''',
                            int(boost_cost), interaction.user.id)
         await conn.execute('''UPDATE cnc_provinces
                               SET development = development + 1
@@ -1251,7 +1251,7 @@ class DevelopmentBoostView(View):
         if "Lumber Mill" in structures:
             boost_cost *= .85
         # subtract mil boost coost
-        boost_cost -= user_info['mil_boost_cost']
+        boost_cost += user_info['mil_boost_cost']
         # round boost cost up
         boost_cost = math.ceil(boost_cost)
         # check if user has sufficient authority
@@ -1261,9 +1261,9 @@ class DevelopmentBoostView(View):
                 f"province. You are missing {boost_cost - user_info['mil_auth']} "
                 f"Military authority.")
         # execute orders
-        await conn.execute('''UPDATE cnc_users
+        self.user_info = await conn.execute('''UPDATE cnc_users
                               SET mil_auth = mil_auth - $1
-                              WHERE user_id = $2;''',
+                              WHERE user_id = $2 RETURNING *;''',
                            int(boost_cost), interaction.user.id)
         await conn.execute('''UPDATE cnc_provinces
                               SET development = development + 1
