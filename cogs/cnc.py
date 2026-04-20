@@ -6918,6 +6918,30 @@ class ArmyActionsView(View):
         # stop listening
         self.stop()
 
+    async def attach_army(self, interaction: discord.Interaction):
+        # establish the connection
+        conn = self.conn
+        # check if the army has any attached armies
+        attached_armies = await conn.fetchval('''SELECT array_agg(army_name) FROM cnc_armies WHERE attached = $1;''',
+                                              self.army_info['army_id'])
+        # if there are any
+        if attached_armies:
+            # disable the button
+            self.attach_button.disabled = True
+            # update the view
+            await self.parent_interaction.edit_original_response(view=self)
+            # reject
+            return await interaction.response.send_message(f"The {self.army_info['name']} cannot be attached to another"
+                                                           f" army as it currently has attached armies.")
+
+        # defer the response and create the menu
+        await interaction.response.defer()
+        # get all the user's armies
+        army_list = await conn.fetch('''SELECT * FROM cnc_armies WHERE owner_id = $1;''',
+                                     interaction.user.id)
+
+
+
     async def embark_army(self, interaction: discord.Interaction):
         # establish the connection
         conn = self.conn
@@ -7628,7 +7652,6 @@ class GeneralSelectView(discord.ui.View):
         # reply
         return await interaction.response.send_message(content="Processing...", ephemeral=True, delete_after=0.5)
 
-
 class GeneralDismissView(discord.ui.View):
 
     def __init__(self, parent_interaction: discord.Interaction, general_info: asyncpg.Record):
@@ -7663,6 +7686,28 @@ class GeneralDismissView(discord.ui.View):
         # return reply
         return await interaction.response.send_message(content=f"General {self.general_info['name']} has been "
                                                                f"dismissed and has retired from national service.")
+
+class ArmyAttachView(discord.ui.Select):
+
+    def __init__(self, parent_interaction: discord.Interaction, owned_armies_info: list[asyncpg.Record],
+                 army_id: int, user_id: int):
+        # define the variables
+        self.parent_interaction = parent_interaction
+        self.owned_armies_info = owned_armies_info
+        self.army_id = army_id
+        self.user_id = user_id
+
+        # create the options
+        options = [discord.SelectOption(label=f"{army['army_name']} (ID: {army['army_id']})",
+                                        value=army['army_id']) for army in owned_armies_info if army['army_id'] != army_id]
+
+        # define the super
+        super().__init__(placeholder="Select an army to attach to...", min_values=1, max_values=1, options=options)
+
+
+
+
+class ArmyAttachDropdown(discord.ui.View):
 
 class ResearchingCancelView(discord.ui.View):
 
