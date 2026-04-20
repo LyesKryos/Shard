@@ -10081,12 +10081,14 @@ class CommandAndConquest(commands.Cog):
             'primary_attacker'] else ", ".join(attackers_list)
         defenders = ", ".join([f"**{war_info['primary_defender']}**"] + defenders_others) if war_info[
             'primary_defender'] else ", ".join(defenders_list)
+        war_score = f"(A) {war_info['war_score'][0]} ⚔ {war_info['war_score'][1]} (D)"
         war_embed.add_field(name=f"The {war_info['name']}",
                             value=f"ID: {war_info['id']}\n"
                                   f"Attackers: {attackers}\n"
                                   f"Defenders: {defenders}\n"
                                   f"Casus Belli: {war_info['cb']}\n"
                                   f"Defensio Belli: {war_info['db'] or 'None'}\n"
+                                  f"War Score: {war_score}\n"
                                   f"Turns: {war_info['turns']}\n"
                                   f"Deaths: {war_info['deaths']}")
         # send the embed with the appropriate buttons
