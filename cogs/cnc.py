@@ -5902,7 +5902,7 @@ class WarOptionsView(discord.ui.View):
                             # create the options
                             nation_options = []
                             for n in all_targets:
-                                nation_options.append(discord.SelectOption(label=n['name']))
+                                nation_options.append(discord.SelectOption(label=n['target']))
                             # define the super
                             super().__init__(placeholder="Choose End Embargo Target(s)...", min_values=1,
                                              max_values=len(nation_options),
@@ -6731,7 +6731,7 @@ class AuthDemandView(discord.ui.View):
         def __init__(self):
             options = [discord.SelectOption(label=str(i), value=str(i)) for i in range(7)]
             super().__init__(
-                placeholder="Select amount of Diplomatic Authority to demand...",
+                placeholder="Select amount of Political Authority to demand...",
                 options=options,
                 row=2
             )
@@ -6749,7 +6749,7 @@ class AuthDemandView(discord.ui.View):
         # if the user has not selected one of the options as is necessary
         if None in (self.mil_authority, self.econ_authority, self.pol_authority):
             return await interaction.followup.send(
-                "You must select all three authority values first.",
+                f"You must select all three authority values first.\nMilitary Authority: {self.mil_authority}\nEconomic Authority: {self.econ_authority}\nPolitical Authority: {self.pol_authority}",
                 ephemeral=True
             )
         # otherwise, define the auths demanded
