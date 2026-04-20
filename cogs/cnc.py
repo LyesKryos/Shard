@@ -6737,7 +6737,7 @@ class AuthDemandView(discord.ui.View):
             )
 
         async def callback(self, interaction: discord.Interaction):
-            self.view.diplo_authority = self.values[0]
+            self.view.pol_authority = self.values[0]
             await interaction.response.defer()
 
     # create submit and cancel buttons
