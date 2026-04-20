@@ -10090,7 +10090,7 @@ class CommandAndConquest(commands.Cog):
                                   f"Defensio Belli: {war_info['db'] or 'None'}\n"
                                   f"War Score: {war_score}\n"
                                   f"Turns: {war_info['turns']}\n"
-                                  f"Deaths: {war_info['deaths']}")
+                                  f"Deaths: {war_info['deaths']:,f}")
         # send the embed with the appropriate buttons
         # if the user is in the war and is a primary, add the military alliance option and the peace option
         if (user_info['name'] == war_info['primary_attacker']) or (user_info['name'] == war_info['primary_defender']):
