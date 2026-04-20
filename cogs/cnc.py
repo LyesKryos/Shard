@@ -8819,7 +8819,6 @@ class CommandAndConquest(commands.Cog):
         battle = False
         enemy_army_list = []
         landing = False
-        war = None
         user_side = None
 
         # create a helper to get the enemy ids
