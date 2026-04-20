@@ -8887,7 +8887,7 @@ class CommandAndConquest(commands.Cog):
                     cb_key = war['db'] if user_side == 'attacker' else war['db']
                     # get the purpose from the cb
                     if cb_key and cb_key != 'Status Quo':
-                        war_goal = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE war_goal = $1;', cb_key)
+                        war_goal = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE name = $1;', cb_key)
                         war_goal = war_goal.lower().split(",")
                     else:
                         war_goal = []
@@ -8951,7 +8951,7 @@ class CommandAndConquest(commands.Cog):
                 cb_key = war['cb'] if user_side == 'attacker' else war['db']
                 # get the purpose from the cb
                 if cb_key and cb_key != 'Status Quo':
-                    war_goal = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE war_goal = $1;', cb_key)
+                    war_goal = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE name = $1;', cb_key)
                     war_goal = war_goal.lower().split(",")
                 else:
                     war_goal = []
@@ -8991,7 +8991,7 @@ class CommandAndConquest(commands.Cog):
                 cb_key = war['cb'] if user_side == 'attacker' else war['db']
                 # get the purpose from the cb
                 if cb_key and cb_key != 'Status Quo':
-                    war_goal = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE war_goal = $1;', cb_key)
+                    war_goal = await conn.fetchval('SELECT purpose FROM cnc_cbs WHERE name = $1;', cb_key)
                     war_goal = war_goal.lower().split(",")
                 else:
                     war_goal = []
