@@ -10060,12 +10060,23 @@ class CommandAndConquest(commands.Cog):
         # pull userinfo
         userinfo = await user_db_info(owner_id, conn)
         user = self.bot.get_user(owner_id)
+        # get attached armies, if any
+        attached_armies = await conn.fetchval('''SELECT array_agg(army_name) FROM cnc_armies WHERE attached = $1;''',
+                                              army_id)
         # build embed
         army_embed = discord.Embed(title=f"{army_name}", description=f"Information about an army (ID {army_id}).",
                                    color=discord.Color.from_str(userinfo['color']))
         army_embed.set_thumbnail(url=r"https://i.ibb.co/bbxhJtx/Command-Conquest-symbol.png")
         army_embed.add_field(name="Owner", value=f"{userinfo['name']}\n({user.mention})")
         army_embed.add_field(name="Troops", value=troops)
+        if army_info['attached']:
+            # get the attached army info and add it
+            attached_army = await conn.fetchval('''SELECT army_name FROM cnc_armies WHERE army_id = $1;''',
+                                            army_info['attached'])
+            army_embed.add_field(name="Attached to", value=f"{attached_army} (ID: {army_info['attached']}")
+        elif attached_armies:
+            # display the attached armies
+            army_embed.add_field(name="Attached Armies", value=', '.join(attached_armies))
         army_embed.add_field(name="Province Location", value=location, inline=False)
         army_embed.add_field(name="General", value=general)
         army_embed.add_field(name="Movement Available", value=round(movement,2))
