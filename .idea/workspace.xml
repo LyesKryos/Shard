@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c4c54346-296b-4b30-8591-44b9e5d672c0" name="Changes" comment="Adding attaching army mechanics">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CNC/battlesim.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNC/battlesim.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/cnc.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/cnc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -19,7 +20,7 @@
     </colors>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="1276" />
+    <option name="cachedIndexableFilesCount" value="1274" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -604,7 +605,9 @@
       <workItem from="1776448448076" duration="2361000" />
       <workItem from="1776629608514" duration="15000" />
       <workItem from="1776629658957" duration="4714000" />
-      <workItem from="1776704646191" duration="2211000" />
+      <workItem from="1776704646191" duration="2408000" />
+      <workItem from="1776790250214" duration="996000" />
+      <workItem from="1776880798141" duration="2546000" />
     </task>
     <task id="LOCAL-00654" summary="Fixing change calculations on crash">
       <created>1681298691033</created>
@@ -949,7 +952,7 @@
       <option name="project" value="LOCAL" />
       <updated>1688781185352</updated>
     </task>
-    <option name="localTasksCounter" value="1801" />
+    <option name="localTasksCounter" value="1802" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1007,6 +1010,11 @@
           <url>file://$PROJECT_DIR$/cogs/dispatch.py</url>
           <line>11</line>
           <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/cogs/cnc.py</url>
+          <line>9005</line>
+          <option name="timeStamp" value="6" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

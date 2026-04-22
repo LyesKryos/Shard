@@ -5,11 +5,12 @@ from typing import Tuple
 
 class Skirmish:
 
-    def __init__(self, attacking_army: asyncpg.Record, defending_armies: list[asyncpg.Record] | list[dict],
+    def __init__(self, attacking_army: asyncpg.Record, attached_attackers: int, defending_armies: list[asyncpg.Record] | list[dict],
                  terrain_id: int, conn: asyncpg.Pool, attack_mod: float, defense_mod: float, siege: bool = False):
         # define the class variables
         self.attacking_army = attacking_army
         self.defending_armies = defending_armies
+        self.attached_attackers = attached_attackers
         self.terrain_id = terrain_id
         self.conn = conn
         self.attack_mod = attack_mod
@@ -77,14 +78,15 @@ class Skirmish:
                                                  self.terrain_id)
 
         # === ARMY SIZE CONSIDERATIONS ===
+        total_attackers = self.attacking_army['troops'] + self.attached_attackers
         total_defenders = sum(a['troops'] for a in self.defending_armies)
         # if the attacker is larger than the defender, add commensurate to the attacker
-        if self.attacking_army['troops'] > total_defenders:
-            ratio = self.attacking_army['troops'] / total_defenders
+        if total_attackers > total_defenders:
+            ratio = total_attackers / total_defenders
             attack_roll_mod += ((ratio - 1) if ratio - 1 > .25 else 0)
         # otherwise, do the defender. if the army sizes are the same, the ratio should pan out to 0 anyway
         else:
-            ratio = total_defenders / self.attacking_army['troops']
+            ratio = total_defenders / total_attackers
             defense_roll_mod += ((ratio - 1) if ratio - 1 > .25 else 0)
 
         # === ROLLS ===
@@ -113,6 +115,7 @@ class Battle:
                  landing: bool = False, siege: bool = False):
         # define the class variables
         self.attacking_army = attacking_army
+        self.attached_attackers = []
         self.defending_armies = defending_armies
         self.province_info = province_info
         self.conn = conn
@@ -127,6 +130,10 @@ class Battle:
         Returns victor -> str = 'attacker' or 'defender' and total casualties -> int (attacker), int (defender)"""
         # establish conn
         conn = self.conn
+
+        # pull any attacking attached armies
+        self.attached_attackers = await conn.fetch('''SELECT * FROM cnc_armies WHERE attached = $1;''',
+                                                   self.attacking_army['army_id'])
 
         # === DEFENDING GENERAL INFO ===
         # get the general of the largest defending army
@@ -182,14 +189,19 @@ class Battle:
         for skirm in range(skirmishes):
             # select a terrain
             terrain_id = choice(terrain_options)
+            # attackers
+            attached_attackers = sum(a['troops'] for a in self.attached_attackers)
             # initialize the skirmish class
-            _skirmish = Skirmish(self.attacking_army, self.defending_armies, terrain_id,
+            _skirmish = Skirmish(self.attacking_army, attached_attackers, self.defending_armies, terrain_id,
                                  conn, self.attack_mod, self.defense_mod, self.siege)
 
             victor, attack_casualties_percent, defense_casualties_percent = await _skirmish.skirmish()
 
             # update the casualty tracker
-            total_attack_casualties += round(self.attacking_army['troops'] * attack_casualties_percent)
+            total_attack_casualties += round((self.attacking_army['troops'] + attached_attackers)
+                                             * attack_casualties_percent)
+            # define casualties share
+            attack_casualties_share = attack_casualties_percent/len(self.attached_attackers) + 1
 
             # tally the victory
             if victor == "attacker":
@@ -200,14 +212,17 @@ class Battle:
             # update the attacking casualties in the db
             await conn.execute('''UPDATE cnc_armies
                                   SET troops = ROUND(troops::numeric * $1::numeric)
-                                  WHERE army_id = $2;''',
-                               1 - attack_casualties_percent, self.attacking_army['army_id'])
+                                  WHERE army_id = $2 OR attached = $2;''',
+                               1 - attack_casualties_share, self.attacking_army['army_id'])
 
             # update the attacking army stats internally
             self.attacking_army = await conn.fetchrow('''SELECT *
                                                          FROM cnc_armies
                                                          WHERE army_id = $1;''',
                                                       self.attacking_army['army_id'])
+            # and do the same for the attached armies (if any)
+            self.attached_attackers = await conn.fetch('''SELECT * FROM cnc_armies WHERE attached = $1;''',
+                                                       self.attacking_army['army_id'])
 
             # get the total defense casualties and add them to the tracker
             total_defense_casualties += round(
@@ -238,7 +253,7 @@ class Battle:
 
             # === TOTAL LOSS CHECK ===
             # if any armies have 0, they are destroyed and removed from the battle
-            if self.attacking_army['troops'] <= 0:
+            if self.attacking_army['troops'] + sum(a['troops'] for a in self.attached_attackers) <= 0:
                 defense_victory_tally = float('inf')
                 break
             if sum(a['troops'] for a in self.defending_armies) <= 0:
