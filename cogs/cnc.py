@@ -6950,7 +6950,7 @@ class ArmyActionsView(View):
 
         # get all the user's armies
         army_list = await conn.fetch('''SELECT * FROM cnc_armies 
-                                        WHERE owner_id = $1 AND attached = NULL AND location = $2;''',
+                                        WHERE owner_id = $1 AND attached is NULL AND location = $2;''',
                                      interaction.user.id, self.army_info['location'])
         # if the army list is none
         if not army_list:
