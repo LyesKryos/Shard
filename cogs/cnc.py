@@ -7745,7 +7745,7 @@ class ArmyAttachDropdown(discord.ui.Select):
         # get connection
         conn = interaction.client.pool
         # define the option
-        host_army = self.values[0]
+        host_army = int(self.values[0])
         # attach to the host army
         await conn.execute('''UPDATE cnc_armies SET attached = $2 WHERE army_id = $1;''',
                            self.army_id, host_army)
