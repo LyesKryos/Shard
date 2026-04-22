@@ -6944,8 +6944,8 @@ class ArmyActionsView(View):
             # update the view
             await self.parent_interaction.edit_original_response(view=self)
             # reject
-            return await interaction.response.send_message(f"The {self.army_info['name']} cannot be attached to another"
-                                                           f" army as it currently has attached armies.",
+            return await interaction.response.send_message(f"The {self.army_info['army_name']} cannot be attached to "
+                                                           f"another army as it currently has attached armies.",
                                                            ephemeral=True)
 
         # get all the user's armies
