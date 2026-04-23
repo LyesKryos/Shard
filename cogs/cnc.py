@@ -7588,7 +7588,7 @@ class GeneralSelectMenu(discord.ui.Select):
             original_message = await self.parent_interaction.original_response()
             army_embed = original_message.embeds[0]
             # update embed
-            army_embed.set_field_at(4, name="General", value=f"{general_name}")
+            army_embed.set_field_at(3, name="General", value=f"{general_name}")
             # return to the army menu
             army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction,
                                                conn=interaction.client.pool,
@@ -7626,7 +7626,8 @@ class GeneralSelectMenu(discord.ui.Select):
                 # create the general
                 await conn.execute('''INSERT INTO cnc_generals(owner_id, type, level, army_id, name) 
                                       VALUES($1, $2, $3, $4, $5);''', user_info['user_id'],
-                                   choice(['Defensive', 'Siege', 'Assault']), user_info['gen_level'],
+                                   choice(['Assault', 'Defensive', 'Assault', 'Defensive', 'Siege']),
+                                   user_info['gen_level'],
                                    self.army_id, general_name)
                 # notify user
                 await interaction.response.send_message(f"General {general_name} has been recruited and assigned to "
@@ -7638,7 +7639,7 @@ class GeneralSelectMenu(discord.ui.Select):
                 original_message = await self.parent_interaction.original_response()
                 army_embed = original_message.embeds[0]
                 # update embed
-                army_embed.set_field_at(4, name="General", value=f"{general_name}")
+                army_embed.set_field_at(3, name="General", value=f"{general_name}")
                 # return to the army menu
                 army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction,
                                                    conn=interaction.client.pool,
@@ -8976,7 +8977,6 @@ class CommandAndConquest(commands.Cog):
         attached_armies = await conn.fetch('''SELECT * FROM cnc_armies WHERE attached = $1;''',
                                            army_info['army_id'])
         attached_total_movement = sum(a['movement'] for a in attached_armies) or 0
-        attacking_troops = army_info['troops'] + (sum(a['troops'] for a in attached_armies) or 0)
 
         # global definition of the battle and landing and armies
         battle = False
@@ -9266,7 +9266,9 @@ class CommandAndConquest(commands.Cog):
                 # update the movement and location
                 await conn.execute(
                     '''UPDATE cnc_armies SET location = $1, movement = movement - $2, embark = False 
-                       WHERE army_id = $3 OR attached = $3;''', move_to, movement_cost, army_info['army_id'])
+                       WHERE army_id = $3;''', move_to, movement_cost, army_info['army_id'])
+                await conn.execute('''UPDATE cnc_armies SET location = $1, movement = movement - $2, embark = False
+                                   WHERE attached = $3;''', move_to, movement_cost, army_info['army_id'])
 
             # if at war, handle occupation or battle
             if war is not None and not battle:
@@ -9285,7 +9287,7 @@ class CommandAndConquest(commands.Cog):
                     # update the movement and location
                     await conn.execute(
                         '''UPDATE cnc_armies SET location = $1, movement = movement - $2, embark = False 
-                           WHERE army_id = $3 OR attached = $3;''', move_to, movement_cost, army_info['army_id'])
+                           WHERE army_id = $3;''', move_to, movement_cost, army_info['army_id'])
                 # otherwise, occupy
                 else:
                     # if the province they are leaving has an unbesieged fort then it reverts
@@ -9301,7 +9303,11 @@ class CommandAndConquest(commands.Cog):
                     # update the movement and location
                     await conn.execute(
                         '''UPDATE cnc_armies SET location = $1, movement = movement - $2, embark = False
-                           WHERE army_id = $3 OR attached = $3;''', move_to, movement_cost, army_info['army_id'])
+                           WHERE army_id = $3;''', move_to, movement_cost, army_info['army_id'])
+                    # update attached armies
+                    await conn.execute(
+                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2, embark = False
+                           WHERE attached = $3;''', move_to, movement_cost, army_info['army_id'])
                     # update the occupier id
                     await conn.execute('''UPDATE cnc_provinces SET occupier_id = $2 WHERE id = $1;''',
                                        move_to, user_info['user_id'])
@@ -9328,7 +9334,10 @@ class CommandAndConquest(commands.Cog):
 
                 # update the movement cost and location
                 await conn.execute('''UPDATE cnc_armies SET movement = movement - $2, location = $3, embark = False 
-                                      WHERE army_id = $1 OR attached = $1;''', army_info['army_id'], movement_cost, move_to)
+                                      WHERE army_id = $1;''', army_info['army_id'], movement_cost, move_to)
+                # update attached movement and location
+                await conn.execute('''UPDATE cnc_armies SET movement = movement - $2, location = $3, embark = False 
+                                      WHERE attached = $1;''', army_info['army_id'], movement_cost, move_to)
                 # notify user
                 return await interaction.followup.send(
                     f"The {army_info['army_name']} has successfully landed at "
@@ -9376,7 +9385,11 @@ class CommandAndConquest(commands.Cog):
                     battle = True
                     # update the movement and location
                     await conn.execute(
-                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3 OR attached = $3;''',
+                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
+                        move_to, cost, army_info['army_id'])
+                    # update attached movement and location
+                    await conn.execute(
+                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE attached = $3;''',
                         move_to, cost, army_info['army_id'])
                 # otherwise, check for wars
                 else:
@@ -9420,7 +9433,11 @@ class CommandAndConquest(commands.Cog):
                                                    depart_prov_info['id'])
                             # update movement and location
                             await conn.execute(
-                                '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3 OR attached = $3;''',
+                                '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
+                                move_to, cost, army_info['army_id'])
+                            # update movement and location
+                            await conn.execute(
+                                '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE attached = $3;''',
                                 move_to, cost, army_info['army_id'])
                             # return success message
                             return await interaction.followup.send(
@@ -9442,7 +9459,11 @@ class CommandAndConquest(commands.Cog):
                                                depart_prov_info['id'])
                         # update movement and location
                         await conn.execute(
-                            '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3 OR attached = $3;''',
+                            '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
+                            move_to, cost, army_info['army_id'])
+                        # update attached movement and location
+                        await conn.execute(
+                            '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE attached = $3;''',
                             move_to, cost, army_info['army_id'])
                         # return success message
                         return await interaction.followup.send(
@@ -9499,7 +9520,11 @@ class CommandAndConquest(commands.Cog):
                                                depart_prov_info['id'])
                         # update movement and location
                         await conn.execute(
-                            '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3 OR attached = $3;''',
+                            '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
+                            move_to, cost, army_info['army_id'])
+                        # update attached movement and location
+                        await conn.execute(
+                            '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE attached = $3;''',
                             move_to, cost, army_info['army_id'])
                         # update the occupier
                         await conn.execute('''UPDATE cnc_provinces SET occupier_id = $2 WHERE id = $1;''',
@@ -9529,7 +9554,11 @@ class CommandAndConquest(commands.Cog):
                                            depart_prov_info['id'])
                     # update movement and location
                     await conn.execute(
-                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3 OR attached = $3;''',
+                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
+                        move_to, cost, army_info['army_id'])
+                    # update attached movement and location
+                    await conn.execute(
+                        '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE attached = $3;''',
                         move_to, cost, army_info['army_id'])
                     # return success message
                     return await interaction.followup.send(
@@ -9552,7 +9581,11 @@ class CommandAndConquest(commands.Cog):
                                        depart_prov_info['id'])
                 # update movement and location
                 await conn.execute(
-                    '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3 OR attached = $3;''',
+                    '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE army_id = $3;''',
+                    move_to, cost, army_info['army_id'])
+                # update attached movement and location
+                await conn.execute(
+                    '''UPDATE cnc_armies SET location = $1, movement = movement - $2 WHERE attached = $3;''',
                     move_to, cost, army_info['army_id'])
                 # return success message
                 return await interaction.followup.send(
@@ -9621,10 +9654,6 @@ class CommandAndConquest(commands.Cog):
 
                 # get the attacking general name
                 general_name = await conn.fetchval('''SELECT name FROM cnc_generals WHERE army_id = $1;''', army_info['army_id'])
-                                # get the names and troop count
-                attacking_armies_names = army_info['army_name'] + (", " if attached_armies else "") + ', '.join([a['army_name'] for a in attached_armies])
-                attacking_army_troops = army_info['troops'] + sum(a['troops'] for a in attached_armies)
-
                 # create the battle embed and send it
                 battle_embed = discord.Embed(title=f"The Conquest of {prov_info['name']}",
                                              description=f"A battle to conquer the province of "
@@ -9633,7 +9662,7 @@ class CommandAndConquest(commands.Cog):
                 # define the attacking attributes
                 battle_embed.add_field(name="Attacker", value=user_info['name'])
                 battle_embed.add_field(name="Attacking Army",
-                                       value=f"{attacking_armies_names}\n{attacking_army_troops:,.0f} troops")
+                                       value=f"The {army_info['army_name']}\n{army_info['troops']:,} troops")
                 battle_embed.add_field(name="General", value=(general_name if general_name is not None else "None"))
                 # define the defending attributes
                 battle_embed.add_field(name="Defenders", value="Natives")
@@ -9727,9 +9756,6 @@ class CommandAndConquest(commands.Cog):
                 # get the attacking general name
                 attacking_general = await conn.fetchval('''SELECT name FROM cnc_generals WHERE army_id = $1;''',
                                                         army_info['army_id'])
-                # get the names and troop count
-                attacking_armies_names = army_info['army_name'] + (", " if attached_armies else "") + ', '.join([a['army_name'] for a in attached_armies])
-                attacking_army_troops = army_info['troops'] + sum(a['troops'] for a in attached_armies)
 
                 # create the battle embed and send it
                 battle_embed = discord.Embed(title=f"The Battle of {prov_info['name']}",
@@ -9739,7 +9765,7 @@ class CommandAndConquest(commands.Cog):
                 # define the attacking attributes
                 battle_embed.add_field(name="Attacker", value=user_info['name'])
                 battle_embed.add_field(name="Attacking Army",
-                                       value=f"{attacking_armies_names}\n{attacking_army_troops:,.0f} troops")
+                                       value=f"The {army_info['army_name']}\n{army_info['troops']:,} troops")
                 battle_embed.add_field(name="General", value=(attacking_general if attacking_general is not None else "None"))
                 # define the defending attributes
                 battle_embed.add_field(name="Defenders", value="Natives")
@@ -9904,7 +9930,7 @@ class CommandAndConquest(commands.Cog):
                     # otherwise, retreat
                     else:
                         # retreat the attackers to whence they came
-                        await conn.execute('''UPDATE cnc_armies SET location = $2 WHERE army_id = $1 OR attached = $1;''',
+                        await conn.execute('''UPDATE cnc_armies SET location = $2 WHERE army_id = $1;''',
                                            army_info['army_id'], depart_prov_info['id'])
                         retreat_message = (f"The {army_info['army_name']} has retreated to "
                                            f"{depart_prov_info['name']} (ID: {depart_prov_info['id']})!")
@@ -9921,10 +9947,6 @@ class CommandAndConquest(commands.Cog):
                 # get the attacking general name
                 attacking_general = await conn.fetchval('''SELECT name FROM cnc_generals WHERE army_id = $1;''',
                                                         army_info['army_id'])
-                # get the names and troop count
-                attacking_armies_names = army_info['army_name'] + (", " if attached_armies else "") + ', '.join([a['army_name'] for a in attached_armies])
-                attacking_army_troops = army_info['troops'] + sum(a['troops'] for a in attached_armies)
-
                 # get the defending general name
                 defending_general = await conn.fetchval('''SELECT name FROM cnc_generals WHERE army_id = $1;''',
                                                         enemy_army_list[0]['army_id'])
@@ -9937,7 +9959,7 @@ class CommandAndConquest(commands.Cog):
                 # define the attacking attributes
                 battle_embed.add_field(name="Attacker", value=f"The {user_info['pretitle']} of {user_info['name']}")
                 battle_embed.add_field(name="Attacking Army",
-                                       value=f"{attacking_armies_names}\n{attacking_army_troops:,.0f} troops")
+                                       value=f"The {army_info['army_name']}\n{army_info['troops']:,}")
                 battle_embed.add_field(name="General", value=(attacking_general if attacking_general is not None else "None"))
                 # define the primary defender
                 primary_defender = await user_db_info(conn=conn, user_id=enemy_army_list[0]['owner_id'])
@@ -9946,7 +9968,7 @@ class CommandAndConquest(commands.Cog):
                 # define the defending attributes
                 battle_embed.add_field(name="Defending Army(s)",
                                        value=(", ".join([a['army_name'] for a in enemy_army_list]))
-                                             +f"\nTotal Force: {sum(a['troops'] for a in enemy_army_list):,.0f}")
+                                             +f"\nTotal Force: {sum(a['troops'] for a in enemy_army_list):,}")
                 battle_embed.add_field(name="General", value=(defending_general if defending_general is not None else "None"))
                 # outcome
                 war_score_emoji = "\U0001f6e1" if victor == "defender" else "\U00002694"
