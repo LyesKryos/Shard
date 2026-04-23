@@ -8976,6 +8976,7 @@ class CommandAndConquest(commands.Cog):
         attached_armies = await conn.fetch('''SELECT * FROM cnc_armies WHERE attached = $1;''',
                                            army_info['army_id'])
         attached_total_movement = sum(a['movement'] for a in attached_armies) or 0
+        attacking_troops = army_info['troops'] + (sum(a['troops'] for a in attached_armies) or 0)
 
         # global definition of the battle and landing and armies
         battle = False
@@ -9764,7 +9765,7 @@ class CommandAndConquest(commands.Cog):
                 # define the attacking attributes
                 battle_embed.add_field(name="Attacker", value=user_info['name'])
                 battle_embed.add_field(name="Attacking Army",
-                                       value=f"The {army_info['army_name']}\n{army_info['troops']:,} troops")
+                                       value=f"{army_info['army_name'] + ', '.join([a['army_name'] for a in attached_armies])}")
                 battle_embed.add_field(name="General", value=(attacking_general if attacking_general is not None else "None"))
                 # define the defending attributes
                 battle_embed.add_field(name="Defenders", value="Natives")
@@ -9958,7 +9959,7 @@ class CommandAndConquest(commands.Cog):
                 # define the attacking attributes
                 battle_embed.add_field(name="Attacker", value=f"The {user_info['pretitle']} of {user_info['name']}")
                 battle_embed.add_field(name="Attacking Army",
-                                       value=f"The {army_info['army_name']}\n{army_info['troops']:,}")
+                                       value=f"{army_info['army_name'] + ', '.join([a['army_name'] for a in attached_armies])}")
                 battle_embed.add_field(name="General", value=(attacking_general if attacking_general is not None else "None"))
                 # define the primary defender
                 primary_defender = await user_db_info(conn=conn, user_id=enemy_army_list[0]['owner_id'])

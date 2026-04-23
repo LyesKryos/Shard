@@ -201,7 +201,7 @@ class Battle:
             total_attack_casualties += round((self.attacking_army['troops'] + attached_attackers)
                                              * attack_casualties_percent)
             # define casualties share
-            attack_casualties_share = attack_casualties_percent/len(self.attached_attackers) + 1
+            attack_casualties_share = attack_casualties_percent/(len(self.attached_attackers) + 1)
 
             # tally the victory
             if victor == "attacker":
