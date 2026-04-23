@@ -7588,7 +7588,7 @@ class GeneralSelectMenu(discord.ui.Select):
             original_message = await self.parent_interaction.original_response()
             army_embed = original_message.embeds[0]
             # update embed
-            army_embed.set_field_at(3, name="General", value=f"{general_name}")
+            army_embed.set_field_at(4, name="General", value=f"{general_name}")
             # return to the army menu
             army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction,
                                                conn=interaction.client.pool,
@@ -7626,7 +7626,7 @@ class GeneralSelectMenu(discord.ui.Select):
                 # create the general
                 await conn.execute('''INSERT INTO cnc_generals(owner_id, type, level, army_id, name) 
                                       VALUES($1, $2, $3, $4, $5);''', user_info['user_id'],
-                                   choice(['Assault', 'Defensive', 'Siege']), user_info['gen_level'],
+                                   choice(['Defensive', 'Siege', 'Assault']), user_info['gen_level'],
                                    self.army_id, general_name)
                 # notify user
                 await interaction.response.send_message(f"General {general_name} has been recruited and assigned to "
@@ -7638,7 +7638,7 @@ class GeneralSelectMenu(discord.ui.Select):
                 original_message = await self.parent_interaction.original_response()
                 army_embed = original_message.embeds[0]
                 # update embed
-                army_embed.set_field_at(3, name="General", value=f"{general_name}")
+                army_embed.set_field_at(4, name="General", value=f"{general_name}")
                 # return to the army menu
                 army_action_menu = ArmyActionsView(parent_interaction=self.parent_interaction,
                                                    conn=interaction.client.pool,
