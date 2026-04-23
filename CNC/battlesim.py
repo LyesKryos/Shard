@@ -203,7 +203,8 @@ class Battle:
             # get the total number of attackers
             attacker_troop_count = self.attacking_army['troops'] + (attached_attackers if attached_attackers else 0)
             # define casualties share
-            attack_casualties_share = (attacker_troop_count * (1-attack_casualties_percent))/(len(self.attached_attackers) + 1)
+            attack_casualties_share = round((self.attacking_army['troops'] + attached_attackers)
+                                             * attack_casualties_percent/(len(self.attached_attackers) + 1))
 
             # tally the victory
             if victor == "attacker":
@@ -230,7 +231,7 @@ class Battle:
             total_defense_casualties += round(
                 sum(a['troops'] for a in self.defending_armies) * defense_casualties_percent)
             # define casualties share
-            defense_casualties_share = (sum(a['troops'] for a in self.defending_armies) * (1-defense_casualties_percent))/len(self.defending_armies)
+            defense_casualties_share = round(sum(a['troops'] for a in self.defending_armies) * defense_casualties_percent)/len(self.defending_armies)
 
             # for each of the defending armies, share the casualties
             refreshed = []
