@@ -200,8 +200,10 @@ class Battle:
             # update the casualty tracker
             total_attack_casualties += round((self.attacking_army['troops'] + attached_attackers)
                                              * attack_casualties_percent)
+            # get the total number of attackers
+            attacker_troop_count = self.attacking_army['troops'] + (sum(a['troops'] for a in attached_attackers) or 0)
             # define casualties share
-            attack_casualties_share = attack_casualties_percent/(len(self.attached_attackers) + 1)
+            attack_casualties_share = (attacker_troop_count * (1-attack_casualties_percent))/(len(attached_attackers) + 1)
 
             # tally the victory
             if victor == "attacker":
@@ -211,9 +213,9 @@ class Battle:
 
             # update the attacking casualties in the db
             await conn.execute('''UPDATE cnc_armies
-                                  SET troops = ROUND(troops::numeric * $1::numeric)
+                                  SET troops = troops - $1
                                   WHERE army_id = $2 OR attached = $2;''',
-                               1 - attack_casualties_share, self.attacking_army['army_id'])
+                                round(attack_casualties_share), self.attacking_army['army_id'])
 
             # update the attacking army stats internally
             self.attacking_army = await conn.fetchrow('''SELECT *
@@ -227,6 +229,8 @@ class Battle:
             # get the total defense casualties and add them to the tracker
             total_defense_casualties += round(
                 sum(a['troops'] for a in self.defending_armies) * defense_casualties_percent)
+            # define casualties share
+            defense_casualties_share = (sum(a['troops'] for a in self.defending_armies * (1-defense_casualties_percent)))/len(self.defending_armies)
 
             # for each of the defending armies, share the casualties
             refreshed = []
@@ -237,13 +241,11 @@ class Battle:
                     updated['troops'] = army['troops'] * (1 - defense_casualties_percent)
                     refreshed.append(updated)
                 else:
-                    # divide the percentage of casualties caught by each defending army
-                    defense_casualties_share = defense_casualties_percent / len(self.defending_armies)
                     # execute casualties
                     await conn.execute('''UPDATE cnc_armies
-                                          SET troops = ROUND(troops::numeric * $2::numeric)
+                                          SET troops = troops - $2
                                           WHERE army_id = $1;''',
-                                       army['army_id'], 1 - defense_casualties_share)
+                                       army['army_id'], defense_casualties_share)
                     army = await conn.fetchrow('''SELECT *
                                                   FROM cnc_armies
                                                   WHERE army_id = $1;''',

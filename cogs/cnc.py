@@ -9756,6 +9756,7 @@ class CommandAndConquest(commands.Cog):
                 # get the attacking general name
                 attacking_general = await conn.fetchval('''SELECT name FROM cnc_generals WHERE army_id = $1;''',
                                                         army_info['army_id'])
+                attacking_armies_names = army_info['army_name'] + (", " if attached_armies else "") + ', '.join([a['army_name'] for a in attached_armies])
 
                 # create the battle embed and send it
                 battle_embed = discord.Embed(title=f"The Battle of {prov_info['name']}",
@@ -9765,7 +9766,7 @@ class CommandAndConquest(commands.Cog):
                 # define the attacking attributes
                 battle_embed.add_field(name="Attacker", value=user_info['name'])
                 battle_embed.add_field(name="Attacking Army",
-                                       value=f"{army_info['army_name'] + ', '.join([a['army_name'] for a in attached_armies])}")
+                                       value=f"{attacking_armies_names}")
                 battle_embed.add_field(name="General", value=(attacking_general if attacking_general is not None else "None"))
                 # define the defending attributes
                 battle_embed.add_field(name="Defenders", value="Natives")
@@ -9947,6 +9948,8 @@ class CommandAndConquest(commands.Cog):
                 # get the attacking general name
                 attacking_general = await conn.fetchval('''SELECT name FROM cnc_generals WHERE army_id = $1;''',
                                                         army_info['army_id'])
+                attacking_armies_names = army_info['army_name'] + (", " if attached_armies else "") + ', '.join([a['army_name'] for a in attached_armies])
+
                 # get the defending general name
                 defending_general = await conn.fetchval('''SELECT name FROM cnc_generals WHERE army_id = $1;''',
                                                         enemy_army_list[0]['army_id'])
@@ -9959,7 +9962,7 @@ class CommandAndConquest(commands.Cog):
                 # define the attacking attributes
                 battle_embed.add_field(name="Attacker", value=f"The {user_info['pretitle']} of {user_info['name']}")
                 battle_embed.add_field(name="Attacking Army",
-                                       value=f"{army_info['army_name'] + ', '.join([a['army_name'] for a in attached_armies])}")
+                                       value=f"{attacking_armies_names}")
                 battle_embed.add_field(name="General", value=(attacking_general if attacking_general is not None else "None"))
                 # define the primary defender
                 primary_defender = await user_db_info(conn=conn, user_id=enemy_army_list[0]['owner_id'])
