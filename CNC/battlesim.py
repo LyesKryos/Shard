@@ -230,7 +230,7 @@ class Battle:
             total_defense_casualties += round(
                 sum(a['troops'] for a in self.defending_armies) * defense_casualties_percent)
             # define casualties share
-            defense_casualties_share = (sum(a['troops'] for a in self.defending_armies) * (1-defense_casualties_percent)))/len(self.defending_armies)
+            defense_casualties_share = (sum(a['troops'] for a in self.defending_armies) * (1-defense_casualties_percent))/len(self.defending_armies)
 
             # for each of the defending armies, share the casualties
             refreshed = []
