@@ -1126,9 +1126,8 @@ class DevelopmentBoostView(View):
 
     @discord.ui.button(label="Economic", style=discord.ButtonStyle.blurple)
     async def economic(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # define province variables
-        prov_info = self.province_db
-        user_info = self.user_info
+        # define  variables
+        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
         conn = self.pool
         prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', prov_info['id'])
         structures = [] if prov_info['structures'] is None else list(prov_info['structures'])
@@ -1156,10 +1155,6 @@ class DevelopmentBoostView(View):
                 f"province. You are missing {boost_cost - user_info['econ_auth']} "
                 f"Economic authority.")
         # execute orders
-        self.user_info = await conn.execute('''UPDATE cnc_users
-                              SET econ_auth = econ_auth - $1
-                              WHERE user_id = $2 RETURNING  *;''',
-                           int(boost_cost), interaction.user.id)
         await conn.execute('''UPDATE cnc_provinces
                               SET development = development + 1
                               WHERE id = $1;''',
@@ -1175,9 +1170,8 @@ class DevelopmentBoostView(View):
 
     @discord.ui.button(label="Political", style=discord.ButtonStyle.blurple)
     async def political(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # define province variables
-        prov_info = self.province_db
-        user_info = self.user_info
+        # define  variables
+        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
         conn = self.pool
         prov_info = await conn.fetchrow('''SELECT *
                                            FROM cnc_provinces
@@ -1209,11 +1203,6 @@ class DevelopmentBoostView(View):
                 f"You do not have sufficient Political authority to boost in this "
                 f"province. You are missing {boost_cost - user_info['pol_auth']} "
                 f"Political authority.")
-        # execute orders
-        self.user_info = await conn.execute('''UPDATE cnc_users
-                              SET pol_auth = pol_auth - $1
-                              WHERE user_id = $2 RETURNING *;''',
-                           int(boost_cost), interaction.user.id)
         await conn.execute('''UPDATE cnc_provinces
                               SET development = development + 1
                               WHERE id = $1;''',
@@ -1229,9 +1218,8 @@ class DevelopmentBoostView(View):
 
     @discord.ui.button(label="Military", style=discord.ButtonStyle.blurple)
     async def military(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # define province variables
-        prov_info = self.province_db
-        user_info = self.user_info
+        # define variables
+        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
         conn = self.pool
         prov_info = await conn.fetchrow('''SELECT *
                                            FROM cnc_provinces
@@ -1261,10 +1249,6 @@ class DevelopmentBoostView(View):
                 f"province. You are missing {boost_cost - user_info['mil_auth']} "
                 f"Military authority.")
         # execute orders
-        self.user_info = await conn.execute('''UPDATE cnc_users
-                              SET mil_auth = mil_auth - $1
-                              WHERE user_id = $2 RETURNING *;''',
-                           int(boost_cost), interaction.user.id)
         await conn.execute('''UPDATE cnc_provinces
                               SET development = development + 1
                               WHERE id = $1;''',
