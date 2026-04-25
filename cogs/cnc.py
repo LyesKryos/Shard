@@ -1122,14 +1122,15 @@ class DevelopmentBoostView(View):
         for child in self.children:
             child.disabled = True
         # update the view
-        return await interaction.edit_original_response(view=self, content=None)
+        return await self.edit_original_response(view=self, content=None)
 
     @discord.ui.button(label="Economic", style=discord.ButtonStyle.blurple)
     async def economic(self, interaction: discord.Interaction, button: discord.ui.Button):
         # define  variables
-        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
         conn = self.pool
-        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''', prov_info['id'])
+        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''',
+                                        self.province_db['id'])
         structures = [] if prov_info['structures'] is None else list(prov_info['structures'])
         # calculate dev boosting cost. base cost = current development * .75
         boost_cost = prov_info['development'] * .75
@@ -1171,11 +1172,10 @@ class DevelopmentBoostView(View):
     @discord.ui.button(label="Political", style=discord.ButtonStyle.blurple)
     async def political(self, interaction: discord.Interaction, button: discord.ui.Button):
         # define  variables
-        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
         conn = self.pool
-        prov_info = await conn.fetchrow('''SELECT *
-                                           FROM cnc_provinces
-                                           WHERE id = $1;''', prov_info['id'])
+        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''',
+                                        self.province_db['id'])
         structures = [] if prov_info['structures'] is None else list(prov_info['structures'])
         # calculate dev boosting cost. base cost = current development * .75
         boost_cost = prov_info['development'] * .75
@@ -1218,12 +1218,11 @@ class DevelopmentBoostView(View):
 
     @discord.ui.button(label="Military", style=discord.ButtonStyle.blurple)
     async def military(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # define variables
-        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        # define  variables
         conn = self.pool
-        prov_info = await conn.fetchrow('''SELECT *
-                                           FROM cnc_provinces
-                                           WHERE id = $1;''', prov_info['id'])
+        user_info = await conn.fetchrow('''SELECT * FROM cnc_users WHERE user_id = $1;''', interaction.user.id)
+        prov_info = await conn.fetchrow('''SELECT * FROM cnc_provinces WHERE id = $1;''',
+                                        self.province_db['id'])
         structures = [] if prov_info['structures'] is None else list(prov_info['structures'])
         # calculate dev boosting cost. base cost = current development * .75
         boost_cost = prov_info['development'] * .75
