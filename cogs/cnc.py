@@ -1122,7 +1122,7 @@ class DevelopmentBoostView(View):
         for child in self.children:
             child.disabled = True
         # update the view
-        return await self.interaction.edit_original_response(view=self, content=None)
+        return await interaction.edit_original_response(view=self, content=None)
 
     @discord.ui.button(label="Economic", style=discord.ButtonStyle.blurple)
     async def economic(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -8983,6 +8983,7 @@ class CommandAndConquest(commands.Cog):
         enemy_army_list = []
         landing = False
         user_side = None
+        war = None
 
         # create a helper to get the enemy ids
         async def get_enemy_ids(war: asyncpg.Record, user_name: str) -> List[int]:
