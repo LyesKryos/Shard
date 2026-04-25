@@ -9312,7 +9312,8 @@ class CommandAndConquest(commands.Cog):
 
                 # update the movement cost and location
                 await conn.execute('''UPDATE cnc_armies SET movement = movement - $2, location = $3, embark = False 
-                                      WHERE army_id = $1 OR attached = $3;''', army_info['army_id'], movement_cost, move_to)
+                                      WHERE army_id = $1 OR attached = $1;''', army_info['army_id'],
+                                   movement_cost, move_to)
                 # notify user
                 return await interaction.followup.send(
                     f"The {army_info['army_name']} has successfully landed at "
